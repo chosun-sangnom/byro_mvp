@@ -1,12 +1,12 @@
 'use client'
 
 import MobileFrame from '@/components/layout/MobileFrame'
-import HomeScreen from '@/components/screens/HomeScreen'
+import MyByro from '@/components/screens/me/MyByro'
 
-export default function HomePage() {
+export default function MePage() {
   return (
     <MobileFrame>
-      <HomeScreen />
+      <MyByro />
     </MobileFrame>
   )
 }

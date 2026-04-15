@@ -1,12 +1,12 @@
 'use client'
 
 import MobileFrame from '@/components/layout/MobileFrame'
-import HomeScreen from '@/components/screens/HomeScreen'
+import Archive from '@/components/screens/archive/Archive'
 
-export default function HomePage() {
+export default function ArchivePage() {
   return (
     <MobileFrame>
-      <HomeScreen />
+      <Archive />
     </MobileFrame>
   )
 }

@@ -36,6 +36,7 @@ export default function MyByro() {
   const [sectionOrder, setSectionOrder] = useState<SectionKey[]>(['sns', 'highlight', 'reputation', 'guestbook'])
   const dragItem = useRef<SectionKey | null>(null)
   const dragOver = useRef<SectionKey | null>(null)
+  const sectionRefs = useRef<Map<SectionKey, HTMLElement>>(new Map())
 
   if (!store.isLoggedIn) return null
   const user = store.user!
@@ -63,6 +64,36 @@ export default function MyByro() {
     dragOver.current = null
     showToast('블럭 순서가 변경됐어요')
   }
+  const handleTouchStart = (key: SectionKey) => {
+    dragItem.current = key
+  }
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const touch = e.touches[0]
+    for (const [sectionKey, el] of Array.from(sectionRefs.current.entries())) {
+      const rect = el.getBoundingClientRect()
+      if (touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+        dragOver.current = sectionKey
+        break
+      }
+    }
+  }
+  const handleTouchEnd = () => {
+    if (!dragItem.current || !dragOver.current || dragItem.current === dragOver.current) {
+      dragItem.current = null
+      dragOver.current = null
+      return
+    }
+    const nextOrder = [...sectionOrder]
+    const from = nextOrder.indexOf(dragItem.current)
+    const to = nextOrder.indexOf(dragOver.current)
+    nextOrder.splice(from, 1)
+    nextOrder.splice(to, 0, dragItem.current)
+    setSectionOrder(nextOrder)
+    dragItem.current = null
+    dragOver.current = null
+    showToast('블럭 순서가 변경됐어요')
+  }
+
   const moveSection = (key: SectionKey, direction: 'up' | 'down') => {
     const nextOrder = [...sectionOrder]
     const from = nextOrder.indexOf(key)
@@ -144,6 +175,7 @@ export default function MyByro() {
           {sectionOrder.map((key) => (
             <div
               key={key}
+              ref={(el) => { if (el) sectionRefs.current.set(key, el) }}
               className="mb-1"
               draggable
               onDragStart={() => handleDragStart(key)}
@@ -152,7 +184,13 @@ export default function MyByro() {
               onDragOver={(e) => e.preventDefault()}
             >
               <div className="flex items-center py-2.5 border-b border-[#f5f5f5]">
-                <span className="mr-2 text-[#BBB] cursor-grab select-none">≡</span>
+                <span
+                  className="mr-2 text-[#BBB] cursor-grab select-none"
+                  style={{ touchAction: 'none' }}
+                  onTouchStart={() => handleTouchStart(key)}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                >≡</span>
                 <span className="mr-2">
                   {key === 'sns' && '📱'}
                   {key === 'highlight' && '✨'}

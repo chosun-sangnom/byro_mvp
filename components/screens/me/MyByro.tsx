@@ -44,6 +44,7 @@ export default function MyByro() {
   const linkedinConnected = store.linkedinConnected || SAMPLE_PROFILE.linkedinConnected
   const currentKeywords = user.selectedKeywords ?? SAMPLE_PROFILE.selectedKeywords
   const avatarColor = user.avatarColor ?? AVATAR_COLORS[0]
+  const avatarImage = user.avatarImage
   const allHighlights = [...SAMPLE_PROFILE.manualHighlights, ...store.highlights]
   const connectedSnsCount = Number(instagramConnected) + Number(linkedinConnected)
   const totalReputationCount = SAMPLE_PROFILE.reputationKeywords.reduce((sum, item) => sum + item.count, 0)
@@ -72,7 +73,6 @@ export default function MyByro() {
     setSectionOrder(nextOrder)
     showToast('블럭 순서가 변경됐어요')
   }
-
   // ── 화면 분기 ──────────────────────────────────────────────
   if (screen === 'editBasic') {
     return <BasicInfoEditScreen user={user} avatarColor={avatarColor} currentKeywords={currentKeywords} onBack={() => setScreen('main')} />
@@ -119,7 +119,11 @@ export default function MyByro() {
               className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-black text-[#555] flex-shrink-0"
               style={{ backgroundColor: avatarColor }}
             >
-              {user.name.charAt(0)}
+              {avatarImage ? (
+                <img src={avatarImage} alt={`${user.name} 프로필 사진`} className="w-full h-full rounded-full object-cover" />
+              ) : (
+                user.name.charAt(0)
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-base font-black">{user.name}</div>
@@ -335,7 +339,7 @@ function ExpandablePreviewRow({
 function BasicInfoEditScreen({
   user, avatarColor, currentKeywords, onBack,
 }: {
-  user: { name: string; linkId: string; title: string; school: string; bio: string; selectedKeywords?: string[]; avatarColor?: string }
+  user: { name: string; linkId: string; title: string; school: string; bio: string; selectedKeywords?: string[]; avatarColor?: string; avatarImage?: string }
   avatarColor: string
   currentKeywords: string[]
   onBack: () => void
@@ -346,8 +350,10 @@ function BasicInfoEditScreen({
   const [bio, setBio] = useState(user.bio)
   const [keywords, setKeywords] = useState<string[]>([...currentKeywords])
   const [color, setColor] = useState(avatarColor)
+  const [avatarImage, setAvatarImage] = useState(user.avatarImage ?? '')
   const [kwPickerOpen, setKwPickerOpen] = useState(false)
   const [pickerTempKw, setPickerTempKw] = useState<string[]>([])
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const removeKw = (kw: string) => setKeywords((prev) => prev.filter((k) => k !== kw))
 
@@ -373,10 +379,30 @@ function BasicInfoEditScreen({
   }
 
   const handleSave = () => {
-    store.updateUserInfo({ title, school, bio, avatarColor: color })
+    store.updateUserInfo({ title, school, bio, avatarColor: color, avatarImage })
     store.updateUserKeywords(keywords)
     showToast('저장됐어요!')
     onBack()
+  }
+
+  const handleAvatarFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      showToast('이미지 파일만 업로드할 수 있어요')
+      event.target.value = ''
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setAvatarImage(reader.result)
+        showToast('사진이 적용됐어요')
+      }
+    }
+    reader.readAsDataURL(file)
+    event.target.value = ''
   }
 
   return (
@@ -393,7 +419,11 @@ function BasicInfoEditScreen({
           <div className="flex flex-col items-center mb-6">
             <div className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-black text-[#555] mb-2"
               style={{ backgroundColor: color }}>
-              {user.name.charAt(0)}
+              {avatarImage ? (
+                <img src={avatarImage} alt={`${user.name} 프로필 사진`} className="w-full h-full rounded-full object-cover" />
+              ) : (
+                user.name.charAt(0)
+              )}
             </div>
             <div className="flex gap-2 mb-2">
               {AVATAR_COLORS.map((c) => (
@@ -402,7 +432,17 @@ function BasicInfoEditScreen({
                   style={{ backgroundColor: c, borderColor: color === c ? '#0A0A0A' : 'transparent' }} />
               ))}
             </div>
-            <button className="flex items-center gap-1 text-xs text-[#555]">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleAvatarFileChange}
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-1 text-xs text-[#555]"
+            >
               <Camera size={12} /> 사진 변경
             </button>
           </div>

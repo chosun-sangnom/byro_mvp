@@ -81,4 +81,5 @@ export interface UserState {
   bio: string
   selectedKeywords: string[]
   avatarColor?: string
+  avatarImage?: string
 }

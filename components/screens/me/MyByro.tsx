@@ -62,6 +62,16 @@ export default function MyByro() {
     dragOver.current = null
     showToast('블럭 순서가 변경됐어요')
   }
+  const moveSection = (key: SectionKey, direction: 'up' | 'down') => {
+    const nextOrder = [...sectionOrder]
+    const from = nextOrder.indexOf(key)
+    const to = direction === 'up' ? from - 1 : from + 1
+    if (from < 0 || to < 0 || to >= nextOrder.length) return
+    const [item] = nextOrder.splice(from, 1)
+    nextOrder.splice(to, 0, item)
+    setSectionOrder(nextOrder)
+    showToast('블럭 순서가 변경됐어요')
+  }
 
   // ── 화면 분기 ──────────────────────────────────────────────
   if (screen === 'editBasic') {
@@ -116,6 +126,12 @@ export default function MyByro() {
               <div className="text-sm text-[#555]">{user.title}</div>
               {user.school && <div className="text-xs text-[#888]">🎓 {user.school}</div>}
               {user.bio && <p className="text-xs text-[#555] mt-1 leading-relaxed line-clamp-2">{user.bio}</p>}
+              <button
+                onClick={() => setScreen('editBasic')}
+                className="mt-2 text-xs border border-[#D8D8D8] rounded-full px-3 py-1 text-[#555]"
+              >
+                기본정보 편집
+              </button>
             </div>
           </div>
         </div>
@@ -147,6 +163,22 @@ export default function MyByro() {
                     {key === 'reputation' && `방문자가 남긴 키워드 ${totalReputationCount}회`}
                     {key === 'guestbook' && `최근 메시지 ${SAMPLE_PROFILE.guestbook.length}개`}
                   </div>
+                </div>
+                <div className="flex items-center gap-1 mr-2">
+                  <button
+                    onClick={() => moveSection(key, 'up')}
+                    disabled={sectionOrder.indexOf(key) === 0}
+                    className="w-6 h-6 text-[10px] border border-[#DDD] rounded text-[#777] disabled:opacity-30"
+                  >
+                    ↑
+                  </button>
+                  <button
+                    onClick={() => moveSection(key, 'down')}
+                    disabled={sectionOrder.indexOf(key) === sectionOrder.length - 1}
+                    className="w-6 h-6 text-[10px] border border-[#DDD] rounded text-[#777] disabled:opacity-30"
+                  >
+                    ↓
+                  </button>
                 </div>
                 {(key === 'sns' || key === 'highlight' || key === 'reputation') && (
                   <button

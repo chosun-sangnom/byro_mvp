@@ -428,7 +428,24 @@ function Step5SNS() {
 function Step6Highlight() {
   const store = useByroStore()
   const [sheetOpen, setSheetOpen] = useState(false)
-  const [certModalOpen, setCertModalOpen] = useState(false)
+  const certItems = [
+    {
+      icon: '💼',
+      title: '재직기간 인증',
+      sub: '건강보험공단 기준으로 재직 지속 기간 확인',
+      badge: '인증 가능',
+      docLabel: '건강보험 관련 재직 증빙',
+    },
+    {
+      icon: '🤝',
+      title: '리멤버 직업 네트워크',
+      sub: '리멤버 앱 명함 내보내기로 네트워크 인증',
+      badge: '인증 가능',
+      docLabel: '리멤버 명함 내보내기 파일',
+    },
+  ] as const
+  const [selectedCert, setSelectedCert] = useState<(typeof certItems)[number] | null>(null)
+  const certModalOpen = selectedCert !== null
 
   // 직접 입력 폼 상태
   const [selectedCat, setSelectedCat] = useState<typeof HIGHLIGHT_CATEGORIES[0] | null>(null)
@@ -467,11 +484,7 @@ function Step6Highlight() {
 
         {/* 인증 가능 항목 */}
         <div className="space-y-2 mb-4">
-          {[
-            { icon: '💼', title: '재직 이력', sub: '재직증명서 인증', badge: '인증 가능' },
-            { icon: '🎓', title: '학력', sub: '학위증명서 인증', badge: '인증 가능' },
-            { icon: '📜', title: '자격증', sub: '자격증 사본 인증', badge: '인증 가능' },
-          ].map((item) => (
+          {certItems.map((item) => (
             <SelectionCard
               key={item.title}
               icon={item.icon}
@@ -480,7 +493,7 @@ function Step6Highlight() {
               badge={item.badge}
             >
               <button
-                onClick={() => setCertModalOpen(true)}
+                onClick={() => setSelectedCert(item)}
                 className="text-xs text-white bg-[#0A0A0A] rounded-lg px-3 py-1.5"
               >
                 인증하기
@@ -523,17 +536,17 @@ function Step6Highlight() {
       </div>
 
       {/* 인증 이메일 모달 */}
-      <Modal open={certModalOpen} onClose={() => setCertModalOpen(false)}>
+      <Modal open={certModalOpen} onClose={() => setSelectedCert(null)}>
         <div className="text-center">
           <div className="text-xl mb-3">📧</div>
           <div className="text-sm font-black mb-2">인증 서류 발송</div>
           <div className="text-xs text-[#555] leading-relaxed mb-4">
-            아래 이메일로 재직증명서를<br />발송해주세요.
+            아래 이메일로 {selectedCert?.docLabel ?? '인증 자료를'}<br />발송해주세요.
           </div>
           <div className="bg-[#f8f8f8] rounded-xl px-3 py-2 text-sm font-mono text-[#0A0A0A] mb-4">
             gangjunmin@data.byro.io
           </div>
-          <Button onClick={() => setCertModalOpen(false)}>확인</Button>
+          <Button onClick={() => setSelectedCert(null)}>확인</Button>
         </div>
       </Modal>
 

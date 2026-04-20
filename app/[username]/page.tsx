@@ -1,7 +1,12 @@
 'use client'
 
+import AppShell from '@/components/layout/AppShell'
 import PublicProfile from '@/components/screens/profile/PublicProfile'
 
 export default function UserPage({ params }: { params: { username: string } }) {
-  return <PublicProfile username={params.username} />
+  return (
+    <AppShell>
+      <PublicProfile username={params.username} />
+    </AppShell>
+  )
 }

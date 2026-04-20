@@ -55,7 +55,6 @@ export const HIGHLIGHT_CATEGORIES = [
   { id: 'collab',    icon: '🤝', label: '협업 프로젝트' },
   { id: 'award',     icon: '🏆', label: '수상 / 표창' },
   { id: 'publish',   icon: '📝', label: '출판 / 기고' },
-  { id: 'patent',    icon: '💡', label: '특허 / 발명' },
   { id: 'volunteer', icon: '🌱', label: '봉사 / 사회공헌' },
   { id: 'edu',       icon: '📚', label: '강의 / 교육' },
   { id: 'other',     icon: '⭐', label: '기타' },
@@ -72,6 +71,11 @@ export const SAMPLE_PROFILE = {
   instagramConnected: true,
   linkedinConnected: true,
   careerHighlight: { avgYears: 4.2, vsIndustryPercent: 128 },
+  corporateHighlight: {
+    companyCount: 2,
+    averageOperatingYears: 5,
+    summary: '2개 법인 · 평균 운영 5년 · 모두 정상 운영 중',
+  },
   rememberHighlight: {
     total: 247,
     industries: [
@@ -79,6 +83,14 @@ export const SAMPLE_PROFILE = {
       { name: '마케팅',   ratio: 24 },
       { name: 'IT',      ratio: 22 },
       { name: '투자',    ratio: 16 },
+    ],
+  },
+  airlineHighlight: {
+    tierSummary: '대한항공 모닝캄 · 아시아나 다이아몬드',
+    badgeLevel: 'global_business',
+    airlines: [
+      { name: '대한항공', tier: '모닝캄' },
+      { name: '아시아나', tier: '다이아몬드' },
     ],
   },
   manualHighlights: [
@@ -129,6 +141,18 @@ export const JIMIN_PROFILE = {
   selectedKeywords: ['전문적인', '신뢰할 수 있는', '통찰력 있는'],
   instagramConnected: true,
   linkedinConnected: false,
+  corporateHighlight: {
+    companyCount: 1,
+    years: 4,
+    summary: '창업 4년차 · 정상 운영 중 · 폐업 이력 없음',
+  },
+  airlineHighlight: {
+    tierSummary: '대한항공 모닝캄',
+    badgeLevel: 'business_traveler',
+    airlines: [
+      { name: '대한항공', tier: '모닝캄' },
+    ],
+  },
   instagram: {
     username: 'jimin_lee',
     profileUrl: 'https://www.instagram.com/jimin_lee/',

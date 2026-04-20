@@ -1,7 +1,12 @@
 'use client'
 
+import AppShell from '@/components/layout/AppShell'
 import OnboardingScreen from '@/components/screens/onboarding/OnboardingScreen'
 
 export default function OnboardingPage() {
-  return <OnboardingScreen />
+  return (
+    <AppShell>
+      <OnboardingScreen />
+    </AppShell>
+  )
 }

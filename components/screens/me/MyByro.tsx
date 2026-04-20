@@ -201,7 +201,7 @@ export default function MyByro() {
                   <div className="text-sm font-bold">{SECTION_LABELS[key]}</div>
                   <div className="text-[11px] text-[#888]">
                     {key === 'sns' && `${connectedSnsCount}개 연동됨`}
-                    {key === 'highlight' && `인증 2개 · 직접 입력 ${allHighlights.length}개`}
+                    {key === 'highlight' && `인증 4개 · 직접 입력 ${allHighlights.length}개`}
                     {key === 'reputation' && `방문자가 남긴 키워드 ${totalReputationCount}회`}
                     {key === 'guestbook' && `최근 메시지 ${SAMPLE_PROFILE.guestbook.length}개`}
                   </div>
@@ -628,7 +628,8 @@ function HighlightManageScreen({
   const certItems = [
     { icon: '💼', title: '커리어 지속성', sub: '건강보험 공단 이메일 발송', verified: true },
     { icon: '🤝', title: '리멤버 직업 네트워크', sub: '리멤버 앱 명함 내보내기', verified: false },
-    { icon: '📄', title: '특허', sub: '특허청 등록증 이메일 발송', verified: false },
+    { icon: '🏢', title: '법인 영속성', sub: '창업 5년차 · 정상 운영 중 · 폐업 이력 없음', verified: true },
+    { icon: '✈️', title: '항공 마일리지', sub: '대한항공 모닝캄 · 아시아나 다이아몬드', verified: true, badge: '🌍 글로벌 비즈니스' },
   ]
   const [certOpen, setCertOpen] = useState<Record<string, boolean>>({})
 
@@ -784,24 +785,70 @@ function HighlightManageScreen({
                       </div>
                     ) : null}
                   </div>
-                  {/* 커리어 지속성 상세 */}
-                  {isOpen && item.verified && item.title === '커리어 지속성' && (
+                  {isOpen && item.verified && (
                     <div className="bg-[#f9f9f9] rounded-xl p-3 mb-2">
-                      <div className="text-xs text-[#888] mb-2">평균 재직 기간</div>
-                      <div className="h-1.5 bg-[#e0e0e0] rounded-full mb-1.5">
-                        <div className="h-full bg-[#0A0A0A] rounded-full" style={{ width: '72%' }} />
-                      </div>
-                      <div className="grid grid-cols-2 gap-2 mt-2">
-                        <div className="bg-white border border-[#eee] rounded-xl p-2.5 text-center">
-                          <div className="text-lg font-black">{SAMPLE_PROFILE.careerHighlight.avgYears}년</div>
-                          <div className="text-xs text-[#888]">본인 평균</div>
-                        </div>
-                        <div className="bg-[#f5fff5] border border-[#c8e6c9] rounded-xl p-2.5 text-center">
-                          <div className="text-lg font-black text-[#1A7A1A]">+{SAMPLE_PROFILE.careerHighlight.vsIndustryPercent}%</div>
-                          <div className="text-xs text-[#888]">업계 평균 대비</div>
-                        </div>
-                      </div>
-                      <div className="text-xs text-[#bbb] text-right mt-2">건강보험공단 기준 · 2026.04 인증</div>
+                      {item.title === '커리어 지속성' && (
+                        <>
+                          <div className="text-xs text-[#888] mb-2">평균 재직 기간</div>
+                          <div className="h-1.5 bg-[#e0e0e0] rounded-full mb-1.5">
+                            <div className="h-full bg-[#0A0A0A] rounded-full" style={{ width: '72%' }} />
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 mt-2">
+                            <div className="bg-white border border-[#eee] rounded-xl p-2.5 text-center">
+                              <div className="text-lg font-black">{SAMPLE_PROFILE.careerHighlight.avgYears}년</div>
+                              <div className="text-xs text-[#888]">본인 평균</div>
+                            </div>
+                            <div className="bg-[#f5fff5] border border-[#c8e6c9] rounded-xl p-2.5 text-center">
+                              <div className="text-lg font-black text-[#1A7A1A]">+{SAMPLE_PROFILE.careerHighlight.vsIndustryPercent}%</div>
+                              <div className="text-xs text-[#888]">업계 평균 대비</div>
+                            </div>
+                          </div>
+                          <div className="text-xs text-[#bbb] text-right mt-2">건강보험공단 기준 · 2026.04 인증</div>
+                        </>
+                      )}
+
+                      {item.title === '리멤버 직업 네트워크' && (
+                        <div className="text-xs text-[#555]">리멤버 명함 기반 네트워크가 인증되어 프로필에 공개됩니다.</div>
+                      )}
+
+                      {item.title === '법인 영속성' && (
+                        <>
+                          <div className="grid grid-cols-3 gap-2">
+                            <div className="bg-white border border-[#eee] rounded-xl p-2.5 text-center">
+                              <div className="text-lg font-black">{SAMPLE_PROFILE.corporateHighlight.companyCount}개</div>
+                              <div className="text-xs text-[#888]">운영 법인</div>
+                            </div>
+                            <div className="bg-white border border-[#eee] rounded-xl p-2.5 text-center">
+                              <div className="text-lg font-black">{SAMPLE_PROFILE.corporateHighlight.averageOperatingYears}년</div>
+                              <div className="text-xs text-[#888]">평균 운영</div>
+                            </div>
+                            <div className="bg-[#f5fff5] border border-[#c8e6c9] rounded-xl p-2.5 text-center">
+                              <div className="text-sm font-black text-[#1A7A1A]">정상 운영</div>
+                              <div className="text-xs text-[#888]">폐업 이력 없음</div>
+                            </div>
+                          </div>
+                          <div className="text-xs text-[#bbb] text-right mt-2">법인 등기 기준 · 2026.04 인증</div>
+                        </>
+                      )}
+
+                      {item.title === '항공 마일리지' && (
+                        <>
+                          {item.badge && (
+                            <div className="inline-flex items-center rounded-full bg-white border border-[#E5E5E5] px-2.5 py-1 text-[11px] font-semibold text-[#333] mb-2">
+                              {item.badge}
+                            </div>
+                          )}
+                          <div className="space-y-2">
+                            {SAMPLE_PROFILE.airlineHighlight.airlines.map((airline) => (
+                              <div key={airline.name} className="flex items-center justify-between rounded-xl border border-[#eee] bg-white px-3 py-2">
+                                <div className="text-xs text-[#888]">{airline.name}</div>
+                                <div className="text-sm font-bold">{airline.tier}</div>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="text-xs text-[#bbb] text-right mt-2">항공사 회원등급 기준 · 2026.04 인증</div>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>

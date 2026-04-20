@@ -35,6 +35,17 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
     reputationKeywords: rawProfile.reputationKeywords,
     guestbook: rawProfile.guestbook,
   }
+  const corporateHighlight = 'corporateHighlight' in rawProfile
+    ? rawProfile.corporateHighlight
+    : { companyCount: 1, years: 4, summary: '창업 4년차 · 정상 운영 중 · 폐업 이력 없음' }
+  const airlineHighlight = 'airlineHighlight' in rawProfile
+    ? rawProfile.airlineHighlight
+    : { tierSummary: '대한항공 모닝캄', badgeLevel: 'business_traveler', airlines: [{ name: '대한항공', tier: '모닝캄' }] }
+  const airlineBadgeLabel = {
+    global_business: '🌍 글로벌 비즈니스',
+    active_business: '✈️ 액티브 비즈니스',
+    business_traveler: '🗺️ 비즈니스 이동형',
+  }[airlineHighlight.badgeLevel] ?? null
 
   const [expSheetOpen, setExpSheetOpen] = useState(false)
   const [expDoneModal, setExpDoneModal] = useState(false)
@@ -42,7 +53,7 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
   const [memoSheetOpen, setMemoSheetOpen] = useState(false)
   const [memoText, setMemoText] = useState('')
   const totalReputationCount = profile.reputationKeywords.reduce((sum, item) => sum + item.count, 0)
-  const totalHighlights = profile.manualHighlights.length + 2
+  const totalHighlights = profile.manualHighlights.length + 4
 
   // SNS 토글
   const igOpen = store.snsOpenStates['instagram_' + username] ?? false
@@ -51,6 +62,8 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
   // 하이라이트 토글
   const careerOpen = store.hlOpenStates['career_' + username] ?? false
   const rememberOpen = store.hlOpenStates['remember_' + username] ?? false
+  const corporateOpen = store.hlOpenStates['corporate_' + username] ?? false
+  const airlineOpen = store.hlOpenStates['airline_' + username] ?? false
 
   const handleExpSubmit = () => {
     if (store.experienceKeywords.length === 0) {
@@ -226,7 +239,7 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
 
         {/* ─── 하이라이트 섹션 ─────────────────────── */}
         <div className="px-5 py-4">
-          <SectionTitle title="하이라이트" subtitle={`인증 2개 · 직접 입력 ${profile.manualHighlights.length}개`} />
+          <SectionTitle title="하이라이트" subtitle={`인증 4개 · 직접 입력 ${profile.manualHighlights.length}개`} />
 
           {/* 커리어 지속성 */}
           <div className="mb-2 rounded-[22px] border border-[#EBEBEB] overflow-hidden">
@@ -305,6 +318,77 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
                   })}
                 </svg>
                 <div className="text-xs text-[#bbb] text-right">리멤버 명함 기준 · 총 {profile.rememberHighlight.total}명</div>
+              </div>
+            )}
+          </div>
+
+          {/* 법인 영속성 */}
+          <div className="mb-2 rounded-[22px] border border-[#EBEBEB] overflow-hidden">
+            <button
+              onClick={() => store.toggleHlOpen('corporate_' + username)}
+              className="flex items-center w-full px-4 py-3"
+            >
+              <span className="text-base mr-2">🏢</span>
+              <div className="flex-1 text-left">
+                <div className="text-sm font-bold">법인 영속성
+                  <span className="ml-1.5 text-[10px] font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-full px-2 py-0.5">인증됨</span>
+                </div>
+                <div className="text-xs text-[#888]">{corporateHighlight.summary}</div>
+              </div>
+              {corporateOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
+            </button>
+            {corporateOpen && (
+              <div className="bg-[#FAFAFA] border-t border-[#F1F1F1] p-4">
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="bg-white border border-[#eee] rounded-xl p-3 text-center">
+                    <div className="text-xl font-black">{corporateHighlight.companyCount}개</div>
+                    <div className="text-xs text-[#888] mt-0.5">운영 법인</div>
+                  </div>
+                  <div className="bg-white border border-[#eee] rounded-xl p-3 text-center">
+                    <div className="text-xl font-black">{'averageOperatingYears' in corporateHighlight ? corporateHighlight.averageOperatingYears : corporateHighlight.years}년</div>
+                    <div className="text-xs text-[#888] mt-0.5">운영 기간</div>
+                  </div>
+                  <div className="bg-[#f5fff5] border border-[#c8e6c9] rounded-xl p-3 text-center">
+                    <div className="text-sm font-black text-[#1A7A1A]">정상 운영</div>
+                    <div className="text-xs text-[#888] mt-0.5">폐업 이력 없음</div>
+                  </div>
+                </div>
+                <div className="text-xs text-[#bbb] text-right mt-2">법인 등기 기준 · 2026.04 인증</div>
+              </div>
+            )}
+          </div>
+
+          {/* 항공 마일리지 */}
+          <div className="mb-2 rounded-[22px] border border-[#EBEBEB] overflow-hidden">
+            <button
+              onClick={() => store.toggleHlOpen('airline_' + username)}
+              className="flex items-center w-full px-4 py-3"
+            >
+              <span className="text-base mr-2">✈️</span>
+              <div className="flex-1 text-left">
+                <div className="text-sm font-bold">항공 마일리지
+                  <span className="ml-1.5 text-[10px] font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-full px-2 py-0.5">인증됨</span>
+                </div>
+                <div className="text-xs text-[#888]">{airlineHighlight.tierSummary}</div>
+              </div>
+              {airlineOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
+            </button>
+            {airlineOpen && (
+              <div className="bg-[#FAFAFA] border-t border-[#F1F1F1] p-4">
+                {airlineBadgeLabel && (
+                  <div className="inline-flex items-center rounded-full border border-[#E5E5E5] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#333] mb-3">
+                    {airlineBadgeLabel}
+                  </div>
+                )}
+                <div className="space-y-2">
+                  {airlineHighlight.airlines.map((airline) => (
+                    <div key={airline.name} className="flex items-center justify-between rounded-xl border border-[#eee] bg-white px-3 py-2.5">
+                      <div className="text-xs text-[#888]">{airline.name}</div>
+                      <div className="text-sm font-bold">{airline.tier}</div>
+                    </div>
+                  ))}
+                </div>
+                <div className="text-xs text-[#bbb] text-right mt-2">항공사 회원등급 기준 · 2026.04 인증</div>
               </div>
             )}
           </div>

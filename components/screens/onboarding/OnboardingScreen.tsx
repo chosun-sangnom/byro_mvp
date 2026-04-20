@@ -443,6 +443,20 @@ function Step6Highlight() {
       badge: '인증 가능',
       docLabel: '리멤버 명함 내보내기 파일',
     },
+    {
+      icon: '🏢',
+      title: '법인 영속성',
+      sub: '법인 운영 기간과 정상 운영 여부 확인',
+      badge: '인증 가능',
+      docLabel: '법인 운영 증빙 서류',
+    },
+    {
+      icon: '✈️',
+      title: '항공 마일리지',
+      sub: '항공사 회원 등급으로 출장형 프로필 인증',
+      badge: '인증 가능',
+      docLabel: '항공사 등급 확인 자료',
+    },
   ] as const
   const [selectedCert, setSelectedCert] = useState<(typeof certItems)[number] | null>(null)
   const certModalOpen = selectedCert !== null

@@ -138,76 +138,70 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
       <div className="flex-1 overflow-y-auto">
         {/* 프로필 헤더 */}
         <div className="px-5 pt-4 pb-3">
-          <div className="overflow-hidden rounded-[32px] bg-[#111] text-white">
-            <div className={`relative h-[248px] bg-gradient-to-b ${heroTheme.cover}`}>
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(0,0,0,0.08)_45%,rgba(0,0,0,0.86)_100%)]" />
-              <div className="absolute inset-x-0 bottom-0 p-5">
-                <div
-                  className={[
-                    'mb-4 h-14 w-14 overflow-hidden rounded-[20px] shadow-[0_12px_28px_rgba(0,0,0,0.24)]',
-                    profile.avatarImage ? 'bg-black/10' : `bg-gradient-to-br ${heroTheme.avatar}`,
-                  ].join(' ')}
-                  style={!profile.avatarImage ? { backgroundColor: profile.avatarColor } : undefined}
-                >
-                  {profile.avatarImage ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={profile.avatarImage} alt={`${profile.name} 프로필 사진`} className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center text-xl font-black text-[#5F4A40]">
+          <div className="rounded-[32px] border border-[#ECECEC] bg-white p-3 shadow-[0_12px_32px_rgba(0,0,0,0.06)]">
+            <div className="relative h-[440px] overflow-hidden rounded-[28px] text-white">
+              {profile.avatarImage ? (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={profile.avatarImage} alt={`${profile.name} 프로필 사진`} className="absolute inset-0 h-full w-full object-cover" />
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,rgba(255,255,255,0.02)_28%,rgba(0,0,0,0.18)_58%,rgba(0,0,0,0.70)_100%)]" />
+                </>
+              ) : (
+                <>
+                  <div className={`absolute inset-0 bg-gradient-to-b ${heroTheme.cover}`} />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_24%,rgba(255,255,255,0.28),rgba(255,255,255,0)_34%),linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_32%,rgba(0,0,0,0.16)_58%,rgba(0,0,0,0.72)_100%)]" />
+                  <div className="absolute left-1/2 top-[18%] h-[188px] w-[188px] -translate-x-1/2 overflow-hidden rounded-[36px] border border-white/18 bg-gradient-to-br from-white/18 to-white/2 shadow-[0_24px_64px_rgba(0,0,0,0.18)] backdrop-blur-[6px]">
+                    <div
+                      className={`h-full w-full bg-gradient-to-br ${heroTheme.avatar}`}
+                      style={{ backgroundColor: profile.avatarColor }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center text-[72px] font-black text-[#4E3B32]/55">
                       {profile.name.charAt(0)}
                     </div>
-                  )}
-                </div>
+                  </div>
+                </>
+              )}
+
+              <div className="absolute inset-x-0 bottom-0 p-5">
                 <div className="flex items-center gap-1.5">
                   <div className="text-[28px] font-black tracking-[-0.04em]">{profile.name}</div>
                   <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#43C07A] text-[10px] font-black text-white">✓</span>
                 </div>
                 <div className="mt-1 text-[15px] text-white/72">{profile.title}</div>
-                {(profile.headline || profile.bio) && (
-                  <div className="mt-4 max-w-[285px] rounded-[18px] border border-white/12 bg-white/8 px-4 py-3 backdrop-blur-[10px]">
-                    {profile.headline && (
-                      <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/48">
-                        Intro
-                      </div>
-                    )}
-                    <div className="mt-1 text-[15px] leading-[1.5] text-white/92">
-                      {profile.headline ?? profile.bio}
-                    </div>
-                  </div>
-                )}
+                <div className="mt-4 max-w-[290px] text-[15px] leading-[1.5] text-white/92">
+                  {profile.headline ?? profile.bio}
+                </div>
               </div>
             </div>
 
-            <div className="bg-[#111] px-4 pb-4 pt-3">
-              <div className="grid grid-cols-4 gap-2">
-                {contactChannels.map((channel) => (
-                  <ContactActionButton
-                    key={channel.id}
-                    channel={channel}
-                    onClick={() => {
-                      if (!channel.href) {
-                        showToast('연결 정보를 준비 중이에요')
-                        return
-                      }
-                      window.open(channel.href, channel.href.startsWith('http') ? '_blank' : '_self')
-                    }}
-                  />
-                ))}
-              </div>
+            <div className="mt-3 grid grid-cols-4 gap-2">
+              {contactChannels.map((channel) => (
+                <ContactActionButton
+                  key={channel.id}
+                  channel={channel}
+                  onClick={() => {
+                    if (!channel.href) {
+                      showToast('연결 정보를 준비 중이에요')
+                      return
+                    }
+                    window.open(channel.href, channel.href.startsWith('http') ? '_blank' : '_self')
+                  }}
+                />
+              ))}
+            </div>
 
-              <div className="mt-4 flex flex-wrap gap-1.5">
-                {profile.selectedKeywords.map((keyword) => (
-                  <span key={keyword} className="rounded-full border border-white/14 bg-white/8 px-2.5 py-1 text-[11px] text-white/78">
-                    {keyword}
-                  </span>
-                ))}
-              </div>
+            <div className="mt-4 flex flex-wrap gap-1.5">
+              {profile.selectedKeywords.map((keyword) => (
+                <span key={keyword} className="rounded-full border border-[#E4E4E4] bg-[#F6F6F6] px-2.5 py-1 text-[11px] text-[#555]">
+                  {keyword}
+                </span>
+              ))}
+            </div>
 
-              <div className="mt-4 grid grid-cols-3 gap-2">
-                <PublicMetricCard dark label="SNS" value={`${Number(profile.instagramConnected) + Number(profile.linkedinConnected)}개`} />
-                <PublicMetricCard dark label="하이라이트" value={`${totalHighlights}개`} />
-                <PublicMetricCard dark label="방명록" value={`${profile.guestbook.length}개`} />
-              </div>
+            <div className="mt-4 grid grid-cols-3 gap-2">
+              <PublicMetricCard label="SNS" value={`${Number(profile.instagramConnected) + Number(profile.linkedinConnected)}개`} />
+              <PublicMetricCard label="하이라이트" value={`${totalHighlights}개`} />
+              <PublicMetricCard label="방명록" value={`${profile.guestbook.length}개`} />
             </div>
           </div>
         </div>
@@ -699,9 +693,9 @@ function ContactActionButton({
   return (
     <button
       onClick={onClick}
-      className="rounded-[18px] border border-white/10 bg-white/6 px-2 py-2.5 text-center text-white transition-colors active:bg-white/12"
+      className="rounded-[18px] border border-[#E7E7E7] bg-[#F8F8F8] px-2 py-2.5 text-center text-[#222] transition-colors active:bg-[#EFEFEF]"
     >
-      <div className="mx-auto mb-1.5 flex h-9 w-9 items-center justify-center rounded-2xl bg-white/10">
+      <div className="mx-auto mb-1.5 flex h-9 w-9 items-center justify-center rounded-2xl bg-white shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]">
         <Icon size={16} />
       </div>
       <div className="text-[11px] font-semibold">{channel.label}</div>

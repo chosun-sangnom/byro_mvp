@@ -9,9 +9,9 @@ interface AppShellProps {
 
 export default function AppShell({ children }: AppShellProps) {
   return (
-    <div className="min-h-dvh bg-white sm:bg-[#F3F3F1] sm:px-4 sm:py-6">
-      <div className="mx-auto w-[calc(100%-24px)] max-w-[430px]">
-        <div className="relative flex min-h-dvh w-full flex-col overflow-hidden bg-white sm:min-h-[calc(100dvh-48px)] sm:rounded-[32px] sm:border sm:border-[#E7E7E7] sm:shadow-[0_24px_80px_rgba(0,0,0,0.08)]">
+    <div className="min-h-dvh bg-white">
+      <div className="mx-auto w-full max-w-[430px] px-3 sm:px-5">
+        <div className="relative flex min-h-dvh w-full flex-col bg-white">
           <ToastSingleton>
             {children}
           </ToastSingleton>

@@ -13,11 +13,20 @@ import {
 
 interface PublicProfileProps {
   username: string
+  mode?: 'public' | 'owner'
+  onOpenArchive?: () => void
+  onOpenManage?: () => void
 }
 
-export default function PublicProfile({ username }: PublicProfileProps) { // eslint-disable-line @typescript-eslint/no-unused-vars
+export default function PublicProfile({
+  username,
+  mode = 'public',
+  onOpenArchive,
+  onOpenManage,
+}: PublicProfileProps) { // eslint-disable-line @typescript-eslint/no-unused-vars
   const router = useRouter()
   const store = useByroStore()
+  const isOwnerMode = mode === 'owner'
 
   // username에 따라 프로필 데이터 선택
   const isJimin = username === 'jiminlee'
@@ -34,6 +43,7 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
       selectedKeywords: store.user.selectedKeywords,
       avatarColor: store.user.avatarColor ?? baseProfile.avatarColor,
       avatarImage: store.user.avatarImage ?? baseProfile.avatarImage,
+      contactChannels: store.user.contactChannels ?? baseProfile.contactChannels,
     }
     : baseProfile
 
@@ -104,33 +114,35 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
       <div className="flex items-center px-4 h-12 border-b border-[#EBEBEB] bg-white/92 backdrop-blur-sm flex-shrink-0">
         <button onClick={() => router.back()} className="text-sm text-[#555] mr-2">‹</button>
         <div className="flex-1 min-w-0">
-          <div className="text-[11px] text-[#AAA] uppercase tracking-[0.18em]">Public Profile</div>
+          <div className="text-[11px] text-[#AAA] uppercase tracking-[0.18em]">{isOwnerMode ? 'My Byro' : 'Public Profile'}</div>
           <div className="text-xs text-[#555] truncate">byro.io/@{profile.linkId}</div>
         </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => {
-              if (bookmarked) {
-                setBookmarked(false)
-                showToast('저장 취소됐어요')
-              } else {
-                setMemoSheetOpen(true)
-              }
-            }}
-            className={[
-              'w-8 h-8 flex items-center justify-center rounded-xl border',
-              bookmarked ? 'bg-[#0A0A0A] border-[#0A0A0A]' : 'bg-white border-[#ddd]',
-            ].join(' ')}
-          >
-            <Bookmark size={14} color={bookmarked ? '#fff' : '#555'} />
-          </button>
-          <button
-            onClick={() => showToast('공유 링크를 준비 중이에요')}
-            className="w-8 h-8 flex items-center justify-center rounded-xl border border-[#ddd] bg-white"
-          >
-            <Share2 size={14} color="#555" />
-          </button>
-        </div>
+        {!isOwnerMode && (
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                if (bookmarked) {
+                  setBookmarked(false)
+                  showToast('저장 취소됐어요')
+                } else {
+                  setMemoSheetOpen(true)
+                }
+              }}
+              className={[
+                'w-8 h-8 flex items-center justify-center rounded-xl border',
+                bookmarked ? 'bg-[#0A0A0A] border-[#0A0A0A]' : 'bg-white border-[#ddd]',
+              ].join(' ')}
+            >
+              <Bookmark size={14} color={bookmarked ? '#fff' : '#555'} />
+            </button>
+            <button
+              onClick={() => showToast('공유 링크를 준비 중이에요')}
+              className="w-8 h-8 flex items-center justify-center rounded-xl border border-[#ddd] bg-white"
+            >
+              <Share2 size={14} color="#555" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 스크롤 영역 */}
@@ -179,6 +191,10 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
                   key={channel.id}
                   channel={channel}
                   onClick={() => {
+                    if (!channel.enabled) {
+                      showToast(isOwnerMode ? 'Byro 편집에서 연동을 활성화해 주세요' : '비활성화된 연락 수단이에요')
+                      return
+                    }
                     if (!channel.href) {
                       showToast('연결 정보를 준비 중이에요')
                       return
@@ -197,12 +213,31 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
               ))}
             </div>
 
+            {isOwnerMode && (
+              <div className="mt-4 flex gap-2">
+                <button
+                  onClick={onOpenArchive}
+                  className="flex-1 rounded-[18px] border border-[#D8D8D8] bg-white px-4 py-3 text-sm font-semibold text-[#555]"
+                >
+                  아카이빙
+                </button>
+                <button
+                  onClick={onOpenManage}
+                  className="flex-1 rounded-[18px] bg-[#111] px-4 py-3 text-sm font-semibold text-white"
+                >
+                  Byro 편집
+                </button>
+              </div>
+            )}
+
           </div>
         </div>
 
         <div className="px-5 pb-2">
           <div className="bg-[#F7F8FA] border border-[#E5EAF2] rounded-xl px-3 py-2 text-xs text-[#5E6B7A]">
-            연락 버튼으로 바로 연결하고, 평판과 방명록부터 확인한 뒤 SNS와 하이라이트로 이어서 살펴볼 수 있어요.
+            {isOwnerMode
+              ? '실제로 공개되는 모습 그대로 보여줍니다. Byro 편집에서 기본정보, 연락 수단, SNS, 하이라이트를 관리할 수 있어요.'
+              : '연락 버튼으로 바로 연결하고, 평판과 방명록부터 확인한 뒤 SNS와 하이라이트로 이어서 살펴볼 수 있어요.'}
           </div>
         </div>
 
@@ -517,18 +552,20 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
       </div>
 
       {/* 하단 고정 바 */}
-      <div className="absolute bottom-0 left-0 right-0 flex gap-2 px-4 py-3 border-t border-[#EBEBEB] bg-white">
-        <Button variant="outline" onClick={() => showToast('피드백 요청을 보냈어요!')}>피드백 요청</Button>
-        <Button
-          onClick={() => {
-            if (alreadySubmitted) { showToast('이미 경험을 남겼어요'); return }
-            setExpSheetOpen(true)
-          }}
-          variant={alreadySubmitted ? 'outline' : 'primary'}
-        >
-          {alreadySubmitted ? '경험 남겼어요 ✓' : '+ 경험 남기기'}
-        </Button>
-      </div>
+      {!isOwnerMode && (
+        <div className="absolute bottom-0 left-0 right-0 flex gap-2 px-4 py-3 border-t border-[#EBEBEB] bg-white">
+          <Button variant="outline" onClick={() => showToast('피드백 요청을 보냈어요!')}>피드백 요청</Button>
+          <Button
+            onClick={() => {
+              if (alreadySubmitted) { showToast('이미 경험을 남겼어요'); return }
+              setExpSheetOpen(true)
+            }}
+            variant={alreadySubmitted ? 'outline' : 'primary'}
+          >
+            {alreadySubmitted ? '경험 남겼어요 ✓' : '+ 경험 남기기'}
+          </Button>
+        </div>
+      )}
 
       {/* ─── 경험 남기기 바텀시트 ────────────────── */}
       <BottomSheet open={expSheetOpen} onClose={() => setExpSheetOpen(false)} dark={!store.isLoggedIn}>
@@ -663,7 +700,7 @@ function ContactActionButton({
   channel,
   onClick,
 }: {
-  channel: { id: string; label: string; value: string; href?: string }
+  channel: { id: string; label: string; value: string; href?: string; enabled: boolean }
   onClick: () => void
 }) {
   const iconMap = {
@@ -677,9 +714,19 @@ function ContactActionButton({
   return (
     <button
       onClick={onClick}
-      className="rounded-[18px] border border-[#E7E7E7] bg-[#F8F8F8] px-2 py-2.5 text-center text-[#222] transition-colors active:bg-[#EFEFEF]"
+      className={[
+        'rounded-[18px] border px-2 py-2.5 text-center transition-colors',
+        channel.enabled
+          ? 'border-[#E7E7E7] bg-[#F8F8F8] text-[#222] active:bg-[#EFEFEF]'
+          : 'border-[#EFEFEF] bg-[#F6F6F6] text-[#B4B4B4]',
+      ].join(' ')}
     >
-      <div className="mx-auto mb-1.5 flex h-9 w-9 items-center justify-center rounded-2xl bg-white shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]">
+      <div className={[
+        'mx-auto mb-1.5 flex h-9 w-9 items-center justify-center rounded-2xl',
+        channel.enabled
+          ? 'bg-white shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]'
+          : 'bg-white/70 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.03)]',
+      ].join(' ')}>
         <Icon size={16} />
       </div>
       <div className="text-[11px] font-semibold">{channel.label}</div>

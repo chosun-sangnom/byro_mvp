@@ -1,3 +1,5 @@
+import type { ContactChannel } from '@/types'
+
 // ─── Instagram 프로필 (sss_uuo)
 export const INSTAGRAM_PROFILE = {
   username: 'sss_uuo',
@@ -75,11 +77,11 @@ export const SAMPLE_PROFILE = {
     avatar: 'from-[#DCC5B6] to-[#8F7265]',
   },
   contactChannels: [
-    { id: 'phone', label: '전화', value: '010-9482-1158', href: 'tel:01094821158' },
-    { id: 'email', label: '이메일', value: 'myongkoo@byro.io', href: 'mailto:myongkoo@byro.io' },
-    { id: 'kakao', label: '카카오', value: 'myongkoo.kakao', href: 'https://open.kakao.com/o/smyongkoo' },
-    { id: 'telegram', label: '텔레그램', value: '@myongkoo', href: 'https://t.me/myongkoo' },
-  ],
+    { id: 'phone', label: '전화', value: '010-9482-1158', href: 'tel:01094821158', enabled: true },
+    { id: 'email', label: '이메일', value: 'myongkoo@byro.io', href: 'mailto:myongkoo@byro.io', enabled: true },
+    { id: 'kakao', label: '카카오', value: 'myongkoo.kakao', href: 'https://open.kakao.com/o/smyongkoo', enabled: true },
+    { id: 'telegram', label: '텔레그램', value: '@myongkoo', href: 'https://t.me/myongkoo', enabled: false },
+  ] as ContactChannel[],
   selectedKeywords: ['전문적인', '신뢰할 수 있는', '통찰력 있는', '실행력 있는', '창의적인'],
   instagramConnected: true,
   linkedinConnected: true,
@@ -159,11 +161,11 @@ export const JIMIN_PROFILE = {
     avatar: 'from-[#D8C4B2] to-[#8A7167]',
   },
   contactChannels: [
-    { id: 'phone', label: '전화', value: '010-2437-1022', href: 'tel:01024371022' },
-    { id: 'email', label: '이메일', value: 'jimin@byro.io', href: 'mailto:jimin@byro.io' },
-    { id: 'kakao', label: '카카오', value: 'jimin.marketer', href: 'https://open.kakao.com/o/sjimin' },
-    { id: 'telegram', label: '텔레그램', value: '@jimin_connect', href: 'https://t.me/jimin_connect' },
-  ],
+    { id: 'phone', label: '전화', value: '010-2437-1022', href: 'tel:01024371022', enabled: true },
+    { id: 'email', label: '이메일', value: 'jimin@byro.io', href: 'mailto:jimin@byro.io', enabled: true },
+    { id: 'kakao', label: '카카오', value: 'jimin.marketer', href: 'https://open.kakao.com/o/sjimin', enabled: true },
+    { id: 'telegram', label: '텔레그램', value: '@jimin_connect', href: 'https://t.me/jimin_connect', enabled: false },
+  ] as ContactChannel[],
   selectedKeywords: ['전문적인', '신뢰할 수 있는', '통찰력 있는'],
   instagramConnected: true,
   linkedinConnected: false,

@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation'
 import { ChevronDown, ChevronUp, Camera, Mail, MessageCircle, Phone, Plus, Send, X } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { Button, BottomSheet, Modal, showToast, TextArea } from '@/components/ui'
-import type { Highlight } from '@/types'
+import type { Highlight, ContactChannel } from '@/types'
 import {
   SAMPLE_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE,
   HIGHLIGHT_CATEGORIES, KEYWORD_GROUPS,
 } from '@/lib/mockData'
+import PublicProfile from '@/components/screens/profile/PublicProfile'
 
-type Screen = 'main' | 'editBasic' | 'editHighlight' | 'editSNS' | 'editReputation'
+type Screen = 'preview' | 'manage' | 'editBasic' | 'editHighlight' | 'editSNS' | 'editReputation' | 'editContact'
 type SectionKey = 'sns' | 'highlight' | 'reputation' | 'guestbook'
 
 const SECTION_LABELS: Record<SectionKey, string> = {
@@ -32,7 +33,7 @@ export default function MyByro() {
     if (!store.isLoggedIn) router.replace('/onboarding')
   }, [store.isLoggedIn, router])
 
-  const [screen, setScreen] = useState<Screen>('main')
+  const [screen, setScreen] = useState<Screen>('preview')
   const [sectionOrder, setSectionOrder] = useState<SectionKey[]>(['reputation', 'guestbook', 'sns', 'highlight'])
   const dragItem = useRef<SectionKey | null>(null)
   const dragOver = useRef<SectionKey | null>(null)
@@ -45,7 +46,6 @@ export default function MyByro() {
   const linkedinConnected = store.linkedinConnected || SAMPLE_PROFILE.linkedinConnected
   const currentKeywords = user.selectedKeywords ?? SAMPLE_PROFILE.selectedKeywords
   const avatarColor = user.avatarColor ?? AVATAR_COLORS[0]
-  const avatarImage = user.avatarImage
   const allHighlights = [...SAMPLE_PROFILE.manualHighlights, ...store.highlights]
   const connectedSnsCount = Number(instagramConnected) + Number(linkedinConnected)
   const totalReputationCount = SAMPLE_PROFILE.reputationKeywords.reduce((sum, item) => sum + item.count, 0)
@@ -105,115 +105,143 @@ export default function MyByro() {
     showToast('블럭 순서가 변경됐어요')
   }
   // ── 화면 분기 ──────────────────────────────────────────────
+  if (screen === 'preview') {
+    return (
+      <PublicProfile
+        username={user.linkId}
+        mode="owner"
+        onOpenArchive={() => router.push('/archive')}
+        onOpenManage={() => setScreen('manage')}
+      />
+    )
+  }
+
+  if (screen === 'manage') {
+    return (
+      <ManageByroScreen
+        allHighlights={allHighlights}
+        connectedSnsCount={connectedSnsCount}
+        totalReputationCount={totalReputationCount}
+        sectionOrder={sectionOrder}
+        sectionRefs={sectionRefs}
+        store={store}
+        instagramConnected={instagramConnected}
+        linkedinConnected={linkedinConnected}
+        onBack={() => setScreen('preview')}
+        onEditBasic={() => setScreen('editBasic')}
+        onEditHighlight={() => setScreen('editHighlight')}
+        onEditSNS={() => setScreen('editSNS')}
+        onEditReputation={() => setScreen('editReputation')}
+        onEditContact={() => setScreen('editContact')}
+        moveSection={moveSection}
+        handleDragStart={handleDragStart}
+        handleDragEnter={handleDragEnter}
+        handleDragEnd={handleDragEnd}
+        handleTouchStart={handleTouchStart}
+        handleTouchMove={handleTouchMove}
+        handleTouchEnd={handleTouchEnd}
+      />
+    )
+  }
+
   if (screen === 'editBasic') {
-    return <BasicInfoEditScreen user={user} avatarColor={avatarColor} currentKeywords={currentKeywords} onBack={() => setScreen('main')} />
+    return <BasicInfoEditScreen user={user} avatarColor={avatarColor} currentKeywords={currentKeywords} onBack={() => setScreen('manage')} />
   }
 
   if (screen === 'editHighlight') {
     return (
       <HighlightManageScreen
         userLinkId={user.linkId}
-        onBack={() => setScreen('main')}
+        onBack={() => setScreen('manage')}
       />
     )
   }
 
   if (screen === 'editSNS') {
-    return <SNSManageScreen onBack={() => setScreen('main')} />
+    return <SNSManageScreen onBack={() => setScreen('manage')} />
   }
 
   if (screen === 'editReputation') {
-    return <ReputationManageScreen currentKeywords={currentKeywords} onBack={() => setScreen('main')} />
+    return <ReputationManageScreen currentKeywords={currentKeywords} onBack={() => setScreen('manage')} />
   }
 
-  // ── 메인 화면 ──────────────────────────────────────────────
+  if (screen === 'editContact') {
+    return <ContactManageScreen onBack={() => setScreen('manage')} />
+  }
+
+  return null
+}
+
+function ManageByroScreen({
+  allHighlights,
+  connectedSnsCount,
+  totalReputationCount,
+  sectionOrder,
+  sectionRefs,
+  store,
+  instagramConnected,
+  linkedinConnected,
+  onBack,
+  onEditBasic,
+  onEditHighlight,
+  onEditSNS,
+  onEditReputation,
+  onEditContact,
+  moveSection,
+  handleDragStart,
+  handleDragEnter,
+  handleDragEnd,
+  handleTouchStart,
+  handleTouchMove,
+  handleTouchEnd,
+}: {
+  allHighlights: Highlight[]
+  connectedSnsCount: number
+  totalReputationCount: number
+  sectionOrder: SectionKey[]
+  sectionRefs: React.MutableRefObject<Map<SectionKey, HTMLElement>>
+  store: {
+    logout: () => void
+    hlOpenStates: Record<string, boolean>
+    toggleHlOpen: (id: string) => void
+  }
+  instagramConnected: boolean
+  linkedinConnected: boolean
+  onBack: () => void
+  onEditBasic: () => void
+  onEditHighlight: () => void
+  onEditSNS: () => void
+  onEditReputation: () => void
+  onEditContact: () => void
+  moveSection: (key: SectionKey, direction: 'up' | 'down') => void
+  handleDragStart: (key: SectionKey) => void
+  handleDragEnter: (key: SectionKey) => void
+  handleDragEnd: () => void
+  handleTouchStart: (key: SectionKey) => void
+  handleTouchMove: (e: React.TouchEvent) => void
+  handleTouchEnd: () => void
+}) {
   return (
     <div className="flex flex-col h-full">
-      {/* 네비 */}
       <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
-        <span className="text-sm text-[#888] flex-1 text-center">byro.io/@{user.linkId}</span>
+        <button onClick={onBack} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+        <span className="text-base font-black flex-1">Byro 편집</span>
         <button onClick={() => store.logout()} className="text-xs text-[#888]">로그아웃</button>
       </div>
 
       <div className="flex-1 overflow-y-auto pb-24">
-        <div className="px-5 pt-4 pb-3">
-          <div className="rounded-[34px] bg-[#F7F4F1] p-[7px] shadow-[0_16px_36px_rgba(0,0,0,0.08)]">
-            <div className="relative h-[452px] overflow-hidden rounded-[30px] text-white ring-1 ring-black/4">
-              {avatarImage ? (
-                <>
-                  <img src={avatarImage} alt={`${user.name} 프로필 사진`} className="absolute inset-0 h-full w-full object-cover" />
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.10)_58%,rgba(0,0,0,0.74)_100%)]" />
-                </>
-              ) : (
-                <>
-                  <div className={`absolute inset-0 bg-gradient-to-b ${SAMPLE_PROFILE.heroTheme.cover}`} />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.24),rgba(255,255,255,0)_36%),linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.08)_56%,rgba(0,0,0,0.76)_100%)]" />
-                  <div className="absolute left-1/2 top-[16%] h-[196px] w-[196px] -translate-x-1/2 overflow-hidden rounded-[40px] border border-white/22 bg-gradient-to-br from-white/18 to-white/3 shadow-[0_28px_72px_rgba(0,0,0,0.18)] backdrop-blur-[6px]">
-                    <div
-                      className={`h-full w-full bg-gradient-to-br ${SAMPLE_PROFILE.heroTheme.avatar}`}
-                      style={{ backgroundColor: avatarColor }}
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center text-[72px] font-black text-[#4E3B32]/55">
-                      {user.name.charAt(0)}
-                    </div>
-                  </div>
-                </>
-              )}
-
-              <div className="absolute inset-x-0 bottom-0 p-5">
-                <div className="flex items-center gap-1.5">
-                  <div className="text-[29px] font-black tracking-[-0.04em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.24)]">{user.name}</div>
-                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#43C07A] text-[10px] font-black text-white shadow-[0_8px_20px_rgba(67,192,122,0.35)]">✓</span>
-                </div>
-                <div className="mt-1 text-[15px] font-medium text-white/72">{user.title}</div>
-                <div className="mt-4 max-w-[318px] rounded-[18px] border border-white/12 bg-white/10 px-4 py-3 text-[15px] leading-[1.52] text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[8px]">
-                  {user.bio || SAMPLE_PROFILE.headline}
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-3 grid grid-cols-4 gap-2">
-              {SAMPLE_PROFILE.contactChannels.map((channel) => (
-                <ProfileActionButton
-                  key={channel.id}
-                  channel={channel}
-                  onClick={() => {
-                    if (!channel.href) {
-                      showToast('연결 정보를 준비 중이에요')
-                      return
-                    }
-                    window.open(channel.href, channel.href.startsWith('http') ? '_blank' : '_self')
-                  }}
-                />
-              ))}
-            </div>
-
-            <div className="mt-4 flex flex-wrap gap-1.5">
-              {currentKeywords.map((keyword) => (
-                <span key={keyword} className="rounded-full border border-[#E4E4E4] bg-[#F6F6F6] px-2.5 py-1 text-[11px] text-[#555]">
-                  {keyword}
-                </span>
-              ))}
-            </div>
-
-            <div className="mt-4 flex gap-2">
-              <button
-                onClick={() => setScreen('editBasic')}
-                className="flex-1 rounded-[18px] border border-[#D8D8D8] bg-white px-4 py-3 text-sm font-semibold text-[#555]"
-              >
-                기본정보 편집
-              </button>
-              <button
-                onClick={() => router.push(`/${user.linkId}`)}
-                className="flex-1 rounded-[18px] bg-[#111] px-4 py-3 text-sm font-semibold text-white"
-              >
-                프로필 미리보기
-              </button>
+        <div className="px-5 py-4">
+          <div className="rounded-[24px] border border-[#EBEBEB] bg-[#FAFAFA] p-4">
+            <div className="text-sm font-black text-[#111] mb-1">공개 프로필 관리</div>
+            <div className="text-xs text-[#777] leading-relaxed mb-4">내 Byro와 공개 프로필은 같은 화면을 사용합니다. 아래에서 노출 정보와 연결 수단을 관리하세요.</div>
+            <div className="grid grid-cols-2 gap-2">
+              <button onClick={onEditBasic} className="rounded-[18px] bg-white border border-[#DDD] px-4 py-3 text-sm font-semibold text-[#444]">기본정보 편집</button>
+              <button onClick={onEditContact} className="rounded-[18px] bg-[#111] px-4 py-3 text-sm font-semibold text-white">연락 수단 관리</button>
             </div>
           </div>
         </div>
 
-        <div className="px-5 pt-3">
+        <div className="px-5 pt-1">
           {sectionOrder.map((key) => (
             <div
               key={key}
@@ -267,9 +295,9 @@ export default function MyByro() {
                 {(key === 'sns' || key === 'highlight' || key === 'reputation') && (
                   <button
                     onClick={() => {
-                      if (key === 'sns') setScreen('editSNS')
-                      if (key === 'highlight') setScreen('editHighlight')
-                      if (key === 'reputation') setScreen('editReputation')
+                      if (key === 'sns') onEditSNS()
+                      if (key === 'highlight') onEditHighlight()
+                      if (key === 'reputation') onEditReputation()
                     }}
                     className="text-xs border border-[#90CAF9] text-[#0D47A1] rounded-full px-2.5 py-1"
                   >
@@ -283,113 +311,59 @@ export default function MyByro() {
                   <SectionSNS instagramConnected={instagramConnected} linkedinConnected={linkedinConnected} />
                 )}
                 {key === 'highlight' && (
-                  <div>
-                    <div className="space-y-1.5 mb-2">
+                  <div className="space-y-1.5 mb-2">
+                    <ExpandablePreviewRow
+                      icon="💼"
+                      title="커리어 지속성"
+                      subtitle="건강보험공단 기준 · 2026.04 인증"
+                      badge="인증됨"
+                      badgeTone="verified"
+                      open={store.hlOpenStates.career_main ?? false}
+                      onToggle={() => store.toggleHlOpen('career_main')}
+                      detail={<div className="text-[11px] text-[#666] mt-2">평균 재직 {SAMPLE_PROFILE.careerHighlight.avgYears}년 · 업계 대비 +{SAMPLE_PROFILE.careerHighlight.vsIndustryPercent}%</div>}
+                    />
+                    <ExpandablePreviewRow
+                      icon="🤝"
+                      title="리멤버 직업 네트워크"
+                      subtitle="스타트업·마케팅 중심 인맥"
+                      badge="인증됨"
+                      badgeTone="verified"
+                      open={store.hlOpenStates.remember_main ?? false}
+                      onToggle={() => store.toggleHlOpen('remember_main')}
+                      detail={<div className="text-[11px] text-[#666] mt-2">스타트업 38% · 마케팅 24% · IT 22% · 투자 16%</div>}
+                    />
+                    {allHighlights.slice(0, 2).map((h) => (
                       <ExpandablePreviewRow
-                        icon="💼"
-                        title="커리어 지속성"
-                        subtitle="건강보험공단 기준 · 2026.04 인증"
-                        badge="인증됨"
-                        badgeTone="verified"
-                        open={store.hlOpenStates.career_main ?? false}
-                        onToggle={() => store.toggleHlOpen('career_main')}
-                        detail={(
-                          <div className="text-[11px] text-[#666] mt-2">
-                            평균 재직 {SAMPLE_PROFILE.careerHighlight.avgYears}년 · 업계 대비 +{SAMPLE_PROFILE.careerHighlight.vsIndustryPercent}%
-                          </div>
-                        )}
+                        key={h.id}
+                        icon={h.icon}
+                        title={h.title}
+                        subtitle={[h.year, h.subtitle].filter(Boolean).join(' · ')}
+                        badge="직접 입력"
+                        badgeTone="draft"
+                        open={store.hlOpenStates[`main_${h.id}`] ?? false}
+                        onToggle={() => store.toggleHlOpen(`main_${h.id}`)}
+                        detail={h.description ? <div className="text-[11px] text-[#666] mt-2">{h.description}</div> : undefined}
                       />
-                      <ExpandablePreviewRow
-                        icon="🤝"
-                        title="리멤버 직업 네트워크"
-                        subtitle="스타트업·마케팅 중심 인맥"
-                        badge="인증됨"
-                        badgeTone="verified"
-                        open={store.hlOpenStates.remember_main ?? false}
-                        onToggle={() => store.toggleHlOpen('remember_main')}
-                        detail={(
-                          <div className="text-[11px] text-[#666] mt-2">
-                            스타트업 38% · 마케팅 24% · IT 22% · 투자 16%
-                          </div>
-                        )}
-                      />
-                      {allHighlights.slice(0, 2).map((h) => (
-                        <ExpandablePreviewRow
-                          key={h.id}
-                          icon={h.icon}
-                          title={h.title}
-                          subtitle={[h.year, h.subtitle].filter(Boolean).join(' · ')}
-                          badge="직접 입력"
-                          badgeTone="draft"
-                          open={store.hlOpenStates[`main_${h.id}`] ?? false}
-                          onToggle={() => store.toggleHlOpen(`main_${h.id}`)}
-                          detail={h.description ? <div className="text-[11px] text-[#666] mt-2">{h.description}</div> : undefined}
-                        />
-                      ))}
-                      {allHighlights.length > 2 && (
-                        <div className="text-xs text-[#AAA]">외 {allHighlights.length - 2}개 더 있음</div>
-                      )}
-                    </div>
+                    ))}
+                    {allHighlights.length > 2 && <div className="text-xs text-[#AAA]">외 {allHighlights.length - 2}개 더 있음</div>}
                   </div>
                 )}
                 {key === 'reputation' && (
-                  <div>
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {SAMPLE_PROFILE.reputationKeywords.map((item) => (
-                        <div
-                          key={item.keyword}
-                          className="bg-[#0A0A0A] text-white text-xs font-semibold px-3 py-1.5 rounded-full"
-                        >
-                          {item.keyword} <span className="opacity-60">{item.count}</span>
-                        </div>
-                      ))}
-                    </div>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {SAMPLE_PROFILE.reputationKeywords.map((item) => (
+                      <div key={item.keyword} className="bg-[#0A0A0A] text-white text-xs font-semibold px-3 py-1.5 rounded-full">
+                        {item.keyword} <span className="opacity-60">{item.count}</span>
+                      </div>
+                    ))}
                   </div>
                 )}
-                {key === 'guestbook' && (
-                  <SectionGuestbook entries={SAMPLE_PROFILE.guestbook} />
-                )}
+                {key === 'guestbook' && <SectionGuestbook entries={SAMPLE_PROFILE.guestbook} />}
               </div>
             </div>
           ))}
         </div>
       </div>
-
-      {/* 하단 바 */}
-      <div className="absolute bottom-0 left-0 right-0 flex gap-2 px-4 py-3 border-t border-[#EBEBEB] bg-white">
-        <Button variant="outline" onClick={() => router.push('/archive')}>아카이브</Button>
-        <Button onClick={() => router.push(`/${user.linkId}`)}>프로필 미리보기</Button>
-      </div>
-
     </div>
-  )
-}
-
-function ProfileActionButton({
-  channel,
-  onClick,
-}: {
-  channel: { id: string; label: string; value: string; href?: string }
-  onClick: () => void
-}) {
-  const iconMap = {
-    phone: Phone,
-    email: Mail,
-    kakao: MessageCircle,
-    telegram: Send,
-  }
-  const Icon = iconMap[channel.id as keyof typeof iconMap] ?? MessageCircle
-
-  return (
-    <button
-      onClick={onClick}
-      className="rounded-[18px] border border-[#E7E7E7] bg-[#F8F8F8] px-2 py-2.5 text-center text-[#222] transition-colors active:bg-[#EFEFEF]"
-    >
-      <div className="mx-auto mb-1.5 flex h-9 w-9 items-center justify-center rounded-2xl bg-white shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]">
-        <Icon size={16} />
-      </div>
-      <div className="text-[11px] font-semibold">{channel.label}</div>
-    </button>
   )
 }
 
@@ -1106,6 +1080,114 @@ function SNSManageScreen({ onBack }: { onBack: () => void }) {
   )
 }
 
+function ContactManageScreen({ onBack }: { onBack: () => void }) {
+  const store = useByroStore()
+  const initialChannels: ContactChannel[] = (store.user?.contactChannels ?? SAMPLE_PROFILE.contactChannels) as ContactChannel[]
+  const [channels, setChannels] = useState<ContactChannel[]>(initialChannels)
+  const [sheetOpen, setSheetOpen] = useState(false)
+  const [selectedChannel, setSelectedChannel] = useState<ContactChannel | null>(null)
+  const [inputValue, setInputValue] = useState('')
+
+  const openSheet = (channel: ContactChannel) => {
+    setSelectedChannel(channel)
+    setInputValue(channel.value)
+    setSheetOpen(true)
+  }
+
+  const updateChannel = (id: ContactChannel['id'], patch: Partial<ContactChannel>) => {
+    setChannels((prev) => prev.map((channel) => (channel.id === id ? { ...channel, ...patch } : channel)))
+  }
+
+  const handleSaveChannel = () => {
+    if (!selectedChannel) return
+    const trimmed = inputValue.trim()
+    updateChannel(selectedChannel.id, {
+      value: trimmed,
+      enabled: trimmed.length > 0,
+      href: buildContactHref(selectedChannel.id, trimmed),
+    })
+    setSheetOpen(false)
+    showToast('연락 수단이 저장됐어요')
+  }
+
+  const handleDisableChannel = () => {
+    if (!selectedChannel) return
+    updateChannel(selectedChannel.id, { enabled: false })
+    setSheetOpen(false)
+    showToast('비활성화됐어요')
+  }
+
+  const handleApply = () => {
+    store.updateUserContactChannels(channels)
+    showToast('연락 수단 설정이 반영됐어요')
+    onBack()
+  }
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
+        <button onClick={onBack} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+        <span className="text-base font-black">연락 수단 관리</span>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-5 py-4">
+        <div className="text-xs text-[#888] mb-5">공개 프로필 상단 버튼에 노출될 연락 수단을 켜고 끌 수 있어요.</div>
+        <div className="space-y-1">
+          {channels.map((channel) => (
+            <button
+              key={channel.id}
+              onClick={() => openSheet(channel)}
+              className="flex items-center w-full py-3 border-b border-[#F1F1F1] text-left"
+            >
+              <div className="mr-3">
+                <ContactTypeIcon channelId={channel.id} enabled={channel.enabled} />
+              </div>
+              <div className="flex-1">
+                <div className="text-sm font-bold text-[#111]">{channel.label}</div>
+                <div className="text-xs text-[#888]">
+                  {channel.enabled ? channel.value || '연결됨' : '비활성화됨'}
+                </div>
+              </div>
+              <span className={['text-[11px] font-semibold rounded-full px-2 py-1', channel.enabled ? 'bg-[#E6F5E6] text-[#1A7A1A]' : 'bg-[#F2F2F2] text-[#999]'].join(' ')}>
+                {channel.enabled ? '활성' : '비활성'}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="px-5 pb-5 pt-3 border-t border-[#EBEBEB]">
+        <Button onClick={handleApply}>적용하기</Button>
+      </div>
+
+      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
+        <div className="px-5 pb-6">
+          <div className="flex items-center gap-3 mb-4">
+            {selectedChannel && <ContactTypeIcon channelId={selectedChannel.id} enabled={selectedChannel.enabled} />}
+            <div>
+              <div className="text-sm font-black">{selectedChannel?.label} 연동</div>
+              <div className="text-xs text-[#888]">값이 있으면 활성화되고, 비우면 버튼만 비활성화됩니다.</div>
+            </div>
+          </div>
+          <div className="text-xs text-[#555] mb-1">{selectedChannel?.label}</div>
+          <input
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder={contactPlaceholder(selectedChannel?.id)}
+            className="w-full border border-[#D9D9D9] rounded-xl px-4 py-3 text-sm outline-none mb-2"
+          />
+          <div className="text-[11px] text-[#AAA] mb-4">{contactPreview(selectedChannel?.id, inputValue)}</div>
+          <div className="space-y-2">
+            <Button onClick={handleSaveChannel}>저장하기</Button>
+            <Button variant="outline" onClick={handleDisableChannel}>비활성화</Button>
+            <Button variant="ghost" onClick={() => setSheetOpen(false)}>취소</Button>
+          </div>
+        </div>
+      </BottomSheet>
+    </div>
+  )
+}
+
 function SnsIcon({ label, bg }: { label: string; bg: string }) {
   return (
     <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-bold" style={{ backgroundColor: bg }}>
@@ -1141,6 +1223,55 @@ function SnsManageRow({
       <span className="text-sm text-[#BBB]">{disabled ? '준비중' : '›'}</span>
     </button>
   )
+}
+
+function ContactTypeIcon({
+  channelId,
+  enabled,
+}: {
+  channelId: ContactChannel['id']
+  enabled: boolean
+}) {
+  const iconMap = {
+    phone: Phone,
+    email: Mail,
+    kakao: MessageCircle,
+    telegram: Send,
+  }
+  const Icon = iconMap[channelId] ?? MessageCircle
+
+  return (
+    <div className={[
+      'w-10 h-10 rounded-xl flex items-center justify-center',
+      enabled ? 'bg-[#111] text-white' : 'bg-[#F1F1F1] text-[#AAA]',
+    ].join(' ')}>
+      <Icon size={16} />
+    </div>
+  )
+}
+
+function buildContactHref(id: ContactChannel['id'], value: string) {
+  const trimmed = value.trim()
+  if (!trimmed) return ''
+  if (id === 'phone') return `tel:${trimmed.replace(/[^0-9+]/g, '')}`
+  if (id === 'email') return `mailto:${trimmed}`
+  if (id === 'kakao') return trimmed.startsWith('http') ? trimmed : `https://open.kakao.com/o/${trimmed}`
+  if (id === 'telegram') return trimmed.startsWith('http') ? trimmed : `https://t.me/${trimmed.replace(/^@/, '')}`
+  return ''
+}
+
+function contactPlaceholder(id?: ContactChannel['id']) {
+  if (id === 'phone') return '010-1234-5678'
+  if (id === 'email') return 'name@byro.io'
+  if (id === 'kakao') return 'openchat 코드 또는 URL'
+  if (id === 'telegram') return '@username 또는 URL'
+  return ''
+}
+
+function contactPreview(id?: ContactChannel['id'], value?: string) {
+  if (!id) return ''
+  if (!value?.trim()) return '값을 비우면 비활성화 상태로 저장할 수 있어요.'
+  return buildContactHref(id, value)
 }
 
 function ReputationManageScreen({

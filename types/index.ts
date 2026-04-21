@@ -52,6 +52,14 @@ export interface ReceivedRequest {
   requestedAt: string
 }
 
+export interface ContactChannel {
+  id: 'phone' | 'email' | 'kakao' | 'telegram'
+  label: string
+  value: string
+  href?: string
+  enabled: boolean
+}
+
 export interface PublicProfile {
   linkId: string
   name: string
@@ -73,12 +81,7 @@ export interface PublicProfile {
     cover: string
     avatar: string
   }
-  contactChannels?: Array<{
-    id: string
-    label: string
-    value: string
-    href?: string
-  }>
+  contactChannels?: ContactChannel[]
   manualHighlights: Highlight[]
   experiences: Experience[]
   savedProfiles: SavedProfile[]
@@ -95,4 +98,5 @@ export interface UserState {
   selectedKeywords: string[]
   avatarColor?: string
   avatarImage?: string
+  contactChannels?: ContactChannel[]
 }

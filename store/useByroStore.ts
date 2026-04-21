@@ -3,7 +3,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { v4 as uuidv4 } from 'uuid'
-import type { OnboardingStep, Highlight, UserState } from '@/types'
+import type { OnboardingStep, Highlight, UserState, ContactChannel } from '@/types'
 import { SAMPLE_PROFILE } from '@/lib/mockData'
 
 const STEP_ORDER: OnboardingStep[] = [
@@ -70,6 +70,7 @@ interface ByroStore {
   setActiveArchiveTab(tab: 'saved' | 'recent' | 'requests'): void
   updateUserInfo(info: Partial<UserState>): void
   updateUserKeywords(keywords: string[]): void
+  updateUserContactChannels(channels: ContactChannel[]): void
 }
 
 export const useByroStore = create<ByroStore>()(persist((set, get) => ({
@@ -212,6 +213,9 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
         school: SAMPLE_PROFILE.school,
         bio: bio || SAMPLE_PROFILE.bio,
         selectedKeywords: selectedKeywords.length > 0 ? selectedKeywords : SAMPLE_PROFILE.selectedKeywords,
+        avatarColor: SAMPLE_PROFILE.avatarColor,
+        avatarImage: SAMPLE_PROFILE.avatarImage,
+        contactChannels: SAMPLE_PROFILE.contactChannels,
       },
       step: 'login',
     })
@@ -230,6 +234,9 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
         school: SAMPLE_PROFILE.school,
         bio: SAMPLE_PROFILE.bio,
         selectedKeywords: SAMPLE_PROFILE.selectedKeywords,
+        avatarColor: SAMPLE_PROFILE.avatarColor,
+        avatarImage: SAMPLE_PROFILE.avatarImage,
+        contactChannels: SAMPLE_PROFILE.contactChannels,
       },
     })
   },
@@ -311,6 +318,12 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   updateUserKeywords(keywords) {
     set((state) => ({
       user: state.user ? { ...state.user, selectedKeywords: keywords } : null,
+    }))
+  },
+
+  updateUserContactChannels(channels) {
+    set((state) => ({
+      user: state.user ? { ...state.user, contactChannels: channels } : null,
     }))
   },
 }), {

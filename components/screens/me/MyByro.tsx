@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, ChevronUp, Camera, Plus, X } from 'lucide-react'
+import { ChevronDown, ChevronUp, Camera, Mail, MessageCircle, Phone, Plus, Send, X } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
-import { Button, ProgressBar, BottomSheet, Modal, showToast, TextArea } from '@/components/ui'
+import { Button, BottomSheet, Modal, showToast, TextArea } from '@/components/ui'
 import type { Highlight } from '@/types'
 import {
   SAMPLE_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE,
@@ -33,7 +33,7 @@ export default function MyByro() {
   }, [store.isLoggedIn, router])
 
   const [screen, setScreen] = useState<Screen>('main')
-  const [sectionOrder, setSectionOrder] = useState<SectionKey[]>(['sns', 'highlight', 'reputation', 'guestbook'])
+  const [sectionOrder, setSectionOrder] = useState<SectionKey[]>(['reputation', 'guestbook', 'sns', 'highlight'])
   const dragItem = useRef<SectionKey | null>(null)
   const dragOver = useRef<SectionKey | null>(null)
   const sectionRefs = useRef<Map<SectionKey, HTMLElement>>(new Map())
@@ -136,36 +136,78 @@ export default function MyByro() {
       </div>
 
       <div className="flex-1 overflow-y-auto pb-24">
-        <div className="px-5 py-3">
-          <div className="flex justify-between text-xs text-[#555] mb-1">
-            <span>프로필 완성도</span>
-            <span className="font-bold">72%</span>
-          </div>
-          <ProgressBar value={72} />
-        </div>
-
-        <div className="px-5 pt-1 pb-4 border-b border-[#f0f0f0]">
-          <div className="flex gap-3 items-start">
-            <div
-              className="w-14 h-14 rounded-full flex items-center justify-center text-xl font-black text-[#555] flex-shrink-0"
-              style={{ backgroundColor: avatarColor }}
-            >
+        <div className="px-5 pt-4 pb-3">
+          <div className="rounded-[34px] bg-[#F7F4F1] p-[7px] shadow-[0_16px_36px_rgba(0,0,0,0.08)]">
+            <div className="relative h-[452px] overflow-hidden rounded-[30px] text-white ring-1 ring-black/4">
               {avatarImage ? (
-                <img src={avatarImage} alt={`${user.name} 프로필 사진`} className="w-full h-full rounded-full object-cover" />
+                <>
+                  <img src={avatarImage} alt={`${user.name} 프로필 사진`} className="absolute inset-0 h-full w-full object-cover" />
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.10)_58%,rgba(0,0,0,0.74)_100%)]" />
+                </>
               ) : (
-                user.name.charAt(0)
+                <>
+                  <div className={`absolute inset-0 bg-gradient-to-b ${SAMPLE_PROFILE.heroTheme.cover}`} />
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.24),rgba(255,255,255,0)_36%),linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.08)_56%,rgba(0,0,0,0.76)_100%)]" />
+                  <div className="absolute left-1/2 top-[16%] h-[196px] w-[196px] -translate-x-1/2 overflow-hidden rounded-[40px] border border-white/22 bg-gradient-to-br from-white/18 to-white/3 shadow-[0_28px_72px_rgba(0,0,0,0.18)] backdrop-blur-[6px]">
+                    <div
+                      className={`h-full w-full bg-gradient-to-br ${SAMPLE_PROFILE.heroTheme.avatar}`}
+                      style={{ backgroundColor: avatarColor }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center text-[72px] font-black text-[#4E3B32]/55">
+                      {user.name.charAt(0)}
+                    </div>
+                  </div>
+                </>
               )}
+
+              <div className="absolute inset-x-0 bottom-0 p-5">
+                <div className="flex items-center gap-1.5">
+                  <div className="text-[29px] font-black tracking-[-0.04em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.24)]">{user.name}</div>
+                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#43C07A] text-[10px] font-black text-white shadow-[0_8px_20px_rgba(67,192,122,0.35)]">✓</span>
+                </div>
+                <div className="mt-1 text-[15px] font-medium text-white/72">{user.title}</div>
+                <div className="mt-4 max-w-[318px] rounded-[18px] border border-white/12 bg-white/10 px-4 py-3 text-[15px] leading-[1.52] text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[8px]">
+                  {user.bio || SAMPLE_PROFILE.headline}
+                </div>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-base font-black">{user.name}</div>
-              <div className="text-sm text-[#555]">{user.title}</div>
-              {user.school && <div className="text-xs text-[#888]">🎓 {user.school}</div>}
-              {user.bio && <p className="text-xs text-[#555] mt-1 leading-relaxed line-clamp-2">{user.bio}</p>}
+
+            <div className="mt-3 grid grid-cols-4 gap-2">
+              {SAMPLE_PROFILE.contactChannels.map((channel) => (
+                <ProfileActionButton
+                  key={channel.id}
+                  channel={channel}
+                  onClick={() => {
+                    if (!channel.href) {
+                      showToast('연결 정보를 준비 중이에요')
+                      return
+                    }
+                    window.open(channel.href, channel.href.startsWith('http') ? '_blank' : '_self')
+                  }}
+                />
+              ))}
+            </div>
+
+            <div className="mt-4 flex flex-wrap gap-1.5">
+              {currentKeywords.map((keyword) => (
+                <span key={keyword} className="rounded-full border border-[#E4E4E4] bg-[#F6F6F6] px-2.5 py-1 text-[11px] text-[#555]">
+                  {keyword}
+                </span>
+              ))}
+            </div>
+
+            <div className="mt-4 flex gap-2">
               <button
                 onClick={() => setScreen('editBasic')}
-                className="mt-2 text-xs border border-[#D8D8D8] rounded-full px-3 py-1 text-[#555]"
+                className="flex-1 rounded-[18px] border border-[#D8D8D8] bg-white px-4 py-3 text-sm font-semibold text-[#555]"
               >
                 기본정보 편집
+              </button>
+              <button
+                onClick={() => router.push(`/${user.linkId}`)}
+                className="flex-1 rounded-[18px] bg-[#111] px-4 py-3 text-sm font-semibold text-white"
+              >
+                프로필 미리보기
               </button>
             </div>
           </div>
@@ -316,10 +358,38 @@ export default function MyByro() {
       {/* 하단 바 */}
       <div className="absolute bottom-0 left-0 right-0 flex gap-2 px-4 py-3 border-t border-[#EBEBEB] bg-white">
         <Button variant="outline" onClick={() => router.push('/archive')}>아카이브</Button>
-        <Button onClick={() => router.push(`/${user.linkId}`)}>프로필 공유</Button>
+        <Button onClick={() => router.push(`/${user.linkId}`)}>프로필 미리보기</Button>
       </div>
 
     </div>
+  )
+}
+
+function ProfileActionButton({
+  channel,
+  onClick,
+}: {
+  channel: { id: string; label: string; value: string; href?: string }
+  onClick: () => void
+}) {
+  const iconMap = {
+    phone: Phone,
+    email: Mail,
+    kakao: MessageCircle,
+    telegram: Send,
+  }
+  const Icon = iconMap[channel.id as keyof typeof iconMap] ?? MessageCircle
+
+  return (
+    <button
+      onClick={onClick}
+      className="rounded-[18px] border border-[#E7E7E7] bg-[#F8F8F8] px-2 py-2.5 text-center text-[#222] transition-colors active:bg-[#EFEFEF]"
+    >
+      <div className="mx-auto mb-1.5 flex h-9 w-9 items-center justify-center rounded-2xl bg-white shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]">
+        <Icon size={16} />
+      </div>
+      <div className="text-[11px] font-semibold">{channel.label}</div>
+    </button>
   )
 }
 

@@ -74,7 +74,6 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
   const [memoSheetOpen, setMemoSheetOpen] = useState(false)
   const [memoText, setMemoText] = useState('')
   const totalReputationCount = profile.reputationKeywords.reduce((sum, item) => sum + item.count, 0)
-  const totalHighlights = profile.manualHighlights.length + 4
 
   // SNS 토글
   const igOpen = store.snsOpenStates['instagram_' + username] ?? false
@@ -138,19 +137,19 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
       <div className="flex-1 overflow-y-auto">
         {/* 프로필 헤더 */}
         <div className="px-5 pt-4 pb-3">
-          <div className="rounded-[32px] border border-[#ECECEC] bg-white p-3 shadow-[0_12px_32px_rgba(0,0,0,0.06)]">
-            <div className="relative h-[440px] overflow-hidden rounded-[28px] text-white">
+          <div className="rounded-[34px] bg-[#F7F4F1] p-[7px] shadow-[0_16px_36px_rgba(0,0,0,0.08)]">
+            <div className="relative h-[452px] overflow-hidden rounded-[30px] text-white ring-1 ring-black/4">
               {profile.avatarImage ? (
                 <>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={profile.avatarImage} alt={`${profile.name} 프로필 사진`} className="absolute inset-0 h-full w-full object-cover" />
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,rgba(255,255,255,0.02)_28%,rgba(0,0,0,0.18)_58%,rgba(0,0,0,0.70)_100%)]" />
+                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.10)_58%,rgba(0,0,0,0.74)_100%)]" />
                 </>
               ) : (
                 <>
                   <div className={`absolute inset-0 bg-gradient-to-b ${heroTheme.cover}`} />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_24%,rgba(255,255,255,0.28),rgba(255,255,255,0)_34%),linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_32%,rgba(0,0,0,0.16)_58%,rgba(0,0,0,0.72)_100%)]" />
-                  <div className="absolute left-1/2 top-[18%] h-[188px] w-[188px] -translate-x-1/2 overflow-hidden rounded-[36px] border border-white/18 bg-gradient-to-br from-white/18 to-white/2 shadow-[0_24px_64px_rgba(0,0,0,0.18)] backdrop-blur-[6px]">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.24),rgba(255,255,255,0)_36%),linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.08)_56%,rgba(0,0,0,0.76)_100%)]" />
+                  <div className="absolute left-1/2 top-[16%] h-[196px] w-[196px] -translate-x-1/2 overflow-hidden rounded-[40px] border border-white/22 bg-gradient-to-br from-white/18 to-white/3 shadow-[0_28px_72px_rgba(0,0,0,0.18)] backdrop-blur-[6px]">
                     <div
                       className={`h-full w-full bg-gradient-to-br ${heroTheme.avatar}`}
                       style={{ backgroundColor: profile.avatarColor }}
@@ -164,11 +163,11 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
 
               <div className="absolute inset-x-0 bottom-0 p-5">
                 <div className="flex items-center gap-1.5">
-                  <div className="text-[28px] font-black tracking-[-0.04em]">{profile.name}</div>
-                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#43C07A] text-[10px] font-black text-white">✓</span>
+                  <div className="text-[29px] font-black tracking-[-0.04em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.24)]">{profile.name}</div>
+                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#43C07A] text-[10px] font-black text-white shadow-[0_8px_20px_rgba(67,192,122,0.35)]">✓</span>
                 </div>
-                <div className="mt-1 text-[15px] text-white/72">{profile.title}</div>
-                <div className="mt-4 max-w-[290px] text-[15px] leading-[1.5] text-white/92">
+                <div className="mt-1 text-[15px] font-medium text-white/72">{profile.title}</div>
+                <div className="mt-4 max-w-[318px] rounded-[18px] border border-white/12 bg-white/10 px-4 py-3 text-[15px] leading-[1.52] text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[8px]">
                   {profile.headline ?? profile.bio}
                 </div>
               </div>
@@ -198,17 +197,49 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
               ))}
             </div>
 
-            <div className="mt-4 grid grid-cols-3 gap-2">
-              <PublicMetricCard label="SNS" value={`${Number(profile.instagramConnected) + Number(profile.linkedinConnected)}개`} />
-              <PublicMetricCard label="하이라이트" value={`${totalHighlights}개`} />
-              <PublicMetricCard label="방명록" value={`${profile.guestbook.length}개`} />
-            </div>
           </div>
         </div>
 
         <div className="px-5 pb-2">
           <div className="bg-[#F7F8FA] border border-[#E5EAF2] rounded-xl px-3 py-2 text-xs text-[#5E6B7A]">
-            연락 버튼으로 바로 연결하고, SNS와 인증 하이라이트를 열어 이 사람의 신뢰 신호를 더 자세히 확인할 수 있어요.
+            연락 버튼으로 바로 연결하고, 평판과 방명록부터 확인한 뒤 SNS와 하이라이트로 이어서 살펴볼 수 있어요.
+          </div>
+        </div>
+
+        {/* ─── 평판 섹션 ───────────────────────────── */}
+        <div className="px-5 py-4">
+          <SectionTitle title="평판" subtitle={`총 ${totalReputationCount}회 기록`} />
+          <div className="flex flex-wrap gap-2">
+            {profile.reputationKeywords.map((item) => (
+              <div
+                key={item.keyword}
+                className="bg-[#0A0A0A] text-white text-xs font-semibold px-3 py-1.5 rounded-full"
+              >
+                {item.keyword} <span className="opacity-70">{item.count}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ─── 방명록 섹션 ─────────────────────────── */}
+        <div className="px-5 py-4">
+          <SectionTitle title="방명록" subtitle={`최근 메시지 ${profile.guestbook.length}개`} />
+          <div className="space-y-2">
+            {profile.guestbook.map((entry) => (
+              <div key={entry.id} className="flex gap-2.5 rounded-2xl border border-[#EBEBEB] px-3 py-3">
+                <div className="w-7 h-7 rounded-full bg-[#e0e0e0] flex items-center justify-center text-xs font-bold text-[#555] flex-shrink-0">
+                  {entry.authorName.charAt(0)}
+                </div>
+                <div className="flex-1">
+                  <div className="text-xs font-bold mb-0.5">{entry.authorName}</div>
+                  <div className="text-xs text-[#555]">{entry.message}</div>
+                  <div className="text-[10px] text-[#bbb] mt-0.5">{entry.date}</div>
+                </div>
+              </div>
+            ))}
+            {profile.guestbook.length > 2 && (
+              <button className="text-xs text-[#0D47A1] text-center w-full">더보기 ›</button>
+            )}
           </div>
         </div>
 
@@ -482,42 +513,7 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
           })}
         </div>
 
-        {/* ─── 평판 섹션 ───────────────────────────── */}
-        <div className="px-5 py-4">
-          <SectionTitle title="평판" subtitle={`총 ${totalReputationCount}회 기록`} />
-          <div className="flex flex-wrap gap-2">
-            {profile.reputationKeywords.map((item) => (
-              <div
-                key={item.keyword}
-                className="bg-[#0A0A0A] text-white text-xs font-semibold px-3 py-1.5 rounded-full"
-              >
-                {item.keyword} <span className="opacity-70">{item.count}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ─── 방명록 섹션 ─────────────────────────── */}
-        <div className="px-5 py-4 pb-28">
-          <SectionTitle title="방명록" subtitle={`최근 메시지 ${profile.guestbook.length}개`} />
-          <div className="space-y-2">
-            {profile.guestbook.map((entry) => (
-              <div key={entry.id} className="flex gap-2.5 rounded-2xl border border-[#EBEBEB] px-3 py-3">
-                <div className="w-7 h-7 rounded-full bg-[#e0e0e0] flex items-center justify-center text-xs font-bold text-[#555] flex-shrink-0">
-                  {entry.authorName.charAt(0)}
-                </div>
-                <div className="flex-1">
-                  <div className="text-xs font-bold mb-0.5">{entry.authorName}</div>
-                  <div className="text-xs text-[#555]">{entry.message}</div>
-                  <div className="text-[10px] text-[#bbb] mt-0.5">{entry.date}</div>
-                </div>
-              </div>
-            ))}
-            {profile.guestbook.length > 2 && (
-              <button className="text-xs text-[#0D47A1] text-center w-full">더보기 ›</button>
-            )}
-          </div>
-        </div>
+        <div className="h-24" />
       </div>
 
       {/* 하단 고정 바 */}
@@ -659,18 +655,6 @@ function SectionTitle({ title, subtitle }: { title: string; subtitle: string }) 
     <div className="mb-3">
       <div className="text-xs font-bold text-[#888] uppercase tracking-wider">{title}</div>
       <div className="text-xs text-[#AAA] mt-1">{subtitle}</div>
-    </div>
-  )
-}
-
-function PublicMetricCard({ label, value, dark = false }: { label: string; value: string; dark?: boolean }) {
-  return (
-    <div className={[
-      'rounded-2xl px-3 py-3 text-center',
-      dark ? 'border border-white/10 bg-white/8' : 'bg-[#F7F7F7]',
-    ].join(' ')}>
-      <div className={['text-[11px] mb-1', dark ? 'text-white/48' : 'text-[#888]'].join(' ')}>{label}</div>
-      <div className={['text-sm font-black', dark ? 'text-white' : 'text-[#111]'].join(' ')}>{value}</div>
     </div>
   )
 }

@@ -56,9 +56,12 @@ export interface PublicProfile {
   linkId: string
   name: string
   title: string
+  headline?: string
   school: string
   bio: string
   selectedKeywords: string[]
+  avatarColor?: string
+  avatarImage?: string
   instagramConnected: boolean
   linkedinConnected: boolean
   careerHighlight: { avgYears: number; vsIndustryPercent: number }
@@ -66,6 +69,16 @@ export interface PublicProfile {
     total: number
     industries: { name: string; ratio: number }[]
   }
+  heroTheme?: {
+    cover: string
+    avatar: string
+  }
+  contactChannels?: Array<{
+    id: string
+    label: string
+    value: string
+    href?: string
+  }>
   manualHighlights: Highlight[]
   experiences: Experience[]
   savedProfiles: SavedProfile[]

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, ChevronUp, Bookmark } from 'lucide-react'
+import { ChevronDown, ChevronUp, Bookmark, Mail, MessageCircle, Phone, Send, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import {
   Button, Chip, BottomSheet, Modal, TextArea, InfoBox, showToast,
@@ -21,7 +21,21 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
 
   // username에 따라 프로필 데이터 선택
   const isJimin = username === 'jiminlee'
-  const rawProfile = isJimin ? JIMIN_PROFILE : SAMPLE_PROFILE
+  const isOwnProfile = store.user?.linkId === username
+  const baseProfile = isJimin ? JIMIN_PROFILE : SAMPLE_PROFILE
+  const rawProfile = isOwnProfile && store.user
+    ? {
+      ...baseProfile,
+      name: store.user.name,
+      linkId: store.user.linkId,
+      title: store.user.title,
+      school: store.user.school,
+      bio: store.user.bio,
+      selectedKeywords: store.user.selectedKeywords,
+      avatarColor: store.user.avatarColor ?? baseProfile.avatarColor,
+      avatarImage: store.user.avatarImage ?? baseProfile.avatarImage,
+    }
+    : baseProfile
 
   // 공통 필드 정규화
   const profile = {
@@ -35,6 +49,13 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
     reputationKeywords: rawProfile.reputationKeywords,
     guestbook: rawProfile.guestbook,
   }
+  const heroTheme = 'heroTheme' in rawProfile
+    ? rawProfile.heroTheme
+    : {
+      cover: 'from-[#B69B8B] via-[#836F66] to-[#121212]',
+      avatar: 'from-[#DCC5B6] to-[#8F7265]',
+    }
+  const contactChannels = 'contactChannels' in rawProfile ? rawProfile.contactChannels : []
   const corporateHighlight = 'corporateHighlight' in rawProfile
     ? rawProfile.corporateHighlight
     : { companyCount: 1, years: 4, summary: '창업 4년차 · 정상 운영 중 · 폐업 이력 없음' }
@@ -81,7 +102,7 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
   return (
     <div className="flex flex-col h-full">
       {/* 상단 네비 */}
-      <div className="flex items-center px-4 h-12 border-b border-[#EBEBEB] bg-white flex-shrink-0">
+      <div className="flex items-center px-4 h-12 border-b border-[#EBEBEB] bg-white/92 backdrop-blur-sm flex-shrink-0">
         <button onClick={() => router.back()} className="text-sm text-[#555] mr-2">‹</button>
         <div className="flex-1 min-w-0">
           <div className="text-[11px] text-[#AAA] uppercase tracking-[0.18em]">Public Profile</div>
@@ -104,7 +125,12 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
           >
             <Bookmark size={14} color={bookmarked ? '#fff' : '#555'} />
           </button>
-          <button className="text-xs text-[#555]">공유</button>
+          <button
+            onClick={() => showToast('공유 링크를 준비 중이에요')}
+            className="w-8 h-8 flex items-center justify-center rounded-xl border border-[#ddd] bg-white"
+          >
+            <Share2 size={14} color="#555" />
+          </button>
         </div>
       </div>
 
@@ -112,43 +138,83 @@ export default function PublicProfile({ username }: PublicProfileProps) { // esl
       <div className="flex-1 overflow-y-auto">
         {/* 프로필 헤더 */}
         <div className="px-5 pt-4 pb-3">
-          <div className="rounded-[28px] border border-[#EBEBEB] bg-white px-4 py-4">
-            <div className="flex gap-3 items-start mb-3">
-              <div className="w-14 h-14 rounded-full bg-[#e0e0e0] flex items-center justify-center text-xl font-black text-[#555] flex-shrink-0">
-                {profile.name.charAt(0)}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <div className="text-lg font-black">{profile.name}</div>
-                  <span className="text-[10px] font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-full px-2 py-0.5">검증됨</span>
+          <div className="overflow-hidden rounded-[32px] bg-[#111] text-white">
+            <div className={`relative h-[248px] bg-gradient-to-b ${heroTheme.cover}`}>
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(0,0,0,0.08)_45%,rgba(0,0,0,0.86)_100%)]" />
+              <div className="absolute inset-x-0 bottom-0 p-5">
+                <div
+                  className={[
+                    'mb-4 h-14 w-14 overflow-hidden rounded-[20px] shadow-[0_12px_28px_rgba(0,0,0,0.24)]',
+                    profile.avatarImage ? 'bg-black/10' : `bg-gradient-to-br ${heroTheme.avatar}`,
+                  ].join(' ')}
+                  style={!profile.avatarImage ? { backgroundColor: profile.avatarColor } : undefined}
+                >
+                  {profile.avatarImage ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={profile.avatarImage} alt={`${profile.name} 프로필 사진`} className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-xl font-black text-[#5F4A40]">
+                      {profile.name.charAt(0)}
+                    </div>
+                  )}
                 </div>
-                <div className="text-sm text-[#555] mt-0.5">{profile.title}</div>
-                {profile.school && <div className="text-xs text-[#888] mt-1">🎓 {profile.school}</div>}
-                <div className="text-xs text-[#AAA] mt-1">@{profile.linkId}</div>
+                <div className="flex items-center gap-1.5">
+                  <div className="text-[28px] font-black tracking-[-0.04em]">{profile.name}</div>
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#43C07A] text-[10px] font-black text-white">✓</span>
+                </div>
+                <div className="mt-1 text-[15px] text-white/72">{profile.title}</div>
+                {(profile.headline || profile.bio) && (
+                  <div className="mt-4 max-w-[285px] rounded-[18px] border border-white/12 bg-white/8 px-4 py-3 backdrop-blur-[10px]">
+                    {profile.headline && (
+                      <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/48">
+                        Intro
+                      </div>
+                    )}
+                    <div className="mt-1 text-[15px] leading-[1.5] text-white/92">
+                      {profile.headline ?? profile.bio}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
-            {profile.bio && <p className="text-sm text-[#333] leading-relaxed">{profile.bio}</p>}
+            <div className="bg-[#111] px-4 pb-4 pt-3">
+              <div className="grid grid-cols-4 gap-2">
+                {contactChannels.map((channel) => (
+                  <ContactActionButton
+                    key={channel.id}
+                    channel={channel}
+                    onClick={() => {
+                      if (!channel.href) {
+                        showToast('연결 정보를 준비 중이에요')
+                        return
+                      }
+                      window.open(channel.href, channel.href.startsWith('http') ? '_blank' : '_self')
+                    }}
+                  />
+                ))}
+              </div>
 
-            <div className="flex flex-wrap gap-1.5 mt-4">
-              {profile.selectedKeywords.map((keyword) => (
-                <span key={keyword} className="text-[11px] bg-[#F4F4F4] text-[#333] rounded-full px-2.5 py-1">
-                  {keyword}
-                </span>
-              ))}
-            </div>
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {profile.selectedKeywords.map((keyword) => (
+                  <span key={keyword} className="rounded-full border border-white/14 bg-white/8 px-2.5 py-1 text-[11px] text-white/78">
+                    {keyword}
+                  </span>
+                ))}
+              </div>
 
-            <div className="grid grid-cols-3 gap-2 mt-4">
-              <PublicMetricCard label="SNS" value={`${Number(profile.instagramConnected) + Number(profile.linkedinConnected)}개`} />
-              <PublicMetricCard label="하이라이트" value={`${totalHighlights}개`} />
-              <PublicMetricCard label="평판" value={`${totalReputationCount}회`} />
+              <div className="mt-4 grid grid-cols-3 gap-2">
+                <PublicMetricCard dark label="SNS" value={`${Number(profile.instagramConnected) + Number(profile.linkedinConnected)}개`} />
+                <PublicMetricCard dark label="하이라이트" value={`${totalHighlights}개`} />
+                <PublicMetricCard dark label="방명록" value={`${profile.guestbook.length}개`} />
+              </div>
             </div>
           </div>
         </div>
 
         <div className="px-5 pb-2">
           <div className="bg-[#F7F8FA] border border-[#E5EAF2] rounded-xl px-3 py-2 text-xs text-[#5E6B7A]">
-            SNS와 인증 하이라이트를 열어보면 이 사람의 이력과 신뢰 신호를 더 자세히 볼 수 있어요.
+            연락 버튼으로 바로 연결하고, SNS와 인증 하이라이트를 열어 이 사람의 신뢰 신호를 더 자세히 확인할 수 있어요.
           </div>
         </div>
 
@@ -603,11 +669,42 @@ function SectionTitle({ title, subtitle }: { title: string; subtitle: string }) 
   )
 }
 
-function PublicMetricCard({ label, value }: { label: string; value: string }) {
+function PublicMetricCard({ label, value, dark = false }: { label: string; value: string; dark?: boolean }) {
   return (
-    <div className="rounded-2xl bg-[#F7F7F7] px-3 py-3 text-center">
-      <div className="text-[11px] text-[#888] mb-1">{label}</div>
-      <div className="text-sm font-black text-[#111]">{value}</div>
+    <div className={[
+      'rounded-2xl px-3 py-3 text-center',
+      dark ? 'border border-white/10 bg-white/8' : 'bg-[#F7F7F7]',
+    ].join(' ')}>
+      <div className={['text-[11px] mb-1', dark ? 'text-white/48' : 'text-[#888]'].join(' ')}>{label}</div>
+      <div className={['text-sm font-black', dark ? 'text-white' : 'text-[#111]'].join(' ')}>{value}</div>
     </div>
+  )
+}
+
+function ContactActionButton({
+  channel,
+  onClick,
+}: {
+  channel: { id: string; label: string; value: string; href?: string }
+  onClick: () => void
+}) {
+  const iconMap = {
+    phone: Phone,
+    email: Mail,
+    kakao: MessageCircle,
+    telegram: Send,
+  }
+  const Icon = iconMap[channel.id as keyof typeof iconMap] ?? MessageCircle
+
+  return (
+    <button
+      onClick={onClick}
+      className="rounded-[18px] border border-white/10 bg-white/6 px-2 py-2.5 text-center text-white transition-colors active:bg-white/12"
+    >
+      <div className="mx-auto mb-1.5 flex h-9 w-9 items-center justify-center rounded-2xl bg-white/10">
+        <Icon size={16} />
+      </div>
+      <div className="text-[11px] font-semibold">{channel.label}</div>
+    </button>
   )
 }

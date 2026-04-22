@@ -14,7 +14,6 @@ import PublicProfile from '@/components/screens/profile/PublicProfile'
 
 type Screen = 'preview' | 'manage' | 'editBasic' | 'editHighlight' | 'editSNS' | 'editReputation' | 'editContact'
 type SectionKey = 'sns' | 'highlight' | 'reputation' | 'guestbook'
-type CropAspectId = 'original' | 'free' | '1:1' | '3:4' | '4:3' | '9:16' | '16:9'
 
 const SECTION_LABELS: Record<SectionKey, string> = {
   sns: 'SNS 연동',
@@ -22,16 +21,6 @@ const SECTION_LABELS: Record<SectionKey, string> = {
   reputation: '평판 키워드',
   guestbook: '방명록',
 }
-
-const CROP_ASPECT_OPTIONS: Array<{ id: CropAspectId; label: string }> = [
-  { id: 'original', label: '원본' },
-  { id: 'free', label: '자유롭게' },
-  { id: '1:1', label: '1:1' },
-  { id: '3:4', label: '3:4' },
-  { id: '4:3', label: '4:3' },
-  { id: '9:16', label: '9:16' },
-  { id: '16:9', label: '16:9' },
-]
 
 // ─────────────────────────────────────────────────────────────────────────────
 export default function MyByro() {
@@ -441,14 +430,14 @@ function BasicInfoEditScreen({
   const [avatarImage, setAvatarImage] = useState(user.avatarImage ?? '')
   const [cropSource, setCropSource] = useState('')
   const [cropOpen, setCropOpen] = useState(false)
-  const [cropAspect, setCropAspect] = useState<CropAspectId>('free')
-  const [cropZoom, setCropZoom] = useState(1)
+  const [cropFrame, setCropFrame] = useState(DEFAULT_CROP_FRAME)
   const [cropPosition, setCropPosition] = useState({ x: 0, y: 0 })
   const [cropNaturalSize, setCropNaturalSize] = useState({ width: 1, height: 1 })
   const [kwPickerOpen, setKwPickerOpen] = useState(false)
   const [pickerTempKw, setPickerTempKw] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const dragStartRef = useRef<{ x: number; y: number; startX: number; startY: number } | null>(null)
+  const resizeStartRef = useRef<{ x: number; direction: 'left' | 'right'; width: number } | null>(null)
 
   const removeKw = (kw: string) => setKeywords((prev) => prev.filter((k) => k !== kw))
 
@@ -496,8 +485,7 @@ function BasicInfoEditScreen({
         img.onload = () => {
           setCropNaturalSize({ width: img.width, height: img.height })
           setCropSource(reader.result as string)
-          setCropAspect('free')
-          setCropZoom(1)
+          setCropFrame(DEFAULT_CROP_FRAME)
           setCropPosition({ x: 0, y: 0 })
           setCropOpen(true)
         }
@@ -508,11 +496,9 @@ function BasicInfoEditScreen({
     event.target.value = ''
   }
 
-  const cropAspectRatio = getCropAspectRatio(cropAspect, cropNaturalSize.width, cropNaturalSize.height)
-  const cropFrame = getCropFrameSize(cropAspectRatio)
   const cropStage = {
-    width: Math.min(360, Math.max(cropFrame.width + 56, 300)),
-    height: Math.min(560, Math.max(cropFrame.height + 120, 420)),
+    width: 344,
+    height: 468,
   }
   const cropFrameOffset = {
     x: (cropStage.width - cropFrame.width) / 2,
@@ -520,8 +506,8 @@ function BasicInfoEditScreen({
   }
   const cropBase = getCropBaseSize(cropNaturalSize.width, cropNaturalSize.height, cropFrame)
   const cropScaled = {
-    width: cropBase.width * cropZoom,
-    height: cropBase.height * cropZoom,
+    width: cropBase.width,
+    height: cropBase.height,
   }
   const boundedCropPosition = clampCropPosition(cropPosition, cropScaled.width, cropScaled.height, cropFrame)
 
@@ -536,6 +522,16 @@ function BasicInfoEditScreen({
   }
 
   const handleCropPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (resizeStartRef.current) {
+      const deltaX = event.clientX - resizeStartRef.current.x
+      const directionFactor = resizeStartRef.current.direction === 'right' ? 2 : -2
+      const nextWidth = clampCropFrameWidth(resizeStartRef.current.width + deltaX * directionFactor, cropStage)
+      const nextFrame = getFixedCropFrame(nextWidth)
+      const nextBase = getCropBaseSize(cropNaturalSize.width, cropNaturalSize.height, nextFrame)
+      setCropFrame(nextFrame)
+      setCropPosition((prev) => clampCropPosition(prev, nextBase.width, nextBase.height, nextFrame))
+      return
+    }
     if (!dragStartRef.current) return
     const deltaX = event.clientX - dragStartRef.current.x
     const deltaY = event.clientY - dragStartRef.current.y
@@ -547,18 +543,19 @@ function BasicInfoEditScreen({
 
   const handleCropPointerEnd = () => {
     dragStartRef.current = null
+    resizeStartRef.current = null
   }
 
-  const handleZoomChange = (nextZoom: number) => {
-    setCropZoom(nextZoom)
-    setCropPosition((prev) => clampCropPosition(prev, cropBase.width * nextZoom, cropBase.height * nextZoom, cropFrame))
-  }
-
-  const handleAspectChange = (nextAspect: CropAspectId) => {
-    setCropAspect(nextAspect)
-    const nextFrame = getCropFrameSize(getCropAspectRatio(nextAspect, cropNaturalSize.width, cropNaturalSize.height))
-    const nextBase = getCropBaseSize(cropNaturalSize.width, cropNaturalSize.height, nextFrame)
-    setCropPosition((prev) => clampCropPosition(prev, nextBase.width * cropZoom, nextBase.height * cropZoom, nextFrame))
+  const handleFrameResizeStart = (
+    event: React.PointerEvent<HTMLButtonElement>,
+    direction: 'left' | 'right',
+  ) => {
+    resizeStartRef.current = {
+      x: event.clientX,
+      direction,
+      width: cropFrame.width,
+    }
+    event.stopPropagation()
   }
 
   const handleApplyCrop = async () => {
@@ -767,39 +764,31 @@ function BasicInfoEditScreen({
                     }}
                   />
                 </div>
+
+                <button
+                  onPointerDown={(event) => handleFrameResizeStart(event, 'left')}
+                  className="absolute z-10 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/40 bg-white/12 backdrop-blur-sm"
+                  style={{
+                    left: `${cropFrameOffset.x}px`,
+                    top: `${cropFrameOffset.y + cropFrame.height / 2}px`,
+                  }}
+                  aria-label="프레임 축소 또는 확대"
+                />
+                <button
+                  onPointerDown={(event) => handleFrameResizeStart(event, 'right')}
+                  className="absolute z-10 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/40 bg-white/12 backdrop-blur-sm"
+                  style={{
+                    left: `${cropFrameOffset.x + cropFrame.width}px`,
+                    top: `${cropFrameOffset.y + cropFrame.height / 2}px`,
+                  }}
+                  aria-label="프레임 축소 또는 확대"
+                />
               </div>
             </div>
 
             <div className="px-5 pb-5">
               <div className="text-[11px] text-white/68 text-center mb-4">
-                직사각형은 메인 카드, 내부 원형 가이드는 방명록 프로필 이미지를 기준으로 합니다.
-              </div>
-
-              <div className="px-1">
-                <input
-                  type="range"
-                  min="1"
-                  max="2.4"
-                  step="0.05"
-                  value={cropZoom}
-                  onChange={(e) => handleZoomChange(Number(e.target.value))}
-                  className="w-full accent-white"
-                />
-              </div>
-
-              <div className="mt-5 flex items-center justify-between text-sm text-white/78">
-                {CROP_ASPECT_OPTIONS.map((option) => (
-                  <button
-                    key={option.id}
-                    onClick={() => handleAspectChange(option.id)}
-                    className={[
-                      'min-w-[40px] rounded-full px-3 py-2 text-center text-xs transition-colors',
-                      cropAspect === option.id ? 'bg-white text-black font-semibold' : 'text-white/70',
-                    ].join(' ')}
-                  >
-                    {option.label}
-                  </button>
-                ))}
+                이미지는 드래그해서 옮기고, 좌우 핸들로 4:5 프레임 크기를 조절하세요. 내부 원형 가이드는 방명록 프로필 이미지를 기준으로 합니다.
               </div>
             </div>
           </div>
@@ -1646,34 +1635,20 @@ function SectionGuestbook({ entries }: {
   )
 }
 
+const CROP_RATIO = 4 / 5
 const DEFAULT_CROP_FRAME = { width: 256, height: 320 }
 
-function getCropAspectRatio(aspect: CropAspectId, imageWidth: number, imageHeight: number) {
-  if (aspect === 'original') return imageWidth / imageHeight
-  if (aspect === 'free') return DEFAULT_CROP_FRAME.width / DEFAULT_CROP_FRAME.height
-
-  const [width, height] = aspect.split(':').map(Number)
-  if (!width || !height) return DEFAULT_CROP_FRAME.width / DEFAULT_CROP_FRAME.height
-  return width / height
+function getFixedCropFrame(width: number) {
+  return {
+    width,
+    height: width / CROP_RATIO,
+  }
 }
 
-function getCropFrameSize(aspectRatio: number) {
-  const maxWidth = 288
-  const maxHeight = 360
-
-  if (aspectRatio >= 1) {
-    const width = maxWidth
-    return {
-      width,
-      height: Math.min(maxHeight, width / aspectRatio),
-    }
-  }
-
-  const height = maxHeight
-  return {
-    width: Math.min(maxWidth, height * aspectRatio),
-    height,
-  }
+function clampCropFrameWidth(width: number, stage: { width: number; height: number }) {
+  const minWidth = 180
+  const maxWidth = Math.min(stage.width - 40, (stage.height - 56) * CROP_RATIO)
+  return Math.max(minWidth, Math.min(maxWidth, width))
 }
 
 function getCropBaseSize(

@@ -166,31 +166,31 @@ function ManageByroScreen({
 
       <div className="flex-1 overflow-y-auto pb-24">
         <div className="px-5 py-4">
-          <div className="mb-3 rounded-[24px] border border-[#EBEBEB] bg-white p-4">
+          <div className="surface-card mb-3 p-4">
             <div className="flex items-center justify-between gap-3">
               <div>
-                <div className="text-sm font-black text-[#111]">프로필 완성도 {completionPercent}%</div>
-                <div className="mt-1 text-xs text-[#777]">
+                <div className="text-sm font-black text-[var(--color-text-strong)]">프로필 완성도 {completionPercent}%</div>
+                <div className="meta-text mt-1">
                   {remainingItems.length > 0
                     ? `${remainingItems.map((item) => item.label).join(', ')} 항목을 채우면 더 좋아져요.`
                     : '기본 프로필 구성이 완료됐어요.'}
                 </div>
               </div>
-              <div className="rounded-full bg-[#F5F5F5] px-3 py-1 text-xs font-semibold text-[#555]">
+              <div className="rounded-full bg-[var(--color-bg-muted)] px-3 py-1 text-xs font-semibold text-[var(--color-text-secondary)]">
                 {completionChecks.filter((item) => item.done).length}/{completionChecks.length}
               </div>
             </div>
-            <div className="mt-3 h-2 rounded-full bg-[#F1F1F1] overflow-hidden">
-              <div className="h-full rounded-full bg-[#111]" style={{ width: `${completionPercent}%` }} />
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--color-bg-muted)]">
+              <div className="h-full rounded-full bg-[var(--color-accent-dark)]" style={{ width: `${completionPercent}%` }} />
             </div>
           </div>
 
-          <div className="rounded-[24px] border border-[#EBEBEB] bg-[#FAFAFA] p-4">
-            <div className="text-sm font-black text-[#111] mb-1">공개 프로필 관리</div>
-            <div className="text-xs text-[#777] leading-relaxed mb-4">내 Byro와 공개 프로필은 같은 화면을 사용합니다. 아래에서 노출 정보와 연결 수단을 관리하세요.</div>
+          <div className="surface-card-soft p-4">
+            <div className="text-sm font-black text-[var(--color-text-strong)] mb-1">공개 프로필 관리</div>
+            <div className="meta-text mb-4 leading-relaxed">내 Byro와 공개 프로필은 같은 화면을 사용합니다. 아래에서 노출 정보와 연결 수단을 관리하세요.</div>
             <div className="grid grid-cols-2 gap-2">
-              <button onClick={onEditBasic} className="rounded-[18px] bg-white border border-[#DDD] px-4 py-3 text-sm font-semibold text-[#444]">기본정보 편집</button>
-              <button onClick={onEditContact} className="rounded-[18px] bg-[#111] px-4 py-3 text-sm font-semibold text-white">연락 수단 관리</button>
+              <button onClick={onEditBasic} className="rounded-[18px] border bg-white px-4 py-3 text-sm font-semibold text-[var(--color-text-primary)]" style={{ borderColor: 'var(--color-border-default)' }}>기본정보 편집</button>
+              <button onClick={onEditContact} className="rounded-[18px] px-4 py-3 text-sm font-semibold text-white" style={{ backgroundColor: 'var(--color-accent-dark)' }}>연락 수단 관리</button>
             </div>
           </div>
         </div>

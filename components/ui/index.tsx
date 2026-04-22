@@ -116,13 +116,13 @@ interface ButtonProps {
 }
 
 const BUTTON_VARIANTS: Record<string, string> = {
-  primary: 'bg-[#0A0A0A] text-white active:opacity-80',
-  outline: 'bg-white text-[#0A0A0A] border border-[#0A0A0A] active:opacity-80',
-  ghost: 'bg-transparent text-[#888] active:opacity-70',
+  primary: 'text-white active:opacity-80',
+  outline: 'bg-white border active:opacity-80',
+  ghost: 'bg-transparent active:opacity-70',
   kakao: 'bg-[#FEE500] text-[#333] active:opacity-80',
-  google: 'bg-white text-[#333] border border-[#EBEBEB] active:opacity-80',
+  google: 'bg-white border active:opacity-80',
   naver: 'bg-[#03C75A] text-white active:opacity-80',
-  danger: 'bg-white text-[#E53935] border border-[#E53935] active:opacity-80',
+  danger: 'bg-white border active:opacity-80',
 }
 
 export function Button({
@@ -135,13 +135,30 @@ export function Button({
       onClick={onClick}
       disabled={disabled}
       className={[
-        'rounded-xl font-bold active:scale-[0.97] transition-all duration-100 select-none',
+        'rounded-[var(--radius-md)] font-bold active:scale-[0.97] transition-all duration-100 select-none',
         size === 'md' ? 'px-4 py-3 text-sm' : 'px-3 py-2 text-xs',
         fullWidth ? 'w-full' : '',
         disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer',
         BUTTON_VARIANTS[variant] ?? BUTTON_VARIANTS.primary,
         className,
       ].join(' ')}
+      style={{
+        backgroundColor:
+          variant === 'primary' ? 'var(--color-accent-dark)'
+            : variant === 'ghost' ? 'transparent'
+              : undefined,
+        color:
+          variant === 'outline' ? 'var(--color-accent-dark)'
+            : variant === 'ghost' ? 'var(--color-text-secondary)'
+              : variant === 'google' ? 'var(--color-text-primary)'
+                : variant === 'danger' ? 'var(--color-state-danger-text)'
+                  : undefined,
+        borderColor:
+          variant === 'outline' ? 'var(--color-accent-dark)'
+            : variant === 'google' ? 'var(--color-border-default)'
+              : variant === 'danger' ? 'var(--color-state-danger-text)'
+                : undefined,
+      }}
     >
       {children}
     </button>

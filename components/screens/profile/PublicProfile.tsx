@@ -183,7 +183,7 @@ export default function PublicProfile({
                 }
               }}
               className={[
-                'w-8 h-8 flex items-center justify-center rounded-xl border',
+                'icon-button',
                 bookmarked ? 'bg-[#0A0A0A] border-[#0A0A0A]' : 'bg-white border-[#ddd]',
               ].join(' ')}
             >
@@ -191,7 +191,7 @@ export default function PublicProfile({
             </button>
             <button
               onClick={() => showToast('공유 링크를 준비 중이에요')}
-              className="w-8 h-8 flex items-center justify-center rounded-xl border border-[#ddd] bg-white"
+              className="icon-button"
             >
               <Share2 size={14} color="#555" />
             </button>
@@ -200,14 +200,14 @@ export default function PublicProfile({
           <div className="flex items-center gap-3">
             <button
               onClick={handleCopyProfileLink}
-              className="w-8 h-8 flex items-center justify-center rounded-xl border border-[#ddd] bg-white"
+              className="icon-button"
               aria-label="프로필 링크 복사"
             >
               <Copy size={14} color="#555" />
             </button>
             <button
               onClick={handleShareProfile}
-              className="w-8 h-8 flex items-center justify-center rounded-xl border border-[#ddd] bg-white"
+              className="icon-button"
               aria-label="프로필 공유"
             >
               <Share2 size={14} color="#555" />
@@ -220,7 +220,7 @@ export default function PublicProfile({
       <div className="flex-1 overflow-y-auto">
         {/* 프로필 헤더 */}
         <div className="px-5 pt-4 pb-3">
-          <div className="rounded-[34px] bg-[#F7F4F1] p-[7px] shadow-[0_16px_36px_rgba(0,0,0,0.08)]">
+          <div className="hero-card bg-[var(--color-bg-soft)] p-[7px]">
             <div className="relative h-[452px] overflow-hidden rounded-[30px] text-white ring-1 ring-black/4">
               {profile.avatarImage ? (
                 <>
@@ -283,15 +283,15 @@ export default function PublicProfile({
               </div>
             )}
 
-            <div className="mt-4 rounded-[24px] border border-[#EBEBEB] bg-white px-4 py-4">
+            <div className="surface-card mt-4 px-4 py-4">
               <div>
-                <div className="text-sm font-black text-[#111]">누적 평판</div>
-                <div className="mt-0.5 text-[11px] text-[#999]">키워드와 최근 방명록으로 신뢰도를 보여줘요</div>
+                <div className="text-sm font-black text-[var(--color-text-strong)]">누적 평판</div>
+                <div className="micro-text mt-0.5">키워드와 최근 방명록으로 신뢰도를 보여줘요</div>
               </div>
 
               <div className="mt-3 flex flex-wrap gap-2">
                 {keywordCounts.map((item) => (
-                  <span key={item.keyword} className="rounded-[14px] bg-[#F3F3F3] px-3 py-2 text-[12px] font-semibold text-[#444]">
+                  <span key={item.keyword} className="chip-metric">
                     {item.keyword} <span className="ml-1 font-black text-[#111]">{item.count}</span>
                   </span>
                 ))}
@@ -328,7 +328,8 @@ export default function PublicProfile({
               {profile.guestbook.length > 0 && (
                 <button
                   onClick={() => router.push(`/${profile.linkId}/guestbook`)}
-                  className="mt-4 w-full rounded-[16px] border border-[#E5E5E5] px-3 py-2.5 text-xs font-semibold text-[#555]"
+                  className="mt-4 w-full rounded-[var(--radius-md)] border px-3 py-2.5 text-xs font-semibold"
+                  style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-secondary)' }}
                 >
                   더보기
                 </button>
@@ -345,7 +346,7 @@ export default function PublicProfile({
           />
 
           {profile.instagramConnected && (
-            <div className="mb-2 rounded-[22px] border border-[#EBEBEB] overflow-hidden">
+            <div className="mb-2 overflow-hidden rounded-[22px] border" style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-surface)' }}>
               <div className="flex items-center gap-3 px-4 py-3">
                 <button
                   onClick={() => store.toggleSnsOpen('instagram_' + username)}
@@ -378,7 +379,7 @@ export default function PublicProfile({
               </div>
               {igOpen && (
                 <div className="px-4 pb-4">
-                  <div className="rounded-2xl bg-[#FAFAFA] border border-[#F0F0F0] px-3 py-3 mb-3">
+                  <div className="surface-card-soft mb-3 rounded-2xl px-3 py-3">
                     <div className="text-[11px] text-[#888] mb-1">AI 요약</div>
                     <p className="text-xs text-[#555] leading-relaxed">{profile.instagram.aiSummary}</p>
                   </div>
@@ -401,7 +402,7 @@ export default function PublicProfile({
           )}
 
           {profile.linkedinConnected && (
-            <div className="mb-2 rounded-[22px] border border-[#EBEBEB] overflow-hidden">
+            <div className="mb-2 overflow-hidden rounded-[22px] border" style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-surface)' }}>
               <div className="flex items-center gap-3 px-4 py-3">
                 <button
                   onClick={() => store.toggleSnsOpen('linkedin_' + username)}
@@ -434,7 +435,7 @@ export default function PublicProfile({
               </div>
               {liOpen && (
                 <div className="px-4 pb-4">
-                  <div className="rounded-2xl bg-[#FAFAFA] border border-[#F0F0F0] px-3 py-3 mb-3">
+                  <div className="surface-card-soft mb-3 rounded-2xl px-3 py-3">
                     <div className="text-[11px] text-[#888] mb-1">AI 요약</div>
                     <p className="text-xs text-[#555] leading-relaxed">
                       Growth 마케팅과 B2B SaaS 제품 전략을 중심으로 활동하며, 스타트업 초기 마케팅 구조 설계 경험이 풍부합니다.
@@ -646,8 +647,8 @@ export default function PublicProfile({
         </div>
 
         <div className="px-5 pt-2 pb-6">
-          <div className="rounded-[26px] border border-[#EBEBEB] bg-[#FAFAFA] px-4 py-4">
-            <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#999] mb-3">Connect</div>
+          <div className="surface-card-soft rounded-[26px] px-4 py-4">
+            <div className="micro-text mb-3 font-bold uppercase tracking-[0.16em]">Connect</div>
             {!isOwnerMode && (
               <div className="flex gap-2 mb-4">
                 <Button variant="outline" onClick={() => showToast('피드백 요청을 보냈어요!')}>피드백 요청</Button>

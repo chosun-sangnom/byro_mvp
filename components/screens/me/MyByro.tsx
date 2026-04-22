@@ -32,10 +32,7 @@ export default function MyByro() {
   }, [store.isLoggedIn, router])
 
   const [screen, setScreen] = useState<Screen>('preview')
-  const [sectionOrder, setSectionOrder] = useState<SectionKey[]>(['reputation', 'guestbook', 'sns', 'highlight'])
-  const dragItem = useRef<SectionKey | null>(null)
-  const dragOver = useRef<SectionKey | null>(null)
-  const sectionRefs = useRef<Map<SectionKey, HTMLElement>>(new Map())
+  const sectionOrder: SectionKey[] = ['reputation', 'guestbook', 'sns', 'highlight']
 
   if (!store.isLoggedIn) return null
   const user = store.user!
@@ -45,61 +42,6 @@ export default function MyByro() {
   const allHighlights = [...SAMPLE_PROFILE.manualHighlights, ...store.highlights]
   const connectedSnsCount = Number(instagramConnected) + Number(linkedinConnected)
   const totalReputationCount = SAMPLE_PROFILE.reputationKeywords.reduce((sum, item) => sum + item.count, 0)
-
-  const handleDragStart = (key: SectionKey) => { dragItem.current = key }
-  const handleDragEnter = (key: SectionKey) => { dragOver.current = key }
-  const handleDragEnd = () => {
-    if (!dragItem.current || !dragOver.current || dragItem.current === dragOver.current) return
-    const nextOrder = [...sectionOrder]
-    const from = nextOrder.indexOf(dragItem.current)
-    const to = nextOrder.indexOf(dragOver.current)
-    nextOrder.splice(from, 1)
-    nextOrder.splice(to, 0, dragItem.current)
-    setSectionOrder(nextOrder)
-    dragItem.current = null
-    dragOver.current = null
-    showToast('블럭 순서가 변경됐어요')
-  }
-  const handleTouchStart = (key: SectionKey) => {
-    dragItem.current = key
-  }
-  const handleTouchMove = (e: React.TouchEvent) => {
-    const touch = e.touches[0]
-    for (const [sectionKey, el] of Array.from(sectionRefs.current.entries())) {
-      const rect = el.getBoundingClientRect()
-      if (touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
-        dragOver.current = sectionKey
-        break
-      }
-    }
-  }
-  const handleTouchEnd = () => {
-    if (!dragItem.current || !dragOver.current || dragItem.current === dragOver.current) {
-      dragItem.current = null
-      dragOver.current = null
-      return
-    }
-    const nextOrder = [...sectionOrder]
-    const from = nextOrder.indexOf(dragItem.current)
-    const to = nextOrder.indexOf(dragOver.current)
-    nextOrder.splice(from, 1)
-    nextOrder.splice(to, 0, dragItem.current)
-    setSectionOrder(nextOrder)
-    dragItem.current = null
-    dragOver.current = null
-    showToast('블럭 순서가 변경됐어요')
-  }
-
-  const moveSection = (key: SectionKey, direction: 'up' | 'down') => {
-    const nextOrder = [...sectionOrder]
-    const from = nextOrder.indexOf(key)
-    const to = direction === 'up' ? from - 1 : from + 1
-    if (from < 0 || to < 0 || to >= nextOrder.length) return
-    const [item] = nextOrder.splice(from, 1)
-    nextOrder.splice(to, 0, item)
-    setSectionOrder(nextOrder)
-    showToast('블럭 순서가 변경됐어요')
-  }
   // ── 화면 분기 ──────────────────────────────────────────────
   if (screen === 'preview') {
     return (
@@ -119,7 +61,6 @@ export default function MyByro() {
         connectedSnsCount={connectedSnsCount}
         totalReputationCount={totalReputationCount}
         sectionOrder={sectionOrder}
-        sectionRefs={sectionRefs}
         store={store}
         instagramConnected={instagramConnected}
         linkedinConnected={linkedinConnected}
@@ -131,13 +72,6 @@ export default function MyByro() {
         onEditContact={() => setScreen('editContact')}
         onEditGuestbook={() => setScreen('editGuestbook')}
         user={user}
-        moveSection={moveSection}
-        handleDragStart={handleDragStart}
-        handleDragEnter={handleDragEnter}
-        handleDragEnd={handleDragEnd}
-        handleTouchStart={handleTouchStart}
-        handleTouchMove={handleTouchMove}
-        handleTouchEnd={handleTouchEnd}
       />
     )
   }
@@ -179,7 +113,6 @@ function ManageByroScreen({
   connectedSnsCount,
   totalReputationCount,
   sectionOrder,
-  sectionRefs,
   store,
   instagramConnected,
   linkedinConnected,
@@ -191,19 +124,11 @@ function ManageByroScreen({
   onEditContact,
   onEditGuestbook,
   user,
-  moveSection,
-  handleDragStart,
-  handleDragEnter,
-  handleDragEnd,
-  handleTouchStart,
-  handleTouchMove,
-  handleTouchEnd,
 }: {
   allHighlights: Highlight[]
   connectedSnsCount: number
   totalReputationCount: number
   sectionOrder: SectionKey[]
-  sectionRefs: React.MutableRefObject<Map<SectionKey, HTMLElement>>
   store: {
     logout: () => void
     hlOpenStates: Record<string, boolean>
@@ -219,13 +144,6 @@ function ManageByroScreen({
   onEditContact: () => void
   onEditGuestbook: () => void
   user: UserState
-  moveSection: (key: SectionKey, direction: 'up' | 'down') => void
-  handleDragStart: (key: SectionKey) => void
-  handleDragEnter: (key: SectionKey) => void
-  handleDragEnd: () => void
-  handleTouchStart: (key: SectionKey) => void
-  handleTouchMove: (e: React.TouchEvent) => void
-  handleTouchEnd: () => void
 }) {
   const activeContactCount = user.contactChannels?.filter((channel) => channel.enabled && channel.value.trim()).length ?? 0
   const completionChecks = [
@@ -279,24 +197,8 @@ function ManageByroScreen({
 
         <div className="px-5 pt-1">
           {sectionOrder.map((key) => (
-            <div
-              key={key}
-              ref={(el) => { if (el) sectionRefs.current.set(key, el) }}
-              className="mb-1"
-              draggable
-              onDragStart={() => handleDragStart(key)}
-              onDragEnter={() => handleDragEnter(key)}
-              onDragEnd={handleDragEnd}
-              onDragOver={(e) => e.preventDefault()}
-            >
+            <div key={key} className="mb-1">
               <div className="flex items-center py-2.5 border-b border-[#f5f5f5]">
-                <span
-                  className="mr-2 text-[#BBB] cursor-grab select-none"
-                  style={{ touchAction: 'none' }}
-                  onTouchStart={() => handleTouchStart(key)}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
-                >≡</span>
                 <span className="mr-2">
                   {key === 'sns' && '📱'}
                   {key === 'highlight' && '✨'}
@@ -311,22 +213,6 @@ function ManageByroScreen({
                     {key === 'reputation' && `방문자가 남긴 키워드 ${totalReputationCount}회`}
                     {key === 'guestbook' && `최근 메시지 ${SAMPLE_PROFILE.guestbook.length}개`}
                   </div>
-                </div>
-                <div className="flex items-center gap-1 mr-2">
-                  <button
-                    onClick={() => moveSection(key, 'up')}
-                    disabled={sectionOrder.indexOf(key) === 0}
-                    className="w-6 h-6 text-[10px] border border-[#DDD] rounded text-[#777] disabled:opacity-30"
-                  >
-                    ↑
-                  </button>
-                  <button
-                    onClick={() => moveSection(key, 'down')}
-                    disabled={sectionOrder.indexOf(key) === sectionOrder.length - 1}
-                    className="w-6 h-6 text-[10px] border border-[#DDD] rounded text-[#777] disabled:opacity-30"
-                  >
-                    ↓
-                  </button>
                 </div>
                 {(key === 'sns' || key === 'highlight' || key === 'reputation') && (
                   <button

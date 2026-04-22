@@ -429,7 +429,7 @@ function BasicInfoEditScreen({
   const [cropOpen, setCropOpen] = useState(false)
   const [cropFrame, setCropFrame] = useState({ x: 44, y: 74, width: DEFAULT_CROP_FRAME.width, height: DEFAULT_CROP_FRAME.height })
   const [cropNaturalSize, setCropNaturalSize] = useState({ width: 1, height: 1 })
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const fileInputId = `profile-photo-input-${user.linkId}`
   const dragStartRef = useRef<{ x: number; y: number; frameX: number; frameY: number } | null>(null)
   const resizeStartRef = useRef<{
     x: number
@@ -552,18 +552,18 @@ function BasicInfoEditScreen({
               )}
             </div>
             <input
-              ref={fileInputRef}
+              id={fileInputId}
               type="file"
               accept="image/*"
-              className="hidden"
+              className="sr-only"
               onChange={handleAvatarFileChange}
             />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-1 text-xs text-[#555]"
+            <label
+              htmlFor={fileInputId}
+              className="flex cursor-pointer items-center gap-1 text-xs text-[#555]"
             >
               <Camera size={12} /> 사진 변경
-            </button>
+            </label>
             <div className="text-[11px] text-[#AAA] mt-1">직사각형 메인 카드와 원형 프로필 이미지에 같이 사용됩니다.</div>
           </div>
 

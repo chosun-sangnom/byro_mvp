@@ -263,7 +263,7 @@ export default function PublicProfile({
             {profile.guestbook.map((entry) => (
               <button
                 key={entry.id}
-                onClick={() => router.push('/' + (entry.linkId || 'jiminlee'))}
+                onClick={() => router.push('/jiminlee')}
                 className="flex w-full gap-2.5 rounded-2xl border border-[#EBEBEB] px-3 py-3 text-left"
               >
                 <div className="w-7 h-7 rounded-full bg-[#e0e0e0] flex items-center justify-center text-xs font-bold text-[#555] flex-shrink-0">

@@ -153,7 +153,7 @@ export const JIMIN_PROFILE = {
   name: '이지민',
   title: '스타트업 마케터 4년 경력',
   avatarColor: '#D8C4B2',
-  avatarImage: '',
+  avatarImage: '/images/jimin-profile-5x4.jpg',
   headline: '브랜드와 사람을 연결하는 스타트업 마케터',
   school: '연세대학교 경영학과 졸업',
   bio: '스타트업 생태계에서 브랜드와 사람을 연결하는 마케터입니다.',

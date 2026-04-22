@@ -79,7 +79,7 @@ export default function Archive() {
             {savedProfiles.map((p) => (
               <button
                 key={p.id}
-                onClick={() => router.push('/' + p.linkId)}
+                onClick={() => router.push('/jiminlee')}
                 className="flex items-center gap-3 rounded-[22px] border border-[#EBEBEB] bg-white px-4 py-4 w-full text-left mb-3"
               >
                 <div className="w-10 h-10 rounded-full bg-[#e0e0e0] flex items-center justify-center font-bold text-[#555] text-sm flex-shrink-0">
@@ -110,7 +110,7 @@ export default function Archive() {
             {recentProfiles.map((p) => (
               <button
                 key={p.id}
-                onClick={() => router.push('/' + p.linkId)}
+                onClick={() => router.push('/jiminlee')}
                 className="flex items-center gap-3 rounded-[22px] border border-[#EBEBEB] bg-white px-4 py-4 w-full text-left mb-3"
               >
                 <div className="w-10 h-10 rounded-full bg-[#e0e0e0] flex items-center justify-center font-bold text-[#555] text-sm flex-shrink-0">
@@ -147,7 +147,7 @@ export default function Archive() {
                   : <p className="text-xs text-[#aaa] mb-3 italic">요청 메시지 없음</p>}
                 <div className="flex gap-2">
                   <button
-                    onClick={() => router.push('/' + r.linkId)}
+                    onClick={() => router.push('/jiminlee')}
                     className="flex-1 bg-[#0A0A0A] text-white text-xs font-bold py-2 rounded-xl"
                   >
                     경험 남기기

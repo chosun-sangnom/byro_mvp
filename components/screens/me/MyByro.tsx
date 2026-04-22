@@ -1629,7 +1629,7 @@ function SectionGuestbook({ entries }: {
         return (
           <button
             key={entry.id}
-            onClick={() => { if (clickable) router.push('/' + entry.linkId) }}
+            onClick={() => { if (clickable) router.push('/jiminlee') }}
             className={['flex gap-2.5 py-2 border-b border-[#f5f5f5] last:border-0 w-full text-left',
               clickable ? 'cursor-pointer' : 'cursor-default'].join(' ')}
           >

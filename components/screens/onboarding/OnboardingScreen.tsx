@@ -27,6 +27,7 @@ export default function OnboardingScreen() {
   const [showExitModal, setShowExitModal] = useState(false)
 
   const stepNum = STEP_NUMS[store.step] ?? 0
+  const linkIdValid = /^[a-z0-9_]{4,20}$/.test(store.linkId)
 
   const handleClose = () => setShowExitModal(true)
   const handleExitConfirm = () => {
@@ -34,13 +35,32 @@ export default function OnboardingScreen() {
     router.push('/')
   }
 
-  const hasBack = stepNum >= 3 // Step 3(linkid)부터 이전 버튼
+  const hasBack = stepNum >= 1 && stepNum <= 8
+  const stepNavConfig: Partial<Record<typeof store.step, { canNext: boolean; onNext: () => void }>> = {
+    verify: { canNext: store.agreedTerms && store.agreedPrivacy, onNext: () => store.nextStep() },
+    linkid: { canNext: linkIdValid, onNext: () => store.nextStep() },
+    keywords: { canNext: true, onNext: () => store.nextStep() },
+    sns: { canNext: true, onNext: () => store.nextStep() },
+    contact: { canNext: true, onNext: () => store.nextStep() },
+    highlight: { canNext: true, onNext: () => store.nextStep() },
+  }
+  const currentStepNav = stepNavConfig[store.step]
 
   return (
     <div className="flex flex-col h-full">
       {/* Nav */}
       <NavBar
         onBack={hasBack ? () => store.prevStep() : undefined}
+        right={currentStepNav ? (
+          <button
+            onClick={currentStepNav.onNext}
+            disabled={!currentStepNav.canNext}
+            className="text-xs font-semibold disabled:opacity-35"
+            style={{ color: currentStepNav.canNext ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}
+          >
+            다음
+          </button>
+        ) : undefined}
         onClose={handleClose}
       />
 

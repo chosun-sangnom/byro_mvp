@@ -4,6 +4,7 @@ export type OnboardingStep =
   | 'linkid'
   | 'keywords'
   | 'sns'
+  | 'contact'
   | 'highlight'
   | 'bio-select'
   | 'bio-ai'

@@ -39,9 +39,9 @@ export default function Archive() {
       </div>
 
       <div className="px-5 pt-4 pb-3">
-        <div className="rounded-[28px] border border-[#EBEBEB] bg-white px-4 py-4">
+        <div className="surface-card px-4 py-4 rounded-[28px]">
           <div className="text-sm font-black mb-1">만났던 사람과 신뢰 기록</div>
-          <div className="text-xs text-[#666] leading-relaxed mb-4">
+          <div className="meta-text leading-relaxed mb-4">
             저장한 프로필, 최근 본 사람, 경험 요청을 한 곳에서 관리할 수 있어요.
           </div>
           <div className="grid grid-cols-3 gap-2">
@@ -62,8 +62,9 @@ export default function Archive() {
               'flex-1 min-w-fit py-2.5 px-3 text-xs font-semibold rounded-full border transition-colors',
               activeArchiveTab === tab.key
                 ? 'border-[#0A0A0A] bg-[#0A0A0A] text-white'
-                : 'border-[#E2E2E2] bg-white text-[#888]',
+                : 'bg-white text-[var(--color-text-secondary)]',
             ].join(' ')}
+            style={activeArchiveTab === tab.key ? undefined : { borderColor: 'var(--color-border-default)' }}
           >
             {tab.label}
           </button>
@@ -80,7 +81,7 @@ export default function Archive() {
               <button
                 key={p.id}
                 onClick={() => router.push('/jiminlee')}
-                className="flex items-center gap-3 rounded-[22px] border border-[#EBEBEB] bg-white px-4 py-4 w-full text-left mb-3"
+                className="surface-card flex items-center gap-3 rounded-[22px] px-4 py-4 w-full text-left mb-3"
               >
                 {p.name === '이지민' ? (
                   <div className="w-10 h-10 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
@@ -118,7 +119,7 @@ export default function Archive() {
               <button
                 key={p.id}
                 onClick={() => router.push('/jiminlee')}
-                className="flex items-center gap-3 rounded-[22px] border border-[#EBEBEB] bg-white px-4 py-4 w-full text-left mb-3"
+                className="surface-card flex items-center gap-3 rounded-[22px] px-4 py-4 w-full text-left mb-3"
               >
                 {p.name === '이지민' ? (
                   <div className="w-10 h-10 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
@@ -145,7 +146,7 @@ export default function Archive() {
           <div className="px-5 py-3">
             <div className="text-xs text-[#AAA] mb-3">다른 사람이 남긴 경험 요청</div>
             {receivedRequests.map((r) => (
-              <div key={r.id} className="border border-[#EBEBEB] rounded-[24px] bg-white p-4 mb-3">
+              <div key={r.id} className="surface-card rounded-[24px] p-4 mb-3">
                 <div className="flex items-center gap-2 mb-2">
                   {r.name === '이지민' ? (
                     <div className="w-8 h-8 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
@@ -164,7 +165,7 @@ export default function Archive() {
                   <span className="text-xs text-[#bbb]">{r.requestedAt}</span>
                 </div>
                 {r.message
-                  ? <p className="text-xs text-[#555] mb-3 leading-relaxed rounded-2xl bg-[#FAFAFA] border border-[#F0F0F0] px-3 py-3">{r.message}</p>
+                  ? <p className="surface-card-soft text-xs text-[#555] mb-3 leading-relaxed rounded-2xl px-3 py-3">{r.message}</p>
                   : <p className="text-xs text-[#aaa] mb-3 italic">요청 메시지 없음</p>}
                 <div className="flex gap-2">
                   <button
@@ -175,7 +176,8 @@ export default function Archive() {
                   </button>
                   <button
                     onClick={() => showToast('나중에 목록 하단으로 이동했어요')}
-                    className="flex-1 border border-[#ddd] text-xs font-bold py-2 rounded-xl text-[#555]"
+                    className="flex-1 border text-xs font-bold py-2 rounded-xl text-[#555]"
+                    style={{ borderColor: 'var(--color-border-default)' }}
                   >
                     나중에
                   </button>
@@ -191,9 +193,9 @@ export default function Archive() {
 
 function ArchiveMetricCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl bg-[#F7F7F7] px-3 py-3 text-center">
-      <div className="text-[11px] text-[#888] mb-1">{label}</div>
-      <div className="text-sm font-black text-[#111]">{value}</div>
+    <div className="surface-card-soft rounded-2xl px-3 py-3 text-center">
+      <div className="micro-text mb-1">{label}</div>
+      <div className="text-sm font-black text-[var(--color-text-strong)]">{value}</div>
     </div>
   )
 }

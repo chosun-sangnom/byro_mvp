@@ -2,12 +2,13 @@
 
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { Trash2 } from 'lucide-react'
+import { Mail, MessageCircle, Phone, Send, Trash2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import {
   NavBar, StepBar, Button, Chip, CheckRow, BottomSheet, Modal,
   InfoBox, TextArea, AiBounce, showToast,
 } from '@/components/ui'
+import type { ContactChannel } from '@/types'
 import {
   KEYWORD_GROUPS, HIGHLIGHT_CATEGORIES, AI_BIO_CANDIDATES,
   INSTAGRAM_PROFILE, LINKEDIN_PROFILE,
@@ -15,7 +16,7 @@ import {
 
 const STEP_NUMS: Record<string, number> = {
   login: 0, verify: 1, linkid: 2, keywords: 3, sns: 4,
-  highlight: 5, 'bio-select': 6, 'bio-ai': 7, complete: 8,
+  contact: 5, highlight: 6, 'bio-select': 7, 'bio-ai': 8, complete: 9,
 }
 
 export default function OnboardingScreen() {
@@ -42,8 +43,8 @@ export default function OnboardingScreen() {
       />
 
       {/* Step indicator (로그인 제외) */}
-      {stepNum >= 1 && stepNum <= 7 && (
-        <StepBar current={stepNum} total={7} />
+      {stepNum >= 1 && stepNum <= 8 && (
+        <StepBar current={stepNum} total={8} />
       )}
 
       {/* Content */}
@@ -53,10 +54,11 @@ export default function OnboardingScreen() {
         {store.step === 'linkid'    && <Step3LinkId />}
         {store.step === 'keywords'  && <Step4Keywords />}
         {store.step === 'sns'       && <Step5SNS />}
-        {store.step === 'highlight' && <Step6Highlight />}
-        {store.step === 'bio-select' && <Step7Select />}
-        {store.step === 'bio-ai'   && <Step7AI />}
-        {store.step === 'complete'  && <Step8Complete />}
+        {store.step === 'contact'   && <Step6Contact />}
+        {store.step === 'highlight' && <Step7Highlight />}
+        {store.step === 'bio-select' && <Step8Select />}
+        {store.step === 'bio-ai'   && <Step8AI />}
+        {store.step === 'complete'  && <Step9Complete />}
       </div>
 
       {/* Exit modal */}
@@ -86,10 +88,10 @@ function StepIntro({
   description: string
 }) {
   return (
-    <div className="rounded-[28px] border border-[#EBEBEB] bg-white px-4 py-4 mb-5">
-      {eyebrow && <div className="text-[11px] text-[#AAA] uppercase tracking-[0.18em] mb-2">{eyebrow}</div>}
+    <div className="surface-card px-4 py-4 mb-5 rounded-[28px]">
+      {eyebrow && <div className="micro-text uppercase tracking-[0.18em] mb-2">{eyebrow}</div>}
       <h2 className="text-[22px] font-black leading-tight mb-2">{title}</h2>
-      <p className="text-sm text-[#555] leading-relaxed whitespace-pre-line">{description}</p>
+      <p className="text-sm leading-relaxed whitespace-pre-line text-[var(--color-text-secondary)]">{description}</p>
     </div>
   )
 }
@@ -118,7 +120,7 @@ function SelectionCard({
         'w-full text-left rounded-[24px] border px-4 py-4 transition-colors',
         tone === 'accent'
           ? 'border-[#E8A000] bg-[#FFF8E6]'
-          : 'border-[#EBEBEB] bg-white',
+          : 'border-[var(--color-border-default)] bg-[var(--color-bg-surface)]',
       ].join(' ')}
     >
       <div className="flex items-start gap-3">
@@ -138,6 +140,55 @@ function SelectionCard({
       </div>
     </button>
   )
+}
+
+function ContactTypeIcon({
+  channelId,
+  enabled,
+}: {
+  channelId: ContactChannel['id']
+  enabled: boolean
+}) {
+  const iconMap = {
+    phone: Phone,
+    email: Mail,
+    kakao: MessageCircle,
+    telegram: Send,
+  }
+  const Icon = iconMap[channelId] ?? MessageCircle
+
+  return (
+    <div className={[
+      'flex h-10 w-10 items-center justify-center rounded-xl',
+      enabled ? 'bg-[var(--color-accent-dark)] text-white' : 'bg-[var(--color-bg-muted)] text-[var(--color-text-tertiary)]',
+    ].join(' ')}>
+      <Icon size={16} />
+    </div>
+  )
+}
+
+function buildContactHref(id: ContactChannel['id'], value: string) {
+  const trimmed = value.trim()
+  if (!trimmed) return ''
+  if (id === 'phone') return `tel:${trimmed.replace(/[^0-9+]/g, '')}`
+  if (id === 'email') return `mailto:${trimmed}`
+  if (id === 'kakao') return trimmed.startsWith('http') ? trimmed : `https://open.kakao.com/o/${trimmed}`
+  if (id === 'telegram') return trimmed.startsWith('http') ? trimmed : `https://t.me/${trimmed.replace(/^@/, '')}`
+  return ''
+}
+
+function contactPlaceholder(id?: ContactChannel['id']) {
+  if (id === 'phone') return '010-1234-5678'
+  if (id === 'email') return 'name@byro.io'
+  if (id === 'kakao') return 'openchat 코드 또는 URL'
+  if (id === 'telegram') return '@username 또는 URL'
+  return ''
+}
+
+function contactPreview(id?: ContactChannel['id'], value?: string) {
+  if (!id) return ''
+  if (!value?.trim()) return '값을 비우면 비활성화 상태로 저장할 수 있어요.'
+  return buildContactHref(id, value)
 }
 
 // ─── Step 1: 소셜 로그인 ────────────────────────────────
@@ -424,8 +475,148 @@ function Step5SNS() {
   )
 }
 
-// ─── Step 6: 하이라이트 ───────────────────────────────────
-function Step6Highlight() {
+// ─── Step 6: 연락 수단 ───────────────────────────────────
+function Step6Contact() {
+  const store = useByroStore()
+  const [sheetOpen, setSheetOpen] = useState(false)
+  const [selectedChannel, setSelectedChannel] = useState<ContactChannel | null>(null)
+  const [inputValue, setInputValue] = useState('')
+  const channels = store.onboardingContactChannels
+  const activeCount = channels.filter((channel) => channel.enabled && channel.value.trim()).length
+
+  const openChannel = (channel: ContactChannel) => {
+    setSelectedChannel(channel)
+    setInputValue(channel.value)
+    setSheetOpen(true)
+  }
+
+  const handleSaveChannel = () => {
+    if (!selectedChannel) return
+    const trimmed = inputValue.trim()
+    const next = channels.map((channel) => (
+      channel.id === selectedChannel.id
+        ? {
+          ...channel,
+          value: trimmed,
+          enabled: Boolean(trimmed),
+          href: trimmed ? buildContactHref(selectedChannel.id, trimmed) : '',
+        }
+        : channel
+    ))
+    store.setOnboardingContactChannels(next)
+    setSheetOpen(false)
+    setSelectedChannel(null)
+    setInputValue('')
+    showToast(trimmed ? '연락 수단이 저장됐어요!' : '연락 수단을 비활성화했어요')
+  }
+
+  const handleClearChannel = () => {
+    if (!selectedChannel) return
+    const next = channels.map((channel) => (
+      channel.id === selectedChannel.id
+        ? { ...channel, value: '', enabled: false, href: '' }
+        : channel
+    ))
+    store.setOnboardingContactChannels(next)
+    setSheetOpen(false)
+    setSelectedChannel(null)
+    setInputValue('')
+    showToast('연락 수단을 비활성화했어요')
+  }
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex-1 overflow-y-auto px-5 py-4">
+        <StepIntro
+          eyebrow="Contact"
+          title={'연락 수단을\n연결해보세요'}
+          description={'프로필을 본 사람이 바로 연락할 수 있어요.\n전화, 이메일, 카카오, 텔레그램 중 원하는 것만 연결하면 됩니다.'}
+        />
+
+        <div className="surface-card-soft p-4 mb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-sm font-black text-[var(--color-text-strong)]">연결된 연락 수단</div>
+              <div className="meta-text mt-1">온보딩 후에도 Byro 편집에서 언제든 바꿀 수 있어요.</div>
+            </div>
+            <div className="rounded-full bg-[var(--color-bg-muted)] px-3 py-1 text-xs font-semibold text-[var(--color-text-secondary)]">
+              {activeCount}/4
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          {channels.map((channel) => (
+            <button
+              key={channel.id}
+              onClick={() => openChannel(channel)}
+              className="flex w-full items-center gap-3 rounded-[20px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-4 text-left"
+            >
+              <ContactTypeIcon channelId={channel.id} enabled={channel.enabled} />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <div className="text-sm font-black text-[var(--color-text-strong)]">{channel.label}</div>
+                  <span
+                    className={[
+                      'rounded-full px-2 py-0.5 text-[10px] font-bold',
+                      channel.enabled
+                        ? 'bg-[var(--color-state-success-bg)] text-[var(--color-state-success-text)]'
+                        : 'bg-[var(--color-bg-muted)] text-[var(--color-text-tertiary)]',
+                    ].join(' ')}
+                  >
+                    {channel.enabled ? '연결됨' : '미연결'}
+                  </span>
+                </div>
+                <div className="meta-text mt-1 truncate">
+                  {channel.value?.trim() ? channel.value : `${channel.label}을 연결해보세요`}
+                </div>
+              </div>
+              <span className="text-sm text-[var(--color-text-tertiary)]">›</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="px-5 pb-5 pt-3 border-t border-[#EBEBEB] space-y-2">
+        <Button onClick={() => store.nextStep()}>다음</Button>
+        <button className="w-full text-center text-sm text-[#888]" onClick={() => store.nextStep()}>나중에 연결하기</button>
+      </div>
+
+      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
+        <div className="px-5 pb-6">
+          <div className="text-sm font-black mb-4">{selectedChannel?.label ?? '연락 수단'} 설정</div>
+          {selectedChannel && (
+            <>
+              <div className="flex items-center gap-3 mb-4">
+                <ContactTypeIcon channelId={selectedChannel.id} enabled={Boolean(inputValue.trim())} />
+                <div className="min-w-0">
+                  <div className="text-sm font-bold text-[var(--color-text-strong)]">{selectedChannel.label}</div>
+                  <div className="meta-text">{selectedChannel.id === 'phone' ? '전화번호를 입력하면 바로 걸 수 있어요.' : selectedChannel.id === 'email' ? '이메일 주소를 입력하면 메일로 연결돼요.' : selectedChannel.id === 'kakao' ? '오픈채팅 링크나 코드를 입력해 주세요.' : '텔레그램 사용자명이나 링크를 입력해 주세요.'}</div>
+                </div>
+              </div>
+
+              <input
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder={contactPlaceholder(selectedChannel.id)}
+                className="w-full border border-[#ddd] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0A0A0A] mb-2"
+              />
+              <div className="text-[11px] text-[#AAA] mb-4">{contactPreview(selectedChannel.id, inputValue)}</div>
+
+              <div className="space-y-2">
+                <Button onClick={handleSaveChannel}>저장하기</Button>
+                <Button variant="outline" onClick={handleClearChannel}>비활성화</Button>
+              </div>
+            </>
+          )}
+        </div>
+      </BottomSheet>
+    </div>
+  )
+}
+
+// ─── Step 7: 하이라이트 ───────────────────────────────────
+function Step7Highlight() {
   const store = useByroStore()
   const [sheetOpen, setSheetOpen] = useState(false)
   const certItems = [
@@ -618,8 +809,8 @@ function Step6Highlight() {
   )
 }
 
-// ─── Step 7-S: 자기소개 방법 선택 ────────────────────────
-function Step7Select() {
+// ─── Step 8-S: 자기소개 방법 선택 ────────────────────────
+function Step8Select() {
   const store = useByroStore()
   const [noDataModal, setNoDataModal] = useState(false)
 
@@ -710,8 +901,8 @@ function Step7Select() {
   )
 }
 
-// ─── Step 7-A: AI 자기소개 / Step 7-B: 직접 작성 (분기) ───
-function Step7AI() {
+// ─── Step 8-A: AI 자기소개 / Step 8-B: 직접 작성 (분기) ───
+function Step8AI() {
   const store = useByroStore()
   const isManual = store.selectedBioMethod === 'manual'
 
@@ -831,7 +1022,7 @@ function Step7AI() {
 }
 
 // ─── Step 8: 프로필 완성 ──────────────────────────────────
-function Step8Complete() {
+function Step9Complete() {
   const store = useByroStore()
   const router = useRouter()
   const linkId = store.linkId || 'myongkoo'

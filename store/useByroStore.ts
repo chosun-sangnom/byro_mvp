@@ -7,7 +7,7 @@ import type { OnboardingStep, Highlight, UserState, ContactChannel } from '@/typ
 import { SAMPLE_PROFILE } from '@/lib/mockData'
 
 const STEP_ORDER: OnboardingStep[] = [
-  'login', 'verify', 'linkid', 'keywords', 'sns', 'highlight', 'bio-select', 'bio-ai', 'complete',
+  'login', 'verify', 'linkid', 'keywords', 'sns', 'contact', 'highlight', 'bio-select', 'bio-ai', 'complete',
 ]
 
 interface ByroStore {
@@ -24,6 +24,7 @@ interface ByroStore {
   selectedKeywords: string[]      // max 5
   instagramConnected: boolean
   linkedinConnected: boolean
+  onboardingContactChannels: ContactChannel[]
   highlights: Highlight[]
   bio: string
   bioMode: 'ai' | 'manual' | null
@@ -53,6 +54,7 @@ interface ByroStore {
   disconnectInstagram(): void
   connectLinkedIn(): void
   disconnectLinkedIn(): void
+  setOnboardingContactChannels(channels: ContactChannel[]): void
   addHighlight(h: Omit<Highlight, 'id'>): void
   updateHighlight(id: string, h: Omit<Highlight, 'id'>): void
   removeHighlight(id: string): void
@@ -89,6 +91,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   selectedKeywords: [],
   instagramConnected: false,
   linkedinConnected: false,
+  onboardingContactChannels: SAMPLE_PROFILE.contactChannels,
   highlights: [],
   bio: '',
   bioMode: null,
@@ -179,6 +182,10 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     set({ linkedinConnected: false })
   },
 
+  setOnboardingContactChannels(channels) {
+    set({ onboardingContactChannels: channels })
+  },
+
   addHighlight(h) {
     set((state) => ({
       highlights: [...state.highlights, { ...h, id: uuidv4() }],
@@ -206,7 +213,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   },
 
   completeOnboarding() {
-    const { linkId, bio, selectedKeywords, instagramConnected, linkedinConnected, highlights } = get()
+    const { linkId, bio, selectedKeywords, instagramConnected, linkedinConnected, onboardingContactChannels, highlights } = get()
     set({
       isLoggedIn: true,
       user: {
@@ -218,7 +225,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
         selectedKeywords: selectedKeywords.length > 0 ? selectedKeywords : SAMPLE_PROFILE.selectedKeywords,
         avatarColor: SAMPLE_PROFILE.avatarColor,
         avatarImage: SAMPLE_PROFILE.avatarImage,
-        contactChannels: SAMPLE_PROFILE.contactChannels,
+        contactChannels: onboardingContactChannels,
       },
       step: 'login',
     })
@@ -256,6 +263,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       selectedKeywords: [],
       instagramConnected: false,
       linkedinConnected: false,
+      onboardingContactChannels: SAMPLE_PROFILE.contactChannels,
       highlights: [],
       bio: '',
       bioMode: null,
@@ -348,6 +356,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     selectedKeywords: state.selectedKeywords,
     instagramConnected: state.instagramConnected,
     linkedinConnected: state.linkedinConnected,
+    onboardingContactChannels: state.onboardingContactChannels,
     highlights: state.highlights,
     bio: state.bio,
     bioMode: state.bioMode,

@@ -82,8 +82,9 @@ export default function Archive() {
                 onClick={() => router.push('/jiminlee')}
                 className="flex items-center gap-3 rounded-[22px] border border-[#EBEBEB] bg-white px-4 py-4 w-full text-left mb-3"
               >
-                <div className="w-10 h-10 rounded-full bg-[#e0e0e0] flex items-center justify-center font-bold text-[#555] text-sm flex-shrink-0">
-                  {p.name.charAt(0)}
+                <div className="w-10 h-10 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/images/jimin-profile-5x4.jpg" alt={`${p.name} 프로필 사진`} className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
@@ -113,8 +114,9 @@ export default function Archive() {
                 onClick={() => router.push('/jiminlee')}
                 className="flex items-center gap-3 rounded-[22px] border border-[#EBEBEB] bg-white px-4 py-4 w-full text-left mb-3"
               >
-                <div className="w-10 h-10 rounded-full bg-[#e0e0e0] flex items-center justify-center font-bold text-[#555] text-sm flex-shrink-0">
-                  {p.name.charAt(0)}
+                <div className="w-10 h-10 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/images/jimin-profile-5x4.jpg" alt={`${p.name} 프로필 사진`} className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1">
                   <div className="text-sm font-bold">{p.name}</div>
@@ -133,8 +135,9 @@ export default function Archive() {
             {receivedRequests.map((r) => (
               <div key={r.id} className="border border-[#EBEBEB] rounded-[24px] bg-white p-4 mb-3">
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-8 h-8 rounded-full bg-[#e0e0e0] flex items-center justify-center font-bold text-[#555] text-sm flex-shrink-0">
-                    {r.name.charAt(0)}
+                  <div className="w-8 h-8 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/images/jimin-profile-5x4.jpg" alt={`${r.name} 프로필 사진`} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-bold">{r.name}</div>

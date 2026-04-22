@@ -93,6 +93,7 @@ export default function PublicProfile({
       count: profile.reputationKeywords.find((item) => item.keyword === keyword)?.count ?? 0,
     }))
   const featuredGuestbook = profile.guestbook.slice(0, 3)
+  const totalReputationCount = keywordCounts.reduce((sum, item) => sum + item.count, 0)
 
   // SNS 토글
   const igOpen = store.snsOpenStates['instagram_' + username] ?? false
@@ -238,57 +239,57 @@ export default function PublicProfile({
               </div>
             )}
 
-            <div className="mt-4">
-              <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#999] mb-2">누적 평판</div>
-              <div className="flex flex-wrap gap-1.5">
+            <div className="mt-4 rounded-[24px] border border-[#EBEBEB] bg-white px-4 py-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-sm font-black text-[#111]">누적 평판 {totalReputationCount}</div>
+                  <div className="mt-0.5 text-[11px] text-[#999]">키워드와 최근 방명록으로 신뢰도를 보여줘요</div>
+                </div>
+                {profile.guestbook.length > 0 && (
+                  <button
+                    onClick={() => router.push(`/${profile.linkId}/guestbook`)}
+                    className="text-[11px] font-semibold text-[#777]"
+                  >
+                    전체 보기
+                  </button>
+                )}
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-2">
                 {keywordCounts.map((item) => (
-                  <span key={item.keyword} className="rounded-full border border-[#E4E4E4] bg-[#F6F6F6] px-2.5 py-1 text-[11px] text-[#555]">
-                    {item.keyword} <span className="text-[#8A8A8A]">{item.count}</span>
+                  <span key={item.keyword} className="rounded-[14px] bg-[#F3F3F3] px-3 py-2 text-[12px] font-semibold text-[#444]">
+                    {item.keyword} <span className="ml-1 font-black text-[#111]">{item.count}</span>
                   </span>
                 ))}
               </div>
-            </div>
 
-            <div className="mt-4 rounded-[24px] border border-[#EBEBEB] bg-white px-4 py-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className="text-sm font-black text-[#111]">방명록</div>
-                <div className="text-[11px] text-[#AAA]">최근 {profile.guestbook.length}개</div>
-              </div>
-              <div className="space-y-2.5">
+              <div className="mt-4 divide-y divide-[#F1F1F1]">
                 {featuredGuestbook.map((entry) => (
                   <button
                     key={entry.id}
                     onClick={() => router.push('/jiminlee')}
-                    className="flex w-full gap-2.5 rounded-[18px] border border-[#F0F0F0] bg-[#FCFCFC] px-3 py-3 text-left"
+                    className="flex w-full gap-2.5 py-3 text-left first:pt-0 last:pb-0"
                   >
                     {entry.authorName === '이지민' ? (
-                      <div className="w-7 h-7 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
+                      <div className="mt-0.5 h-8 w-8 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src="/images/jimin-profile-5x4.jpg" alt={`${entry.authorName} 프로필 사진`} className="w-full h-full object-cover" />
                       </div>
                     ) : (
-                      <div className="w-7 h-7 rounded-full bg-[#e0e0e0] flex items-center justify-center text-xs font-bold text-[#555] flex-shrink-0">
+                      <div className="mt-0.5 h-8 w-8 rounded-full bg-[#e0e0e0] flex items-center justify-center text-xs font-bold text-[#555] flex-shrink-0">
                         {entry.authorName.charAt(0)}
                       </div>
                     )}
-                    <div className="flex-1 min-w-0">
+                    <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
                         <div className="text-xs font-bold text-[#222]">{entry.authorName}</div>
                         <div className="text-[10px] text-[#BBB]">{entry.date}</div>
                       </div>
-                      <div className="text-xs text-[#666] mt-1 line-clamp-2">{entry.message}</div>
+                      <div className="mt-1 text-sm leading-relaxed text-[#555] line-clamp-2">{entry.message}</div>
                     </div>
                   </button>
                 ))}
               </div>
-              {profile.guestbook.length > 3 && (
-                <button
-                  onClick={() => router.push(`/${profile.linkId}/guestbook`)}
-                  className="mt-3 w-full rounded-[16px] border border-[#E5E5E5] px-3 py-2.5 text-xs font-semibold text-[#555]"
-                >
-                  전체 방명록 보기
-                </button>
-              )}
             </div>
           </div>
         </div>

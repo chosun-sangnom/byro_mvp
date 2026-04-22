@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { Mail, MessageCircle, Phone, Send, Trash2 } from 'lucide-react'
+import { AlertCircle, CheckCircle2, Mail, MessageCircle, Pencil, Phone, Send, Sparkles, Trash2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import {
   NavBar, StepBar, Button, Chip, CheckRow, BottomSheet, Modal,
@@ -236,7 +236,7 @@ function Step1Login({ onClose: _onClose }: { onClose: () => void }) { // eslint-
         </div>
       </div>
       <div className="space-y-3">
-        <Button variant="kakao" onClick={handleSocial}>💬 카카오로 시작하기</Button>
+        <Button variant="kakao" onClick={handleSocial}>카카오로 시작하기</Button>
         <Button variant="google" onClick={handleSocial}>G  구글로 시작하기</Button>
         <Button variant="naver" onClick={handleSocial}>N  네이버로 시작하기</Button>
       </div>
@@ -349,7 +349,7 @@ function Step3LinkId() {
           status === 'valid' ? 'border-[#1A7A1A]' : status === 'error' ? 'border-[#E53935]' : 'border-[#ddd]',
         ].join(' ')}
       />
-      {status === 'valid' && <p className="text-xs text-[var(--color-state-success-text)] mb-3">✓ 사용 가능한 ID예요</p>}
+      {status === 'valid' && <p className="text-xs text-[var(--color-state-success-text)] mb-3">사용할 수 있는 ID예요</p>}
       {status === 'error' && <p className="text-xs text-[var(--color-state-danger-text)] mb-3">영문 소문자, 숫자, 밑줄(_)만 가능 · 4~20자</p>}
       <p className="meta-text mb-6">· 영문 소문자, 숫자, 밑줄(_) &nbsp;· 4~20자 이내</p>
       {input && status !== 'error' && (
@@ -766,7 +766,9 @@ function Step7Highlight() {
       {/* 인증 이메일 모달 */}
       <Modal open={certModalOpen} onClose={() => setSelectedCert(null)}>
         <div className="text-center">
-          <div className="text-xl mb-3">📧</div>
+          <div className="mb-3 flex justify-center text-[var(--color-text-secondary)]">
+            <Mail size={20} />
+          </div>
           <div className="text-sm font-black mb-2">인증 서류 발송</div>
           <div className="meta-text leading-relaxed mb-4">
             아래 이메일로 {selectedCert?.docLabel ?? '인증 자료를'}<br />발송해주세요.
@@ -865,7 +867,7 @@ function Step8Select() {
 
       <div className="space-y-3">
         <SelectionCard
-          icon="✨"
+          icon={<Sparkles size={18} />}
           title="AI가 자기소개 작성하기"
           subtitle="SNS·키워드 기반으로 초안을 만들어드려요"
           tone="accent"
@@ -880,7 +882,7 @@ function Step8Select() {
             <div className="flex flex-wrap gap-1">
               {store.instagramConnected && <span className="inline-flex items-center gap-1 text-xs bg-white rounded-full px-2 py-0.5 border" style={{ borderColor: 'var(--color-border-default)' }}><Image src="/images/Instagram.svg" alt="" width={12} height={12} className="w-3 h-3" /> Instagram</span>}
               {store.linkedinConnected && <span className="inline-flex items-center gap-1 text-xs bg-white rounded-full px-2 py-0.5 border" style={{ borderColor: 'var(--color-border-default)' }}><Image src="/images/linkedin.png" alt="" width={12} height={12} className="w-3 h-3" /> LinkedIn</span>}
-              {store.selectedKeywords.length > 0 && <span className="text-xs bg-white rounded-full px-2 py-0.5 border" style={{ borderColor: 'var(--color-border-default)' }}>🏷 키워드 {store.selectedKeywords.length}개</span>}
+              {store.selectedKeywords.length > 0 && <span className="text-xs bg-white rounded-full px-2 py-0.5 border" style={{ borderColor: 'var(--color-border-default)' }}>키워드 {store.selectedKeywords.length}개</span>}
             </div>
           )}
         </SelectionCard>
@@ -893,7 +895,7 @@ function Step8Select() {
 
         {/* 직접 작성 카드 */}
         <SelectionCard
-          icon="✍️"
+          icon={<Pencil size={18} />}
           title="직접 작성하기"
           subtitle="내 말로 바로 작성할게요"
           onClick={handleManual}
@@ -907,7 +909,9 @@ function Step8Select() {
       {/* 정보 부족 모달 */}
       <Modal open={noDataModal} onClose={() => { setNoDataModal(false); store.prevStep() }}>
         <div className="text-center">
-          <div className="text-2xl mb-2">⚠️</div>
+          <div className="mb-2 flex justify-center text-[var(--color-state-danger-text)]">
+            <AlertCircle size={20} />
+          </div>
           <div className="text-sm font-black mb-2">정보가 부족해요</div>
           <div className="meta-text leading-relaxed mb-4">
             AI 초안을 만들려면 아래 정보가 하나 이상 필요해요.
@@ -1068,7 +1072,9 @@ function Step9Complete() {
   return (
     <div className="flex flex-col h-full overflow-y-auto px-5 py-6 items-center text-center">
       <div className="w-full rounded-[30px] border border-[#EBEBEB] bg-white px-5 py-7 mb-6">
-        <div className="text-5xl mb-4">🎉</div>
+        <div className="mb-4 flex justify-center text-[var(--color-state-success-text)]">
+          <CheckCircle2 size={36} />
+        </div>
         <h2 className="text-2xl font-black mb-2">Byro를<br />만들었어요</h2>
         <p className="text-sm text-[#555] mb-6">이제 링크로 바로 공유할 수 있어요.</p>
 

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ChevronDown, ChevronUp, Camera, Mail, MessageCircle, Phone, Send } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { Button, BottomSheet, Modal, showToast, TextArea } from '@/components/ui'
-import type { Highlight, ContactChannel } from '@/types'
+import type { Highlight, ContactChannel, UserState } from '@/types'
 import {
   SAMPLE_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE,
   HIGHLIGHT_CATEGORIES, KEYWORD_GROUPS,
@@ -130,6 +130,7 @@ export default function MyByro() {
         onEditReputation={() => setScreen('editReputation')}
         onEditContact={() => setScreen('editContact')}
         onEditGuestbook={() => setScreen('editGuestbook')}
+        user={user}
         moveSection={moveSection}
         handleDragStart={handleDragStart}
         handleDragEnter={handleDragEnter}
@@ -189,6 +190,7 @@ function ManageByroScreen({
   onEditReputation,
   onEditContact,
   onEditGuestbook,
+  user,
   moveSection,
   handleDragStart,
   handleDragEnter,
@@ -216,6 +218,7 @@ function ManageByroScreen({
   onEditReputation: () => void
   onEditContact: () => void
   onEditGuestbook: () => void
+  user: UserState
   moveSection: (key: SectionKey, direction: 'up' | 'down') => void
   handleDragStart: (key: SectionKey) => void
   handleDragEnter: (key: SectionKey) => void
@@ -224,6 +227,17 @@ function ManageByroScreen({
   handleTouchMove: (e: React.TouchEvent) => void
   handleTouchEnd: () => void
 }) {
+  const activeContactCount = user.contactChannels?.filter((channel) => channel.enabled && channel.value.trim()).length ?? 0
+  const completionChecks = [
+    { label: '프로필 사진', done: Boolean(user.avatarImage) },
+    { label: '자기소개', done: user.bio.trim().length >= 20 },
+    { label: '연락 수단', done: activeContactCount > 0 },
+    { label: 'SNS 연동', done: connectedSnsCount > 0 },
+    { label: '하이라이트', done: allHighlights.length > 0 },
+  ]
+  const completionPercent = Math.round((completionChecks.filter((item) => item.done).length / completionChecks.length) * 100)
+  const remainingItems = completionChecks.filter((item) => !item.done).slice(0, 3)
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
@@ -234,6 +248,25 @@ function ManageByroScreen({
 
       <div className="flex-1 overflow-y-auto pb-24">
         <div className="px-5 py-4">
+          <div className="mb-3 rounded-[24px] border border-[#EBEBEB] bg-white p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-sm font-black text-[#111]">프로필 완성도 {completionPercent}%</div>
+                <div className="mt-1 text-xs text-[#777]">
+                  {remainingItems.length > 0
+                    ? `${remainingItems.map((item) => item.label).join(', ')} 항목을 채우면 더 좋아져요.`
+                    : '기본 프로필 구성이 완료됐어요.'}
+                </div>
+              </div>
+              <div className="rounded-full bg-[#F5F5F5] px-3 py-1 text-xs font-semibold text-[#555]">
+                {completionChecks.filter((item) => item.done).length}/{completionChecks.length}
+              </div>
+            </div>
+            <div className="mt-3 h-2 rounded-full bg-[#F1F1F1] overflow-hidden">
+              <div className="h-full rounded-full bg-[#111]" style={{ width: `${completionPercent}%` }} />
+            </div>
+          </div>
+
           <div className="rounded-[24px] border border-[#EBEBEB] bg-[#FAFAFA] p-4">
             <div className="text-sm font-black text-[#111] mb-1">공개 프로필 관리</div>
             <div className="text-xs text-[#777] leading-relaxed mb-4">내 Byro와 공개 프로필은 같은 화면을 사용합니다. 아래에서 노출 정보와 연결 수단을 관리하세요.</div>
@@ -620,11 +653,6 @@ function BasicInfoEditScreen({
                   className="text-xs text-[#E8A000] font-bold">→ AI로 채우기</button>
               </div>
               <TextArea value={bio} onChange={setBio} rows={4} maxLength={300} />
-            </div>
-
-            <div className="rounded-2xl border border-[#EBEBEB] bg-[#FAFAFA] px-4 py-3">
-              <div className="text-xs font-semibold text-[#555] mb-1">평판 키워드</div>
-              <div className="text-xs text-[#888] leading-relaxed">평판 키워드는 별도 `평판 키워드 편집` 화면에서만 관리됩니다.</div>
             </div>
           </div>
 

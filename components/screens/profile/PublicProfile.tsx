@@ -238,7 +238,7 @@ export default function PublicProfile({
             )}
 
             <div className="mt-4">
-              <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#999] mb-2">신뢰 키워드</div>
+              <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#999] mb-2">누적 평판</div>
               <div className="flex flex-wrap gap-1.5">
                 {keywordCounts.map((item) => (
                   <span key={item.keyword} className="rounded-full border border-[#E4E4E4] bg-[#F6F6F6] px-2.5 py-1 text-[11px] text-[#555]">

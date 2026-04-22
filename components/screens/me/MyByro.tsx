@@ -22,8 +22,6 @@ const SECTION_LABELS: Record<SectionKey, string> = {
   guestbook: '방명록',
 }
 
-const AVATAR_COLORS = ['#e0e0e0', '#FFCDD2', '#C8E6C9', '#BBDEFB', '#F8BBD0', '#FFF9C4']
-
 // ─────────────────────────────────────────────────────────────────────────────
 export default function MyByro() {
   const router = useRouter()
@@ -45,7 +43,6 @@ export default function MyByro() {
   const instagramConnected = store.instagramConnected || SAMPLE_PROFILE.instagramConnected
   const linkedinConnected = store.linkedinConnected || SAMPLE_PROFILE.linkedinConnected
   const currentKeywords = user.selectedKeywords ?? SAMPLE_PROFILE.selectedKeywords
-  const avatarColor = user.avatarColor ?? AVATAR_COLORS[0]
   const allHighlights = [...SAMPLE_PROFILE.manualHighlights, ...store.highlights]
   const connectedSnsCount = Number(instagramConnected) + Number(linkedinConnected)
   const totalReputationCount = SAMPLE_PROFILE.reputationKeywords.reduce((sum, item) => sum + item.count, 0)
@@ -145,7 +142,7 @@ export default function MyByro() {
   }
 
   if (screen === 'editBasic') {
-    return <BasicInfoEditScreen user={user} avatarColor={avatarColor} currentKeywords={currentKeywords} onBack={() => setScreen('manage')} />
+    return <BasicInfoEditScreen user={user} currentKeywords={currentKeywords} onBack={() => setScreen('manage')} />
   }
 
   if (screen === 'editHighlight') {
@@ -419,10 +416,9 @@ function ExpandablePreviewRow({
 // 기본정보 편집 화면
 // ─────────────────────────────────────────────────────────────────────────────
 function BasicInfoEditScreen({
-  user, avatarColor, currentKeywords, onBack,
+  user, currentKeywords, onBack,
 }: {
   user: { name: string; linkId: string; title: string; school: string; bio: string; selectedKeywords?: string[]; avatarColor?: string; avatarImage?: string }
-  avatarColor: string
   currentKeywords: string[]
   onBack: () => void
 }) {
@@ -431,11 +427,16 @@ function BasicInfoEditScreen({
   const [school, setSchool] = useState(user.school ?? '')
   const [bio, setBio] = useState(user.bio)
   const [keywords, setKeywords] = useState<string[]>([...currentKeywords])
-  const [color, setColor] = useState(avatarColor)
   const [avatarImage, setAvatarImage] = useState(user.avatarImage ?? '')
+  const [cropSource, setCropSource] = useState('')
+  const [cropOpen, setCropOpen] = useState(false)
+  const [cropZoom, setCropZoom] = useState(1)
+  const [cropPosition, setCropPosition] = useState({ x: 0, y: 0 })
+  const [cropNaturalSize, setCropNaturalSize] = useState({ width: 1, height: 1 })
   const [kwPickerOpen, setKwPickerOpen] = useState(false)
   const [pickerTempKw, setPickerTempKw] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const dragStartRef = useRef<{ x: number; y: number; startX: number; startY: number } | null>(null)
 
   const removeKw = (kw: string) => setKeywords((prev) => prev.filter((k) => k !== kw))
 
@@ -461,7 +462,7 @@ function BasicInfoEditScreen({
   }
 
   const handleSave = () => {
-    store.updateUserInfo({ title, school, bio, avatarColor: color, avatarImage })
+    store.updateUserInfo({ title, school, bio, avatarImage })
     store.updateUserKeywords(keywords)
     showToast('저장됐어요!')
     onBack()
@@ -479,12 +480,63 @@ function BasicInfoEditScreen({
     const reader = new FileReader()
     reader.onload = () => {
       if (typeof reader.result === 'string') {
-        setAvatarImage(reader.result)
-        showToast('사진이 적용됐어요')
+        const img = new Image()
+        img.onload = () => {
+          setCropNaturalSize({ width: img.width, height: img.height })
+          setCropSource(reader.result as string)
+          setCropZoom(1)
+          setCropPosition({ x: 0, y: 0 })
+          setCropOpen(true)
+        }
+        img.src = reader.result
       }
     }
     reader.readAsDataURL(file)
     event.target.value = ''
+  }
+
+  const cropBase = getCropBaseSize(cropNaturalSize.width, cropNaturalSize.height)
+  const cropScaled = {
+    width: cropBase.width * cropZoom,
+    height: cropBase.height * cropZoom,
+  }
+  const boundedCropPosition = clampCropPosition(cropPosition, cropScaled.width, cropScaled.height)
+
+  const handleCropPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    dragStartRef.current = {
+      x: event.clientX,
+      y: event.clientY,
+      startX: boundedCropPosition.x,
+      startY: boundedCropPosition.y,
+    }
+    event.currentTarget.setPointerCapture(event.pointerId)
+  }
+
+  const handleCropPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragStartRef.current) return
+    const deltaX = event.clientX - dragStartRef.current.x
+    const deltaY = event.clientY - dragStartRef.current.y
+    setCropPosition(clampCropPosition({
+      x: dragStartRef.current.startX + deltaX,
+      y: dragStartRef.current.startY + deltaY,
+    }, cropScaled.width, cropScaled.height))
+  }
+
+  const handleCropPointerEnd = () => {
+    dragStartRef.current = null
+  }
+
+  const handleZoomChange = (nextZoom: number) => {
+    setCropZoom(nextZoom)
+    setCropPosition((prev) => clampCropPosition(prev, cropBase.width * nextZoom, cropBase.height * nextZoom))
+  }
+
+  const handleApplyCrop = async () => {
+    if (!cropSource) return
+    const cropped = await renderCroppedImage(cropSource, cropNaturalSize, boundedCropPosition, cropScaled)
+    setAvatarImage(cropped)
+    setCropOpen(false)
+    showToast('사진이 적용됐어요')
   }
 
   return (
@@ -499,20 +551,12 @@ function BasicInfoEditScreen({
         <div className="px-5 py-5">
           {/* 아바타 */}
           <div className="flex flex-col items-center mb-6">
-            <div className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-black text-[#555] mb-2"
-              style={{ backgroundColor: color }}>
+            <div className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-black text-[#555] mb-2 bg-[#E8DED7] overflow-hidden">
               {avatarImage ? (
                 <img src={avatarImage} alt={`${user.name} 프로필 사진`} className="w-full h-full rounded-full object-cover" />
               ) : (
                 user.name.charAt(0)
               )}
-            </div>
-            <div className="flex gap-2 mb-2">
-              {AVATAR_COLORS.map((c) => (
-                <button key={c} onClick={() => setColor(c)}
-                  className="w-7 h-7 rounded-full border-2"
-                  style={{ backgroundColor: c, borderColor: color === c ? '#0A0A0A' : 'transparent' }} />
-              ))}
             </div>
             <input
               ref={fileInputRef}
@@ -527,6 +571,7 @@ function BasicInfoEditScreen({
             >
               <Camera size={12} /> 사진 변경
             </button>
+            <div className="text-[11px] text-[#AAA] mt-1">직사각형 메인 카드와 원형 프로필 이미지에 같이 사용됩니다.</div>
           </div>
 
           {/* 폼 */}
@@ -615,6 +660,65 @@ function BasicInfoEditScreen({
           </div>
           <div className="text-xs text-[#888] mb-3">선택: {pickerTempKw.length} / 10</div>
           <Button onClick={handleConfirmPicker}>확인</Button>
+        </div>
+      </BottomSheet>
+
+      <BottomSheet open={cropOpen} onClose={() => setCropOpen(false)}>
+        <div className="px-5 pb-6">
+          <div className="text-sm font-black mb-1">사진 자르기</div>
+          <div className="text-xs text-[#888] mb-4">메인 카드용 세로 프레임에 맞추고, 원형 가이드 안에도 얼굴이 들어오도록 맞춰주세요.</div>
+
+          <div
+            className="relative mx-auto h-[320px] w-[256px] overflow-hidden rounded-[28px] bg-[#111] touch-none select-none"
+            onPointerDown={handleCropPointerDown}
+            onPointerMove={handleCropPointerMove}
+            onPointerUp={handleCropPointerEnd}
+            onPointerCancel={handleCropPointerEnd}
+            onPointerLeave={handleCropPointerEnd}
+          >
+            {cropSource && (
+              <img
+                src={cropSource}
+                alt="자르기 미리보기"
+                className="absolute max-w-none object-cover"
+                style={{
+                  width: `${cropScaled.width}px`,
+                  height: `${cropScaled.height}px`,
+                  left: `${boundedCropPosition.x}px`,
+                  top: `${boundedCropPosition.y}px`,
+                }}
+              />
+            )}
+            <div className="absolute inset-0 border-[3px] border-white/80 rounded-[28px] shadow-[inset_0_0_0_9999px_rgba(0,0,0,0.26)] pointer-events-none" />
+            <div className="absolute inset-x-6 top-5 text-center text-[11px] font-semibold text-white/92 pointer-events-none">
+              메인 카드 가이드
+            </div>
+            <div className="absolute left-1/2 top-[58px] h-[120px] w-[120px] -translate-x-1/2 rounded-full border-2 border-dashed border-white/85 bg-white/8 pointer-events-none" />
+            <div className="absolute left-1/2 top-[186px] -translate-x-1/2 text-[11px] font-semibold text-white/88 pointer-events-none">
+              방명록 원형 가이드
+            </div>
+          </div>
+
+          <div className="mt-5">
+            <div className="flex items-center justify-between text-[11px] text-[#888] mb-2">
+              <span>확대/축소</span>
+              <span>{cropZoom.toFixed(1)}x</span>
+            </div>
+            <input
+              type="range"
+              min="1"
+              max="2.4"
+              step="0.05"
+              value={cropZoom}
+              onChange={(e) => handleZoomChange(Number(e.target.value))}
+              className="w-full"
+            />
+          </div>
+
+          <div className="mt-5 space-y-2">
+            <Button onClick={handleApplyCrop}>적용하기</Button>
+            <Button variant="ghost" onClick={() => setCropOpen(false)}>취소</Button>
+          </div>
         </div>
       </BottomSheet>
     </div>
@@ -1456,4 +1560,71 @@ function SectionGuestbook({ entries }: {
       })}
     </div>
   )
+}
+
+const CROP_FRAME = { width: 256, height: 320 }
+
+function getCropBaseSize(imageWidth: number, imageHeight: number) {
+  const scale = Math.max(CROP_FRAME.width / imageWidth, CROP_FRAME.height / imageHeight)
+  return {
+    width: imageWidth * scale,
+    height: imageHeight * scale,
+  }
+}
+
+function clampCropPosition(
+  position: { x: number; y: number },
+  scaledWidth: number,
+  scaledHeight: number,
+) {
+  const minX = Math.min(0, CROP_FRAME.width - scaledWidth)
+  const minY = Math.min(0, CROP_FRAME.height - scaledHeight)
+  return {
+    x: Math.max(minX, Math.min(0, position.x)),
+    y: Math.max(minY, Math.min(0, position.y)),
+  }
+}
+
+async function renderCroppedImage(
+  src: string,
+  naturalSize: { width: number; height: number },
+  position: { x: number; y: number },
+  scaledSize: { width: number; height: number },
+) {
+  const image = await loadImage(src)
+  const canvas = document.createElement('canvas')
+  canvas.width = CROP_FRAME.width
+  canvas.height = CROP_FRAME.height
+  const context = canvas.getContext('2d')
+  if (!context) return src
+
+  const scaleX = naturalSize.width / scaledSize.width
+  const scaleY = naturalSize.height / scaledSize.height
+  const sourceX = Math.max(0, -position.x * scaleX)
+  const sourceY = Math.max(0, -position.y * scaleY)
+  const sourceWidth = Math.min(naturalSize.width - sourceX, CROP_FRAME.width * scaleX)
+  const sourceHeight = Math.min(naturalSize.height - sourceY, CROP_FRAME.height * scaleY)
+
+  context.drawImage(
+    image,
+    sourceX,
+    sourceY,
+    sourceWidth,
+    sourceHeight,
+    0,
+    0,
+    CROP_FRAME.width,
+    CROP_FRAME.height,
+  )
+
+  return canvas.toDataURL('image/jpeg', 0.92)
+}
+
+function loadImage(src: string) {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image()
+    image.onload = () => resolve(image)
+    image.onerror = reject
+    image.src = src
+  })
 }

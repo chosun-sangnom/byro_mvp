@@ -8,7 +8,7 @@ import {
   Button, Chip, BottomSheet, Modal, TextArea, InfoBox, showToast,
 } from '@/components/ui'
 import {
-  SAMPLE_PROFILE, JIMIN_PROFILE, INSTAGRAM_PROFILE, EXPERIENCE_KEYWORDS,
+  SAMPLE_PROFILE, JIMIN_PROFILE, INSTAGRAM_PROFILE, EXPERIENCE_KEYWORDS, LINKEDIN_PROFILE,
 } from '@/lib/mockData'
 
 interface PublicProfileProps {
@@ -351,6 +351,14 @@ export default function PublicProfile({
                     <div className="rounded-xl border border-[#EFEFEF] px-3 py-2.5">
                       <div className="text-[11px] text-[#888] mb-1">핵심 키워드</div>
                       <div className="text-xs text-[#333]">B2B SaaS · Product Strategy · Growth</div>
+                    </div>
+                    <div className="rounded-xl border border-[#EFEFEF] px-3 py-2.5">
+                      <div className="text-[11px] text-[#888] mb-1">샘플 활동</div>
+                      <p className="text-xs text-[#333] leading-relaxed line-clamp-3">{LINKEDIN_PROFILE.recentPosts[0]?.text}</p>
+                      <div className="flex items-center gap-2 mt-2">
+                        <span className="text-[10px] text-[#888]">👍 {LINKEDIN_PROFILE.recentPosts[0]?.likes}</span>
+                        <span className="text-[10px] text-[#bbb]">{LINKEDIN_PROFILE.recentPosts[0]?.date}</span>
+                      </div>
                     </div>
                   </div>
                 </div>

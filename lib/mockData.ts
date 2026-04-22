@@ -24,6 +24,7 @@ export const LINKEDIN_PROFILE = {
   headline: 'B2B SaaS Product Owner | 스타트업 공동창업자 | Byro',
   aiSummary: 'Growth 마케팅과 B2B SaaS 제품 전략을 중심으로 활동하며, 스타트업 초기 마케팅 구조 설계 경험이 풍부합니다. 커뮤니티 기반 마케팅 사례를 자주 공유합니다.',
   recentPosts: [
+    { id: '0', text: '오프라인에서 만난 신뢰를 온라인 프로필로 어떻게 이어붙일지 정리했습니다. 명함 이후의 프로필은 정보가 아니라 맥락을 남겨야 한다고 생각합니다.', likes: 267, date: '1일 전' },
     { id: '1', text: 'B2B SaaS에서 신뢰(Trust)가 왜 가장 강력한 성장 엔진인지 정리했습니다. CAC를 40% 낮춘 커뮤니티 기반 마케팅 실험기...', likes: 148, date: '3일 전' },
     { id: '2', text: 'Byro 개발 일지 #3 — 타인이 검증하고 채워주는 프로필 구조가 왜 더 신뢰를 만드는지에 대해...', likes: 203, date: '1주 전' },
   ],

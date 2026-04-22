@@ -8,7 +8,7 @@ import {
   Button, Chip, BottomSheet, Modal, TextArea, InfoBox, showToast,
 } from '@/components/ui'
 import {
-  SAMPLE_PROFILE, JIMIN_PROFILE, INSTAGRAM_PROFILE, EXPERIENCE_KEYWORDS, LINKEDIN_PROFILE,
+  SAMPLE_PROFILE, JIMIN_PROFILE, INSTAGRAM_PROFILE, EXPERIENCE_KEYWORDS,
 } from '@/lib/mockData'
 
 interface PublicProfileProps {

@@ -563,6 +563,7 @@ function BasicInfoEditScreen({
           <div className="flex flex-col items-center mb-6">
             <div className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-black text-[#555] mb-2 bg-[#E8DED7] overflow-hidden">
               {avatarImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img src={avatarImage} alt={`${user.name} 프로필 사진`} className="w-full h-full rounded-full object-cover" />
               ) : (
                 user.name.charAt(0)
@@ -650,6 +651,7 @@ function BasicInfoEditScreen({
                 onPointerLeave={handleCropPointerEnd}
               >
                 {cropSource && (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={cropSource}
                     alt="자르기 미리보기"
@@ -1482,7 +1484,7 @@ function ReputationManageScreen({
           <div className="text-xl mb-3">⚠️</div>
           <div className="text-sm font-black mb-2">누적 평판이 사라져요</div>
           <div className="text-xs text-[#555] leading-relaxed mb-4">
-            <span className="font-bold">"{confirmKeyword}"</span> 키워드에 쌓인{' '}
+            <span className="font-bold">&ldquo;{confirmKeyword}&rdquo;</span> 키워드에 쌓인{' '}
             <span className="font-bold">{confirmKeyword ? getReputationCount(confirmKeyword) : 0}개</span>의 평판이
             {' '}영구적으로 삭제돼요.<br />정말 해제하시겠어요?
           </div>

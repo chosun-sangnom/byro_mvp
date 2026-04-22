@@ -220,26 +220,6 @@ export default function PublicProfile({
               </div>
             </div>
 
-            <div className="mt-3 grid grid-cols-4 gap-2">
-              {contactChannels.map((channel) => (
-                <ContactActionButton
-                  key={channel.id}
-                  channel={channel}
-                  onClick={() => {
-                    if (!channel.enabled) {
-                      showToast(isOwnerMode ? 'Byro 편집에서 연동을 활성화해 주세요' : '비활성화된 연락 수단이에요')
-                      return
-                    }
-                    if (!channel.href) {
-                      showToast('연결 정보를 준비 중이에요')
-                      return
-                    }
-                    window.open(channel.href, channel.href.startsWith('http') ? '_blank' : '_self')
-                  }}
-                />
-              ))}
-            </div>
-
             <div className="mt-4 flex flex-wrap gap-1.5">
               {keywordCounts.map((item) => (
                 <span key={item.keyword} className="rounded-full border border-[#E4E4E4] bg-[#F6F6F6] px-2.5 py-1 text-[11px] text-[#555]">
@@ -289,24 +269,6 @@ export default function PublicProfile({
                 </button>
               )}
             </div>
-
-            {isOwnerMode && (
-              <div className="mt-4 flex gap-2">
-                <button
-                  onClick={onOpenArchive}
-                  className="flex-1 rounded-[18px] border border-[#D8D8D8] bg-white px-4 py-3 text-sm font-semibold text-[#555]"
-                >
-                  아카이빙
-                </button>
-                <button
-                  onClick={onOpenManage}
-                  className="flex-1 rounded-[18px] bg-[#111] px-4 py-3 text-sm font-semibold text-white"
-                >
-                  Byro 편집
-                </button>
-              </div>
-            )}
-
           </div>
         </div>
 
@@ -596,24 +558,62 @@ export default function PublicProfile({
           })}
         </div>
 
+        <div className="px-5 pt-2 pb-6">
+          <div className="rounded-[26px] border border-[#EBEBEB] bg-[#FAFAFA] px-4 py-4">
+            <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#999] mb-3">Connect</div>
+            {isOwnerMode ? (
+              <div className="flex gap-2 mb-4">
+                <button
+                  onClick={onOpenArchive}
+                  className="flex-1 rounded-[18px] border border-[#D8D8D8] bg-white px-4 py-3 text-sm font-semibold text-[#555]"
+                >
+                  아카이빙
+                </button>
+                <button
+                  onClick={onOpenManage}
+                  className="flex-1 rounded-[18px] bg-[#111] px-4 py-3 text-sm font-semibold text-white"
+                >
+                  Byro 편집
+                </button>
+              </div>
+            ) : (
+              <div className="flex gap-2 mb-4">
+                <Button variant="outline" onClick={() => showToast('피드백 요청을 보냈어요!')}>피드백 요청</Button>
+                <Button
+                  onClick={() => {
+                    if (alreadySubmitted) { showToast('이미 경험을 남겼어요'); return }
+                    setExpSheetOpen(true)
+                  }}
+                  variant={alreadySubmitted ? 'outline' : 'primary'}
+                >
+                  {alreadySubmitted ? '경험 남겼어요 ✓' : '+ 경험 남기기'}
+                </Button>
+              </div>
+            )}
+            <div className="grid grid-cols-4 gap-3">
+              {contactChannels.map((channel) => (
+                <ContactActionButton
+                  key={channel.id}
+                  channel={channel}
+                  onClick={() => {
+                    if (!channel.enabled) {
+                      showToast(isOwnerMode ? 'Byro 편집에서 연동을 활성화해 주세요' : '비활성화된 연락 수단이에요')
+                      return
+                    }
+                    if (!channel.href) {
+                      showToast('연결 정보를 준비 중이에요')
+                      return
+                    }
+                    window.open(channel.href, channel.href.startsWith('http') ? '_blank' : '_self')
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+
         <div className="h-24" />
       </div>
-
-      {/* 하단 고정 바 */}
-      {!isOwnerMode && (
-        <div className="absolute bottom-0 left-0 right-0 flex gap-2 px-4 py-3 border-t border-[#EBEBEB] bg-white">
-          <Button variant="outline" onClick={() => showToast('피드백 요청을 보냈어요!')}>피드백 요청</Button>
-          <Button
-            onClick={() => {
-              if (alreadySubmitted) { showToast('이미 경험을 남겼어요'); return }
-              setExpSheetOpen(true)
-            }}
-            variant={alreadySubmitted ? 'outline' : 'primary'}
-          >
-            {alreadySubmitted ? '경험 남겼어요 ✓' : '+ 경험 남기기'}
-          </Button>
-        </div>
-      )}
 
       {/* ─── 경험 남기기 바텀시트 ────────────────── */}
       <BottomSheet open={expSheetOpen} onClose={() => setExpSheetOpen(false)} dark={!store.isLoggedIn}>
@@ -763,17 +763,15 @@ function ContactActionButton({
     <button
       onClick={onClick}
       className={[
-        'rounded-[18px] border px-2 py-2.5 text-center transition-colors',
-        channel.enabled
-          ? 'border-[#E7E7E7] bg-[#F8F8F8] text-[#222] active:bg-[#EFEFEF]'
-          : 'border-[#EFEFEF] bg-[#F6F6F6] text-[#B4B4B4]',
+        'text-center transition-colors',
+        channel.enabled ? 'text-[#222]' : 'text-[#B4B4B4]',
       ].join(' ')}
     >
       <div className={[
-        'mx-auto mb-1.5 flex h-9 w-9 items-center justify-center rounded-2xl',
+        'mx-auto mb-1.5 flex h-11 w-11 items-center justify-center rounded-full border',
         channel.enabled
-          ? 'bg-white shadow-[inset_0_0_0_1px_rgba(0,0,0,0.05)]'
-          : 'bg-white/70 shadow-[inset_0_0_0_1px_rgba(0,0,0,0.03)]',
+          ? 'border-[#E7E7E7] bg-white shadow-[0_6px_18px_rgba(0,0,0,0.06)]'
+          : 'border-[#EFEFEF] bg-white/70',
       ].join(' ')}>
         <Icon size={16} />
       </div>

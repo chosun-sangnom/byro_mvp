@@ -261,7 +261,11 @@ export default function PublicProfile({
           <SectionTitle title="방명록" subtitle={`최근 메시지 ${profile.guestbook.length}개`} />
           <div className="space-y-2">
             {profile.guestbook.map((entry) => (
-              <div key={entry.id} className="flex gap-2.5 rounded-2xl border border-[#EBEBEB] px-3 py-3">
+              <button
+                key={entry.id}
+                onClick={() => router.push('/' + (entry.linkId || 'jiminlee'))}
+                className="flex w-full gap-2.5 rounded-2xl border border-[#EBEBEB] px-3 py-3 text-left"
+              >
                 <div className="w-7 h-7 rounded-full bg-[#e0e0e0] flex items-center justify-center text-xs font-bold text-[#555] flex-shrink-0">
                   {entry.authorName.charAt(0)}
                 </div>
@@ -270,7 +274,7 @@ export default function PublicProfile({
                   <div className="text-xs text-[#555]">{entry.message}</div>
                   <div className="text-[10px] text-[#bbb] mt-0.5">{entry.date}</div>
                 </div>
-              </div>
+              </button>
             ))}
             {profile.guestbook.length > 2 && (
               <button className="text-xs text-[#0D47A1] text-center w-full">더보기 ›</button>

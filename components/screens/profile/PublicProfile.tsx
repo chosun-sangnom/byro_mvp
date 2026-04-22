@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronDown, ChevronUp, Bookmark, Mail, MessageCircle, Phone, Send, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
@@ -83,6 +83,9 @@ export default function PublicProfile({
   const [bookmarked, setBookmarked] = useState(false)
   const [memoSheetOpen, setMemoSheetOpen] = useState(false)
   const [memoText, setMemoText] = useState('')
+  const [bioExpanded, setBioExpanded] = useState(false)
+  const [bioOverflowing, setBioOverflowing] = useState(false)
+  const bioRef = useRef<HTMLParagraphElement | null>(null)
   const keywordCounts = profile.selectedKeywords
     .slice(0, 5)
     .map((keyword) => ({
@@ -100,6 +103,22 @@ export default function PublicProfile({
   const rememberOpen = store.hlOpenStates['remember_' + username] ?? false
   const corporateOpen = store.hlOpenStates['corporate_' + username] ?? false
   const airlineOpen = store.hlOpenStates['airline_' + username] ?? false
+
+  useEffect(() => {
+    setBioExpanded(false)
+  }, [profile.bio, username])
+
+  useEffect(() => {
+    const checkOverflow = () => {
+      const element = bioRef.current
+      if (!element) return
+      setBioOverflowing(element.scrollHeight - element.clientHeight > 2)
+    }
+
+    checkOverflow()
+    window.addEventListener('resize', checkOverflow)
+    return () => window.removeEventListener('resize', checkOverflow)
+  }, [profile.bio, bioExpanded])
 
   const handleExpSubmit = () => {
     if (store.experienceKeywords.length === 0) {
@@ -186,7 +205,17 @@ export default function PublicProfile({
                 </div>
                 <div className="mt-1 text-[15px] font-medium text-white/72">{profile.title}</div>
                 <div className="mt-4 max-w-[318px] rounded-[18px] border border-white/12 bg-white/10 px-4 py-3 text-[15px] leading-[1.52] text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[8px]">
-                  {profile.bio}
+                  <p ref={bioRef} className={bioExpanded ? '' : 'line-clamp-3'}>
+                    {profile.bio}
+                  </p>
+                  {bioOverflowing && (
+                    <button
+                      onClick={() => setBioExpanded((prev) => !prev)}
+                      className="mt-2 text-xs font-semibold text-white/82"
+                    >
+                      {bioExpanded ? '접기' : '더보기'}
+                    </button>
+                  )}
                 </div>
               </div>
             </div>

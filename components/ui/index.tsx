@@ -250,7 +250,7 @@ export function BottomSheet({ open, onClose, children, dark }: BottomSheetProps)
   return (
     <AnimatePresence>
       {open && (
-        <div className="absolute inset-0 z-40">
+        <div className="fixed inset-0 z-[80]">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -265,9 +265,10 @@ export function BottomSheet({ open, onClose, children, dark }: BottomSheetProps)
             exit={{ y: '100%' }}
             transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
             className={[
-              'absolute bottom-0 left-0 right-0 rounded-t-2xl z-50 max-h-[80%] overflow-y-auto',
+              'absolute bottom-0 left-0 right-0 rounded-t-2xl z-50 max-h-[80dvh] overflow-y-auto pb-[max(env(safe-area-inset-bottom),16px)]',
               dark ? 'bg-[#1a1a1a]' : 'bg-white',
             ].join(' ')}
+            onClick={(e) => e.stopPropagation()}
           >
             <div className={[
               'w-8 h-1 rounded-full mx-auto mt-3 mb-2',

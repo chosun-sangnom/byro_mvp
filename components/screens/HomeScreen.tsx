@@ -279,7 +279,7 @@ function HeroSection({
       >
         <div className="mb-12">
           <div className="inline-flex items-center gap-2 rounded-full border bg-white px-3 py-1.5 text-[11px] font-semibold shadow-sm" style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-secondary)' }}>
-            <Stars size={12} className="text-[#6366F1]" />
+            <Stars size={12} style={{ color: 'var(--color-accent-brand)' }} />
             Live it, Prove It
           </div>
           <h1 className="mt-6 text-2xl tracking-tight text-[var(--color-text-strong)]">Byro</h1>
@@ -325,34 +325,34 @@ function HeroSection({
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600" />
                 <div className="flex-1 text-left">
-                  <div className="text-sm text-[#111]">김지원</div>
-                  <div className="text-xs text-[#111]/60">Product Designer</div>
+                  <div className="text-sm text-[var(--color-text-strong)]">김지원</div>
+                  <div className="text-xs text-[var(--color-text-secondary)]">Product Designer</div>
                 </div>
               </div>
 
-              <p className="text-xs text-[#111]/70 mb-4 text-left leading-relaxed">
+              <p className="text-xs text-[var(--color-text-primary)] mb-4 text-left leading-relaxed">
                 사용자 경험과 비즈니스 임팩트를 연결하는 디자이너입니다
               </p>
 
               <div className="space-y-2 mb-4">
                 <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-3 text-left">
                   <div className="text-[10px] text-indigo-600 mb-1">커리어 지속성</div>
-                  <div className="text-xs text-[#111]/80">평균 대비 128% 장기 재직</div>
+                  <div className="text-xs text-[var(--color-text-primary)]">평균 대비 128% 장기 재직</div>
                 </div>
                 <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-3 text-left">
                   <div className="text-[10px] text-blue-600 mb-1">글로벌 활동</div>
-                  <div className="text-xs text-[#111]/80">국제 프로젝트 다수 참여</div>
+                  <div className="text-xs text-[var(--color-text-primary)]">국제 프로젝트 다수 참여</div>
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-1.5 mb-4">
-                <span className="text-[10px] px-2 py-1 bg-gray-100 text-[#111]/70 rounded-full">신뢰할 수 있는</span>
-                <span className="text-[10px] px-2 py-1 bg-gray-100 text-[#111]/70 rounded-full">통찰력 있는</span>
-                <span className="text-[10px] px-2 py-1 bg-gray-100 text-[#111]/70 rounded-full">전문적인</span>
+                <span className="text-[10px] px-2 py-1 rounded-full" style={{ backgroundColor: 'var(--color-bg-muted)', color: 'var(--color-text-primary)' }}>신뢰할 수 있는</span>
+                <span className="text-[10px] px-2 py-1 rounded-full" style={{ backgroundColor: 'var(--color-bg-muted)', color: 'var(--color-text-primary)' }}>통찰력 있는</span>
+                <span className="text-[10px] px-2 py-1 rounded-full" style={{ backgroundColor: 'var(--color-bg-muted)', color: 'var(--color-text-primary)' }}>전문적인</span>
               </div>
 
-              <div className="bg-gray-50 rounded-xl p-3 text-left">
-                <p className="text-[10px] text-[#111]/60 italic">&quot;함께 일하고 싶은 사람이에요&quot;</p>
+              <div className="rounded-xl p-3 text-left" style={{ backgroundColor: 'var(--color-bg-soft)' }}>
+                <p className="text-[10px] text-[var(--color-text-secondary)] italic">&quot;함께 일하고 싶은 사람이에요&quot;</p>
               </div>
             </div>
           </div>
@@ -364,14 +364,14 @@ function HeroSection({
 
 function ProblemSection() {
   return (
-    <section className="px-6 py-20 bg-gray-50/50">
+    <section className="px-6 py-20" style={{ backgroundColor: 'color-mix(in srgb, var(--color-bg-soft) 70%, transparent)' }}>
       <div className="max-w-md mx-auto">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-3xl tracking-tight text-center mb-12 text-[#111]"
+          className="text-3xl tracking-tight text-center mb-12 text-[var(--color-text-strong)]"
         >
           명함은 연락처를 보여주지만,
           <br />
@@ -389,12 +389,12 @@ function ProblemSection() {
               className="surface-card rounded-2xl p-6"
             >
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
-                  <problem.icon className="w-5 h-5 text-[#111]/60" />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'var(--color-bg-muted)' }}>
+                  <problem.icon className="w-5 h-5 text-[var(--color-text-secondary)]" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-base mb-1.5 text-[#111]">{problem.title}</h3>
-                  <p className="text-sm text-[#111]/60 leading-relaxed">
+                  <h3 className="text-base mb-1.5 text-[var(--color-text-strong)]">{problem.title}</h3>
+                  <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
                     {problem.description}
                   </p>
                 </div>
@@ -416,7 +416,7 @@ function SolutionSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-3xl tracking-tight text-center mb-12 text-[#111]"
+          className="text-3xl tracking-tight text-center mb-12 text-[var(--color-text-strong)]"
         >
           Byro는 흩어진 신호를
           <br />
@@ -442,12 +442,12 @@ function SolutionSection() {
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center flex-shrink-0">
                     <step.icon className="w-5 h-5 text-indigo-600" />
                   </div>
-                  <h3 className="text-lg pt-2 text-[#111]">{step.title}</h3>
+                  <h3 className="text-lg pt-2 text-[var(--color-text-strong)]">{step.title}</h3>
                 </div>
 
                 <ul className="space-y-2 ml-1">
                   {step.items.map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-sm text-[#111]/70">
+                    <li key={item} className="flex items-start gap-2 text-sm text-[var(--color-text-primary)]">
                       <span className="text-indigo-500 mt-1">•</span>
                       <span className="flex-1">{item}</span>
                     </li>
@@ -468,7 +468,7 @@ function SolutionSection() {
 
 function HighlightSection() {
   return (
-    <section className="py-20 bg-gradient-to-b from-gray-50/50 to-white">
+    <section className="py-20" style={{ background: 'linear-gradient(to bottom, color-mix(in srgb, var(--color-bg-soft) 70%, transparent), var(--color-bg-page))' }}>
       <div className="max-w-md mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -477,12 +477,12 @@ function HighlightSection() {
           transition={{ duration: 0.5 }}
           className="text-center mb-4"
         >
-          <h2 className="text-3xl tracking-tight mb-3 text-[#111]">
+          <h2 className="text-3xl tracking-tight mb-3 text-[var(--color-text-strong)]">
             자기소개보다 먼저 보이는
             <br />
             검증 하이라이트
           </h2>
-          <p className="text-sm text-[#111]/60">
+          <p className="text-sm text-[var(--color-text-secondary)]">
             말보다 신뢰를 남기는 정보만 골라 보여줍니다
           </p>
         </motion.div>
@@ -508,16 +508,16 @@ function HighlightSection() {
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className="flex-shrink-0 w-72 snap-start"
             >
-              <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 h-full">
+              <div className="surface-card rounded-2xl p-6 shadow-lg h-full">
                 <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${highlight.gradient} flex items-center justify-center mb-4 shadow-md`}>
                   <highlight.icon className="w-6 h-6 text-white" />
                 </div>
 
-                <div className="text-xs text-[#111]/50 mb-2 uppercase tracking-wide">
+                <div className="text-xs text-[var(--color-text-tertiary)] mb-2 uppercase tracking-wide">
                   {highlight.label}
                 </div>
 
-                <div className="text-base text-[#111] leading-relaxed">
+                <div className="text-base text-[var(--color-text-strong)] leading-relaxed">
                   {highlight.value}
                 </div>
               </div>
@@ -530,7 +530,8 @@ function HighlightSection() {
         {highlightCards.map((item) => (
           <div
             key={item.label}
-            className="w-1.5 h-1.5 rounded-full bg-gray-300"
+            className="w-1.5 h-1.5 rounded-full"
+            style={{ backgroundColor: 'var(--color-text-tertiary)' }}
           />
         ))}
       </div>
@@ -540,14 +541,14 @@ function HighlightSection() {
 
 function ComparisonSection() {
   return (
-    <section className="px-6 py-20 bg-gray-50/30">
+    <section className="px-6 py-20" style={{ backgroundColor: 'color-mix(in srgb, var(--color-bg-soft) 45%, transparent)' }}>
       <div className="max-w-md mx-auto">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-3xl tracking-tight text-center mb-4 text-[#111]"
+          className="text-3xl tracking-tight text-center mb-4 text-[var(--color-text-strong)]"
         >
           간단함과 전문성,
           <br />
@@ -559,7 +560,7 @@ function ComparisonSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-sm text-[#111]/60 text-center mb-12"
+          className="text-sm text-[var(--color-text-secondary)] text-center mb-12"
         >
           오프라인 네트워킹에 최적화된 신뢰 프로필
         </motion.p>
@@ -574,9 +575,10 @@ function ComparisonSection() {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className={`${
                 item.isHighlight
-                  ? 'bg-white border-2 border-indigo-200 shadow-lg'
-                  : 'bg-white border border-gray-100 shadow-sm'
+                  ? 'bg-white border-2 shadow-lg'
+                  : 'bg-white border shadow-sm'
               } rounded-2xl p-4 relative`}
+              style={item.isHighlight ? { borderColor: 'var(--color-accent-brand-soft)' } : { borderColor: 'var(--color-border-default)' }}
             >
               {item.isHighlight && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
@@ -590,7 +592,7 @@ function ComparisonSection() {
                 <item.icon className="w-5 h-5 text-white" />
               </div>
 
-              <div className={`text-sm text-center mb-4 ${item.isHighlight ? 'text-[#111]' : 'text-[#111]/70'}`}>
+              <div className={`text-sm text-center mb-4 ${item.isHighlight ? 'text-[var(--color-text-strong)]' : 'text-[var(--color-text-primary)]'}`}>
                 {item.name}
               </div>
 
@@ -598,14 +600,14 @@ function ComparisonSection() {
                 {item.features.map((feature) => (
                   <div key={feature.text} className="flex items-center gap-1.5">
                     {feature.available ? (
-                      <Check className={`w-3 h-3 flex-shrink-0 ${item.isHighlight ? 'text-indigo-600' : 'text-gray-400'}`} />
+                      <Check className={`w-3 h-3 flex-shrink-0 ${item.isHighlight ? 'text-indigo-600' : 'text-[var(--color-text-tertiary)]'}`} />
                     ) : (
-                      <X className="w-3 h-3 flex-shrink-0 text-gray-300" />
+                      <X className="w-3 h-3 flex-shrink-0 text-[var(--color-border-default)]" />
                     )}
                     <span className={`text-[10px] leading-tight ${
                       feature.available
-                        ? item.isHighlight ? 'text-[#111]' : 'text-[#111]/60'
-                        : 'text-[#111]/30'
+                        ? item.isHighlight ? 'text-[var(--color-text-strong)]' : 'text-[var(--color-text-secondary)]'
+                        : 'text-[var(--color-text-tertiary)]'
                     }`}
                     >
                       {feature.text}
@@ -643,7 +645,7 @@ function ProductPreviewSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-3xl tracking-tight text-center mb-12 text-[#111]"
+          className="text-3xl tracking-tight text-center mb-12 text-[var(--color-text-strong)]"
         >
           실제로는 이렇게 보입니다
         </motion.h2>
@@ -655,58 +657,58 @@ function ProductPreviewSection() {
           transition={{ duration: 0.6 }}
           className="mb-10"
         >
-          <div className="bg-gradient-to-br from-white to-gray-50 rounded-[2rem] p-4 shadow-2xl border border-gray-200/50 max-w-[360px] mx-auto">
-            <div className="bg-white rounded-[1.5rem] p-6 shadow-inner">
+          <div className="rounded-[2rem] p-4 shadow-2xl max-w-[360px] mx-auto" style={{ background: 'linear-gradient(135deg, var(--color-bg-surface), var(--color-bg-soft))', border: '1px solid var(--color-border-default)' }}>
+            <div className="surface-card rounded-[1.5rem] p-6 shadow-inner">
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600" />
                   <div className="flex-1 text-left">
-                    <div className="text-base text-[#111] mb-0.5">이서연</div>
-                    <div className="text-xs text-[#111]/60">Growth Product Manager</div>
+                    <div className="text-base text-[var(--color-text-strong)] mb-0.5">이서연</div>
+                    <div className="text-xs text-[var(--color-text-secondary)]">Growth Product Manager</div>
                   </div>
                 </div>
 
-                <div className="bg-gray-50 rounded-xl p-4">
-                  <p className="text-xs text-[#111]/70 leading-relaxed">
+                <div className="rounded-xl p-4" style={{ backgroundColor: 'var(--color-bg-soft)' }}>
+                  <p className="text-xs text-[var(--color-text-primary)] leading-relaxed">
                     데이터 기반 성장 전략을 설계하고 실행합니다. B2B SaaS 프로덕트 경험 4년차
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <div className="text-[10px] text-[#111]/50 uppercase tracking-wide mb-2">Highlights</div>
+                  <div className="text-[10px] text-[var(--color-text-tertiary)] uppercase tracking-wide mb-2">Highlights</div>
                   <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-3">
                     <div className="text-[10px] text-indigo-600 mb-1">리멤버 네트워크</div>
-                    <div className="text-xs text-[#111]/80">스타트업 중심 인맥 구조</div>
+                    <div className="text-xs text-[var(--color-text-primary)]">스타트업 중심 인맥 구조</div>
                   </div>
                   <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-3">
                     <div className="text-[10px] text-blue-600 mb-1">강연 경험</div>
-                    <div className="text-xs text-[#111]/80">Startup Conference 2025</div>
+                    <div className="text-xs text-[var(--color-text-primary)]">Startup Conference 2025</div>
                   </div>
                 </div>
 
                 <div className="flex gap-2">
-                  <div className="flex-1 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
-                    <div className="w-5 h-5 rounded bg-gray-300" />
+                  <div className="flex-1 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-muted)' }}>
+                    <div className="w-5 h-5 rounded" style={{ backgroundColor: 'var(--color-text-tertiary)' }} />
                   </div>
-                  <div className="flex-1 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
-                    <div className="w-5 h-5 rounded bg-gray-300" />
+                  <div className="flex-1 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-muted)' }}>
+                    <div className="w-5 h-5 rounded" style={{ backgroundColor: 'var(--color-text-tertiary)' }} />
                   </div>
-                  <div className="flex-1 h-10 rounded-xl bg-gray-100 flex items-center justify-center">
-                    <div className="w-5 h-5 rounded bg-gray-300" />
+                  <div className="flex-1 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-muted)' }}>
+                    <div className="w-5 h-5 rounded" style={{ backgroundColor: 'var(--color-text-tertiary)' }} />
                   </div>
                 </div>
 
                 <div className="flex flex-wrap gap-1.5">
-                  <span className="text-[10px] px-2.5 py-1 bg-gray-100 text-[#111]/70 rounded-full">전략적인</span>
-                  <span className="text-[10px] px-2.5 py-1 bg-gray-100 text-[#111]/70 rounded-full">데이터 기반</span>
-                  <span className="text-[10px] px-2.5 py-1 bg-gray-100 text-[#111]/70 rounded-full">실행력 있는</span>
+                  <span className="text-[10px] px-2.5 py-1 rounded-full" style={{ backgroundColor: 'var(--color-bg-muted)', color: 'var(--color-text-primary)' }}>전략적인</span>
+                  <span className="text-[10px] px-2.5 py-1 rounded-full" style={{ backgroundColor: 'var(--color-bg-muted)', color: 'var(--color-text-primary)' }}>데이터 기반</span>
+                  <span className="text-[10px] px-2.5 py-1 rounded-full" style={{ backgroundColor: 'var(--color-bg-muted)', color: 'var(--color-text-primary)' }}>실행력 있는</span>
                 </div>
 
-                <div className="bg-gray-50 rounded-xl p-3">
+                <div className="rounded-xl p-3" style={{ backgroundColor: 'var(--color-bg-soft)' }}>
                   <div className="flex items-start gap-2">
-                    <div className="w-6 h-6 rounded-full bg-gray-300 flex-shrink-0" />
+                    <div className="w-6 h-6 rounded-full flex-shrink-0" style={{ backgroundColor: 'var(--color-text-tertiary)' }} />
                     <div className="flex-1">
-                      <p className="text-[10px] text-[#111]/60 leading-relaxed italic">
+                      <p className="text-[10px] text-[var(--color-text-secondary)] leading-relaxed italic">
                         &quot;문제를 빠르게 파악하고 해결하는 능력이 인상적이었습니다&quot;
                       </p>
                     </div>
@@ -725,13 +727,13 @@ function ProductPreviewSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
-              className="bg-white rounded-xl p-4 shadow-sm border border-gray-100"
+              className="surface-card rounded-xl p-4 shadow-sm"
             >
               <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center mb-3">
                 <element.icon className="w-4 h-4 text-indigo-600" />
               </div>
-              <div className="text-xs text-[#111] mb-1">{element.title}</div>
-              <div className="text-[10px] text-[#111]/50 leading-relaxed">
+              <div className="text-xs text-[var(--color-text-strong)] mb-1">{element.title}</div>
+              <div className="text-[10px] text-[var(--color-text-tertiary)] leading-relaxed">
                 {element.description}
               </div>
             </motion.div>
@@ -896,7 +898,7 @@ function FinalCTASection({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-3xl tracking-tight mb-12 text-[#111]"
+          className="text-3xl tracking-tight mb-12 text-[var(--color-text-strong)]"
         >
           설명보다 먼저 전해지는
           <br />
@@ -931,16 +933,17 @@ function FinalCTASection({
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="pt-12 border-t border-gray-200"
+          className="pt-12 border-t"
+          style={{ borderColor: 'var(--color-border-default)' }}
         >
-          <div className="text-2xl tracking-tight mb-4 text-[#111]">Byro</div>
-          <p className="text-xs text-[#111]/40 mb-8">
+          <div className="text-2xl tracking-tight mb-4 text-[var(--color-text-strong)]">Byro</div>
+          <p className="text-xs text-[var(--color-text-tertiary)] mb-8">
             Live it, Prove It
           </p>
-          <div className="flex justify-center gap-6 text-xs text-[#111]/40">
-            <a href="#" className="hover:text-[#111]/60 transition-colors">서비스 소개</a>
-            <a href="#" className="hover:text-[#111]/60 transition-colors">문의하기</a>
-            <a href="#" className="hover:text-[#111]/60 transition-colors">개인정보처리방침</a>
+          <div className="flex justify-center gap-6 text-xs text-[var(--color-text-tertiary)]">
+            <a href="#" className="hover:text-[var(--color-text-secondary)] transition-colors">서비스 소개</a>
+            <a href="#" className="hover:text-[var(--color-text-secondary)] transition-colors">문의하기</a>
+            <a href="#" className="hover:text-[var(--color-text-secondary)] transition-colors">개인정보처리방침</a>
           </div>
         </motion.div>
       </div>
@@ -966,7 +969,7 @@ function FixedCTA({
       className="sticky bottom-0 left-0 right-0 z-50 pb-6 px-6 pointer-events-none"
     >
       <div className="max-w-md mx-auto pointer-events-auto">
-        <div className="bg-white/95 backdrop-blur-lg rounded-2xl shadow-2xl border border-gray-200/50 p-4">
+        <div className="rounded-2xl shadow-2xl border p-4 backdrop-blur-lg" style={{ backgroundColor: 'color-mix(in srgb, var(--color-bg-surface) 95%, transparent)', borderColor: 'var(--color-border-default)' }}>
           <Button
             onClick={onClick}
             className={[

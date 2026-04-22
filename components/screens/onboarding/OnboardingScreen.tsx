@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Mail, MessageCircle, Phone, Send, Trash2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
@@ -435,7 +436,7 @@ function Step5SNS() {
       {/* Instagram */}
       <div className="space-y-3">
         <SelectionCard
-          icon={<img src="/images/Instagram.svg" alt="Instagram" className="w-6 h-6" />}
+          icon={<Image src="/images/Instagram.svg" alt="Instagram" width={24} height={24} className="w-6 h-6" />}
           title="Instagram"
           subtitle={store.instagramConnected ? `@${INSTAGRAM_PROFILE.username} 연동됨` : '하드코딩된 Instagram 주소를 연결해 미리보기를 보여줍니다.'}
           badge={store.instagramConnected ? '연동됨' : '선택'}
@@ -449,7 +450,7 @@ function Step5SNS() {
         </SelectionCard>
 
         <SelectionCard
-          icon={<img src="/images/linkedin.png" alt="LinkedIn" className="w-6 h-6" />}
+          icon={<Image src="/images/linkedin.png" alt="LinkedIn" width={24} height={24} className="w-6 h-6" />}
           title="LinkedIn"
           subtitle={store.linkedinConnected ? 'myongkoo-kang 연동됨' : '하드코딩된 LinkedIn 주소로 커리어 요약을 보여줍니다.'}
           badge={store.linkedinConnected ? '연동됨' : '선택'}
@@ -858,8 +859,8 @@ function Step8Select() {
           )}
           {hasData && (
             <div className="flex flex-wrap gap-1">
-              {store.instagramConnected && <span className="inline-flex items-center gap-1 text-xs bg-white rounded-full px-2 py-0.5 border" style={{ borderColor: 'var(--color-border-default)' }}><img src="/images/Instagram.svg" alt="" className="w-3 h-3" /> Instagram</span>}
-              {store.linkedinConnected && <span className="inline-flex items-center gap-1 text-xs bg-white rounded-full px-2 py-0.5 border" style={{ borderColor: 'var(--color-border-default)' }}><img src="/images/linkedin.png" alt="" className="w-3 h-3" /> LinkedIn</span>}
+              {store.instagramConnected && <span className="inline-flex items-center gap-1 text-xs bg-white rounded-full px-2 py-0.5 border" style={{ borderColor: 'var(--color-border-default)' }}><Image src="/images/Instagram.svg" alt="" width={12} height={12} className="w-3 h-3" /> Instagram</span>}
+              {store.linkedinConnected && <span className="inline-flex items-center gap-1 text-xs bg-white rounded-full px-2 py-0.5 border" style={{ borderColor: 'var(--color-border-default)' }}><Image src="/images/linkedin.png" alt="" width={12} height={12} className="w-3 h-3" /> LinkedIn</span>}
               {store.selectedKeywords.length > 0 && <span className="text-xs bg-white rounded-full px-2 py-0.5 border" style={{ borderColor: 'var(--color-border-default)' }}>🏷 키워드 {store.selectedKeywords.length}개</span>}
             </div>
           )}

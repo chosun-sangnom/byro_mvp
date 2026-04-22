@@ -430,12 +430,18 @@ function BasicInfoEditScreen({
   const [avatarImage, setAvatarImage] = useState(user.avatarImage ?? '')
   const [cropSource, setCropSource] = useState('')
   const [cropOpen, setCropOpen] = useState(false)
-  const [cropFrame, setCropFrame] = useState(DEFAULT_CROP_FRAME)
+  const [cropFrame, setCropFrame] = useState({ x: 44, y: 74, width: DEFAULT_CROP_FRAME.width, height: DEFAULT_CROP_FRAME.height })
   const [cropNaturalSize, setCropNaturalSize] = useState({ width: 1, height: 1 })
   const [kwPickerOpen, setKwPickerOpen] = useState(false)
   const [pickerTempKw, setPickerTempKw] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement | null>(null)
-  const resizeStartRef = useRef<{ x: number; direction: 'left' | 'right'; width: number } | null>(null)
+  const dragStartRef = useRef<{ x: number; y: number; frameX: number; frameY: number } | null>(null)
+  const resizeStartRef = useRef<{
+    x: number
+    y: number
+    corner: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+    frame: { x: number; y: number; width: number; height: number }
+  } | null>(null)
 
   const removeKw = (kw: string) => setKeywords((prev) => prev.filter((k) => k !== kw))
 
@@ -483,7 +489,7 @@ function BasicInfoEditScreen({
         img.onload = () => {
           setCropNaturalSize({ width: img.width, height: img.height })
           setCropSource(reader.result as string)
-          setCropFrame(DEFAULT_CROP_FRAME)
+          setCropFrame(getDefaultCropFrame(cropStage))
           setCropOpen(true)
         }
         img.src = reader.result
@@ -497,40 +503,58 @@ function BasicInfoEditScreen({
     width: 344,
     height: 468,
   }
-  const cropFrameOffset = {
-    x: (cropStage.width - cropFrame.width) / 2,
-    y: (cropStage.height - cropFrame.height) / 2,
-  }
   const cropImageLayout = getCropImageLayout(cropNaturalSize.width, cropNaturalSize.height, cropStage)
+
+  const handleCropPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    dragStartRef.current = {
+      x: event.clientX,
+      y: event.clientY,
+      frameX: cropFrame.x,
+      frameY: cropFrame.y,
+    }
+    event.currentTarget.setPointerCapture(event.pointerId)
+  }
 
   const handleCropPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     if (resizeStartRef.current) {
       const deltaX = event.clientX - resizeStartRef.current.x
-      const directionFactor = resizeStartRef.current.direction === 'right' ? 2 : -2
-      const nextWidth = clampCropFrameWidth(resizeStartRef.current.width + deltaX * directionFactor, cropStage)
-      setCropFrame(getFixedCropFrame(nextWidth))
+      const deltaY = event.clientY - resizeStartRef.current.y
+      setCropFrame(getResizedCropFrame(resizeStartRef.current.frame, resizeStartRef.current.corner, deltaX, deltaY, cropStage))
+      return
+    }
+
+    if (dragStartRef.current) {
+      const deltaX = event.clientX - dragStartRef.current.x
+      const deltaY = event.clientY - dragStartRef.current.y
+      setCropFrame((prev) => clampCropFrameRect({
+        ...prev,
+        x: dragStartRef.current!.frameX + deltaX,
+        y: dragStartRef.current!.frameY + deltaY,
+      }, cropStage))
     }
   }
 
   const handleCropPointerEnd = () => {
+    dragStartRef.current = null
     resizeStartRef.current = null
   }
 
   const handleFrameResizeStart = (
     event: React.PointerEvent<HTMLButtonElement>,
-    direction: 'left' | 'right',
+    corner: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right',
   ) => {
     resizeStartRef.current = {
       x: event.clientX,
-      direction,
-      width: cropFrame.width,
+      y: event.clientY,
+      corner,
+      frame: cropFrame,
     }
     event.stopPropagation()
   }
 
   const handleApplyCrop = async () => {
     if (!cropSource) return
-    const cropped = await renderCroppedImage(cropSource, cropNaturalSize, cropImageLayout, cropFrameOffset, cropFrame)
+    const cropped = await renderCroppedImage(cropSource, cropNaturalSize, cropImageLayout, cropFrame)
     setAvatarImage(cropped)
     setCropOpen(false)
     showToast('사진이 적용됐어요')
@@ -673,6 +697,7 @@ function BasicInfoEditScreen({
               <div
                 className="relative overflow-hidden touch-none select-none"
                 style={{ width: `${cropStage.width}px`, height: `${cropStage.height}px` }}
+                onPointerDown={handleCropPointerDown}
                 onPointerMove={handleCropPointerMove}
                 onPointerUp={handleCropPointerEnd}
                 onPointerCancel={handleCropPointerEnd}
@@ -695,27 +720,27 @@ function BasicInfoEditScreen({
                 <div className="absolute inset-0 pointer-events-none">
                   <div
                     className="absolute left-0 right-0 top-0 bg-black/48"
-                    style={{ height: `${cropFrameOffset.y}px` }}
+                    style={{ height: `${cropFrame.y}px` }}
                   />
                   <div
                     className="absolute left-0 right-0 bottom-0 bg-black/48"
-                    style={{ height: `${cropStage.height - cropFrameOffset.y - cropFrame.height}px` }}
+                    style={{ height: `${cropStage.height - cropFrame.y - cropFrame.height}px` }}
                   />
                   <div
                     className="absolute left-0 bg-black/48"
-                    style={{ top: `${cropFrameOffset.y}px`, width: `${cropFrameOffset.x}px`, height: `${cropFrame.height}px` }}
+                    style={{ top: `${cropFrame.y}px`, width: `${cropFrame.x}px`, height: `${cropFrame.height}px` }}
                   />
                   <div
                     className="absolute right-0 bg-black/48"
-                    style={{ top: `${cropFrameOffset.y}px`, width: `${cropFrameOffset.x}px`, height: `${cropFrame.height}px` }}
+                    style={{ top: `${cropFrame.y}px`, width: `${cropStage.width - cropFrame.x - cropFrame.width}px`, height: `${cropFrame.height}px` }}
                   />
                 </div>
 
                 <div
-                  className="absolute pointer-events-none"
+                  className="absolute cursor-move"
                   style={{
-                    left: `${cropFrameOffset.x}px`,
-                    top: `${cropFrameOffset.y}px`,
+                    left: `${cropFrame.x}px`,
+                    top: `${cropFrame.y}px`,
                     width: `${cropFrame.width}px`,
                     height: `${cropFrame.height}px`,
                   }}
@@ -725,39 +750,57 @@ function BasicInfoEditScreen({
                   <div className="absolute left-0 bottom-0 h-5 w-5 border-l-[3px] border-b-[3px] border-white/92" />
                   <div className="absolute right-0 bottom-0 h-5 w-5 border-r-[3px] border-b-[3px] border-white/92" />
                   <div
-                    className="absolute left-1/2 -translate-x-1/2 rounded-[42%] border border-white/70 bg-white/5"
+                    className="absolute left-1/2 -translate-x-1/2 rounded-full border border-white/78 bg-white/5"
                     style={{
-                      width: `${Math.min(cropFrame.width - 28, cropFrame.width * 0.78)}px`,
-                      height: `${Math.min(cropFrame.height - 84, cropFrame.width * 0.92)}px`,
-                      top: `${Math.max(20, cropFrame.height * 0.12)}px`,
+                      width: `${Math.min(cropFrame.width - 48, cropFrame.width * 0.58)}px`,
+                      height: `${Math.min(cropFrame.width - 48, cropFrame.width * 0.58)}px`,
+                      top: `${Math.max(28, cropFrame.height * 0.18)}px`,
                     }}
                   />
                 </div>
 
                 <button
-                  onPointerDown={(event) => handleFrameResizeStart(event, 'left')}
-                  className="absolute z-10 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/40 bg-white/12 backdrop-blur-sm"
+                  onPointerDown={(event) => handleFrameResizeStart(event, 'top-left')}
+                  className="absolute z-10 h-8 w-8 -translate-x-1/2 -translate-y-1/2 bg-transparent"
                   style={{
-                    left: `${cropFrameOffset.x}px`,
-                    top: `${cropFrameOffset.y + cropFrame.height / 2}px`,
+                    left: `${cropFrame.x}px`,
+                    top: `${cropFrame.y}px`,
                   }}
-                  aria-label="프레임 축소 또는 확대"
+                  aria-label="프레임 좌상단 조절"
                 />
                 <button
-                  onPointerDown={(event) => handleFrameResizeStart(event, 'right')}
-                  className="absolute z-10 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/40 bg-white/12 backdrop-blur-sm"
+                  onPointerDown={(event) => handleFrameResizeStart(event, 'top-right')}
+                  className="absolute z-10 h-8 w-8 -translate-x-1/2 -translate-y-1/2 bg-transparent"
                   style={{
-                    left: `${cropFrameOffset.x + cropFrame.width}px`,
-                    top: `${cropFrameOffset.y + cropFrame.height / 2}px`,
+                    left: `${cropFrame.x + cropFrame.width}px`,
+                    top: `${cropFrame.y}px`,
                   }}
-                  aria-label="프레임 축소 또는 확대"
+                  aria-label="프레임 우상단 조절"
+                />
+                <button
+                  onPointerDown={(event) => handleFrameResizeStart(event, 'bottom-left')}
+                  className="absolute z-10 h-8 w-8 -translate-x-1/2 -translate-y-1/2 bg-transparent"
+                  style={{
+                    left: `${cropFrame.x}px`,
+                    top: `${cropFrame.y + cropFrame.height}px`,
+                  }}
+                  aria-label="프레임 좌하단 조절"
+                />
+                <button
+                  onPointerDown={(event) => handleFrameResizeStart(event, 'bottom-right')}
+                  className="absolute z-10 h-8 w-8 -translate-x-1/2 -translate-y-1/2 bg-transparent"
+                  style={{
+                    left: `${cropFrame.x + cropFrame.width}px`,
+                    top: `${cropFrame.y + cropFrame.height}px`,
+                  }}
+                  aria-label="프레임 우하단 조절"
                 />
               </div>
             </div>
 
             <div className="px-5 pb-5">
               <div className="text-[11px] text-white/68 text-center mb-4">
-                사진은 그대로 두고, 좌우 핸들로 잘릴 범위만 조절하세요. 검정 영역은 잘려 나가는 부분입니다.
+                프레임을 드래그해 위치를 잡고, 코너 ㄴ 핸들로 잘릴 범위를 조절하세요. 정원형 가이드는 방명록 프로필 사진으로 보이는 영역입니다.
               </div>
             </div>
           </div>
@@ -1607,10 +1650,12 @@ function SectionGuestbook({ entries }: {
 const CROP_RATIO = 4 / 5
 const DEFAULT_CROP_FRAME = { width: 256, height: 320 }
 
-function getFixedCropFrame(width: number) {
+function getDefaultCropFrame(stage: { width: number; height: number }) {
   return {
-    width,
-    height: width / CROP_RATIO,
+    x: (stage.width - DEFAULT_CROP_FRAME.width) / 2,
+    y: (stage.height - DEFAULT_CROP_FRAME.height) / 2,
+    width: DEFAULT_CROP_FRAME.width,
+    height: DEFAULT_CROP_FRAME.height,
   }
 }
 
@@ -1618,6 +1663,44 @@ function clampCropFrameWidth(width: number, stage: { width: number; height: numb
   const minWidth = 180
   const maxWidth = Math.min(stage.width - 40, (stage.height - 56) * CROP_RATIO)
   return Math.max(minWidth, Math.min(maxWidth, width))
+}
+
+function clampCropFrameRect(
+  frame: { x: number; y: number; width: number; height: number },
+  stage: { width: number; height: number },
+) {
+  return {
+    ...frame,
+    x: Math.max(0, Math.min(stage.width - frame.width, frame.x)),
+    y: Math.max(0, Math.min(stage.height - frame.height, frame.y)),
+  }
+}
+
+function getResizedCropFrame(
+  frame: { x: number; y: number; width: number; height: number },
+  corner: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right',
+  deltaX: number,
+  deltaY: number,
+  stage: { width: number; height: number },
+) {
+  const directionX = corner.includes('left') ? -1 : 1
+  const directionY = corner.includes('top') ? -1 : 1
+  const primaryDelta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX * directionX : deltaY * directionY * CROP_RATIO
+  const nextWidth = clampCropFrameWidth(frame.width + primaryDelta, stage)
+  const nextHeight = nextWidth / CROP_RATIO
+
+  let nextX = frame.x
+  let nextY = frame.y
+
+  if (corner.includes('left')) nextX = frame.x + (frame.width - nextWidth)
+  if (corner.includes('top')) nextY = frame.y + (frame.height - nextHeight)
+
+  return clampCropFrameRect({
+    x: nextX,
+    y: nextY,
+    width: nextWidth,
+    height: nextHeight,
+  }, stage)
 }
 
 function getCropImageLayout(
@@ -1638,8 +1721,7 @@ async function renderCroppedImage(
   src: string,
   naturalSize: { width: number; height: number },
   imageLayout: { width: number; height: number; left: number; top: number },
-  frameOffset: { x: number; y: number },
-  frame: { width: number; height: number },
+  frame: { x: number; y: number; width: number; height: number },
 ) {
   const image = await loadImage(src)
   const canvas = document.createElement('canvas')
@@ -1650,8 +1732,8 @@ async function renderCroppedImage(
 
   const scaleX = naturalSize.width / imageLayout.width
   const scaleY = naturalSize.height / imageLayout.height
-  const sourceX = Math.max(0, (frameOffset.x - imageLayout.left) * scaleX)
-  const sourceY = Math.max(0, (frameOffset.y - imageLayout.top) * scaleY)
+  const sourceX = Math.max(0, (frame.x - imageLayout.left) * scaleX)
+  const sourceY = Math.max(0, (frame.y - imageLayout.top) * scaleY)
   const sourceWidth = Math.min(naturalSize.width - sourceX, frame.width * scaleX)
   const sourceHeight = Math.min(naturalSize.height - sourceY, frame.height * scaleY)
 

@@ -264,7 +264,7 @@ function Step2Verify() {
       <StepIntro
         eyebrow="Verification"
         title={'본인 확인이 필요해요'}
-        description={'이름은 본인인증을 통해 확인됩니다.\n인증 후에는 수정이 어려워요.'}
+        description={'인증된 이름은 프로필에 실명으로 표시됩니다.\n본인인증 후에는 수정이 어려워요.'}
       />
 
       {/* 약관 체크박스 */}
@@ -306,9 +306,6 @@ function Step2Verify() {
         </Button>
       </div>
 
-      <InfoBox variant="info">
-        🔒 인증된 이름은 프로필에 실명으로 표시됩니다.
-      </InfoBox>
     </div>
   )
 }
@@ -484,11 +481,9 @@ function Step5SNS() {
           </div>
         </SelectionCard>
       </div>
-
       <InfoBox variant="info">
         🔒 SNS 미연동 시 해당 섹션은 프로필에 공개되지 않아요.
       </InfoBox>
-
       <div className="mt-auto pt-4 space-y-2">
         <Button onClick={() => store.nextStep()}>다음</Button>
         <button className="w-full text-center text-sm text-[var(--color-text-secondary)]" onClick={() => store.nextStep()}>나중에 연동하기</button>

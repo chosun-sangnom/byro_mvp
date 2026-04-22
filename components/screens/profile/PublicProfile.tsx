@@ -292,14 +292,6 @@ export default function PublicProfile({
           </div>
         </div>
 
-        <div className="px-5 pb-2">
-          <div className="bg-[#F7F8FA] border border-[#E5EAF2] rounded-xl px-3 py-2 text-xs text-[#5E6B7A]">
-            {isOwnerMode
-              ? '실제로 공개되는 모습 그대로 보여줍니다. Byro 편집에서 기본정보, 연락 수단, SNS, 하이라이트를 관리할 수 있어요.'
-              : '연락 버튼으로 바로 연결하고, 평판과 방명록부터 확인한 뒤 SNS와 하이라이트로 이어서 살펴볼 수 있어요.'}
-          </div>
-        </div>
-
         {/* ─── SNS 섹션 ─────────────────────────────── */}
         <div className="px-5 py-4">
           <SectionTitle
@@ -313,7 +305,8 @@ export default function PublicProfile({
                 onClick={() => store.toggleSnsOpen('instagram_' + username)}
                 className="flex items-center w-full px-4 py-3"
               >
-                <span className="text-base mr-2">📸</span>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/Instagram.svg" alt="Instagram" className="w-5 h-5 mr-2 flex-shrink-0" />
                 <div className="flex-1 text-left">
                   <div className="text-sm font-bold">Instagram
                     <span className="ml-1.5 text-[10px] font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-full px-2 py-0.5">연동됨</span>
@@ -352,7 +345,8 @@ export default function PublicProfile({
                 onClick={() => store.toggleSnsOpen('linkedin_' + username)}
                 className="flex items-center w-full px-4 py-3"
               >
-                <span className="text-base mr-2">💼</span>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/linkedin.png" alt="LinkedIn" className="w-5 h-5 mr-2 flex-shrink-0" />
                 <div className="flex-1 text-left">
                   <div className="text-sm font-bold">LinkedIn
                     <span className="ml-1.5 text-[10px] font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-full px-2 py-0.5">연동됨</span>
@@ -370,16 +364,12 @@ export default function PublicProfile({
                     </p>
                   </div>
                   <div className="space-y-2">
-                    <div className="rounded-xl border border-[#EFEFEF] px-3 py-2.5">
-                      <div className="text-[11px] text-[#888] mb-1">핵심 키워드</div>
-                      <div className="text-xs text-[#333]">B2B SaaS · Product Strategy · Growth</div>
-                    </div>
-                    <div className="rounded-xl border border-[#EFEFEF] px-3 py-2.5">
-                      <div className="text-[11px] text-[#888] mb-1">샘플 활동</div>
-                      <p className="text-xs text-[#333] leading-relaxed line-clamp-3">{LINKEDIN_PROFILE.recentPosts[0]?.text}</p>
-                      <div className="flex items-center gap-2 mt-2">
-                        <span className="text-[10px] text-[#888]">👍 {LINKEDIN_PROFILE.recentPosts[0]?.likes}</span>
-                        <span className="text-[10px] text-[#bbb]">{LINKEDIN_PROFILE.recentPosts[0]?.date}</span>
+                    <div className="rounded-xl border border-[#EFEFEF] overflow-hidden">
+                      <div className="px-3 pt-2.5 pb-1 text-[11px] text-[#888]">최근 게시물</div>
+                      <div className="relative max-h-48 overflow-hidden">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/images/linkedsample.png" alt="LinkedIn 최근 게시물" className="w-full" />
+                        <div className="absolute bottom-0 inset-x-0 h-20 bg-gradient-to-t from-white to-transparent" />
                       </div>
                     </div>
                   </div>

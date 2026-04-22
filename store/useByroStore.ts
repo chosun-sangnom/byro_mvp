@@ -37,6 +37,7 @@ interface ByroStore {
   experienceKeywords: string[]
   experienceMessage: string
   expSubmittedProfiles: string[]
+  deletedGuestbookIds: string[]
 
   // Actions
   nextStep(): void
@@ -71,6 +72,7 @@ interface ByroStore {
   updateUserInfo(info: Partial<UserState>): void
   updateUserKeywords(keywords: string[]): void
   updateUserContactChannels(channels: ContactChannel[]): void
+  deleteGuestbookEntry(id: string): void
 }
 
 export const useByroStore = create<ByroStore>()(persist((set, get) => ({
@@ -100,6 +102,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   experienceKeywords: [],
   experienceMessage: '',
   expSubmittedProfiles: [],
+  deletedGuestbookIds: [],
 
   // Actions
   nextStep() {
@@ -326,6 +329,12 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       user: state.user ? { ...state.user, contactChannels: channels } : null,
     }))
   },
+
+  deleteGuestbookEntry(id) {
+    set((state) => ({
+      deletedGuestbookIds: [...state.deletedGuestbookIds, id],
+    }))
+  },
 }), {
   name: 'byro-store',
   partialize: (state) => ({
@@ -350,5 +359,6 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     experienceKeywords: state.experienceKeywords,
     experienceMessage: state.experienceMessage,
     expSubmittedProfiles: state.expSubmittedProfiles,
+    deletedGuestbookIds: state.deletedGuestbookIds,
   }),
 }))

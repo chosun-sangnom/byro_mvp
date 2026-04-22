@@ -12,7 +12,7 @@ import {
 } from '@/lib/mockData'
 import PublicProfile from '@/components/screens/profile/PublicProfile'
 
-type Screen = 'preview' | 'manage' | 'editBasic' | 'editHighlight' | 'editSNS' | 'editReputation' | 'editContact'
+type Screen = 'preview' | 'manage' | 'editBasic' | 'editHighlight' | 'editSNS' | 'editReputation' | 'editContact' | 'editGuestbook'
 type SectionKey = 'sns' | 'highlight' | 'reputation' | 'guestbook'
 
 const SECTION_LABELS: Record<SectionKey, string> = {
@@ -129,6 +129,7 @@ export default function MyByro() {
         onEditSNS={() => setScreen('editSNS')}
         onEditReputation={() => setScreen('editReputation')}
         onEditContact={() => setScreen('editContact')}
+        onEditGuestbook={() => setScreen('editGuestbook')}
         moveSection={moveSection}
         handleDragStart={handleDragStart}
         handleDragEnter={handleDragEnter}
@@ -165,6 +166,10 @@ export default function MyByro() {
     return <ContactManageScreen onBack={() => setScreen('manage')} />
   }
 
+  if (screen === 'editGuestbook') {
+    return <GuestbookManageScreen onBack={() => setScreen('manage')} />
+  }
+
   return null
 }
 
@@ -183,6 +188,7 @@ function ManageByroScreen({
   onEditSNS,
   onEditReputation,
   onEditContact,
+  onEditGuestbook,
   moveSection,
   handleDragStart,
   handleDragEnter,
@@ -209,6 +215,7 @@ function ManageByroScreen({
   onEditSNS: () => void
   onEditReputation: () => void
   onEditContact: () => void
+  onEditGuestbook: () => void
   moveSection: (key: SectionKey, direction: 'up' | 'down') => void
   handleDragStart: (key: SectionKey) => void
   handleDragEnter: (key: SectionKey) => void
@@ -353,7 +360,17 @@ function ManageByroScreen({
                     ))}
                   </div>
                 )}
-                {key === 'guestbook' && <SectionGuestbook entries={SAMPLE_PROFILE.guestbook} />}
+                {key === 'guestbook' && (
+                  <>
+                    <SectionGuestbook entries={SAMPLE_PROFILE.guestbook.slice(0, 3)} />
+                    <button
+                      onClick={onEditGuestbook}
+                      className="mt-2 w-full rounded-[14px] border border-[#E5E5E5] px-3 py-2 text-xs font-semibold text-[#555]"
+                    >
+                      방명록 관리
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           ))}
@@ -1404,9 +1421,18 @@ function ReputationManageScreen({
 }) {
   const store = useByroStore()
   const [keywords, setKeywords] = useState<string[]>([...currentKeywords])
+  const [confirmKeyword, setConfirmKeyword] = useState<string | null>(null)
+
+  const getReputationCount = (kw: string) =>
+    SAMPLE_PROFILE.reputationKeywords.find((r) => r.keyword === kw)?.count ?? 0
 
   const toggleKeyword = (kw: string) => {
     if (keywords.includes(kw)) {
+      const count = getReputationCount(kw)
+      if (count > 0) {
+        setConfirmKeyword(kw)
+        return
+      }
       setKeywords((prev) => prev.filter((item) => item !== kw))
       return
     }
@@ -1450,6 +1476,25 @@ function ReputationManageScreen({
       <div className="px-5 pb-5 pt-3 border-t border-[#EBEBEB]">
         <Button onClick={() => { store.updateUserKeywords(keywords); showToast('키워드가 저장됐어요!'); onBack() }}>저장</Button>
       </div>
+
+      <Modal open={confirmKeyword !== null} onClose={() => setConfirmKeyword(null)}>
+        <div className="text-center">
+          <div className="text-xl mb-3">⚠️</div>
+          <div className="text-sm font-black mb-2">누적 평판이 사라져요</div>
+          <div className="text-xs text-[#555] leading-relaxed mb-4">
+            <span className="font-bold">"{confirmKeyword}"</span> 키워드에 쌓인{' '}
+            <span className="font-bold">{confirmKeyword ? getReputationCount(confirmKeyword) : 0}개</span>의 평판이
+            {' '}영구적으로 삭제돼요.<br />정말 해제하시겠어요?
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setConfirmKeyword(null)}>취소</Button>
+            <Button onClick={() => {
+              if (confirmKeyword) setKeywords((prev) => prev.filter((item) => item !== confirmKeyword))
+              setConfirmKeyword(null)
+            }}>해제하기</Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }
@@ -1470,7 +1515,8 @@ function SectionSNS({ instagramConnected, linkedinConnected }: {
       {/* Instagram */}
       <div className="border-b border-[#f0f0f0]">
         <div className="flex items-center py-2.5">
-          <span className="text-lg mr-2">📸</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/Instagram.svg" alt="Instagram" className="w-5 h-5 mr-2 flex-shrink-0" />
           <div className="flex-1">
             <div className="text-sm font-bold">Instagram
               {instagramConnected && <span className="ml-1.5 text-xs font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded px-1 py-0.5">✓ 연동됨</span>}
@@ -1507,7 +1553,8 @@ function SectionSNS({ instagramConnected, linkedinConnected }: {
       {/* LinkedIn */}
       <div>
         <div className="flex items-center py-2.5">
-          <span className="text-lg mr-2">💼</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/linkedin.png" alt="LinkedIn" className="w-5 h-5 mr-2 flex-shrink-0" />
           <div className="flex-1">
             <div className="text-sm font-bold">LinkedIn
               {linkedinConnected && <span className="ml-1.5 text-xs font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded px-1 py-0.5">✓ 연동됨</span>}
@@ -1545,6 +1592,61 @@ function SectionSNS({ instagramConnected, linkedinConnected }: {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// 방명록 관리 화면
+// ─────────────────────────────────────────────────────────────────────────────
+function GuestbookManageScreen({ onBack }: { onBack: () => void }) {
+  const store = useByroStore()
+  const entries = SAMPLE_PROFILE.guestbook.filter(
+    (e) => !store.deletedGuestbookIds.includes(e.id)
+  )
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
+        <button onClick={onBack} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+        <span className="text-base font-black">방명록 관리</span>
+        <span className="ml-2 text-xs text-[#AAA]">{entries.length}개</span>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-5 py-4">
+        {entries.length === 0 ? (
+          <div className="text-center text-sm text-[#AAA] mt-16">받은 방명록이 없어요</div>
+        ) : (
+          <div className="space-y-2">
+            {entries.map((entry) => (
+              <div key={entry.id} className="flex items-start gap-2.5 rounded-[18px] border border-[#F0F0F0] bg-[#FCFCFC] px-3 py-3">
+                {entry.authorName === '이지민' ? (
+                  <div className="w-7 h-7 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/images/jimin-profile-5x4.jpg" alt={entry.authorName} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="w-7 h-7 rounded-full bg-[#e0e0e0] flex items-center justify-center text-xs font-bold text-[#555] flex-shrink-0">
+                    {entry.authorName.charAt(0)}
+                  </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-xs font-bold text-[#222]">{entry.authorName}</div>
+                    <div className="text-[10px] text-[#BBB]">{entry.date}</div>
+                  </div>
+                  <div className="text-xs text-[#666] mt-0.5">{entry.message}</div>
+                </div>
+                <button
+                  onClick={() => { store.deleteGuestbookEntry(entry.id); showToast('방명록을 삭제했어요') }}
+                  className="flex-shrink-0 text-[#CCC] hover:text-[#E53935] transition-colors p-1"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 // 방명록 섹션
 // ─────────────────────────────────────────────────────────────────────────────
 function SectionGuestbook({ entries }: {

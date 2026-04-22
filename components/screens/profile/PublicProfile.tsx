@@ -8,7 +8,7 @@ import {
   Button, Chip, BottomSheet, Modal, TextArea, InfoBox, showToast,
 } from '@/components/ui'
 import {
-  SAMPLE_PROFILE, JIMIN_PROFILE, INSTAGRAM_PROFILE, EXPERIENCE_KEYWORDS,
+  SAMPLE_PROFILE, JIMIN_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE, EXPERIENCE_KEYWORDS,
 } from '@/lib/mockData'
 
 interface PublicProfileProps {
@@ -301,20 +301,36 @@ export default function PublicProfile({
 
           {profile.instagramConnected && (
             <div className="mb-2 rounded-[22px] border border-[#EBEBEB] overflow-hidden">
-              <button
-                onClick={() => store.toggleSnsOpen('instagram_' + username)}
-                className="flex items-center w-full px-4 py-3"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/Instagram.svg" alt="Instagram" className="w-5 h-5 mr-2 flex-shrink-0" />
-                <div className="flex-1 text-left">
-                  <div className="text-sm font-bold">Instagram
-                    <span className="ml-1.5 text-[10px] font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-full px-2 py-0.5">연동됨</span>
+              <div className="flex items-center gap-3 px-4 py-3">
+                <button
+                  onClick={() => store.toggleSnsOpen('instagram_' + username)}
+                  className="flex min-w-0 flex-1 items-center text-left"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/images/Instagram.svg" alt="Instagram" className="w-5 h-5 mr-2 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <div className="text-sm font-bold">Instagram
+                      <span className="ml-1.5 text-[10px] font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-full px-2 py-0.5">연동됨</span>
+                    </div>
+                    <a
+                      href={profile.instagram.profileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="block truncate text-xs text-[#0D47A1] underline-offset-2 hover:underline"
+                    >
+                      instagram.com/{profile.instagram.username}
+                    </a>
                   </div>
-                  <div className="text-xs text-[#0D47A1]">instagram.com/{profile.instagram.username}</div>
-                </div>
-                {igOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
-              </button>
+                </button>
+                <button
+                  onClick={() => store.toggleSnsOpen('instagram_' + username)}
+                  className="flex-shrink-0 p-1"
+                  aria-label={igOpen ? '인스타그램 섹션 접기' : '인스타그램 섹션 펼치기'}
+                >
+                  {igOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
+                </button>
+              </div>
               {igOpen && (
                 <div className="px-4 pb-4">
                   <div className="rounded-2xl bg-[#FAFAFA] border border-[#F0F0F0] px-3 py-3 mb-3">
@@ -341,20 +357,36 @@ export default function PublicProfile({
 
           {profile.linkedinConnected && (
             <div className="mb-2 rounded-[22px] border border-[#EBEBEB] overflow-hidden">
-              <button
-                onClick={() => store.toggleSnsOpen('linkedin_' + username)}
-                className="flex items-center w-full px-4 py-3"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/linkedin.png" alt="LinkedIn" className="w-5 h-5 mr-2 flex-shrink-0" />
-                <div className="flex-1 text-left">
-                  <div className="text-sm font-bold">LinkedIn
-                    <span className="ml-1.5 text-[10px] font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-full px-2 py-0.5">연동됨</span>
+              <div className="flex items-center gap-3 px-4 py-3">
+                <button
+                  onClick={() => store.toggleSnsOpen('linkedin_' + username)}
+                  className="flex min-w-0 flex-1 items-center text-left"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/images/linkedin.png" alt="LinkedIn" className="w-5 h-5 mr-2 flex-shrink-0" />
+                  <div className="min-w-0">
+                    <div className="text-sm font-bold">LinkedIn
+                      <span className="ml-1.5 text-[10px] font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-full px-2 py-0.5">연동됨</span>
+                    </div>
+                    <a
+                      href={LINKEDIN_PROFILE.profileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="block truncate text-xs text-[#0D47A1] underline-offset-2 hover:underline"
+                    >
+                      {LINKEDIN_PROFILE.profileUrl.replace(/^https?:\/\//, '')}
+                    </a>
                   </div>
-                  <div className="text-xs text-[#0D47A1]">career summary available</div>
-                </div>
-                {liOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
-              </button>
+                </button>
+                <button
+                  onClick={() => store.toggleSnsOpen('linkedin_' + username)}
+                  className="flex-shrink-0 p-1"
+                  aria-label={liOpen ? '링크드인 섹션 접기' : '링크드인 섹션 펼치기'}
+                >
+                  {liOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
+                </button>
+              </div>
               {liOpen && (
                 <div className="px-4 pb-4">
                   <div className="rounded-2xl bg-[#FAFAFA] border border-[#F0F0F0] px-3 py-3 mb-3">

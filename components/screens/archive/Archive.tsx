@@ -30,10 +30,10 @@ export default function Archive() {
   return (
     <div className="flex flex-col h-full">
       {/* 네비 */}
-      <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
-        <button onClick={() => router.back()} className="text-sm text-[#555] mr-3">‹</button>
+      <div className="flex items-center px-5 h-12 border-b flex-shrink-0" style={{ borderColor: 'var(--color-border-default)' }}>
+        <button onClick={() => router.back()} className="text-sm mr-3 text-[var(--color-text-secondary)]">‹</button>
         <div>
-          <div className="text-[11px] text-[#AAA] uppercase tracking-[0.18em]">Archive</div>
+          <div className="micro-text uppercase tracking-[0.18em]">Archive</div>
           <span className="text-base font-black">아카이브</span>
         </div>
       </div>
@@ -76,7 +76,7 @@ export default function Archive() {
         {/* 저장 탭 */}
         {activeArchiveTab === 'saved' && (
           <div className="px-5 py-3">
-            <div className="text-xs text-[#AAA] mb-3">메모와 함께 저장한 프로필</div>
+            <div className="micro-text mb-3">메모와 함께 저장한 프로필</div>
             {savedProfiles.map((p) => (
               <button
                 key={p.id}
@@ -96,16 +96,16 @@ export default function Archive() {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <div className="text-sm font-bold">{p.name}</div>
-                    <span className="text-[10px] text-[#888] bg-[#F5F5F5] rounded-full px-2 py-0.5">저장됨</span>
+                    <span className="text-[10px] text-[var(--color-text-secondary)] bg-[var(--color-bg-muted)] rounded-full px-2 py-0.5">저장됨</span>
                   </div>
-                  <div className="text-xs text-[#888] mt-0.5">{p.title}</div>
+                  <div className="meta-text mt-0.5">{p.title}</div>
                   {p.memo && (
-                    <div className="text-xs text-[#444] bg-[#fffde7] rounded-full px-2.5 py-1 mt-2 inline-block">
+                    <div className="text-xs text-[var(--color-text-primary)] rounded-full px-2.5 py-1 mt-2 inline-block" style={{ backgroundColor: '#FFF8E6' }}>
                       📝 {p.memo}
                     </div>
                   )}
                 </div>
-                <div className="text-[11px] text-[#BBB]">{p.savedAt}</div>
+                <div className="micro-text">{p.savedAt}</div>
               </button>
             ))}
           </div>
@@ -114,7 +114,7 @@ export default function Archive() {
         {/* 최근 본 탭 */}
         {activeArchiveTab === 'recent' && (
           <div className="px-5 py-3">
-            <div className="text-xs text-[#AAA] mb-3">최근 확인한 공개 프로필</div>
+            <div className="micro-text mb-3">최근 확인한 공개 프로필</div>
             {recentProfiles.map((p) => (
               <button
                 key={p.id}
@@ -133,9 +133,9 @@ export default function Archive() {
                 )}
                 <div className="flex-1">
                   <div className="text-sm font-bold">{p.name}</div>
-                  <div className="text-xs text-[#888] mt-0.5">{p.title}</div>
+                  <div className="meta-text mt-0.5">{p.title}</div>
                 </div>
-                <div className="text-[11px] text-[#BBB]">{p.viewedAt}</div>
+                <div className="micro-text">{p.viewedAt}</div>
               </button>
             ))}
           </div>
@@ -144,7 +144,7 @@ export default function Archive() {
         {/* 받은 요청 탭 */}
         {activeArchiveTab === 'requests' && (
           <div className="px-5 py-3">
-            <div className="text-xs text-[#AAA] mb-3">다른 사람이 남긴 경험 요청</div>
+            <div className="micro-text mb-3">다른 사람이 남긴 경험 요청</div>
             {receivedRequests.map((r) => (
               <div key={r.id} className="surface-card rounded-[24px] p-4 mb-3">
                 <div className="flex items-center gap-2 mb-2">
@@ -160,23 +160,24 @@ export default function Archive() {
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-bold">{r.name}</div>
-                    <div className="text-[11px] text-[#AAA]">경험 요청 도착</div>
+                    <div className="micro-text">경험 요청 도착</div>
                   </div>
-                  <span className="text-xs text-[#bbb]">{r.requestedAt}</span>
+                  <span className="micro-text">{r.requestedAt}</span>
                 </div>
                 {r.message
-                  ? <p className="surface-card-soft text-xs text-[#555] mb-3 leading-relaxed rounded-2xl px-3 py-3">{r.message}</p>
-                  : <p className="text-xs text-[#aaa] mb-3 italic">요청 메시지 없음</p>}
+                  ? <p className="surface-card-soft text-xs text-[var(--color-text-secondary)] mb-3 leading-relaxed rounded-2xl px-3 py-3">{r.message}</p>
+                  : <p className="micro-text mb-3 italic">요청 메시지 없음</p>}
                 <div className="flex gap-2">
                   <button
                     onClick={() => router.push('/jiminlee')}
-                    className="flex-1 bg-[#0A0A0A] text-white text-xs font-bold py-2 rounded-xl"
+                    className="flex-1 text-white text-xs font-bold py-2 rounded-xl"
+                    style={{ backgroundColor: 'var(--color-accent-dark)' }}
                   >
                     경험 남기기
                   </button>
                   <button
                     onClick={() => showToast('나중에 목록 하단으로 이동했어요')}
-                    className="flex-1 border text-xs font-bold py-2 rounded-xl text-[#555]"
+                    className="flex-1 border text-xs font-bold py-2 rounded-xl text-[var(--color-text-secondary)]"
                     style={{ borderColor: 'var(--color-border-default)' }}
                   >
                     나중에

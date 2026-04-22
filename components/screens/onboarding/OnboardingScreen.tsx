@@ -65,7 +65,7 @@ export default function OnboardingScreen() {
       <Modal open={showExitModal} onClose={() => setShowExitModal(false)}>
         <div className="text-center">
           <div className="text-base font-black mb-2">온보딩을 종료할까요?</div>
-          <div className="text-xs text-[#555] mb-5 leading-relaxed">
+          <div className="meta-text mb-5 leading-relaxed">
             지금 나가면 입력한 정보가<br />저장되지 않아요.
           </div>
           <div className="flex gap-2">
@@ -127,14 +127,14 @@ function SelectionCard({
         <div className="text-2xl leading-none mt-0.5">{icon}</div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-1">
-            <div className="text-sm font-black text-[#111]">{title}</div>
+            <div className="text-sm font-black text-[var(--color-text-strong)]">{title}</div>
             {badge && (
-              <span className="text-[10px] font-bold rounded-full px-2 py-0.5 bg-white/80 border border-[#E6E6E6] text-[#666]">
+              <span className="text-[10px] font-bold rounded-full px-2 py-0.5 bg-white/80 border text-[var(--color-text-secondary)]" style={{ borderColor: 'var(--color-border-default)' }}>
                 {badge}
               </span>
             )}
           </div>
-          <div className="text-xs text-[#666] leading-relaxed">{subtitle}</div>
+          <div className="meta-text leading-relaxed">{subtitle}</div>
           {children && <div className="mt-3">{children}</div>}
         </div>
       </div>
@@ -201,13 +201,13 @@ function Step1Login({ onClose: _onClose }: { onClose: () => void }) { // eslint-
 
   return (
     <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-      <div className="rounded-[32px] border border-[#EBEBEB] bg-white px-5 py-6 text-center mb-5">
-        <div className="text-[11px] text-[#AAA] uppercase tracking-[0.18em] mb-2">Welcome</div>
+      <div className="surface-card rounded-[32px] px-5 py-6 text-center mb-5">
+        <div className="micro-text uppercase tracking-[0.18em] mb-2">Welcome</div>
         <div className="text-3xl font-black mb-2">Byro</div>
-        <div className="text-lg font-black text-[#111] leading-snug">
+        <div className="text-lg font-black text-[var(--color-text-strong)] leading-snug">
           말하지 않아도<br />증명되는 나
         </div>
-        <div className="text-sm text-[#666] mt-3 leading-relaxed">
+        <div className="meta-text mt-3 leading-relaxed">
           3분 안에 오프라인 신뢰 프로필을 만들고
           <br />
           링크 하나로 공유할 수 있어요.
@@ -218,7 +218,7 @@ function Step1Login({ onClose: _onClose }: { onClose: () => void }) { // eslint-
         <Button variant="google" onClick={handleSocial}>G  구글로 시작하기</Button>
         <Button variant="naver" onClick={handleSocial}>N  네이버로 시작하기</Button>
       </div>
-      <p className="text-center text-xs text-[#aaa] mt-6">
+      <p className="micro-text text-center mt-6">
         시작하면 이용약관 및 개인정보 처리방침에 동의하게 됩니다
       </p>
     </div>
@@ -246,9 +246,9 @@ function Step2Verify() {
       />
 
       {/* 약관 체크박스 */}
-      <div className="bg-[#FAFAFA] border border-[#EBEBEB] rounded-[24px] p-4 mb-4">
+      <div className="surface-card-soft rounded-[24px] p-4 mb-4">
         {/* 전체 동의 */}
-        <div className="pb-3 border-b border-[#e0e0e0] mb-3">
+        <div className="pb-3 mb-3 border-b" style={{ borderColor: 'var(--color-border-default)' }}>
           <CheckRow
             label="전체 동의"
             checked={allChecked}
@@ -319,7 +319,7 @@ function Step3LinkId() {
         현재 오픈베타 참여자에게만 무료. 정식 출시 후 유료 전환 예정.
       </InfoBox>
 
-      <label className="text-xs font-bold text-[#555] uppercase tracking-wide mb-1">Byro 링크 ID</label>
+      <label className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wide mb-1">Byro 링크 ID</label>
       <input
         value={input}
         onChange={(e) => handleChange(e.target.value)}
@@ -329,13 +329,13 @@ function Step3LinkId() {
           status === 'valid' ? 'border-[#1A7A1A]' : status === 'error' ? 'border-[#E53935]' : 'border-[#ddd]',
         ].join(' ')}
       />
-      {status === 'valid' && <p className="text-xs text-[#1A7A1A] mb-3">✓ 사용 가능한 ID예요</p>}
-      {status === 'error' && <p className="text-xs text-[#E53935] mb-3">영문 소문자, 숫자, 밑줄(_)만 가능 · 4~20자</p>}
-      <p className="text-xs text-[#888] mb-6">· 영문 소문자, 숫자, 밑줄(_) &nbsp;· 4~20자 이내</p>
+      {status === 'valid' && <p className="text-xs text-[var(--color-state-success-text)] mb-3">✓ 사용 가능한 ID예요</p>}
+      {status === 'error' && <p className="text-xs text-[var(--color-state-danger-text)] mb-3">영문 소문자, 숫자, 밑줄(_)만 가능 · 4~20자</p>}
+      <p className="meta-text mb-6">· 영문 소문자, 숫자, 밑줄(_) &nbsp;· 4~20자 이내</p>
       {input && status !== 'error' && (
-        <div className="rounded-2xl bg-[#F7F7F7] border border-[#ECECEC] px-4 py-3 mb-5">
-          <div className="text-[11px] text-[#888] mb-1">미리보기</div>
-          <div className="text-sm font-semibold text-[#111]">byro.io/@{input}</div>
+        <div className="surface-card-soft rounded-2xl px-4 py-3 mb-5">
+          <div className="micro-text mb-1">미리보기</div>
+          <div className="text-sm font-semibold text-[var(--color-text-strong)]">byro.io/@{input}</div>
         </div>
       )}
 
@@ -365,7 +365,7 @@ function Step4Keywords() {
           title={'나를 표현하는 키워드를\n골라보세요'}
           description={'방문자가 평가할 때 사용할 키워드예요.\n최대 5개까지 선택할 수 있습니다.'}
         />
-        <div className="bg-[#E3F2FD] border border-[#90CAF9] rounded-lg px-3 py-2 text-xs text-[#0D47A1] flex justify-between mb-4">
+        <div className="rounded-lg px-3 py-2 text-xs flex justify-between mb-4" style={{ backgroundColor: 'var(--color-state-info-bg)', border: '1px solid var(--color-state-info-text)', color: 'var(--color-state-info-text)' }}>
           <span>✨ AI 자기소개 생성에도 활용돼요</span>
           <span className="font-black">{selectedKeywords.length} / 5</span>
         </div>
@@ -373,8 +373,8 @@ function Step4Keywords() {
         {KEYWORD_GROUPS.map((group, gi) => (
           <div key={gi} className="mb-5">
             <div className="flex items-center gap-2 mb-2">
-              <span className="bg-[#0A0A0A] text-white text-xs font-bold rounded px-1.5 py-0.5">{gi + 1}</span>
-              <span className="text-xs font-bold text-[#555]">{group.category}</span>
+              <span className="bg-[var(--color-accent-dark)] text-white text-xs font-bold rounded px-1.5 py-0.5">{gi + 1}</span>
+              <span className="text-xs font-bold text-[var(--color-text-secondary)]">{group.category}</span>
             </div>
             <div className="flex flex-wrap gap-2">
               {group.keywords.map((kw) => (
@@ -441,10 +441,10 @@ function Step5SNS() {
           badge={store.instagramConnected ? '연동됨' : '선택'}
         >
           <div className="flex items-center justify-between gap-3">
-            <div className="text-[11px] text-[#888] truncate">{INSTAGRAM_PROFILE.profileUrl}</div>
+            <div className="micro-text truncate">{INSTAGRAM_PROFILE.profileUrl}</div>
             {store.instagramConnected
-              ? <button onClick={handleDisconnectInstagram} className="text-xs text-[#E53935] border border-[#E53935] rounded-lg px-3 py-1.5">해제</button>
-              : <button onClick={handleConnectInstagram} className="text-xs text-white bg-[#0A0A0A] rounded-lg px-3 py-1.5">연동하기</button>}
+              ? <button onClick={handleDisconnectInstagram} className="text-xs rounded-lg px-3 py-1.5 border" style={{ color: 'var(--color-state-danger-text)', borderColor: 'var(--color-state-danger-text)' }}>해제</button>
+              : <button onClick={handleConnectInstagram} className="text-xs text-white rounded-lg px-3 py-1.5" style={{ backgroundColor: 'var(--color-accent-dark)' }}>연동하기</button>}
           </div>
         </SelectionCard>
 
@@ -455,10 +455,10 @@ function Step5SNS() {
           badge={store.linkedinConnected ? '연동됨' : '선택'}
         >
           <div className="flex items-center justify-between gap-3">
-            <div className="text-[11px] text-[#888] truncate">{LINKEDIN_PROFILE.profileUrl}</div>
+            <div className="micro-text truncate">{LINKEDIN_PROFILE.profileUrl}</div>
             {store.linkedinConnected
-              ? <button onClick={handleDisconnectLinkedIn} className="text-xs text-[#E53935] border border-[#E53935] rounded-lg px-3 py-1.5">해제</button>
-              : <button onClick={handleConnectLinkedIn} className="text-xs text-white bg-[#0A0A0A] rounded-lg px-3 py-1.5">연동하기</button>}
+              ? <button onClick={handleDisconnectLinkedIn} className="text-xs rounded-lg px-3 py-1.5 border" style={{ color: 'var(--color-state-danger-text)', borderColor: 'var(--color-state-danger-text)' }}>해제</button>
+              : <button onClick={handleConnectLinkedIn} className="text-xs text-white rounded-lg px-3 py-1.5" style={{ backgroundColor: 'var(--color-accent-dark)' }}>연동하기</button>}
           </div>
         </SelectionCard>
       </div>
@@ -469,7 +469,7 @@ function Step5SNS() {
 
       <div className="mt-auto pt-4 space-y-2">
         <Button onClick={() => store.nextStep()}>다음</Button>
-        <button className="w-full text-center text-sm text-[#888]" onClick={() => store.nextStep()}>나중에 연동하기</button>
+        <button className="w-full text-center text-sm text-[var(--color-text-secondary)]" onClick={() => store.nextStep()}>나중에 연동하기</button>
       </div>
     </div>
   )
@@ -579,7 +579,7 @@ function Step6Contact() {
 
       <div className="px-5 pb-5 pt-3 border-t border-[#EBEBEB] space-y-2">
         <Button onClick={() => store.nextStep()}>다음</Button>
-        <button className="w-full text-center text-sm text-[#888]" onClick={() => store.nextStep()}>나중에 연결하기</button>
+        <button className="w-full text-center text-sm text-[var(--color-text-secondary)]" onClick={() => store.nextStep()}>나중에 연결하기</button>
       </div>
 
       <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
@@ -599,9 +599,10 @@ function Step6Contact() {
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder={contactPlaceholder(selectedChannel.id)}
-                className="w-full border border-[#ddd] rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0A0A0A] mb-2"
+                className="w-full border rounded-xl px-4 py-3 text-sm outline-none mb-2"
+                style={{ borderColor: 'var(--color-border-default)' }}
               />
-              <div className="text-[11px] text-[#AAA] mb-4">{contactPreview(selectedChannel.id, inputValue)}</div>
+              <div className="micro-text mb-4">{contactPreview(selectedChannel.id, inputValue)}</div>
 
               <div className="space-y-2">
                 <Button onClick={handleSaveChannel}>저장하기</Button>
@@ -699,7 +700,8 @@ function Step7Highlight() {
             >
               <button
                 onClick={() => setSelectedCert(item)}
-                className="text-xs text-white bg-[#0A0A0A] rounded-lg px-3 py-1.5"
+                className="text-xs text-white rounded-lg px-3 py-1.5"
+                style={{ backgroundColor: 'var(--color-accent-dark)' }}
               >
                 인증하기
               </button>
@@ -711,14 +713,14 @@ function Step7Highlight() {
         {store.highlights.length > 0 && (
           <div className="space-y-2 mb-4">
             {store.highlights.map((h) => (
-              <div key={h.id} className="flex items-start border border-[#EBEBEB] rounded-[22px] p-3">
+              <div key={h.id} className="surface-card flex items-start rounded-[22px] p-3">
                 <span className="text-lg mr-2 mt-0.5">{h.icon}</span>
                 <div className="flex-1">
                   <div className="text-sm font-bold">{h.title}</div>
-                  <div className="text-xs text-[#888]">{h.subtitle}</div>
-                  {h.description && <div className="text-xs text-[#555] mt-0.5">{h.description}</div>}
+                  <div className="micro-text">{h.subtitle}</div>
+                  {h.description && <div className="meta-text mt-0.5">{h.description}</div>}
                 </div>
-                <button onClick={() => store.removeHighlight(h.id)} className="text-[#E53935] ml-2 mt-0.5">
+                <button onClick={() => store.removeHighlight(h.id)} className="ml-2 mt-0.5 text-[var(--color-state-danger-text)]">
                   <Trash2 size={14} />
                 </button>
               </div>
@@ -729,7 +731,8 @@ function Step7Highlight() {
         {/* 직접 입력 추가 버튼 */}
         <button
           onClick={() => setSheetOpen(true)}
-          className="w-full border border-dashed border-[#ccc] rounded-xl py-3 text-sm text-[#555] font-medium"
+          className="w-full border border-dashed rounded-xl py-3 text-sm font-medium"
+          style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-secondary)' }}
         >
           + 강연, 협업, 수상 등 추가하기
         </button>
@@ -737,7 +740,7 @@ function Step7Highlight() {
 
       <div className="px-5 pb-5 pt-3 border-t border-[#EBEBEB] space-y-2">
         <Button onClick={() => store.nextStep()}>다음</Button>
-        <button className="w-full text-center text-sm text-[#888]" onClick={() => store.nextStep()}>나중에 추가하기</button>
+        <button className="w-full text-center text-sm text-[var(--color-text-secondary)]" onClick={() => store.nextStep()}>나중에 추가하기</button>
       </div>
 
       {/* 인증 이메일 모달 */}
@@ -745,10 +748,10 @@ function Step7Highlight() {
         <div className="text-center">
           <div className="text-xl mb-3">📧</div>
           <div className="text-sm font-black mb-2">인증 서류 발송</div>
-          <div className="text-xs text-[#555] leading-relaxed mb-4">
+          <div className="meta-text leading-relaxed mb-4">
             아래 이메일로 {selectedCert?.docLabel ?? '인증 자료를'}<br />발송해주세요.
           </div>
-          <div className="bg-[#f8f8f8] rounded-xl px-3 py-2 text-sm font-mono text-[#0A0A0A] mb-4">
+          <div className="surface-card-soft rounded-xl px-3 py-2 text-sm font-mono text-[var(--color-accent-dark)] mb-4">
             gangjunmin@data.byro.io
           </div>
           <Button onClick={() => setSelectedCert(null)}>확인</Button>
@@ -769,8 +772,8 @@ function Step7Highlight() {
                 className={[
                   'flex flex-col items-center p-2 rounded-xl border text-center transition-all',
                   selectedCat?.id === cat.id
-                    ? 'bg-[#0A0A0A] border-[#0A0A0A] text-white'
-                    : 'border-[#EBEBEB] text-[#555]',
+                    ? 'bg-[var(--color-accent-dark)] border-[var(--color-accent-dark)] text-white'
+                    : 'border-[var(--color-border-default)] text-[var(--color-text-secondary)]',
                 ].join(' ')}
               >
                 <span className="text-lg mb-1">{cat.icon}</span>
@@ -784,14 +787,16 @@ function Step7Highlight() {
               value={hlTitle}
               onChange={(e) => setHlTitle(e.target.value)}
               placeholder="제목 (필수)"
-              className="w-full border border-[#ddd] rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#0A0A0A]"
+              className="w-full border rounded-xl px-4 py-2.5 text-sm outline-none"
+              style={{ borderColor: 'var(--color-border-default)' }}
             />
             <input
               value={hlYear}
               onChange={(e) => setHlYear(e.target.value)}
               placeholder="연도 (예: 2023)"
               type="number"
-              className="w-full border border-[#ddd] rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#0A0A0A]"
+              className="w-full border rounded-xl px-4 py-2.5 text-sm outline-none"
+              style={{ borderColor: 'var(--color-border-default)' }}
             />
             <TextArea
               value={hlDesc}
@@ -847,23 +852,23 @@ function Step8Select() {
           onClick={handleAI}
         >
           {!hasData && (
-            <div className="bg-[#fff3e0] rounded-lg px-2 py-1.5 text-xs text-[#7A5A00]">
+            <div className="rounded-lg px-2 py-1.5 text-xs" style={{ backgroundColor: '#FFF8E6', color: '#7A5A00' }}>
               ⚠️ AI 초안 생성에는 키워드·SNS·하이라이트 중 최소 1개가 필요해요
             </div>
           )}
           {hasData && (
             <div className="flex flex-wrap gap-1">
-              {store.instagramConnected && <span className="inline-flex items-center gap-1 text-xs bg-white rounded-full px-2 py-0.5 border border-[#ddd]"><img src="/images/Instagram.svg" alt="" className="w-3 h-3" /> Instagram</span>}
-              {store.linkedinConnected && <span className="inline-flex items-center gap-1 text-xs bg-white rounded-full px-2 py-0.5 border border-[#ddd]"><img src="/images/linkedin.png" alt="" className="w-3 h-3" /> LinkedIn</span>}
-              {store.selectedKeywords.length > 0 && <span className="text-xs bg-white rounded-full px-2 py-0.5 border border-[#ddd]">🏷 키워드 {store.selectedKeywords.length}개</span>}
+              {store.instagramConnected && <span className="inline-flex items-center gap-1 text-xs bg-white rounded-full px-2 py-0.5 border" style={{ borderColor: 'var(--color-border-default)' }}><img src="/images/Instagram.svg" alt="" className="w-3 h-3" /> Instagram</span>}
+              {store.linkedinConnected && <span className="inline-flex items-center gap-1 text-xs bg-white rounded-full px-2 py-0.5 border" style={{ borderColor: 'var(--color-border-default)' }}><img src="/images/linkedin.png" alt="" className="w-3 h-3" /> LinkedIn</span>}
+              {store.selectedKeywords.length > 0 && <span className="text-xs bg-white rounded-full px-2 py-0.5 border" style={{ borderColor: 'var(--color-border-default)' }}>🏷 키워드 {store.selectedKeywords.length}개</span>}
             </div>
           )}
         </SelectionCard>
 
-        <div className="flex items-center gap-2 text-xs text-[#888]">
-          <div className="flex-1 h-px bg-[#eee]" />
+        <div className="flex items-center gap-2 text-xs text-[var(--color-text-secondary)]">
+          <div className="flex-1 h-px bg-[var(--color-border-default)]" />
           <span>또는</span>
-          <div className="flex-1 h-px bg-[#eee]" />
+          <div className="flex-1 h-px bg-[var(--color-border-default)]" />
         </div>
 
         {/* 직접 작성 카드 */}
@@ -875,7 +880,7 @@ function Step8Select() {
         />
       </div>
 
-      <button className="text-center text-sm text-[#888] mt-6" onClick={() => { store.completeOnboarding(); store.goToStep('complete') }}>
+      <button className="text-center text-sm text-[var(--color-text-secondary)] mt-6" onClick={() => { store.completeOnboarding(); store.goToStep('complete') }}>
         나중에 작성하기
       </button>
 
@@ -884,7 +889,7 @@ function Step8Select() {
         <div className="text-center">
           <div className="text-2xl mb-2">⚠️</div>
           <div className="text-sm font-black mb-2">정보가 부족해요</div>
-          <div className="text-xs text-[#555] leading-relaxed mb-4">
+          <div className="meta-text leading-relaxed mb-4">
             AI 자기소개를 만들려면<br />아래 중 하나 이상이 필요해요.<br /><br />
             <b>· 평판 키워드 선택</b><br />
             <b>· SNS 연동</b><br />
@@ -893,7 +898,7 @@ function Step8Select() {
           <div className="space-y-2">
             <Button onClick={() => { setNoDataModal(false); store.goToStep('keywords') }}>← 정보 추가하러 가기</Button>
             <Button variant="outline" onClick={() => { setNoDataModal(false); handleManual() }}>직접 작성하기</Button>
-            <button className="text-xs text-[#888] mt-1" onClick={() => { setNoDataModal(false); store.completeOnboarding(); store.goToStep('complete') }}>나중에 작성하기</button>
+            <button className="text-xs text-[var(--color-text-secondary)] mt-1" onClick={() => { setNoDataModal(false); store.completeOnboarding(); store.goToStep('complete') }}>나중에 작성하기</button>
           </div>
         </div>
       </Modal>

@@ -232,7 +232,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <div className="min-h-full bg-white text-[#111] antialiased">
+    <div className="min-h-full bg-[var(--color-bg-page)] text-[var(--color-text-strong)] antialiased">
       <HeroSection
         primaryLabel={primaryLabel}
         secondaryLabel={secondaryLabel}
@@ -278,29 +278,30 @@ function HeroSection({
         className="w-full max-w-md text-center"
       >
         <div className="mb-12">
-          <div className="inline-flex items-center gap-2 rounded-full border border-[#E5E7EB] bg-white px-3 py-1.5 text-[11px] font-semibold text-[#4B5563] shadow-sm">
+          <div className="inline-flex items-center gap-2 rounded-full border bg-white px-3 py-1.5 text-[11px] font-semibold shadow-sm" style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-secondary)' }}>
             <Stars size={12} className="text-[#6366F1]" />
             Live it, Prove It
           </div>
-          <h1 className="mt-6 text-2xl tracking-tight text-[#111]">Byro</h1>
+          <h1 className="mt-6 text-2xl tracking-tight text-[var(--color-text-strong)]">Byro</h1>
         </div>
 
-        <h2 className="text-5xl tracking-tight mb-4 text-[#111]">
+        <h2 className="text-5xl tracking-tight mb-4 text-[var(--color-text-strong)]">
           Live it, Prove It
         </h2>
 
-        <p className="text-xl mb-6 text-[#111]/80">
+        <p className="text-xl mb-6 text-[var(--color-text-primary)]">
           설명하기 전에, 먼저 증명되는 프로필
         </p>
 
-        <p className="text-sm leading-relaxed mb-10 text-[#111]/60 max-w-sm mx-auto">
+        <p className="text-sm leading-relaxed mb-10 text-[var(--color-text-secondary)] max-w-sm mx-auto">
           하나의 링크로 정체성, 검증된 하이라이트, 평판, SNS, 자기소개를 정리해 오프라인 비즈니스 네트워킹에 활용할 수 있는 프로필 서비스
         </p>
 
         <div className="flex flex-col gap-3 mb-12">
           <Button
             onClick={onPrimary}
-            className="w-full h-12 bg-[#1a1a2e] hover:bg-[#2a2a3e] text-white rounded-2xl shadow-lg"
+            className="w-full h-12 text-white rounded-2xl shadow-lg"
+            style={{ backgroundColor: 'var(--color-accent-dark)' }}
           >
             {primaryLabel}
           </Button>
@@ -319,8 +320,8 @@ function HeroSection({
           transition={{ duration: 0.8, delay: 0.3 }}
           className="relative"
         >
-          <div className="bg-gradient-to-br from-white to-gray-50 rounded-[2rem] p-4 shadow-2xl border border-gray-200/50 max-w-[320px] mx-auto">
-            <div className="bg-white rounded-[1.5rem] p-6 shadow-inner">
+          <div className="rounded-[2rem] p-4 shadow-2xl max-w-[320px] mx-auto" style={{ background: 'linear-gradient(135deg, var(--color-bg-surface), var(--color-bg-soft))', border: '1px solid var(--color-border-default)' }}>
+            <div className="surface-card rounded-[1.5rem] p-6 shadow-inner">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600" />
                 <div className="flex-1 text-left">
@@ -385,7 +386,7 @@ function ProblemSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100"
+              className="surface-card rounded-2xl p-6"
             >
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
@@ -436,7 +437,7 @@ function SolutionSection() {
                 {index + 1}
               </div>
 
-              <div className="bg-white rounded-2xl p-6 pl-10 shadow-sm border border-gray-100">
+              <div className="surface-card rounded-2xl p-6 pl-10">
                 <div className="flex items-start gap-3 mb-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center flex-shrink-0">
                     <step.icon className="w-5 h-5 text-indigo-600" />

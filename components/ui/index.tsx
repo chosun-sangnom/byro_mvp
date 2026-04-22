@@ -113,6 +113,7 @@ interface ButtonProps {
   onClick?: () => void
   className?: string
   type?: 'button' | 'submit'
+  style?: React.CSSProperties
 }
 
 const BUTTON_VARIANTS: Record<string, string> = {
@@ -127,7 +128,7 @@ const BUTTON_VARIANTS: Record<string, string> = {
 
 export function Button({
   children, variant = 'primary', size = 'md', fullWidth = true,
-  disabled, onClick, className = '', type = 'button',
+  disabled, onClick, className = '', type = 'button', style,
 }: ButtonProps) {
   return (
     <button
@@ -158,6 +159,7 @@ export function Button({
             : variant === 'google' ? 'var(--color-border-default)'
               : variant === 'danger' ? 'var(--color-state-danger-text)'
                 : undefined,
+        ...style,
       }}
     >
       {children}

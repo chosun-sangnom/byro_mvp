@@ -8,7 +8,7 @@ import {
   Button, Chip, BottomSheet, Modal, TextArea, InfoBox, showToast,
 } from '@/components/ui'
 import {
-  SAMPLE_PROFILE, JIMIN_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE, EXPERIENCE_KEYWORDS,
+  SAMPLE_PROFILE, JIMIN_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE,
 } from '@/lib/mockData'
 
 interface PublicProfileProps {
@@ -93,6 +93,7 @@ export default function PublicProfile({
       count: profile.reputationKeywords.find((item) => item.keyword === keyword)?.count ?? 0,
     }))
   const featuredGuestbook = profile.guestbook.slice(0, 3)
+  const experienceOptions = profile.selectedKeywords.slice(0, 4)
 
   // SNS 토글
   const igOpen = store.snsOpenStates['instagram_' + username] ?? false
@@ -693,13 +694,13 @@ export default function PublicProfile({
             <div className="text-sm font-black mb-1">{profile.name}에게 경험 남기기</div>
             <div className="text-xs text-[#888] mb-4">{store.user?.name ?? '나'}으로 남겨져요</div>
             <div className="flex flex-wrap gap-2 mb-4">
-              {EXPERIENCE_KEYWORDS.map((kw) => (
+              {experienceOptions.map((kw) => (
                 <Chip
                   key={kw} label={kw}
                   selected={store.experienceKeywords.includes(kw)}
                   onClick={() => {
-                    if (!store.experienceKeywords.includes(kw) && store.experienceKeywords.length >= 5) {
-                      showToast('키워드는 최대 5개까지 선택할 수 있어요'); return
+                    if (!store.experienceKeywords.includes(kw) && store.experienceKeywords.length >= 3) {
+                      showToast('키워드는 최대 3개까지 선택할 수 있어요'); return
                     }
                     store.setExperienceKeyword(kw)
                   }}
@@ -717,12 +718,12 @@ export default function PublicProfile({
             <div className="text-sm font-black text-white mb-1">{profile.name}에게 경험 남기기</div>
             <div className="text-xs text-[#aaa] mb-4">익명 사용자로 남겨져요</div>
             <div className="flex flex-wrap gap-2 mb-4">
-              {EXPERIENCE_KEYWORDS.map((kw) => (
+              {experienceOptions.map((kw) => (
                 <Chip key={kw} label={kw} dark
                   selected={store.experienceKeywords.includes(kw)}
                   onClick={() => {
-                    if (!store.experienceKeywords.includes(kw) && store.experienceKeywords.length >= 5) {
-                      showToast('키워드는 최대 5개까지 선택할 수 있어요'); return
+                    if (!store.experienceKeywords.includes(kw) && store.experienceKeywords.length >= 3) {
+                      showToast('키워드는 최대 3개까지 선택할 수 있어요'); return
                     }
                     store.setExperienceKeyword(kw)
                   }}

@@ -289,7 +289,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       if (current.includes(kw)) {
         return { experienceKeywords: current.filter((k) => k !== kw) }
       }
-      if (current.length >= 5) return {}
+      if (current.length >= 3) return {}
       return { experienceKeywords: [...current, kw] }
     })
   },

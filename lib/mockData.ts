@@ -169,7 +169,7 @@ export const JIMIN_PROFILE = {
     { id: 'kakao', label: '카카오', value: 'jimin.marketer', href: 'https://open.kakao.com/o/sjimin', enabled: true },
     { id: 'telegram', label: '텔레그램', value: '@jimin_connect', href: 'https://t.me/jimin_connect', enabled: false },
   ] as ContactChannel[],
-  selectedKeywords: ['전문적인', '신뢰할 수 있는', '통찰력 있는'],
+  selectedKeywords: ['전문적인', '신뢰할 수 있는', '통찰력 있는', '창의적인'],
   instagramConnected: true,
   linkedinConnected: false,
   corporateHighlight: {
@@ -214,6 +214,7 @@ export const JIMIN_PROFILE = {
     { keyword: '전문적인', count: 5 },
     { keyword: '신뢰할 수 있는', count: 4 },
     { keyword: '통찰력 있는', count: 2 },
+    { keyword: '창의적인', count: 1 },
   ],
   guestbook: [
     { id: 'jg1', linkId: 'myongkoo', authorName: '강민준', message: '정말 통찰력 있는 분이에요.', date: '2일 전' },

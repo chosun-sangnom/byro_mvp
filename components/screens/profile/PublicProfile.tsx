@@ -115,6 +115,7 @@ export default function PublicProfile({
       setBioOverflowing(element.scrollHeight - element.clientHeight > 2)
     }
 
+    if (bioExpanded) return
     checkOverflow()
     window.addEventListener('resize', checkOverflow)
     return () => window.removeEventListener('resize', checkOverflow)

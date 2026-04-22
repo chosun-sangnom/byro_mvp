@@ -158,7 +158,7 @@ export const JIMIN_PROFILE = {
   avatarImage: '/images/jimin-profile-5x4.jpg',
   headline: '브랜드와 사람을 연결하는 스타트업 마케터',
   school: '연세대학교 경영학과 졸업',
-  bio: '스타트업 생태계에서 브랜드와 사람을 연결하는 마케터입니다.',
+  bio: '스타트업 생태계에서 브랜드와 사람을 연결하는 마케터입니다. 브랜드의 방향성과 사람들의 경험이 자연스럽게 이어지도록 설계하는 일을 좋아하고, 성장 전략과 커뮤니티 빌딩에도 꾸준히 관심을 두고 있습니다.',
   heroTheme: {
     cover: 'from-[#B9A597] via-[#7F6A61] to-[#101010]',
     avatar: 'from-[#D8C4B2] to-[#8A7167]',

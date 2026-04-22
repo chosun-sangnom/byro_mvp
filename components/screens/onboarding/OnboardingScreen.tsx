@@ -27,7 +27,6 @@ export default function OnboardingScreen() {
   const [showExitModal, setShowExitModal] = useState(false)
 
   const stepNum = STEP_NUMS[store.step] ?? 0
-  const linkIdValid = /^[a-z0-9_]{4,20}$/.test(store.linkId)
 
   const handleClose = () => setShowExitModal(true)
   const handleExitConfirm = () => {
@@ -36,31 +35,12 @@ export default function OnboardingScreen() {
   }
 
   const hasBack = stepNum >= 1 && stepNum <= 8
-  const stepNavConfig: Partial<Record<typeof store.step, { canNext: boolean; onNext: () => void }>> = {
-    verify: { canNext: store.agreedTerms && store.agreedPrivacy, onNext: () => store.nextStep() },
-    linkid: { canNext: linkIdValid, onNext: () => store.nextStep() },
-    keywords: { canNext: true, onNext: () => store.nextStep() },
-    sns: { canNext: true, onNext: () => store.nextStep() },
-    contact: { canNext: true, onNext: () => store.nextStep() },
-    highlight: { canNext: true, onNext: () => store.nextStep() },
-  }
-  const currentStepNav = stepNavConfig[store.step]
 
   return (
     <div className="flex flex-col h-full">
       {/* Nav */}
       <NavBar
         onBack={hasBack ? () => store.prevStep() : undefined}
-        right={currentStepNav ? (
-          <button
-            onClick={currentStepNav.onNext}
-            disabled={!currentStepNav.canNext}
-            className="text-xs font-semibold disabled:opacity-35"
-            style={{ color: currentStepNav.canNext ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}
-          >
-            다음
-          </button>
-        ) : undefined}
         onClose={handleClose}
       />
 
@@ -213,6 +193,36 @@ function contactPreview(id?: ContactChannel['id'], value?: string) {
   return buildContactHref(id, value)
 }
 
+function StepFooter({
+  canNext,
+  onNext,
+  onPrev,
+  onSkip,
+  nextLabel = '다음',
+  skipLabel = '건너뛰기',
+}: {
+  canNext: boolean
+  onNext: () => void
+  onPrev?: () => void
+  onSkip?: () => void
+  nextLabel?: string
+  skipLabel?: string
+}) {
+  return (
+    <div className="px-5 pb-5 pt-3 border-t border-[#EBEBEB] space-y-2">
+      <div className="grid grid-cols-2 gap-2">
+        <Button variant="outline" onClick={onPrev} disabled={!onPrev}>이전</Button>
+        <Button onClick={onNext} disabled={!canNext}>{nextLabel}</Button>
+      </div>
+      {onSkip && (
+        <button className="w-full text-center text-sm text-[var(--color-text-secondary)]" onClick={onSkip}>
+          {skipLabel}
+        </button>
+      )}
+    </div>
+  )
+}
+
 // ─── Step 1: 소셜 로그인 ────────────────────────────────
 function Step1Login({ onClose: _onClose }: { onClose: () => void }) { // eslint-disable-line @typescript-eslint/no-unused-vars
   const store = useByroStore()
@@ -305,7 +315,11 @@ function Step2Verify() {
           카카오로 인증하기
         </Button>
       </div>
-
+      <StepFooter
+        canNext={canProceed}
+        onNext={handleVerify}
+        onPrev={() => store.prevStep()}
+      />
     </div>
   )
 }
@@ -325,7 +339,7 @@ function Step3LinkId() {
     else if (LINK_REGEX.test(v)) setStatus('valid')
     else setStatus('error')
   }
-
+  const canNext = status === 'valid'
   return (
     <div className="flex flex-col h-full overflow-y-auto px-5 py-4">
       <StepIntro
@@ -359,7 +373,11 @@ function Step3LinkId() {
         </div>
       )}
 
-      <Button disabled={status !== 'valid'} onClick={() => store.nextStep()}>다음</Button>
+      <StepFooter
+        canNext={canNext}
+        onNext={() => store.nextStep()}
+        onPrev={() => store.prevStep()}
+      />
     </div>
   )
 }
@@ -410,10 +428,12 @@ function Step4Keywords() {
         ))}
       </div>
 
-      <div className="px-5 pb-5 space-y-2 border-t border-[#EBEBEB] pt-3">
-        <Button onClick={() => store.nextStep()}>다음</Button>
-        <button className="w-full text-center text-sm text-[#888]" onClick={() => store.nextStep()}>건너뛰기</button>
-      </div>
+      <StepFooter
+        canNext={selectedKeywords.length > 0}
+        onNext={() => store.nextStep()}
+        onPrev={() => store.prevStep()}
+        onSkip={() => store.nextStep()}
+      />
     </div>
   )
 }
@@ -485,10 +505,13 @@ function Step5SNS() {
       <InfoBox variant="info">
         연결하지 않으면 프로필에 보이지 않아요.
       </InfoBox>
-      <div className="mt-auto pt-4 space-y-2">
-        <Button onClick={() => store.nextStep()}>다음</Button>
-        <button className="w-full text-center text-sm text-[var(--color-text-secondary)]" onClick={() => store.nextStep()}>나중에 연동하기</button>
-      </div>
+      <StepFooter
+        canNext={store.instagramConnected || store.linkedinConnected}
+        onNext={() => store.nextStep()}
+        onPrev={() => store.prevStep()}
+        onSkip={() => store.nextStep()}
+        skipLabel="건너뛰기"
+      />
     </div>
   )
 }
@@ -595,10 +618,13 @@ function Step6Contact() {
         </div>
       </div>
 
-      <div className="px-5 pb-5 pt-3 border-t border-[#EBEBEB] space-y-2">
-        <Button onClick={() => store.nextStep()}>다음</Button>
-        <button className="w-full text-center text-sm text-[var(--color-text-secondary)]" onClick={() => store.nextStep()}>나중에 연결하기</button>
-      </div>
+      <StepFooter
+        canNext={activeCount > 0}
+        onNext={() => store.nextStep()}
+        onPrev={() => store.prevStep()}
+        onSkip={() => store.nextStep()}
+        skipLabel="건너뛰기"
+      />
 
       <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
         <div className="px-5 pb-6">
@@ -758,10 +784,13 @@ function Step7Highlight() {
         </button>
       </div>
 
-      <div className="px-5 pb-5 pt-3 border-t border-[#EBEBEB] space-y-2">
-        <Button onClick={() => store.nextStep()}>다음</Button>
-        <button className="w-full text-center text-sm text-[var(--color-text-secondary)]" onClick={() => store.nextStep()}>나중에 추가하기</button>
-      </div>
+      <StepFooter
+        canNext={store.highlights.length > 0}
+        onNext={() => store.nextStep()}
+        onPrev={() => store.prevStep()}
+        onSkip={() => store.nextStep()}
+        skipLabel="건너뛰기"
+      />
 
       {/* 인증 이메일 모달 */}
       <Modal open={certModalOpen} onClose={() => setSelectedCert(null)}>

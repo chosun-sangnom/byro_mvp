@@ -488,8 +488,9 @@ function BasicInfoEditScreen({
         const img = new Image()
         img.onload = () => {
           setCropNaturalSize({ width: img.width, height: img.height })
+          const initialLayout = getCropImageLayout(img.width, img.height, cropStage)
           setCropSource(reader.result as string)
-          setCropFrame(getDefaultCropFrame(cropStage))
+          setCropFrame(getDefaultCropFrame(initialLayout))
           setCropOpen(true)
         }
         img.src = reader.result
@@ -519,7 +520,7 @@ function BasicInfoEditScreen({
     if (resizeStartRef.current) {
       const deltaX = event.clientX - resizeStartRef.current.x
       const deltaY = event.clientY - resizeStartRef.current.y
-      setCropFrame(getResizedCropFrame(resizeStartRef.current.frame, resizeStartRef.current.corner, deltaX, deltaY, cropStage))
+      setCropFrame(getResizedCropFrame(resizeStartRef.current.frame, resizeStartRef.current.corner, deltaX, deltaY, cropImageLayout))
       return
     }
 
@@ -530,7 +531,7 @@ function BasicInfoEditScreen({
         ...prev,
         x: dragStartRef.current!.frameX + deltaX,
         y: dragStartRef.current!.frameY + deltaY,
-      }, cropStage))
+      }, cropImageLayout))
     }
   }
 
@@ -697,7 +698,6 @@ function BasicInfoEditScreen({
               <div
                 className="relative overflow-hidden touch-none select-none"
                 style={{ width: `${cropStage.width}px`, height: `${cropStage.height}px` }}
-                onPointerDown={handleCropPointerDown}
                 onPointerMove={handleCropPointerMove}
                 onPointerUp={handleCropPointerEnd}
                 onPointerCancel={handleCropPointerEnd}
@@ -717,22 +717,38 @@ function BasicInfoEditScreen({
                   />
                 )}
 
-                <div className="absolute inset-0 pointer-events-none">
+                <div
+                  className="absolute pointer-events-none"
+                  style={{
+                    left: `${cropImageLayout.left}px`,
+                    top: `${cropImageLayout.top}px`,
+                    width: `${cropImageLayout.width}px`,
+                    height: `${cropImageLayout.height}px`,
+                  }}
+                >
                   <div
                     className="absolute left-0 right-0 top-0 bg-black/48"
-                    style={{ height: `${cropFrame.y}px` }}
+                    style={{ height: `${cropFrame.y - cropImageLayout.top}px` }}
                   />
                   <div
                     className="absolute left-0 right-0 bottom-0 bg-black/48"
-                    style={{ height: `${cropStage.height - cropFrame.y - cropFrame.height}px` }}
+                    style={{ height: `${cropImageLayout.top + cropImageLayout.height - cropFrame.y - cropFrame.height}px` }}
                   />
                   <div
                     className="absolute left-0 bg-black/48"
-                    style={{ top: `${cropFrame.y}px`, width: `${cropFrame.x}px`, height: `${cropFrame.height}px` }}
+                    style={{
+                      top: `${cropFrame.y - cropImageLayout.top}px`,
+                      width: `${cropFrame.x - cropImageLayout.left}px`,
+                      height: `${cropFrame.height}px`,
+                    }}
                   />
                   <div
                     className="absolute right-0 bg-black/48"
-                    style={{ top: `${cropFrame.y}px`, width: `${cropStage.width - cropFrame.x - cropFrame.width}px`, height: `${cropFrame.height}px` }}
+                    style={{
+                      top: `${cropFrame.y - cropImageLayout.top}px`,
+                      width: `${cropImageLayout.left + cropImageLayout.width - cropFrame.x - cropFrame.width}px`,
+                      height: `${cropFrame.height}px`,
+                    }}
                   />
                 </div>
 
@@ -744,6 +760,7 @@ function BasicInfoEditScreen({
                     width: `${cropFrame.width}px`,
                     height: `${cropFrame.height}px`,
                   }}
+                  onPointerDown={handleCropPointerDown}
                 >
                   <div className="absolute left-0 top-0 h-5 w-5 border-l-[3px] border-t-[3px] border-white/92" />
                   <div className="absolute right-0 top-0 h-5 w-5 border-r-[3px] border-t-[3px] border-white/92" />
@@ -752,8 +769,8 @@ function BasicInfoEditScreen({
                   <div
                     className="absolute left-1/2 -translate-x-1/2 rounded-full border border-white/78 bg-white/5"
                     style={{
-                      width: `${Math.min(cropFrame.width - 48, cropFrame.width * 0.58)}px`,
-                      height: `${Math.min(cropFrame.width - 48, cropFrame.width * 0.58)}px`,
+                      width: `${Math.min(getMaxCropFrameWidth(cropImageLayout) - 48, cropFrame.width - 48)}px`,
+                      height: `${Math.min(getMaxCropFrameWidth(cropImageLayout) - 48, cropFrame.width - 48)}px`,
                       top: `${Math.max(28, cropFrame.height * 0.18)}px`,
                     }}
                   />
@@ -1650,29 +1667,36 @@ function SectionGuestbook({ entries }: {
 const CROP_RATIO = 4 / 5
 const DEFAULT_CROP_FRAME = { width: 256, height: 320 }
 
-function getDefaultCropFrame(stage: { width: number; height: number }) {
+function getMaxCropFrameWidth(imageLayout: { width: number; height: number }) {
+  return Math.min(imageLayout.width, imageLayout.height * CROP_RATIO)
+}
+
+function getDefaultCropFrame(imageLayout: { width: number; height: number; left: number; top: number }) {
+  const width = Math.max(DEFAULT_CROP_FRAME.width, getMaxCropFrameWidth(imageLayout))
+  const clampedWidth = Math.min(width, getMaxCropFrameWidth(imageLayout))
+  const height = clampedWidth / CROP_RATIO
   return {
-    x: (stage.width - DEFAULT_CROP_FRAME.width) / 2,
-    y: (stage.height - DEFAULT_CROP_FRAME.height) / 2,
-    width: DEFAULT_CROP_FRAME.width,
-    height: DEFAULT_CROP_FRAME.height,
+    x: imageLayout.left + (imageLayout.width - clampedWidth) / 2,
+    y: imageLayout.top + (imageLayout.height - height) / 2,
+    width: clampedWidth,
+    height,
   }
 }
 
-function clampCropFrameWidth(width: number, stage: { width: number; height: number }) {
+function clampCropFrameWidth(width: number, imageLayout: { width: number; height: number }) {
   const minWidth = 180
-  const maxWidth = Math.min(stage.width - 40, (stage.height - 56) * CROP_RATIO)
+  const maxWidth = getMaxCropFrameWidth(imageLayout)
   return Math.max(minWidth, Math.min(maxWidth, width))
 }
 
 function clampCropFrameRect(
   frame: { x: number; y: number; width: number; height: number },
-  stage: { width: number; height: number },
+  imageLayout: { width: number; height: number; left: number; top: number },
 ) {
   return {
     ...frame,
-    x: Math.max(0, Math.min(stage.width - frame.width, frame.x)),
-    y: Math.max(0, Math.min(stage.height - frame.height, frame.y)),
+    x: Math.max(imageLayout.left, Math.min(imageLayout.left + imageLayout.width - frame.width, frame.x)),
+    y: Math.max(imageLayout.top, Math.min(imageLayout.top + imageLayout.height - frame.height, frame.y)),
   }
 }
 
@@ -1681,12 +1705,12 @@ function getResizedCropFrame(
   corner: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right',
   deltaX: number,
   deltaY: number,
-  stage: { width: number; height: number },
+  imageLayout: { width: number; height: number; left: number; top: number },
 ) {
   const directionX = corner.includes('left') ? -1 : 1
   const directionY = corner.includes('top') ? -1 : 1
   const primaryDelta = Math.abs(deltaX) > Math.abs(deltaY) ? deltaX * directionX : deltaY * directionY * CROP_RATIO
-  const nextWidth = clampCropFrameWidth(frame.width + primaryDelta, stage)
+  const nextWidth = clampCropFrameWidth(frame.width + primaryDelta, imageLayout)
   const nextHeight = nextWidth / CROP_RATIO
 
   let nextX = frame.x
@@ -1700,7 +1724,7 @@ function getResizedCropFrame(
     y: nextY,
     width: nextWidth,
     height: nextHeight,
-  }, stage)
+  }, imageLayout)
 }
 
 function getCropImageLayout(

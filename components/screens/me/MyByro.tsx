@@ -18,7 +18,7 @@ type SectionKey = 'sns' | 'highlight' | 'reputation' | 'guestbook'
 const SECTION_LABELS: Record<SectionKey, string> = {
   sns: 'SNS 연동',
   highlight: '하이라이트',
-  reputation: '평판 키워드',
+  reputation: '신뢰 키워드',
   guestbook: '방명록',
 }
 

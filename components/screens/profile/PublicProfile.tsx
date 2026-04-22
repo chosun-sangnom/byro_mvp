@@ -220,12 +220,32 @@ export default function PublicProfile({
               </div>
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-1.5">
-              {keywordCounts.map((item) => (
-                <span key={item.keyword} className="rounded-full border border-[#E4E4E4] bg-[#F6F6F6] px-2.5 py-1 text-[11px] text-[#555]">
-                  {item.keyword} <span className="text-[#8A8A8A]">{item.count}</span>
-                </span>
-              ))}
+            {isOwnerMode && (
+              <div className="flex gap-2 mt-4">
+                <button
+                  onClick={onOpenArchive}
+                  className="flex-1 rounded-[18px] border border-[#D8D8D8] bg-white px-4 py-3 text-sm font-semibold text-[#555]"
+                >
+                  아카이브
+                </button>
+                <button
+                  onClick={onOpenManage}
+                  className="flex-1 rounded-[18px] bg-[#111] px-4 py-3 text-sm font-semibold text-white"
+                >
+                  Byro 편집
+                </button>
+              </div>
+            )}
+
+            <div className="mt-4">
+              <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#999] mb-2">신뢰 키워드</div>
+              <div className="flex flex-wrap gap-1.5">
+                {keywordCounts.map((item) => (
+                  <span key={item.keyword} className="rounded-full border border-[#E4E4E4] bg-[#F6F6F6] px-2.5 py-1 text-[11px] text-[#555]">
+                    {item.keyword} <span className="text-[#8A8A8A]">{item.count}</span>
+                  </span>
+                ))}
+              </div>
             </div>
 
             <div className="mt-4 rounded-[24px] border border-[#EBEBEB] bg-white px-4 py-4">
@@ -561,22 +581,7 @@ export default function PublicProfile({
         <div className="px-5 pt-2 pb-6">
           <div className="rounded-[26px] border border-[#EBEBEB] bg-[#FAFAFA] px-4 py-4">
             <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#999] mb-3">Connect</div>
-            {isOwnerMode ? (
-              <div className="flex gap-2 mb-4">
-                <button
-                  onClick={onOpenArchive}
-                  className="flex-1 rounded-[18px] border border-[#D8D8D8] bg-white px-4 py-3 text-sm font-semibold text-[#555]"
-                >
-                  아카이빙
-                </button>
-                <button
-                  onClick={onOpenManage}
-                  className="flex-1 rounded-[18px] bg-[#111] px-4 py-3 text-sm font-semibold text-white"
-                >
-                  Byro 편집
-                </button>
-              </div>
-            ) : (
+            {!isOwnerMode && (
               <div className="flex gap-2 mb-4">
                 <Button variant="outline" onClick={() => showToast('피드백 요청을 보냈어요!')}>피드백 요청</Button>
                 <Button

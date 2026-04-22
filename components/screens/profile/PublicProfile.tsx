@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, ChevronUp, Bookmark, Mail, MessageCircle, Phone, Send, Share2 } from 'lucide-react'
+import { ChevronDown, ChevronUp, Bookmark, Copy, Mail, MessageCircle, Phone, Send, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import {
   Button, Chip, BottomSheet, Modal, TextArea, InfoBox, showToast,
@@ -133,6 +133,33 @@ export default function PublicProfile({
   }
 
   const alreadySubmitted = store.expSubmittedProfiles.includes(profile.linkId)
+  const publicProfileUrl = `https://byro.io/@${profile.linkId}`
+
+  const handleCopyProfileLink = async () => {
+    try {
+      await navigator.clipboard.writeText(publicProfileUrl)
+      showToast('프로필 링크를 복사했어요')
+    } catch {
+      showToast('링크 복사에 실패했어요')
+    }
+  }
+
+  const handleShareProfile = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: `${profile.name}의 Byro`,
+          text: `${profile.name}의 Byro 프로필을 확인해보세요.`,
+          url: publicProfileUrl,
+        })
+        return
+      }
+      await navigator.clipboard.writeText(publicProfileUrl)
+      showToast('공유 기능을 지원하지 않아 링크를 복사했어요')
+    } catch {
+      showToast('공유를 취소했어요')
+    }
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -143,7 +170,7 @@ export default function PublicProfile({
           <div className="text-[11px] text-[#AAA] uppercase tracking-[0.18em]">{isOwnerMode ? 'My Byro' : 'Public Profile'}</div>
           <div className="text-xs text-[#555] truncate">byro.io/@{profile.linkId}</div>
         </div>
-        {!isOwnerMode && (
+        {!isOwnerMode ? (
           <div className="flex items-center gap-3">
             <button
               onClick={() => {
@@ -164,6 +191,23 @@ export default function PublicProfile({
             <button
               onClick={() => showToast('공유 링크를 준비 중이에요')}
               className="w-8 h-8 flex items-center justify-center rounded-xl border border-[#ddd] bg-white"
+            >
+              <Share2 size={14} color="#555" />
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleCopyProfileLink}
+              className="w-8 h-8 flex items-center justify-center rounded-xl border border-[#ddd] bg-white"
+              aria-label="프로필 링크 복사"
+            >
+              <Copy size={14} color="#555" />
+            </button>
+            <button
+              onClick={handleShareProfile}
+              className="w-8 h-8 flex items-center justify-center rounded-xl border border-[#ddd] bg-white"
+              aria-label="프로필 공유"
             >
               <Share2 size={14} color="#555" />
             </button>

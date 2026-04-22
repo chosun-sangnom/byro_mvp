@@ -21,7 +21,7 @@ interface ByroStore {
   agreedPrivacy: boolean
   agreedMarketing: boolean
   linkId: string
-  selectedKeywords: string[]      // max 10
+  selectedKeywords: string[]      // max 5
   instagramConnected: boolean
   linkedinConnected: boolean
   highlights: Highlight[]
@@ -153,7 +153,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     if (selectedKeywords.includes(kw)) {
       set({ selectedKeywords: selectedKeywords.filter((k) => k !== kw) })
     } else {
-      if (selectedKeywords.length >= 10) {
+      if (selectedKeywords.length >= 5) {
         return // caller handles toast
       }
       set({ selectedKeywords: [...selectedKeywords, kw] })

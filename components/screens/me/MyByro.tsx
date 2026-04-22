@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, ChevronUp, Camera, Mail, MessageCircle, Phone, Plus, Send, X } from 'lucide-react'
+import { ChevronDown, ChevronUp, Camera, Mail, MessageCircle, Phone, Send } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { Button, BottomSheet, Modal, showToast, TextArea } from '@/components/ui'
 import type { Highlight, ContactChannel } from '@/types'
@@ -42,7 +42,6 @@ export default function MyByro() {
 
   const instagramConnected = store.instagramConnected || SAMPLE_PROFILE.instagramConnected
   const linkedinConnected = store.linkedinConnected || SAMPLE_PROFILE.linkedinConnected
-  const currentKeywords = user.selectedKeywords ?? SAMPLE_PROFILE.selectedKeywords
   const allHighlights = [...SAMPLE_PROFILE.manualHighlights, ...store.highlights]
   const connectedSnsCount = Number(instagramConnected) + Number(linkedinConnected)
   const totalReputationCount = SAMPLE_PROFILE.reputationKeywords.reduce((sum, item) => sum + item.count, 0)
@@ -142,7 +141,7 @@ export default function MyByro() {
   }
 
   if (screen === 'editBasic') {
-    return <BasicInfoEditScreen user={user} currentKeywords={currentKeywords} onBack={() => setScreen('manage')} />
+    return <BasicInfoEditScreen user={user} onBack={() => setScreen('manage')} />
   }
 
   if (screen === 'editHighlight') {
@@ -159,7 +158,7 @@ export default function MyByro() {
   }
 
   if (screen === 'editReputation') {
-    return <ReputationManageScreen currentKeywords={currentKeywords} onBack={() => setScreen('manage')} />
+    return <ReputationManageScreen currentKeywords={user.selectedKeywords ?? SAMPLE_PROFILE.selectedKeywords} onBack={() => setScreen('manage')} />
   }
 
   if (screen === 'editContact') {
@@ -416,24 +415,20 @@ function ExpandablePreviewRow({
 // 기본정보 편집 화면
 // ─────────────────────────────────────────────────────────────────────────────
 function BasicInfoEditScreen({
-  user, currentKeywords, onBack,
+  user, onBack,
 }: {
   user: { name: string; linkId: string; title: string; school: string; bio: string; selectedKeywords?: string[]; avatarColor?: string; avatarImage?: string }
-  currentKeywords: string[]
   onBack: () => void
 }) {
   const store = useByroStore()
   const [title, setTitle] = useState(user.title)
   const [school, setSchool] = useState(user.school ?? '')
   const [bio, setBio] = useState(user.bio)
-  const [keywords, setKeywords] = useState<string[]>([...currentKeywords])
   const [avatarImage, setAvatarImage] = useState(user.avatarImage ?? '')
   const [cropSource, setCropSource] = useState('')
   const [cropOpen, setCropOpen] = useState(false)
   const [cropFrame, setCropFrame] = useState({ x: 44, y: 74, width: DEFAULT_CROP_FRAME.width, height: DEFAULT_CROP_FRAME.height })
   const [cropNaturalSize, setCropNaturalSize] = useState({ width: 1, height: 1 })
-  const [kwPickerOpen, setKwPickerOpen] = useState(false)
-  const [pickerTempKw, setPickerTempKw] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const dragStartRef = useRef<{ x: number; y: number; frameX: number; frameY: number } | null>(null)
   const resizeStartRef = useRef<{
@@ -443,32 +438,8 @@ function BasicInfoEditScreen({
     frame: { x: number; y: number; width: number; height: number }
   } | null>(null)
 
-  const removeKw = (kw: string) => setKeywords((prev) => prev.filter((k) => k !== kw))
-
-  const togglePickerKw = (kw: string) => {
-    if (pickerTempKw.includes(kw)) {
-      setPickerTempKw((prev) => prev.filter((k) => k !== kw))
-    } else {
-      if (keywords.length + pickerTempKw.filter((k) => !keywords.includes(k)).length >= 10) {
-        showToast('최대 10개까지 선택할 수 있어요'); return
-      }
-      setPickerTempKw((prev) => [...prev, kw])
-    }
-  }
-
-  const handleOpenPicker = () => {
-    setPickerTempKw([...keywords])
-    setKwPickerOpen(true)
-  }
-
-  const handleConfirmPicker = () => {
-    setKeywords(pickerTempKw)
-    setKwPickerOpen(false)
-  }
-
   const handleSave = () => {
     store.updateUserInfo({ title, school, bio, avatarImage })
-    store.updateUserKeywords(keywords)
     showToast('저장됐어요!')
     onBack()
   }
@@ -633,57 +604,15 @@ function BasicInfoEditScreen({
               <TextArea value={bio} onChange={setBio} rows={4} maxLength={300} />
             </div>
 
-            {/* 평판 키워드 */}
-            <div>
-              <label className="text-xs text-[#888] mb-2 block">평판 키워드</label>
-              <div className="flex flex-wrap gap-2">
-                {keywords.map((kw) => (
-                  <div key={kw} className="flex items-center gap-1 bg-[#f0f0f0] rounded-full px-3 py-1.5">
-                    <span className="text-xs text-[#333]">{kw}</span>
-                    <button onClick={() => removeKw(kw)} className="ml-0.5">
-                      <X size={10} color="#888" />
-                    </button>
-                  </div>
-                ))}
-                <button onClick={handleOpenPicker}
-                  className="flex items-center gap-1 text-xs text-[#555] border border-dashed border-[#ccc] rounded-full px-3 py-1.5">
-                  <Plus size={10} /> 추가
-                </button>
-              </div>
+            <div className="rounded-2xl border border-[#EBEBEB] bg-[#FAFAFA] px-4 py-3">
+              <div className="text-xs font-semibold text-[#555] mb-1">평판 키워드</div>
+              <div className="text-xs text-[#888] leading-relaxed">평판 키워드는 별도 `평판 키워드 편집` 화면에서만 관리됩니다.</div>
             </div>
           </div>
 
           <Button onClick={handleSave}>저장</Button>
         </div>
       </div>
-
-      {/* 키워드 피커 */}
-      <BottomSheet open={kwPickerOpen} onClose={() => setKwPickerOpen(false)}>
-        <div className="px-5 pb-6">
-          <div className="text-sm font-black mb-4">키워드 선택 (최대 10개)</div>
-          <div className="space-y-4 mb-4 max-h-64 overflow-y-auto">
-            {KEYWORD_GROUPS.map((group) => (
-              <div key={group.category}>
-                <div className="text-xs font-bold text-[#555] mb-2">{group.category}</div>
-                <div className="flex flex-wrap gap-1.5">
-                  {group.keywords.map((kw) => {
-                    const sel = pickerTempKw.includes(kw)
-                    return (
-                      <button key={kw} onClick={() => togglePickerKw(kw)}
-                        className={['text-xs px-3 py-1.5 rounded-full border font-semibold',
-                          sel ? 'bg-[#0A0A0A] text-white border-[#0A0A0A]' : 'bg-white text-[#555] border-[#ddd]'].join(' ')}>
-                        {kw}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="text-xs text-[#888] mb-3">선택: {pickerTempKw.length} / 10</div>
-          <Button onClick={handleConfirmPicker}>확인</Button>
-        </div>
-      </BottomSheet>
 
       {cropOpen && (
         <div className="absolute inset-0 z-50 bg-black text-white">
@@ -1481,8 +1410,8 @@ function ReputationManageScreen({
       setKeywords((prev) => prev.filter((item) => item !== kw))
       return
     }
-    if (keywords.length >= 10) {
-      showToast('최대 10개까지 선택할 수 있어요')
+    if (keywords.length >= 5) {
+      showToast('최대 5개까지 선택할 수 있어요')
       return
     }
     setKeywords((prev) => [...prev, kw])
@@ -1496,7 +1425,7 @@ function ReputationManageScreen({
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
-        <div className="text-xs text-[#888] mb-4">선택된 키워드는 공개 프로필 상단에 노출됩니다.</div>
+        <div className="text-xs text-[#888] mb-4">선택된 키워드는 프로필 카드 안에 노출됩니다. 최대 5개까지 선택할 수 있어요.</div>
         <div className="space-y-4 mb-4">
           {KEYWORD_GROUPS.map((group) => (
             <div key={group.category}>

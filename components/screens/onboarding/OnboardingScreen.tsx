@@ -299,8 +299,8 @@ function Step4Keywords() {
   const { selectedKeywords } = store
 
   const handleToggle = (kw: string) => {
-    if (!selectedKeywords.includes(kw) && selectedKeywords.length >= 10) {
-      showToast('키워드는 최대 10개까지 선택할 수 있어요')
+    if (!selectedKeywords.includes(kw) && selectedKeywords.length >= 5) {
+      showToast('키워드는 최대 5개까지 선택할 수 있어요')
       return
     }
     store.toggleKeyword(kw)
@@ -312,11 +312,11 @@ function Step4Keywords() {
         <StepIntro
           eyebrow="Keywords"
           title={'나를 표현하는 키워드를\n골라보세요'}
-          description={'방문자가 평가할 때 사용할 키워드예요.\n최대 10개까지 선택할 수 있습니다.'}
+          description={'방문자가 평가할 때 사용할 키워드예요.\n최대 5개까지 선택할 수 있습니다.'}
         />
         <div className="bg-[#E3F2FD] border border-[#90CAF9] rounded-lg px-3 py-2 text-xs text-[#0D47A1] flex justify-between mb-4">
           <span>✨ AI 자기소개 생성에도 활용돼요</span>
-          <span className="font-black">{selectedKeywords.length} / 10</span>
+          <span className="font-black">{selectedKeywords.length} / 5</span>
         </div>
 
         {KEYWORD_GROUPS.map((group, gi) => (

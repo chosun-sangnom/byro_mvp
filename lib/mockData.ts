@@ -144,6 +144,8 @@ export const SAMPLE_PROFILE = {
   guestbook: [
     { id: 'g1', linkId: 'jiminlee', authorName: '이지민', message: '정말 인사이트 넘치는 분.', date: '3일 전' },
     { id: 'g2', linkId: 'parkseoyeon', authorName: '박서연', message: '실행력이 정말 대단하신 분.', date: '1주 전' },
+    { id: 'g3', linkId: 'kimdohyeon', authorName: '김도현', message: '대화가 구체적이고 믿음이 가는 분이었어요.', date: '2주 전' },
+    { id: 'g4', linkId: 'chijiwon', authorName: '최지원', message: '비즈니스 관점이 선명해서 배우는 포인트가 많았습니다.', date: '3주 전' },
   ],
 }
 
@@ -215,5 +217,8 @@ export const JIMIN_PROFILE = {
   ],
   guestbook: [
     { id: 'jg1', linkId: 'myongkoo', authorName: '강민준', message: '정말 통찰력 있는 분이에요.', date: '2일 전' },
+    { id: 'jg2', linkId: 'parkseoyeon', authorName: '박서연', message: '브랜딩 감각이 좋아서 같이 일하고 싶은 분입니다.', date: '5일 전' },
+    { id: 'jg3', linkId: 'chijiwon', authorName: '최지원', message: '사람을 편하게 연결하는 힘이 있어요.', date: '1주 전' },
+    { id: 'jg4', linkId: 'kimdohyeon', authorName: '김도현', message: '마케팅 관점이 실무적이라 대화가 특히 좋았습니다.', date: '2주 전' },
   ],
 }

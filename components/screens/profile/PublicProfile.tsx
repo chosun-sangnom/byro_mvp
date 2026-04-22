@@ -83,7 +83,13 @@ export default function PublicProfile({
   const [bookmarked, setBookmarked] = useState(false)
   const [memoSheetOpen, setMemoSheetOpen] = useState(false)
   const [memoText, setMemoText] = useState('')
-  const totalReputationCount = profile.reputationKeywords.reduce((sum, item) => sum + item.count, 0)
+  const keywordCounts = profile.selectedKeywords
+    .slice(0, 5)
+    .map((keyword) => ({
+      keyword,
+      count: profile.reputationKeywords.find((item) => item.keyword === keyword)?.count ?? 0,
+    }))
+  const featuredGuestbook = profile.guestbook.slice(0, 3)
 
   // SNS 토글
   const igOpen = store.snsOpenStates['instagram_' + username] ?? false
@@ -206,11 +212,53 @@ export default function PublicProfile({
             </div>
 
             <div className="mt-4 flex flex-wrap gap-1.5">
-              {profile.selectedKeywords.map((keyword) => (
-                <span key={keyword} className="rounded-full border border-[#E4E4E4] bg-[#F6F6F6] px-2.5 py-1 text-[11px] text-[#555]">
-                  {keyword}
+              {keywordCounts.map((item) => (
+                <span key={item.keyword} className="rounded-full border border-[#E4E4E4] bg-[#F6F6F6] px-2.5 py-1 text-[11px] text-[#555]">
+                  {item.keyword} <span className="text-[#8A8A8A]">{item.count}</span>
                 </span>
               ))}
+            </div>
+
+            <div className="mt-4 rounded-[24px] border border-[#EBEBEB] bg-white px-4 py-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-sm font-black text-[#111]">방명록</div>
+                <div className="text-[11px] text-[#AAA]">최근 {profile.guestbook.length}개</div>
+              </div>
+              <div className="space-y-2.5">
+                {featuredGuestbook.map((entry) => (
+                  <button
+                    key={entry.id}
+                    onClick={() => router.push('/jiminlee')}
+                    className="flex w-full gap-2.5 rounded-[18px] border border-[#F0F0F0] bg-[#FCFCFC] px-3 py-3 text-left"
+                  >
+                    {entry.authorName === '이지민' ? (
+                      <div className="w-7 h-7 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/images/jimin-profile-5x4.jpg" alt={`${entry.authorName} 프로필 사진`} className="w-full h-full object-cover" />
+                      </div>
+                    ) : (
+                      <div className="w-7 h-7 rounded-full bg-[#e0e0e0] flex items-center justify-center text-xs font-bold text-[#555] flex-shrink-0">
+                        {entry.authorName.charAt(0)}
+                      </div>
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="text-xs font-bold text-[#222]">{entry.authorName}</div>
+                        <div className="text-[10px] text-[#BBB]">{entry.date}</div>
+                      </div>
+                      <div className="text-xs text-[#666] mt-1 line-clamp-2">{entry.message}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              {profile.guestbook.length > 3 && (
+                <button
+                  onClick={() => router.push(`/${profile.linkId}/guestbook`)}
+                  className="mt-3 w-full rounded-[16px] border border-[#E5E5E5] px-3 py-2.5 text-xs font-semibold text-[#555]"
+                >
+                  전체 방명록 보기
+                </button>
+              )}
             </div>
 
             {isOwnerMode && (
@@ -238,54 +286,6 @@ export default function PublicProfile({
             {isOwnerMode
               ? '실제로 공개되는 모습 그대로 보여줍니다. Byro 편집에서 기본정보, 연락 수단, SNS, 하이라이트를 관리할 수 있어요.'
               : '연락 버튼으로 바로 연결하고, 평판과 방명록부터 확인한 뒤 SNS와 하이라이트로 이어서 살펴볼 수 있어요.'}
-          </div>
-        </div>
-
-        {/* ─── 평판 섹션 ───────────────────────────── */}
-        <div className="px-5 py-4">
-          <SectionTitle title="평판" subtitle={`총 ${totalReputationCount}회 기록`} />
-          <div className="flex flex-wrap gap-2">
-            {profile.reputationKeywords.map((item) => (
-              <div
-                key={item.keyword}
-                className="bg-[#0A0A0A] text-white text-xs font-semibold px-3 py-1.5 rounded-full"
-              >
-                {item.keyword} <span className="opacity-70">{item.count}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ─── 방명록 섹션 ─────────────────────────── */}
-        <div className="px-5 py-4">
-          <SectionTitle title="방명록" subtitle={`최근 메시지 ${profile.guestbook.length}개`} />
-          <div className="space-y-2">
-            {profile.guestbook.map((entry) => (
-              <button
-                key={entry.id}
-                onClick={() => router.push('/jiminlee')}
-                className="flex w-full gap-2.5 rounded-2xl border border-[#EBEBEB] px-3 py-3 text-left"
-              >
-                {entry.authorName === '이지민' ? (
-                  <div className="w-7 h-7 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/images/jimin-profile-5x4.jpg" alt={`${entry.authorName} 프로필 사진`} className="w-full h-full object-cover" />
-                  </div>
-                ) : (
-                  <div className="w-7 h-7 rounded-full bg-[#e0e0e0] flex items-center justify-center text-xs font-bold text-[#555] flex-shrink-0">
-                    {entry.authorName.charAt(0)}
-                  </div>
-                )}
-                <div className="flex-1">
-                  <div className="text-xs font-bold mb-0.5">{entry.authorName}</div>
-                  <div className="text-xs text-[#555]">{entry.message}</div>
-                  <div className="text-[10px] text-[#bbb] mt-0.5">{entry.date}</div>
-                </div>
-              </button>
-            ))}
-            {profile.guestbook.length > 2 && (
-              <button className="text-xs text-[#0D47A1] text-center w-full">더보기 ›</button>
-            )}
           </div>
         </div>
 

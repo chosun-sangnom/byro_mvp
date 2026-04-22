@@ -718,7 +718,7 @@ function BasicInfoEditScreen({
                 )}
 
                 <div
-                  className="absolute pointer-events-none"
+                  className="absolute overflow-hidden pointer-events-none"
                   style={{
                     left: `${cropImageLayout.left}px`,
                     top: `${cropImageLayout.top}px`,
@@ -727,27 +727,13 @@ function BasicInfoEditScreen({
                   }}
                 >
                   <div
-                    className="absolute left-0 right-0 top-0 bg-black/48"
-                    style={{ height: `${cropFrame.y - cropImageLayout.top}px` }}
-                  />
-                  <div
-                    className="absolute left-0 right-0 bottom-0 bg-black/48"
-                    style={{ height: `${cropImageLayout.top + cropImageLayout.height - cropFrame.y - cropFrame.height}px` }}
-                  />
-                  <div
-                    className="absolute left-0 bg-black/48"
+                    className="absolute border border-white/16"
                     style={{
+                      left: `${cropFrame.x - cropImageLayout.left}px`,
                       top: `${cropFrame.y - cropImageLayout.top}px`,
-                      width: `${cropFrame.x - cropImageLayout.left}px`,
+                      width: `${cropFrame.width}px`,
                       height: `${cropFrame.height}px`,
-                    }}
-                  />
-                  <div
-                    className="absolute right-0 bg-black/48"
-                    style={{
-                      top: `${cropFrame.y - cropImageLayout.top}px`,
-                      width: `${cropImageLayout.left + cropImageLayout.width - cropFrame.x - cropFrame.width}px`,
-                      height: `${cropFrame.height}px`,
+                      boxShadow: '0 0 0 9999px rgba(0,0,0,0.52)',
                     }}
                   />
                 </div>

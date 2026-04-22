@@ -266,10 +266,16 @@ export default function PublicProfile({
                 onClick={() => router.push('/jiminlee')}
                 className="flex w-full gap-2.5 rounded-2xl border border-[#EBEBEB] px-3 py-3 text-left"
               >
-                <div className="w-7 h-7 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/images/jimin-profile-5x4.jpg" alt={`${entry.authorName} 프로필 사진`} className="w-full h-full object-cover" />
-                </div>
+                {entry.authorName === '이지민' ? (
+                  <div className="w-7 h-7 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/images/jimin-profile-5x4.jpg" alt={`${entry.authorName} 프로필 사진`} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="w-7 h-7 rounded-full bg-[#e0e0e0] flex items-center justify-center text-xs font-bold text-[#555] flex-shrink-0">
+                    {entry.authorName.charAt(0)}
+                  </div>
+                )}
                 <div className="flex-1">
                   <div className="text-xs font-bold mb-0.5">{entry.authorName}</div>
                   <div className="text-xs text-[#555]">{entry.message}</div>

@@ -42,7 +42,7 @@ export default function PublicProfile({
       bio: store.user.bio,
       selectedKeywords: store.user.selectedKeywords,
       avatarColor: store.user.avatarColor ?? baseProfile.avatarColor,
-      avatarImage: store.user.avatarImage ?? baseProfile.avatarImage,
+      avatarImage: store.user.avatarImage || baseProfile.avatarImage,
       contactChannels: store.user.contactChannels ?? baseProfile.contactChannels,
     }
     : baseProfile

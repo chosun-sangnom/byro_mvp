@@ -230,9 +230,9 @@ function Step1Login({ onClose: _onClose }: { onClose: () => void }) { // eslint-
           말하지 않아도<br />증명되는 나
         </div>
         <div className="meta-text mt-3 leading-relaxed">
-          3분 안에 오프라인 신뢰 프로필을 만들고
+          3분이면 프로필을 만들 수 있어요.
           <br />
-          링크 하나로 공유할 수 있어요.
+          링크 하나로 바로 공유해보세요.
         </div>
       </div>
       <div className="space-y-3">
@@ -264,7 +264,7 @@ function Step2Verify() {
       <StepIntro
         eyebrow="Verification"
         title={'본인 확인이 필요해요'}
-        description={'인증된 이름은 프로필에 실명으로 표시됩니다.\n본인인증 후에는 수정이 어려워요.'}
+        description={'인증한 이름은 프로필에 실명으로 표시돼요.\n인증 후에는 바꾸기 어려워요.'}
       />
 
       {/* 약관 체크박스 */}
@@ -299,10 +299,10 @@ function Step2Verify() {
 
       <div className="space-y-3">
         <Button variant="outline" disabled={!canProceed} onClick={handleVerify}>
-          💬 SMS 인증 — 휴대폰 문자 인증 →
+          SMS로 인증하기
         </Button>
         <Button variant="kakao" disabled={!canProceed} onClick={handleVerify}>
-          💛 카카오 인증 — 카카오페이 전자서명 →
+          카카오로 인증하기
         </Button>
       </div>
 
@@ -331,11 +331,12 @@ function Step3LinkId() {
       <StepIntro
         eyebrow="Link"
         title={'나만의 Byro 링크를\n만들어보세요'}
-        description={'한 번 설정하면 변경이 어렵습니다.\n공유하기 쉬운 ID를 추천합니다.'}
+        description={'한 번 정하면 바꾸기 어려워요.\n공유하기 쉬운 이름을 추천해요.'}
       />
       <InfoBox variant="warn">
-        🔒 <b>오픈베타 전용 기능</b><br />
-        현재 오픈베타 참여자에게만 무료. 정식 출시 후 유료 전환 예정.
+        지금은 무료로 만들 수 있어요.
+        <br />
+        정식 출시 후에는 유료로 전환될 수 있어요.
       </InfoBox>
 
       <label className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wide mb-1">Byro 링크 ID</label>
@@ -379,13 +380,13 @@ function Step4Keywords() {
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto px-5 py-4">
-        <StepIntro
-          eyebrow="Keywords"
-          title={'나를 표현하는 키워드를\n골라보세요'}
-          description={'방문자가 평가할 때 사용할 키워드예요.\n최대 5개까지 선택할 수 있습니다.'}
-        />
+      <StepIntro
+        eyebrow="Keywords"
+        title={'나를 표현하는 키워드를\n골라보세요'}
+        description={'다른 사람이 나를 표현할 때 쓰는 키워드예요.\n최대 5개까지 고를 수 있어요.'}
+      />
         <div className="rounded-lg px-3 py-2 text-xs flex justify-between mb-4" style={{ backgroundColor: 'var(--color-state-info-bg)', border: '1px solid var(--color-state-info-text)', color: 'var(--color-state-info-text)' }}>
-          <span>✨ AI 자기소개 생성에도 활용돼요</span>
+          <span>AI 자기소개를 만들 때도 활용돼요</span>
           <span className="font-black">{selectedKeywords.length} / 5</span>
         </div>
 
@@ -448,7 +449,7 @@ function Step5SNS() {
       <StepIntro
         eyebrow="Social"
         title={'SNS를 연동하면\n프로필이 풍부해져요'}
-        description={'하드코딩된 프로필 주소를 기준으로\n시안용 미리보기를 연결합니다.'}
+        description={'연결한 SNS를 프로필에 보여드려요.\n나중에 다시 바꿀 수 있어요.'}
       />
 
       {/* Instagram */}
@@ -482,7 +483,7 @@ function Step5SNS() {
         </SelectionCard>
       </div>
       <InfoBox variant="info">
-        🔒 SNS 미연동 시 해당 섹션은 프로필에 공개되지 않아요.
+        연결하지 않으면 프로필에 보이지 않아요.
       </InfoBox>
       <div className="mt-auto pt-4 space-y-2">
         <Button onClick={() => store.nextStep()}>다음</Button>
@@ -544,17 +545,17 @@ function Step6Contact() {
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto px-5 py-4">
-        <StepIntro
-          eyebrow="Contact"
-          title={'연락 수단을\n연결해보세요'}
-          description={'프로필을 본 사람이 바로 연락할 수 있어요.\n전화, 이메일, 카카오, 텔레그램 중 원하는 것만 연결하면 됩니다.'}
-        />
+      <StepIntro
+        eyebrow="Contact"
+        title={'연락 수단을\n연결해보세요'}
+        description={'프로필을 본 사람이 바로 연락할 수 있어요.\n원하는 수단만 골라 연결해 주세요.'}
+      />
 
         <div className="surface-card-soft p-4 mb-4">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm font-black text-[var(--color-text-strong)]">연결된 연락 수단</div>
-              <div className="meta-text mt-1">온보딩 후에도 Byro 편집에서 언제든 바꿀 수 있어요.</div>
+              <div className="meta-text mt-1">나중에 Byro 편집에서 언제든 바꿀 수 있어요.</div>
             </div>
             <div className="rounded-full bg-[var(--color-bg-muted)] px-3 py-1 text-xs font-semibold text-[var(--color-text-secondary)]">
               {activeCount}/4
@@ -699,11 +700,11 @@ function Step7Highlight() {
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto px-5 py-4">
-        <StepIntro
-          eyebrow="Highlight"
-          title={'커리어 하이라이트를\n추가해보세요'}
-          description={'인증된 정보와 직접 입력한 경험을 함께 보여주면\n프로필 신뢰도가 더 올라갑니다.'}
-        />
+      <StepIntro
+        eyebrow="Highlight"
+        title={'커리어 하이라이트를\n추가해보세요'}
+        description={'인증한 정보와 직접 추가한 경험을\n프로필에 함께 보여줄 수 있어요.'}
+      />
 
         {/* 인증 가능 항목 */}
         <div className="space-y-2 mb-4">
@@ -753,7 +754,7 @@ function Step7Highlight() {
           className="w-full border border-dashed rounded-xl py-3 text-sm font-medium"
           style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-secondary)' }}
         >
-          + 강연, 협업, 수상 등 추가하기
+          + 경험 추가하기
         </button>
       </div>
 
@@ -859,7 +860,7 @@ function Step8Select() {
       <StepIntro
         eyebrow="Bio"
         title={'자기소개를\n어떻게 작성할까요?'}
-        description={'지금까지 입력한 정보와 연동된 SNS를 활용해\n자기소개를 만들 수 있어요.'}
+        description={'직접 쓰거나 AI 초안을 받을 수 있어요.'}
       />
 
       <div className="space-y-3">
@@ -872,7 +873,7 @@ function Step8Select() {
         >
           {!hasData && (
             <div className="rounded-lg px-2 py-1.5 text-xs" style={{ backgroundColor: '#FFF8E6', color: '#7A5A00' }}>
-              ⚠️ AI 초안 생성에는 키워드·SNS·하이라이트 중 최소 1개가 필요해요
+              AI 초안을 만들려면 키워드, SNS, 하이라이트 중 하나 이상이 필요해요
             </div>
           )}
           {hasData && (
@@ -894,7 +895,7 @@ function Step8Select() {
         <SelectionCard
           icon="✍️"
           title="직접 작성하기"
-          subtitle="내 말로 자유롭게 작성해요"
+          subtitle="내 말로 바로 작성할게요"
           onClick={handleManual}
         />
       </div>
@@ -909,13 +910,14 @@ function Step8Select() {
           <div className="text-2xl mb-2">⚠️</div>
           <div className="text-sm font-black mb-2">정보가 부족해요</div>
           <div className="meta-text leading-relaxed mb-4">
-            AI 자기소개를 만들려면<br />아래 중 하나 이상이 필요해요.<br /><br />
-            <b>· 평판 키워드 선택</b><br />
+            AI 초안을 만들려면 아래 정보가 하나 이상 필요해요.
+            <br /><br />
+            <b>· 평판 키워드</b><br />
             <b>· SNS 연동</b><br />
-            <b>· 하이라이트 인증</b>
+            <b>· 하이라이트</b>
           </div>
           <div className="space-y-2">
-            <Button onClick={() => { setNoDataModal(false); store.goToStep('keywords') }}>← 정보 추가하러 가기</Button>
+            <Button onClick={() => { setNoDataModal(false); store.goToStep('keywords') }}>정보 추가하러 가기</Button>
             <Button variant="outline" onClick={() => { setNoDataModal(false); handleManual() }}>직접 작성하기</Button>
             <button className="text-xs text-[var(--color-text-secondary)] mt-1" onClick={() => { setNoDataModal(false); store.completeOnboarding(); store.goToStep('complete') }}>나중에 작성하기</button>
           </div>
@@ -966,11 +968,11 @@ function Step8AI() {
   if (isManual) {
     return (
       <div className="flex flex-col h-full overflow-y-auto px-5 py-4">
-        <StepIntro
-          eyebrow="Bio"
-          title={'자기소개를 직접\n작성해주세요'}
-          description={'나를 잘 표현하는 문장으로 자유롭게 써보세요.'}
-        />
+      <StepIntro
+        eyebrow="Bio"
+        title={'자기소개를 직접\n작성해주세요'}
+        description={'나를 잘 보여주는 문장으로 적어주세요.'}
+      />
 
         <label className="text-xs font-bold text-[#555] uppercase tracking-wide mb-2">자기소개</label>
         <TextArea
@@ -981,7 +983,7 @@ function Step8AI() {
           rows={6}
         />
         <div className="bg-[#E3F2FD] border border-[#90CAF9] rounded-lg px-3 py-2 text-xs text-[#0D47A1] mt-3 mb-6">
-          💡 나중에 AI 자기소개로 바꿀 수 있어요
+          나중에 AI 초안으로 바꿀 수 있어요.
         </div>
 
         <div className="space-y-2">
@@ -1000,29 +1002,29 @@ function Step8AI() {
       <StepIntro
         eyebrow="AI Draft"
         title={'AI가 나를 소개해드릴게요'}
-        description={'지금까지 입력한 정보를 바탕으로 자기소개 초안을 만들었어요.'}
+        description={'입력한 정보를 바탕으로 초안을 만들었어요.'}
       />
 
       {phase === 'loading' && (
         <div className="flex-1 flex flex-col items-center justify-center gap-4">
           <AiBounce />
-          <div className="text-sm text-[#888]">SNS 분석 중...</div>
+          <div className="text-sm text-[#888]">소개 문구를 만들고 있어요</div>
         </div>
       )}
 
       {phase === 'done' && (
         <>
           <div className="relative bg-[#E6F5E6] border border-[#A5D6A7] rounded-xl p-4 mb-3">
-            <div className="text-xs font-bold text-[#1A7A1A] mb-2">✨ AI 초안 · 키워드 + SNS 기반</div>
+            <div className="text-xs font-bold text-[#1A7A1A] mb-2">AI 초안</div>
             <p className="text-sm text-[#1A7A1A] leading-relaxed pr-10">{bioText}</p>
             <button
               onClick={() => setPhase('edit')}
               className="absolute top-3 right-3 flex items-center gap-1 text-xs text-[#555] bg-white border border-[#ddd] rounded-lg px-2 py-1"
             >
-              ✏️ 수정
+              수정
             </button>
           </div>
-          <Button variant="outline" onClick={handleRegenerate}>🔄 다시 생성하기</Button>
+          <Button variant="outline" onClick={handleRegenerate}>다시 만들기</Button>
           <div className="h-4" />
         </>
       )}
@@ -1067,8 +1069,8 @@ function Step9Complete() {
     <div className="flex flex-col h-full overflow-y-auto px-5 py-6 items-center text-center">
       <div className="w-full rounded-[30px] border border-[#EBEBEB] bg-white px-5 py-7 mb-6">
         <div className="text-5xl mb-4">🎉</div>
-        <h2 className="text-2xl font-black mb-2">내 Byro가<br />만들어졌어요!</h2>
-        <p className="text-sm text-[#555] mb-6">이제 나의 신뢰 프로필을 공유해보세요</p>
+        <h2 className="text-2xl font-black mb-2">Byro를<br />만들었어요</h2>
+        <p className="text-sm text-[#555] mb-6">이제 링크로 바로 공유할 수 있어요.</p>
 
         {/* 링크 복사 */}
         <div className="w-full flex items-center bg-[#f8f8f8] border border-[#EBEBEB] rounded-xl px-4 py-3">

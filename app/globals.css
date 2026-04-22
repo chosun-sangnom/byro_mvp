@@ -1,10 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import './tokens.css';
 
 :root {
-  --background: #ffffff;
-  --foreground: #0A0A0A;
+  --background: var(--color-bg-page);
+  --foreground: var(--color-text-strong);
 }
 
 body {

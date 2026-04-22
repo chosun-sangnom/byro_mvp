@@ -278,23 +278,24 @@ export function BottomSheet({ open, onClose, children, dark }: BottomSheetProps)
             className="absolute inset-0 bg-black/45"
             onClick={onClose}
           />
-          <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-            className={[
-              'absolute bottom-0 left-0 right-0 rounded-t-2xl z-50 max-h-[80dvh] overflow-y-auto pb-[max(env(safe-area-inset-bottom),16px)]',
-              dark ? 'bg-[#1a1a1a]' : 'bg-white',
-            ].join(' ')}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className={[
-              'w-8 h-1 rounded-full mx-auto mt-3 mb-2',
-              dark ? 'bg-[#555]' : 'bg-[#ddd]',
-            ].join(' ')} />
-            {children}
-          </motion.div>
+          <div className="absolute inset-x-0 bottom-0 z-50 px-3 sm:px-4" onClick={(e) => e.stopPropagation()}>
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+              className={[
+                'mx-auto w-full max-w-[430px] rounded-t-2xl max-h-[80dvh] overflow-y-auto pb-[max(env(safe-area-inset-bottom),16px)]',
+                dark ? 'bg-[#1a1a1a]' : 'bg-white',
+              ].join(' ')}
+            >
+              <div className={[
+                'w-8 h-1 rounded-full mx-auto mt-3 mb-2',
+                dark ? 'bg-[#555]' : 'bg-[#ddd]',
+              ].join(' ')} />
+              {children}
+            </motion.div>
+          </div>
         </div>
       )}
     </AnimatePresence>

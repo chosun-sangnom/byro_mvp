@@ -7,9 +7,11 @@ import { useByroStore } from '@/store/useByroStore'
 import {
   Button, Chip, BottomSheet, Modal, TextArea, InfoBox, showToast,
 } from '@/components/ui'
+import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import {
   SAMPLE_PROFILE, JIMIN_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE,
 } from '@/lib/mockData'
+import type { HighlightIconId } from '@/types'
 
 interface PublicProfileProps {
   username: string
@@ -471,7 +473,9 @@ export default function PublicProfile({
               onClick={() => store.toggleHlOpen('career_' + username)}
               className="flex items-center w-full px-4 py-3"
             >
-              <span className="text-base mr-2">💼</span>
+              <span className="mr-2 text-[var(--color-text-strong)]">
+                <HighlightIcon id="briefcase" size={18} />
+              </span>
               <div className="flex-1 text-left">
                 <div className="text-sm font-bold">커리어 지속성
                   <span className="ml-1.5 text-[10px] font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-full px-2 py-0.5">인증됨</span>
@@ -508,7 +512,9 @@ export default function PublicProfile({
               onClick={() => store.toggleHlOpen('remember_' + username)}
               className="flex items-center w-full px-4 py-3"
             >
-              <span className="text-base mr-2">🤝</span>
+              <span className="mr-2 text-[var(--color-text-strong)]">
+                <HighlightIcon id="users" size={18} />
+              </span>
               <div className="flex-1 text-left">
                 <div className="text-sm font-bold">리멤버 직업 네트워크
                   <span className="ml-1.5 text-[10px] font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-full px-2 py-0.5">인증됨</span>
@@ -552,7 +558,9 @@ export default function PublicProfile({
               onClick={() => store.toggleHlOpen('corporate_' + username)}
               className="flex items-center w-full px-4 py-3"
             >
-              <span className="text-base mr-2">🏢</span>
+              <span className="mr-2 text-[var(--color-text-strong)]">
+                <HighlightIcon id="building2" size={18} />
+              </span>
               <div className="flex-1 text-left">
                 <div className="text-sm font-bold">법인 영속성
                   <span className="ml-1.5 text-[10px] font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-full px-2 py-0.5">인증됨</span>
@@ -588,7 +596,9 @@ export default function PublicProfile({
               onClick={() => store.toggleHlOpen('airline_' + username)}
               className="flex items-center w-full px-4 py-3"
             >
-              <span className="text-base mr-2">✈️</span>
+              <span className="mr-2 text-[var(--color-text-strong)]">
+                <HighlightIcon id="plane" size={18} />
+              </span>
               <div className="flex-1 text-left">
                 <div className="text-sm font-bold">항공 마일리지
                   <span className="ml-1.5 text-[10px] font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-full px-2 py-0.5">인증됨</span>
@@ -626,7 +636,9 @@ export default function PublicProfile({
                   onClick={() => store.toggleHlOpen(hl.id + '_' + username)}
                   className="flex items-center w-full px-4 py-3"
                 >
-                  <span className="mr-2">{hl.icon}</span>
+                  <span className="mr-2 text-[var(--color-text-strong)]">
+                    <HighlightIcon id={hl.icon as HighlightIconId} size={18} />
+                  </span>
                   <div className="flex-1 text-left">
                     <div className="text-sm font-bold">{hl.title}</div>
                     <div className="text-xs text-[#888]">{hl.subtitle}</div>
@@ -636,7 +648,10 @@ export default function PublicProfile({
                 </button>
                 {isOpen && hl.description && (
                   <div className="bg-[#FAFAFA] border-t border-[#F1F1F1] px-4 py-3 text-xs text-[#333] leading-relaxed">
-                    <div className="font-bold mb-1">{hl.icon} {hl.title}</div>
+                    <div className="font-bold mb-1 flex items-center gap-1.5">
+                      <HighlightIcon id={hl.icon as HighlightIconId} size={16} />
+                      <span>{hl.title}</span>
+                    </div>
                     <div>{hl.description}</div>
                     <div className="text-[#888] mt-1">{hl.year}년 · {hl.subtitle.split('·')[0].trim()} · 직접 입력 (미인증)</div>
                   </div>

@@ -1,4 +1,4 @@
-import type { ContactChannel } from '@/types'
+import type { ContactChannel, Highlight } from '@/types'
 
 // ─── Instagram 프로필 (sss_uuo)
 export const INSTAGRAM_PROFILE = {
@@ -54,13 +54,13 @@ export const EXPERIENCE_KEYWORDS = [
 
 // ─── 하이라이트 카테고리
 export const HIGHLIGHT_CATEGORIES = [
-  { id: 'talk',      icon: '🎤', label: '강연 / 연설' },
-  { id: 'collab',    icon: '🤝', label: '협업 프로젝트' },
-  { id: 'award',     icon: '🏆', label: '수상 / 표창' },
-  { id: 'publish',   icon: '📝', label: '출판 / 기고' },
-  { id: 'volunteer', icon: '🌱', label: '봉사 / 사회공헌' },
-  { id: 'edu',       icon: '📚', label: '강의 / 교육' },
-  { id: 'other',     icon: '⭐', label: '기타' },
+  { id: 'talk',      icon: 'mic', label: '강연 / 연설' },
+  { id: 'collab',    icon: 'handshake', label: '협업 프로젝트' },
+  { id: 'award',     icon: 'trophy', label: '수상 / 표창' },
+  { id: 'publish',   icon: 'book-open', label: '출판 / 기고' },
+  { id: 'volunteer', icon: 'globe', label: '봉사 / 사회공헌' },
+  { id: 'edu',       icon: 'book-open', label: '강의 / 교육' },
+  { id: 'other',     icon: 'pencil', label: '기타' },
 ]
 
 // ─── 샘플 공개 프로필 (myongkoo)
@@ -110,9 +110,9 @@ export const SAMPLE_PROFILE = {
     ],
   },
   manualHighlights: [
-    { id: 'mh1', icon: '🎤', title: 'TEDx Seoul 2023', subtitle: '강연 / 연설 · 직접 입력', description: '신뢰 기반 네트워킹의 미래를 주제로 강연', year: '2023' },
-    { id: 'mh2', icon: '🌏', title: '일본 파트너사 협업 프로젝트', subtitle: '협업 프로젝트 · 직접 입력', description: '6개월 간 일본 파트너사와 B2B 제품 공동 개발', year: '2022' },
-  ],
+    { id: 'mh1', icon: 'mic', title: 'TEDx Seoul 2023', subtitle: '강연 / 연설 · 직접 입력', description: '신뢰 기반 네트워킹의 미래를 주제로 강연', year: '2023' },
+    { id: 'mh2', icon: 'handshake', title: '일본 파트너사 협업 프로젝트', subtitle: '협업 프로젝트 · 직접 입력', description: '6개월 간 일본 파트너사와 B2B 제품 공동 개발', year: '2022' },
+  ] as Highlight[],
   experiences: [
     { id: 'e1', authorName: '김지수', isAnonymous: false, keywords: ['전문적인', '통찰력 있는'], message: '정말 통찰력 있는 분이에요. 같이 일하고 싶다!', date: '2일 전' },
     { id: 'e2', authorName: null, isAnonymous: true, keywords: ['신뢰할 수 있는', '실행력 있는'], message: '', date: '5일 전' },
@@ -208,8 +208,8 @@ export const JIMIN_PROFILE = {
     ],
   },
   manualHighlights: [
-    { id: 'jh1', icon: '🎤', title: 'TEDx Seoul 2023', subtitle: '강연 / 연설 · 직접 입력', description: '기술과 사람의 연결에 대해 강연', year: '2023' },
-  ],
+    { id: 'jh1', icon: 'mic', title: 'TEDx Seoul 2023', subtitle: '강연 / 연설 · 직접 입력', description: '기술과 사람의 연결에 대해 강연', year: '2023' },
+  ] as Highlight[],
   reputationKeywords: [
     { keyword: '전문적인', count: 5 },
     { keyword: '신뢰할 수 있는', count: 4 },

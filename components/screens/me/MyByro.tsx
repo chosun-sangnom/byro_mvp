@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import { ChevronDown, ChevronUp, Camera, Mail, MessageCircle, Phone, Send } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { Button, BottomSheet, Modal, showToast, TextArea } from '@/components/ui'
-import type { Highlight, ContactChannel, UserState } from '@/types'
+import { HighlightIcon } from '@/components/highlights/HighlightIcon'
+import type { Highlight, ContactChannel, UserState, HighlightIconId } from '@/types'
 import {
   SAMPLE_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE,
   HIGHLIGHT_CATEGORIES, KEYWORD_GROUPS,
@@ -235,7 +236,7 @@ function ManageByroScreen({
                 {key === 'highlight' && (
                   <div className="space-y-1.5 mb-2">
                     <ExpandablePreviewRow
-                      icon="💼"
+                      icon="briefcase"
                       title="커리어 지속성"
                       subtitle="건강보험공단 기준 · 2026.04 인증"
                       badge="인증됨"
@@ -245,7 +246,7 @@ function ManageByroScreen({
                       detail={<div className="text-[11px] text-[#666] mt-2">평균 재직 {SAMPLE_PROFILE.careerHighlight.avgYears}년 · 업계 대비 +{SAMPLE_PROFILE.careerHighlight.vsIndustryPercent}%</div>}
                     />
                     <ExpandablePreviewRow
-                      icon="🤝"
+                      icon="users"
                       title="리멤버 직업 네트워크"
                       subtitle="스타트업·마케팅 중심 인맥"
                       badge="인증됨"
@@ -309,7 +310,7 @@ function ExpandablePreviewRow({
   onToggle,
   detail,
 }: {
-  icon: string
+  icon: HighlightIconId
   title: string
   subtitle: string
   badge: string
@@ -321,7 +322,9 @@ function ExpandablePreviewRow({
   return (
     <button onClick={onToggle} className="w-full text-left">
       <div className="flex items-start gap-2 py-1.5">
-        <span className="text-base leading-none mt-0.5">{icon}</span>
+        <span className="mt-0.5 text-[var(--color-text-strong)]">
+          <HighlightIcon id={icon} size={18} />
+        </span>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
             <div className="text-sm font-semibold text-[#111] truncate">{title}</div>
@@ -706,7 +709,7 @@ function HighlightManageScreen({
   const handleSave = () => {
     if (!selectedCat || !hlTitle) { showToast('카테고리와 제목을 입력해주세요'); return }
     const payload = {
-      icon: selectedCat.icon,
+      icon: selectedCat.icon as HighlightIconId,
       title: hlTitle,
       subtitle: `${selectedCat.label} · 직접 입력`,
       description: hlDesc,
@@ -724,10 +727,10 @@ function HighlightManageScreen({
   }
 
   const certItems = [
-    { icon: '💼', title: '커리어 지속성', sub: '건강보험 공단 이메일 발송', verified: true },
-    { icon: '🤝', title: '리멤버 직업 네트워크', sub: '리멤버 앱 명함 내보내기', verified: false },
-    { icon: '🏢', title: '법인 영속성', sub: '창업 5년차 · 정상 운영 중 · 폐업 이력 없음', verified: true },
-    { icon: '✈️', title: '항공 마일리지', sub: '대한항공 모닝캄 · 아시아나 다이아몬드', verified: true, badge: '🌍 글로벌 비즈니스' },
+    { icon: 'briefcase', title: '커리어 지속성', sub: '건강보험 공단 이메일 발송', verified: true },
+    { icon: 'users', title: '리멤버 직업 네트워크', sub: '리멤버 앱 명함 내보내기', verified: false },
+    { icon: 'building2', title: '법인 영속성', sub: '창업 5년차 · 정상 운영 중 · 폐업 이력 없음', verified: true },
+    { icon: 'plane', title: '항공 마일리지', sub: '대한항공 모닝캄 · 아시아나 다이아몬드', verified: true, badge: '🌍 글로벌 비즈니스' },
   ]
   const [certOpen, setCertOpen] = useState<Record<string, boolean>>({})
 
@@ -757,7 +760,9 @@ function HighlightManageScreen({
                 {store.highlights.map((hl) => (
                   <div key={hl.id} className="border border-[#EBEBEB] rounded-xl p-3">
                     <div className="flex items-start gap-2">
-                      <span className="text-lg mt-0.5">{hl.icon}</span>
+                    <span className="mt-0.5 text-[var(--color-text-strong)]">
+                      <HighlightIcon id={hl.icon as HighlightIconId} size={18} />
+                    </span>
                       <div className="flex-1">
                         <div className="text-sm font-bold">{hl.title}</div>
                         <div className="text-xs text-[#888]">{hl.year} · {hl.subtitle}</div>
@@ -782,7 +787,7 @@ function HighlightManageScreen({
                   selectedCat?.id === cat.id
                     ? 'bg-[#0A0A0A] border-[#0A0A0A] text-white'
                     : 'border-[#EBEBEB] text-[#555]'].join(' ')}>
-                <span className="text-lg mb-0.5">{cat.icon}</span>
+                <HighlightIcon id={cat.icon as HighlightIconId} size={18} className="mb-0.5" />
                 <span className="text-[10px] font-semibold leading-tight">{cat.label}</span>
               </button>
             ))}
@@ -816,7 +821,9 @@ function HighlightManageScreen({
                 onClick={() => setCertModalOpen(true)}
                 className="flex items-center w-full py-3 border-b border-[#f5f5f5] text-left"
               >
-                <span className="text-lg mr-3">{item.icon}</span>
+                <span className="mr-3 text-[var(--color-text-strong)]">
+                  <HighlightIcon id={item.icon as HighlightIconId} size={18} />
+                </span>
                 <div className="flex-1">
                   <div className="text-sm font-bold">{item.title}</div>
                   <div className="text-xs text-[#888]">{item.sub}</div>
@@ -869,7 +876,9 @@ function HighlightManageScreen({
               return (
                 <div key={item.title} className="border-b border-[#f5f5f5]">
                   <div className="flex items-center py-2.5">
-                    <span className="text-lg mr-3">{item.icon}</span>
+                    <span className="mr-3 text-[var(--color-text-strong)]">
+                      <HighlightIcon id={item.icon as HighlightIconId} size={18} />
+                    </span>
                     <div className="flex-1">
                       <div className="text-sm font-bold">{item.title}</div>
                       <div className="text-xs text-[#888]">{item.sub}</div>
@@ -971,7 +980,9 @@ function HighlightManageScreen({
             {[...SAMPLE_PROFILE.manualHighlights, ...store.highlights].map((hl) => (
               <div key={hl.id} className="border border-[#DCDCDC] rounded-xl px-3 py-3">
                 <div className="flex items-start gap-2">
-                  <span className="text-base mt-0.5">{hl.icon}</span>
+                  <span className="mt-0.5 text-[var(--color-text-strong)]">
+                    <HighlightIcon id={hl.icon as HighlightIconId} size={18} />
+                  </span>
                   <div className="flex-1">
                     <div className="text-sm font-bold">{hl.title}</div>
                     <div className="text-[11px] text-[#888]">{hl.subtitle.split('·')[0].trim()} {hl.year ? `· ${hl.year}` : ''}</div>

@@ -1,3 +1,15 @@
+export type HighlightIconId =
+  | 'briefcase'
+  | 'users'
+  | 'building2'
+  | 'plane'
+  | 'mic'
+  | 'handshake'
+  | 'trophy'
+  | 'book-open'
+  | 'globe'
+  | 'pencil'
+
 export type OnboardingStep =
   | 'login'
   | 'verify'
@@ -12,7 +24,7 @@ export type OnboardingStep =
 
 export interface Highlight {
   id: string
-  icon: string
+  icon: HighlightIconId
   title: string
   subtitle: string
   description: string

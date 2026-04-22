@@ -9,7 +9,8 @@ import {
   NavBar, StepBar, Button, Chip, CheckRow, BottomSheet, Modal,
   InfoBox, TextArea, AiBounce, showToast,
 } from '@/components/ui'
-import type { ContactChannel } from '@/types'
+import { HighlightIcon } from '@/components/highlights/HighlightIcon'
+import type { ContactChannel, HighlightIconId } from '@/types'
 import {
   KEYWORD_GROUPS, HIGHLIGHT_CATEGORIES, AI_BIO_CANDIDATES,
   INSTAGRAM_PROFILE, LINKEDIN_PROFILE,
@@ -623,28 +624,28 @@ function Step7Highlight() {
   const [sheetOpen, setSheetOpen] = useState(false)
   const certItems = [
     {
-      icon: '💼',
+      icon: 'briefcase',
       title: '재직기간 인증',
       sub: '건강보험공단 기준으로 재직 지속 기간 확인',
       badge: '인증 가능',
       docLabel: '건강보험 관련 재직 증빙',
     },
     {
-      icon: '🤝',
+      icon: 'users',
       title: '리멤버 직업 네트워크',
       sub: '리멤버 앱 명함 내보내기로 네트워크 인증',
       badge: '인증 가능',
       docLabel: '리멤버 명함 내보내기 파일',
     },
     {
-      icon: '🏢',
+      icon: 'building2',
       title: '법인 영속성',
       sub: '법인 운영 기간과 정상 운영 여부 확인',
       badge: '인증 가능',
       docLabel: '법인 운영 증빙 서류',
     },
     {
-      icon: '✈️',
+      icon: 'plane',
       title: '항공 마일리지',
       sub: '항공사 회원 등급으로 출장형 프로필 인증',
       badge: '인증 가능',
@@ -666,7 +667,7 @@ function Step7Highlight() {
       return
     }
     store.addHighlight({
-      icon: selectedCat.icon,
+      icon: selectedCat.icon as HighlightIconId,
       title: hlTitle,
       subtitle: `${selectedCat.label} · 직접 입력`,
       description: hlDesc,
@@ -694,7 +695,7 @@ function Step7Highlight() {
           {certItems.map((item) => (
             <SelectionCard
               key={item.title}
-              icon={item.icon}
+              icon={<HighlightIcon id={item.icon as HighlightIconId} size={18} />}
               title={item.title}
               subtitle={item.sub}
               badge={item.badge}
@@ -715,7 +716,9 @@ function Step7Highlight() {
           <div className="space-y-2 mb-4">
             {store.highlights.map((h) => (
               <div key={h.id} className="surface-card flex items-start rounded-[22px] p-3">
-                <span className="text-lg mr-2 mt-0.5">{h.icon}</span>
+                <span className="mr-2 mt-0.5 text-[var(--color-text-strong)]">
+                  <HighlightIcon id={h.icon as HighlightIconId} size={18} />
+                </span>
                 <div className="flex-1">
                   <div className="text-sm font-bold">{h.title}</div>
                   <div className="micro-text">{h.subtitle}</div>
@@ -777,7 +780,7 @@ function Step7Highlight() {
                     : 'border-[var(--color-border-default)] text-[var(--color-text-secondary)]',
                 ].join(' ')}
               >
-                <span className="text-lg mb-1">{cat.icon}</span>
+                  <HighlightIcon id={cat.icon as HighlightIconId} size={18} className="mb-1" />
                 <span className="text-[10px] font-semibold leading-tight">{cat.label}</span>
               </button>
             ))}

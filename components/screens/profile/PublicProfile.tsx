@@ -186,7 +186,7 @@ export default function PublicProfile({
                 </div>
                 <div className="mt-1 text-[15px] font-medium text-white/72">{profile.title}</div>
                 <div className="mt-4 max-w-[318px] rounded-[18px] border border-white/12 bg-white/10 px-4 py-3 text-[15px] leading-[1.52] text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[8px]">
-                  {profile.headline ?? profile.bio}
+                  {profile.bio || profile.headline}
                 </div>
               </div>
             </div>

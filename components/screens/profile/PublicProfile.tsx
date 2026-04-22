@@ -93,7 +93,6 @@ export default function PublicProfile({
       count: profile.reputationKeywords.find((item) => item.keyword === keyword)?.count ?? 0,
     }))
   const featuredGuestbook = profile.guestbook.slice(0, 3)
-  const totalReputationCount = keywordCounts.reduce((sum, item) => sum + item.count, 0)
 
   // SNS 토글
   const igOpen = store.snsOpenStates['instagram_' + username] ?? false
@@ -240,19 +239,9 @@ export default function PublicProfile({
             )}
 
             <div className="mt-4 rounded-[24px] border border-[#EBEBEB] bg-white px-4 py-4">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <div className="text-sm font-black text-[#111]">누적 평판 {totalReputationCount}</div>
-                  <div className="mt-0.5 text-[11px] text-[#999]">키워드와 최근 방명록으로 신뢰도를 보여줘요</div>
-                </div>
-                {profile.guestbook.length > 0 && (
-                  <button
-                    onClick={() => router.push(`/${profile.linkId}/guestbook`)}
-                    className="text-[11px] font-semibold text-[#777]"
-                  >
-                    전체 보기
-                  </button>
-                )}
+              <div>
+                <div className="text-sm font-black text-[#111]">누적 평판</div>
+                <div className="mt-0.5 text-[11px] text-[#999]">키워드와 최근 방명록으로 신뢰도를 보여줘요</div>
               </div>
 
               <div className="mt-3 flex flex-wrap gap-2">
@@ -290,6 +279,15 @@ export default function PublicProfile({
                   </button>
                 ))}
               </div>
+
+              {profile.guestbook.length > 0 && (
+                <button
+                  onClick={() => router.push(`/${profile.linkId}/guestbook`)}
+                  className="mt-4 w-full rounded-[16px] border border-[#E5E5E5] px-3 py-2.5 text-xs font-semibold text-[#555]"
+                >
+                  더보기
+                </button>
+              )}
             </div>
           </div>
         </div>

@@ -431,12 +431,10 @@ function BasicInfoEditScreen({
   const [cropSource, setCropSource] = useState('')
   const [cropOpen, setCropOpen] = useState(false)
   const [cropFrame, setCropFrame] = useState(DEFAULT_CROP_FRAME)
-  const [cropPosition, setCropPosition] = useState({ x: 0, y: 0 })
   const [cropNaturalSize, setCropNaturalSize] = useState({ width: 1, height: 1 })
   const [kwPickerOpen, setKwPickerOpen] = useState(false)
   const [pickerTempKw, setPickerTempKw] = useState<string[]>([])
   const fileInputRef = useRef<HTMLInputElement | null>(null)
-  const dragStartRef = useRef<{ x: number; y: number; startX: number; startY: number } | null>(null)
   const resizeStartRef = useRef<{ x: number; direction: 'left' | 'right'; width: number } | null>(null)
 
   const removeKw = (kw: string) => setKeywords((prev) => prev.filter((k) => k !== kw))
@@ -486,7 +484,6 @@ function BasicInfoEditScreen({
           setCropNaturalSize({ width: img.width, height: img.height })
           setCropSource(reader.result as string)
           setCropFrame(DEFAULT_CROP_FRAME)
-          setCropPosition({ x: 0, y: 0 })
           setCropOpen(true)
         }
         img.src = reader.result
@@ -504,45 +501,18 @@ function BasicInfoEditScreen({
     x: (cropStage.width - cropFrame.width) / 2,
     y: (cropStage.height - cropFrame.height) / 2,
   }
-  const cropBase = getCropBaseSize(cropNaturalSize.width, cropNaturalSize.height, cropFrame)
-  const cropScaled = {
-    width: cropBase.width,
-    height: cropBase.height,
-  }
-  const boundedCropPosition = clampCropPosition(cropPosition, cropScaled.width, cropScaled.height, cropFrame)
-
-  const handleCropPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    dragStartRef.current = {
-      x: event.clientX,
-      y: event.clientY,
-      startX: boundedCropPosition.x,
-      startY: boundedCropPosition.y,
-    }
-    event.currentTarget.setPointerCapture(event.pointerId)
-  }
+  const cropImageLayout = getCropImageLayout(cropNaturalSize.width, cropNaturalSize.height, cropStage)
 
   const handleCropPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     if (resizeStartRef.current) {
       const deltaX = event.clientX - resizeStartRef.current.x
       const directionFactor = resizeStartRef.current.direction === 'right' ? 2 : -2
       const nextWidth = clampCropFrameWidth(resizeStartRef.current.width + deltaX * directionFactor, cropStage)
-      const nextFrame = getFixedCropFrame(nextWidth)
-      const nextBase = getCropBaseSize(cropNaturalSize.width, cropNaturalSize.height, nextFrame)
-      setCropFrame(nextFrame)
-      setCropPosition((prev) => clampCropPosition(prev, nextBase.width, nextBase.height, nextFrame))
-      return
+      setCropFrame(getFixedCropFrame(nextWidth))
     }
-    if (!dragStartRef.current) return
-    const deltaX = event.clientX - dragStartRef.current.x
-    const deltaY = event.clientY - dragStartRef.current.y
-    setCropPosition(clampCropPosition({
-      x: dragStartRef.current.startX + deltaX,
-      y: dragStartRef.current.startY + deltaY,
-    }, cropScaled.width, cropScaled.height, cropFrame))
   }
 
   const handleCropPointerEnd = () => {
-    dragStartRef.current = null
     resizeStartRef.current = null
   }
 
@@ -560,7 +530,7 @@ function BasicInfoEditScreen({
 
   const handleApplyCrop = async () => {
     if (!cropSource) return
-    const cropped = await renderCroppedImage(cropSource, cropNaturalSize, boundedCropPosition, cropScaled, cropFrame)
+    const cropped = await renderCroppedImage(cropSource, cropNaturalSize, cropImageLayout, cropFrameOffset, cropFrame)
     setAvatarImage(cropped)
     setCropOpen(false)
     showToast('사진이 적용됐어요')
@@ -703,7 +673,6 @@ function BasicInfoEditScreen({
               <div
                 className="relative overflow-hidden touch-none select-none"
                 style={{ width: `${cropStage.width}px`, height: `${cropStage.height}px` }}
-                onPointerDown={handleCropPointerDown}
                 onPointerMove={handleCropPointerMove}
                 onPointerUp={handleCropPointerEnd}
                 onPointerCancel={handleCropPointerEnd}
@@ -715,10 +684,10 @@ function BasicInfoEditScreen({
                     alt="자르기 미리보기"
                     className="absolute max-w-none object-cover"
                     style={{
-                      width: `${cropScaled.width}px`,
-                      height: `${cropScaled.height}px`,
-                      left: `${cropFrameOffset.x + boundedCropPosition.x}px`,
-                      top: `${cropFrameOffset.y + boundedCropPosition.y}px`,
+                      width: `${cropImageLayout.width}px`,
+                      height: `${cropImageLayout.height}px`,
+                      left: `${cropImageLayout.left}px`,
+                      top: `${cropImageLayout.top}px`,
                     }}
                   />
                 )}
@@ -788,7 +757,7 @@ function BasicInfoEditScreen({
 
             <div className="px-5 pb-5">
               <div className="text-[11px] text-white/68 text-center mb-4">
-                이미지는 드래그해서 옮기고, 좌우 핸들로 4:5 프레임 크기를 조절하세요. 내부 원형 가이드는 방명록 프로필 이미지를 기준으로 합니다.
+                사진은 그대로 두고, 좌우 핸들로 잘릴 범위만 조절하세요. 검정 영역은 잘려 나가는 부분입니다.
               </div>
             </div>
           </div>
@@ -1651,37 +1620,25 @@ function clampCropFrameWidth(width: number, stage: { width: number; height: numb
   return Math.max(minWidth, Math.min(maxWidth, width))
 }
 
-function getCropBaseSize(
+function getCropImageLayout(
   imageWidth: number,
   imageHeight: number,
-  frame: { width: number; height: number },
+  stage: { width: number; height: number },
 ) {
-  const scale = Math.max(frame.width / imageWidth, frame.height / imageHeight)
+  const scale = Math.max(stage.width / imageWidth, stage.height / imageHeight)
   return {
     width: imageWidth * scale,
     height: imageHeight * scale,
-  }
-}
-
-function clampCropPosition(
-  position: { x: number; y: number },
-  scaledWidth: number,
-  scaledHeight: number,
-  frame: { width: number; height: number },
-) {
-  const minX = Math.min(0, frame.width - scaledWidth)
-  const minY = Math.min(0, frame.height - scaledHeight)
-  return {
-    x: Math.max(minX, Math.min(0, position.x)),
-    y: Math.max(minY, Math.min(0, position.y)),
+    left: (stage.width - imageWidth * scale) / 2,
+    top: (stage.height - imageHeight * scale) / 2,
   }
 }
 
 async function renderCroppedImage(
   src: string,
   naturalSize: { width: number; height: number },
-  position: { x: number; y: number },
-  scaledSize: { width: number; height: number },
+  imageLayout: { width: number; height: number; left: number; top: number },
+  frameOffset: { x: number; y: number },
   frame: { width: number; height: number },
 ) {
   const image = await loadImage(src)
@@ -1691,10 +1648,10 @@ async function renderCroppedImage(
   const context = canvas.getContext('2d')
   if (!context) return src
 
-  const scaleX = naturalSize.width / scaledSize.width
-  const scaleY = naturalSize.height / scaledSize.height
-  const sourceX = Math.max(0, -position.x * scaleX)
-  const sourceY = Math.max(0, -position.y * scaleY)
+  const scaleX = naturalSize.width / imageLayout.width
+  const scaleY = naturalSize.height / imageLayout.height
+  const sourceX = Math.max(0, (frameOffset.x - imageLayout.left) * scaleX)
+  const sourceY = Math.max(0, (frameOffset.y - imageLayout.top) * scaleY)
   const sourceWidth = Math.min(naturalSize.width - sourceX, frame.width * scaleX)
   const sourceHeight = Math.min(naturalSize.height - sourceY, frame.height * scaleY)
 

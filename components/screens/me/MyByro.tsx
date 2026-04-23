@@ -9,7 +9,7 @@ import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import type { Highlight, ContactChannel, UserState, HighlightIconId } from '@/types'
 import {
   SAMPLE_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE,
-  HIGHLIGHT_CATEGORIES, KEYWORD_GROUPS,
+  HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS, KEYWORD_GROUPS,
 } from '@/lib/mockData'
 import PublicProfile from '@/components/screens/profile/PublicProfile'
 
@@ -22,6 +22,41 @@ const SECTION_LABELS: Record<SectionKey, string> = {
   reputation: '평판 키워드',
   guestbook: '방명록',
 }
+
+const CERTIFICATION_ITEMS = [
+  {
+    categoryId: 'career-continuity',
+    icon: 'briefcase',
+    title: '커리어 지속성',
+    summary: '건강보험공단 기준 · 2026.04 인증',
+    pickerDescription: '건강보험공단 기준 장기 재직 이력을 인증해요',
+    emailLabel: '건강보험공단 경력 증빙 자료',
+  },
+  {
+    categoryId: 'corporate-longevity',
+    icon: 'building2',
+    title: '법인 영속성',
+    summary: '법인 운영 기간과 정상 운영 여부를 인증해요',
+    pickerDescription: '법인 운영 기간과 정상 운영 여부를 인증해요',
+    emailLabel: '법인 운영 증빙 서류',
+  },
+  {
+    categoryId: 'remember-network',
+    icon: 'users',
+    title: '리멤버 네트워크',
+    summary: '리멤버 명함 기반 직업 네트워크를 인증해요',
+    pickerDescription: '리멤버 명함 기반 직업 네트워크를 인증해요',
+    emailLabel: '리멤버 명함 내보내기 파일',
+  },
+  {
+    categoryId: 'airline-mileage',
+    icon: 'plane',
+    title: '항공 마일리지',
+    summary: '항공사 회원 등급으로 출장형 프로필을 인증해요',
+    pickerDescription: '항공사 회원 등급으로 출장형 프로필을 인증해요',
+    emailLabel: '항공사 회원 등급 확인 자료',
+  },
+] as const
 
 // ─────────────────────────────────────────────────────────────────────────────
 export default function MyByro() {
@@ -688,27 +723,42 @@ function HighlightManageScreen({
   onBack: () => void
 }) {
   const store = useByroStore()
-  const [mode, setMode] = useState<'list' | 'add' | 'cert'>('list')
+  const [mode, setMode] = useState<'list' | 'picker' | 'form'>('list')
   const [editingHl, setEditingHl] = useState<typeof SAMPLE_PROFILE.manualHighlights[0] | Highlight | null>(null)
   const [selectedCat, setSelectedCat] = useState<typeof HIGHLIGHT_CATEGORIES[0] | null>(null)
   const [hlTitle, setHlTitle] = useState('')
   const [hlYear, setHlYear] = useState('')
   const [hlDesc, setHlDesc] = useState('')
-  const [certModalOpen, setCertModalOpen] = useState(false)
+  const [selectedCert, setSelectedCert] = useState<(typeof CERTIFICATION_ITEMS)[number] | null>(null)
+
+  const allManualHighlights = [...SAMPLE_PROFILE.manualHighlights, ...store.highlights]
+  const groupedHighlights = HIGHLIGHT_GROUPS.map((group) => ({
+    ...group,
+    items: [
+      ...CERTIFICATION_ITEMS.filter((item) => {
+        const category = HIGHLIGHT_CATEGORIES.find((cat) => cat.id === item.categoryId)
+        return category?.group === group.id
+      }).map((item) => ({ kind: 'verified' as const, item })),
+      ...allManualHighlights
+        .filter((item) => HIGHLIGHT_CATEGORIES.find((cat) => cat.id === item.categoryId)?.group === group.id)
+        .map((item) => ({ kind: 'manual' as const, item })),
+    ],
+  }))
 
   const openEditSheet = (hl: typeof SAMPLE_PROFILE.manualHighlights[0]) => {
-    const cat = HIGHLIGHT_CATEGORIES.find((c) => c.icon === hl.icon) ?? null
+    const cat = HIGHLIGHT_CATEGORIES.find((c) => c.id === hl.categoryId) ?? null
     setSelectedCat(cat)
     setHlTitle(hl.title)
     setHlYear(hl.year)
     setHlDesc(hl.description)
     setEditingHl(hl)
-    setMode('add')
+    setMode('form')
   }
 
   const handleSave = () => {
     if (!selectedCat || !hlTitle) { showToast('카테고리와 제목을 입력해주세요'); return }
     const payload = {
+      categoryId: selectedCat.id,
       icon: selectedCat.icon as HighlightIconId,
       title: hlTitle,
       subtitle: `${selectedCat.label} · 직접 입력`,
@@ -726,12 +776,6 @@ function HighlightManageScreen({
     showToast(editingHl ? '수정됐어요!' : '추가됐어요!')
   }
 
-  const certItems = [
-    { icon: 'briefcase', title: '커리어 지속성', sub: '건강보험 공단 이메일 발송', verified: true },
-    { icon: 'users', title: '리멤버 직업 네트워크', sub: '리멤버 앱 명함 내보내기', verified: false },
-    { icon: 'building2', title: '법인 영속성', sub: '창업 5년차 · 정상 운영 중 · 폐업 이력 없음', verified: true },
-    { icon: 'plane', title: '항공 마일리지', sub: '대한항공 모닝캄 · 아시아나 다이아몬드', verified: true, badge: '🌍 글로벌 비즈니스' },
-  ]
   const [certOpen, setCertOpen] = useState<Record<string, boolean>>({})
 
   const toggleCert = (title: string) => setCertOpen((p) => ({ ...p, [title]: !p[title] }))
@@ -744,54 +788,28 @@ function HighlightManageScreen({
     setEditingHl(null)
   }
 
-  if (mode === 'add') {
+  if (mode === 'form') {
     return (
       <div className="flex flex-col h-full">
         <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
-          <button onClick={() => { resetAddForm(); setMode('list') }} className="text-xl text-[#555] mr-3 leading-none">‹</button>
-          <span className="text-base font-black">경험 추가하기</span>
+          <button onClick={() => { resetAddForm(); setMode('picker') }} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+          <span className="text-base font-black">{editingHl ? '하이라이트 수정하기' : '하이라이트 추가하기'}</span>
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-4">
-          {store.highlights.length > 0 && (
-            <div className="mb-5">
-              <div className="text-xs font-bold text-[#555] mb-2">내가 추가한 경험</div>
-              <div className="space-y-2">
-                {store.highlights.map((hl) => (
-                  <div key={hl.id} className="border border-[#EBEBEB] rounded-xl p-3">
-                    <div className="flex items-start gap-2">
-                    <span className="mt-0.5 text-[var(--color-text-strong)]">
-                      <HighlightIcon id={hl.icon as HighlightIconId} size={18} />
-                    </span>
-                      <div className="flex-1">
-                        <div className="text-sm font-bold">{hl.title}</div>
-                        <div className="text-xs text-[#888]">{hl.year} · {hl.subtitle}</div>
-                        {hl.description && <div className="text-xs text-[#555] mt-1">{hl.description}</div>}
-                      </div>
-                    </div>
-                    <div className="flex gap-2 mt-3">
-                      <button onClick={() => openEditSheet(hl)}
-                        className="text-xs border border-[#ddd] rounded-lg px-3 py-1.5">수정</button>
-                      <button onClick={() => { store.removeHighlight(hl.id); showToast('삭제됐어요') }}
-                        className="text-xs border border-[#E53935] text-[#E53935] rounded-lg px-3 py-1.5">삭제</button>
-                    </div>
-                  </div>
-                ))}
+          {selectedCat && (
+            <div className="mb-4 rounded-2xl border border-[#E7E2DC] bg-white px-4 py-3">
+              <div className="flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
+                  <HighlightIcon id={selectedCat.icon as HighlightIconId} size={18} />
+                </span>
+                <div>
+                  <div className="text-sm font-bold text-[var(--color-text-strong)]">{selectedCat.label}</div>
+                  <div className="micro-text">직접 입력으로 추가돼요</div>
+                </div>
               </div>
             </div>
           )}
-          <div className="grid grid-cols-4 gap-2 mb-4">
-            {HIGHLIGHT_CATEGORIES.map((cat) => (
-              <button key={cat.id} onClick={() => setSelectedCat(cat)}
-                className={['flex flex-col items-center p-2 rounded-xl border text-center',
-                  selectedCat?.id === cat.id
-                    ? 'bg-[#0A0A0A] border-[#0A0A0A] text-white'
-                    : 'border-[#EBEBEB] text-[#555]'].join(' ')}>
-                <HighlightIcon id={cat.icon as HighlightIconId} size={18} className="mb-0.5" />
-                <span className="text-[10px] font-semibold leading-tight">{cat.label}</span>
-              </button>
-            ))}
-          </div>
           <div className="space-y-2 mb-4">
             <input value={hlTitle} onChange={(e) => setHlTitle(e.target.value)} placeholder="제목 (필수)"
               className="w-full border border-[#ddd] rounded-xl px-4 py-2.5 text-sm outline-none" />
@@ -805,40 +823,56 @@ function HighlightManageScreen({
     )
   }
 
-  if (mode === 'cert') {
+  if (mode === 'picker') {
     return (
       <div className="flex flex-col h-full">
         <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
           <button onClick={() => setMode('list')} className="text-xl text-[#555] mr-3 leading-none">‹</button>
-          <span className="text-base font-black">인증 추가하기</span>
+          <span className="text-base font-black">하이라이트 추가</span>
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-4 pb-8">
-          <div className="space-y-1">
-            {certItems.map((item) => (
-              <button
-                key={item.title}
-                onClick={() => setCertModalOpen(true)}
-                className="flex items-center w-full py-3 border-b border-[#f5f5f5] text-left"
-              >
-                <span className="mr-3 text-[var(--color-text-strong)]">
-                  <HighlightIcon id={item.icon as HighlightIconId} size={18} />
-                </span>
-                <div className="flex-1">
-                  <div className="text-sm font-bold">{item.title}</div>
-                  <div className="text-xs text-[#888]">{item.sub}</div>
+          <div className="rounded-[18px] bg-[#EEF8F0] px-4 py-3 text-sm font-semibold text-[#3F7B54] mb-5">
+            표시 항목은 인증 연동이 가능해요
+          </div>
+
+          <div className="space-y-6">
+            {HIGHLIGHT_GROUPS.map((group) => (
+              <div key={group.id}>
+                <div className="mb-3 text-sm font-bold text-[#7E766E]">{group.label}</div>
+                <div className="grid grid-cols-3 gap-3">
+                  {HIGHLIGHT_CATEGORIES.filter((cat) => cat.group === group.id).map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => {
+                        if (cat.certificationOnly) {
+                          const certItem = CERTIFICATION_ITEMS.find((item) => item.categoryId === cat.id)
+                          if (certItem) setSelectedCert(certItem)
+                          return
+                        }
+                        setSelectedCat(cat)
+                        setMode('form')
+                      }}
+                      className="relative min-h-[110px] rounded-[22px] border border-[#E7E2DC] bg-white px-3 py-4 text-center shadow-[0_6px_20px_rgba(17,17,17,0.04)]"
+                    >
+                      {cat.certificationOnly && <span className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full bg-[#4D8D5C]" />}
+                      <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
+                        <HighlightIcon id={cat.icon as HighlightIconId} size={18} />
+                      </div>
+                      <div className="text-[13px] font-bold leading-[1.45] text-[var(--color-text-primary)]">{cat.label}</div>
+                    </button>
+                  ))}
                 </div>
-                <span className="text-sm text-[#BBB]">›</span>
-              </button>
+              </div>
             ))}
           </div>
         </div>
 
-        <Modal open={certModalOpen} onClose={() => setCertModalOpen(false)}>
+        <Modal open={selectedCert !== null} onClose={() => setSelectedCert(null)}>
           <div className="text-center">
-            <div className="text-xl mb-3">📧</div>
-            <div className="text-sm font-black mb-2">하이라이트 인증</div>
-            <div className="text-xs text-[#555] leading-relaxed mb-4">아래 이메일 주소로<br />인증 서류를 발송해주세요.</div>
+            <div className="mb-3 flex justify-center text-[var(--color-text-secondary)]"><Mail size={20} /></div>
+            <div className="text-sm font-black mb-2">{selectedCert?.title} 인증</div>
+            <div className="text-xs text-[#555] leading-relaxed mb-4">아래 이메일 주소로<br />{selectedCert?.emailLabel ?? '인증 서류'}를 발송해주세요.</div>
             <div className="border-2 border-[#0A0A0A] rounded-xl px-3 py-2 mb-4">
               <div className="text-xs text-[#888] mb-1">나의 Byro 인증 이메일 주소</div>
               <div className="flex items-center justify-between">
@@ -847,7 +881,7 @@ function HighlightManageScreen({
                   className="text-xs text-white bg-[#0A0A0A] rounded-lg px-2 py-1 ml-2">복사</button>
               </div>
             </div>
-            <Button onClick={() => setCertModalOpen(false)}>확인</Button>
+            <Button onClick={() => setSelectedCert(null)}>확인</Button>
           </div>
         </Modal>
       </div>
@@ -863,165 +897,141 @@ function HighlightManageScreen({
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-4 pb-8">
-        <div className="text-xs text-[#888] mb-4">인증된 항목만 상단에 노출됩니다.</div>
+        <div className="rounded-[18px] bg-[#EEF8F0] px-4 py-3 text-sm font-semibold text-[#3F7B54] mb-6">
+          표시 항목은 인증 연동이 가능해요
+        </div>
 
-        <div className="mb-5">
-          <div className="flex items-center gap-1.5 mb-3">
-            <span className="text-sm font-bold text-[#1A7A1A]">✓</span>
-            <span className="text-sm font-bold">인증 항목</span>
-          </div>
-          <div className="space-y-1">
-            {certItems.filter((item) => item.verified).map((item) => {
-              const isOpen = certOpen[item.title]
-              return (
-                <div key={item.title} className="border-b border-[#f5f5f5]">
-                  <div className="flex items-center py-2.5">
-                    <span className="mr-3 text-[var(--color-text-strong)]">
-                      <HighlightIcon id={item.icon as HighlightIconId} size={18} />
-                    </span>
-                    <div className="flex-1">
-                      <div className="text-sm font-bold">{item.title}</div>
-                      <div className="text-xs text-[#888]">{item.sub}</div>
-                    </div>
-                    {item.verified ? (
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-xs font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-lg px-2 py-1">→ 인증됨</span>
-                        <button onClick={() => toggleCert(item.title)} className="p-1">
-                          {isOpen ? <ChevronUp size={15} color="#888" /> : <ChevronDown size={15} color="#888" />}
-                        </button>
-                      </div>
-                    ) : null}
-                  </div>
-                  {isOpen && item.verified && (
-                    <div className="bg-[#f9f9f9] rounded-xl p-3 mb-2">
-                      {item.title === '커리어 지속성' && (
-                        <>
-                          <div className="text-xs text-[#888] mb-2">평균 재직 기간</div>
-                          <div className="h-1.5 bg-[#e0e0e0] rounded-full mb-1.5">
-                            <div className="h-full bg-[#0A0A0A] rounded-full" style={{ width: '72%' }} />
-                          </div>
-                          <div className="grid grid-cols-2 gap-2 mt-2">
-                            <div className="bg-white border border-[#eee] rounded-xl p-2.5 text-center">
-                              <div className="text-lg font-black">{SAMPLE_PROFILE.careerHighlight.avgYears}년</div>
-                              <div className="text-xs text-[#888]">본인 평균</div>
+        <div className="space-y-6">
+          {groupedHighlights.map((group) => (
+            <div key={group.id}>
+              <div className="mb-3 text-sm font-bold text-[#7E766E]">{group.label}</div>
+              {group.items.length > 0 ? (
+                <div className="space-y-3">
+                  {group.items.map((entry) => {
+                    if (entry.kind === 'verified') {
+                      const isOpen = certOpen[entry.item.title]
+                      return (
+                        <div key={entry.item.categoryId} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
+                          <button onClick={() => toggleCert(entry.item.title)} className="flex w-full items-center gap-3 px-4 py-4 text-left">
+                            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
+                              <HighlightIcon id={entry.item.icon as HighlightIconId} size={18} />
+                            </span>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="text-[15px] font-bold text-[var(--color-text-strong)]">{entry.item.title}</span>
+                                <span className="rounded-full bg-[#E8F5EC] px-2 py-0.5 text-[11px] font-semibold text-[#217A43]">인증됨</span>
+                              </div>
+                              <div className="micro-text mt-0.5">{entry.item.summary}</div>
                             </div>
-                            <div className="bg-[#f5fff5] border border-[#c8e6c9] rounded-xl p-2.5 text-center">
-                              <div className="text-lg font-black text-[#1A7A1A]">+{SAMPLE_PROFILE.careerHighlight.vsIndustryPercent}%</div>
-                              <div className="text-xs text-[#888]">업계 평균 대비</div>
-                            </div>
-                          </div>
-                          <div className="text-xs text-[#bbb] text-right mt-2">건강보험공단 기준 · 2026.04 인증</div>
-                        </>
-                      )}
-
-                      {item.title === '리멤버 직업 네트워크' && (
-                        <div className="text-xs text-[#555]">리멤버 명함 기반 네트워크가 인증되어 프로필에 공개됩니다.</div>
-                      )}
-
-                      {item.title === '법인 영속성' && (
-                        <>
-                          <div className="grid grid-cols-3 gap-2">
-                            <div className="bg-white border border-[#eee] rounded-xl p-2.5 text-center">
-                              <div className="text-lg font-black">{SAMPLE_PROFILE.corporateHighlight.companyCount}개</div>
-                              <div className="text-xs text-[#888]">운영 법인</div>
-                            </div>
-                            <div className="bg-white border border-[#eee] rounded-xl p-2.5 text-center">
-                              <div className="text-lg font-black">{SAMPLE_PROFILE.corporateHighlight.averageOperatingYears}년</div>
-                              <div className="text-xs text-[#888]">평균 운영</div>
-                            </div>
-                            <div className="bg-[#f5fff5] border border-[#c8e6c9] rounded-xl p-2.5 text-center">
-                              <div className="text-sm font-black text-[#1A7A1A]">정상 운영</div>
-                              <div className="text-xs text-[#888]">폐업 이력 없음</div>
-                            </div>
-                          </div>
-                          <div className="text-xs text-[#bbb] text-right mt-2">법인 등기 기준 · 2026.04 인증</div>
-                        </>
-                      )}
-
-                      {item.title === '항공 마일리지' && (
-                        <>
-                          {item.badge && (
-                            <div className="inline-flex items-center rounded-full bg-white border border-[#E5E5E5] px-2.5 py-1 text-[11px] font-semibold text-[#333] mb-2">
-                              {item.badge}
+                            {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
+                          </button>
+                          {isOpen && (
+                            <div className="border-t border-[#F1ECE6] bg-[#FBFAF8] px-4 py-4">
+                              {entry.item.categoryId === 'career-continuity' && (
+                                <div className="grid grid-cols-2 gap-3">
+                                  <div className="rounded-2xl border border-[#E7E2DC] bg-white px-4 py-3 text-center">
+                                    <div className="text-xl font-black text-[#111]">{SAMPLE_PROFILE.careerHighlight.avgYears}년</div>
+                                    <div className="micro-text mt-1">평균 재직</div>
+                                  </div>
+                                  <div className="rounded-2xl border border-[#D9ECD9] bg-[#F5FFF5] px-4 py-3 text-center">
+                                    <div className="text-xl font-black text-[#217A43]">+{SAMPLE_PROFILE.careerHighlight.vsIndustryPercent}%</div>
+                                    <div className="micro-text mt-1">업계 대비</div>
+                                  </div>
+                                </div>
+                              )}
+                              {entry.item.categoryId === 'corporate-longevity' && (
+                                <div className="grid grid-cols-3 gap-3">
+                                  <div className="rounded-2xl border border-[#E7E2DC] bg-white px-3 py-3 text-center">
+                                    <div className="text-lg font-black text-[#111]">{SAMPLE_PROFILE.corporateHighlight.companyCount}개</div>
+                                    <div className="micro-text mt-1">운영 법인</div>
+                                  </div>
+                                  <div className="rounded-2xl border border-[#E7E2DC] bg-white px-3 py-3 text-center">
+                                    <div className="text-lg font-black text-[#111]">{SAMPLE_PROFILE.corporateHighlight.averageOperatingYears}년</div>
+                                    <div className="micro-text mt-1">평균 운영</div>
+                                  </div>
+                                  <div className="rounded-2xl border border-[#D9ECD9] bg-[#F5FFF5] px-3 py-3 text-center">
+                                    <div className="text-sm font-black text-[#217A43]">정상 운영</div>
+                                    <div className="micro-text mt-1">폐업 이력 없음</div>
+                                  </div>
+                                </div>
+                              )}
+                              {entry.item.categoryId === 'remember-network' && (
+                                <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">리멤버 명함 기반 네트워크가 인증되면 직업 네트워크 구성이 공개됩니다.</div>
+                              )}
+                              {entry.item.categoryId === 'airline-mileage' && (
+                                <div className="space-y-2">
+                                  {SAMPLE_PROFILE.airlineHighlight.airlines.map((airline) => (
+                                    <div key={airline.name} className="flex items-center justify-between rounded-2xl border border-[#E7E2DC] bg-white px-4 py-3">
+                                      <div className="text-sm text-[var(--color-text-secondary)]">{airline.name}</div>
+                                      <div className="text-sm font-bold text-[var(--color-text-strong)]">{airline.tier}</div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           )}
-                          <div className="space-y-2">
-                            {SAMPLE_PROFILE.airlineHighlight.airlines.map((airline) => (
-                              <div key={airline.name} className="flex items-center justify-between rounded-xl border border-[#eee] bg-white px-3 py-2">
-                                <div className="text-xs text-[#888]">{airline.name}</div>
-                                <div className="text-sm font-bold">{airline.tier}</div>
-                              </div>
-                            ))}
+                        </div>
+                      )
+                    }
+
+                    const isEditable = store.highlights.some((item) => item.id === entry.item.id)
+                    return (
+                      <div key={entry.item.id} className="rounded-[22px] border border-[#E7E2DC] bg-white px-4 py-4">
+                        <div className="flex items-start gap-3">
+                          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
+                            <HighlightIcon id={entry.item.icon as HighlightIconId} size={18} />
+                          </span>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="text-[15px] font-bold text-[var(--color-text-strong)]">{entry.item.title}</span>
+                              <span className="rounded-full bg-[#F1EFEC] px-2 py-0.5 text-[11px] font-semibold text-[#7E766E]">직접 입력</span>
+                            </div>
+                            <div className="micro-text mt-1">{entry.item.year ? `${entry.item.year} · ` : ''}{entry.item.subtitle.split('·')[0].trim()}</div>
+                            {entry.item.description && <div className="text-sm leading-relaxed text-[var(--color-text-secondary)] mt-2">{entry.item.description}</div>}
                           </div>
-                          <div className="text-xs text-[#bbb] text-right mt-2">항공사 회원등급 기준 · 2026.04 인증</div>
-                        </>
-                      )}
-                    </div>
-                  )}
+                        </div>
+                        <div className="mt-3 flex gap-2">
+                          <button
+                            onClick={() => {
+                              if (isEditable) openEditSheet(entry.item)
+                              else showToast('기본 목업 항목은 수정하지 않습니다')
+                            }}
+                            className="rounded-lg border border-[#CFC7BF] px-3 py-1.5 text-xs font-medium text-[#555]"
+                          >
+                            수정
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (isEditable) {
+                                store.removeHighlight(entry.item.id)
+                                showToast('삭제됐어요')
+                                return
+                              }
+                              showToast('기본 목업 항목은 삭제하지 않습니다')
+                            }}
+                            className="rounded-lg border border-[#F2C7C5] px-3 py-1.5 text-xs font-medium text-[#C9473D]"
+                          >
+                            삭제
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
-              )
-            })}
-          </div>
+              ) : (
+                <div className="rounded-[22px] border border-dashed border-[#E7E2DC] bg-white px-4 py-10 text-center text-sm text-[#A29B93]">
+                  아직 {group.label.toLowerCase()} 하이라이트가 없어요
+                </div>
+              )}
+            </div>
+          ))}
         </div>
 
         <button
-          onClick={() => setMode('cert')}
-          className="w-full border border-[#D7D7D7] rounded-xl py-3 text-sm font-semibold text-[#111] mb-5"
+          onClick={() => { resetAddForm(); setMode('picker') }}
+          className="w-full border border-[#D7D7D7] rounded-xl py-3 text-sm font-semibold text-[#111] mt-6"
         >
-          + 인증 추가하기
-        </button>
-
-        <div className="mb-3">
-          <div className="flex items-center gap-1.5 mb-2">
-            <span className="text-sm">✏️</span>
-            <span className="text-sm font-bold">직접 입력 경험</span>
-          </div>
-          <div className="space-y-3">
-            {[...SAMPLE_PROFILE.manualHighlights, ...store.highlights].map((hl) => (
-              <div key={hl.id} className="border border-[#DCDCDC] rounded-xl px-3 py-3">
-                <div className="flex items-start gap-2">
-                  <span className="mt-0.5 text-[var(--color-text-strong)]">
-                    <HighlightIcon id={hl.icon as HighlightIconId} size={18} />
-                  </span>
-                  <div className="flex-1">
-                    <div className="text-sm font-bold">{hl.title}</div>
-                    <div className="text-[11px] text-[#888]">{hl.subtitle.split('·')[0].trim()} {hl.year ? `· ${hl.year}` : ''}</div>
-                  </div>
-                </div>
-                <div className="flex gap-2 mt-3">
-                  <button
-                    onClick={() => {
-                      if (store.highlights.some((item) => item.id === hl.id)) openEditSheet(hl)
-                      else showToast('기본 목업 항목은 수정하지 않습니다')
-                    }}
-                    className="text-xs border border-[#BFBFBF] text-[#555] rounded-lg px-3 py-1"
-                  >
-                    수정
-                  </button>
-                  <button
-                    onClick={() => {
-                      if (store.highlights.some((item) => item.id === hl.id)) {
-                        store.removeHighlight(hl.id)
-                        showToast('삭제됐어요')
-                      } else {
-                        showToast('기본 목업 항목은 삭제하지 않습니다')
-                      }
-                    }}
-                    className="text-xs border border-[#FF6B6B] text-[#FF4D4F] rounded-lg px-3 py-1"
-                  >
-                    삭제
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <button
-          onClick={() => { resetAddForm(); setMode('add') }}
-          className="w-full border border-[#D7D7D7] rounded-xl py-3 text-sm font-semibold text-[#111]"
-        >
-          + 경험 추가하기
+          + 하이라이트 추가하기
         </button>
       </div>
     </div>

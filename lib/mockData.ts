@@ -1,4 +1,4 @@
-import type { ContactChannel, Highlight } from '@/types'
+import type { ContactChannel, Highlight, HighlightCategoryId, HighlightGroupId, HighlightIconId } from '@/types'
 
 // ─── Instagram 프로필 (sss_uuo)
 export const INSTAGRAM_PROFILE = {
@@ -53,14 +53,32 @@ export const EXPERIENCE_KEYWORDS = [
 ]
 
 // ─── 하이라이트 카테고리
-export const HIGHLIGHT_CATEGORIES = [
-  { id: 'talk',      icon: 'mic', label: '강연 / 연설' },
-  { id: 'collab',    icon: 'handshake', label: '협업 프로젝트' },
-  { id: 'award',     icon: 'trophy', label: '수상 / 표창' },
-  { id: 'publish',   icon: 'book-open', label: '출판 / 기고' },
-  { id: 'volunteer', icon: 'globe', label: '봉사 / 사회공헌' },
-  { id: 'edu',       icon: 'book-open', label: '강의 / 교육' },
-  { id: 'other',     icon: 'pencil', label: '기타' },
+export const HIGHLIGHT_GROUPS: Array<{ id: HighlightGroupId; label: string }> = [
+  { id: 'career', label: '커리어' },
+  { id: 'achievement', label: '업적' },
+  { id: 'lifestyle', label: '라이프스타일' },
+]
+
+export const HIGHLIGHT_CATEGORIES: Array<{
+  id: HighlightCategoryId
+  icon: HighlightIconId
+  label: string
+  group: HighlightGroupId
+  certificationOnly?: boolean
+}> = [
+  { id: 'career-continuity', icon: 'briefcase', label: '커리어 지속성', group: 'career', certificationOnly: true },
+  { id: 'corporate-longevity', icon: 'building2', label: '법인 영속성', group: 'career', certificationOnly: true },
+  { id: 'remember-network', icon: 'users', label: '리멤버 네트워크', group: 'career', certificationOnly: true },
+  { id: 'talk', icon: 'mic', label: '강연 / 연설', group: 'career' },
+  { id: 'collab', icon: 'handshake', label: '협업 프로젝트', group: 'career' },
+  { id: 'publish', icon: 'book-open', label: '출판 / 기고', group: 'career' },
+  { id: 'education', icon: 'book-open', label: '강의 / 교육', group: 'career' },
+  { id: 'award', icon: 'trophy', label: '수상 / 표창', group: 'achievement' },
+  { id: 'patent', icon: 'book-open', label: '특허 / 연구', group: 'achievement' },
+  { id: 'license', icon: 'badge-check', label: '자격증 / 수료', group: 'achievement' },
+  { id: 'airline-mileage', icon: 'plane', label: '항공 마일리지', group: 'lifestyle', certificationOnly: true },
+  { id: 'volunteer', icon: 'globe', label: '봉사 / 사회공헌', group: 'lifestyle' },
+  { id: 'other', icon: 'pencil', label: '기타', group: 'lifestyle' },
 ]
 
 // ─── 샘플 공개 프로필 (myongkoo)
@@ -109,8 +127,8 @@ export const SAMPLE_PROFILE = {
     ],
   },
   manualHighlights: [
-    { id: 'mh1', icon: 'mic', title: 'TEDx Seoul 2023', subtitle: '강연 / 연설 · 직접 입력', description: '신뢰 기반 네트워킹의 미래를 주제로 강연', year: '2023' },
-    { id: 'mh2', icon: 'handshake', title: '일본 파트너사 협업 프로젝트', subtitle: '협업 프로젝트 · 직접 입력', description: '6개월 간 일본 파트너사와 B2B 제품 공동 개발', year: '2022' },
+    { id: 'mh1', categoryId: 'talk', icon: 'mic', title: 'TEDx Seoul 2023', subtitle: '강연 / 연설 · 직접 입력', description: '신뢰 기반 네트워킹의 미래를 주제로 강연', year: '2023' },
+    { id: 'mh2', categoryId: 'collab', icon: 'handshake', title: '일본 파트너사 협업 프로젝트', subtitle: '협업 프로젝트 · 직접 입력', description: '6개월 간 일본 파트너사와 B2B 제품 공동 개발', year: '2022' },
   ] as Highlight[],
   experiences: [
     { id: 'e1', authorName: '김지수', isAnonymous: false, keywords: ['전문적인', '통찰력 있는'], message: '정말 통찰력 있는 분이에요. 같이 일하고 싶다!', date: '2일 전' },
@@ -206,7 +224,7 @@ export const JIMIN_PROFILE = {
     ],
   },
   manualHighlights: [
-    { id: 'jh1', icon: 'mic', title: 'TEDx Seoul 2023', subtitle: '강연 / 연설 · 직접 입력', description: '기술과 사람의 연결에 대해 강연', year: '2023' },
+    { id: 'jh1', categoryId: 'talk', icon: 'mic', title: 'TEDx Seoul 2023', subtitle: '강연 / 연설 · 직접 입력', description: '기술과 사람의 연결에 대해 강연', year: '2023' },
   ] as Highlight[],
   reputationKeywords: [
     { keyword: '전문적인', count: 5 },

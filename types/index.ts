@@ -9,6 +9,24 @@ export type HighlightIconId =
   | 'book-open'
   | 'globe'
   | 'pencil'
+  | 'badge-check'
+
+export type HighlightGroupId = 'career' | 'achievement' | 'lifestyle'
+
+export type HighlightCategoryId =
+  | 'career-continuity'
+  | 'remember-network'
+  | 'corporate-longevity'
+  | 'talk'
+  | 'collab'
+  | 'publish'
+  | 'education'
+  | 'award'
+  | 'patent'
+  | 'license'
+  | 'airline-mileage'
+  | 'volunteer'
+  | 'other'
 
 export type OnboardingStep =
   | 'login'
@@ -25,6 +43,7 @@ export type OnboardingStep =
 
 export interface Highlight {
   id: string
+  categoryId: HighlightCategoryId
   icon: HighlightIconId
   title: string
   subtitle: string

@@ -9,9 +9,9 @@ import {
 } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import {
-  SAMPLE_PROFILE, JIMIN_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE,
+  SAMPLE_PROFILE, JIMIN_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE, HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS,
 } from '@/lib/mockData'
-import type { HighlightIconId } from '@/types'
+import type { Highlight, HighlightIconId } from '@/types'
 
 interface PublicProfileProps {
   username: string
@@ -19,6 +19,12 @@ interface PublicProfileProps {
   onOpenArchive?: () => void
   onOpenManage?: () => void
 }
+
+const AIRLINE_BADGE_LABELS = {
+  global_business: '글로벌 비즈니스',
+  active_business: '액티브 비즈니스',
+  business_traveler: '비즈니스 이동형',
+} as const
 
 export default function PublicProfile({
   username,
@@ -74,11 +80,7 @@ export default function PublicProfile({
   const airlineHighlight = 'airlineHighlight' in rawProfile
     ? rawProfile.airlineHighlight
     : { tierSummary: '대한항공 모닝캄', badgeLevel: 'business_traveler', airlines: [{ name: '대한항공', tier: '모닝캄' }] }
-  const airlineBadgeLabel = {
-    global_business: '🌍 글로벌 비즈니스',
-    active_business: '✈️ 액티브 비즈니스',
-    business_traveler: '🗺️ 비즈니스 이동형',
-  }[airlineHighlight.badgeLevel] ?? null
+  const airlineBadgeLabel = AIRLINE_BADGE_LABELS[airlineHighlight.badgeLevel as keyof typeof AIRLINE_BADGE_LABELS] ?? null
 
   const [expSheetOpen, setExpSheetOpen] = useState(false)
   const [expDoneModal, setExpDoneModal] = useState(false)
@@ -96,16 +98,54 @@ export default function PublicProfile({
     }))
   const featuredGuestbook = profile.guestbook.slice(0, 3)
   const experienceOptions = profile.selectedKeywords.slice(0, 4)
+  const verifiedHighlights: Highlight[] = [
+    {
+      id: `verified-career-${username}`,
+      categoryId: 'career-continuity',
+      icon: 'briefcase',
+      title: '커리어 지속성',
+      subtitle: `건강보험공단 기준 · 2026.04 인증`,
+      description: '업계 평균 대비 더 길게 축적된 재직 이력을 보여줍니다.',
+      year: '',
+    },
+    {
+      id: `verified-corporate-${username}`,
+      categoryId: 'corporate-longevity',
+      icon: 'building2',
+      title: '법인 영속성',
+      subtitle: corporateHighlight.summary,
+      description: '법인 운영 기간과 정상 운영 여부를 확인한 항목입니다.',
+      year: '',
+    },
+    {
+      id: `verified-remember-${username}`,
+      categoryId: 'remember-network',
+      icon: 'users',
+      title: '리멤버 네트워크',
+      subtitle: '리멤버 명함 기반 직업 네트워크',
+      description: '명함 기반 직업 네트워크 구성이 인증되어 공개됩니다.',
+      year: '',
+    },
+    {
+      id: `verified-airline-${username}`,
+      categoryId: 'airline-mileage',
+      icon: 'plane',
+      title: '항공 마일리지',
+      subtitle: airlineHighlight.tierSummary,
+      description: '항공사 회원 등급으로 이동성과 출장 경험을 보여줍니다.',
+      year: '',
+    },
+  ]
+  const groupedHighlights = HIGHLIGHT_GROUPS.map((group) => ({
+    ...group,
+    items: [...verifiedHighlights, ...profile.manualHighlights].filter(
+      (item) => HIGHLIGHT_CATEGORIES.find((category) => category.id === item.categoryId)?.group === group.id,
+    ),
+  }))
 
   // SNS 토글
   const igOpen = store.snsOpenStates['instagram_' + username] ?? false
   const liOpen = store.snsOpenStates['linkedin_' + username] ?? false
-
-  // 하이라이트 토글
-  const careerOpen = store.hlOpenStates['career_' + username] ?? false
-  const rememberOpen = store.hlOpenStates['remember_' + username] ?? false
-  const corporateOpen = store.hlOpenStates['corporate_' + username] ?? false
-  const airlineOpen = store.hlOpenStates['airline_' + username] ?? false
 
   useEffect(() => {
     setBioExpanded(false)
@@ -467,198 +507,129 @@ export default function PublicProfile({
         <div className="px-5 py-4">
           <SectionTitle title="하이라이트" subtitle={`인증 4개 · 직접 입력 ${profile.manualHighlights.length}개`} />
 
-          {/* 커리어 지속성 */}
-          <div className="mb-2 rounded-[22px] border border-[#EBEBEB] overflow-hidden">
-            <button
-              onClick={() => store.toggleHlOpen('career_' + username)}
-              className="flex items-center w-full px-4 py-3"
-            >
-              <span className="mr-2 text-[var(--color-text-strong)]">
-                <HighlightIcon id="briefcase" size={18} />
-              </span>
-              <div className="flex-1 text-left">
-                <div className="text-sm font-bold">커리어 지속성
-                  <span className="ml-1.5 text-[10px] font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-full px-2 py-0.5">인증됨</span>
-                </div>
-                <div className="text-xs text-[#888]">평균 대비 128% 장기 재직</div>
-              </div>
-              {careerOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
-            </button>
-            {careerOpen && (
-              <div className="bg-[#FAFAFA] border-t border-[#F1F1F1] p-4">
-                <div className="text-xs text-[#888] mb-2">평균 재직 기간</div>
-                <div className="h-1.5 bg-[#e0e0e0] rounded-full mb-1.5">
-                  <div className="h-full bg-[#0A0A0A] rounded-full" style={{ width: '72%' }} />
-                </div>
-                <div className="text-right text-xs text-[#555] font-bold mb-3">평균 대비 128% 장기 재직</div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-white border border-[#eee] rounded-xl p-3 text-center">
-                    <div className="text-xl font-black">{profile.careerHighlight.avgYears}년</div>
-                    <div className="text-xs text-[#888] mt-0.5">본인 평균</div>
+          <div className="space-y-6">
+            {groupedHighlights.map((group) => (
+              <div key={group.id}>
+                <div className="mb-3 text-sm font-bold text-[#7E766E]">{group.label} {group.items.length}개</div>
+                {group.items.length > 0 ? (
+                  <div className="space-y-2">
+                    {group.items.map((hl) => {
+                      const isVerified = hl.id.startsWith('verified-')
+                      const toggleKey = `${hl.id}_${username}`
+                      const isOpen = store.hlOpenStates[toggleKey] ?? false
+                      return (
+                        <div key={hl.id} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
+                          <button
+                            onClick={() => store.toggleHlOpen(toggleKey)}
+                            className="flex w-full items-center gap-3 px-4 py-3 text-left"
+                          >
+                            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
+                              <HighlightIcon id={hl.icon as HighlightIconId} size={18} />
+                            </span>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <span className="text-[15px] font-bold text-[var(--color-text-strong)]">{hl.title}</span>
+                                <span className={isVerified ? 'rounded-full bg-[#E8F5EC] px-2 py-0.5 text-[11px] font-semibold text-[#217A43]' : 'rounded-full bg-[#F1EFEC] px-2 py-0.5 text-[11px] font-semibold text-[#7E766E]'}>
+                                  {isVerified ? '인증됨' : '직접 입력'}
+                                </span>
+                              </div>
+                              <div className="micro-text mt-0.5">{hl.subtitle}</div>
+                            </div>
+                            {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
+                          </button>
+                          {isOpen && (
+                            <div className="border-t border-[#F1ECE6] bg-[#FBFAF8] px-4 py-4">
+                              {hl.categoryId === 'career-continuity' && (
+                                <div className="grid grid-cols-2 gap-3">
+                                  <div className="rounded-2xl border border-[#E7E2DC] bg-white px-4 py-3 text-center">
+                                    <div className="text-xl font-black text-[#111]">{profile.careerHighlight.avgYears}년</div>
+                                    <div className="micro-text mt-1">평균 재직</div>
+                                  </div>
+                                  <div className="rounded-2xl border border-[#D9ECD9] bg-[#F5FFF5] px-4 py-3 text-center">
+                                    <div className="text-xl font-black text-[#217A43]">+{profile.careerHighlight.vsIndustryPercent}%</div>
+                                    <div className="micro-text mt-1">업계 대비</div>
+                                  </div>
+                                </div>
+                              )}
+                              {hl.categoryId === 'remember-network' && (
+                                <>
+                                  <svg viewBox="0 0 200 150" className="w-full h-auto mb-2">
+                                    <circle cx="100" cy="75" r="20" fill="#333" stroke="#fff" strokeWidth="2" />
+                                    <text x="100" y="79" textAnchor="middle" fontSize="8" fill="#fff" fontWeight="700">나</text>
+                                    {profile.rememberHighlight.industries.map((ind, index) => {
+                                      const positions = [
+                                        { cx: 100, cy: 22, r: 18 },
+                                        { cx: 168, cy: 75, r: 15 },
+                                        { cx: 100, cy: 128, r: 13 },
+                                        { cx: 32, cy: 75, r: 14 },
+                                      ]
+                                      const pos = positions[index] ?? { cx: 100, cy: 22, r: 14 }
+                                      return (
+                                        <g key={ind.name}>
+                                          <line x1="100" y1="75" x2={pos.cx} y2={pos.cy} stroke="#ccc" strokeWidth="1" />
+                                          <circle cx={pos.cx} cy={pos.cy} r={pos.r} fill={['#111', '#444', '#666', '#999'][index] ?? '#888'} stroke="#fff" strokeWidth="2" />
+                                          <text x={pos.cx} y={pos.cy - 3} textAnchor="middle" fontSize="6" fill="#fff">{ind.name}</text>
+                                          <text x={pos.cx} y={pos.cy + 6} textAnchor="middle" fontSize="7" fill="#fff" fontWeight="700">{ind.ratio}%</text>
+                                        </g>
+                                      )
+                                    })}
+                                  </svg>
+                                  <div className="text-xs text-[#bbb] text-right">리멤버 명함 기준 · 총 {profile.rememberHighlight.total}명</div>
+                                </>
+                              )}
+                              {hl.categoryId === 'corporate-longevity' && (
+                                <div className="grid grid-cols-3 gap-3">
+                                  <div className="rounded-2xl border border-[#E7E2DC] bg-white px-3 py-3 text-center">
+                                    <div className="text-lg font-black text-[#111]">{corporateHighlight.companyCount}개</div>
+                                    <div className="micro-text mt-1">운영 법인</div>
+                                  </div>
+                                  <div className="rounded-2xl border border-[#E7E2DC] bg-white px-3 py-3 text-center">
+                                    <div className="text-lg font-black text-[#111]">{'averageOperatingYears' in corporateHighlight ? corporateHighlight.averageOperatingYears : corporateHighlight.years}년</div>
+                                    <div className="micro-text mt-1">운영 기간</div>
+                                  </div>
+                                  <div className="rounded-2xl border border-[#D9ECD9] bg-[#F5FFF5] px-3 py-3 text-center">
+                                    <div className="text-sm font-black text-[#217A43]">정상 운영</div>
+                                    <div className="micro-text mt-1">폐업 이력 없음</div>
+                                  </div>
+                                </div>
+                              )}
+                              {hl.categoryId === 'airline-mileage' && (
+                                <div>
+                                  {airlineBadgeLabel && (
+                                    <div className="mb-3 inline-flex items-center rounded-full border border-[#E5E5E5] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#333]">
+                                      {airlineBadgeLabel}
+                                    </div>
+                                  )}
+                                  <div className="space-y-2">
+                                    {airlineHighlight.airlines.map((airline) => (
+                                      <div key={airline.name} className="flex items-center justify-between rounded-2xl border border-[#E7E2DC] bg-white px-4 py-3">
+                                        <div className="text-sm text-[var(--color-text-secondary)]">{airline.name}</div>
+                                        <div className="text-sm font-bold text-[var(--color-text-strong)]">{airline.tier}</div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                              {!isVerified && (
+                                <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
+                                  {hl.description || '세부 설명이 아직 없어요.'}
+                                  <div className="micro-text mt-2">{hl.year ? `${hl.year} · ` : ''}{hl.subtitle}</div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
                   </div>
-                  <div className="bg-[#f5fff5] border border-[#c8e6c9] rounded-xl p-3 text-center">
-                    <div className="text-xl font-black text-[#1A7A1A]">+{profile.careerHighlight.vsIndustryPercent}%</div>
-                    <div className="text-xs text-[#888] mt-0.5">업계 평균 대비</div>
-                  </div>
-                </div>
-                <div className="text-xs text-[#bbb] text-right mt-2">건강보험공단 기준 · 2026.04 인증</div>
-              </div>
-            )}
-          </div>
-
-          {/* 리멤버 네트워크 */}
-          <div className="mb-2 rounded-[22px] border border-[#EBEBEB] overflow-hidden">
-            <button
-              onClick={() => store.toggleHlOpen('remember_' + username)}
-              className="flex items-center w-full px-4 py-3"
-            >
-              <span className="mr-2 text-[var(--color-text-strong)]">
-                <HighlightIcon id="users" size={18} />
-              </span>
-              <div className="flex-1 text-left">
-                <div className="text-sm font-bold">리멤버 직업 네트워크
-                  <span className="ml-1.5 text-[10px] font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-full px-2 py-0.5">인증됨</span>
-                </div>
-                <div className="text-xs text-[#888]">스타트업·마케팅 중심 인맥</div>
-              </div>
-              {rememberOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
-            </button>
-            {rememberOpen && (
-              <div className="bg-[#FAFAFA] border-t border-[#F1F1F1] p-4">
-                {/* 버블 다이어그램 */}
-                <svg viewBox="0 0 200 150" className="w-full h-auto mb-2">
-                  <circle cx="100" cy="75" r="20" fill="#333" stroke="#fff" strokeWidth="2"/>
-                  <text x="100" y="79" textAnchor="middle" fontSize="8" fill="#fff" fontWeight="700">나</text>
-                  {profile.rememberHighlight.industries.map((ind, i) => {
-                    const positions = [
-                      { cx: 100, cy: 22, r: 18 },
-                      { cx: 168, cy: 75, r: 15 },
-                      { cx: 100, cy: 128, r: 13 },
-                      { cx: 32, cy: 75, r: 14 },
-                    ]
-                    const pos = positions[i] ?? { cx: 100, cy: 22, r: 14 }
-                    return (
-                      <g key={ind.name}>
-                        <line x1="100" y1="75" x2={pos.cx} y2={pos.cy} stroke="#ccc" strokeWidth="1"/>
-                        <circle cx={pos.cx} cy={pos.cy} r={pos.r} fill={['#111','#444','#666','#999'][i] ?? '#888'} stroke="#fff" strokeWidth="2"/>
-                        <text x={pos.cx} y={pos.cy - 3} textAnchor="middle" fontSize="6" fill="#fff">{ind.name}</text>
-                        <text x={pos.cx} y={pos.cy + 6} textAnchor="middle" fontSize="7" fill="#fff" fontWeight="700">{ind.ratio}%</text>
-                      </g>
-                    )
-                  })}
-                </svg>
-                <div className="text-xs text-[#bbb] text-right">리멤버 명함 기준 · 총 {profile.rememberHighlight.total}명</div>
-              </div>
-            )}
-          </div>
-
-          {/* 법인 영속성 */}
-          <div className="mb-2 rounded-[22px] border border-[#EBEBEB] overflow-hidden">
-            <button
-              onClick={() => store.toggleHlOpen('corporate_' + username)}
-              className="flex items-center w-full px-4 py-3"
-            >
-              <span className="mr-2 text-[var(--color-text-strong)]">
-                <HighlightIcon id="building2" size={18} />
-              </span>
-              <div className="flex-1 text-left">
-                <div className="text-sm font-bold">법인 영속성
-                  <span className="ml-1.5 text-[10px] font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-full px-2 py-0.5">인증됨</span>
-                </div>
-                <div className="text-xs text-[#888]">{corporateHighlight.summary}</div>
-              </div>
-              {corporateOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
-            </button>
-            {corporateOpen && (
-              <div className="bg-[#FAFAFA] border-t border-[#F1F1F1] p-4">
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="bg-white border border-[#eee] rounded-xl p-3 text-center">
-                    <div className="text-xl font-black">{corporateHighlight.companyCount}개</div>
-                    <div className="text-xs text-[#888] mt-0.5">운영 법인</div>
-                  </div>
-                  <div className="bg-white border border-[#eee] rounded-xl p-3 text-center">
-                    <div className="text-xl font-black">{'averageOperatingYears' in corporateHighlight ? corporateHighlight.averageOperatingYears : corporateHighlight.years}년</div>
-                    <div className="text-xs text-[#888] mt-0.5">운영 기간</div>
-                  </div>
-                  <div className="bg-[#f5fff5] border border-[#c8e6c9] rounded-xl p-3 text-center">
-                    <div className="text-sm font-black text-[#1A7A1A]">정상 운영</div>
-                    <div className="text-xs text-[#888] mt-0.5">폐업 이력 없음</div>
-                  </div>
-                </div>
-                <div className="text-xs text-[#bbb] text-right mt-2">법인 등기 기준 · 2026.04 인증</div>
-              </div>
-            )}
-          </div>
-
-          {/* 항공 마일리지 */}
-          <div className="mb-2 rounded-[22px] border border-[#EBEBEB] overflow-hidden">
-            <button
-              onClick={() => store.toggleHlOpen('airline_' + username)}
-              className="flex items-center w-full px-4 py-3"
-            >
-              <span className="mr-2 text-[var(--color-text-strong)]">
-                <HighlightIcon id="plane" size={18} />
-              </span>
-              <div className="flex-1 text-left">
-                <div className="text-sm font-bold">항공 마일리지
-                  <span className="ml-1.5 text-[10px] font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-full px-2 py-0.5">인증됨</span>
-                </div>
-                <div className="text-xs text-[#888]">{airlineHighlight.tierSummary}</div>
-              </div>
-              {airlineOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
-            </button>
-            {airlineOpen && (
-              <div className="bg-[#FAFAFA] border-t border-[#F1F1F1] p-4">
-                {airlineBadgeLabel && (
-                  <div className="inline-flex items-center rounded-full border border-[#E5E5E5] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#333] mb-3">
-                    {airlineBadgeLabel}
-                  </div>
-                )}
-                <div className="space-y-2">
-                  {airlineHighlight.airlines.map((airline) => (
-                    <div key={airline.name} className="flex items-center justify-between rounded-xl border border-[#eee] bg-white px-3 py-2.5">
-                      <div className="text-xs text-[#888]">{airline.name}</div>
-                      <div className="text-sm font-bold">{airline.tier}</div>
-                    </div>
-                  ))}
-                </div>
-                <div className="text-xs text-[#bbb] text-right mt-2">항공사 회원등급 기준 · 2026.04 인증</div>
-              </div>
-            )}
-          </div>
-
-          {/* 직접 입력 하이라이트 */}
-          {profile.manualHighlights.map((hl) => {
-            const isOpen = store.hlOpenStates[hl.id + '_' + username] ?? false
-            return (
-              <div key={hl.id} className="mb-2 rounded-[22px] border border-[#EBEBEB] overflow-hidden">
-                <button
-                  onClick={() => store.toggleHlOpen(hl.id + '_' + username)}
-                  className="flex items-center w-full px-4 py-3"
-                >
-                  <span className="mr-2 text-[var(--color-text-strong)]">
-                    <HighlightIcon id={hl.icon as HighlightIconId} size={18} />
-                  </span>
-                  <div className="flex-1 text-left">
-                    <div className="text-sm font-bold">{hl.title}</div>
-                    <div className="text-xs text-[#888]">{hl.subtitle}</div>
-                  </div>
-                  {hl.year && <span className="text-xs text-[#888] mr-2">{hl.year}</span>}
-                  {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
-                </button>
-                {isOpen && hl.description && (
-                  <div className="bg-[#FAFAFA] border-t border-[#F1F1F1] px-4 py-3 text-xs text-[#333] leading-relaxed">
-                    <div className="font-bold mb-1 flex items-center gap-1.5">
-                      <HighlightIcon id={hl.icon as HighlightIconId} size={16} />
-                      <span>{hl.title}</span>
-                    </div>
-                    <div>{hl.description}</div>
-                    <div className="text-[#888] mt-1">{hl.year}년 · {hl.subtitle.split('·')[0].trim()} · 직접 입력 (미인증)</div>
+                ) : (
+                  <div className="rounded-[22px] border border-dashed border-[#E7E2DC] bg-white px-4 py-10 text-center text-sm text-[#A29B93]">
+                    아직 {group.label.toLowerCase()}이 없어요
                   </div>
                 )}
               </div>
-            )
-          })}
+            ))}
+          </div>
         </div>
 
         <div className="px-5 pt-2 pb-6">

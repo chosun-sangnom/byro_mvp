@@ -12,7 +12,7 @@ import {
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import type { ContactChannel, HighlightIconId } from '@/types'
 import {
-  KEYWORD_GROUPS, HIGHLIGHT_CATEGORIES, AI_BIO_CANDIDATES,
+  KEYWORD_GROUPS, HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS, AI_BIO_CANDIDATES,
   INSTAGRAM_PROFILE, LINKEDIN_PROFILE, SAMPLE_PROFILE,
 } from '@/lib/mockData'
 
@@ -20,6 +20,13 @@ const STEP_NUMS: Record<string, number> = {
   login: 0, verify: 1, 'basic-info': 2, linkid: 3, keywords: 4, sns: 5,
   contact: 6, highlight: 7, 'bio-select': 8, 'bio-ai': 9, complete: 10,
 }
+
+const CERTIFICATION_HIGHLIGHTS = [
+  { categoryId: 'career-continuity', icon: 'briefcase', title: '커리어 지속성', docLabel: '건강보험 관련 재직 증빙' },
+  { categoryId: 'corporate-longevity', icon: 'building2', title: '법인 영속성', docLabel: '법인 운영 증빙 서류' },
+  { categoryId: 'remember-network', icon: 'users', title: '리멤버 네트워크', docLabel: '리멤버 명함 내보내기 파일' },
+  { categoryId: 'airline-mileage', icon: 'plane', title: '항공 마일리지', docLabel: '항공사 등급 확인 자료' },
+] as const
 
 export default function OnboardingScreen() {
   const router = useRouter()
@@ -724,37 +731,7 @@ function Step6Contact() {
 function Step7Highlight() {
   const store = useByroStore()
   const [sheetOpen, setSheetOpen] = useState(false)
-  const certItems = [
-    {
-      icon: 'briefcase',
-      title: '재직기간 인증',
-      sub: '건강보험공단 기준으로 재직 지속 기간 확인',
-      badge: '인증 가능',
-      docLabel: '건강보험 관련 재직 증빙',
-    },
-    {
-      icon: 'users',
-      title: '리멤버 직업 네트워크',
-      sub: '리멤버 앱 명함 내보내기로 네트워크 인증',
-      badge: '인증 가능',
-      docLabel: '리멤버 명함 내보내기 파일',
-    },
-    {
-      icon: 'building2',
-      title: '법인 영속성',
-      sub: '법인 운영 기간과 정상 운영 여부 확인',
-      badge: '인증 가능',
-      docLabel: '법인 운영 증빙 서류',
-    },
-    {
-      icon: 'plane',
-      title: '항공 마일리지',
-      sub: '항공사 회원 등급으로 출장형 프로필 인증',
-      badge: '인증 가능',
-      docLabel: '항공사 등급 확인 자료',
-    },
-  ] as const
-  const [selectedCert, setSelectedCert] = useState<(typeof certItems)[number] | null>(null)
+  const [selectedCert, setSelectedCert] = useState<(typeof CERTIFICATION_HIGHLIGHTS)[number] | null>(null)
   const certModalOpen = selectedCert !== null
 
   // 직접 입력 폼 상태
@@ -769,6 +746,7 @@ function Step7Highlight() {
       return
     }
     store.addHighlight({
+      categoryId: selectedCat.id,
       icon: selectedCat.icon as HighlightIconId,
       title: hlTitle,
       subtitle: `${selectedCat.label} · 직접 입력`,
@@ -792,28 +770,10 @@ function Step7Highlight() {
         description={'인증한 정보와 직접 추가한 경험을\n프로필에 함께 보여줄 수 있어요.'}
       />
 
-        {/* 인증 가능 항목 */}
-        <div className="space-y-2 mb-4">
-          {certItems.map((item) => (
-            <SelectionCard
-              key={item.title}
-              icon={<HighlightIcon id={item.icon as HighlightIconId} size={18} />}
-              title={item.title}
-              subtitle={item.sub}
-              badge={item.badge}
-            >
-              <button
-                onClick={() => setSelectedCert(item)}
-                className="text-xs text-white rounded-lg px-3 py-1.5"
-                style={{ backgroundColor: 'var(--color-accent-dark)' }}
-              >
-                인증하기
-              </button>
-            </SelectionCard>
-          ))}
+        <div className="mb-5">
+          <InfoBox>표시 항목은 인증 연동이 가능해요</InfoBox>
         </div>
 
-        {/* 직접 입력 목록 */}
         {store.highlights.length > 0 && (
           <div className="space-y-2 mb-4">
             {store.highlights.map((h) => (
@@ -834,13 +794,12 @@ function Step7Highlight() {
           </div>
         )}
 
-        {/* 직접 입력 추가 버튼 */}
         <button
           onClick={() => setSheetOpen(true)}
           className="w-full border border-dashed rounded-xl py-3 text-sm font-medium"
           style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-secondary)' }}
         >
-          + 경험 추가하기
+          + 하이라이트 추가하기
         </button>
       </div>
 
@@ -872,24 +831,40 @@ function Step7Highlight() {
       {/* 직접 입력 바텀시트 */}
       <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
         <div className="px-5 pb-6">
-          <div className="text-sm font-black mb-4">경험 추가하기</div>
+          <div className="text-sm font-black mb-4">하이라이트 추가하기</div>
 
-          {/* 카테고리 그리드 */}
-          <div className="grid grid-cols-4 gap-2 mb-4">
-            {HIGHLIGHT_CATEGORIES.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setSelectedCat(cat)}
-                className={[
-                  'flex flex-col items-center p-2 rounded-xl border text-center transition-all',
-                  selectedCat?.id === cat.id
-                    ? 'bg-[var(--color-accent-dark)] border-[var(--color-accent-dark)] text-white'
-                    : 'border-[var(--color-border-default)] text-[var(--color-text-secondary)]',
-                ].join(' ')}
-              >
-                  <HighlightIcon id={cat.icon as HighlightIconId} size={18} className="mb-1" />
-                <span className="text-[10px] font-semibold leading-tight">{cat.label}</span>
-              </button>
+          <div className="space-y-5 mb-5">
+            {HIGHLIGHT_GROUPS.map((group) => (
+              <div key={group.id}>
+                <div className="mb-3 text-sm font-bold text-[var(--color-text-secondary)]">{group.label}</div>
+                <div className="grid grid-cols-3 gap-3">
+                  {HIGHLIGHT_CATEGORIES.filter((cat) => cat.group === group.id).map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => {
+                        if (cat.certificationOnly) {
+                          const certification = CERTIFICATION_HIGHLIGHTS.find((item) => item.categoryId === cat.id)
+                          if (certification) setSelectedCert(certification)
+                          return
+                        }
+                        setSelectedCat(cat)
+                      }}
+                      className={[
+                        'relative min-h-[110px] rounded-[22px] border bg-white px-3 py-4 text-center transition-all',
+                        selectedCat?.id === cat.id
+                          ? 'border-[var(--color-accent-dark)]'
+                          : 'border-[var(--color-border-default)]',
+                      ].join(' ')}
+                    >
+                      {cat.certificationOnly && <span className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full bg-[#4D8D5C]" />}
+                      <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
+                        <HighlightIcon id={cat.icon as HighlightIconId} size={18} />
+                      </div>
+                      <div className="text-[13px] font-bold leading-[1.45] text-[var(--color-text-primary)]">{cat.label}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
 

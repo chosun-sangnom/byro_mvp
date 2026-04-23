@@ -1,6 +1,7 @@
 'use client'
 
 import {
+  BadgeCheck,
   BookOpen,
   Briefcase,
   Building2,
@@ -26,6 +27,7 @@ const ICON_MAP = {
   'book-open': BookOpen,
   globe: Globe,
   pencil: Pencil,
+  'badge-check': BadgeCheck,
 } as const satisfies Record<HighlightIconId, LucideIcon>
 
 export function HighlightIcon({

@@ -1054,7 +1054,7 @@ function HighlightManageScreen({
                           <div className="min-w-0 flex-1">
                             <div className="flex flex-wrap items-center gap-2">
                               <span className="text-[15px] font-bold text-[var(--color-text-strong)]">{entry.item.title}</span>
-                              <span className="rounded-full bg-[#F1EFEC] px-2 py-0.5 text-[11px] font-semibold text-[#7E766E]">직접 입력</span>
+                              
                             </div>
                             <div className="micro-text mt-1">{entry.item.year ? `${entry.item.year} · ` : ''}{entry.item.subtitle.split('·')[0].trim()}</div>
                             {entry.item.description && <div className="text-sm leading-relaxed text-[var(--color-text-secondary)] mt-2">{entry.item.description}</div>}

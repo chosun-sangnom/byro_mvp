@@ -532,9 +532,11 @@ export default function PublicProfile({
                             <div className="min-w-0 flex-1">
                               <div className="flex flex-wrap items-center gap-2">
                                 <span className="text-[15px] font-bold text-[var(--color-text-strong)]">{hl.title}</span>
-                                <span className={isVerified ? 'rounded-full bg-[#E8F5EC] px-2 py-0.5 text-[11px] font-semibold text-[#217A43]' : 'rounded-full bg-[#F1EFEC] px-2 py-0.5 text-[11px] font-semibold text-[#7E766E]'}>
-                                  {isVerified ? '인증됨' : '직접 입력'}
-                                </span>
+                                {isVerified && (
+                                  <span className="rounded-full bg-[#E8F5EC] px-2 py-0.5 text-[11px] font-semibold text-[#217A43]">
+                                    인증됨
+                                  </span>
+                                )}
                               </div>
                               <div className="micro-text mt-0.5">{hl.subtitle}</div>
                             </div>
@@ -652,7 +654,7 @@ export default function PublicProfile({
                 </Button>
               </div>
             )}
-            <div className="grid grid-cols-4 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               {contactChannels.map((channel) => (
                 <ContactActionButton
                   key={channel.id}

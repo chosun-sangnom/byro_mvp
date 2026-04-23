@@ -861,10 +861,10 @@ function Step7Highlight() {
                             setSelectedCat(cat)
                             setSheetMode('form')
                           }}
-                          className="relative rounded-[20px] border border-[var(--color-border-default)] bg-white px-3 py-4 text-center shadow-[0_4px_14px_rgba(17,17,17,0.03)]"
+                          className="relative overflow-visible rounded-[20px] border border-[var(--color-border-default)] bg-white px-3 py-4 text-center shadow-[0_4px_14px_rgba(17,17,17,0.03)]"
                         >
                           {cat.certificationOnly && (
-                            <span className="absolute right-2.5 top-2.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white text-[#217A43] shadow-[0_4px_10px_rgba(17,17,17,0.08)]">
+                            <span className="absolute -right-2 -top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-white text-[#217A43] shadow-[0_4px_12px_rgba(17,17,17,0.10)]">
                               <BadgeCheck size={14} />
                             </span>
                           )}

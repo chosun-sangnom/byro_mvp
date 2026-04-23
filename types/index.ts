@@ -13,6 +13,7 @@ export type HighlightIconId =
 export type OnboardingStep =
   | 'login'
   | 'verify'
+  | 'basic-info'
   | 'linkid'
   | 'keywords'
   | 'sns'

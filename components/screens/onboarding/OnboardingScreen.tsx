@@ -13,12 +13,12 @@ import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import type { ContactChannel, HighlightIconId } from '@/types'
 import {
   KEYWORD_GROUPS, HIGHLIGHT_CATEGORIES, AI_BIO_CANDIDATES,
-  INSTAGRAM_PROFILE, LINKEDIN_PROFILE,
+  INSTAGRAM_PROFILE, LINKEDIN_PROFILE, SAMPLE_PROFILE,
 } from '@/lib/mockData'
 
 const STEP_NUMS: Record<string, number> = {
-  login: 0, verify: 1, linkid: 2, keywords: 3, sns: 4,
-  contact: 5, highlight: 6, 'bio-select': 7, 'bio-ai': 8, complete: 9,
+  login: 0, verify: 1, 'basic-info': 2, linkid: 3, keywords: 4, sns: 5,
+  contact: 6, highlight: 7, 'bio-select': 8, 'bio-ai': 9, complete: 10,
 }
 
 export default function OnboardingScreen() {
@@ -34,7 +34,7 @@ export default function OnboardingScreen() {
     router.push('/')
   }
 
-  const hasBack = stepNum >= 1 && stepNum <= 8
+  const hasBack = stepNum >= 1 && stepNum <= 9
 
   return (
     <div className="flex flex-col h-full">
@@ -45,14 +45,15 @@ export default function OnboardingScreen() {
       />
 
       {/* Step indicator (로그인 제외) */}
-      {stepNum >= 1 && stepNum <= 8 && (
-        <StepBar current={stepNum} total={8} />
+      {stepNum >= 1 && stepNum <= 9 && (
+        <StepBar current={stepNum} total={9} />
       )}
 
       {/* Content */}
       <div className="flex-1 overflow-hidden">
         {store.step === 'login'     && <Step1Login onClose={handleClose} />}
         {store.step === 'verify'    && <Step2Verify />}
+        {store.step === 'basic-info' && <StepBasicInfo />}
         {store.step === 'linkid'    && <Step3LinkId />}
         {store.step === 'keywords'  && <Step4Keywords />}
         {store.step === 'sns'       && <Step5SNS />}
@@ -313,6 +314,66 @@ function Step2Verify() {
       <StepFooter
         canNext={canProceed}
         onNext={handleVerify}
+        onPrev={() => store.prevStep()}
+      />
+    </div>
+  )
+}
+
+function StepBasicInfo() {
+  const store = useByroStore()
+  const [title, setTitle] = useState(store.onboardingTitle)
+  const [school, setSchool] = useState(store.onboardingSchool)
+
+  useEffect(() => {
+    store.setOnboardingBasicInfo({ title, school })
+  }, [school, store, title])
+
+  const canNext = title.trim().length > 0 && school.trim().length > 0
+
+  return (
+    <div className="flex flex-col h-full overflow-y-auto px-5 py-4">
+      <StepIntro
+        eyebrow="Basic Info"
+        title={'기본 정보를\n입력해주세요'}
+        description={'인증한 이름을 확인하고 직함과 학력을 입력해주세요.'}
+      />
+
+      <div className="space-y-3">
+        <div>
+          <label className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wide mb-1 block">이름</label>
+          <input
+            value={SAMPLE_PROFILE.name}
+            readOnly
+            className="w-full border rounded-xl px-4 py-3 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-secondary)] outline-none"
+            style={{ borderColor: 'var(--color-border-default)' }}
+          />
+        </div>
+        <div>
+          <label className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wide mb-1 block">직함</label>
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="예: 스타트업 마케터"
+            className="w-full border rounded-xl px-4 py-3 text-sm outline-none"
+            style={{ borderColor: 'var(--color-border-default)' }}
+          />
+        </div>
+        <div>
+          <label className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wide mb-1 block">학력</label>
+          <input
+            value={school}
+            onChange={(e) => setSchool(e.target.value)}
+            placeholder="예: 연세대학교 경영학과 졸업"
+            className="w-full border rounded-xl px-4 py-3 text-sm outline-none"
+            style={{ borderColor: 'var(--color-border-default)' }}
+          />
+        </div>
+      </div>
+
+      <StepFooter
+        canNext={canNext}
+        onNext={() => store.nextStep()}
         onPrev={() => store.prevStep()}
       />
     </div>

@@ -7,7 +7,7 @@ import type { OnboardingStep, Highlight, UserState, ContactChannel } from '@/typ
 import { SAMPLE_PROFILE } from '@/lib/mockData'
 
 const STEP_ORDER: OnboardingStep[] = [
-  'login', 'verify', 'linkid', 'keywords', 'sns', 'contact', 'highlight', 'bio-select', 'bio-ai', 'complete',
+  'login', 'verify', 'basic-info', 'linkid', 'keywords', 'sns', 'contact', 'highlight', 'bio-select', 'bio-ai', 'complete',
 ]
 
 interface ByroStore {
@@ -20,6 +20,8 @@ interface ByroStore {
   agreedTerms: boolean
   agreedPrivacy: boolean
   agreedMarketing: boolean
+  onboardingTitle: string
+  onboardingSchool: string
   linkId: string
   selectedKeywords: string[]      // max 5
   instagramConnected: boolean
@@ -48,6 +50,7 @@ interface ByroStore {
   setAgreedPrivacy(v: boolean): void
   setAgreedMarketing(v: boolean): void
   toggleAllAgreed(): void
+  setOnboardingBasicInfo(info: { title?: string; school?: string }): void
   setLinkId(id: string): void
   toggleKeyword(kw: string): void
   connectInstagram(): void
@@ -87,6 +90,8 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   agreedTerms: false,
   agreedPrivacy: false,
   agreedMarketing: false,
+  onboardingTitle: SAMPLE_PROFILE.title,
+  onboardingSchool: SAMPLE_PROFILE.school,
   linkId: '',
   selectedKeywords: [],
   instagramConnected: false,
@@ -148,6 +153,13 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       agreedPrivacy: !allChecked,
       agreedMarketing: !allChecked,
     })
+  },
+
+  setOnboardingBasicInfo(info) {
+    set((state) => ({
+      onboardingTitle: info.title ?? state.onboardingTitle,
+      onboardingSchool: info.school ?? state.onboardingSchool,
+    }))
   },
 
   setLinkId(id) {
@@ -213,14 +225,17 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   },
 
   completeOnboarding() {
-    const { linkId, bio, selectedKeywords, instagramConnected, linkedinConnected, onboardingContactChannels, highlights } = get()
+    const {
+      linkId, bio, selectedKeywords, instagramConnected, linkedinConnected,
+      onboardingContactChannels, highlights, onboardingTitle, onboardingSchool,
+    } = get()
     set({
       isLoggedIn: true,
       user: {
         name: SAMPLE_PROFILE.name,
         linkId: linkId || SAMPLE_PROFILE.linkId,
-        title: SAMPLE_PROFILE.title,
-        school: SAMPLE_PROFILE.school,
+        title: onboardingTitle.trim() || SAMPLE_PROFILE.title,
+        school: onboardingSchool.trim() || SAMPLE_PROFILE.school,
         bio: bio || SAMPLE_PROFILE.bio,
         selectedKeywords: selectedKeywords.length > 0 ? selectedKeywords : SAMPLE_PROFILE.selectedKeywords,
         avatarColor: SAMPLE_PROFILE.avatarColor,
@@ -259,6 +274,8 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       agreedTerms: false,
       agreedPrivacy: false,
       agreedMarketing: false,
+      onboardingTitle: SAMPLE_PROFILE.title,
+      onboardingSchool: SAMPLE_PROFILE.school,
       linkId: '',
       selectedKeywords: [],
       instagramConnected: false,
@@ -345,14 +362,16 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   },
 }), {
   name: 'byro-store',
-  partialize: (state) => ({
-    isLoggedIn: state.isLoggedIn,
-    user: state.user,
-    step: state.step,
-    agreedTerms: state.agreedTerms,
-    agreedPrivacy: state.agreedPrivacy,
-    agreedMarketing: state.agreedMarketing,
-    linkId: state.linkId,
+      partialize: (state) => ({
+        isLoggedIn: state.isLoggedIn,
+        user: state.user,
+        step: state.step,
+        agreedTerms: state.agreedTerms,
+        agreedPrivacy: state.agreedPrivacy,
+        agreedMarketing: state.agreedMarketing,
+        onboardingTitle: state.onboardingTitle,
+        onboardingSchool: state.onboardingSchool,
+        linkId: state.linkId,
     selectedKeywords: state.selectedKeywords,
     instagramConnected: state.instagramConnected,
     linkedinConnected: state.linkedinConnected,

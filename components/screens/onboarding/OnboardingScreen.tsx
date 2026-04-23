@@ -743,6 +743,7 @@ function Step7Highlight() {
   const [hlTitle, setHlTitle] = useState('')
   const [hlYear, setHlYear] = useState('')
   const [hlDesc, setHlDesc] = useState('')
+  const highlightLimitReached = store.highlights.length >= 5
 
   const resetForm = () => {
     setSelectedCat(null)
@@ -752,6 +753,10 @@ function Step7Highlight() {
   }
 
   const handleAddHighlight = () => {
+    if (highlightLimitReached) {
+      showToast('하이라이트는 최대 5개까지 추가할 수 있어요')
+      return
+    }
     if (!selectedCat || !hlTitle) {
       showToast('카테고리와 제목을 입력해주세요')
       return
@@ -918,12 +923,20 @@ function Step7Highlight() {
         )}
 
         <button
-          onClick={() => setPickerOpen(true)}
-          className="w-full border border-dashed rounded-xl py-3 text-sm font-medium"
+          onClick={() => {
+            if (highlightLimitReached) {
+              showToast('하이라이트는 최대 5개까지 추가할 수 있어요')
+              return
+            }
+            setPickerOpen(true)
+          }}
+          disabled={highlightLimitReached}
+          className="w-full border border-dashed rounded-xl py-3 text-sm font-medium disabled:opacity-45"
           style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-secondary)' }}
         >
-          + 하이라이트 추가하기
+          {highlightLimitReached ? '하이라이트 5개를 모두 추가했어요' : '+ 하이라이트 추가하기'}
         </button>
+        <div className="micro-text mt-2 text-center">{store.highlights.length}/5</div>
       </div>
 
       <StepFooter
@@ -942,10 +955,10 @@ function Step7Highlight() {
           </div>
 
           <div className="space-y-6">
-            {HIGHLIGHT_GROUPS.map((group) => (
-              <div key={group.id}>
+            {HIGHLIGHT_GROUPS.map((group, groupIndex) => (
+              <div key={group.id} className={groupIndex > 0 ? 'border-t border-[var(--color-border-soft)] pt-5' : ''}>
                 <div className="mb-3 text-sm font-bold text-[var(--color-text-secondary)]">{group.label}</div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-4 gap-3">
                   {HIGHLIGHT_CATEGORIES.filter((cat) => cat.group === group.id).map((cat) => {
                     const certification = CERTIFICATION_HIGHLIGHTS.find((item) => item.categoryId === cat.id)
                     return (
@@ -961,17 +974,17 @@ function Step7Highlight() {
                           setSelectedCat(cat)
                           setMode('form')
                         }}
-                        className="relative rounded-[22px] border border-[var(--color-border-default)] bg-white px-4 py-4 text-center shadow-[0_6px_20px_rgba(17,17,17,0.04)]"
+                        className="relative rounded-[20px] border border-[var(--color-border-default)] bg-white px-3 py-4 text-center shadow-[0_4px_14px_rgba(17,17,17,0.03)]"
                       >
                         {cat.certificationOnly && (
                           <span className="absolute right-3 top-3 rounded-full bg-[#E8F5EC] px-2 py-0.5 text-[10px] font-semibold text-[#217A43]">
                             인증
                           </span>
                         )}
-                        <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-soft)] text-[var(--color-text-secondary)]">
-                          <HighlightIcon id={cat.icon as HighlightIconId} size={19} />
+                        <div className="mx-auto mb-2 flex items-center justify-center text-[var(--color-text-secondary)]">
+                          <HighlightIcon id={cat.icon as HighlightIconId} size={22} />
                         </div>
-                        <div className="text-[14px] font-bold leading-[1.45] text-[var(--color-text-primary)]">{cat.label}</div>
+                        <div className="text-[12px] font-bold leading-[1.4] text-[var(--color-text-primary)] break-keep">{cat.label}</div>
                       </button>
                     )
                   })}

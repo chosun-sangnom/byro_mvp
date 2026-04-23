@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ChevronDown, ChevronUp, Bookmark, Copy, Mail, MessageCircle, Phone, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import {
-  Button, Chip, BottomSheet, Modal, TextArea, InfoBox, showToast,
+  Button, Chip, BottomSheet, Modal, TextArea, showToast,
 } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { CareerContinuityChart } from '@/components/highlights/CareerContinuityChart'
@@ -779,15 +779,10 @@ export default function PublicProfile({
         <div className="text-center">
           <div className="text-3xl mb-3">🤝</div>
           <div className="text-sm font-black mb-3">경험을 남겼어요!</div>
+          <div className="meta-text mb-4">{profile.name} 님의 평판이 쌓였어요!</div>
           {store.isLoggedIn ? (
             <>
-              <InfoBox variant="info">이지민 님에게 경험 요청을 보내보세요.</InfoBox>
-              <div className="mt-4 space-y-2">
-                <Button onClick={() => { showToast('이지민 님에게 경험 요청을 보냈어요!'); setExpDoneModal(false) }}>
-                  이지민 님에게 경험 요청하기
-                </Button>
-                <Button variant="outline" onClick={() => setExpDoneModal(false)}>프로필로 돌아가기</Button>
-              </div>
+              <Button variant="outline" onClick={() => setExpDoneModal(false)}>프로필로 돌아가기</Button>
             </>
           ) : (
             <>

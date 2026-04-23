@@ -325,10 +325,6 @@ function StepBasicInfo() {
   const [title, setTitle] = useState(store.onboardingTitle)
   const [school, setSchool] = useState(store.onboardingSchool)
 
-  useEffect(() => {
-    store.setOnboardingBasicInfo({ title, school })
-  }, [school, store, title])
-
   const canNext = title.trim().length > 0 && school.trim().length > 0
 
   return (
@@ -353,7 +349,11 @@ function StepBasicInfo() {
           <label className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wide mb-1 block">직함</label>
           <input
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => {
+              const nextValue = e.target.value
+              setTitle(nextValue)
+              store.setOnboardingBasicInfo({ title: nextValue })
+            }}
             placeholder="예: 스타트업 마케터"
             className="w-full border rounded-xl px-4 py-3 text-sm outline-none"
             style={{ borderColor: 'var(--color-border-default)' }}
@@ -363,7 +363,11 @@ function StepBasicInfo() {
           <label className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wide mb-1 block">학력</label>
           <input
             value={school}
-            onChange={(e) => setSchool(e.target.value)}
+            onChange={(e) => {
+              const nextValue = e.target.value
+              setSchool(nextValue)
+              store.setOnboardingBasicInfo({ school: nextValue })
+            }}
             placeholder="예: 연세대학교 경영학과 졸업"
             className="w-full border rounded-xl px-4 py-3 text-sm outline-none"
             style={{ borderColor: 'var(--color-border-default)' }}

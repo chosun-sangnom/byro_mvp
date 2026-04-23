@@ -723,7 +723,7 @@ function HighlightManageScreen({
   onBack: () => void
 }) {
   const store = useByroStore()
-  const [mode, setMode] = useState<'list' | 'picker' | 'form'>('list')
+  const [mode, setMode] = useState<'list' | 'picker' | 'form' | 'cert'>('list')
   const [editingHl, setEditingHl] = useState<typeof SAMPLE_PROFILE.manualHighlights[0] | Highlight | null>(null)
   const [selectedCat, setSelectedCat] = useState<typeof HIGHLIGHT_CATEGORIES[0] | null>(null)
   const [hlTitle, setHlTitle] = useState('')
@@ -788,6 +788,60 @@ function HighlightManageScreen({
     setEditingHl(null)
   }
 
+  if (mode === 'cert' && selectedCert) {
+    return (
+      <div className="flex flex-col h-full">
+        <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
+          <button onClick={() => { setSelectedCert(null); setMode('picker') }} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+          <span className="text-base font-black">{selectedCert.title} 인증</span>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-5 py-5">
+          <div className="surface-card rounded-[28px] p-5">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-secondary)]">
+              <HighlightIcon id={selectedCert.icon as HighlightIconId} size={20} />
+            </div>
+            <div className="mt-4 text-[22px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">{selectedCert.title}</div>
+            <div className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
+              {selectedCert.summary}
+            </div>
+          </div>
+
+          <div className="surface-card mt-4 rounded-[28px] p-5">
+            <div className="text-sm font-bold text-[var(--color-text-strong)]">인증 방법</div>
+            <div className="mt-3 space-y-3 text-sm leading-6 text-[var(--color-text-secondary)]">
+              <p>1. 아래 이메일 주소로 {selectedCert.emailLabel}를 보내주세요.</p>
+              <p>2. 확인이 끝나면 프로필 하이라이트에 인증 항목으로 반영돼요.</p>
+            </div>
+
+            <div className="mt-5 rounded-[22px] border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-4">
+              <div className="micro-text mb-2">나의 Byro 인증 이메일 주소</div>
+              <div className="flex items-center gap-2">
+                <div className="min-w-0 flex-1 truncate text-sm font-mono font-bold text-[var(--color-text-strong)]">
+                  {userLinkId}@data.byro.io
+                </div>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${userLinkId}@data.byro.io`).catch(() => {})
+                    showToast('복사됐어요!')
+                  }}
+                  className="rounded-xl bg-[var(--color-accent-dark)] px-3 py-2 text-xs font-semibold text-white"
+                >
+                  복사
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-5 flex gap-2">
+              <Button variant="outline" onClick={() => { setSelectedCert(null); setMode('picker') }}>이전</Button>
+              <Button onClick={() => { setSelectedCert(null); setMode('list'); showToast('인증 메일 발송 후 반영을 기다려주세요') }}>확인</Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   if (mode === 'form') {
     return (
       <div className="flex flex-col h-full">
@@ -796,28 +850,33 @@ function HighlightManageScreen({
           <span className="text-base font-black">{editingHl ? '하이라이트 수정하기' : '하이라이트 추가하기'}</span>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-5 py-4">
+        <div className="flex-1 overflow-y-auto px-5 py-5">
           {selectedCat && (
-            <div className="mb-4 rounded-2xl border border-[#E7E2DC] bg-white px-4 py-3">
+            <div className="surface-card mb-4 rounded-[26px] px-4 py-4">
               <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
+                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
                   <HighlightIcon id={selectedCat.icon as HighlightIconId} size={18} />
                 </span>
                 <div>
-                  <div className="text-sm font-bold text-[var(--color-text-strong)]">{selectedCat.label}</div>
-                  <div className="micro-text">직접 입력으로 추가돼요</div>
+                  <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{selectedCat.label}</div>
+                  <div className="micro-text">프로필에 직접 입력한 경험으로 표시돼요</div>
                 </div>
               </div>
             </div>
           )}
-          <div className="space-y-2 mb-4">
-            <input value={hlTitle} onChange={(e) => setHlTitle(e.target.value)} placeholder="제목 (필수)"
-              className="w-full border border-[#ddd] rounded-xl px-4 py-2.5 text-sm outline-none" />
-            <input value={hlYear} onChange={(e) => setHlYear(e.target.value)} placeholder="연도 (예: 2023)" type="number"
-              className="w-full border border-[#ddd] rounded-xl px-4 py-2.5 text-sm outline-none" />
-            <TextArea value={hlDesc} onChange={setHlDesc} placeholder="설명 (선택, 150자)" maxLength={150} rows={3} />
+          <div className="surface-card rounded-[26px] p-4">
+            <div className="space-y-3 mb-4">
+              <input value={hlTitle} onChange={(e) => setHlTitle(e.target.value)} placeholder="제목"
+                className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
+              <input value={hlYear} onChange={(e) => setHlYear(e.target.value)} placeholder="연도 (예: 2023)" type="number"
+                className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
+              <TextArea value={hlDesc} onChange={setHlDesc} placeholder="어떤 경험인지 간단히 적어주세요" maxLength={150} rows={4} />
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setMode('picker')}>이전</Button>
+              <Button onClick={handleSave}>{editingHl ? '수정하기' : '저장하기'}</Button>
+            </div>
           </div>
-          <Button onClick={handleSave}>{editingHl ? '수정하기' : '저장'}</Button>
         </div>
       </div>
     )
@@ -831,9 +890,12 @@ function HighlightManageScreen({
           <span className="text-base font-black">하이라이트 추가</span>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-5 py-4 pb-8">
-          <div className="rounded-[18px] bg-[#EEF8F0] px-4 py-3 text-sm font-semibold text-[#3F7B54] mb-5">
-            표시 항목은 인증 연동이 가능해요
+        <div className="flex-1 overflow-y-auto px-5 py-5 pb-8">
+          <div className="surface-card rounded-[28px] px-5 py-5 mb-5">
+            <div className="text-[22px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">어떤 하이라이트를 추가할까요?</div>
+            <div className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
+              인증 가능한 항목은 서류 확인 후 자동으로 표시되고, 경험형 항목은 직접 입력해서 바로 추가할 수 있어요.
+            </div>
           </div>
 
           <div className="space-y-6">
@@ -847,19 +909,29 @@ function HighlightManageScreen({
                       onClick={() => {
                         if (cat.certificationOnly) {
                           const certItem = CERTIFICATION_ITEMS.find((item) => item.categoryId === cat.id)
-                          if (certItem) setSelectedCert(certItem)
+                          if (certItem) {
+                            setSelectedCert(certItem)
+                            setMode('cert')
+                          }
                           return
                         }
                         setSelectedCat(cat)
                         setMode('form')
                       }}
-                      className="relative min-h-[110px] rounded-[22px] border border-[#E7E2DC] bg-white px-3 py-4 text-center shadow-[0_6px_20px_rgba(17,17,17,0.04)]"
+                      className="group relative min-h-[120px] rounded-[24px] border border-[#E7E2DC] bg-white px-3 py-4 text-left shadow-[0_8px_24px_rgba(17,17,17,0.04)] transition-colors hover:border-[#D6CFC8]"
                     >
-                      {cat.certificationOnly && <span className="absolute right-3 top-3 h-2.5 w-2.5 rounded-full bg-[#4D8D5C]" />}
-                      <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
+                      {cat.certificationOnly && (
+                        <span className="absolute right-3 top-3 rounded-full bg-[#E8F5EC] px-2 py-0.5 text-[10px] font-semibold text-[#217A43]">
+                          인증
+                        </span>
+                      )}
+                      <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
                         <HighlightIcon id={cat.icon as HighlightIconId} size={18} />
                       </div>
                       <div className="text-[13px] font-bold leading-[1.45] text-[var(--color-text-primary)]">{cat.label}</div>
+                      <div className="mt-2 text-[11px] leading-5 text-[var(--color-text-tertiary)]">
+                        {cat.certificationOnly ? '인증 자료를 보내면 반영돼요' : '직접 입력해서 바로 추가할 수 있어요'}
+                      </div>
                     </button>
                   ))}
                 </div>
@@ -867,23 +939,6 @@ function HighlightManageScreen({
             ))}
           </div>
         </div>
-
-        <Modal open={selectedCert !== null} onClose={() => setSelectedCert(null)}>
-          <div className="text-center">
-            <div className="mb-3 flex justify-center text-[var(--color-text-secondary)]"><Mail size={20} /></div>
-            <div className="text-sm font-black mb-2">{selectedCert?.title} 인증</div>
-            <div className="text-xs text-[#555] leading-relaxed mb-4">아래 이메일 주소로<br />{selectedCert?.emailLabel ?? '인증 서류'}를 발송해주세요.</div>
-            <div className="border-2 border-[#0A0A0A] rounded-xl px-3 py-2 mb-4">
-              <div className="text-xs text-[#888] mb-1">나의 Byro 인증 이메일 주소</div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-mono font-bold">{userLinkId}@data.byro.io</span>
-                <button onClick={() => { navigator.clipboard.writeText(`${userLinkId}@data.byro.io`).catch(() => {}); showToast('복사됐어요!') }}
-                  className="text-xs text-white bg-[#0A0A0A] rounded-lg px-2 py-1 ml-2">복사</button>
-              </div>
-            </div>
-            <Button onClick={() => setSelectedCert(null)}>확인</Button>
-          </div>
-        </Modal>
       </div>
     )
   }

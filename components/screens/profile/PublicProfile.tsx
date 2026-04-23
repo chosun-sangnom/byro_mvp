@@ -530,12 +530,7 @@ export default function PublicProfile({
                       const isOpen = store.hlOpenStates[toggleKey] ?? false
                       const category = HIGHLIGHT_CATEGORIES.find((item) => item.id === hl.categoryId)
                       return (
-                        <div key={hl.id} className="relative overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
-                          {isVerified && (
-                            <span className="absolute -right-2 -top-2 z-10 inline-flex h-7 w-7 items-center justify-center rounded-full bg-white text-[#217A43] shadow-[0_4px_12px_rgba(17,17,17,0.10)]">
-                              <BadgeCheck size={15} />
-                            </span>
-                          )}
+                        <div key={hl.id} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
                           <button
                             onClick={() => store.toggleHlOpen(toggleKey)}
                             className="flex w-full items-center gap-3 px-4 py-3 text-left"
@@ -548,6 +543,9 @@ export default function PublicProfile({
                                 <>
                                   <div className="flex flex-wrap items-center gap-2">
                                     <span className="text-[15px] font-bold text-[var(--color-text-strong)]">{hl.title}</span>
+                                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-[#217A43] shadow-[0_2px_8px_rgba(17,17,17,0.08)]">
+                                      <BadgeCheck size={12} />
+                                    </span>
                                   </div>
                                   <div className="micro-text mt-0.5">{hl.subtitle}</div>
                                 </>

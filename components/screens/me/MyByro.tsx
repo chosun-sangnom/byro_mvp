@@ -973,10 +973,7 @@ function HighlightManageScreen({
                     if (entry.kind === 'verified') {
                       const isOpen = certOpen[entry.item.title]
                       return (
-                        <div key={entry.item.categoryId} className="relative overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
-                          <span className="absolute -right-2 -top-2 z-10 inline-flex h-7 w-7 items-center justify-center rounded-full bg-white text-[#217A43] shadow-[0_4px_12px_rgba(17,17,17,0.10)]">
-                            <BadgeCheck size={15} />
-                          </span>
+                        <div key={entry.item.categoryId} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
                           <button onClick={() => toggleCert(entry.item.title)} className="flex w-full items-center gap-3 px-4 py-4 text-left">
                             <span className="flex h-11 w-8 items-center justify-center text-[var(--color-text-strong)]">
                               <HighlightIcon id={entry.item.icon as HighlightIconId} size={18} />
@@ -984,6 +981,9 @@ function HighlightManageScreen({
                             <div className="flex-1">
                               <div className="flex items-center gap-2">
                                 <span className="text-[15px] font-bold text-[var(--color-text-strong)]">{entry.item.title}</span>
+                                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-[#217A43] shadow-[0_2px_8px_rgba(17,17,17,0.08)]">
+                                  <BadgeCheck size={12} />
+                                </span>
                               </div>
                               <div className="micro-text mt-0.5">{entry.item.summary}</div>
                             </div>

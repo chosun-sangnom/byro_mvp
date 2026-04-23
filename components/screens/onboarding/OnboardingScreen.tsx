@@ -12,7 +12,7 @@ import {
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import type { ContactChannel, HighlightIconId } from '@/types'
 import {
-  KEYWORD_GROUPS, HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS, AI_BIO_CANDIDATES,
+  KEYWORD_GROUPS, HIGHLIGHT_CATEGORIES, AI_BIO_CANDIDATES,
   INSTAGRAM_PROFILE, LINKEDIN_PROFILE, SAMPLE_PROFILE,
 } from '@/lib/mockData'
 
@@ -734,7 +734,8 @@ function Step6Contact() {
 // ─── Step 7: 하이라이트 ───────────────────────────────────
 function Step7Highlight() {
   const store = useByroStore()
-  const [mode, setMode] = useState<'list' | 'picker' | 'form' | 'cert'>('list')
+  const [mode, setMode] = useState<'list' | 'form' | 'cert'>('list')
+  const [pickerOpen, setPickerOpen] = useState(false)
   const [selectedCert, setSelectedCert] = useState<(typeof CERTIFICATION_HIGHLIGHTS)[number] | null>(null)
 
   // 직접 입력 폼 상태
@@ -810,11 +811,11 @@ function Step7Highlight() {
           nextLabel="확인"
           onNext={() => {
             setSelectedCert(null)
-            setMode('picker')
+            setMode('list')
           }}
           onPrev={() => {
             setSelectedCert(null)
-            setMode('picker')
+            setMode('list')
           }}
         />
       </div>
@@ -877,74 +878,6 @@ function Step7Highlight() {
           canNext={Boolean(selectedCat && hlTitle.trim())}
           nextLabel="저장하기"
           onNext={handleAddHighlight}
-          onPrev={() => setMode('picker')}
-        />
-      </div>
-    )
-  }
-
-  if (mode === 'picker') {
-    return (
-      <div className="flex flex-col h-full">
-        <div className="flex-1 overflow-y-auto px-5 py-4">
-          <StepIntro
-            eyebrow="Highlight"
-            title={'어떤 하이라이트를\n추가할까요?'}
-            description={'인증 가능한 항목과 직접 입력 항목을 한 곳에서 고를 수 있어요.'}
-          />
-
-          <div className="surface-card rounded-[28px] px-5 py-5 mb-5">
-            <div className="text-sm leading-6 text-[var(--color-text-secondary)]">
-              인증 가능한 항목은 자료 확인 후 반영되고, 직접 입력 항목은 바로 추가돼요.
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            {HIGHLIGHT_GROUPS.map((group) => (
-              <div key={group.id}>
-                <div className="mb-3 text-sm font-bold text-[var(--color-text-secondary)]">{group.label}</div>
-                <div className="grid grid-cols-3 gap-3">
-                  {HIGHLIGHT_CATEGORIES.filter((cat) => cat.group === group.id).map((cat) => (
-                    <button
-                      key={cat.id}
-                      onClick={() => {
-                        if (cat.certificationOnly) {
-                          const certification = CERTIFICATION_HIGHLIGHTS.find((item) => item.categoryId === cat.id)
-                          if (certification) {
-                            setSelectedCert(certification)
-                            setMode('cert')
-                          }
-                          return
-                        }
-                        setSelectedCat(cat)
-                        setMode('form')
-                      }}
-                      className="relative min-h-[120px] rounded-[24px] border border-[var(--color-border-default)] bg-white px-3 py-4 text-left shadow-[0_8px_24px_rgba(17,17,17,0.04)]"
-                    >
-                      {cat.certificationOnly && (
-                        <span className="absolute right-3 top-3 rounded-full bg-[#E8F5EC] px-2 py-0.5 text-[10px] font-semibold text-[#217A43]">
-                          인증
-                        </span>
-                      )}
-                      <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
-                        <HighlightIcon id={cat.icon as HighlightIconId} size={18} />
-                      </div>
-                      <div className="text-[13px] font-bold leading-[1.45] text-[var(--color-text-primary)]">{cat.label}</div>
-                      <div className="mt-2 text-[11px] leading-5 text-[var(--color-text-tertiary)]">
-                        {cat.certificationOnly ? '자료를 보내면 인증 후 반영돼요' : '직접 적어서 바로 추가할 수 있어요'}
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <StepFooter
-          canNext={false}
-          nextLabel="다음"
-          onNext={() => {}}
           onPrev={() => setMode('list')}
         />
       </div>
@@ -985,7 +918,7 @@ function Step7Highlight() {
         )}
 
         <button
-          onClick={() => setMode('picker')}
+          onClick={() => setPickerOpen(true)}
           className="w-full border border-dashed rounded-xl py-3 text-sm font-medium"
           style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-secondary)' }}
         >
@@ -1000,6 +933,64 @@ function Step7Highlight() {
         onSkip={() => store.nextStep()}
         skipLabel="건너뛰기"
       />
+
+      <BottomSheet open={pickerOpen} onClose={() => setPickerOpen(false)}>
+        <div className="px-5 pb-6">
+          <div className="text-[22px] font-black tracking-[-0.03em] text-[var(--color-text-strong)] mb-1">경험 추가하기</div>
+          <div className="text-sm leading-6 text-[var(--color-text-secondary)] mb-5">
+            프로필에 보여줄 경험을 선택하세요.
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            {HIGHLIGHT_CATEGORIES.filter((cat) => !cat.certificationOnly).map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => {
+                  setPickerOpen(false)
+                  setSelectedCat(cat)
+                  setMode('form')
+                }}
+                className="rounded-[24px] border border-[var(--color-border-default)] bg-white px-4 py-5 text-center shadow-[0_6px_20px_rgba(17,17,17,0.04)]"
+              >
+                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-bg-soft)] text-[var(--color-text-secondary)]">
+                  <HighlightIcon id={cat.icon as HighlightIconId} size={20} />
+                </div>
+                <div className="text-[15px] font-bold leading-[1.45] text-[var(--color-text-primary)]">{cat.label}</div>
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-6">
+            <div className="mb-3 text-sm font-bold text-[var(--color-text-secondary)]">인증 가능한 항목</div>
+            <div className="space-y-2">
+              {HIGHLIGHT_CATEGORIES.filter((cat) => cat.certificationOnly).map((cat) => {
+                const certification = CERTIFICATION_HIGHLIGHTS.find((item) => item.categoryId === cat.id)
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      if (!certification) return
+                      setPickerOpen(false)
+                      setSelectedCert(certification)
+                      setMode('cert')
+                    }}
+                    className="flex w-full items-center gap-3 rounded-[20px] border border-[var(--color-border-default)] bg-white px-4 py-3 text-left"
+                  >
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--color-bg-soft)] text-[var(--color-text-secondary)]">
+                      <HighlightIcon id={cat.icon as HighlightIconId} size={18} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="text-sm font-bold text-[var(--color-text-primary)]">{cat.label}</div>
+                      <div className="micro-text">자료 확인 후 프로필에 반영돼요</div>
+                    </div>
+                    <span className="rounded-full bg-[#E8F5EC] px-2 py-0.5 text-[10px] font-semibold text-[#217A43]">인증</span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      </BottomSheet>
     </div>
   )
 }

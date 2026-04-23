@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { AlertCircle, CheckCircle2, Mail, MessageCircle, Pencil, Phone, Send, Sparkles, Trash2 } from 'lucide-react'
+import { AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, Mail, MessageCircle, Pencil, Phone, Send, Sparkles, Trash2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import {
   NavBar, StepBar, Button, Chip, CheckRow, BottomSheet, Modal,
@@ -198,26 +198,40 @@ function StepFooter({
   onNext,
   onPrev,
   onSkip,
-  nextLabel = '다음',
   skipLabel = '건너뛰기',
 }: {
   canNext: boolean
   onNext: () => void
   onPrev?: () => void
   onSkip?: () => void
-  nextLabel?: string
   skipLabel?: string
 }) {
   return (
     <div className="px-5 pb-5 pt-3 border-t border-[#EBEBEB] space-y-2">
-      <div className="grid grid-cols-2 gap-2">
-        <Button variant="outline" onClick={onPrev} disabled={!onPrev}>이전</Button>
-        <Button onClick={onNext} disabled={!canNext}>{nextLabel}</Button>
+      <div className="flex items-center justify-between gap-3">
+        <button
+          onClick={onPrev}
+          disabled={!onPrev}
+          className="inline-flex items-center gap-1.5 text-sm font-medium disabled:opacity-35"
+          style={{ color: onPrev ? 'var(--color-text-secondary)' : 'var(--color-text-tertiary)' }}
+        >
+          <ChevronLeft size={16} />
+          이전
+        </button>
+        <button
+          onClick={onNext}
+          disabled={!canNext}
+          className="inline-flex items-center gap-1.5 text-sm font-semibold disabled:opacity-35"
+          style={{ color: canNext ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}
+        >
+          다음
+          <ChevronRight size={16} />
+        </button>
       </div>
       {onSkip && (
-        <button className="w-full text-center text-sm text-[var(--color-text-secondary)]" onClick={onSkip}>
+        <Button variant="outline" onClick={onSkip}>
           {skipLabel}
-        </button>
+        </Button>
       )}
     </div>
   )
@@ -477,7 +491,7 @@ function Step5SNS() {
         <SelectionCard
           icon={<Image src="/images/Instagram.svg" alt="Instagram" width={24} height={24} className="w-6 h-6" />}
           title="Instagram"
-          subtitle={store.instagramConnected ? `@${INSTAGRAM_PROFILE.username} 연동됨` : '하드코딩된 Instagram 주소를 연결해 미리보기를 보여줍니다.'}
+          subtitle={store.instagramConnected ? `@${INSTAGRAM_PROFILE.username} 연동됨` : 'Instagram을 연결하면 미리보기를 보여드려요.'}
           badge={store.instagramConnected ? '연동됨' : '선택'}
         >
           <div className="flex items-center justify-between gap-3">
@@ -491,7 +505,7 @@ function Step5SNS() {
         <SelectionCard
           icon={<Image src="/images/linkedin.png" alt="LinkedIn" width={24} height={24} className="w-6 h-6" />}
           title="LinkedIn"
-          subtitle={store.linkedinConnected ? 'myongkoo-kang 연동됨' : '하드코딩된 LinkedIn 주소로 커리어 요약을 보여줍니다.'}
+          subtitle={store.linkedinConnected ? 'myongkoo-kang 연동됨' : 'LinkedIn을 연결하면 커리어 요약을 보여드려요.'}
           badge={store.linkedinConnected ? '연동됨' : '선택'}
         >
           <div className="flex items-center justify-between gap-3">

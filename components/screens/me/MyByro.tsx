@@ -983,7 +983,7 @@ function HighlightManageScreen({
                       return (
                         <div key={entry.item.categoryId} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
                           <button onClick={() => toggleCert(entry.item.title)} className="flex w-full items-center gap-3 px-4 py-4 text-left">
-                            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
+                            <span className="flex h-11 w-8 items-center justify-center text-[var(--color-text-strong)]">
                               <HighlightIcon id={entry.item.icon as HighlightIconId} size={18} />
                             </span>
                             <div className="flex-1">
@@ -1048,7 +1048,7 @@ function HighlightManageScreen({
                     return (
                       <div key={entry.item.id} className="rounded-[22px] border border-[#E7E2DC] bg-white px-4 py-4">
                         <div className="flex items-start gap-3">
-                          <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
+                          <span className="flex h-11 w-8 items-center justify-center text-[var(--color-text-strong)]">
                             <HighlightIcon id={entry.item.icon as HighlightIconId} size={18} />
                           </span>
                           <div className="min-w-0 flex-1">

@@ -526,7 +526,7 @@ export default function PublicProfile({
                             onClick={() => store.toggleHlOpen(toggleKey)}
                             className="flex w-full items-center gap-3 px-4 py-3 text-left"
                           >
-                            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
+                            <span className="flex h-11 w-8 items-center justify-center text-[var(--color-text-strong)]">
                               <HighlightIcon id={hl.icon as HighlightIconId} size={18} />
                             </span>
                             <div className="min-w-0 flex-1">

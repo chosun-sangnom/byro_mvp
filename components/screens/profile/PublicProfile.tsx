@@ -382,12 +382,14 @@ export default function PublicProfile({
 
         {/* ─── SNS 섹션 ─────────────────────────────── */}
         <div className="px-5 py-4">
-          <SectionTitle
-            title="SNS"
-            subtitle={`${Number(profile.instagramConnected) + Number(profile.linkedinConnected)}개 연동됨`}
-          />
+          <div className="surface-card rounded-[28px] px-4 py-4">
+            <SectionTitle
+              title="SNS"
+              subtitle={`${Number(profile.instagramConnected) + Number(profile.linkedinConnected)}개 연동됨`}
+              emphasis="secondary"
+            />
 
-          {profile.instagramConnected && (
+            {profile.instagramConnected && (
             <div className="mb-2 overflow-hidden rounded-[22px] border" style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-surface)' }}>
               <div className="flex items-center gap-3 px-4 py-3">
                 <button
@@ -441,9 +443,9 @@ export default function PublicProfile({
                 </div>
               )}
             </div>
-          )}
+            )}
 
-          {profile.linkedinConnected && (
+            {profile.linkedinConnected && (
             <div className="mb-2 overflow-hidden rounded-[22px] border" style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-surface)' }}>
               <div className="flex items-center gap-3 px-4 py-3">
                 <button
@@ -496,18 +498,20 @@ export default function PublicProfile({
                 </div>
               )}
             </div>
-          )}
+            )}
 
-          {!profile.instagramConnected && !profile.linkedinConnected && (
-            <p className="text-sm text-[#888]">연동된 SNS가 없습니다.</p>
-          )}
+            {!profile.instagramConnected && !profile.linkedinConnected && (
+              <p className="text-sm text-[#888]">연동된 SNS가 없습니다.</p>
+            )}
+          </div>
         </div>
 
         {/* ─── 하이라이트 섹션 ─────────────────────── */}
         <div className="px-5 py-4">
-          <SectionTitle title="하이라이트" subtitle={`인증 ${verifiedHighlights.length}개 · 직접 입력 ${profile.manualHighlights.length}개`} />
+          <div className="surface-card rounded-[28px] px-4 py-4">
+            <SectionTitle title="하이라이트" subtitle={`인증 ${verifiedHighlights.length}개 · 직접 입력 ${profile.manualHighlights.length}개`} emphasis="primary" />
 
-          <div className="space-y-6">
+            <div className="space-y-6">
             {groupedHighlights.map((group) => (
               <div key={group.id}>
                 <div className="mb-3 flex items-center gap-3">
@@ -634,12 +638,13 @@ export default function PublicProfile({
                 )}
               </div>
             ))}
+            </div>
           </div>
         </div>
 
         <div className="px-5 pt-2 pb-6">
-          <div className="surface-card-soft rounded-[26px] px-4 py-4">
-            <div className="micro-text mb-3 font-bold uppercase tracking-[0.16em]">Connect</div>
+          <div className="surface-card rounded-[28px] px-4 py-4">
+            <SectionTitle title="Connect" subtitle="프로필을 확인한 뒤 바로 연결할 수 있어요" emphasis="secondary" />
             {!isOwnerMode && (
               <div className="flex gap-2 mb-4">
                 <Button variant="outline" onClick={() => showToast('피드백 요청을 보냈어요!')}>피드백 요청</Button>
@@ -799,11 +804,24 @@ export default function PublicProfile({
   )
 }
 
-function SectionTitle({ title, subtitle }: { title: string; subtitle: string }) {
+function SectionTitle({
+  title,
+  subtitle,
+  emphasis = 'primary',
+}: {
+  title: string
+  subtitle: string
+  emphasis?: 'primary' | 'secondary'
+}) {
   return (
-    <div className="mb-3">
-      <div className="text-xs font-bold text-[#888] uppercase tracking-wider">{title}</div>
-      <div className="text-xs text-[#AAA] mt-1">{subtitle}</div>
+    <div className="mb-4">
+      <div className={emphasis === 'primary'
+        ? 'text-[17px] font-bold tracking-[-0.02em] text-[var(--color-text-strong)]'
+        : 'text-[15px] font-semibold tracking-[-0.01em] text-[var(--color-text-primary)]'}
+      >
+        {title}
+      </div>
+      <div className="text-[11px] text-[var(--color-text-tertiary)] mt-1">{subtitle}</div>
     </div>
   )
 }

@@ -6,6 +6,7 @@ import { ChevronDown, ChevronUp, Camera, Mail, MessageCircle, Phone } from 'luci
 import { useByroStore } from '@/store/useByroStore'
 import { Button, BottomSheet, Modal, showToast, TextArea } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
+import { CareerContinuityChart } from '@/components/highlights/CareerContinuityChart'
 import type { Highlight, ContactChannel, UserState, HighlightIconId } from '@/types'
 import {
   SAMPLE_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE,
@@ -998,16 +999,10 @@ function HighlightManageScreen({
                           {isOpen && (
                             <div className="border-t border-[#F1ECE6] bg-[#FBFAF8] px-4 py-4">
                               {entry.item.categoryId === 'career-continuity' && (
-                                <div className="grid grid-cols-2 gap-3">
-                                  <div className="rounded-2xl border border-[#E7E2DC] bg-white px-4 py-3 text-center">
-                                    <div className="text-xl font-black text-[#111]">{SAMPLE_PROFILE.careerHighlight.avgYears}년</div>
-                                    <div className="micro-text mt-1">평균 재직</div>
-                                  </div>
-                                  <div className="rounded-2xl border border-[#D9ECD9] bg-[#F5FFF5] px-4 py-3 text-center">
-                                    <div className="text-xl font-black text-[#217A43]">+{SAMPLE_PROFILE.careerHighlight.vsIndustryPercent}%</div>
-                                    <div className="micro-text mt-1">업계 대비</div>
-                                  </div>
-                                </div>
+                                <CareerContinuityChart
+                                  avgYears={SAMPLE_PROFILE.careerHighlight.avgYears}
+                                  vsIndustryPercent={SAMPLE_PROFILE.careerHighlight.vsIndustryPercent}
+                                />
                               )}
                               {entry.item.categoryId === 'corporate-longevity' && (
                                 <div className="grid grid-cols-3 gap-3">

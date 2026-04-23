@@ -8,6 +8,7 @@ import {
   Button, Chip, BottomSheet, Modal, TextArea, InfoBox, showToast,
 } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
+import { CareerContinuityChart } from '@/components/highlights/CareerContinuityChart'
 import {
   SAMPLE_PROFILE, JIMIN_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE, HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS,
 } from '@/lib/mockData'
@@ -544,16 +545,10 @@ export default function PublicProfile({
                           {isOpen && (
                             <div className="border-t border-[#F1ECE6] bg-[#FBFAF8] px-4 py-4">
                               {hl.categoryId === 'career-continuity' && (
-                                <div className="grid grid-cols-2 gap-3">
-                                  <div className="rounded-2xl border border-[#E7E2DC] bg-white px-4 py-3 text-center">
-                                    <div className="text-xl font-black text-[#111]">{profile.careerHighlight.avgYears}년</div>
-                                    <div className="micro-text mt-1">평균 재직</div>
-                                  </div>
-                                  <div className="rounded-2xl border border-[#D9ECD9] bg-[#F5FFF5] px-4 py-3 text-center">
-                                    <div className="text-xl font-black text-[#217A43]">+{profile.careerHighlight.vsIndustryPercent}%</div>
-                                    <div className="micro-text mt-1">업계 대비</div>
-                                  </div>
-                                </div>
+                                <CareerContinuityChart
+                                  avgYears={profile.careerHighlight.avgYears}
+                                  vsIndustryPercent={profile.careerHighlight.vsIndustryPercent}
+                                />
                               )}
                               {hl.categoryId === 'remember-network' && (
                                 <>

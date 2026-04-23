@@ -17,8 +17,6 @@ export function CorporateLongevityTimeline({
   companies: CorporateCompany[]
   footer?: string
 }) {
-  const maxYears = Math.max(...companies.map((company) => company.years), 1)
-
   return (
     <div className="rounded-[22px] border border-[#E7E2DC] bg-white px-4 py-4">
       <div className="mb-4">
@@ -26,13 +24,16 @@ export function CorporateLongevityTimeline({
         <div className="mt-1 text-[11px] text-[var(--color-text-tertiary)]">{summary}</div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         {companies.map((company) => (
-          <div key={`${company.name}-${company.startYear}`}>
-            <div className="mb-1.5 flex items-center justify-between gap-3">
+          <div
+            key={`${company.name}-${company.startYear}`}
+            className="rounded-[18px] border border-[#F0ECE7] bg-[#FBFAF8] px-3.5 py-3"
+          >
+            <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="truncate text-[12px] font-semibold text-[var(--color-text-strong)]">{company.name}</div>
-                <div className="text-[11px] text-[var(--color-text-tertiary)]">
+                <div className="mt-1 text-[11px] text-[var(--color-text-tertiary)]">
                   {company.startYear} - {company.endYear ?? '현재'}
                 </div>
               </div>
@@ -41,15 +42,11 @@ export function CorporateLongevityTimeline({
               </div>
             </div>
 
-            <div className="h-3 overflow-hidden rounded-full bg-[#F1EFEC]">
-              <div
-                className="h-full rounded-full bg-[#111111]"
-                style={{ width: `${(company.years / maxYears) * 100}%` }}
-              />
-            </div>
-
-            <div className="mt-1.5 text-right text-[11px] font-semibold text-[var(--color-text-secondary)]">
-              {company.years}년 운영
+            <div className="mt-3 flex items-center gap-2">
+              <div className="h-px flex-1 bg-[#DED8D1]" />
+              <div className="text-[11px] font-semibold text-[var(--color-text-secondary)]">
+                운영 {company.years}년
+              </div>
             </div>
           </div>
         ))}

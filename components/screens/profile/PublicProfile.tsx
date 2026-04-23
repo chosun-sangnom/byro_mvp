@@ -126,22 +126,22 @@ export default function PublicProfile({
       description: '명함 기반 직업 네트워크 구성이 인증되어 공개됩니다.',
       year: '',
     },
-    {
+    ...(!isJimin ? [{
       id: `verified-airline-${username}`,
-      categoryId: 'airline-mileage',
-      icon: 'plane',
+      categoryId: 'airline-mileage' as const,
+      icon: 'plane' as const,
       title: '항공 마일리지',
       subtitle: airlineHighlight.tierSummary,
       description: '항공사 회원 등급으로 이동성과 출장 경험을 보여줍니다.',
       year: '',
-    },
+    }] : []),
   ]
   const groupedHighlights = HIGHLIGHT_GROUPS.map((group) => ({
     ...group,
     items: [...verifiedHighlights, ...profile.manualHighlights].filter(
       (item) => HIGHLIGHT_CATEGORIES.find((category) => category.id === item.categoryId)?.group === group.id,
     ),
-  }))
+  })).filter((group) => group.items.length > 0)
 
   // SNS 토글
   const igOpen = store.snsOpenStates['instagram_' + username] ?? false
@@ -505,7 +505,7 @@ export default function PublicProfile({
 
         {/* ─── 하이라이트 섹션 ─────────────────────── */}
         <div className="px-5 py-4">
-          <SectionTitle title="하이라이트" subtitle={`인증 4개 · 직접 입력 ${profile.manualHighlights.length}개`} />
+          <SectionTitle title="하이라이트" subtitle={`인증 ${verifiedHighlights.length}개 · 직접 입력 ${profile.manualHighlights.length}개`} />
 
           <div className="space-y-6">
             {groupedHighlights.map((group) => (

@@ -129,6 +129,7 @@ export const SAMPLE_PROFILE = {
   manualHighlights: [
     { id: 'mh1', categoryId: 'talk', icon: 'mic', title: 'TEDx Seoul 2023', subtitle: '강연 / 연설 · 직접 입력', description: '신뢰 기반 네트워킹의 미래를 주제로 강연', year: '2023' },
     { id: 'mh2', categoryId: 'collab', icon: 'handshake', title: '일본 파트너사 협업 프로젝트', subtitle: '협업 프로젝트 · 직접 입력', description: '6개월 간 일본 파트너사와 B2B 제품 공동 개발', year: '2022' },
+    { id: 'mh3', categoryId: 'award', icon: 'trophy', title: 'K-Startup Excellence 2024', subtitle: '수상 / 표창 · 직접 입력', description: '초기 스타트업 성장 전략 부문 우수 사례로 선정', year: '2024' },
   ] as Highlight[],
   experiences: [
     { id: 'e1', authorName: '김지수', isAnonymous: false, keywords: ['전문적인', '통찰력 있는'], message: '정말 통찰력 있는 분이에요. 같이 일하고 싶다!', date: '2일 전' },
@@ -223,9 +224,7 @@ export const JIMIN_PROFILE = {
       { name: '투자', ratio: 16 },
     ],
   },
-  manualHighlights: [
-    { id: 'jh1', categoryId: 'talk', icon: 'mic', title: 'TEDx Seoul 2023', subtitle: '강연 / 연설 · 직접 입력', description: '기술과 사람의 연결에 대해 강연', year: '2023' },
-  ] as Highlight[],
+  manualHighlights: [] as Highlight[],
   reputationKeywords: [
     { keyword: '전문적인', count: 5 },
     { keyword: '신뢰할 수 있는', count: 4 },

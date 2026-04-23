@@ -551,11 +551,11 @@ export default function PublicProfile({
                                 </>
                               ) : (
                                 <>
-                                  <div className="text-[11px] font-semibold text-[var(--color-text-secondary)]">
+                                  <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
                                     {category?.label ?? '직접 입력'}
                                   </div>
-                                  <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                    <span className="text-[14px] font-semibold text-[var(--color-text-strong)]">{hl.title}</span>
+                                  <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                                    <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{hl.title}</span>
                                     {hl.year && (
                                       <span className="text-[11px] text-[var(--color-text-tertiary)]">{hl.year}</span>
                                     )}

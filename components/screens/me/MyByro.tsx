@@ -908,18 +908,11 @@ function HighlightManageScreen({
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-5 pb-8">
-          <div className="surface-card rounded-[28px] px-5 py-5 mb-5">
-            <div className="text-[22px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">어떤 하이라이트를 추가할까요?</div>
-            <div className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">
-              인증 가능한 항목은 서류 확인 후 자동으로 표시되고, 경험형 항목은 직접 입력해서 바로 추가할 수 있어요.
-            </div>
-          </div>
-
           <div className="space-y-6">
-            {HIGHLIGHT_GROUPS.map((group) => (
-              <div key={group.id}>
-                <div className="mb-3 text-sm font-bold text-[#7E766E]">{group.label}</div>
-                <div className="grid grid-cols-3 gap-3">
+            {HIGHLIGHT_GROUPS.map((group, groupIndex) => (
+              <div key={group.id} className={groupIndex > 0 ? 'border-t border-[var(--color-border-soft)] pt-5' : ''}>
+                <div className="mb-3 text-sm font-bold text-[var(--color-text-secondary)]">{group.label}</div>
+                <div className="grid grid-cols-4 gap-3">
                   {HIGHLIGHT_CATEGORIES.filter((cat) => cat.group === group.id).map((cat) => (
                     <button
                       key={cat.id}
@@ -935,20 +928,17 @@ function HighlightManageScreen({
                         setSelectedCat(cat)
                         setMode('form')
                       }}
-                      className="group relative min-h-[120px] rounded-[24px] border border-[#E7E2DC] bg-white px-3 py-4 text-left shadow-[0_8px_24px_rgba(17,17,17,0.04)] transition-colors hover:border-[#D6CFC8]"
+                      className="relative rounded-[20px] border border-[var(--color-border-default)] bg-white px-3 py-4 text-center shadow-[0_4px_14px_rgba(17,17,17,0.03)]"
                     >
                       {cat.certificationOnly && (
                         <span className="absolute right-3 top-3 rounded-full bg-[#E8F5EC] px-2 py-0.5 text-[10px] font-semibold text-[#217A43]">
                           인증
                         </span>
                       )}
-                      <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
+                      <div className="mx-auto mb-2 flex items-center justify-center text-[var(--color-text-secondary)]">
                         <HighlightIcon id={cat.icon as HighlightIconId} size={16} />
                       </div>
-                      <div className="text-[13px] font-bold leading-[1.45] text-[var(--color-text-primary)]">{cat.label}</div>
-                      <div className="mt-2 text-[11px] leading-5 text-[var(--color-text-tertiary)]">
-                        {cat.certificationOnly ? '인증 자료를 보내면 반영돼요' : '직접 입력해서 바로 추가할 수 있어요'}
-                      </div>
+                      <div className="text-[12px] font-bold leading-[1.4] text-[var(--color-text-primary)] break-keep">{cat.label}</div>
                     </button>
                   ))}
                 </div>
@@ -1043,11 +1033,11 @@ function HighlightManageScreen({
                             <HighlightIcon id={entry.item.icon as HighlightIconId} size={18} />
                           </span>
                           <div className="min-w-0 flex-1">
-                            <div className="text-[11px] font-semibold text-[var(--color-text-secondary)]">
+                            <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
                               {category?.label ?? '직접 입력'}
                             </div>
-                            <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-                              <span className="text-[14px] font-semibold text-[var(--color-text-strong)]">{entry.item.title}</span>
+                            <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                              <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{entry.item.title}</span>
                               {entry.item.year && (
                                 <span className="text-[11px] text-[var(--color-text-tertiary)]">{entry.item.year}</span>
                               )}

@@ -8,6 +8,8 @@ import { Button, BottomSheet, Modal, showToast, TextArea } from '@/components/ui
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { CareerContinuityChart } from '@/components/highlights/CareerContinuityChart'
 import { CorporateLongevityTimeline } from '@/components/highlights/CorporateLongevityTimeline'
+import { RememberNetworkGraph } from '@/components/highlights/RememberNetworkGraph'
+import { AirlineMileageSummary } from '@/components/highlights/AirlineMileageSummary'
 import type { Highlight, ContactChannel, UserState, HighlightIconId } from '@/types'
 import {
   SAMPLE_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE,
@@ -1004,17 +1006,17 @@ function HighlightManageScreen({
                                 />
                               )}
                               {entry.item.categoryId === 'remember-network' && (
-                                <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">리멤버 명함 기반 네트워크가 인증되면 직업 네트워크 구성이 공개됩니다.</div>
+                                <RememberNetworkGraph
+                                  total={SAMPLE_PROFILE.rememberHighlight.total}
+                                  industries={SAMPLE_PROFILE.rememberHighlight.industries}
+                                />
                               )}
                               {entry.item.categoryId === 'airline-mileage' && (
-                                <div className="space-y-2">
-                                  {SAMPLE_PROFILE.airlineHighlight.airlines.map((airline) => (
-                                    <div key={airline.name} className="flex items-center justify-between rounded-2xl border border-[#E7E2DC] bg-white px-4 py-3">
-                                      <div className="text-sm text-[var(--color-text-secondary)]">{airline.name}</div>
-                                      <div className="text-sm font-bold text-[var(--color-text-strong)]">{airline.tier}</div>
-                                    </div>
-                                  ))}
-                                </div>
+                                <AirlineMileageSummary
+                                  badgeLabel="글로벌 비즈니스"
+                                  tierSummary={SAMPLE_PROFILE.airlineHighlight.tierSummary}
+                                  airlines={SAMPLE_PROFILE.airlineHighlight.airlines}
+                                />
                               )}
                             </div>
                           )}

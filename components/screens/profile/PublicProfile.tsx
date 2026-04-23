@@ -10,6 +10,8 @@ import {
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { CareerContinuityChart } from '@/components/highlights/CareerContinuityChart'
 import { CorporateLongevityTimeline } from '@/components/highlights/CorporateLongevityTimeline'
+import { RememberNetworkGraph } from '@/components/highlights/RememberNetworkGraph'
+import { AirlineMileageSummary } from '@/components/highlights/AirlineMileageSummary'
 import {
   SAMPLE_PROFILE, JIMIN_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE, HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS,
 } from '@/lib/mockData'
@@ -574,30 +576,10 @@ export default function PublicProfile({
                                 />
                               )}
                               {hl.categoryId === 'remember-network' && (
-                                <>
-                                  <svg viewBox="0 0 200 150" className="w-full h-auto mb-2">
-                                    <circle cx="100" cy="75" r="20" fill="#333" stroke="#fff" strokeWidth="2" />
-                                    <text x="100" y="79" textAnchor="middle" fontSize="8" fill="#fff" fontWeight="700">나</text>
-                                    {profile.rememberHighlight.industries.map((ind, index) => {
-                                      const positions = [
-                                        { cx: 100, cy: 22, r: 18 },
-                                        { cx: 168, cy: 75, r: 15 },
-                                        { cx: 100, cy: 128, r: 13 },
-                                        { cx: 32, cy: 75, r: 14 },
-                                      ]
-                                      const pos = positions[index] ?? { cx: 100, cy: 22, r: 14 }
-                                      return (
-                                        <g key={ind.name}>
-                                          <line x1="100" y1="75" x2={pos.cx} y2={pos.cy} stroke="#ccc" strokeWidth="1" />
-                                          <circle cx={pos.cx} cy={pos.cy} r={pos.r} fill={['#111', '#444', '#666', '#999'][index] ?? '#888'} stroke="#fff" strokeWidth="2" />
-                                          <text x={pos.cx} y={pos.cy - 3} textAnchor="middle" fontSize="6" fill="#fff">{ind.name}</text>
-                                          <text x={pos.cx} y={pos.cy + 6} textAnchor="middle" fontSize="7" fill="#fff" fontWeight="700">{ind.ratio}%</text>
-                                        </g>
-                                      )
-                                    })}
-                                  </svg>
-                                  <div className="text-xs text-[#bbb] text-right">리멤버 명함 기준 · 총 {profile.rememberHighlight.total}명</div>
-                                </>
+                                <RememberNetworkGraph
+                                  total={profile.rememberHighlight.total}
+                                  industries={profile.rememberHighlight.industries}
+                                />
                               )}
                               {hl.categoryId === 'corporate-longevity' && (
                                 <CorporateLongevityTimeline
@@ -606,21 +588,11 @@ export default function PublicProfile({
                                 />
                               )}
                               {hl.categoryId === 'airline-mileage' && (
-                                <div>
-                                  {airlineBadgeLabel && (
-                                    <div className="mb-3 inline-flex items-center rounded-full border border-[#E5E5E5] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#333]">
-                                      {airlineBadgeLabel}
-                                    </div>
-                                  )}
-                                  <div className="space-y-2">
-                                    {airlineHighlight.airlines.map((airline) => (
-                                      <div key={airline.name} className="flex items-center justify-between rounded-2xl border border-[#E7E2DC] bg-white px-4 py-3">
-                                        <div className="text-sm text-[var(--color-text-secondary)]">{airline.name}</div>
-                                        <div className="text-sm font-bold text-[var(--color-text-strong)]">{airline.tier}</div>
-                                      </div>
-                                    ))}
-                                  </div>
-                                </div>
+                                <AirlineMileageSummary
+                                  badgeLabel={airlineBadgeLabel}
+                                  tierSummary={airlineHighlight.tierSummary}
+                                  airlines={airlineHighlight.airlines}
+                                />
                               )}
                               {!isVerified && (
                                 <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">

@@ -324,6 +324,11 @@ function HeroSection({
             {secondaryLabel}
           </Button>
           {!isLoggedIn && (
+            <div className="text-xs text-[var(--color-text-tertiary)]">
+              샘플 프로필은 실제 기능이 아니라 플로우 검증용 화면이에요.
+            </div>
+          )}
+          {!isLoggedIn && (
             <button
               onClick={onLogin}
               className="text-sm font-medium text-[var(--color-text-secondary)]"
@@ -947,6 +952,11 @@ function FinalCTASection({
           >
             {isLoggedIn ? '샘플 보기' : secondaryLabel}
           </Button>
+          {!isLoggedIn && (
+            <div className="text-xs text-[var(--color-text-tertiary)]">
+              샘플 프로필은 실제 기능이 아니라 플로우 검증용 화면이에요.
+            </div>
+          )}
           {!isLoggedIn && (
             <button
               onClick={onLogin}

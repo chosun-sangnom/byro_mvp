@@ -12,7 +12,7 @@ import {
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import type { ContactChannel, HighlightIconId } from '@/types'
 import {
-  KEYWORD_GROUPS, HIGHLIGHT_CATEGORIES, AI_BIO_CANDIDATES,
+  KEYWORD_GROUPS, HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS, AI_BIO_CANDIDATES,
   INSTAGRAM_PROFILE, LINKEDIN_PROFILE, SAMPLE_PROFILE,
 } from '@/lib/mockData'
 
@@ -941,53 +941,43 @@ function Step7Highlight() {
             프로필에 보여줄 경험을 선택하세요.
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            {HIGHLIGHT_CATEGORIES.filter((cat) => !cat.certificationOnly).map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => {
-                  setPickerOpen(false)
-                  setSelectedCat(cat)
-                  setMode('form')
-                }}
-                className="rounded-[24px] border border-[var(--color-border-default)] bg-white px-4 py-5 text-center shadow-[0_6px_20px_rgba(17,17,17,0.04)]"
-              >
-                <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-bg-soft)] text-[var(--color-text-secondary)]">
-                  <HighlightIcon id={cat.icon as HighlightIconId} size={20} />
+          <div className="space-y-6">
+            {HIGHLIGHT_GROUPS.map((group) => (
+              <div key={group.id}>
+                <div className="mb-3 text-sm font-bold text-[var(--color-text-secondary)]">{group.label}</div>
+                <div className="grid grid-cols-2 gap-3">
+                  {HIGHLIGHT_CATEGORIES.filter((cat) => cat.group === group.id).map((cat) => {
+                    const certification = CERTIFICATION_HIGHLIGHTS.find((item) => item.categoryId === cat.id)
+                    return (
+                      <button
+                        key={cat.id}
+                        onClick={() => {
+                          setPickerOpen(false)
+                          if (cat.certificationOnly && certification) {
+                            setSelectedCert(certification)
+                            setMode('cert')
+                            return
+                          }
+                          setSelectedCat(cat)
+                          setMode('form')
+                        }}
+                        className="relative rounded-[22px] border border-[var(--color-border-default)] bg-white px-4 py-4 text-center shadow-[0_6px_20px_rgba(17,17,17,0.04)]"
+                      >
+                        {cat.certificationOnly && (
+                          <span className="absolute right-3 top-3 rounded-full bg-[#E8F5EC] px-2 py-0.5 text-[10px] font-semibold text-[#217A43]">
+                            인증
+                          </span>
+                        )}
+                        <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-soft)] text-[var(--color-text-secondary)]">
+                          <HighlightIcon id={cat.icon as HighlightIconId} size={19} />
+                        </div>
+                        <div className="text-[14px] font-bold leading-[1.45] text-[var(--color-text-primary)]">{cat.label}</div>
+                      </button>
+                    )
+                  })}
                 </div>
-                <div className="text-[15px] font-bold leading-[1.45] text-[var(--color-text-primary)]">{cat.label}</div>
-              </button>
+              </div>
             ))}
-          </div>
-
-          <div className="mt-6">
-            <div className="mb-3 text-sm font-bold text-[var(--color-text-secondary)]">인증 가능한 항목</div>
-            <div className="space-y-2">
-              {HIGHLIGHT_CATEGORIES.filter((cat) => cat.certificationOnly).map((cat) => {
-                const certification = CERTIFICATION_HIGHLIGHTS.find((item) => item.categoryId === cat.id)
-                return (
-                  <button
-                    key={cat.id}
-                    onClick={() => {
-                      if (!certification) return
-                      setPickerOpen(false)
-                      setSelectedCert(certification)
-                      setMode('cert')
-                    }}
-                    className="flex w-full items-center gap-3 rounded-[20px] border border-[var(--color-border-default)] bg-white px-4 py-3 text-left"
-                  >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[var(--color-bg-soft)] text-[var(--color-text-secondary)]">
-                      <HighlightIcon id={cat.icon as HighlightIconId} size={18} />
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-sm font-bold text-[var(--color-text-primary)]">{cat.label}</div>
-                      <div className="micro-text">자료 확인 후 프로필에 반영돼요</div>
-                    </div>
-                    <span className="rounded-full bg-[#E8F5EC] px-2 py-0.5 text-[10px] font-semibold text-[#217A43]">인증</span>
-                  </button>
-                )
-              })}
-            </div>
           </div>
         </div>
       </BottomSheet>

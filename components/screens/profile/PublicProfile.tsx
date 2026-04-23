@@ -215,6 +215,12 @@ export default function PublicProfile({
     }
   }
 
+  const handleLogout = () => {
+    const nextLinkId = profile.linkId
+    store.logout()
+    router.replace(`/${nextLinkId}`)
+  }
+
   return (
     <div className="flex flex-col h-full">
       {/* 상단 네비 */}
@@ -251,6 +257,13 @@ export default function PublicProfile({
           </div>
         ) : (
           <div className="flex items-center gap-3">
+            <button
+              onClick={handleLogout}
+              className="text-xs font-medium text-[var(--color-text-secondary)]"
+              aria-label="로그아웃"
+            >
+              로그아웃
+            </button>
             <button
               onClick={handleCopyProfileLink}
               className="icon-button"

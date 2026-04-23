@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { AlertCircle, CheckCircle2, Mail, MessageCircle, Pencil, Phone, Sparkles, Trash2 } from 'lucide-react'
+import { AlertCircle, BadgeCheck, CheckCircle2, Mail, MessageCircle, Pencil, Phone, Sparkles, Trash2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import {
   NavBar, StepBar, Button, Chip, CheckRow, BottomSheet, Modal,
@@ -864,8 +864,8 @@ function Step7Highlight() {
                           className="relative rounded-[20px] border border-[var(--color-border-default)] bg-white px-3 py-4 text-center shadow-[0_4px_14px_rgba(17,17,17,0.03)]"
                         >
                           {cat.certificationOnly && (
-                            <span className="absolute right-3 top-3 rounded-full bg-[#E8F5EC] px-2 py-0.5 text-[10px] font-semibold text-[#217A43]">
-                              인증
+                            <span className="absolute right-2.5 top-2.5 inline-flex h-6 w-6 items-center justify-center rounded-full bg-white text-[#217A43] shadow-[0_4px_10px_rgba(17,17,17,0.08)]">
+                              <BadgeCheck size={14} />
                             </span>
                           )}
                           <div className="mx-auto mb-2 flex items-center justify-center text-[var(--color-text-secondary)]">

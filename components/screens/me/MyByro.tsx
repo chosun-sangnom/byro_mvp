@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, ChevronUp, Camera, Mail, MessageCircle, Phone, Send } from 'lucide-react'
+import { ChevronDown, ChevronUp, Camera, Mail, MessageCircle, Phone } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { Button, BottomSheet, Modal, showToast, TextArea } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
@@ -1301,7 +1301,6 @@ function ContactTypeIcon({
     phone: Phone,
     email: Mail,
     kakao: MessageCircle,
-    telegram: Send,
   }
   const Icon = iconMap[channelId] ?? MessageCircle
 
@@ -1321,7 +1320,6 @@ function buildContactHref(id: ContactChannel['id'], value: string) {
   if (id === 'phone') return `tel:${trimmed.replace(/[^0-9+]/g, '')}`
   if (id === 'email') return `mailto:${trimmed}`
   if (id === 'kakao') return trimmed.startsWith('http') ? trimmed : `https://open.kakao.com/o/${trimmed}`
-  if (id === 'telegram') return trimmed.startsWith('http') ? trimmed : `https://t.me/${trimmed.replace(/^@/, '')}`
   return ''
 }
 
@@ -1329,7 +1327,6 @@ function contactPlaceholder(id?: ContactChannel['id']) {
   if (id === 'phone') return '010-1234-5678'
   if (id === 'email') return 'name@byro.io'
   if (id === 'kakao') return 'openchat 코드 또는 URL'
-  if (id === 'telegram') return '@username 또는 URL'
   return ''
 }
 

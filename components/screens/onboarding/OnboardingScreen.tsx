@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, Mail, MessageCircle, Pencil, Phone, Send, Sparkles, Trash2 } from 'lucide-react'
+import { AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, Mail, MessageCircle, Pencil, Phone, Sparkles, Trash2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import {
   NavBar, StepBar, Button, Chip, CheckRow, BottomSheet, Modal,
@@ -155,7 +155,6 @@ function ContactTypeIcon({
     phone: Phone,
     email: Mail,
     kakao: MessageCircle,
-    telegram: Send,
   }
   const Icon = iconMap[channelId] ?? MessageCircle
 
@@ -175,7 +174,6 @@ function buildContactHref(id: ContactChannel['id'], value: string) {
   if (id === 'phone') return `tel:${trimmed.replace(/[^0-9+]/g, '')}`
   if (id === 'email') return `mailto:${trimmed}`
   if (id === 'kakao') return trimmed.startsWith('http') ? trimmed : `https://open.kakao.com/o/${trimmed}`
-  if (id === 'telegram') return trimmed.startsWith('http') ? trimmed : `https://t.me/${trimmed.replace(/^@/, '')}`
   return ''
 }
 
@@ -183,7 +181,6 @@ function contactPlaceholder(id?: ContactChannel['id']) {
   if (id === 'phone') return '010-1234-5678'
   if (id === 'email') return 'name@byro.io'
   if (id === 'kakao') return 'openchat 코드 또는 URL'
-  if (id === 'telegram') return '@username 또는 URL'
   return ''
 }
 
@@ -582,11 +579,11 @@ function Step6Contact() {
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto px-5 py-4">
-      <StepIntro
-        eyebrow="Contact"
-        title={'연락 수단을\n연결해보세요'}
-        description={'프로필을 본 사람이 바로 연락할 수 있어요.\n원하는 수단만 골라 연결해 주세요.'}
-      />
+        <StepIntro
+          eyebrow="Contact"
+          title={'연락 수단을\n연결해보세요'}
+          description={'프로필을 본 사람이 바로 연락할 수 있어요.\n전화, 이메일, 카카오 중에서 연결할 수 있어요.'}
+        />
 
         <div className="surface-card-soft p-4 mb-4">
           <div className="flex items-center justify-between">
@@ -649,7 +646,7 @@ function Step6Contact() {
                 <ContactTypeIcon channelId={selectedChannel.id} enabled={Boolean(inputValue.trim())} />
                 <div className="min-w-0">
                   <div className="text-sm font-bold text-[var(--color-text-strong)]">{selectedChannel.label}</div>
-                  <div className="meta-text">{selectedChannel.id === 'phone' ? '전화번호를 입력하면 바로 걸 수 있어요.' : selectedChannel.id === 'email' ? '이메일 주소를 입력하면 메일로 연결돼요.' : selectedChannel.id === 'kakao' ? '오픈채팅 링크나 코드를 입력해 주세요.' : '텔레그램 사용자명이나 링크를 입력해 주세요.'}</div>
+                  <div className="meta-text">{selectedChannel.id === 'phone' ? '전화번호를 입력하면 바로 걸 수 있어요.' : selectedChannel.id === 'email' ? '이메일 주소를 입력하면 메일로 연결돼요.' : '오픈채팅 링크나 코드를 입력해 주세요.'}</div>
                 </div>
               </div>
 

@@ -66,7 +66,7 @@ export interface ReceivedRequest {
 }
 
 export interface ContactChannel {
-  id: 'phone' | 'email' | 'kakao' | 'telegram'
+  id: 'phone' | 'email' | 'kakao'
   label: string
   value: string
   href?: string

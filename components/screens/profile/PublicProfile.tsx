@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronDown, ChevronUp, Bookmark, Copy, Mail, MessageCircle, Phone, Send, Share2 } from 'lucide-react'
+import { ChevronDown, ChevronUp, Bookmark, Copy, Mail, MessageCircle, Phone, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import {
   Button, Chip, BottomSheet, Modal, TextArea, InfoBox, showToast,
@@ -843,7 +843,6 @@ function ContactActionButton({
     phone: Phone,
     email: Mail,
     kakao: MessageCircle,
-    telegram: Send,
   }
   const Icon = iconMap[channel.id as keyof typeof iconMap] ?? MessageCircle
 

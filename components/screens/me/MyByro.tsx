@@ -7,6 +7,7 @@ import { useByroStore } from '@/store/useByroStore'
 import { Button, BottomSheet, Modal, showToast, TextArea } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { CareerContinuityChart } from '@/components/highlights/CareerContinuityChart'
+import { CorporateLongevityTimeline } from '@/components/highlights/CorporateLongevityTimeline'
 import type { Highlight, ContactChannel, UserState, HighlightIconId } from '@/types'
 import {
   SAMPLE_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE,
@@ -1005,20 +1006,10 @@ function HighlightManageScreen({
                                 />
                               )}
                               {entry.item.categoryId === 'corporate-longevity' && (
-                                <div className="grid grid-cols-3 gap-3">
-                                  <div className="rounded-2xl border border-[#E7E2DC] bg-white px-3 py-3 text-center">
-                                    <div className="text-lg font-black text-[#111]">{SAMPLE_PROFILE.corporateHighlight.companyCount}개</div>
-                                    <div className="micro-text mt-1">운영 법인</div>
-                                  </div>
-                                  <div className="rounded-2xl border border-[#E7E2DC] bg-white px-3 py-3 text-center">
-                                    <div className="text-lg font-black text-[#111]">{SAMPLE_PROFILE.corporateHighlight.averageOperatingYears}년</div>
-                                    <div className="micro-text mt-1">평균 운영</div>
-                                  </div>
-                                  <div className="rounded-2xl border border-[#D9ECD9] bg-[#F5FFF5] px-3 py-3 text-center">
-                                    <div className="text-sm font-black text-[#217A43]">정상 운영</div>
-                                    <div className="micro-text mt-1">폐업 이력 없음</div>
-                                  </div>
-                                </div>
+                                <CorporateLongevityTimeline
+                                  summary={SAMPLE_PROFILE.corporateHighlight.summary}
+                                  companies={SAMPLE_PROFILE.corporateHighlight.companies}
+                                />
                               )}
                               {entry.item.categoryId === 'remember-network' && (
                                 <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">리멤버 명함 기반 네트워크가 인증되면 직업 네트워크 구성이 공개됩니다.</div>

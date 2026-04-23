@@ -9,6 +9,7 @@ import {
 } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { CareerContinuityChart } from '@/components/highlights/CareerContinuityChart'
+import { CorporateLongevityTimeline } from '@/components/highlights/CorporateLongevityTimeline'
 import {
   SAMPLE_PROFILE, JIMIN_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE, HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS,
 } from '@/lib/mockData'
@@ -77,7 +78,14 @@ export default function PublicProfile({
   const contactChannels = 'contactChannels' in rawProfile ? rawProfile.contactChannels : []
   const corporateHighlight = 'corporateHighlight' in rawProfile
     ? rawProfile.corporateHighlight
-    : { companyCount: 1, years: 4, summary: '창업 4년차 · 정상 운영 중 · 폐업 이력 없음' }
+    : {
+      companyCount: 1,
+      years: 4,
+      summary: '창업 4년차 · 정상 운영 중 · 폐업 이력 없음',
+      companies: [
+        { name: 'Byro Studio', startYear: 2022, endYear: null, years: 4, status: '정상 운영' },
+      ],
+    }
   const airlineHighlight = 'airlineHighlight' in rawProfile
     ? rawProfile.airlineHighlight
     : { tierSummary: '대한항공 모닝캄', badgeLevel: 'business_traveler', airlines: [{ name: '대한항공', tier: '모닝캄' }] }
@@ -577,20 +585,10 @@ export default function PublicProfile({
                                 </>
                               )}
                               {hl.categoryId === 'corporate-longevity' && (
-                                <div className="grid grid-cols-3 gap-3">
-                                  <div className="rounded-2xl border border-[#E7E2DC] bg-white px-3 py-3 text-center">
-                                    <div className="text-lg font-black text-[#111]">{corporateHighlight.companyCount}개</div>
-                                    <div className="micro-text mt-1">운영 법인</div>
-                                  </div>
-                                  <div className="rounded-2xl border border-[#E7E2DC] bg-white px-3 py-3 text-center">
-                                    <div className="text-lg font-black text-[#111]">{'averageOperatingYears' in corporateHighlight ? corporateHighlight.averageOperatingYears : corporateHighlight.years}년</div>
-                                    <div className="micro-text mt-1">운영 기간</div>
-                                  </div>
-                                  <div className="rounded-2xl border border-[#D9ECD9] bg-[#F5FFF5] px-3 py-3 text-center">
-                                    <div className="text-sm font-black text-[#217A43]">정상 운영</div>
-                                    <div className="micro-text mt-1">폐업 이력 없음</div>
-                                  </div>
-                                </div>
+                                <CorporateLongevityTimeline
+                                  summary={corporateHighlight.summary}
+                                  companies={corporateHighlight.companies}
+                                />
                               )}
                               {hl.categoryId === 'airline-mileage' && (
                                 <div>

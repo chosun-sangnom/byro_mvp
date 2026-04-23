@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, Mail, MessageCircle, Pencil, Phone, Sparkles, Trash2 } from 'lucide-react'
+import { AlertCircle, CheckCircle2, Mail, MessageCircle, Pencil, Phone, Sparkles, Trash2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import {
   NavBar, StepBar, Button, Chip, CheckRow, BottomSheet, Modal,
@@ -205,30 +205,14 @@ function StepFooter({
 }) {
   return (
     <div className="px-5 pb-5 pt-3 border-t border-[#EBEBEB] space-y-2">
-      <div className="flex items-center justify-between gap-3">
-        <button
-          onClick={onPrev}
-          disabled={!onPrev}
-          className="inline-flex items-center gap-1.5 text-sm font-medium disabled:opacity-35"
-          style={{ color: onPrev ? 'var(--color-text-secondary)' : 'var(--color-text-tertiary)' }}
-        >
-          <ChevronLeft size={16} />
-          이전
-        </button>
-        <button
-          onClick={onNext}
-          disabled={!canNext}
-          className="inline-flex items-center gap-1.5 text-sm font-semibold disabled:opacity-35"
-          style={{ color: canNext ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}
-        >
-          다음
-          <ChevronRight size={16} />
-        </button>
+      <div className="grid grid-cols-2 gap-2">
+        <Button variant="outline" onClick={onPrev} disabled={!onPrev}>이전</Button>
+        <Button onClick={onNext} disabled={!canNext}>다음</Button>
       </div>
       {onSkip && (
-        <Button variant="outline" onClick={onSkip}>
+        <button className="w-full text-center text-sm text-[var(--color-text-secondary)]" onClick={onSkip}>
           {skipLabel}
-        </Button>
+        </button>
       )}
     </div>
   )

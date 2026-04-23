@@ -384,7 +384,6 @@ export default function PublicProfile({
         <div className="px-5 py-4">
           <SectionTitle
             title="SNS"
-            subtitle={`${Number(profile.instagramConnected) + Number(profile.linkedinConnected)}개 연동됨`}
           />
 
           {profile.instagramConnected && (
@@ -505,7 +504,7 @@ export default function PublicProfile({
 
         {/* ─── 하이라이트 섹션 ─────────────────────── */}
         <div className="px-5 py-4">
-          <SectionTitle title="하이라이트" subtitle={`인증 ${verifiedHighlights.length}개 · 직접 입력 ${profile.manualHighlights.length}개`} />
+          <SectionTitle title="하이라이트" />
 
           <div className="space-y-6">
             {groupedHighlights.map((group) => (
@@ -638,7 +637,7 @@ export default function PublicProfile({
         </div>
 
         <div className="px-5 pt-2 pb-6">
-          <SectionTitle title="Connect" subtitle="프로필을 확인한 뒤 바로 연결할 수 있어요" />
+          <SectionTitle title="Connect" />
             {!isOwnerMode && (
               <div className="flex gap-2 mb-4">
                 <Button variant="outline" onClick={() => showToast('피드백 요청을 보냈어요!')}>피드백 요청</Button>
@@ -802,12 +801,12 @@ function SectionTitle({
   subtitle,
 }: {
   title: string
-  subtitle: string
+  subtitle?: string
 }) {
   return (
     <div className="mb-4">
       <div className="text-[17px] font-bold tracking-[-0.02em] text-[var(--color-text-strong)]">{title}</div>
-      <div className="text-[11px] text-[var(--color-text-tertiary)] mt-1">{subtitle}</div>
+      {subtitle && <div className="text-[11px] text-[var(--color-text-tertiary)] mt-1">{subtitle}</div>}
     </div>
   )
 }

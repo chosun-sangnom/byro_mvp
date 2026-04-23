@@ -748,7 +748,7 @@ function HighlightManageScreen({
     ],
   }))
 
-  const openEditSheet = (hl: typeof SAMPLE_PROFILE.manualHighlights[0]) => {
+  const openEditSheet = (hl: Highlight) => {
     const cat = HIGHLIGHT_CATEGORIES.find((c) => c.id === hl.categoryId) ?? null
     setSelectedCat(cat)
     setHlTitle(hl.title)
@@ -872,7 +872,7 @@ function HighlightManageScreen({
             <div className="surface-card mb-4 rounded-[26px] px-4 py-4">
               <div className="flex items-center gap-3">
                 <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
-                  <HighlightIcon id={selectedCat.icon as HighlightIconId} size={18} />
+                  <HighlightIcon id={selectedCat.icon as HighlightIconId} size={16} />
                 </span>
                 <div>
                   <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{selectedCat.label}</div>
@@ -943,7 +943,7 @@ function HighlightManageScreen({
                         </span>
                       )}
                       <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
-                        <HighlightIcon id={cat.icon as HighlightIconId} size={18} />
+                        <HighlightIcon id={cat.icon as HighlightIconId} size={16} />
                       </div>
                       <div className="text-[13px] font-bold leading-[1.45] text-[var(--color-text-primary)]">{cat.label}</div>
                       <div className="mt-2 text-[11px] leading-5 text-[var(--color-text-tertiary)]">
@@ -1031,45 +1031,65 @@ function HighlightManageScreen({
                     }
 
                     const isEditable = store.highlights.some((item) => item.id === entry.item.id)
+                    const isOpen = certOpen[entry.item.id]
+                    const category = HIGHLIGHT_CATEGORIES.find((item) => item.id === entry.item.categoryId)
                     return (
-                      <div key={entry.item.id} className="rounded-[22px] border border-[#E7E2DC] bg-white px-4 py-4">
-                        <div className="flex items-start gap-3">
+                      <div key={entry.item.id} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
+                        <button
+                          onClick={() => toggleCert(entry.item.id)}
+                          className="flex w-full items-center gap-3 px-4 py-4 text-left"
+                        >
                           <span className="flex h-11 w-8 items-center justify-center text-[var(--color-text-strong)]">
                             <HighlightIcon id={entry.item.icon as HighlightIconId} size={18} />
                           </span>
                           <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span className="text-[15px] font-bold text-[var(--color-text-strong)]">{entry.item.title}</span>
-                              
+                            <div className="text-[11px] font-semibold text-[var(--color-text-secondary)]">
+                              {category?.label ?? '직접 입력'}
                             </div>
-                            <div className="micro-text mt-1">{entry.item.year ? `${entry.item.year} · ` : ''}{entry.item.subtitle.split('·')[0].trim()}</div>
-                            {entry.item.description && <div className="text-sm leading-relaxed text-[var(--color-text-secondary)] mt-2">{entry.item.description}</div>}
+                            <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                              <span className="text-[14px] font-semibold text-[var(--color-text-strong)]">{entry.item.title}</span>
+                              {entry.item.year && (
+                                <span className="text-[11px] text-[var(--color-text-tertiary)]">{entry.item.year}</span>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                        <div className="mt-3 flex gap-2">
-                          <button
-                            onClick={() => {
-                              if (isEditable) openEditSheet(entry.item)
-                              else showToast('기본 목업 항목은 수정하지 않습니다')
-                            }}
-                            className="rounded-lg border border-[#CFC7BF] px-3 py-1.5 text-xs font-medium text-[#555]"
-                          >
-                            수정
-                          </button>
-                          <button
-                            onClick={() => {
-                              if (isEditable) {
-                                store.removeHighlight(entry.item.id)
-                                showToast('삭제됐어요')
-                                return
-                              }
-                              showToast('기본 목업 항목은 삭제하지 않습니다')
-                            }}
-                            className="rounded-lg border border-[#F2C7C5] px-3 py-1.5 text-xs font-medium text-[#C9473D]"
-                          >
-                            삭제
-                          </button>
-                        </div>
+                          {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
+                        </button>
+                        {isOpen && (
+                          <div className="border-t border-[#F1ECE6] bg-[#FBFAF8] px-4 py-4">
+                            <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
+                              {entry.item.description || '세부 설명이 아직 없어요.'}
+                              <div className="micro-text mt-2">
+                                {category?.label ?? entry.item.subtitle}
+                                {entry.item.year ? ` · ${entry.item.year}` : ''}
+                              </div>
+                            </div>
+                            <div className="mt-3 flex gap-2">
+                              <button
+                                onClick={() => {
+                                  if (isEditable) openEditSheet(entry.item)
+                                  else showToast('기본 목업 항목은 수정하지 않습니다')
+                                }}
+                                className="rounded-lg border border-[#CFC7BF] px-3 py-1.5 text-xs font-medium text-[#555]"
+                              >
+                                수정
+                              </button>
+                              <button
+                                onClick={() => {
+                                  if (isEditable) {
+                                    store.removeHighlight(entry.item.id)
+                                    showToast('삭제됐어요')
+                                    return
+                                  }
+                                  showToast('기본 목업 항목은 삭제하지 않습니다')
+                                }}
+                                className="rounded-lg border border-[#F2C7C5] px-3 py-1.5 text-xs font-medium text-[#C9473D]"
+                              >
+                                삭제
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )
                   })}

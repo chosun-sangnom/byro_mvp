@@ -528,6 +528,7 @@ export default function PublicProfile({
                       const isVerified = hl.id.startsWith('verified-')
                       const toggleKey = `${hl.id}_${username}`
                       const isOpen = store.hlOpenStates[toggleKey] ?? false
+                      const category = HIGHLIGHT_CATEGORIES.find((item) => item.id === hl.categoryId)
                       return (
                         <div key={hl.id} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
                           <button
@@ -538,15 +539,29 @@ export default function PublicProfile({
                               <HighlightIcon id={hl.icon as HighlightIconId} size={18} />
                             </span>
                             <div className="min-w-0 flex-1">
-                              <div className="flex flex-wrap items-center gap-2">
-                                <span className="text-[15px] font-bold text-[var(--color-text-strong)]">{hl.title}</span>
-                                {isVerified && (
-                                  <span className="rounded-full bg-[#E8F5EC] px-2 py-0.5 text-[11px] font-semibold text-[#217A43]">
-                                    인증됨
-                                  </span>
-                                )}
-                              </div>
-                              <div className="micro-text mt-0.5">{hl.subtitle}</div>
+                              {isVerified ? (
+                                <>
+                                  <div className="flex flex-wrap items-center gap-2">
+                                    <span className="text-[15px] font-bold text-[var(--color-text-strong)]">{hl.title}</span>
+                                    <span className="rounded-full bg-[#E8F5EC] px-2 py-0.5 text-[11px] font-semibold text-[#217A43]">
+                                      인증됨
+                                    </span>
+                                  </div>
+                                  <div className="micro-text mt-0.5">{hl.subtitle}</div>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="text-[11px] font-semibold text-[var(--color-text-secondary)]">
+                                    {category?.label ?? '직접 입력'}
+                                  </div>
+                                  <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                                    <span className="text-[14px] font-semibold text-[var(--color-text-strong)]">{hl.title}</span>
+                                    {hl.year && (
+                                      <span className="text-[11px] text-[var(--color-text-tertiary)]">{hl.year}</span>
+                                    )}
+                                  </div>
+                                </>
+                              )}
                             </div>
                             {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
                           </button>
@@ -610,7 +625,10 @@ export default function PublicProfile({
                               {!isVerified && (
                                 <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
                                   {hl.description || '세부 설명이 아직 없어요.'}
-                                  <div className="micro-text mt-2">{hl.year ? `${hl.year} · ` : ''}{hl.subtitle}</div>
+                                  <div className="micro-text mt-2">
+                                    {category?.label ?? hl.subtitle}
+                                    {hl.year ? ` · ${hl.year}` : ''}
+                                  </div>
                                 </div>
                               )}
                             </div>

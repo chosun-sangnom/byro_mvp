@@ -869,7 +869,7 @@ function Step7Highlight() {
                             </span>
                           )}
                           <div className="mx-auto mb-2 flex items-center justify-center text-[var(--color-text-secondary)]">
-                            <HighlightIcon id={cat.icon as HighlightIconId} size={22} />
+                            <HighlightIcon id={cat.icon as HighlightIconId} size={16} />
                           </div>
                           <div className="text-[12px] font-bold leading-[1.4] text-[var(--color-text-primary)] break-keep">{cat.label}</div>
                         </button>

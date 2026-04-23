@@ -510,7 +510,10 @@ export default function PublicProfile({
           <div className="space-y-6">
             {groupedHighlights.map((group) => (
               <div key={group.id}>
-                <div className="mb-3 text-sm font-bold text-[#7E766E]">{group.label} {group.items.length}개</div>
+                <div className="mb-3 flex items-center gap-3">
+                  <div className="text-xs font-semibold text-[#8E867E]">{group.label} {group.items.length}개</div>
+                  <div className="h-px flex-1 bg-[#E7E2DC]" />
+                </div>
                 {group.items.length > 0 ? (
                   <div className="space-y-2">
                     {group.items.map((hl) => {

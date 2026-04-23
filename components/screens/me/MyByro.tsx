@@ -28,33 +28,34 @@ const CERTIFICATION_ITEMS = [
     categoryId: 'career-continuity',
     icon: 'briefcase',
     title: '커리어 지속성',
-    summary: '건강보험공단 기준 · 2026.04 인증',
-    pickerDescription: '건강보험공단 기준 장기 재직 이력을 인증해요',
-    emailLabel: '건강보험공단 경력 증빙 자료',
+    summary: '본인확인 후 자동으로 재직 이력을 불러와요',
+    pickerDescription: '본인확인 후 건강보험공단 기준 장기 재직 이력을 자동으로 불러와요',
+    automated: true,
   },
   {
     categoryId: 'corporate-longevity',
     icon: 'building2',
     title: '법인 영속성',
-    summary: '법인 운영 기간과 정상 운영 여부를 인증해요',
-    pickerDescription: '법인 운영 기간과 정상 운영 여부를 인증해요',
-    emailLabel: '법인 운영 증빙 서류',
+    summary: '본인확인 후 법인 운영 정보를 자동으로 불러와요',
+    pickerDescription: '본인확인 후 법인 운영 기간과 정상 운영 여부를 자동으로 불러와요',
+    automated: true,
   },
   {
     categoryId: 'remember-network',
     icon: 'users',
-    title: '리멤버 네트워크',
-    summary: '리멤버 명함 기반 직업 네트워크를 인증해요',
-    pickerDescription: '리멤버 명함 기반 직업 네트워크를 인증해요',
+    title: '리멤버 직업 네트워크',
+    summary: '리멤버 명함 파일과 이메일로 직업 네트워크를 인증해요',
+    pickerDescription: '리멤버 명함 파일을 메일로 보내면 직업 네트워크를 인증해요',
+    automated: false,
     emailLabel: '리멤버 명함 내보내기 파일',
   },
   {
     categoryId: 'airline-mileage',
     icon: 'plane',
     title: '항공 마일리지',
-    summary: '항공사 회원 등급으로 출장형 프로필을 인증해요',
-    pickerDescription: '항공사 회원 등급으로 출장형 프로필을 인증해요',
-    emailLabel: '항공사 회원 등급 확인 자료',
+    summary: '본인확인 후 항공사 등급 정보를 자동으로 불러와요',
+    pickerDescription: '본인확인 후 항공사 회원 등급을 자동으로 불러와요',
+    automated: true,
   },
 ] as const
 
@@ -809,28 +810,42 @@ function HighlightManageScreen({
 
           <div className="surface-card mt-4 rounded-[28px] p-5">
             <div className="text-sm font-bold text-[var(--color-text-strong)]">인증 방법</div>
-            <div className="mt-3 space-y-3 text-sm leading-6 text-[var(--color-text-secondary)]">
-              <p>1. 아래 이메일 주소로 {selectedCert.emailLabel}를 보내주세요.</p>
-              <p>2. 확인이 끝나면 프로필 하이라이트에 인증 항목으로 반영돼요.</p>
-            </div>
-
-            <div className="mt-5 rounded-[22px] border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-4">
-              <div className="micro-text mb-2">나의 Byro 인증 이메일 주소</div>
-              <div className="flex items-center gap-2">
-                <div className="min-w-0 flex-1 truncate text-sm font-mono font-bold text-[var(--color-text-strong)]">
-                  {userLinkId}@data.byro.io
+            {selectedCert.automated ? (
+              <>
+                <div className="mt-3 space-y-3 text-sm leading-6 text-[var(--color-text-secondary)]">
+                  <p>1. 본인확인을 진행하면 필요한 정보를 자동으로 불러와요.</p>
+                  <p>2. 확인이 끝나면 하이라이트에 인증 항목으로 바로 반영돼요.</p>
                 </div>
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(`${userLinkId}@data.byro.io`).catch(() => {})
-                    showToast('복사됐어요!')
-                  }}
-                  className="rounded-xl bg-[var(--color-accent-dark)] px-3 py-2 text-xs font-semibold text-white"
-                >
-                  복사
-                </button>
-              </div>
-            </div>
+                <div className="mt-5 rounded-[22px] border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-4 text-sm leading-6 text-[var(--color-text-secondary)]">
+                  별도 파일을 보내지 않아도 돼요. 본인확인만 완료되면 자동으로 진행됩니다.
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="mt-3 space-y-3 text-sm leading-6 text-[var(--color-text-secondary)]">
+                  <p>1. 리멤버 앱에서 명함 내보내기 파일을 준비해주세요.</p>
+                  <p>2. 아래 이메일 주소로 파일을 보내주시면 확인 후 반영돼요.</p>
+                </div>
+                <div className="mt-5 rounded-[22px] border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-4">
+                  <div className="micro-text mb-2">나의 Byro 인증 이메일 주소</div>
+                  <div className="flex items-center gap-2">
+                    <div className="min-w-0 flex-1 truncate text-sm font-mono font-bold text-[var(--color-text-strong)]">
+                      {userLinkId}@data.byro.io
+                    </div>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(`${userLinkId}@data.byro.io`).catch(() => {})
+                        showToast('복사됐어요!')
+                      }}
+                      className="rounded-xl bg-[var(--color-accent-dark)] px-3 py-2 text-xs font-semibold text-white"
+                    >
+                      복사
+                    </button>
+                  </div>
+                  <div className="micro-text mt-3">{selectedCert.emailLabel}</div>
+                </div>
+              </>
+            )}
 
             <div className="mt-5 flex gap-2">
               <Button variant="outline" onClick={() => { setSelectedCert(null); setMode('picker') }}>이전</Button>

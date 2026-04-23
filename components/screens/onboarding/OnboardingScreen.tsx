@@ -22,10 +22,10 @@ const STEP_NUMS: Record<string, number> = {
 }
 
 const CERTIFICATION_HIGHLIGHTS = [
-  { categoryId: 'career-continuity', icon: 'briefcase', title: '커리어 지속성', docLabel: '건강보험 관련 재직 증빙' },
-  { categoryId: 'corporate-longevity', icon: 'building2', title: '법인 영속성', docLabel: '법인 운영 증빙 서류' },
-  { categoryId: 'remember-network', icon: 'users', title: '리멤버 네트워크', docLabel: '리멤버 명함 내보내기 파일' },
-  { categoryId: 'airline-mileage', icon: 'plane', title: '항공 마일리지', docLabel: '항공사 등급 확인 자료' },
+  { categoryId: 'career-continuity', icon: 'briefcase', title: '커리어 지속성', automated: true },
+  { categoryId: 'corporate-longevity', icon: 'building2', title: '법인 영속성', automated: true },
+  { categoryId: 'remember-network', icon: 'users', title: '리멤버 직업 네트워크', automated: false, docLabel: '리멤버 명함 내보내기 파일' },
+  { categoryId: 'airline-mileage', icon: 'plane', title: '항공 마일리지', automated: true },
 ] as const
 
 export default function OnboardingScreen() {
@@ -947,26 +947,44 @@ function Step7Highlight() {
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-secondary)]">
                 <HighlightIcon id={selectedCert.icon as HighlightIconId} size={20} />
               </div>
-              <div className="mt-4 text-sm font-bold text-[var(--color-text-strong)]">보낼 자료</div>
-              <div className="mt-2 text-sm leading-6 text-[var(--color-text-secondary)]">{selectedCert.docLabel}</div>
-
-              <div className="mt-5 rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4">
-                <div className="micro-text mb-2">인증 이메일 주소</div>
-                <div className="flex items-center gap-2">
-                  <div className="min-w-0 flex-1 truncate text-sm font-mono font-bold text-[var(--color-text-strong)]">
-                    gangjunmin@data.byro.io
+              {selectedCert.automated ? (
+                <>
+                  <div className="mt-4 text-sm font-bold text-[var(--color-text-strong)]">진행 방식</div>
+                  <div className="mt-2 space-y-3 text-sm leading-6 text-[var(--color-text-secondary)]">
+                    <p>1. 본인확인을 진행하면 필요한 정보를 자동으로 불러와요.</p>
+                    <p>2. 확인이 끝나면 하이라이트에 바로 반영돼요.</p>
                   </div>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText('gangjunmin@data.byro.io').catch(() => {})
-                      showToast('복사됐어요!')
-                    }}
-                    className="rounded-xl bg-[var(--color-accent-dark)] px-3 py-2 text-xs font-semibold text-white"
-                  >
-                    복사
-                  </button>
-                </div>
-              </div>
+                  <div className="mt-5 rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4 text-sm leading-6 text-[var(--color-text-secondary)]">
+                    별도 파일을 보내지 않아도 돼요. 본인확인만 끝나면 자동으로 진행됩니다.
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="mt-4 text-sm font-bold text-[var(--color-text-strong)]">진행 방식</div>
+                  <div className="mt-2 space-y-3 text-sm leading-6 text-[var(--color-text-secondary)]">
+                    <p>1. 리멤버 앱에서 명함 내보내기 파일을 준비해주세요.</p>
+                    <p>2. 아래 이메일 주소로 파일을 보내주시면 확인 후 반영돼요.</p>
+                  </div>
+                  <div className="mt-5 rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4">
+                    <div className="micro-text mb-2">인증 이메일 주소</div>
+                    <div className="flex items-center gap-2">
+                      <div className="min-w-0 flex-1 truncate text-sm font-mono font-bold text-[var(--color-text-strong)]">
+                        gangjunmin@data.byro.io
+                      </div>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText('gangjunmin@data.byro.io').catch(() => {})
+                          showToast('복사됐어요!')
+                        }}
+                        className="rounded-xl bg-[var(--color-accent-dark)] px-3 py-2 text-xs font-semibold text-white"
+                      >
+                        복사
+                      </button>
+                    </div>
+                    <div className="micro-text mt-3">{selectedCert.docLabel}</div>
+                  </div>
+                </>
+              )}
 
               <div className="mt-4 flex gap-2">
                 <Button variant="outline" onClick={() => setSheetMode('picker')}>이전</Button>

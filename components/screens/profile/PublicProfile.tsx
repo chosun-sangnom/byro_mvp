@@ -231,22 +231,24 @@ export default function PublicProfile({
         </div>
         {!isOwnerMode ? (
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => {
-                if (bookmarked) {
-                  setBookmarked(false)
-                  showToast('저장 취소됐어요')
-                } else {
-                  setMemoSheetOpen(true)
-                }
-              }}
-              className={[
-                'icon-button',
-                bookmarked ? 'bg-[#0A0A0A] border-[#0A0A0A]' : 'bg-white border-[#ddd]',
-              ].join(' ')}
-            >
-              <Bookmark size={14} color={bookmarked ? '#fff' : '#555'} />
-            </button>
+            {store.isLoggedIn && (
+              <button
+                onClick={() => {
+                  if (bookmarked) {
+                    setBookmarked(false)
+                    showToast('저장 취소됐어요')
+                  } else {
+                    setMemoSheetOpen(true)
+                  }
+                }}
+                className={[
+                  'icon-button',
+                  bookmarked ? 'bg-[#0A0A0A] border-[#0A0A0A]' : 'bg-white border-[#ddd]',
+                ].join(' ')}
+              >
+                <Bookmark size={14} color={bookmarked ? '#fff' : '#555'} />
+              </button>
+            )}
             <button
               onClick={() => showToast('공유 링크를 준비 중이에요')}
               className="icon-button"
@@ -770,12 +772,15 @@ export default function PublicProfile({
             </>
           ) : (
             <>
-              <div className="border border-[#EBEBEB] rounded-xl p-3 my-3 text-left">
-                <div className="text-xs font-bold mb-2">나도 평판을 받고 싶다면?</div>
-                <div className="space-y-2">
-                  <Button onClick={() => { setExpDoneModal(false); router.push('/onboarding') }}>내 Byro 만들기</Button>
-                  <Button variant="outline" onClick={() => { setExpDoneModal(false); router.push('/onboarding') }}>로그인하기</Button>
+              <div className="mb-4 text-left">
+                <div className="text-xs font-bold text-[var(--color-text-strong)]">나도 평판을 받고 싶다면?</div>
+                <div className="meta-text mt-2">
+                  로그인하면 {profile.name} 님에게 경험요청을 보내고, 나도 평판을 쌓을 수 있어요.
                 </div>
+              </div>
+              <div className="space-y-2">
+                <Button onClick={() => { setExpDoneModal(false); router.push('/onboarding') }}>내 Byro 만들기</Button>
+                <Button variant="outline" onClick={() => { setExpDoneModal(false); router.push('/onboarding') }}>로그인하기</Button>
               </div>
               <Button variant="ghost" onClick={() => setExpDoneModal(false)}>프로필로 돌아가기</Button>
             </>

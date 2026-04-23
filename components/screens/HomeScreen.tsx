@@ -2,11 +2,8 @@
 
 import {
   motion,
-  useScroll,
-  useTransform,
 } from 'framer-motion'
 import {
-  ArrowRight,
   Award,
   Boxes,
   Briefcase,
@@ -210,10 +207,10 @@ const targetUsers = [
 
 export default function HomeScreen() {
   const router = useRouter()
-  const { isLoggedIn, logout } = useByroStore()
+  const { isLoggedIn, login, logout } = useByroStore()
 
   const primaryLabel = isLoggedIn ? '내 Byro 보러가기' : '내 Byro 만들기'
-  const secondaryLabel = isLoggedIn ? '로그아웃' : '샘플 프로필 보기'
+  const secondaryLabel = isLoggedIn ? '로그아웃' : '로그인'
 
   const handlePrimary = () => {
     if (isLoggedIn) {
@@ -228,11 +225,12 @@ export default function HomeScreen() {
       logout()
       return
     }
-    router.push('/jiminlee')
+    login()
+    router.push('/me')
   }
 
-  const handleLogin = () => {
-    router.push('/onboarding')
+  const handleSampleProfile = () => {
+    router.push('/jiminlee')
   }
 
   return (
@@ -243,7 +241,7 @@ export default function HomeScreen() {
         secondaryLabel={secondaryLabel}
         onPrimary={handlePrimary}
         onSecondary={handleSecondary}
-        onLogin={handleLogin}
+        onSampleProfile={handleSampleProfile}
       />
       <ProblemSection />
       <SolutionSection />
@@ -252,15 +250,6 @@ export default function HomeScreen() {
       <ProductPreviewSection />
       <ReputationSection />
       <TargetUserSection />
-      <FinalCTASection
-        isLoggedIn={isLoggedIn}
-        primaryLabel={primaryLabel}
-        secondaryLabel={secondaryLabel}
-        onPrimary={handlePrimary}
-        onSecondary={handleSecondary}
-        onLogin={handleLogin}
-      />
-      <FixedCTA isLoggedIn={isLoggedIn} label={primaryLabel} onClick={handlePrimary} />
     </div>
   )
 }
@@ -271,14 +260,14 @@ function HeroSection({
   secondaryLabel,
   onPrimary,
   onSecondary,
-  onLogin,
+  onSampleProfile,
 }: {
   isLoggedIn: boolean
   primaryLabel: string
   secondaryLabel: string
   onPrimary: () => void
   onSecondary: () => void
-  onLogin: () => void
+  onSampleProfile: () => void
 }) {
   return (
     <section className="min-h-[90vh] flex flex-col items-center justify-center px-6 pt-24 pb-12">
@@ -324,17 +313,17 @@ function HeroSection({
             {secondaryLabel}
           </Button>
           {!isLoggedIn && (
+            <button
+              onClick={onSampleProfile}
+              className="text-sm font-medium text-[var(--color-text-secondary)]"
+            >
+              샘플 프로필 보기
+            </button>
+          )}
+          {!isLoggedIn && (
             <div className="text-xs text-[var(--color-text-tertiary)]">
               샘플 프로필은 실제 기능이 아니라 플로우 검증용 화면이에요.
             </div>
-          )}
-          {!isLoggedIn && (
-            <button
-              onClick={onLogin}
-              className="text-sm font-medium text-[var(--color-text-secondary)]"
-            >
-              로그인
-            </button>
           )}
         </div>
 
@@ -898,131 +887,5 @@ function TargetUserSection() {
         </div>
       </div>
     </section>
-  )
-}
-
-function FinalCTASection({
-  isLoggedIn,
-  primaryLabel,
-  secondaryLabel,
-  onPrimary,
-  onSecondary,
-  onLogin,
-}: {
-  isLoggedIn: boolean
-  primaryLabel: string
-  secondaryLabel: string
-  onPrimary: () => void
-  onSecondary: () => void
-  onLogin: () => void
-}) {
-  return (
-    <section className="px-6 py-20 bg-gradient-to-b from-gray-50/30 to-white">
-      <div className="max-w-md mx-auto text-center">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-3xl tracking-tight mb-12 text-[var(--color-text-strong)]"
-        >
-          설명보다 먼저 전해지는
-          <br />
-          프로필을 만들어보세요
-        </motion.h2>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="space-y-3 mb-16"
-        >
-          <Button
-            onClick={onPrimary}
-            className="w-full h-14 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-2xl shadow-lg group"
-          >
-            <span>{primaryLabel}</span>
-            <ArrowRight className="w-5 h-5 ml-2 inline-block" />
-          </Button>
-          <Button
-            variant="outline"
-            onClick={onSecondary}
-            className="w-full h-12 border-2 rounded-2xl"
-          >
-            {isLoggedIn ? '샘플 보기' : secondaryLabel}
-          </Button>
-          {!isLoggedIn && (
-            <div className="text-xs text-[var(--color-text-tertiary)]">
-              샘플 프로필은 실제 기능이 아니라 플로우 검증용 화면이에요.
-            </div>
-          )}
-          {!isLoggedIn && (
-            <button
-              onClick={onLogin}
-              className="text-sm font-medium text-[var(--color-text-secondary)]"
-            >
-              로그인
-            </button>
-          )}
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="pt-12 border-t"
-          style={{ borderColor: 'var(--color-border-default)' }}
-        >
-          <div className="text-2xl tracking-tight mb-4 text-[var(--color-text-strong)]">Byro</div>
-          <p className="text-xs text-[var(--color-text-tertiary)] mb-8">
-            Live it, Prove It
-          </p>
-          <div className="flex justify-center gap-6 text-xs text-[var(--color-text-tertiary)]">
-            <a href="#" className="hover:text-[var(--color-text-secondary)] transition-colors">서비스 소개</a>
-            <a href="#" className="hover:text-[var(--color-text-secondary)] transition-colors">문의하기</a>
-            <a href="#" className="hover:text-[var(--color-text-secondary)] transition-colors">개인정보처리방침</a>
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  )
-}
-
-function FixedCTA({
-  isLoggedIn,
-  label,
-  onClick,
-}: {
-  isLoggedIn: boolean
-  label: string
-  onClick: () => void
-}) {
-  const { scrollYProgress } = useScroll()
-  const opacity = useTransform(scrollYProgress, [0, 0.1, 0.9, 1], [0, 1, 1, 0])
-
-  return (
-    <motion.div
-      style={{ opacity }}
-      className="sticky bottom-0 left-0 right-0 z-50 pb-6 px-6 pointer-events-none"
-    >
-      <div className="max-w-md mx-auto pointer-events-auto">
-        <div className="rounded-2xl shadow-2xl border p-4 backdrop-blur-lg" style={{ backgroundColor: 'color-mix(in srgb, var(--color-bg-surface) 95%, transparent)', borderColor: 'var(--color-border-default)' }}>
-          <Button
-            onClick={onClick}
-            className={[
-              'w-full h-12 rounded-xl shadow-md',
-              isLoggedIn
-                ? 'bg-gradient-to-r from-slate-900 to-slate-700 text-white'
-                : 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white',
-            ].join(' ')}
-          >
-            <span>{label}</span>
-            <ArrowRight className="w-4 h-4 ml-2 inline-block" />
-          </Button>
-        </div>
-      </div>
-    </motion.div>
   )
 }

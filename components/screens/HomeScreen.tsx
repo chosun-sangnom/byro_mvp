@@ -231,13 +231,19 @@ export default function HomeScreen() {
     router.push('/jiminlee')
   }
 
+  const handleLogin = () => {
+    router.push('/onboarding')
+  }
+
   return (
     <div className="min-h-full bg-[var(--color-bg-page)] text-[var(--color-text-strong)] antialiased">
       <HeroSection
+        isLoggedIn={isLoggedIn}
         primaryLabel={primaryLabel}
         secondaryLabel={secondaryLabel}
         onPrimary={handlePrimary}
         onSecondary={handleSecondary}
+        onLogin={handleLogin}
       />
       <ProblemSection />
       <SolutionSection />
@@ -252,6 +258,7 @@ export default function HomeScreen() {
         secondaryLabel={secondaryLabel}
         onPrimary={handlePrimary}
         onSecondary={handleSecondary}
+        onLogin={handleLogin}
       />
       <FixedCTA isLoggedIn={isLoggedIn} label={primaryLabel} onClick={handlePrimary} />
     </div>
@@ -259,15 +266,19 @@ export default function HomeScreen() {
 }
 
 function HeroSection({
+  isLoggedIn,
   primaryLabel,
   secondaryLabel,
   onPrimary,
   onSecondary,
+  onLogin,
 }: {
+  isLoggedIn: boolean
   primaryLabel: string
   secondaryLabel: string
   onPrimary: () => void
   onSecondary: () => void
+  onLogin: () => void
 }) {
   return (
     <section className="min-h-[90vh] flex flex-col items-center justify-center px-6 pt-24 pb-12">
@@ -312,6 +323,14 @@ function HeroSection({
           >
             {secondaryLabel}
           </Button>
+          {!isLoggedIn && (
+            <button
+              onClick={onLogin}
+              className="text-sm font-medium text-[var(--color-text-secondary)]"
+            >
+              로그인
+            </button>
+          )}
         </div>
 
         <motion.div
@@ -883,12 +902,14 @@ function FinalCTASection({
   secondaryLabel,
   onPrimary,
   onSecondary,
+  onLogin,
 }: {
   isLoggedIn: boolean
   primaryLabel: string
   secondaryLabel: string
   onPrimary: () => void
   onSecondary: () => void
+  onLogin: () => void
 }) {
   return (
     <section className="px-6 py-20 bg-gradient-to-b from-gray-50/30 to-white">
@@ -926,6 +947,14 @@ function FinalCTASection({
           >
             {isLoggedIn ? '샘플 보기' : secondaryLabel}
           </Button>
+          {!isLoggedIn && (
+            <button
+              onClick={onLogin}
+              className="text-sm font-medium text-[var(--color-text-secondary)]"
+            >
+              로그인
+            </button>
+          )}
         </motion.div>
 
         <motion.div

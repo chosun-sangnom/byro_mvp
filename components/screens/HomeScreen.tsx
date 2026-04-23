@@ -210,10 +210,10 @@ const targetUsers = [
 
 export default function HomeScreen() {
   const router = useRouter()
-  const { isLoggedIn, login, logout } = useByroStore()
+  const { isLoggedIn, logout } = useByroStore()
 
   const primaryLabel = isLoggedIn ? '내 Byro 보러가기' : '내 Byro 만들기'
-  const secondaryLabel = isLoggedIn ? '로그아웃' : '로그인해서 둘러보기'
+  const secondaryLabel = isLoggedIn ? '로그아웃' : '샘플 프로필 보기'
 
   const handlePrimary = () => {
     if (isLoggedIn) {
@@ -228,7 +228,7 @@ export default function HomeScreen() {
       logout()
       return
     }
-    login()
+    router.push('/jiminlee')
   }
 
   return (

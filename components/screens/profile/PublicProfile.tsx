@@ -216,9 +216,8 @@ export default function PublicProfile({
   }
 
   const handleLogout = () => {
-    const nextLinkId = profile.linkId
     store.logout()
-    router.replace(`/${nextLinkId}`)
+    window.location.replace('/')
   }
 
   return (

@@ -727,7 +727,7 @@ export default function PublicProfile({
                 <span className="text-xs text-[#666]">이름으로 남기고 싶다면</span>
                 <div className="flex-1 h-px bg-[#333]" />
               </div>
-              <button onClick={() => { setExpSheetOpen(false); router.push('/onboarding') }}
+              <button onClick={() => { setExpSheetOpen(false); store.login() }}
                 className="w-full border border-[#555] text-white font-bold py-3 rounded-xl text-sm">
                 로그인하기
               </button>
@@ -780,7 +780,7 @@ export default function PublicProfile({
               </div>
               <div className="space-y-2">
                 <Button onClick={() => { setExpDoneModal(false); router.push('/onboarding') }}>내 Byro 만들기</Button>
-                <Button variant="outline" onClick={() => { setExpDoneModal(false); router.push('/onboarding') }}>로그인하기</Button>
+                <Button variant="outline" onClick={() => { setExpDoneModal(false); store.login() }}>로그인하기</Button>
               </div>
               <Button variant="ghost" onClick={() => setExpDoneModal(false)}>프로필로 돌아가기</Button>
             </>

@@ -226,7 +226,6 @@ export default function HomeScreen() {
       return
     }
     login()
-    router.push('/me')
   }
 
   const handleSampleProfile = () => {

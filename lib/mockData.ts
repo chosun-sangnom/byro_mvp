@@ -332,7 +332,7 @@ export const JIMIN_PROFILE = {
   ],
   guestbook: [
     { id: 'jg1', linkId: 'gangminjun', authorName: '강민준', message: '정말 통찰력 있는 분이에요.', date: '2일 전' },
-    { id: 'jg2', linkId: 'mk', authorName: '박서연', message: '브랜딩 감각이 좋아서 같이 일하고 싶은 분입니다.', date: '5일 전' },
+    { id: 'jg2', linkId: 'mk', authorName: '강명구', message: '브랜딩 감각이 좋아서 같이 일하고 싶은 분입니다.', date: '5일 전' },
     { id: 'jg3', linkId: 'chijiwon', authorName: '최지원', message: '사람을 편하게 연결하는 힘이 있어요.', date: '1주 전' },
     { id: 'jg4', linkId: 'kimdohyeon', authorName: '김도현', message: '마케팅 관점이 실무적이라 대화가 특히 좋았습니다.', date: '2주 전' },
   ],

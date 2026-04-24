@@ -3,6 +3,7 @@
 type IndustryNode = {
   name: string
   ratio: number
+  count?: number
 }
 
 const NODE_POSITIONS = [
@@ -10,6 +11,10 @@ const NODE_POSITIONS = [
   { x: 168, y: 78, r: 20 },
   { x: 136, y: 136, r: 18 },
   { x: 58, y: 134, r: 19 },
+  { x: 162, y: 138, r: 16 },
+  { x: 28, y: 116, r: 16 },
+  { x: 28, y: 60, r: 15 },
+  { x: 166, y: 38, r: 15 },
 ]
 
 export function RememberNetworkGraph({
@@ -38,7 +43,7 @@ export function RememberNetworkGraph({
 
         <rect x="0" y="0" width="200" height="160" rx="20" fill="url(#rememberGlow)" />
 
-        {industries.slice(0, 4).map((industry, index) => {
+        {industries.slice(0, 8).map((industry, index) => {
           const pos = NODE_POSITIONS[index]
           return (
             <g key={industry.name}>
@@ -65,7 +70,7 @@ export function RememberNetworkGraph({
               </text>
               <text
                 x={pos.x}
-                y={pos.y + 8}
+                y={pos.y + 4}
                 textAnchor="middle"
                 fontSize="10"
                 fontWeight="800"
@@ -73,6 +78,18 @@ export function RememberNetworkGraph({
               >
                 {industry.ratio}%
               </text>
+              {industry.count && (
+                <text
+                  x={pos.x}
+                  y={pos.y + 15}
+                  textAnchor="middle"
+                  fontSize="6"
+                  fontWeight="600"
+                  fill="#9A958E"
+                >
+                  {industry.count}명
+                </text>
+              )}
             </g>
           )
         })}

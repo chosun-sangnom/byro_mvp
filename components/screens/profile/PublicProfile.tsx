@@ -13,7 +13,8 @@ import { CorporateLongevityTimeline } from '@/components/highlights/CorporateLon
 import { RememberNetworkGraph } from '@/components/highlights/RememberNetworkGraph'
 import { AirlineMileageSummary } from '@/components/highlights/AirlineMileageSummary'
 import {
-  SAMPLE_PROFILE, JIMIN_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE, HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS,
+  INSTAGRAM_PROFILE, LINKEDIN_PROFILE, HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS,
+  getPublicProfileByUsername, getProfileAvatar,
 } from '@/lib/mockData'
 import type { Highlight, HighlightIconId } from '@/types'
 
@@ -41,9 +42,8 @@ export default function PublicProfile({
   const isOwnerMode = mode === 'owner'
 
   // username에 따라 프로필 데이터 선택
-  const isJimin = username === 'jiminlee'
   const isOwnProfile = store.user?.linkId === username
-  const baseProfile = isJimin ? JIMIN_PROFILE : SAMPLE_PROFILE
+  const baseProfile = getPublicProfileByUsername(username)
   const rawProfile = isOwnProfile && store.user
     ? {
       ...baseProfile,
@@ -62,11 +62,16 @@ export default function PublicProfile({
   // 공통 필드 정규화
   const profile = {
     ...rawProfile,
-    instagram: isJimin ? JIMIN_PROFILE.instagram : {
+    instagram: 'instagram' in rawProfile ? rawProfile.instagram : {
       username: INSTAGRAM_PROFILE.username,
       profileUrl: INSTAGRAM_PROFILE.profileUrl,
       aiSummary: INSTAGRAM_PROFILE.aiSummary,
       posts: INSTAGRAM_PROFILE.posts,
+    },
+    linkedin: 'linkedin' in rawProfile ? rawProfile.linkedin : {
+      profileUrl: LINKEDIN_PROFILE.profileUrl,
+      aiSummary: LINKEDIN_PROFILE.aiSummary,
+      previewImage: '/images/linkedsample.png',
     },
     reputationKeywords: rawProfile.reputationKeywords,
     guestbook: rawProfile.guestbook,
@@ -93,6 +98,7 @@ export default function PublicProfile({
     : { tierSummary: '대한항공 모닝캄', badgeLevel: 'business_traveler', airlines: [{ name: '대한항공', tier: '모닝캄' }] }
   const airlineBadgeLabel = AIRLINE_BADGE_LABELS[airlineHighlight.badgeLevel as keyof typeof AIRLINE_BADGE_LABELS] ?? null
   const topRememberIndustry = [...profile.rememberHighlight.industries].sort((a, b) => b.ratio - a.ratio)[0]
+  const showAirlineHighlight = !['jiminlee', 'mk'].includes(username)
 
   const [expSheetOpen, setExpSheetOpen] = useState(false)
   const [expDoneModal, setExpDoneModal] = useState(false)
@@ -138,7 +144,7 @@ export default function PublicProfile({
       description: '명함 기반 직업 네트워크 구성이 인증되어 공개됩니다.',
       year: '',
     },
-    ...(!isJimin ? [{
+    ...(showAirlineHighlight ? [{
       id: `verified-airline-${username}`,
       categoryId: 'airline-mileage' as const,
       icon: 'plane' as const,
@@ -369,13 +375,13 @@ export default function PublicProfile({
                 {featuredGuestbook.map((entry) => (
                   <button
                     key={entry.id}
-                    onClick={() => router.push('/jiminlee')}
+                    onClick={() => router.push(`/${entry.linkId}`)}
                     className="flex w-full gap-2.5 py-3 text-left first:pt-0 last:pb-0"
                   >
-                    {entry.authorName === '이지민' ? (
+                    {getProfileAvatar(entry.linkId) ? (
                       <div className="mt-0.5 h-8 w-8 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src="/images/jimin-profile-5x4.jpg" alt={`${entry.authorName} 프로필 사진`} className="w-full h-full object-cover" />
+                        <img src={getProfileAvatar(entry.linkId)} alt={`${entry.authorName} 프로필 사진`} className="w-full h-full object-cover" />
                       </div>
                     ) : (
                       <div className="mt-0.5 h-8 w-8 rounded-full bg-[#e0e0e0] flex items-center justify-center text-xs font-bold text-[#555] flex-shrink-0">
@@ -482,13 +488,13 @@ export default function PublicProfile({
                       <span className="ml-1.5 text-[10px] font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-full px-2 py-0.5">연동됨</span>
                     </div>
                     <a
-                      href={LINKEDIN_PROFILE.profileUrl}
+                      href={profile.linkedin.profileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
                       className="block truncate text-xs text-[#0D47A1] underline-offset-2 hover:underline"
                     >
-                      {LINKEDIN_PROFILE.profileUrl.replace(/^https?:\/\//, '')}
+                      {profile.linkedin.profileUrl.replace(/^https?:\/\//, '')}
                     </a>
                   </div>
                 </button>
@@ -502,18 +508,16 @@ export default function PublicProfile({
               </div>
               {liOpen && (
                 <div className="px-4 pb-4">
-                  <div className="surface-card-soft mb-3 rounded-2xl px-3 py-3">
-                    <div className="text-[11px] text-[#888] mb-1">AI 요약</div>
-                    <p className="text-xs text-[#555] leading-relaxed">
-                      Growth 마케팅과 B2B SaaS 제품 전략을 중심으로 활동하며, 스타트업 초기 마케팅 구조 설계 경험이 풍부합니다.
-                    </p>
-                  </div>
+                    <div className="surface-card-soft mb-3 rounded-2xl px-3 py-3">
+                      <div className="text-[11px] text-[#888] mb-1">AI 요약</div>
+                      <p className="text-xs text-[#555] leading-relaxed">{profile.linkedin.aiSummary}</p>
+                    </div>
                   <div className="space-y-2">
                     <div className="rounded-xl border border-[#EFEFEF] overflow-hidden">
                       <div className="px-3 pt-2.5 pb-1 text-[11px] text-[#888]">최근 게시물</div>
                       <div className="relative max-h-48 overflow-hidden">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src="/images/linkedsample.png" alt="LinkedIn 최근 게시물" className="w-full" />
+                        <img src={profile.linkedin.previewImage} alt="LinkedIn 최근 게시물" className="w-full" />
                         <div className="absolute bottom-0 inset-x-0 h-20 bg-gradient-to-t from-white to-transparent" />
                       </div>
                     </div>

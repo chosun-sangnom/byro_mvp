@@ -30,6 +30,13 @@ export const LINKEDIN_PROFILE = {
   ],
 }
 
+export const MK_LINKEDIN_PROFILE = {
+  name: '강명구',
+  profileUrl: 'https://www.linkedin.com/in/myongkoo-kang/',
+  aiSummary: '스타트업/비즈니스 리더 성격이 강하고 업무·리더십·산업 인사이트를 드러내는 활동이 주를 이룹니다. 최근에는 공간지능·공간컴퓨팅·피지컬 AI 관련 강연과 대외 활동 언급이 확인됩니다.',
+  previewImage: '/images/MK_Linkedin.png',
+}
+
 // ─── AI 자기소개 후보 (랜덤 선택)
 export const AI_BIO_CANDIDATES = [
   'B2B SaaS 분야에서 5년간 Product Owner로 활동해 온 강명구입니다. 전문성과 신뢰를 바탕으로 팀을 이끌며 비즈니스 성장을 만들어가는 것을 즐깁니다. 마케팅에도 관심이 많아 콜드스타트 문제를 고민하고 있습니다. 주말마다 골프를 즐기고 있어 라운딩 제안도 환영합니다.',
@@ -82,10 +89,10 @@ export const HIGHLIGHT_CATEGORIES: Array<{
   { id: 'other', icon: 'pencil', label: '기타', group: 'lifestyle' },
 ]
 
-// ─── 샘플 공개 프로필 (myongkoo)
+// ─── 로그인 기본 샘플 유저
 export const SAMPLE_PROFILE = {
-  linkId: 'myongkoo',
-  name: '강명구',
+  linkId: 'gangminjun',
+  name: '강민준',
   title: 'B2B SaaS Product Owner · 스타트업 공동창업자',
   avatarColor: '#DCC5B6',
   avatarImage: '',
@@ -98,12 +105,23 @@ export const SAMPLE_PROFILE = {
   },
   contactChannels: [
     { id: 'phone', label: '전화', value: '010-9482-1158', href: 'tel:01094821158', enabled: true },
-    { id: 'email', label: '이메일', value: 'myongkoo@byro.io', href: 'mailto:myongkoo@byro.io', enabled: true },
-    { id: 'kakao', label: '카카오', value: 'myongkoo.kakao', href: 'https://open.kakao.com/o/smyongkoo', enabled: true },
+    { id: 'email', label: '이메일', value: 'gangminjun@byro.io', href: 'mailto:gangminjun@byro.io', enabled: true },
+    { id: 'kakao', label: '카카오', value: 'gangminjun.kakao', href: 'https://open.kakao.com/o/sgangminjun', enabled: true },
   ] as ContactChannel[],
   selectedKeywords: ['전문적인', '신뢰할 수 있는', '통찰력 있는', '실행력 있는', '창의적인'],
   instagramConnected: true,
   linkedinConnected: true,
+  instagram: {
+    username: INSTAGRAM_PROFILE.username,
+    profileUrl: INSTAGRAM_PROFILE.profileUrl,
+    aiSummary: INSTAGRAM_PROFILE.aiSummary,
+    posts: INSTAGRAM_PROFILE.posts,
+  },
+  linkedin: {
+    profileUrl: LINKEDIN_PROFILE.profileUrl,
+    aiSummary: LINKEDIN_PROFILE.aiSummary,
+    previewImage: '/images/linkedsample.png',
+  },
   careerHighlight: { avgYears: 4.2, vsIndustryPercent: 128 },
   corporateHighlight: {
     companyCount: 2,
@@ -143,12 +161,12 @@ export const SAMPLE_PROFILE = {
   ],
   savedProfiles: [
     { id: 'p1', linkId: 'jiminlee', name: '이지민', title: '스타트업 마케터', memo: '비즈니스 살롱 2026.03 · 마케팅 인사이트 굿', savedAt: '3일 전' },
-    { id: 'p2', linkId: 'parkseoyeon', name: '박서연', title: '콘텐츠 크리에이터', memo: '', savedAt: '1주 전' },
+    { id: 'p2', linkId: 'mk', name: '강명구', title: 'Byth CEO', memo: '', savedAt: '1주 전' },
     { id: 'p3', linkId: 'kimdohyeon', name: '김도현', title: '독립 재무설계사', memo: '', savedAt: '2주 전' },
   ],
   recentProfiles: [
     { id: 'p1', linkId: 'jiminlee', name: '이지민', title: '스타트업 마케터', viewedAt: '방금 전' },
-    { id: 'p4', linkId: 'parkseoyeon', name: '박서연', title: '콘텐츠 크리에이터', viewedAt: '1시간 전' },
+    { id: 'p4', linkId: 'mk', name: '강명구', title: 'Byth CEO', viewedAt: '1시간 전' },
     { id: 'p5', linkId: 'chijiwon', name: '최지원', title: 'VC 심사역', viewedAt: '3시간 전' },
   ],
   receivedRequests: [
@@ -166,9 +184,82 @@ export const SAMPLE_PROFILE = {
   // 방명록
   guestbook: [
     { id: 'g1', linkId: 'jiminlee', authorName: '이지민', message: '정말 인사이트 넘치는 분.', date: '3일 전' },
-    { id: 'g2', linkId: 'parkseoyeon', authorName: '박서연', message: '실행력이 정말 대단하신 분.', date: '1주 전' },
+    { id: 'g2', linkId: 'mk', authorName: '박서연', message: '실행력이 정말 대단하신 분.', date: '1주 전' },
     { id: 'g3', linkId: 'kimdohyeon', authorName: '김도현', message: '대화가 구체적이고 믿음이 가는 분이었어요.', date: '2주 전' },
     { id: 'g4', linkId: 'chijiwon', authorName: '최지원', message: '비즈니스 관점이 선명해서 배우는 포인트가 많았습니다.', date: '3주 전' },
+  ],
+}
+
+export const MK_PROFILE = {
+  linkId: 'mk',
+  name: '강명구',
+  title: 'Byth CEO',
+  avatarColor: '#D4CABF',
+  avatarImage: '/images/MK_img.jpeg',
+  headline: 'Entrepreneur, Writer, Connector',
+  school: '연세대학교 경영학 학사',
+  bio: 'Entrepreneur, Writer, Connector. Byth에서 Byro 만들고 운영하고 있어요.',
+  heroTheme: {
+    cover: 'from-[#8D887D] via-[#57534D] to-[#0E0E0E]',
+    avatar: 'from-[#D8D0C7] to-[#8C8278]',
+  },
+  contactChannels: [
+    { id: 'phone', label: '전화', value: '010-3221-1042', href: 'tel:01032211042', enabled: true },
+    { id: 'email', label: '이메일', value: 'mk@byth.io', href: 'mailto:mk@byth.io', enabled: true },
+    { id: 'kakao', label: '카카오', value: 'epicmkk', href: 'https://open.kakao.com/o/smkbyth', enabled: true },
+  ] as ContactChannel[],
+  selectedKeywords: ['진정성 있는', '전문적인', '실행력 있는'],
+  instagramConnected: true,
+  linkedinConnected: true,
+  instagram: {
+    username: 'epicmkk',
+    profileUrl: 'https://www.instagram.com/epicmkk/',
+    aiSummary: '일상 사진에 생각이나 감상을 붙이는 에세이형 포스팅이 주를 이룹니다. 일상, 관계, 자기 생각 정리, 글쓰기와 작업 이야기 비중이 크고 사색적이고 담백한 톤의 포스팅을 지향합니다.',
+    posts: [
+      { id: 'mk1', imageUrl: 'https://picsum.photos/seed/mk_ig1/400/400', caption: '작업 메모', timestamp: '2일 전' },
+      { id: 'mk2', imageUrl: 'https://picsum.photos/seed/mk_ig2/400/400', caption: '일상과 기록', timestamp: '5일 전' },
+      { id: 'mk3', imageUrl: 'https://picsum.photos/seed/mk_ig3/400/400', caption: '글쓰기와 사색', timestamp: '1주 전' },
+    ],
+  },
+  linkedin: MK_LINKEDIN_PROFILE,
+  careerHighlight: { avgYears: 4.8, vsIndustryPercent: 146 },
+  corporateHighlight: {
+    companyCount: 1,
+    years: 2,
+    summary: 'Byth CEO · 2년째 정상 운영 중',
+    companies: [
+      { name: 'Byth', startYear: 2025, endYear: null, years: 2, status: '정상 운영' },
+    ],
+  },
+  rememberHighlight: {
+    total: 1691,
+    industries: [
+      { name: 'IT/테크', ratio: 17, count: 286 },
+      { name: '금융/투자', ratio: 16, count: 263 },
+      { name: '대기업/제조', ratio: 13, count: 212 },
+      { name: '마케팅/PR', ratio: 9, count: 144 },
+      { name: '블록체인', ratio: 7, count: 118 },
+      { name: '미디어/언론', ratio: 6, count: 104 },
+      { name: '컨설팅/법률', ratio: 6, count: 102 },
+      { name: '교육/연구', ratio: 5, count: 88 },
+    ],
+  },
+  manualHighlights: [
+    { id: 'mkh1', categoryId: 'education', icon: 'book-open', title: '아이젠하워 펠로우십', subtitle: '교육 · 직접 입력', description: '전 세계 유망한 리더들을 선정해 미국 현지 연수와 교류 기회를 제공하는 리더십 프로그램에 선발되었습니다.', year: '2026' },
+    { id: 'mkh2', categoryId: 'award', icon: 'trophy', title: '월드와이드 웹소설 공모전 우수상', subtitle: '수상 / 표창 · 직접 입력', description: '2024 월드와이드 웹소설 공모전에서 우수상을 수상했습니다.', year: '2024' },
+    { id: 'mkh3', categoryId: 'publish', icon: 'book-open', title: '당신의 엔진을 뜨겁게 달궈라', subtitle: '출판 / 기고 · 직접 입력', description: '내적 동력과 실행력을 키우는 과정을 담은 에세이형 저서입니다. 일과 삶에서 스스로를 움직이게 하는 엔진을 어떻게 점화할지 다룹니다.', year: '2025' },
+    { id: 'mkh4', categoryId: 'article-interview', icon: 'file-text', title: '강명구 코인원 부대표 "가상자산, 전통 금융 시장에 새 문법 제시"', subtitle: '기사 / 인터뷰 · 직접 입력', description: '가상자산과 전통 금융이 만나는 지점에서 새로운 시장 문법을 설명한 인터뷰 기사입니다. https://zdnet.co.kr/view/?no=20221018103937', year: '2022' },
+  ] as Highlight[],
+  reputationKeywords: [
+    { keyword: '진정성 있는', count: 9 },
+    { keyword: '전문적인', count: 7 },
+    { keyword: '실행력 있는', count: 6 },
+  ],
+  guestbook: [
+    { id: 'mkg1', linkId: 'jiminlee', authorName: '이지민', message: '큰 방향을 빠르게 정리하고 실제 실행으로 옮기는 힘이 분명한 분이에요.', date: '2일 전' },
+    { id: 'mkg2', linkId: 'gangminjun', authorName: '강민준', message: '생각이 깊은데 실행이 느리지 않아서 같이 일할 때 추진력이 좋았습니다.', date: '5일 전' },
+    { id: 'mkg3', linkId: 'kimdohyeon', authorName: '김도현', message: '사람을 연결하는 방식이 자연스럽고 진정성이 느껴졌어요.', date: '1주 전' },
+    { id: 'mkg4', linkId: 'chijiwon', authorName: '최지원', message: '비즈니스 맥락을 읽는 힘이 좋아서 대화가 늘 선명했습니다.', date: '2주 전' },
   ],
 }
 
@@ -240,9 +331,21 @@ export const JIMIN_PROFILE = {
     { keyword: '창의적인', count: 1 },
   ],
   guestbook: [
-    { id: 'jg1', linkId: 'myongkoo', authorName: '강민준', message: '정말 통찰력 있는 분이에요.', date: '2일 전' },
-    { id: 'jg2', linkId: 'parkseoyeon', authorName: '박서연', message: '브랜딩 감각이 좋아서 같이 일하고 싶은 분입니다.', date: '5일 전' },
+    { id: 'jg1', linkId: 'gangminjun', authorName: '강민준', message: '정말 통찰력 있는 분이에요.', date: '2일 전' },
+    { id: 'jg2', linkId: 'mk', authorName: '박서연', message: '브랜딩 감각이 좋아서 같이 일하고 싶은 분입니다.', date: '5일 전' },
     { id: 'jg3', linkId: 'chijiwon', authorName: '최지원', message: '사람을 편하게 연결하는 힘이 있어요.', date: '1주 전' },
     { id: 'jg4', linkId: 'kimdohyeon', authorName: '김도현', message: '마케팅 관점이 실무적이라 대화가 특히 좋았습니다.', date: '2주 전' },
   ],
+}
+
+export function getPublicProfileByUsername(username: string) {
+  if (username === 'jiminlee') return JIMIN_PROFILE
+  if (username === 'mk') return MK_PROFILE
+  return SAMPLE_PROFILE
+}
+
+export function getProfileAvatar(linkId: string) {
+  if (linkId === 'jiminlee') return '/images/jimin-profile-5x4.jpg'
+  if (linkId === 'mk') return '/images/MK_img.jpeg'
+  return ''
 }

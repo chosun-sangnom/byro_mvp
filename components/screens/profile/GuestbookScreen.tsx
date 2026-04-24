@@ -2,14 +2,13 @@
 
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
-import { JIMIN_PROFILE, SAMPLE_PROFILE } from '@/lib/mockData'
+import { getPublicProfileByUsername, getProfileAvatar } from '@/lib/mockData'
 
 export default function GuestbookScreen({ username }: { username: string }) {
   const router = useRouter()
   const store = useByroStore()
-  const isJimin = username === 'jiminlee'
   const isOwnProfile = store.user?.linkId === username
-  const baseProfile = isJimin ? JIMIN_PROFILE : SAMPLE_PROFILE
+  const baseProfile = getPublicProfileByUsername(username)
   const profile = isOwnProfile && store.user
     ? {
       ...baseProfile,
@@ -35,13 +34,13 @@ export default function GuestbookScreen({ username }: { username: string }) {
           {profile.guestbook.map((entry) => (
             <button
               key={entry.id}
-              onClick={() => router.push('/jiminlee')}
+              onClick={() => router.push(`/${entry.linkId}`)}
               className="flex w-full gap-3 rounded-[22px] border border-[#EBEBEB] bg-white px-4 py-4 text-left"
             >
-              {entry.authorName === '이지민' ? (
+              {getProfileAvatar(entry.linkId) ? (
                 <div className="w-9 h-9 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/images/jimin-profile-5x4.jpg" alt={`${entry.authorName} 프로필 사진`} className="w-full h-full object-cover" />
+                  <img src={getProfileAvatar(entry.linkId)} alt={`${entry.authorName} 프로필 사진`} className="w-full h-full object-cover" />
                 </div>
               ) : (
                 <div className="w-9 h-9 rounded-full bg-[#e0e0e0] flex items-center justify-center text-sm font-bold text-[#555] flex-shrink-0">

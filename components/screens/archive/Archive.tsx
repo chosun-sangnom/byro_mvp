@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
 import { showToast } from '@/components/ui'
-import { SAMPLE_PROFILE } from '@/lib/mockData'
+import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mockData'
 
 export default function Archive() {
   const router = useRouter()
@@ -80,13 +80,13 @@ export default function Archive() {
             {savedProfiles.map((p) => (
               <button
                 key={p.id}
-                onClick={() => router.push('/jiminlee')}
+                onClick={() => router.push(`/${p.linkId}`)}
                 className="surface-card flex items-center gap-3 rounded-[22px] px-4 py-4 w-full text-left mb-3"
               >
-                {p.name === '이지민' ? (
+                {getProfileAvatar(p.linkId) ? (
                   <div className="w-10 h-10 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/images/jimin-profile-5x4.jpg" alt={`${p.name} 프로필 사진`} className="w-full h-full object-cover" />
+                    <img src={getProfileAvatar(p.linkId)} alt={`${p.name} 프로필 사진`} className="w-full h-full object-cover" />
                   </div>
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-[#e0e0e0] flex items-center justify-center font-bold text-[#555] text-sm flex-shrink-0">
@@ -118,13 +118,13 @@ export default function Archive() {
             {recentProfiles.map((p) => (
               <button
                 key={p.id}
-                onClick={() => router.push('/jiminlee')}
+                onClick={() => router.push(`/${p.linkId}`)}
                 className="surface-card flex items-center gap-3 rounded-[22px] px-4 py-4 w-full text-left mb-3"
               >
-                {p.name === '이지민' ? (
+                {getProfileAvatar(p.linkId) ? (
                   <div className="w-10 h-10 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/images/jimin-profile-5x4.jpg" alt={`${p.name} 프로필 사진`} className="w-full h-full object-cover" />
+                    <img src={getProfileAvatar(p.linkId)} alt={`${p.name} 프로필 사진`} className="w-full h-full object-cover" />
                   </div>
                 ) : (
                   <div className="w-10 h-10 rounded-full bg-[#e0e0e0] flex items-center justify-center font-bold text-[#555] text-sm flex-shrink-0">
@@ -148,10 +148,10 @@ export default function Archive() {
             {receivedRequests.map((r) => (
               <div key={r.id} className="surface-card rounded-[24px] p-4 mb-3">
                 <div className="flex items-center gap-2 mb-2">
-                  {r.name === '이지민' ? (
+                  {getProfileAvatar(r.linkId) ? (
                     <div className="w-8 h-8 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/images/jimin-profile-5x4.jpg" alt={`${r.name} 프로필 사진`} className="w-full h-full object-cover" />
+                      <img src={getProfileAvatar(r.linkId)} alt={`${r.name} 프로필 사진`} className="w-full h-full object-cover" />
                     </div>
                   ) : (
                     <div className="w-8 h-8 rounded-full bg-[#e0e0e0] flex items-center justify-center font-bold text-[#555] text-sm flex-shrink-0">
@@ -169,7 +169,7 @@ export default function Archive() {
                   : <p className="micro-text mb-3 italic">요청 메시지 없음</p>}
                 <div className="flex gap-2">
                   <button
-                    onClick={() => router.push('/jiminlee')}
+                    onClick={() => router.push(`/${r.linkId}`)}
                     className="flex-1 text-white text-xs font-bold py-2 rounded-xl"
                     style={{ backgroundColor: 'var(--color-accent-dark)' }}
                   >

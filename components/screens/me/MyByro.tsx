@@ -12,7 +12,7 @@ import { RememberNetworkGraph } from '@/components/highlights/RememberNetworkGra
 import { AirlineMileageSummary } from '@/components/highlights/AirlineMileageSummary'
 import type { Highlight, ContactChannel, UserState, HighlightIconId } from '@/types'
 import {
-  SAMPLE_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE,
+  SAMPLE_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE, getProfileAvatar,
   HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS, KEYWORD_GROUPS,
 } from '@/lib/mockData'
 import PublicProfile from '@/components/screens/profile/PublicProfile'
@@ -1630,10 +1630,10 @@ function GuestbookManageScreen({ onBack }: { onBack: () => void }) {
           <div className="space-y-2">
             {entries.map((entry) => (
               <div key={entry.id} className="flex items-start gap-2.5 rounded-[18px] border border-[#F0F0F0] bg-[#FCFCFC] px-3 py-3">
-                {entry.authorName === '이지민' ? (
+                {getProfileAvatar(entry.linkId) ? (
                   <div className="w-7 h-7 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/images/jimin-profile-5x4.jpg" alt={entry.authorName} className="w-full h-full object-cover" />
+                    <img src={getProfileAvatar(entry.linkId)} alt={entry.authorName} className="w-full h-full object-cover" />
                   </div>
                 ) : (
                   <div className="w-7 h-7 rounded-full bg-[#e0e0e0] flex items-center justify-center text-xs font-bold text-[#555] flex-shrink-0">
@@ -1675,14 +1675,14 @@ function SectionGuestbook({ entries }: {
         return (
           <button
             key={entry.id}
-            onClick={() => { if (clickable) router.push('/jiminlee') }}
+            onClick={() => { if (clickable) router.push(`/${entry.linkId}`) }}
             className={['flex gap-2.5 py-2 border-b border-[#f5f5f5] last:border-0 w-full text-left',
               clickable ? 'cursor-pointer' : 'cursor-default'].join(' ')}
           >
-            {entry.authorName === '이지민' ? (
+            {getProfileAvatar(entry.linkId) ? (
               <div className="w-7 h-7 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/jimin-profile-5x4.jpg" alt={`${entry.authorName} 프로필 사진`} className="w-full h-full object-cover" />
+                <img src={getProfileAvatar(entry.linkId)} alt={`${entry.authorName} 프로필 사진`} className="w-full h-full object-cover" />
               </div>
             ) : (
               <div className="w-7 h-7 rounded-full bg-[#e0e0e0] flex items-center justify-center text-xs font-bold text-[#555] flex-shrink-0">

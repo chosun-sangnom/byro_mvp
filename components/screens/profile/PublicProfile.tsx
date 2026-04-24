@@ -98,6 +98,7 @@ export default function PublicProfile({
     : { tierSummary: '대한항공 모닝캄', badgeLevel: 'business_traveler', airlines: [{ name: '대한항공', tier: '모닝캄' }] }
   const airlineBadgeLabel = AIRLINE_BADGE_LABELS[airlineHighlight.badgeLevel as keyof typeof AIRLINE_BADGE_LABELS] ?? null
   const topRememberIndustry = [...profile.rememberHighlight.industries].sort((a, b) => b.ratio - a.ratio)[0]
+  const showCareerHighlight = username !== 'mk'
   const showAirlineHighlight = !['jiminlee', 'mk'].includes(username)
 
   const [expSheetOpen, setExpSheetOpen] = useState(false)
@@ -117,15 +118,15 @@ export default function PublicProfile({
   const featuredGuestbook = profile.guestbook.slice(0, 3)
   const experienceOptions = profile.selectedKeywords.slice(0, 4)
   const verifiedHighlights: Highlight[] = [
-    {
+    ...(showCareerHighlight ? [{
       id: `verified-career-${username}`,
-      categoryId: 'career-continuity',
-      icon: 'briefcase',
+      categoryId: 'career-continuity' as const,
+      icon: 'briefcase' as const,
       title: '커리어 지속성',
       subtitle: `평균 ${profile.careerHighlight.avgYears}년 재직`,
       description: '업계 평균 대비 더 길게 축적된 재직 이력을 보여줍니다.',
       year: '',
-    },
+    }] : []),
     {
       id: `verified-corporate-${username}`,
       categoryId: 'corporate-longevity',

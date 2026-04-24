@@ -80,6 +80,25 @@ interface ByroStore {
   deleteGuestbookEntry(id: string): void
 }
 
+const normalizeSampleUser = (user: UserState | null): UserState | null => {
+  if (!user) return null
+
+  const isDefaultSampleUser = user.linkId === SAMPLE_PROFILE.linkId
+    || user.name === '강명구'
+    || user.name === '강민준'
+
+  if (!isDefaultSampleUser) return user
+
+  return {
+    ...user,
+    name: SAMPLE_PROFILE.name,
+    linkId: SAMPLE_PROFILE.linkId,
+    bio: user.bio === 'B2B SaaS 분야에서 5년간 Product Owner로 활동해 온 강명구입니다. 파트너십을 통해 성장을 만들어가는 것을 즐깁니다.'
+      ? SAMPLE_PROFILE.bio
+      : user.bio,
+  }
+}
+
 export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   // 인증
   isLoggedIn: false,
@@ -362,16 +381,25 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   },
 }), {
   name: 'byro-store',
-      partialize: (state) => ({
-        isLoggedIn: state.isLoggedIn,
-        user: state.user,
-        step: state.step,
-        agreedTerms: state.agreedTerms,
-        agreedPrivacy: state.agreedPrivacy,
-        agreedMarketing: state.agreedMarketing,
-        onboardingTitle: state.onboardingTitle,
-        onboardingSchool: state.onboardingSchool,
-        linkId: state.linkId,
+  version: 1,
+  migrate: (persistedState: unknown) => {
+    const state = persistedState as ByroStore | undefined
+    if (!state) return persistedState
+    return {
+      ...state,
+      user: normalizeSampleUser(state.user),
+    }
+  },
+  partialize: (state) => ({
+    isLoggedIn: state.isLoggedIn,
+    user: normalizeSampleUser(state.user),
+    step: state.step,
+    agreedTerms: state.agreedTerms,
+    agreedPrivacy: state.agreedPrivacy,
+    agreedMarketing: state.agreedMarketing,
+    onboardingTitle: state.onboardingTitle,
+    onboardingSchool: state.onboardingSchool,
+    linkId: state.linkId,
     selectedKeywords: state.selectedKeywords,
     instagramConnected: state.instagramConnected,
     linkedinConnected: state.linkedinConnected,

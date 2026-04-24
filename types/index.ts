@@ -51,6 +51,9 @@ export interface Highlight {
   subtitle: string
   description: string
   year: string
+  linkUrl?: string
+  thumbnailUrl?: string
+  sourceLabel?: string
 }
 
 export interface Experience {

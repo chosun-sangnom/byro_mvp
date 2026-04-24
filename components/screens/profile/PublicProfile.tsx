@@ -115,6 +115,7 @@ export default function PublicProfile({
       keyword,
       count: profile.reputationKeywords.find((item) => item.keyword === keyword)?.count ?? 0,
     }))
+  const totalKeywordCount = keywordCounts.reduce((sum, item) => sum + item.count, 0)
   const featuredGuestbook = profile.guestbook.slice(0, 3)
   const experienceOptions = profile.selectedKeywords.slice(0, 4)
   const verifiedHighlights: Highlight[] = [
@@ -325,7 +326,9 @@ export default function PublicProfile({
                   <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#43C07A] text-[10px] font-black text-white shadow-[0_8px_20px_rgba(67,192,122,0.35)]">✓</span>
                 </div>
                 <div className="mt-1 text-[15px] font-medium text-white/72">{profile.title}</div>
-                <div className="mt-1 text-[13px] font-medium text-white/58">{profile.school}</div>
+                {profile.school && (
+                  <div className="mt-1 text-[13px] font-medium text-white/58">{profile.school}</div>
+                )}
                 <div className="mt-4 max-w-[318px] rounded-[18px] border border-white/12 bg-white/10 px-4 py-3 text-[15px] leading-[1.52] text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[8px]">
                   <p ref={bioRef} className={bioExpanded ? '' : 'line-clamp-3'}>
                     {profile.bio}
@@ -361,7 +364,12 @@ export default function PublicProfile({
 
             <div className="surface-card mt-4 px-4 py-4">
               <div>
-                <div className="text-sm font-black text-[var(--color-text-strong)]">누적 평판</div>
+                <div className="flex items-center gap-2">
+                  <div className="text-sm font-black text-[var(--color-text-strong)]">누적 평판</div>
+                  <div className="micro-text rounded-full border px-2 py-0.5" style={{ borderColor: 'var(--color-border-default)' }}>
+                    총 {totalKeywordCount}
+                  </div>
+                </div>
                 <div className="micro-text mt-0.5">키워드와 최근 방명록으로 신뢰도를 보여줘요</div>
               </div>
 
@@ -618,6 +626,37 @@ export default function PublicProfile({
                               {!isVerified && (
                                 <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
                                   {hl.description || '세부 설명이 아직 없어요.'}
+                                  {hl.linkUrl && (
+                                    <a
+                                      href={hl.linkUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="mt-3 block overflow-hidden rounded-[18px] border border-[#E7E2DC] bg-white"
+                                    >
+                                      <div className="flex min-h-[84px]">
+                                        {hl.thumbnailUrl ? (
+                                          <div className="h-auto w-24 flex-shrink-0 overflow-hidden bg-[#F4F1EC]">
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img src={hl.thumbnailUrl} alt={hl.title} className="h-full w-full object-cover" />
+                                          </div>
+                                        ) : (
+                                          <div className="flex w-24 flex-shrink-0 items-center justify-center bg-[linear-gradient(180deg,#F6F3EF_0%,#EDE7DF_100%)] px-3 text-center">
+                                            <div>
+                                              <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[#8E867E]">News</div>
+                                              <div className="mt-1 text-[11px] font-semibold text-[#3D3833]">{hl.sourceLabel ?? '기사 링크'}</div>
+                                            </div>
+                                          </div>
+                                        )}
+                                        <div className="flex min-w-0 flex-1 items-center px-4 py-3">
+                                          <div className="min-w-0">
+                                            <div className="text-[12px] font-semibold text-[#8E867E]">{hl.sourceLabel ?? '외부 링크'}</div>
+                                            <div className="mt-1 line-clamp-2 text-[13px] font-bold leading-snug text-[#1F1B18]">{hl.title}</div>
+                                            <div className="mt-2 text-[11px] font-semibold text-[#0D47A1]">기사 보러가기</div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </a>
+                                  )}
                                   <div className="micro-text mt-2">
                                     {category?.label ?? hl.subtitle}
                                     {hl.year ? ` · ${hl.year}` : ''}

@@ -197,7 +197,7 @@ export const MK_PROFILE = {
   avatarColor: '#D4CABF',
   avatarImage: '/images/MK_img.jpeg',
   headline: 'Entrepreneur, Writer, Connector',
-  school: '연세대학교 경영학 학사',
+  school: '',
   bio: 'Entrepreneur, Writer, Connector. Byth에서 Byro 만들고 운영하고 있어요.',
   heroTheme: {
     cover: 'from-[#8D887D] via-[#57534D] to-[#0E0E0E]',
@@ -208,7 +208,7 @@ export const MK_PROFILE = {
     { id: 'email', label: '이메일', value: 'mk@byth.io', href: 'mailto:mk@byth.io', enabled: true },
     { id: 'kakao', label: '카카오', value: 'epicmkk', href: 'https://open.kakao.com/o/smkbyth', enabled: true },
   ] as ContactChannel[],
-  selectedKeywords: ['진정성 있는', '전문적인', '실행력 있는'],
+  selectedKeywords: ['진정성 있는', '전문적인', '실행력 있는', '신뢰할 수 있는', '통찰력 있는'],
   instagramConnected: true,
   linkedinConnected: true,
   instagram: {
@@ -248,12 +248,24 @@ export const MK_PROFILE = {
     { id: 'mkh1', categoryId: 'education', icon: 'book-open', title: '아이젠하워 펠로우십', subtitle: '교육 · 직접 입력', description: '전 세계 유망한 리더들을 선정해 미국 현지 연수와 교류 기회를 제공하는 리더십 프로그램에 선발되었습니다.', year: '2026' },
     { id: 'mkh2', categoryId: 'award', icon: 'trophy', title: '월드와이드 웹소설 공모전 · 우수상 수상', subtitle: '수상 / 표창 · 직접 입력', description: '중앙일보 주최 공모전에서 <무진장>이라는 작품으로 우수상을 수상했습니다.', year: '2024' },
     { id: 'mkh3', categoryId: 'publish', icon: 'book-open', title: '당신의 엔진을 뜨겁게 달궈라', subtitle: '출판 / 기고 · 직접 입력', description: '대학생들에게 열정 있는 삶을 권고하는 자기개발서입니다.', year: '2025' },
-    { id: 'mkh4', categoryId: 'article-interview', icon: 'file-text', title: '강명구 코인원 부대표 "가상자산, 전통 금융 시장에 새 문법 제시"', subtitle: '기사 / 인터뷰 · 직접 입력', description: '가상자산 시장의 현황과 미래에 대한 조망을 제시한 인터뷰입니다. https://zdnet.co.kr/view/?no=20221018103937', year: '2022' },
+    {
+      id: 'mkh4',
+      categoryId: 'article-interview',
+      icon: 'file-text',
+      title: '강명구 코인원 부대표 "가상자산, 전통 금융 시장에 새 문법 제시"',
+      subtitle: '기사 / 인터뷰 · 직접 입력',
+      description: '가상자산 시장의 현황과 미래에 대한 조망을 제시한 인터뷰입니다.',
+      year: '2022',
+      linkUrl: 'https://zdnet.co.kr/view/?no=20221018103937',
+      sourceLabel: 'ZDNet Korea',
+    },
   ] as Highlight[],
   reputationKeywords: [
     { keyword: '진정성 있는', count: 9 },
     { keyword: '전문적인', count: 7 },
     { keyword: '실행력 있는', count: 6 },
+    { keyword: '신뢰할 수 있는', count: 5 },
+    { keyword: '통찰력 있는', count: 4 },
   ],
   guestbook: [
     { id: 'mkg1', linkId: 'jiminlee', authorName: '이지민', message: '큰 방향을 빠르게 정리하고 실제 실행으로 옮기는 힘이 분명한 분이에요.', date: '2일 전' },
@@ -271,7 +283,7 @@ export const JIMIN_PROFILE = {
   avatarColor: '#D8C4B2',
   avatarImage: '/images/jimin-profile-5x4.jpg',
   headline: '브랜드와 사람을 연결하는 스타트업 마케터',
-  school: '연세대학교 경영학과 졸업',
+  school: '연세대학교 경영학 학사',
   bio: '스타트업 생태계에서 브랜드와 사람을 연결하는 마케터입니다. 브랜드의 방향성과 사람들의 경험이 자연스럽게 이어지도록 설계하는 일을 좋아하고, 성장 전략과 커뮤니티 빌딩에도 꾸준히 관심을 두고 있습니다.',
   heroTheme: {
     cover: 'from-[#B9A597] via-[#7F6A61] to-[#101010]',

@@ -6,6 +6,13 @@ type IndustryNode = {
   count?: number
 }
 
+const formatNodeLines = (name: string) => {
+  if (name.includes('/')) return name.split('/').slice(0, 2)
+  if (name.length <= 6) return [name]
+  const midpoint = Math.ceil(name.length / 2)
+  return [name.slice(0, midpoint), name.slice(midpoint)]
+}
+
 const NODE_POSITIONS = [
   { x: 100, y: 30, r: 22 },
   { x: 168, y: 78, r: 20 },
@@ -45,6 +52,8 @@ export function RememberNetworkGraph({
 
         {industries.slice(0, 8).map((industry, index) => {
           const pos = NODE_POSITIONS[index]
+          const labelLines = formatNodeLines(industry.name)
+          const labelStartY = labelLines.length > 1 ? pos.y - 9 : pos.y - 5
           return (
             <g key={industry.name}>
               <line
@@ -60,17 +69,21 @@ export function RememberNetworkGraph({
               <circle cx={pos.x} cy={pos.y} r={pos.r} fill="#FFFFFF" stroke="#E7E2DC" strokeWidth="1.5" />
               <text
                 x={pos.x}
-                y={pos.y - 3}
+                y={labelStartY}
                 textAnchor="middle"
-                fontSize="7"
+                fontSize="6.4"
                 fontWeight="700"
                 fill="#6F6B66"
               >
-                {industry.name}
+                {labelLines.map((line, lineIndex) => (
+                  <tspan key={line} x={pos.x} dy={lineIndex === 0 ? 0 : 6.8}>
+                    {line}
+                  </tspan>
+                ))}
               </text>
               <text
                 x={pos.x}
-                y={pos.y + 4}
+                y={labelLines.length > 1 ? pos.y + 7 : pos.y + 5}
                 textAnchor="middle"
                 fontSize="10"
                 fontWeight="800"
@@ -81,9 +94,9 @@ export function RememberNetworkGraph({
               {industry.count && (
                 <text
                   x={pos.x}
-                  y={pos.y + 15}
+                  y={labelLines.length > 1 ? pos.y + 17 : pos.y + 16}
                   textAnchor="middle"
-                  fontSize="6"
+                  fontSize="5.8"
                   fontWeight="600"
                   fill="#9A958E"
                 >

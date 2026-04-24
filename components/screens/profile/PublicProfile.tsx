@@ -325,6 +325,7 @@ export default function PublicProfile({
                   <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#43C07A] text-[10px] font-black text-white shadow-[0_8px_20px_rgba(67,192,122,0.35)]">✓</span>
                 </div>
                 <div className="mt-1 text-[15px] font-medium text-white/72">{profile.title}</div>
+                <div className="mt-1 text-[13px] font-medium text-white/58">{profile.school}</div>
                 <div className="mt-4 max-w-[318px] rounded-[18px] border border-white/12 bg-white/10 px-4 py-3 text-[15px] leading-[1.52] text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[8px]">
                   <p ref={bioRef} className={bioExpanded ? '' : 'line-clamp-3'}>
                     {profile.bio}

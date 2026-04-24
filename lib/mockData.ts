@@ -184,7 +184,7 @@ export const SAMPLE_PROFILE = {
   // 방명록
   guestbook: [
     { id: 'g1', linkId: 'jiminlee', authorName: '이지민', message: '정말 인사이트 넘치는 분.', date: '3일 전' },
-    { id: 'g2', linkId: 'mk', authorName: '박서연', message: '실행력이 정말 대단하신 분.', date: '1주 전' },
+    { id: 'g2', linkId: 'mk', authorName: '강명구', message: '실행력이 정말 대단하신 분.', date: '1주 전' },
     { id: 'g3', linkId: 'kimdohyeon', authorName: '김도현', message: '대화가 구체적이고 믿음이 가는 분이었어요.', date: '2주 전' },
     { id: 'g4', linkId: 'chijiwon', authorName: '최지원', message: '비즈니스 관점이 선명해서 배우는 포인트가 많았습니다.', date: '3주 전' },
   ],
@@ -246,9 +246,9 @@ export const MK_PROFILE = {
   },
   manualHighlights: [
     { id: 'mkh1', categoryId: 'education', icon: 'book-open', title: '아이젠하워 펠로우십', subtitle: '교육 · 직접 입력', description: '전 세계 유망한 리더들을 선정해 미국 현지 연수와 교류 기회를 제공하는 리더십 프로그램에 선발되었습니다.', year: '2026' },
-    { id: 'mkh2', categoryId: 'award', icon: 'trophy', title: '월드와이드 웹소설 공모전 우수상', subtitle: '수상 / 표창 · 직접 입력', description: '2024 월드와이드 웹소설 공모전에서 우수상을 수상했습니다.', year: '2024' },
-    { id: 'mkh3', categoryId: 'publish', icon: 'book-open', title: '당신의 엔진을 뜨겁게 달궈라', subtitle: '출판 / 기고 · 직접 입력', description: '내적 동력과 실행력을 키우는 과정을 담은 에세이형 저서입니다. 일과 삶에서 스스로를 움직이게 하는 엔진을 어떻게 점화할지 다룹니다.', year: '2025' },
-    { id: 'mkh4', categoryId: 'article-interview', icon: 'file-text', title: '강명구 코인원 부대표 "가상자산, 전통 금융 시장에 새 문법 제시"', subtitle: '기사 / 인터뷰 · 직접 입력', description: '가상자산과 전통 금융이 만나는 지점에서 새로운 시장 문법을 설명한 인터뷰 기사입니다. https://zdnet.co.kr/view/?no=20221018103937', year: '2022' },
+    { id: 'mkh2', categoryId: 'award', icon: 'trophy', title: '월드와이드 웹소설 공모전 · 우수상 수상', subtitle: '수상 / 표창 · 직접 입력', description: '중앙일보 주최 공모전에서 <무진장>이라는 작품으로 우수상을 수상했습니다.', year: '2024' },
+    { id: 'mkh3', categoryId: 'publish', icon: 'book-open', title: '당신의 엔진을 뜨겁게 달궈라', subtitle: '출판 / 기고 · 직접 입력', description: '대학생들에게 열정 있는 삶을 권고하는 자기개발서입니다.', year: '2025' },
+    { id: 'mkh4', categoryId: 'article-interview', icon: 'file-text', title: '강명구 코인원 부대표 "가상자산, 전통 금융 시장에 새 문법 제시"', subtitle: '기사 / 인터뷰 · 직접 입력', description: '가상자산 시장의 현황과 미래에 대한 조망을 제시한 인터뷰입니다. https://zdnet.co.kr/view/?no=20221018103937', year: '2022' },
   ] as Highlight[],
   reputationKeywords: [
     { keyword: '진정성 있는', count: 9 },

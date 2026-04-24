@@ -92,6 +92,7 @@ export default function PublicProfile({
     ? rawProfile.airlineHighlight
     : { tierSummary: '대한항공 모닝캄', badgeLevel: 'business_traveler', airlines: [{ name: '대한항공', tier: '모닝캄' }] }
   const airlineBadgeLabel = AIRLINE_BADGE_LABELS[airlineHighlight.badgeLevel as keyof typeof AIRLINE_BADGE_LABELS] ?? null
+  const topRememberIndustry = [...profile.rememberHighlight.industries].sort((a, b) => b.ratio - a.ratio)[0]
 
   const [expSheetOpen, setExpSheetOpen] = useState(false)
   const [expDoneModal, setExpDoneModal] = useState(false)
@@ -115,7 +116,7 @@ export default function PublicProfile({
       categoryId: 'career-continuity',
       icon: 'briefcase',
       title: '커리어 지속성',
-      subtitle: `건강보험공단 기준 · 2026.04 인증`,
+      subtitle: `평균 ${profile.careerHighlight.avgYears}년 재직`,
       description: '업계 평균 대비 더 길게 축적된 재직 이력을 보여줍니다.',
       year: '',
     },
@@ -133,7 +134,7 @@ export default function PublicProfile({
       categoryId: 'remember-network',
       icon: 'users',
       title: '리멤버 네트워크',
-      subtitle: '리멤버 명함 기반 직업 네트워크',
+      subtitle: topRememberIndustry ? `${topRememberIndustry.name} 네트워크 다수, ${topRememberIndustry.ratio}%` : '리멤버 명함 기반 직업 네트워크',
       description: '명함 기반 직업 네트워크 구성이 인증되어 공개됩니다.',
       year: '',
     },

@@ -63,6 +63,15 @@ const CERTIFICATION_ITEMS = [
   },
 ] as const
 
+const sampleTopRememberIndustry = [...SAMPLE_PROFILE.rememberHighlight.industries].sort((a, b) => b.ratio - a.ratio)[0]
+
+const VERIFIED_HIGHLIGHT_SUMMARIES: Record<string, string> = {
+  'career-continuity': `평균 ${SAMPLE_PROFILE.careerHighlight.avgYears}년 재직`,
+  'corporate-longevity': SAMPLE_PROFILE.corporateHighlight.summary,
+  'remember-network': sampleTopRememberIndustry ? `${sampleTopRememberIndustry.name} 네트워크 다수, ${sampleTopRememberIndustry.ratio}%` : '리멤버 명함 기반 직업 네트워크',
+  'airline-mileage': SAMPLE_PROFILE.airlineHighlight.tierSummary,
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 export default function MyByro() {
   const router = useRouter()
@@ -987,7 +996,9 @@ function HighlightManageScreen({
                                   <BadgeCheck size={12} />
                                 </span>
                               </div>
-                              <div className="micro-text mt-0.5">{entry.item.summary}</div>
+                              <div className="micro-text mt-0.5">
+                                {VERIFIED_HIGHLIGHT_SUMMARIES[entry.item.categoryId] ?? entry.item.summary}
+                              </div>
                             </div>
                             {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
                           </button>

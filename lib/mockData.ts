@@ -34,7 +34,7 @@ export const MK_LINKEDIN_PROFILE = {
   name: '강명구',
   profileUrl: 'https://www.linkedin.com/in/myongkoo-kang/',
   aiSummary: '스타트업/비즈니스 리더 성격이 강하고 업무·리더십·산업 인사이트를 드러내는 활동이 주를 이룹니다. 최근에는 공간지능·공간컴퓨팅·피지컬 AI 관련 강연과 대외 활동 언급이 확인됩니다.',
-  previewImage: '/images/MK_Linkedin.png',
+  previewImage: '/images/MK_Linkedin_v2.png',
 }
 
 // ─── AI 자기소개 후보 (랜덤 선택)

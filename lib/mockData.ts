@@ -163,6 +163,16 @@ export const SAMPLE_PROFILE = {
       metadata: { status: '재직 중', role: 'B2B SaaS Product Owner' },
     },
     {
+      id: 'mh0-0',
+      categoryId: 'career-role',
+      icon: 'briefcase',
+      title: 'ABC Labs',
+      subtitle: '경력 · 직접 입력',
+      description: '초기 제품 기획과 파트너십 운영을 담당하며 서비스의 첫 시장 적합성을 검증했습니다.',
+      year: '2020 - 2022',
+      metadata: { status: '종료', role: 'Product Owner' },
+    },
+    {
       id: 'mh0-1',
       categoryId: 'education-history',
       icon: 'book-open',

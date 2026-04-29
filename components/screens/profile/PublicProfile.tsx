@@ -16,6 +16,7 @@ import {
   INSTAGRAM_PROFILE, LINKEDIN_PROFILE, HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS,
   getPublicProfileByUsername, getProfileAvatar,
 } from '@/lib/mockData'
+import { getHighlightDetailFootnote, getHighlightMetaParts } from '@/lib/highlightMeta'
 import type { Highlight, HighlightIconId } from '@/types'
 
 interface PublicProfileProps {
@@ -640,6 +641,7 @@ export default function PublicProfile({
                                 const toggleKey = `${hl.id}_${username}`
                                 const isOpen = store.hlOpenStates[toggleKey] ?? false
                                 const hasDetail = Boolean(hl.description?.trim() || hl.linkUrl)
+                                const metaParts = getHighlightMetaParts(hl)
                                 return (
                                   <div key={hl.id} className={index > 0 ? 'border-t border-[#F1ECE6]' : ''}>
                                     <button
@@ -651,20 +653,18 @@ export default function PublicProfile({
                                         <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
                                           {hl.title}
                                         </div>
-                                        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                          {hl.metadata?.role && (
-                                            <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{String(hl.metadata.role)}</span>
-                                          )}
-                                          {hl.metadata?.degree && (
-                                            <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(hl.metadata.degree)}</span>
-                                          )}
-                                          {hl.metadata?.status && (
-                                            <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(hl.metadata.status)}</span>
-                                          )}
-                                          {hl.year && (
-                                            <span className="text-[11px] text-[var(--color-text-tertiary)]">{hl.year}</span>
-                                          )}
-                                        </div>
+                                        {metaParts.length > 0 && (
+                                          <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                                            {metaParts.map((part, partIndex) => (
+                                              <span
+                                                key={`${hl.id}-meta-${partIndex}`}
+                                                className={`text-[11px] ${partIndex === 0 ? 'font-semibold text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'}`}
+                                              >
+                                                {part}
+                                              </span>
+                                            ))}
+                                          </div>
+                                        )}
                                       </div>
                                       {hasDetail && (isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />)}
                                     </button>
@@ -677,36 +677,33 @@ export default function PublicProfile({
                                               href={hl.linkUrl}
                                               target="_blank"
                                               rel="noopener noreferrer"
-                                              className="mt-3 block overflow-hidden rounded-[18px] border border-[#E7E2DC] bg-white"
+                                              className="mt-3 block overflow-hidden rounded-[16px] border border-[#ECE6DF] bg-[var(--color-bg-soft)]"
                                             >
-                                              <div className="flex min-h-[84px]">
+                                              <div className="flex min-h-[74px]">
                                                 {hl.thumbnailUrl ? (
-                                                  <div className="h-auto w-24 flex-shrink-0 overflow-hidden bg-[#F4F1EC]">
+                                                  <div className="h-auto w-20 flex-shrink-0 overflow-hidden bg-[#F4F1EC]">
                                                     {/* eslint-disable-next-line @next/next/no-img-element */}
                                                     <img src={hl.thumbnailUrl} alt={hl.title} className="h-full w-full object-cover" />
                                                   </div>
                                                 ) : (
-                                                  <div className="flex w-24 flex-shrink-0 items-center justify-center bg-[linear-gradient(180deg,#F6F3EF_0%,#EDE7DF_100%)] px-3 text-center">
+                                                  <div className="flex w-20 flex-shrink-0 items-center justify-center bg-[linear-gradient(180deg,#F6F3EF_0%,#EDE7DF_100%)] px-3 text-center">
                                                     <div>
                                                       <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[#8E867E]">News</div>
                                                       <div className="mt-1 text-[11px] font-semibold text-[#3D3833]">{hl.sourceLabel ?? '기사 링크'}</div>
                                                     </div>
                                                   </div>
                                                 )}
-                                                <div className="flex min-w-0 flex-1 items-center px-4 py-3">
+                                                <div className="flex min-w-0 flex-1 items-center px-3.5 py-2.5">
                                                   <div className="min-w-0">
-                                                    <div className="text-[12px] font-semibold text-[#8E867E]">{hl.sourceLabel ?? '외부 링크'}</div>
-                                                    <div className="mt-1 line-clamp-2 text-[13px] font-bold leading-snug text-[#1F1B18]">{hl.title}</div>
-                                                    <div className="mt-2 text-[11px] font-semibold text-[#0D47A1]">기사 보러가기</div>
+                                                    <div className="text-[11px] font-semibold text-[#8E867E]">{hl.sourceLabel ?? '외부 링크'}</div>
+                                                    <div className="mt-1 line-clamp-2 text-[12px] font-bold leading-snug text-[#1F1B18]">{hl.title}</div>
+                                                    <div className="mt-2 text-[11px] font-medium text-[var(--color-text-secondary)]">보러가기</div>
                                                   </div>
                                                 </div>
                                               </div>
                                             </a>
                                           )}
-                                          <div className="micro-text mt-2">
-                                            {category?.label ?? hl.subtitle}
-                                            {hl.year ? ` · ${hl.year}` : ''}
-                                          </div>
+                                          <div className="micro-text mt-2">{getHighlightDetailFootnote(hl, category?.label)}</div>
                                         </div>
                                       </div>
                                     )}

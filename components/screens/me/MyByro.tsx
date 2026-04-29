@@ -15,6 +15,7 @@ import {
   SAMPLE_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE, getProfileAvatar,
   HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS, KEYWORD_GROUPS,
 } from '@/lib/mockData'
+import { getHighlightDetailFootnote, getHighlightMetaParts } from '@/lib/highlightMeta'
 import PublicProfile from '@/components/screens/profile/PublicProfile'
 
 type Screen = 'preview' | 'manage' | 'editBasic' | 'editHighlight' | 'editSNS' | 'editReputation' | 'editContact' | 'editGuestbook'
@@ -1212,6 +1213,7 @@ function HighlightManageScreen({
                               const isEditable = store.highlights.some((highlight) => highlight.id === item.id)
                               const isOpen = certOpen[item.id]
                               const hasDetail = Boolean(item.description?.trim() || item.linkUrl)
+                              const metaParts = getHighlightMetaParts(item)
                               return (
                                 <div key={item.id} className={index > 0 ? 'border-t border-[#F1ECE6]' : ''}>
                                   <button
@@ -1223,20 +1225,18 @@ function HighlightManageScreen({
                                       <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
                                         {item.title}
                                       </div>
-                                      <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                        {item.metadata?.role && (
-                                          <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{String(item.metadata.role)}</span>
-                                        )}
-                                        {item.metadata?.degree && (
-                                          <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(item.metadata.degree)}</span>
-                                        )}
-                                        {item.metadata?.status && (
-                                          <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(item.metadata.status)}</span>
-                                        )}
-                                        {item.year && (
-                                          <span className="text-[11px] text-[var(--color-text-tertiary)]">{item.year}</span>
-                                        )}
-                                      </div>
+                                      {metaParts.length > 0 && (
+                                        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                                          {metaParts.map((part, partIndex) => (
+                                            <span
+                                              key={`${item.id}-meta-${partIndex}`}
+                                              className={`text-[11px] ${partIndex === 0 ? 'font-semibold text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'}`}
+                                            >
+                                              {part}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      )}
                                     </div>
                                     {hasDetail && (isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />)}
                                   </button>
@@ -1245,8 +1245,7 @@ function HighlightManageScreen({
                                       <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
                                         {item.description || '세부 설명이 아직 없어요.'}
                                         <div className="micro-text mt-2">
-                                          {HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === item.categoryId)?.label ?? item.subtitle}
-                                          {item.year ? ` · ${item.year}` : ''}
+                                          {getHighlightDetailFootnote(item, HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === item.categoryId)?.label)}
                                         </div>
                                       </div>
                                       <div className="mt-3 flex gap-2">

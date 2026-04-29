@@ -15,6 +15,7 @@ import {
   KEYWORD_GROUPS, HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS, AI_BIO_CANDIDATES,
   INSTAGRAM_PROFILE, LINKEDIN_PROFILE,
 } from '@/lib/mockData'
+import { getHighlightMetaParts } from '@/lib/highlightMeta'
 
 const STEP_NUMS: Record<string, number> = {
   login: 0, verify: 1, linkid: 2, keywords: 3, sns: 4,
@@ -789,9 +790,22 @@ function Step7Highlight() {
                   <HighlightIcon id={h.icon as HighlightIconId} size={18} />
                 </span>
                 <div className="flex-1">
-                  <div className="text-sm font-bold">{h.title}</div>
-                  <div className="micro-text">{h.subtitle}</div>
-                  {h.description && <div className="meta-text mt-0.5">{h.description}</div>}
+                  <div className="micro-text">
+                    {HIGHLIGHT_CATEGORIES.find((item) => item.id === h.categoryId)?.label ?? h.subtitle}
+                  </div>
+                  <div className="mt-0.5 text-sm font-bold">{h.title}</div>
+                  {getHighlightMetaParts(h).length > 0 && (
+                    <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                      {getHighlightMetaParts(h).map((part, index) => (
+                        <span
+                          key={`${h.id}-meta-${index}`}
+                          className={`text-[11px] ${index === 0 ? 'font-semibold text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'}`}
+                        >
+                          {part}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <button onClick={() => store.removeHighlight(h.id)} className="ml-2 mt-0.5 text-[var(--color-state-danger-text)]">
                   <Trash2 size={14} />

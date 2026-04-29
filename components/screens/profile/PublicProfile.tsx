@@ -666,7 +666,7 @@ export default function PublicProfile({
                                   </button>
                                   {isOpen && (
                                     <div className="border-t border-[#F1ECE6] px-4 py-4">
-                                      <div className="rounded-[18px] bg-[#FBFAF8] px-4 py-4">
+                                      <div className="rounded-[22px] border border-[#EAE4DC] bg-white px-4 py-4 shadow-[0_1px_0_rgba(17,17,17,0.02)]">
                                       <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
                                         {hl.description || '세부 설명이 아직 없어요.'}
                                         {hl.linkUrl && (

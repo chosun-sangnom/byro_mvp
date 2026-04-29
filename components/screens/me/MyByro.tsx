@@ -1131,39 +1131,39 @@ function HighlightManageScreen({
                                   {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
                                 </button>
                                 {isOpen && (
-                                  <div className="border-t border-[#F1ECE6] bg-[#FBFAF8] py-4">
-                                  <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
-                                    {item.description || '세부 설명이 아직 없어요.'}
-                                    <div className="micro-text mt-2">
-                                      {HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === item.categoryId)?.label ?? item.subtitle}
-                                      {item.year ? ` · ${item.year}` : ''}
+                                  <div className="border-t border-[#F1ECE6] bg-[#FBFAF8] px-4 py-4">
+                                    <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
+                                      {item.description || '세부 설명이 아직 없어요.'}
+                                      <div className="micro-text mt-2">
+                                        {HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === item.categoryId)?.label ?? item.subtitle}
+                                        {item.year ? ` · ${item.year}` : ''}
+                                      </div>
+                                    </div>
+                                    <div className="mt-3 flex gap-2">
+                                      <button
+                                        onClick={() => {
+                                          if (isEditable) openEditSheet(item)
+                                          else showToast('기본 목업 항목은 수정하지 않습니다')
+                                        }}
+                                        className="rounded-lg border border-[#CFC7BF] px-3 py-1.5 text-xs font-medium text-[#555]"
+                                      >
+                                        수정
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          if (isEditable) {
+                                            store.removeHighlight(item.id)
+                                            showToast('삭제됐어요')
+                                            return
+                                          }
+                                          showToast('기본 목업 항목은 삭제하지 않습니다')
+                                        }}
+                                        className="rounded-lg border border-[#F2C7C5] px-3 py-1.5 text-xs font-medium text-[#C9473D]"
+                                      >
+                                        삭제
+                                      </button>
                                     </div>
                                   </div>
-                                  <div className="mt-3 flex gap-2">
-                                    <button
-                                      onClick={() => {
-                                        if (isEditable) openEditSheet(item)
-                                        else showToast('기본 목업 항목은 수정하지 않습니다')
-                                      }}
-                                      className="rounded-lg border border-[#CFC7BF] px-3 py-1.5 text-xs font-medium text-[#555]"
-                                    >
-                                      수정
-                                    </button>
-                                    <button
-                                      onClick={() => {
-                                        if (isEditable) {
-                                          store.removeHighlight(item.id)
-                                          showToast('삭제됐어요')
-                                          return
-                                        }
-                                        showToast('기본 목업 항목은 삭제하지 않습니다')
-                                      }}
-                                      className="rounded-lg border border-[#F2C7C5] px-3 py-1.5 text-xs font-medium text-[#C9473D]"
-                                    >
-                                      삭제
-                                    </button>
-                                  </div>
-                                </div>
                                 )}
                               </div>
                             )

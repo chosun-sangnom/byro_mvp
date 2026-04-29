@@ -773,10 +773,11 @@ function HighlightManageScreen({
   const handleSave = () => {
     if (!selectedCat || !hlTitle.trim()) { showToast('필수 항목을 입력해주세요'); return }
     if (isCareerRole && !hlRole.trim()) { showToast('직함을 입력해주세요'); return }
+    if (isEducationHistory && !hlRole.trim()) { showToast('전공을 입력해주세요'); return }
     if (isEducationHistory && !hlStatus) { showToast('졸업 여부를 선택해주세요'); return }
     let metadata: Record<string, string | boolean> | undefined
     if (isEducationHistory) {
-      metadata = { status: hlStatus }
+      metadata = { status: hlStatus, role: hlRole }
     } else if (isCareerRole) {
       metadata = { status: hlStatus || '재직 중', role: hlRole }
     }
@@ -906,13 +907,17 @@ function HighlightManageScreen({
           )}
             <div className="surface-card rounded-[26px] p-4">
               <div className="space-y-3 mb-4">
-              <input value={hlTitle} onChange={(e) => setHlTitle(e.target.value)} placeholder={isCareerRole ? '회사명' : isEducationHistory ? '전공' : '제목'}
+              <input value={hlTitle} onChange={(e) => setHlTitle(e.target.value)} placeholder={isCareerRole ? '회사명' : isEducationHistory ? '학교명' : '제목'}
                 className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
+              {isEducationHistory && (
+                <input value={hlRole} onChange={(e) => setHlRole(e.target.value)} placeholder="전공"
+                  className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
+              )}
               {isCareerRole && (
                 <input value={hlRole} onChange={(e) => setHlRole(e.target.value)} placeholder="직함"
                   className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
               )}
-              <input value={hlYear} onChange={(e) => setHlYear(e.target.value)} placeholder={isCareerRole ? '년도 또는 기간 (예: 2022 - 2024)' : isEducationHistory ? '년도 (예: 2020)' : '연도 (예: 2023)'}
+              <input value={hlYear} onChange={(e) => setHlYear(e.target.value)} placeholder={isCareerRole ? '년도 또는 기간 (예: 2022 - 2024)' : isEducationHistory ? '년도 또는 기간 (예: 2018 - 2022)' : '연도 (예: 2023)'}
                 className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
               {isCareerRole && (
                 <div className="grid grid-cols-2 gap-2">
@@ -950,11 +955,11 @@ function HighlightManageScreen({
                   ))}
                 </div>
               )}
-              <TextArea value={hlDesc} onChange={setHlDesc} placeholder={isCareerRole ? '어떤 일을 했는지 적어주세요' : isEducationHistory ? '전공이나 학업 경험을 적어주세요' : '어떤 경험인지 간단히 적어주세요'} maxLength={150} rows={4} />
+              <TextArea value={hlDesc} onChange={setHlDesc} placeholder={isCareerRole ? '어떤 일을 했는지 적어주세요' : isEducationHistory ? '학교 생활이나 학업 경험을 적어주세요' : '어떤 경험인지 간단히 적어주세요'} maxLength={150} rows={4} />
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => setMode('picker')}>이전</Button>
-              <Button onClick={handleSave} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && !hlRole.trim()) || (isEducationHistory && !hlStatus)}>{editingHl ? '수정하기' : '저장하기'}</Button>
+              <Button onClick={handleSave} disabled={!selectedCat || !hlTitle.trim() || ((isCareerRole || isEducationHistory) && !hlRole.trim()) || (isEducationHistory && !hlStatus)}>{editingHl ? '수정하기' : '저장하기'}</Button>
             </div>
           </div>
         </div>
@@ -1097,35 +1102,36 @@ function HighlightManageScreen({
                             {HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === entry.categoryId)?.label ?? '직접 입력'}
                           </div>
                         </div>
-                        {entry.items.map((item, index) => {
-                          const isEditable = store.highlights.some((highlight) => highlight.id === item.id)
-                          const isOpen = certOpen[item.id]
-                          return (
-                            <div key={item.id} className={index > 0 ? 'border-t border-[#F1ECE6]' : ''}>
-                              <button
-                                onClick={() => toggleCert(item.id)}
-                                className="flex w-full items-center gap-3 px-4 py-4 text-left"
-                              >
-                                <div className="min-w-0 flex-1 pl-11">
-                                  <div className="mt-1 text-[15px] font-bold text-[var(--color-text-strong)]">
-                                    {item.title}
+                        <div className="pb-1 pl-[60px] pr-4">
+                          {entry.items.map((item, index) => {
+                            const isEditable = store.highlights.some((highlight) => highlight.id === item.id)
+                            const isOpen = certOpen[item.id]
+                            return (
+                              <div key={item.id} className={index > 0 ? 'border-t border-[#F1ECE6]' : ''}>
+                                <button
+                                  onClick={() => toggleCert(item.id)}
+                                  className="flex w-full items-center gap-3 py-3 text-left"
+                                >
+                                  <div className="min-w-0 flex-1">
+                                    <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
+                                      {item.title}
+                                    </div>
+                                    <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                                      {item.metadata?.role && (
+                                        <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{String(item.metadata.role)}</span>
+                                      )}
+                                      {item.metadata?.status && (
+                                        <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(item.metadata.status)}</span>
+                                      )}
+                                      {item.year && (
+                                        <span className="text-[11px] text-[var(--color-text-tertiary)]">{item.year}</span>
+                                      )}
+                                    </div>
                                   </div>
-                                  <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                    {item.metadata?.role && (
-                                      <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{String(item.metadata.role)}</span>
-                                    )}
-                                    {item.metadata?.status && (
-                                      <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(item.metadata.status)}</span>
-                                    )}
-                                    {item.year && (
-                                      <span className="text-[11px] text-[var(--color-text-tertiary)]">{item.year}</span>
-                                    )}
-                                  </div>
-                                </div>
-                                {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
-                              </button>
-                              {isOpen && (
-                                <div className="border-t border-[#F1ECE6] bg-[#FBFAF8] px-4 py-4">
+                                  {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
+                                </button>
+                                {isOpen && (
+                                  <div className="border-t border-[#F1ECE6] bg-[#FBFAF8] px-4 py-4">
                                   <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
                                     {item.description || '세부 설명이 아직 없어요.'}
                                     <div className="micro-text mt-2">
@@ -1158,10 +1164,11 @@ function HighlightManageScreen({
                                     </button>
                                   </div>
                                 </div>
-                              )}
-                            </div>
-                          )
-                        })}
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
                       </div>
                     )
                   })}

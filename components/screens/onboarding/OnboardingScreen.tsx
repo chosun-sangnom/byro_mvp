@@ -703,13 +703,17 @@ function Step7Highlight() {
       showToast('직함을 입력해주세요')
       return
     }
+    if (isEducationHistory && !hlRole.trim()) {
+      showToast('전공을 입력해주세요')
+      return
+    }
     if (isEducationHistory && !hlStatus) {
       showToast('졸업 여부를 선택해주세요')
       return
     }
     let metadata: Record<string, string | boolean> | undefined
     if (isEducationHistory) {
-      metadata = { status: hlStatus }
+      metadata = { status: hlStatus, role: hlRole }
     } else if (isCareerRole) {
       metadata = { status: hlStatus || '재직 중', role: hlRole }
     }
@@ -861,10 +865,19 @@ function Step7Highlight() {
                 <input
                   value={hlTitle}
                   onChange={(e) => setHlTitle(e.target.value)}
-                  placeholder={isCareerRole ? '회사명' : isEducationHistory ? '전공' : '제목'}
+                  placeholder={isCareerRole ? '회사명' : isEducationHistory ? '학교명' : '제목'}
                   className="w-full rounded-2xl border px-4 py-3 text-sm outline-none"
                   style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-soft)' }}
                 />
+                {isEducationHistory && (
+                  <input
+                    value={hlRole}
+                    onChange={(e) => setHlRole(e.target.value)}
+                    placeholder="전공"
+                    className="w-full rounded-2xl border px-4 py-3 text-sm outline-none"
+                    style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-soft)' }}
+                  />
+                )}
                 {isCareerRole && (
                   <input
                     value={hlRole}
@@ -877,7 +890,7 @@ function Step7Highlight() {
                 <input
                   value={hlYear}
                   onChange={(e) => setHlYear(e.target.value)}
-                  placeholder={isCareerRole ? '년도 또는 기간 (예: 2022 - 2024)' : isEducationHistory ? '년도 (예: 2020)' : '연도 (예: 2023)'}
+                  placeholder={isCareerRole ? '년도 또는 기간 (예: 2022 - 2024)' : isEducationHistory ? '년도 또는 기간 (예: 2018 - 2022)' : '연도 (예: 2023)'}
                   className="w-full rounded-2xl border px-4 py-3 text-sm outline-none"
                   style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-soft)' }}
                 />
@@ -920,14 +933,14 @@ function Step7Highlight() {
                 <TextArea
                   value={hlDesc}
                   onChange={setHlDesc}
-                  placeholder={isCareerRole ? '어떤 일을 했는지 적어주세요' : isEducationHistory ? '전공이나 학업 경험을 적어주세요' : '어떤 경험인지 간단히 적어주세요'}
+                  placeholder={isCareerRole ? '어떤 일을 했는지 적어주세요' : isEducationHistory ? '학교 생활이나 학업 경험을 적어주세요' : '어떤 경험인지 간단히 적어주세요'}
                   maxLength={150}
                   rows={4}
                 />
               </div>
               <div className="mt-4 flex gap-2">
                 <Button variant="outline" onClick={() => setSheetMode('picker')}>이전</Button>
-                <Button onClick={handleAddHighlight} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && !hlRole.trim()) || (isEducationHistory && !hlStatus)}>저장하기</Button>
+                <Button onClick={handleAddHighlight} disabled={!selectedCat || !hlTitle.trim() || ((isCareerRole || isEducationHistory) && !hlRole.trim()) || (isEducationHistory && !hlStatus)}>저장하기</Button>
               </div>
             </div>
           </div>

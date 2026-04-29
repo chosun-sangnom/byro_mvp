@@ -636,35 +636,36 @@ export default function PublicProfile({
                               {category?.label ?? '직접 입력'}
                             </div>
                           </div>
-                          {entry.items.map((hl, index) => {
-                            const toggleKey = `${hl.id}_${username}`
-                            const isOpen = store.hlOpenStates[toggleKey] ?? false
-                            return (
-                              <div key={hl.id} className={index > 0 ? 'border-t border-[#F1ECE6]' : ''}>
-                                <button
-                                  onClick={() => store.toggleHlOpen(toggleKey)}
-                                  className="flex w-full items-center gap-3 px-4 py-3 text-left"
-                                >
-                                  <div className="min-w-0 flex-1 pl-11">
-                                    <div className="mt-1 text-[15px] font-bold text-[var(--color-text-strong)]">
-                                      {hl.title}
+                          <div className="pb-1 pl-[60px] pr-4">
+                            {entry.items.map((hl, index) => {
+                              const toggleKey = `${hl.id}_${username}`
+                              const isOpen = store.hlOpenStates[toggleKey] ?? false
+                              return (
+                                <div key={hl.id} className={index > 0 ? 'border-t border-[#F1ECE6]' : ''}>
+                                  <button
+                                    onClick={() => store.toggleHlOpen(toggleKey)}
+                                    className="flex w-full items-center gap-3 py-3 text-left"
+                                  >
+                                    <div className="min-w-0 flex-1">
+                                      <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
+                                        {hl.title}
+                                      </div>
+                                      <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                                        {hl.metadata?.role && (
+                                          <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{String(hl.metadata.role)}</span>
+                                        )}
+                                        {hl.metadata?.status && (
+                                          <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(hl.metadata.status)}</span>
+                                        )}
+                                        {hl.year && (
+                                          <span className="text-[11px] text-[var(--color-text-tertiary)]">{hl.year}</span>
+                                        )}
+                                      </div>
                                     </div>
-                                    <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                      {hl.metadata?.role && (
-                                        <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{String(hl.metadata.role)}</span>
-                                      )}
-                                      {hl.metadata?.status && (
-                                        <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(hl.metadata.status)}</span>
-                                      )}
-                                      {hl.year && (
-                                        <span className="text-[11px] text-[var(--color-text-tertiary)]">{hl.year}</span>
-                                      )}
-                                    </div>
-                                  </div>
-                                  {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
-                                </button>
-                                {isOpen && (
-                                  <div className="border-t border-[#F1ECE6] bg-[#FBFAF8] px-4 py-4">
+                                    {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
+                                  </button>
+                                  {isOpen && (
+                                    <div className="border-t border-[#F1ECE6] bg-[#FBFAF8] px-4 py-4">
                                     <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
                                       {hl.description || '세부 설명이 아직 없어요.'}
                                       {hl.linkUrl && (
@@ -704,10 +705,11 @@ export default function PublicProfile({
                                       </div>
                                     </div>
                                   </div>
-                                )}
-                              </div>
-                            )
-                          })}
+                                  )}
+                                </div>
+                              )
+                            })}
+                          </div>
                         </div>
                       )
                     })}

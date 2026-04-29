@@ -15,7 +15,7 @@ import {
   SAMPLE_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE, getProfileAvatar,
   HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS, KEYWORD_GROUPS,
 } from '@/lib/mockData'
-import { getGroupedHighlightSummary, getHighlightDetailFootnote, getHighlightMetaParts } from '@/lib/highlightMeta'
+import { getGroupedHighlightPreview, getHighlightDetailFootnote, getHighlightMetaParts } from '@/lib/highlightMeta'
 import PublicProfile from '@/components/screens/profile/PublicProfile'
 
 type Screen = 'preview' | 'manage' | 'editBasic' | 'editHighlight' | 'editSNS' | 'editReputation' | 'editContact' | 'editGuestbook'
@@ -1209,6 +1209,7 @@ function HighlightManageScreen({
                             {(() => {
                               const categoryLabel = HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === entry.categoryId)?.label ?? '직접 입력'
                               const isGroupOpen = certOpen[entry.categoryId]
+                              const preview = getGroupedHighlightPreview(entry.items)
                               return (
                                 <>
                                   <button onClick={() => toggleCert(entry.categoryId)} className="flex w-full items-center gap-3 text-left">
@@ -1217,19 +1218,21 @@ function HighlightManageScreen({
                                         {categoryLabel}
                                       </div>
                                       <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
-                                        {getGroupedHighlightSummary(entry.items, categoryLabel)}
+                                        {preview.title}
                                       </div>
+                                      {preview.meta && (
+                                        <div className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">{preview.meta}</div>
+                                      )}
                                     </div>
                                     {isGroupOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
                                   </button>
                                   {isGroupOpen && (
-                                    <div className="pt-3 pb-3 pr-4">
-                                      <div className="rounded-[18px] border border-[#F0ECE7] bg-[#FBFAF8] px-3.5 py-3">
-                                        {entry.items.map((item, index) => {
+                                    <div className="pt-3 pb-3 pr-4 space-y-3">
+                                        {entry.items.map((item) => {
                                           const isEditable = store.highlights.some((highlight) => highlight.id === item.id)
                                           const metaParts = getHighlightMetaParts(item)
                                           return (
-                                            <div key={item.id} className={index > 0 ? 'mt-3 border-t border-[#E7E2DC] pt-3' : ''}>
+                                            <div key={item.id} className="rounded-[18px] border border-[#F0ECE7] bg-[#FBFAF8] px-3.5 py-3">
                                               <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{item.title}</div>
                                               {metaParts.length > 0 && (
                                                 <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -1282,7 +1285,6 @@ function HighlightManageScreen({
                                             </div>
                                           )
                                         })}
-                                      </div>
                                     </div>
                                   )}
                                 </>

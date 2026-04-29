@@ -51,3 +51,19 @@ export function getGroupedHighlightSummary(items: Highlight[], categoryLabel?: s
   const countLabel = `${items.length}개 ${categoryLabel ?? '항목'}`
   return [countLabel, titles.join(', ')].filter(Boolean).join(' · ')
 }
+
+export function getGroupedHighlightPreview(items: Highlight[]) {
+  const first = items[0]
+  if (!first) {
+    return { title: '', meta: '' }
+  }
+
+  const metaParts = getHighlightMetaParts(first)
+  const remainder = items.length > 1 ? `외 ${items.length - 1}개` : ''
+  const meta = [metaParts.join(' · '), remainder].filter(Boolean).join(' · ')
+
+  return {
+    title: first.title,
+    meta,
+  }
+}

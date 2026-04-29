@@ -16,7 +16,7 @@ import {
   INSTAGRAM_PROFILE, LINKEDIN_PROFILE, HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS,
   getPublicProfileByUsername, getProfileAvatar,
 } from '@/lib/mockData'
-import { getGroupedHighlightSummary, getHighlightDetailFootnote, getHighlightMetaParts } from '@/lib/highlightMeta'
+import { getGroupedHighlightPreview, getHighlightDetailFootnote, getHighlightMetaParts } from '@/lib/highlightMeta'
 import type { Highlight, HighlightIconId } from '@/types'
 
 interface PublicProfileProps {
@@ -629,6 +629,7 @@ export default function PublicProfile({
                       const category = HIGHLIGHT_CATEGORIES.find((item) => item.id === entry.categoryId)
                       const groupToggleKey = `group_${entry.categoryId}_${username}`
                       const isGroupOpen = store.hlOpenStates[groupToggleKey] ?? false
+                      const preview = getGroupedHighlightPreview(entry.items)
                       return (
                         <div key={`${entry.categoryId}-${group.id}`} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
                           <div className="flex gap-3 px-4 py-2.5">
@@ -642,18 +643,20 @@ export default function PublicProfile({
                                     {category?.label ?? '직접 입력'}
                                   </div>
                                   <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
-                                    {getGroupedHighlightSummary(entry.items, category?.label)}
+                                    {preview.title}
                                   </div>
+                                  {preview.meta && (
+                                    <div className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">{preview.meta}</div>
+                                  )}
                                 </div>
                                 {isGroupOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
                               </button>
                               {isGroupOpen && (
-                                <div className="pt-3 pb-3 pr-4">
-                                  <div className="rounded-[18px] border border-[#F0ECE7] bg-[#FBFAF8] px-3.5 py-3">
-                                    {entry.items.map((hl, index) => {
+                                <div className="pt-3 pb-3 pr-4 space-y-3">
+                                    {entry.items.map((hl) => {
                                       const metaParts = getHighlightMetaParts(hl)
                                       return (
-                                        <div key={hl.id} className={index > 0 ? 'mt-3 border-t border-[#E7E2DC] pt-3' : ''}>
+                                        <div key={hl.id} className="rounded-[18px] border border-[#F0ECE7] bg-[#FBFAF8] px-3.5 py-3">
                                           <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{hl.title}</div>
                                           {metaParts.length > 0 && (
                                             <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
@@ -711,7 +714,6 @@ export default function PublicProfile({
                                         </div>
                                       )
                                     })}
-                                  </div>
                                 </div>
                               )}
                             </div>

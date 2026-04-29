@@ -654,6 +654,9 @@ export default function PublicProfile({
                                         {hl.metadata?.role && (
                                           <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{String(hl.metadata.role)}</span>
                                         )}
+                                        {hl.metadata?.degree && (
+                                          <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(hl.metadata.degree)}</span>
+                                        )}
                                         {hl.metadata?.status && (
                                           <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(hl.metadata.status)}</span>
                                         )}

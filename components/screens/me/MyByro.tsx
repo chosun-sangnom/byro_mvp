@@ -727,11 +727,13 @@ function HighlightManageScreen({
   const [hlTitle, setHlTitle] = useState('')
   const [hlYear, setHlYear] = useState('')
   const [hlRole, setHlRole] = useState('')
+  const [hlDegree, setHlDegree] = useState('')
   const [hlStatus, setHlStatus] = useState('')
   const [hlDesc, setHlDesc] = useState('')
   const [selectedCert, setSelectedCert] = useState<(typeof CERTIFICATION_ITEMS)[number] | null>(null)
   const isCareerRole = selectedCat?.id === 'career-role'
   const isEducationHistory = selectedCat?.id === 'education-history'
+  const educationNeedsMajor = hlDegree !== '고등학교'
 
   const allManualHighlights = [...SAMPLE_PROFILE.manualHighlights, ...store.highlights]
   const groupedHighlights = HIGHLIGHT_GROUPS.map((group) => {
@@ -764,6 +766,7 @@ function HighlightManageScreen({
     setHlTitle(hl.title)
     setHlYear(hl.year)
     setHlRole(typeof hl.metadata?.role === 'string' ? hl.metadata.role : '')
+    setHlDegree(typeof hl.metadata?.degree === 'string' ? hl.metadata.degree : '')
     setHlStatus(typeof hl.metadata?.status === 'string' ? hl.metadata.status : '')
     setHlDesc(hl.description)
     setEditingHl(hl)
@@ -773,11 +776,13 @@ function HighlightManageScreen({
   const handleSave = () => {
     if (!selectedCat || !hlTitle.trim()) { showToast('필수 항목을 입력해주세요'); return }
     if (isCareerRole && !hlRole.trim()) { showToast('직함을 입력해주세요'); return }
-    if (isEducationHistory && !hlRole.trim()) { showToast('전공을 입력해주세요'); return }
-    if (isEducationHistory && !hlStatus) { showToast('졸업 여부를 선택해주세요'); return }
+    if (isEducationHistory && !hlDegree) { showToast('학위 또는 학교 유형을 선택해주세요'); return }
+    if (isEducationHistory && educationNeedsMajor && !hlRole.trim()) { showToast('전공을 입력해주세요'); return }
+    if (isEducationHistory && !hlStatus) { showToast('상태를 선택해주세요'); return }
+    if (isEducationHistory && !hlYear.trim()) { showToast('년도를 입력해주세요'); return }
     let metadata: Record<string, string | boolean> | undefined
     if (isEducationHistory) {
-      metadata = { status: hlStatus, role: hlRole }
+      metadata = { status: hlStatus, role: hlRole, degree: hlDegree }
     } else if (isCareerRole) {
       metadata = { status: hlStatus || '재직 중', role: hlRole }
     }
@@ -785,7 +790,7 @@ function HighlightManageScreen({
       categoryId: selectedCat.id,
       icon: selectedCat.icon as HighlightIconId,
       title: hlTitle,
-      subtitle: isEducationHistory ? `${selectedCat.label} · ${hlStatus}` : `${selectedCat.label} · 직접 입력`,
+      subtitle: isEducationHistory ? `${selectedCat.label} · ${hlDegree}` : `${selectedCat.label} · 직접 입력`,
       description: hlDesc,
       year: hlYear,
       metadata,
@@ -810,6 +815,7 @@ function HighlightManageScreen({
     setHlTitle('')
     setHlYear('')
     setHlRole('')
+    setHlDegree('')
     setHlStatus('')
     setHlDesc('')
     setEditingHl(null)
@@ -910,6 +916,27 @@ function HighlightManageScreen({
               <input value={hlTitle} onChange={(e) => setHlTitle(e.target.value)} placeholder={isCareerRole ? '회사명' : isEducationHistory ? '학교명' : '제목'}
                 className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
               {isEducationHistory && (
+                <div className="space-y-2">
+                  <div className="micro-text">학교 유형 / 학위</div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {['고등학교', '전문학사', '학사', '석사', '박사'].map((degree) => (
+                      <button
+                        key={degree}
+                        onClick={() => setHlDegree(degree)}
+                        className="rounded-2xl border px-3 py-3 text-sm font-semibold"
+                        style={{
+                          borderColor: hlDegree === degree ? 'var(--color-accent-dark)' : '#E7E2DC',
+                          backgroundColor: hlDegree === degree ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
+                          color: hlDegree === degree ? '#fff' : 'var(--color-text-secondary)',
+                        }}
+                      >
+                        {degree}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {isEducationHistory && educationNeedsMajor && (
                 <input value={hlRole} onChange={(e) => setHlRole(e.target.value)} placeholder="전공"
                   className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
               )}
@@ -939,7 +966,7 @@ function HighlightManageScreen({
               )}
               {isEducationHistory && (
                 <div className="grid grid-cols-2 gap-2">
-                  {['졸업', '재학 중'].map((status) => (
+                  {['졸업', '재학', '중퇴'].map((status) => (
                     <button
                       key={status}
                       onClick={() => setHlStatus(status)}
@@ -955,11 +982,13 @@ function HighlightManageScreen({
                   ))}
                 </div>
               )}
-              <TextArea value={hlDesc} onChange={setHlDesc} placeholder={isCareerRole ? '어떤 일을 했는지 적어주세요' : isEducationHistory ? '학교 생활이나 학업 경험을 적어주세요' : '어떤 경험인지 간단히 적어주세요'} maxLength={150} rows={4} />
+              {!isEducationHistory && (
+                <TextArea value={hlDesc} onChange={setHlDesc} placeholder={isCareerRole ? '어떤 일을 했는지 적어주세요' : '어떤 경험인지 간단히 적어주세요'} maxLength={150} rows={4} />
+              )}
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => setMode('picker')}>이전</Button>
-              <Button onClick={handleSave} disabled={!selectedCat || !hlTitle.trim() || ((isCareerRole || isEducationHistory) && !hlRole.trim()) || (isEducationHistory && !hlStatus)}>{editingHl ? '수정하기' : '저장하기'}</Button>
+              <Button onClick={handleSave} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && !hlRole.trim()) || (isEducationHistory && (!hlDegree || (educationNeedsMajor && !hlRole.trim()) || !hlStatus || !hlYear.trim()))}>{editingHl ? '수정하기' : '저장하기'}</Button>
             </div>
           </div>
         </div>
@@ -1119,6 +1148,9 @@ function HighlightManageScreen({
                                     <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
                                       {item.metadata?.role && (
                                         <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{String(item.metadata.role)}</span>
+                                      )}
+                                      {item.metadata?.degree && (
+                                        <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(item.metadata.degree)}</span>
                                       )}
                                       {item.metadata?.status && (
                                         <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(item.metadata.status)}</span>

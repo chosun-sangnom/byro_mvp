@@ -13,12 +13,12 @@ import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import type { ContactChannel, HighlightIconId } from '@/types'
 import {
   KEYWORD_GROUPS, HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS, AI_BIO_CANDIDATES,
-  INSTAGRAM_PROFILE, LINKEDIN_PROFILE, SAMPLE_PROFILE,
+  INSTAGRAM_PROFILE, LINKEDIN_PROFILE,
 } from '@/lib/mockData'
 
 const STEP_NUMS: Record<string, number> = {
-  login: 0, verify: 1, 'basic-info': 2, linkid: 3, keywords: 4, sns: 5,
-  contact: 6, highlight: 7, 'bio-select': 8, 'bio-ai': 9, complete: 10,
+  login: 0, verify: 1, linkid: 2, keywords: 3, sns: 4,
+  contact: 5, highlight: 6, 'bio-select': 7, 'bio-ai': 8, complete: 9,
 }
 
 const CERTIFICATION_HIGHLIGHTS = [
@@ -41,7 +41,7 @@ export default function OnboardingScreen() {
     router.push('/')
   }
 
-  const hasBack = stepNum >= 1 && stepNum <= 9
+  const hasBack = stepNum >= 1 && stepNum <= 8
 
   return (
     <div className="flex flex-col h-full">
@@ -52,15 +52,14 @@ export default function OnboardingScreen() {
       />
 
       {/* Step indicator (로그인 제외) */}
-      {stepNum >= 1 && stepNum <= 9 && (
-        <StepBar current={stepNum} total={9} />
+      {stepNum >= 1 && stepNum <= 8 && (
+        <StepBar current={stepNum} total={8} />
       )}
 
       {/* Content */}
       <div className="flex-1 overflow-hidden">
         {store.step === 'login'     && <Step1Login onClose={handleClose} />}
         {store.step === 'verify'    && <Step2Verify />}
-        {store.step === 'basic-info' && <StepBasicInfo />}
         {store.step === 'linkid'    && <Step3LinkId />}
         {store.step === 'keywords'  && <Step4Keywords />}
         {store.step === 'sns'       && <Step5SNS />}
@@ -322,70 +321,6 @@ function Step2Verify() {
       <StepFooter
         canNext={canProceed}
         onNext={handleVerify}
-        onPrev={() => store.prevStep()}
-      />
-    </div>
-  )
-}
-
-function StepBasicInfo() {
-  const store = useByroStore()
-  const [title, setTitle] = useState(store.onboardingTitle)
-  const [school, setSchool] = useState(store.onboardingSchool)
-
-  const canNext = title.trim().length > 0 && school.trim().length > 0
-
-  return (
-    <div className="flex flex-col h-full overflow-y-auto px-5 py-4">
-      <StepIntro
-        eyebrow="Basic Info"
-        title={'기본 정보를\n입력해주세요'}
-        description={'인증한 이름을 확인하고 직함과 학력을 입력해주세요.'}
-      />
-
-      <div className="space-y-3">
-        <div>
-          <label className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wide mb-1 block">이름</label>
-          <input
-            value={SAMPLE_PROFILE.name}
-            readOnly
-            className="w-full border rounded-xl px-4 py-3 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-secondary)] outline-none"
-            style={{ borderColor: 'var(--color-border-default)' }}
-          />
-        </div>
-        <div>
-          <label className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wide mb-1 block">직함</label>
-          <input
-            value={title}
-            onChange={(e) => {
-              const nextValue = e.target.value
-              setTitle(nextValue)
-              store.setOnboardingBasicInfo({ title: nextValue })
-            }}
-            placeholder="예: 스타트업 마케터"
-            className="w-full border rounded-xl px-4 py-3 text-sm outline-none"
-            style={{ borderColor: 'var(--color-border-default)' }}
-          />
-        </div>
-        <div>
-          <label className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wide mb-1 block">학력</label>
-          <input
-            value={school}
-            onChange={(e) => {
-              const nextValue = e.target.value
-              setSchool(nextValue)
-              store.setOnboardingBasicInfo({ school: nextValue })
-            }}
-            placeholder="예: 연세대학교 경영학과 졸업"
-            className="w-full border rounded-xl px-4 py-3 text-sm outline-none"
-            style={{ borderColor: 'var(--color-border-default)' }}
-          />
-        </div>
-      </div>
-
-      <StepFooter
-        canNext={canNext}
-        onNext={() => store.nextStep()}
         onPrev={() => store.prevStep()}
       />
     </div>
@@ -739,13 +674,17 @@ function Step7Highlight() {
   const [selectedCat, setSelectedCat] = useState<typeof HIGHLIGHT_CATEGORIES[0] | null>(null)
   const [hlTitle, setHlTitle] = useState('')
   const [hlYear, setHlYear] = useState('')
+  const [hlStatus, setHlStatus] = useState('')
   const [hlDesc, setHlDesc] = useState('')
   const highlightLimitReached = store.highlights.length >= 5
+  const isCareerRole = selectedCat?.id === 'career-role'
+  const isEducationHistory = selectedCat?.id === 'education-history'
 
   const resetForm = () => {
     setSelectedCat(null)
     setHlTitle('')
     setHlYear('')
+    setHlStatus('')
     setHlDesc('')
   }
 
@@ -754,17 +693,22 @@ function Step7Highlight() {
       showToast('하이라이트는 최대 5개까지 추가할 수 있어요')
       return
     }
-    if (!selectedCat || !hlTitle) {
-      showToast('카테고리와 제목을 입력해주세요')
+    if (!selectedCat || !hlTitle.trim()) {
+      showToast('필수 항목을 입력해주세요')
+      return
+    }
+    if (isEducationHistory && !hlStatus) {
+      showToast('졸업 여부를 선택해주세요')
       return
     }
     store.addHighlight({
       categoryId: selectedCat.id,
       icon: selectedCat.icon as HighlightIconId,
       title: hlTitle,
-      subtitle: `${selectedCat.label} · 직접 입력`,
+      subtitle: isEducationHistory ? `${selectedCat.label} · ${hlStatus}` : `${selectedCat.label} · 직접 입력`,
       description: hlDesc,
       year: hlYear,
+      metadata: isEducationHistory ? { status: hlStatus } : isCareerRole && hlStatus ? { status: hlStatus } : undefined,
     })
     resetForm()
     setPickerOpen(false)
@@ -905,29 +849,46 @@ function Step7Highlight() {
                 <input
                   value={hlTitle}
                   onChange={(e) => setHlTitle(e.target.value)}
-                  placeholder="제목"
+                  placeholder={isCareerRole ? '직함' : isEducationHistory ? '전공' : '제목'}
                   className="w-full rounded-2xl border px-4 py-3 text-sm outline-none"
                   style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-soft)' }}
                 />
                 <input
                   value={hlYear}
                   onChange={(e) => setHlYear(e.target.value)}
-                  placeholder="연도 (예: 2023)"
-                  type="number"
+                  placeholder={isCareerRole ? '년도 또는 기간 (예: 2022 - 2024)' : isEducationHistory ? '년도 (예: 2020)' : '연도 (예: 2023)'}
                   className="w-full rounded-2xl border px-4 py-3 text-sm outline-none"
                   style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-soft)' }}
                 />
+                {isEducationHistory && (
+                  <div className="grid grid-cols-2 gap-2">
+                    {['졸업', '재학 중'].map((status) => (
+                      <button
+                        key={status}
+                        onClick={() => setHlStatus(status)}
+                        className="rounded-2xl border px-4 py-3 text-sm font-semibold"
+                        style={{
+                          borderColor: hlStatus === status ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
+                          backgroundColor: hlStatus === status ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
+                          color: hlStatus === status ? '#fff' : 'var(--color-text-secondary)',
+                        }}
+                      >
+                        {status}
+                      </button>
+                    ))}
+                  </div>
+                )}
                 <TextArea
                   value={hlDesc}
                   onChange={setHlDesc}
-                  placeholder="어떤 경험인지 간단히 적어주세요"
+                  placeholder={isCareerRole ? '어떤 역할을 했는지 적어주세요' : isEducationHistory ? '전공이나 학업 경험을 적어주세요' : '어떤 경험인지 간단히 적어주세요'}
                   maxLength={150}
                   rows={4}
                 />
               </div>
               <div className="mt-4 flex gap-2">
                 <Button variant="outline" onClick={() => setSheetMode('picker')}>이전</Button>
-                <Button onClick={handleAddHighlight} disabled={!selectedCat || !hlTitle.trim()}>저장하기</Button>
+                <Button onClick={handleAddHighlight} disabled={!selectedCat || !hlTitle.trim() || (isEducationHistory && !hlStatus)}>저장하기</Button>
               </div>
             </div>
           </div>

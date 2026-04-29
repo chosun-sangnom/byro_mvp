@@ -15,6 +15,8 @@ export type HighlightIconId =
 export type HighlightGroupId = 'career' | 'achievement' | 'lifestyle'
 
 export type HighlightCategoryId =
+  | 'career-role'
+  | 'education-history'
   | 'career-continuity'
   | 'remember-network'
   | 'corporate-longevity'
@@ -33,7 +35,6 @@ export type HighlightCategoryId =
 export type OnboardingStep =
   | 'login'
   | 'verify'
-  | 'basic-info'
   | 'linkid'
   | 'keywords'
   | 'sns'
@@ -51,6 +52,7 @@ export interface Highlight {
   subtitle: string
   description: string
   year: string
+  metadata?: Record<string, string | boolean>
   linkUrl?: string
   thumbnailUrl?: string
   sourceLabel?: string

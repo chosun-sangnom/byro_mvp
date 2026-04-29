@@ -409,8 +409,6 @@ function BasicInfoEditScreen({
   onBack: () => void
 }) {
   const store = useByroStore()
-  const [title, setTitle] = useState(user.title)
-  const [school, setSchool] = useState(user.school ?? '')
   const [bio, setBio] = useState(user.bio)
   const [avatarImage, setAvatarImage] = useState(user.avatarImage ?? '')
   const [cropSource, setCropSource] = useState('')
@@ -427,7 +425,7 @@ function BasicInfoEditScreen({
   } | null>(null)
 
   const handleSave = () => {
-    store.updateUserInfo({ title, school, bio, avatarImage })
+    store.updateUserInfo({ bio, avatarImage })
     showToast('저장됐어요!')
     onBack()
   }
@@ -567,20 +565,6 @@ function BasicInfoEditScreen({
                 placeholder="변경 불가"
                 className="w-full border border-[#eee] rounded-xl px-4 py-2.5 text-sm bg-[#f9f9f9] text-[#aaa]"
               />
-            </div>
-
-            {/* 직함/소속 */}
-            <div>
-              <label className="text-xs text-[#888] mb-1 block">직함 / 소속</label>
-              <input value={title} onChange={(e) => setTitle(e.target.value)}
-                className="w-full border border-[#ddd] rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#0A0A0A]" />
-            </div>
-
-            {/* 학력/전공 */}
-            <div>
-              <label className="text-xs text-[#888] mb-1 block">학력 / 전공</label>
-              <input value={school} onChange={(e) => setSchool(e.target.value)}
-                className="w-full border border-[#ddd] rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#0A0A0A]" />
             </div>
 
             {/* 자기소개 */}
@@ -742,8 +726,11 @@ function HighlightManageScreen({
   const [selectedCat, setSelectedCat] = useState<typeof HIGHLIGHT_CATEGORIES[0] | null>(null)
   const [hlTitle, setHlTitle] = useState('')
   const [hlYear, setHlYear] = useState('')
+  const [hlStatus, setHlStatus] = useState('')
   const [hlDesc, setHlDesc] = useState('')
   const [selectedCert, setSelectedCert] = useState<(typeof CERTIFICATION_ITEMS)[number] | null>(null)
+  const isCareerRole = selectedCat?.id === 'career-role'
+  const isEducationHistory = selectedCat?.id === 'education-history'
 
   const allManualHighlights = [...SAMPLE_PROFILE.manualHighlights, ...store.highlights]
   const groupedHighlights = HIGHLIGHT_GROUPS.map((group) => ({
@@ -764,20 +751,23 @@ function HighlightManageScreen({
     setSelectedCat(cat)
     setHlTitle(hl.title)
     setHlYear(hl.year)
+    setHlStatus(typeof hl.metadata?.status === 'string' ? hl.metadata.status : '')
     setHlDesc(hl.description)
     setEditingHl(hl)
     setMode('form')
   }
 
   const handleSave = () => {
-    if (!selectedCat || !hlTitle) { showToast('카테고리와 제목을 입력해주세요'); return }
+    if (!selectedCat || !hlTitle.trim()) { showToast('필수 항목을 입력해주세요'); return }
+    if (isEducationHistory && !hlStatus) { showToast('졸업 여부를 선택해주세요'); return }
     const payload = {
       categoryId: selectedCat.id,
       icon: selectedCat.icon as HighlightIconId,
       title: hlTitle,
-      subtitle: `${selectedCat.label} · 직접 입력`,
+      subtitle: isEducationHistory ? `${selectedCat.label} · ${hlStatus}` : `${selectedCat.label} · 직접 입력`,
       description: hlDesc,
       year: hlYear,
+      metadata: isEducationHistory ? { status: hlStatus } : isCareerRole && hlStatus ? { status: hlStatus } : undefined,
     }
     if (editingHl && store.highlights.some((h) => h.id === editingHl.id)) {
       store.updateHighlight(editingHl.id, payload)
@@ -798,6 +788,7 @@ function HighlightManageScreen({
     setSelectedCat(null)
     setHlTitle('')
     setHlYear('')
+    setHlStatus('')
     setHlDesc('')
     setEditingHl(null)
   }
@@ -892,17 +883,35 @@ function HighlightManageScreen({
               </div>
             </div>
           )}
-          <div className="surface-card rounded-[26px] p-4">
-            <div className="space-y-3 mb-4">
-              <input value={hlTitle} onChange={(e) => setHlTitle(e.target.value)} placeholder="제목"
+            <div className="surface-card rounded-[26px] p-4">
+              <div className="space-y-3 mb-4">
+              <input value={hlTitle} onChange={(e) => setHlTitle(e.target.value)} placeholder={isCareerRole ? '직함' : isEducationHistory ? '전공' : '제목'}
                 className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
-              <input value={hlYear} onChange={(e) => setHlYear(e.target.value)} placeholder="연도 (예: 2023)" type="number"
+              <input value={hlYear} onChange={(e) => setHlYear(e.target.value)} placeholder={isCareerRole ? '년도 또는 기간 (예: 2022 - 2024)' : isEducationHistory ? '년도 (예: 2020)' : '연도 (예: 2023)'}
                 className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
-              <TextArea value={hlDesc} onChange={setHlDesc} placeholder="어떤 경험인지 간단히 적어주세요" maxLength={150} rows={4} />
+              {isEducationHistory && (
+                <div className="grid grid-cols-2 gap-2">
+                  {['졸업', '재학 중'].map((status) => (
+                    <button
+                      key={status}
+                      onClick={() => setHlStatus(status)}
+                      className="rounded-2xl border px-4 py-3 text-sm font-semibold"
+                      style={{
+                        borderColor: hlStatus === status ? 'var(--color-accent-dark)' : '#E7E2DC',
+                        backgroundColor: hlStatus === status ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
+                        color: hlStatus === status ? '#fff' : 'var(--color-text-secondary)',
+                      }}
+                    >
+                      {status}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <TextArea value={hlDesc} onChange={setHlDesc} placeholder={isCareerRole ? '어떤 역할을 했는지 적어주세요' : isEducationHistory ? '전공이나 학업 경험을 적어주세요' : '어떤 경험인지 간단히 적어주세요'} maxLength={150} rows={4} />
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => setMode('picker')}>이전</Button>
-              <Button onClick={handleSave}>{editingHl ? '수정하기' : '저장하기'}</Button>
+              <Button onClick={handleSave} disabled={!selectedCat || !hlTitle.trim() || (isEducationHistory && !hlStatus)}>{editingHl ? '수정하기' : '저장하기'}</Button>
             </div>
           </div>
         </div>
@@ -1053,6 +1062,9 @@ function HighlightManageScreen({
                             </div>
                             <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
                               <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{entry.item.title}</span>
+                              {entry.item.metadata?.status && (
+                                <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(entry.item.metadata.status)}</span>
+                              )}
                               {entry.item.year && (
                                 <span className="text-[11px] text-[var(--color-text-tertiary)]">{entry.item.year}</span>
                               )}

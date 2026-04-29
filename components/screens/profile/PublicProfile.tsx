@@ -325,10 +325,6 @@ export default function PublicProfile({
                   <div className="text-[29px] font-black tracking-[-0.04em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.24)]">{profile.name}</div>
                   <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#43C07A] text-[10px] font-black text-white shadow-[0_8px_20px_rgba(67,192,122,0.35)]">✓</span>
                 </div>
-                <div className="mt-1 text-[15px] font-medium text-white/72">{profile.title}</div>
-                {profile.school && (
-                  <div className="mt-1 text-[13px] font-medium text-white/58">{profile.school}</div>
-                )}
                 <div className="mt-4 max-w-[318px] rounded-[18px] border border-white/12 bg-white/10 px-4 py-3 text-[15px] leading-[1.52] text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[8px]">
                   <p ref={bioRef} className={bioExpanded ? '' : 'line-clamp-3'}>
                     {profile.bio}
@@ -587,6 +583,9 @@ export default function PublicProfile({
                                   </div>
                                   <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
                                     <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{hl.title}</span>
+                                    {hl.metadata?.status && (
+                                      <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(hl.metadata.status)}</span>
+                                    )}
                                     {hl.year && (
                                       <span className="text-[11px] text-[var(--color-text-tertiary)]">{hl.year}</span>
                                     )}
@@ -786,7 +785,7 @@ export default function PublicProfile({
       <BottomSheet open={memoSheetOpen} onClose={() => setMemoSheetOpen(false)}>
         <div className="px-5 pb-6">
           <div className="text-sm font-black mb-1">프로필 저장</div>
-          <div className="text-xs text-[#888] mb-4">{profile.name} · {profile.title}</div>
+          <div className="text-xs text-[#888] mb-4">{profile.name}</div>
           <div className="text-xs text-[#555] mb-1">메모 (선택)</div>
           <TextArea
             value={memoText}

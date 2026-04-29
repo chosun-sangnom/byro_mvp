@@ -7,7 +7,7 @@ import type { OnboardingStep, Highlight, UserState, ContactChannel } from '@/typ
 import { SAMPLE_PROFILE } from '@/lib/mockData'
 
 const STEP_ORDER: OnboardingStep[] = [
-  'login', 'verify', 'basic-info', 'linkid', 'keywords', 'sns', 'contact', 'highlight', 'bio-select', 'bio-ai', 'complete',
+  'login', 'verify', 'linkid', 'keywords', 'sns', 'contact', 'highlight', 'bio-select', 'bio-ai', 'complete',
 ]
 
 interface ByroStore {
@@ -381,13 +381,15 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   },
 }), {
   name: 'byro-store',
-  version: 1,
+  version: 2,
   migrate: (persistedState: unknown) => {
     const state = persistedState as ByroStore | undefined
     if (!state) return persistedState
+    const persistedStep = state.step as string
     return {
       ...state,
       user: normalizeSampleUser(state.user),
+      step: persistedStep === 'basic-info' ? 'linkid' : state.step,
     }
   },
   partialize: (state) => ({

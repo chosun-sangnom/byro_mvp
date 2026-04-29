@@ -1057,11 +1057,13 @@ function HighlightManageScreen({
                             <HighlightIcon id={entry.item.icon as HighlightIconId} size={18} />
                           </span>
                           <div className="min-w-0 flex-1">
-                            <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
+                            <div className="text-[11px] font-semibold text-[var(--color-text-secondary)]">
                               {category?.label ?? '직접 입력'}
                             </div>
+                            <div className="mt-1 text-[15px] font-bold text-[var(--color-text-strong)]">
+                              {entry.item.title}
+                            </div>
                             <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
-                              <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{entry.item.title}</span>
                               {entry.item.metadata?.status && (
                                 <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(entry.item.metadata.status)}</span>
                               )}

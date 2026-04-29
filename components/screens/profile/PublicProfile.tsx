@@ -628,15 +628,15 @@ export default function PublicProfile({
                       const category = HIGHLIGHT_CATEGORIES.find((item) => item.id === entry.categoryId)
                       return (
                         <div key={`${entry.categoryId}-${group.id}`} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
-                          <div className="flex items-center gap-3 px-4 pb-1 pt-3">
-                            <span className="flex h-11 w-8 items-center justify-center text-[var(--color-text-strong)]">
+                          <div className="flex items-center gap-2 px-4 pb-0.5 pt-3">
+                            <span className="flex h-5 w-5 items-center justify-center text-[var(--color-text-strong)]">
                               <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={18} />
                             </span>
                             <div className="text-[11px] font-semibold text-[var(--color-text-secondary)]">
                               {category?.label ?? '직접 입력'}
                             </div>
                           </div>
-                          <div className="pb-1 pl-[60px] pr-4">
+                          <div className="pb-1 pl-[26px] pr-4">
                             {entry.items.map((hl, index) => {
                               const toggleKey = `${hl.id}_${username}`
                               const isOpen = store.hlOpenStates[toggleKey] ?? false

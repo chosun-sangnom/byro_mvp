@@ -156,12 +156,28 @@ export default function PublicProfile({
       year: '',
     }] : []),
   ]
-  const groupedHighlights = HIGHLIGHT_GROUPS.map((group) => ({
-    ...group,
-    items: [...verifiedHighlights, ...profile.manualHighlights].filter(
+  const groupedHighlights = HIGHLIGHT_GROUPS.map((group) => {
+    const verifiedItems = verifiedHighlights
+      .filter((item) => HIGHLIGHT_CATEGORIES.find((category) => category.id === item.categoryId)?.group === group.id)
+      .map((item) => ({ kind: 'verified' as const, item }))
+
+    const manualItems = profile.manualHighlights.filter(
       (item) => HIGHLIGHT_CATEGORIES.find((category) => category.id === item.categoryId)?.group === group.id,
-    ),
-  })).filter((group) => group.items.length > 0)
+    )
+
+    const manualGroups = Array.from(new Map(
+      manualItems.map((item) => [item.categoryId, manualItems.filter((manual) => manual.categoryId === item.categoryId)]),
+    ).entries()).map(([categoryId, items]) => ({
+      kind: 'manual-group' as const,
+      categoryId,
+      items,
+    }))
+
+    return {
+      ...group,
+      items: [...verifiedItems, ...manualGroups],
+    }
+  }).filter((group) => group.items.length > 0)
 
   // SNS 토글
   const igOpen = store.snsOpenStates['instagram_' + username] ?? false
@@ -551,124 +567,145 @@ export default function PublicProfile({
                 </div>
                 {group.items.length > 0 ? (
                   <div className="space-y-2">
-                    {group.items.map((hl) => {
-                      const isVerified = hl.id.startsWith('verified-')
-                      const toggleKey = `${hl.id}_${username}`
-                      const isOpen = store.hlOpenStates[toggleKey] ?? false
-                      const category = HIGHLIGHT_CATEGORIES.find((item) => item.id === hl.categoryId)
+                    {group.items.map((entry) => {
+                      if (entry.kind === 'verified') {
+                        const hl = entry.item
+                        const toggleKey = `${hl.id}_${username}`
+                        const isOpen = store.hlOpenStates[toggleKey] ?? false
+                        return (
+                          <div key={hl.id} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
+                            <button
+                              onClick={() => store.toggleHlOpen(toggleKey)}
+                              className="flex w-full items-center gap-3 px-4 py-3 text-left"
+                            >
+                              <span className="flex h-11 w-8 items-center justify-center text-[var(--color-text-strong)]">
+                                <HighlightIcon id={hl.icon as HighlightIconId} size={18} />
+                              </span>
+                              <div className="min-w-0 flex-1">
+                                <div className="flex flex-wrap items-center gap-2">
+                                  <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{hl.title}</span>
+                                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-[#217A43] shadow-[0_2px_8px_rgba(17,17,17,0.08)]">
+                                    <BadgeCheck size={12} />
+                                  </span>
+                                </div>
+                                <div className="mt-1 text-[15px] font-bold text-[var(--color-text-strong)]">{hl.subtitle}</div>
+                              </div>
+                              {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
+                            </button>
+                            {isOpen && (
+                              <div className="border-t border-[#F1ECE6] bg-[#FBFAF8] px-4 py-4">
+                                {hl.categoryId === 'career-continuity' && (
+                                  <CareerContinuityChart
+                                    avgYears={profile.careerHighlight.avgYears}
+                                    vsIndustryPercent={profile.careerHighlight.vsIndustryPercent}
+                                  />
+                                )}
+                                {hl.categoryId === 'remember-network' && (
+                                  <RememberNetworkGraph
+                                    total={profile.rememberHighlight.total}
+                                    industries={profile.rememberHighlight.industries}
+                                  />
+                                )}
+                                {hl.categoryId === 'corporate-longevity' && (
+                                  <CorporateLongevityTimeline
+                                    summary={corporateHighlight.summary}
+                                    companies={corporateHighlight.companies}
+                                  />
+                                )}
+                                {hl.categoryId === 'airline-mileage' && (
+                                  <AirlineMileageSummary
+                                    badgeLabel={airlineBadgeLabel}
+                                    tierSummary={airlineHighlight.tierSummary}
+                                    airlines={airlineHighlight.airlines}
+                                  />
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      }
+
+                      const category = HIGHLIGHT_CATEGORIES.find((item) => item.id === entry.categoryId)
                       return (
-                        <div key={hl.id} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
-                          <button
-                            onClick={() => store.toggleHlOpen(toggleKey)}
-                            className="flex w-full items-center gap-3 px-4 py-3 text-left"
-                          >
-                            <span className="flex h-11 w-8 items-center justify-center text-[var(--color-text-strong)]">
-                              <HighlightIcon id={hl.icon as HighlightIconId} size={18} />
-                            </span>
-                            <div className="min-w-0 flex-1">
-                              {isVerified ? (
-                                <>
-                                  <div className="flex flex-wrap items-center gap-2">
-                                    <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{hl.title}</span>
-                                    <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-[#217A43] shadow-[0_2px_8px_rgba(17,17,17,0.08)]">
-                                      <BadgeCheck size={12} />
-                                    </span>
+                        <div key={`${entry.categoryId}-${group.id}`} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
+                          {entry.items.map((hl, index) => {
+                            const toggleKey = `${hl.id}_${username}`
+                            const isOpen = store.hlOpenStates[toggleKey] ?? false
+                            return (
+                              <div key={hl.id} className={index > 0 ? 'border-t border-[#F1ECE6]' : ''}>
+                                <button
+                                  onClick={() => store.toggleHlOpen(toggleKey)}
+                                  className="flex w-full items-center gap-3 px-4 py-3 text-left"
+                                >
+                                  <span className="flex h-11 w-8 items-center justify-center text-[var(--color-text-strong)]">
+                                    <HighlightIcon id={hl.icon as HighlightIconId} size={18} />
+                                  </span>
+                                  <div className="min-w-0 flex-1">
+                                    <div className="text-[11px] font-semibold text-[var(--color-text-secondary)]">
+                                      {category?.label ?? '직접 입력'}
+                                    </div>
+                                    <div className="mt-1 text-[15px] font-bold text-[var(--color-text-strong)]">
+                                      {hl.title}
+                                    </div>
+                                    <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                                      {hl.metadata?.role && (
+                                        <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{String(hl.metadata.role)}</span>
+                                      )}
+                                      {hl.metadata?.status && (
+                                        <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(hl.metadata.status)}</span>
+                                      )}
+                                      {hl.year && (
+                                        <span className="text-[11px] text-[var(--color-text-tertiary)]">{hl.year}</span>
+                                      )}
+                                    </div>
                                   </div>
-                                  <div className="mt-1 text-[15px] font-bold text-[var(--color-text-strong)]">{hl.subtitle}</div>
-                                </>
-                              ) : (
-                                <>
-                                  <div className="text-[11px] font-semibold text-[var(--color-text-secondary)]">
-                                    {category?.label ?? '직접 입력'}
-                                  </div>
-                                  <div className="mt-1 text-[15px] font-bold text-[var(--color-text-strong)]">
-                                    {hl.title}
-                                  </div>
-                                  <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                    {hl.metadata?.role && (
-                                      <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{String(hl.metadata.role)}</span>
-                                    )}
-                                    {hl.metadata?.status && (
-                                      <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(hl.metadata.status)}</span>
-                                    )}
-                                    {hl.year && (
-                                      <span className="text-[11px] text-[var(--color-text-tertiary)]">{hl.year}</span>
-                                    )}
-                                  </div>
-                                </>
-                              )}
-                            </div>
-                            {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
-                          </button>
-                          {isOpen && (
-                            <div className="border-t border-[#F1ECE6] bg-[#FBFAF8] px-4 py-4">
-                              {hl.categoryId === 'career-continuity' && (
-                                <CareerContinuityChart
-                                  avgYears={profile.careerHighlight.avgYears}
-                                  vsIndustryPercent={profile.careerHighlight.vsIndustryPercent}
-                                />
-                              )}
-                              {hl.categoryId === 'remember-network' && (
-                                <RememberNetworkGraph
-                                  total={profile.rememberHighlight.total}
-                                  industries={profile.rememberHighlight.industries}
-                                />
-                              )}
-                              {hl.categoryId === 'corporate-longevity' && (
-                                <CorporateLongevityTimeline
-                                  summary={corporateHighlight.summary}
-                                  companies={corporateHighlight.companies}
-                                />
-                              )}
-                              {hl.categoryId === 'airline-mileage' && (
-                                <AirlineMileageSummary
-                                  badgeLabel={airlineBadgeLabel}
-                                  tierSummary={airlineHighlight.tierSummary}
-                                  airlines={airlineHighlight.airlines}
-                                />
-                              )}
-                              {!isVerified && (
-                                <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
-                                  {hl.description || '세부 설명이 아직 없어요.'}
-                                  {hl.linkUrl && (
-                                    <a
-                                      href={hl.linkUrl}
-                                      target="_blank"
-                                      rel="noopener noreferrer"
-                                      className="mt-3 block overflow-hidden rounded-[18px] border border-[#E7E2DC] bg-white"
-                                    >
-                                      <div className="flex min-h-[84px]">
-                                        {hl.thumbnailUrl ? (
-                                          <div className="h-auto w-24 flex-shrink-0 overflow-hidden bg-[#F4F1EC]">
-                                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                                            <img src={hl.thumbnailUrl} alt={hl.title} className="h-full w-full object-cover" />
-                                          </div>
-                                        ) : (
-                                          <div className="flex w-24 flex-shrink-0 items-center justify-center bg-[linear-gradient(180deg,#F6F3EF_0%,#EDE7DF_100%)] px-3 text-center">
-                                            <div>
-                                              <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[#8E867E]">News</div>
-                                              <div className="mt-1 text-[11px] font-semibold text-[#3D3833]">{hl.sourceLabel ?? '기사 링크'}</div>
+                                  {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
+                                </button>
+                                {isOpen && (
+                                  <div className="border-t border-[#F1ECE6] bg-[#FBFAF8] px-4 py-4">
+                                    <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
+                                      {hl.description || '세부 설명이 아직 없어요.'}
+                                      {hl.linkUrl && (
+                                        <a
+                                          href={hl.linkUrl}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="mt-3 block overflow-hidden rounded-[18px] border border-[#E7E2DC] bg-white"
+                                        >
+                                          <div className="flex min-h-[84px]">
+                                            {hl.thumbnailUrl ? (
+                                              <div className="h-auto w-24 flex-shrink-0 overflow-hidden bg-[#F4F1EC]">
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                <img src={hl.thumbnailUrl} alt={hl.title} className="h-full w-full object-cover" />
+                                              </div>
+                                            ) : (
+                                              <div className="flex w-24 flex-shrink-0 items-center justify-center bg-[linear-gradient(180deg,#F6F3EF_0%,#EDE7DF_100%)] px-3 text-center">
+                                                <div>
+                                                  <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[#8E867E]">News</div>
+                                                  <div className="mt-1 text-[11px] font-semibold text-[#3D3833]">{hl.sourceLabel ?? '기사 링크'}</div>
+                                                </div>
+                                              </div>
+                                            )}
+                                            <div className="flex min-w-0 flex-1 items-center px-4 py-3">
+                                              <div className="min-w-0">
+                                                <div className="text-[12px] font-semibold text-[#8E867E]">{hl.sourceLabel ?? '외부 링크'}</div>
+                                                <div className="mt-1 line-clamp-2 text-[13px] font-bold leading-snug text-[#1F1B18]">{hl.title}</div>
+                                                <div className="mt-2 text-[11px] font-semibold text-[#0D47A1]">기사 보러가기</div>
+                                              </div>
                                             </div>
                                           </div>
-                                        )}
-                                        <div className="flex min-w-0 flex-1 items-center px-4 py-3">
-                                          <div className="min-w-0">
-                                            <div className="text-[12px] font-semibold text-[#8E867E]">{hl.sourceLabel ?? '외부 링크'}</div>
-                                            <div className="mt-1 line-clamp-2 text-[13px] font-bold leading-snug text-[#1F1B18]">{hl.title}</div>
-                                            <div className="mt-2 text-[11px] font-semibold text-[#0D47A1]">기사 보러가기</div>
-                                          </div>
-                                        </div>
+                                        </a>
+                                      )}
+                                      <div className="micro-text mt-2">
+                                        {category?.label ?? hl.subtitle}
+                                        {hl.year ? ` · ${hl.year}` : ''}
                                       </div>
-                                    </a>
-                                  )}
-                                  <div className="micro-text mt-2">
-                                    {category?.label ?? hl.subtitle}
-                                    {hl.year ? ` · ${hl.year}` : ''}
+                                    </div>
                                   </div>
-                                </div>
-                              )}
-                            </div>
-                          )}
+                                )}
+                              </div>
+                            )
+                          })}
                         </div>
                       )
                     })}

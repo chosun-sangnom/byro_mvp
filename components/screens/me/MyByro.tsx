@@ -940,7 +940,7 @@ function HighlightManageScreen({
               </span>
               <div>
                 <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{selectedCat.label}</div>
-                <div className="micro-text">여러 항목을 추가하고 대표로 보여줄 항목을 선택할 수 있어요</div>
+                <div className="micro-text">여러 항목을 추가하고 메인으로 보여줄 항목을 선택할 수 있어요</div>
               </div>
             </div>
           </div>
@@ -972,16 +972,16 @@ function HighlightManageScreen({
                         )}
                       </div>
                       {isPrimaryHighlight(item) ? (
-                        <span className="rounded-full bg-[#E8F5EC] px-2.5 py-1 text-[11px] font-semibold text-[#217A43]">대표</span>
+                        <span className="rounded-full bg-[#E8F5EC] px-2.5 py-1 text-[11px] font-semibold text-[#217A43]">메인 노출 중</span>
                       ) : isEditable ? (
                         <button
                           onClick={() => {
                             store.setHighlightPrimary(item.id)
-                            showToast('대표 항목으로 설정했어요')
+                            showToast('메인 항목으로 설정했어요')
                           }}
                           className="rounded-full border border-[#D7D0C8] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-secondary)]"
                         >
-                          대표로 설정
+                          메인으로 설정
                         </button>
                       ) : (
                         <span className="rounded-full bg-[#F6F3EF] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-tertiary)]">기본</span>

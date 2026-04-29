@@ -244,12 +244,12 @@ function Step1Login({ onClose: _onClose }: { onClose: () => void }) { // eslint-
         <div className="micro-text uppercase tracking-[0.18em] mb-2">Welcome</div>
         <div className="text-3xl font-black mb-2">Byro</div>
         <div className="text-lg font-black text-[var(--color-text-strong)] leading-snug">
-          말하지 않아도<br />증명되는 나
+          진짜 나를 보여주는<br />브랜딩 프로필, Byro
         </div>
         <div className="meta-text mt-3 leading-relaxed">
-          3분이면 프로필을 만들 수 있어요.
+          3분이면 프로필을 만들 수 있고,
           <br />
-          링크 하나로 바로 공유해보세요.
+          만난 사람에게 바로 공유해보세요.
         </div>
       </div>
       <div className="space-y-3">

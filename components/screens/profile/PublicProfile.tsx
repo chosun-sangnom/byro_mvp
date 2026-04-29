@@ -639,11 +639,13 @@ export default function PublicProfile({
                               {entry.items.map((hl, index) => {
                                 const toggleKey = `${hl.id}_${username}`
                                 const isOpen = store.hlOpenStates[toggleKey] ?? false
+                                const hasDetail = Boolean(hl.description?.trim() || hl.linkUrl)
                                 return (
                                   <div key={hl.id} className={index > 0 ? 'border-t border-[#F1ECE6]' : ''}>
                                     <button
-                                      onClick={() => store.toggleHlOpen(toggleKey)}
+                                      onClick={hasDetail ? () => store.toggleHlOpen(toggleKey) : undefined}
                                       className={`${index === 0 ? 'pt-0' : 'pt-2.5'} flex w-full items-center gap-3 pb-2.5 text-left`}
+                                      disabled={!hasDetail}
                                     >
                                       <div className="min-w-0 flex-1">
                                         <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
@@ -664,9 +666,9 @@ export default function PublicProfile({
                                           )}
                                         </div>
                                       </div>
-                                      {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
+                                      {hasDetail && (isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />)}
                                     </button>
-                                    {isOpen && (
+                                    {hasDetail && isOpen && (
                                       <div className="pb-3 pr-4">
                                         <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
                                           {hl.description || '세부 설명이 아직 없어요.'}

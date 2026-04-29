@@ -1211,11 +1211,13 @@ function HighlightManageScreen({
                             {entry.items.map((item, index) => {
                               const isEditable = store.highlights.some((highlight) => highlight.id === item.id)
                               const isOpen = certOpen[item.id]
+                              const hasDetail = Boolean(item.description?.trim() || item.linkUrl)
                               return (
                                 <div key={item.id} className={index > 0 ? 'border-t border-[#F1ECE6]' : ''}>
                                   <button
-                                    onClick={() => toggleCert(item.id)}
+                                    onClick={hasDetail ? () => toggleCert(item.id) : undefined}
                                     className={`${index === 0 ? 'pt-0' : 'pt-2.5'} flex w-full items-center gap-3 pb-2.5 text-left`}
+                                    disabled={!hasDetail}
                                   >
                                     <div className="min-w-0 flex-1">
                                       <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
@@ -1236,9 +1238,9 @@ function HighlightManageScreen({
                                         )}
                                       </div>
                                     </div>
-                                    {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
+                                    {hasDetail && (isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />)}
                                   </button>
-                                  {isOpen && (
+                                  {hasDetail && isOpen && (
                                     <div className="pb-3 pr-4">
                                       <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
                                         {item.description || '세부 설명이 아직 없어요.'}

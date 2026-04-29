@@ -787,7 +787,7 @@ function HighlightManageScreen({
     setMode('form')
   }
 
-  const handleSave = (continueAdding = false) => {
+  const handleSave = () => {
     if (!selectedCat || !hlTitle.trim()) { showToast('필수 항목을 입력해주세요'); return }
     if (isCareerRole && !hlRole.trim()) { showToast('직함을 입력해주세요'); return }
     if (isCareerRole && !hlStatus) { showToast('상태를 선택해주세요'); return }
@@ -823,17 +823,10 @@ function HighlightManageScreen({
     } else {
       store.addHighlight(payload)
     }
-    setEditingHl(null)
-    if (continueAdding && !editingHl) {
-      const preservedCategory = selectedCat
-      resetAddForm()
-      setSelectedCat(preservedCategory)
-      setMode('form')
-      showToast('추가됐어요. 같은 항목을 계속 입력할 수 있어요!')
-      return
-    }
+    const preservedCategory = selectedCat
     setMode('group')
     resetAddForm()
+    setSelectedCat(preservedCategory)
     showToast(editingHl ? '수정됐어요!' : '추가됐어요!')
   }
 
@@ -1200,7 +1193,7 @@ function HighlightManageScreen({
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => setMode(selectedCat ? 'group' : 'picker')}>이전</Button>
-              <Button onClick={() => handleSave(false)} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && (!hlRole.trim() || !hlStatus || !hlStartYear || (hlStatus === '종료' && !hlEndYear))) || (isEducationHistory && (!hlSchoolType || (educationNeedsDegree && !hlDegree) || (educationNeedsMajor && !hlRole.trim()) || !hlStatus))}>{editingHl ? '수정하기' : '저장하기'}</Button>
+              <Button onClick={handleSave} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && (!hlRole.trim() || !hlStatus || !hlStartYear || (hlStatus === '종료' && !hlEndYear))) || (isEducationHistory && (!hlSchoolType || (educationNeedsDegree && !hlDegree) || (educationNeedsMajor && !hlRole.trim()) || !hlStatus))}>{editingHl ? '수정하기' : '저장하기'}</Button>
             </div>
           </div>
         </div>

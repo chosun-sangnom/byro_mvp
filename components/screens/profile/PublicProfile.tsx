@@ -628,6 +628,14 @@ export default function PublicProfile({
                       const category = HIGHLIGHT_CATEGORIES.find((item) => item.id === entry.categoryId)
                       return (
                         <div key={`${entry.categoryId}-${group.id}`} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
+                          <div className="flex items-center gap-3 px-4 py-3">
+                            <span className="flex h-11 w-8 items-center justify-center text-[var(--color-text-strong)]">
+                              <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={18} />
+                            </span>
+                            <div className="text-[11px] font-semibold text-[var(--color-text-secondary)]">
+                              {category?.label ?? '직접 입력'}
+                            </div>
+                          </div>
                           {entry.items.map((hl, index) => {
                             const toggleKey = `${hl.id}_${username}`
                             const isOpen = store.hlOpenStates[toggleKey] ?? false
@@ -637,13 +645,7 @@ export default function PublicProfile({
                                   onClick={() => store.toggleHlOpen(toggleKey)}
                                   className="flex w-full items-center gap-3 px-4 py-3 text-left"
                                 >
-                                  <span className="flex h-11 w-8 items-center justify-center text-[var(--color-text-strong)]">
-                                    <HighlightIcon id={hl.icon as HighlightIconId} size={18} />
-                                  </span>
-                                  <div className="min-w-0 flex-1">
-                                    <div className="text-[11px] font-semibold text-[var(--color-text-secondary)]">
-                                      {category?.label ?? '직접 입력'}
-                                    </div>
+                                  <div className="min-w-0 flex-1 pl-11">
                                     <div className="mt-1 text-[15px] font-bold text-[var(--color-text-strong)]">
                                       {hl.title}
                                     </div>

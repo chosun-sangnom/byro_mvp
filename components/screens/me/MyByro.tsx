@@ -1089,23 +1089,24 @@ function HighlightManageScreen({
 
                     return (
                       <div key={`${entry.categoryId}-${group.id}`} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
+                        <div className="flex items-center gap-3 px-4 py-3">
+                          <span className="flex h-11 w-8 items-center justify-center text-[var(--color-text-strong)]">
+                            <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={18} />
+                          </span>
+                          <div className="text-[11px] font-semibold text-[var(--color-text-secondary)]">
+                            {HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === entry.categoryId)?.label ?? '직접 입력'}
+                          </div>
+                        </div>
                         {entry.items.map((item, index) => {
                           const isEditable = store.highlights.some((highlight) => highlight.id === item.id)
                           const isOpen = certOpen[item.id]
-                          const category = HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === item.categoryId)
                           return (
                             <div key={item.id} className={index > 0 ? 'border-t border-[#F1ECE6]' : ''}>
                               <button
                                 onClick={() => toggleCert(item.id)}
                                 className="flex w-full items-center gap-3 px-4 py-4 text-left"
                               >
-                                <span className="flex h-11 w-8 items-center justify-center text-[var(--color-text-strong)]">
-                                  <HighlightIcon id={item.icon as HighlightIconId} size={18} />
-                                </span>
-                                <div className="min-w-0 flex-1">
-                                  <div className="text-[11px] font-semibold text-[var(--color-text-secondary)]">
-                                    {category?.label ?? '직접 입력'}
-                                  </div>
+                                <div className="min-w-0 flex-1 pl-11">
                                   <div className="mt-1 text-[15px] font-bold text-[var(--color-text-strong)]">
                                     {item.title}
                                   </div>
@@ -1128,7 +1129,7 @@ function HighlightManageScreen({
                                   <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
                                     {item.description || '세부 설명이 아직 없어요.'}
                                     <div className="micro-text mt-2">
-                                      {category?.label ?? item.subtitle}
+                                      {HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === item.categoryId)?.label ?? item.subtitle}
                                       {item.year ? ` · ${item.year}` : ''}
                                     </div>
                                   </div>

@@ -1102,7 +1102,7 @@ function HighlightManageScreen({
                             {HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === entry.categoryId)?.label ?? '직접 입력'}
                           </div>
                         </div>
-                        <div className="pb-1 pl-[26px] pr-4">
+                        <div className="pb-1 pl-[44px] pr-4">
                           {entry.items.map((item, index) => {
                             const isEditable = store.highlights.some((highlight) => highlight.id === item.id)
                             const isOpen = certOpen[item.id]

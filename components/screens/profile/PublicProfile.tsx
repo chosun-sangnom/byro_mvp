@@ -636,7 +636,7 @@ export default function PublicProfile({
                               {category?.label ?? '직접 입력'}
                             </div>
                           </div>
-                          <div className="pb-1 pl-[26px] pr-4">
+                          <div className="pb-1 pl-[44px] pr-4">
                             {entry.items.map((hl, index) => {
                               const toggleKey = `${hl.id}_${username}`
                               const isOpen = store.hlOpenStates[toggleKey] ?? false

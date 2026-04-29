@@ -398,7 +398,7 @@ function Step3LinkId() {
   const [input, setInput] = useState(store.linkId)
   const [status, setStatus] = useState<'idle' | 'valid' | 'error'>('idle')
 
-  const LINK_REGEX = /^[a-z0-9_]{4,20}$/
+  const LINK_REGEX = /^[a-z0-9_]{2,20}$/
 
   const handleChange = (v: string) => {
     setInput(v)
@@ -432,8 +432,8 @@ function Step3LinkId() {
         ].join(' ')}
       />
       {status === 'valid' && <p className="text-xs text-[var(--color-state-success-text)] mb-3">사용할 수 있는 ID예요</p>}
-      {status === 'error' && <p className="text-xs text-[var(--color-state-danger-text)] mb-3">영문 소문자, 숫자, 밑줄(_)만 가능 · 4~20자</p>}
-      <p className="meta-text mb-6">· 영문 소문자, 숫자, 밑줄(_) &nbsp;· 4~20자 이내</p>
+      {status === 'error' && <p className="text-xs text-[var(--color-state-danger-text)] mb-3">영문 소문자, 숫자, 밑줄(_)만 가능 · 2~20자</p>}
+      <p className="meta-text mb-6">· 영문 소문자, 숫자, 밑줄(_) &nbsp;· 2~20자 이내</p>
       {input && status !== 'error' && (
         <div className="surface-card-soft rounded-2xl px-4 py-3 mb-5">
           <div className="micro-text mb-1">미리보기</div>

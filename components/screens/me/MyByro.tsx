@@ -913,8 +913,6 @@ function HighlightManageScreen({
           )}
             <div className="surface-card rounded-[26px] p-4">
               <div className="space-y-3 mb-4">
-              <input value={hlTitle} onChange={(e) => setHlTitle(e.target.value)} placeholder={isCareerRole ? '회사명' : isEducationHistory ? '학교명' : '제목'}
-                className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
               {isEducationHistory && (
                 <div className="space-y-2">
                   <div className="micro-text">학교 유형 / 학위</div>
@@ -923,7 +921,7 @@ function HighlightManageScreen({
                       <button
                         key={degree}
                         onClick={() => setHlDegree(degree)}
-                        className="rounded-2xl border px-3 py-3 text-sm font-semibold"
+                        className="rounded-2xl border px-3 py-2.5 text-sm font-semibold"
                         style={{
                           borderColor: hlDegree === degree ? 'var(--color-accent-dark)' : '#E7E2DC',
                           backgroundColor: hlDegree === degree ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
@@ -936,6 +934,8 @@ function HighlightManageScreen({
                   </div>
                 </div>
               )}
+              <input value={hlTitle} onChange={(e) => setHlTitle(e.target.value)} placeholder={isCareerRole ? '회사명' : isEducationHistory ? '학교명' : '제목'}
+                className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
               {isEducationHistory && educationNeedsMajor && (
                 <input value={hlRole} onChange={(e) => setHlRole(e.target.value)} placeholder="전공"
                   className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
@@ -965,12 +965,14 @@ function HighlightManageScreen({
                 </div>
               )}
               {isEducationHistory && (
-                <div className="grid grid-cols-2 gap-2">
+                <div className="space-y-2">
+                  <div className="micro-text">현재 상태</div>
+                  <div className="grid grid-cols-3 gap-2">
                   {['졸업', '재학', '중퇴'].map((status) => (
                     <button
                       key={status}
                       onClick={() => setHlStatus(status)}
-                      className="rounded-2xl border px-4 py-3 text-sm font-semibold"
+                      className="rounded-2xl border px-3 py-2.5 text-sm font-semibold"
                       style={{
                         borderColor: hlStatus === status ? 'var(--color-accent-dark)' : '#E7E2DC',
                         backgroundColor: hlStatus === status ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
@@ -980,6 +982,7 @@ function HighlightManageScreen({
                       {status}
                     </button>
                   ))}
+                  </div>
                 </div>
               )}
               {!isEducationHistory && (

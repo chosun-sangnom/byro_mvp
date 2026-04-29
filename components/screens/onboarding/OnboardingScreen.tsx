@@ -873,13 +873,6 @@ function Step7Highlight() {
 
             <div className="surface-card rounded-[26px] p-4">
               <div className="space-y-3">
-                <input
-                  value={hlTitle}
-                  onChange={(e) => setHlTitle(e.target.value)}
-                  placeholder={isCareerRole ? '회사명' : isEducationHistory ? '학교명' : '제목'}
-                  className="w-full rounded-2xl border px-4 py-3 text-sm outline-none"
-                  style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-soft)' }}
-                />
                 {isEducationHistory && (
                   <div className="space-y-2">
                     <div className="micro-text">학교 유형 / 학위</div>
@@ -888,7 +881,7 @@ function Step7Highlight() {
                         <button
                           key={degree}
                           onClick={() => setHlDegree(degree)}
-                          className="rounded-2xl border px-3 py-3 text-sm font-semibold"
+                          className="rounded-2xl border px-3 py-2.5 text-sm font-semibold"
                           style={{
                             borderColor: hlDegree === degree ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
                             backgroundColor: hlDegree === degree ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
@@ -901,6 +894,13 @@ function Step7Highlight() {
                     </div>
                   </div>
                 )}
+                <input
+                  value={hlTitle}
+                  onChange={(e) => setHlTitle(e.target.value)}
+                  placeholder={isCareerRole ? '회사명' : isEducationHistory ? '학교명' : '제목'}
+                  className="w-full rounded-2xl border px-4 py-3 text-sm outline-none"
+                  style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-soft)' }}
+                />
                 {isEducationHistory && educationNeedsMajor && (
                   <input
                     value={hlRole}
@@ -945,12 +945,14 @@ function Step7Highlight() {
                   </div>
                 )}
                 {isEducationHistory && (
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-2">
+                    <div className="micro-text">현재 상태</div>
+                    <div className="grid grid-cols-3 gap-2">
                     {['졸업', '재학', '중퇴'].map((status) => (
                       <button
                         key={status}
                         onClick={() => setHlStatus(status)}
-                        className="rounded-2xl border px-4 py-3 text-sm font-semibold"
+                        className="rounded-2xl border px-3 py-2.5 text-sm font-semibold"
                         style={{
                           borderColor: hlStatus === status ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
                           backgroundColor: hlStatus === status ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
@@ -960,6 +962,7 @@ function Step7Highlight() {
                         {status}
                       </button>
                     ))}
+                    </div>
                   </div>
                 )}
                 {!isEducationHistory && (

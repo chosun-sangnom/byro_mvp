@@ -1202,7 +1202,7 @@ function HighlightManageScreen({
                     return (
                       <div key={`${entry.categoryId}-${group.id}`} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
                         <div className="flex gap-3 px-4 py-2.5">
-                          <span className="flex h-11 w-11 shrink-0 items-center justify-center self-start rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
+                          <span className="flex h-11 w-8 shrink-0 items-center justify-center self-center text-[var(--color-text-strong)]">
                             <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={18} />
                           </span>
                           <div className="min-w-0 flex-1">

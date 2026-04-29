@@ -670,7 +670,7 @@ export default function PublicProfile({
                                     </button>
                                     {hasDetail && isOpen && (
                                       <div className="pb-3 pr-4">
-                                        <div className="rounded-[22px] border border-[#ECE6DF] bg-[var(--color-bg-soft)] px-4 py-4 space-y-3">
+                                        <div className="rounded-[18px] border border-[#F0ECE7] bg-[#FBFAF8] px-3.5 py-3 space-y-3">
                                           {hl.description?.trim() && (
                                             <p className="text-[14px] leading-7 text-[var(--color-text-secondary)]">
                                               {hl.description}

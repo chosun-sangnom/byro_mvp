@@ -585,6 +585,9 @@ export default function PublicProfile({
                                     {hl.title}
                                   </div>
                                   <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                                    {hl.metadata?.role && (
+                                      <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{String(hl.metadata.role)}</span>
+                                    )}
                                     {hl.metadata?.status && (
                                       <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(hl.metadata.status)}</span>
                                     )}

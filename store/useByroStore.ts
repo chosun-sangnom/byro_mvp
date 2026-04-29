@@ -35,6 +35,7 @@ interface ByroStore {
   // 앱
   bookmarkedProfiles: string[]
   hlOpenStates: Record<string, boolean>
+  primaryHighlightOverrides: Record<string, string>
   snsOpenStates: Record<string, boolean>
   activeArchiveTab: 'saved' | 'recent' | 'requests'
   experienceKeywords: string[]
@@ -61,7 +62,7 @@ interface ByroStore {
   addHighlight(h: Omit<Highlight, 'id'>): void
   updateHighlight(id: string, h: Omit<Highlight, 'id'>): void
   removeHighlight(id: string): void
-  setHighlightPrimary(id: string): void
+  setHighlightPrimary(categoryId: string, id: string): void
   setBio(bio: string, mode: 'ai' | 'manual'): void
   setSelectedBioMethod(method: 'ai' | 'manual'): void
   completeOnboarding(): void
@@ -125,6 +126,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   // 앱
   bookmarkedProfiles: [],
   hlOpenStates: {},
+  primaryHighlightOverrides: {},
   snsOpenStates: {},
   activeArchiveTab: 'saved',
   experienceKeywords: [],
@@ -236,14 +238,14 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     }))
   },
 
-  setHighlightPrimary(id) {
-    set((state) => {
-      const target = state.highlights.find((item) => item.id === id)
-      if (!target) return state
-
-      return {
-        highlights: state.highlights.map((item) => {
-          if (item.categoryId !== target.categoryId) return item
+  setHighlightPrimary(categoryId, id) {
+    set((state) => ({
+      primaryHighlightOverrides: {
+        ...state.primaryHighlightOverrides,
+        [categoryId]: id,
+      },
+      highlights: state.highlights.map((item) => {
+          if (item.categoryId !== categoryId) return item
           if (item.id === id) {
             return {
               ...item,
@@ -261,8 +263,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
             },
           }
         }),
-      }
-    })
+    }))
   },
 
   setBio(bio, mode) {
@@ -331,6 +332,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       linkedinConnected: false,
       onboardingContactChannels: SAMPLE_PROFILE.contactChannels,
       highlights: [],
+      primaryHighlightOverrides: {},
       bio: '',
       bioMode: null,
       expSubmittedProfiles: [],
@@ -442,6 +444,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     selectedBioMethod: state.selectedBioMethod,
     bookmarkedProfiles: state.bookmarkedProfiles,
     hlOpenStates: state.hlOpenStates,
+    primaryHighlightOverrides: state.primaryHighlightOverrides,
     snsOpenStates: state.snsOpenStates,
     activeArchiveTab: state.activeArchiveTab,
     experienceKeywords: state.experienceKeywords,

@@ -1,11 +1,12 @@
 import type { Highlight } from '@/types'
 
-export function isPrimaryHighlight(highlight: Highlight): boolean {
+export function isPrimaryHighlight(highlight: Highlight, overrideId?: string): boolean {
+  if (overrideId) return highlight.id === overrideId
   return highlight.metadata?.isPrimary === true
 }
 
-export function sortHighlightsByPrimary(items: Highlight[]): Highlight[] {
-  return [...items].sort((a, b) => Number(isPrimaryHighlight(b)) - Number(isPrimaryHighlight(a)))
+export function sortHighlightsByPrimary(items: Highlight[], overrideId?: string): Highlight[] {
+  return [...items].sort((a, b) => Number(isPrimaryHighlight(b, overrideId)) - Number(isPrimaryHighlight(a, overrideId)))
 }
 
 export function getHighlightMetaParts(highlight: Highlight): string[] {
@@ -60,8 +61,8 @@ export function getGroupedHighlightSummary(items: Highlight[], categoryLabel?: s
   return [countLabel, titles.join(', ')].filter(Boolean).join(' · ')
 }
 
-export function getGroupedHighlightPreview(items: Highlight[]) {
-  const first = sortHighlightsByPrimary(items)[0]
+export function getGroupedHighlightPreview(items: Highlight[], overrideId?: string) {
+  const first = sortHighlightsByPrimary(items, overrideId)[0]
   if (!first) {
     return { title: '', meta: '' }
   }

@@ -744,7 +744,7 @@ function HighlightManageScreen({
   const yearOptions = Array.from({ length: currentYear - 1979 }, (_, index) => String(currentYear - index))
   const allManualHighlights = [...SAMPLE_PROFILE.manualHighlights, ...store.highlights]
   const selectedCategoryHighlights = selectedCat
-    ? sortHighlightsByPrimary(allManualHighlights.filter((item) => item.categoryId === selectedCat.id))
+    ? sortHighlightsByPrimary(allManualHighlights.filter((item) => item.categoryId === selectedCat.id), store.primaryHighlightOverrides[selectedCat.id])
     : []
   const groupedHighlights = HIGHLIGHT_GROUPS.map((group) => {
     const verifiedItems = CERTIFICATION_ITEMS.filter((item) => {
@@ -757,7 +757,7 @@ function HighlightManageScreen({
     )
 
     const manualGroups = Array.from(new Map(
-      manualItems.map((item) => [item.categoryId, sortHighlightsByPrimary(manualItems.filter((manual) => manual.categoryId === item.categoryId))]),
+      manualItems.map((item) => [item.categoryId, sortHighlightsByPrimary(manualItems.filter((manual) => manual.categoryId === item.categoryId), store.primaryHighlightOverrides[item.categoryId])]),
     ).entries()).map(([categoryId, items]) => ({
       kind: 'manual-group' as const,
       categoryId,
@@ -971,20 +971,18 @@ function HighlightManageScreen({
                           <p className="mt-3 text-[14px] leading-7 text-[var(--color-text-secondary)]">{item.description}</p>
                         )}
                       </div>
-                      {isPrimaryHighlight(item) ? (
+                      {isPrimaryHighlight(item, store.primaryHighlightOverrides[selectedCat.id]) ? (
                         <span className="rounded-full bg-[#E8F5EC] px-2.5 py-1 text-[11px] font-semibold text-[#217A43]">메인 노출 중</span>
-                      ) : isEditable ? (
+                      ) : (
                         <button
                           onClick={() => {
-                            store.setHighlightPrimary(item.id)
+                            store.setHighlightPrimary(selectedCat.id, item.id)
                             showToast('메인 항목으로 설정했어요')
                           }}
                           className="rounded-full border border-[#D7D0C8] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-secondary)]"
                         >
                           메인으로 설정
                         </button>
-                      ) : (
-                        <span className="rounded-full bg-[#F6F3EF] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-tertiary)]">기본</span>
                       )}
                     </div>
                     <div className="mt-4 flex gap-2">
@@ -1345,7 +1343,7 @@ function HighlightManageScreen({
                             {(() => {
                               const categoryLabel = HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === entry.categoryId)?.label ?? '직접 입력'
                               const isGroupOpen = certOpen[entry.categoryId]
-                              const preview = getGroupedHighlightPreview(entry.items)
+                              const preview = getGroupedHighlightPreview(entry.items, store.primaryHighlightOverrides[entry.categoryId])
                               return (
                                 <>
                                   <button onClick={() => toggleCert(entry.categoryId)} className="flex w-full items-center gap-3 text-left">

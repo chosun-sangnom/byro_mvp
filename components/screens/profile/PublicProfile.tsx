@@ -629,7 +629,7 @@ export default function PublicProfile({
                       const category = HIGHLIGHT_CATEGORIES.find((item) => item.id === entry.categoryId)
                       const groupToggleKey = `group_${entry.categoryId}_${username}`
                       const isGroupOpen = store.hlOpenStates[groupToggleKey] ?? false
-                      const preview = getGroupedHighlightPreview(entry.items)
+                      const preview = getGroupedHighlightPreview(entry.items, store.primaryHighlightOverrides[entry.categoryId])
                       return (
                         <div key={`${entry.categoryId}-${group.id}`} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
                           <div className="flex gap-3 px-4 py-2.5">

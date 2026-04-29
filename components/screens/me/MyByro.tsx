@@ -15,7 +15,7 @@ import {
   SAMPLE_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE, getProfileAvatar,
   HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS, KEYWORD_GROUPS,
 } from '@/lib/mockData'
-import { getHighlightDetailFootnote, getHighlightMetaParts } from '@/lib/highlightMeta'
+import { getGroupedHighlightSummary, getHighlightDetailFootnote, getHighlightMetaParts } from '@/lib/highlightMeta'
 import PublicProfile from '@/components/screens/profile/PublicProfile'
 
 type Screen = 'preview' | 'manage' | 'editBasic' | 'editHighlight' | 'editSNS' | 'editReputation' | 'editContact' | 'editGuestbook'
@@ -1206,81 +1206,88 @@ function HighlightManageScreen({
                             <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={18} />
                           </span>
                           <div className="min-w-0 flex-1">
-                            <div className="mb-1.5 text-[11px] font-semibold text-[var(--color-text-secondary)]">
-                              {HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === entry.categoryId)?.label ?? '직접 입력'}
-                            </div>
-                            {entry.items.map((item, index) => {
-                              const isEditable = store.highlights.some((highlight) => highlight.id === item.id)
-                              const isOpen = certOpen[item.id]
-                              const hasDetail = Boolean(item.description?.trim() || item.linkUrl)
-                              const metaParts = getHighlightMetaParts(item)
+                            {(() => {
+                              const categoryLabel = HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === entry.categoryId)?.label ?? '직접 입력'
+                              const isGroupOpen = certOpen[entry.categoryId]
                               return (
-                                <div key={item.id} className={index > 0 ? 'border-t border-[#F1ECE6]' : ''}>
-                                  <button
-                                    onClick={hasDetail ? () => toggleCert(item.id) : undefined}
-                                    className={`${index === 0 ? 'pt-0' : 'pt-2.5'} flex w-full items-center gap-3 pb-2.5 text-left`}
-                                    disabled={!hasDetail}
-                                  >
+                                <>
+                                  <button onClick={() => toggleCert(entry.categoryId)} className="flex w-full items-center gap-3 text-left">
                                     <div className="min-w-0 flex-1">
-                                      <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
-                                        {item.title}
+                                      <div className="mb-1.5 text-[11px] font-semibold text-[var(--color-text-secondary)]">
+                                        {categoryLabel}
                                       </div>
-                                      {metaParts.length > 0 && (
-                                        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                          {metaParts.map((part, partIndex) => (
-                                            <span
-                                              key={`${item.id}-meta-${partIndex}`}
-                                              className={`text-[11px] ${partIndex === 0 ? 'font-semibold text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'}`}
-                                            >
-                                              {part}
-                                            </span>
-                                          ))}
-                                        </div>
-                                      )}
+                                      <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
+                                        {getGroupedHighlightSummary(entry.items, categoryLabel)}
+                                      </div>
                                     </div>
-                                    {hasDetail && (isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />)}
+                                    {isGroupOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
                                   </button>
-                                  {hasDetail && isOpen && (
-                                    <div className="pb-3 pr-4">
-                                      <div className="rounded-[18px] border border-[#F0ECE7] bg-[#FBFAF8] px-3.5 py-3 space-y-3">
-                                        {item.description?.trim() && (
-                                          <p className="text-[14px] leading-7 text-[var(--color-text-secondary)]">
-                                            {item.description}
-                                          </p>
-                                        )}
-                                        <div className="micro-text">
-                                          {getHighlightDetailFootnote(item, HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === item.categoryId)?.label)}
-                                        </div>
-                                        <div className="flex gap-2 pt-0.5">
-                                          <button
-                                            onClick={() => {
-                                              if (isEditable) openEditSheet(item)
-                                              else showToast('기본 목업 항목은 수정하지 않습니다')
-                                            }}
-                                            className="rounded-lg border border-[#CFC7BF] px-3 py-1.5 text-xs font-medium text-[#555]"
-                                          >
-                                            수정
-                                          </button>
-                                          <button
-                                            onClick={() => {
-                                              if (isEditable) {
-                                                store.removeHighlight(item.id)
-                                                showToast('삭제됐어요')
-                                                return
-                                              }
-                                              showToast('기본 목업 항목은 삭제하지 않습니다')
-                                            }}
-                                            className="rounded-lg border border-[#F2C7C5] px-3 py-1.5 text-xs font-medium text-[#C9473D]"
-                                          >
-                                            삭제
-                                          </button>
-                                        </div>
+                                  {isGroupOpen && (
+                                    <div className="pt-3 pb-3 pr-4">
+                                      <div className="rounded-[18px] border border-[#F0ECE7] bg-[#FBFAF8] px-3.5 py-3">
+                                        {entry.items.map((item, index) => {
+                                          const isEditable = store.highlights.some((highlight) => highlight.id === item.id)
+                                          const metaParts = getHighlightMetaParts(item)
+                                          return (
+                                            <div key={item.id} className={index > 0 ? 'mt-3 border-t border-[#E7E2DC] pt-3' : ''}>
+                                              <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{item.title}</div>
+                                              {metaParts.length > 0 && (
+                                                <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                                                  {metaParts.map((part, partIndex) => (
+                                                    <span
+                                                      key={`${item.id}-meta-${partIndex}`}
+                                                      className={`text-[11px] ${partIndex === 0 ? 'font-semibold text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'}`}
+                                                    >
+                                                      {part}
+                                                    </span>
+                                                  ))}
+                                                </div>
+                                              )}
+                                              {(item.description?.trim() || item.linkUrl) && (
+                                                <div className="mt-3 space-y-3">
+                                                  {item.description?.trim() && (
+                                                    <p className="text-[14px] leading-7 text-[var(--color-text-secondary)]">
+                                                      {item.description}
+                                                    </p>
+                                                  )}
+                                                  <div className="micro-text">
+                                                    {getHighlightDetailFootnote(item, categoryLabel)}
+                                                  </div>
+                                                </div>
+                                              )}
+                                              <div className="mt-3 flex gap-2 pt-0.5">
+                                                <button
+                                                  onClick={() => {
+                                                    if (isEditable) openEditSheet(item)
+                                                    else showToast('기본 목업 항목은 수정하지 않습니다')
+                                                  }}
+                                                  className="rounded-lg border border-[#CFC7BF] px-3 py-1.5 text-xs font-medium text-[#555]"
+                                                >
+                                                  수정
+                                                </button>
+                                                <button
+                                                  onClick={() => {
+                                                    if (isEditable) {
+                                                      store.removeHighlight(item.id)
+                                                      showToast('삭제됐어요')
+                                                      return
+                                                    }
+                                                    showToast('기본 목업 항목은 삭제하지 않습니다')
+                                                  }}
+                                                  className="rounded-lg border border-[#F2C7C5] px-3 py-1.5 text-xs font-medium text-[#C9473D]"
+                                                >
+                                                  삭제
+                                                </button>
+                                              </div>
+                                            </div>
+                                          )
+                                        })}
                                       </div>
                                     </div>
                                   )}
-                                </div>
+                                </>
                               )
-                            })}
+                            })()}
                           </div>
                         </div>
                       </div>

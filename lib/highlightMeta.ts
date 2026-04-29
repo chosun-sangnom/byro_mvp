@@ -34,3 +34,20 @@ export function getHighlightDetailFootnote(highlight: Highlight, categoryLabel?:
   const parts = [categoryLabel, highlight.year?.trim() ?? ''].filter(Boolean)
   return parts.join(' · ')
 }
+
+export function getGroupedHighlightSummary(items: Highlight[], categoryLabel?: string): string {
+  if (!items.length) return categoryLabel ?? ''
+
+  if (items.length === 1) {
+    const single = items[0]
+    return [single.title, ...getHighlightMetaParts(single).slice(0, 2)].filter(Boolean).join(' · ')
+  }
+
+  const titles = items
+    .map((item) => item.title.trim())
+    .filter(Boolean)
+    .slice(0, 2)
+
+  const countLabel = `${items.length}개 ${categoryLabel ?? '항목'}`
+  return [countLabel, titles.join(', ')].filter(Boolean).join(' · ')
+}

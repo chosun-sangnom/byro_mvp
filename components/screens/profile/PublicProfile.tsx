@@ -16,7 +16,7 @@ import {
   INSTAGRAM_PROFILE, LINKEDIN_PROFILE, HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS,
   getPublicProfileByUsername, getProfileAvatar,
 } from '@/lib/mockData'
-import { getHighlightDetailFootnote, getHighlightMetaParts } from '@/lib/highlightMeta'
+import { getGroupedHighlightSummary, getHighlightDetailFootnote, getHighlightMetaParts } from '@/lib/highlightMeta'
 import type { Highlight, HighlightIconId } from '@/types'
 
 interface PublicProfileProps {
@@ -627,6 +627,8 @@ export default function PublicProfile({
                       }
 
                       const category = HIGHLIGHT_CATEGORIES.find((item) => item.id === entry.categoryId)
+                      const groupToggleKey = `group_${entry.categoryId}_${username}`
+                      const isGroupOpen = store.hlOpenStates[groupToggleKey] ?? false
                       return (
                         <div key={`${entry.categoryId}-${group.id}`} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
                           <div className="flex gap-3 px-4 py-2.5">
@@ -634,86 +636,84 @@ export default function PublicProfile({
                               <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={18} />
                             </span>
                             <div className="min-w-0 flex-1">
-                              <div className="mb-1.5 text-[11px] font-semibold text-[var(--color-text-secondary)]">
-                                {category?.label ?? '직접 입력'}
-                              </div>
-                              {entry.items.map((hl, index) => {
-                                const toggleKey = `${hl.id}_${username}`
-                                const isOpen = store.hlOpenStates[toggleKey] ?? false
-                                const hasDetail = Boolean(hl.description?.trim() || hl.linkUrl)
-                                const metaParts = getHighlightMetaParts(hl)
-                                return (
-                                  <div key={hl.id} className={index > 0 ? 'border-t border-[#F1ECE6]' : ''}>
-                                    <button
-                                      onClick={hasDetail ? () => store.toggleHlOpen(toggleKey) : undefined}
-                                      className={`${index === 0 ? 'pt-0' : 'pt-2.5'} flex w-full items-center gap-3 pb-2.5 text-left`}
-                                      disabled={!hasDetail}
-                                    >
-                                      <div className="min-w-0 flex-1">
-                                        <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
-                                          {hl.title}
-                                        </div>
-                                        {metaParts.length > 0 && (
-                                          <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                            {metaParts.map((part, partIndex) => (
-                                              <span
-                                                key={`${hl.id}-meta-${partIndex}`}
-                                                className={`text-[11px] ${partIndex === 0 ? 'font-semibold text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'}`}
-                                              >
-                                                {part}
-                                              </span>
-                                            ))}
-                                          </div>
-                                        )}
-                                      </div>
-                                      {hasDetail && (isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />)}
-                                    </button>
-                                    {hasDetail && isOpen && (
-                                      <div className="pb-3 pr-4">
-                                        <div className="rounded-[18px] border border-[#F0ECE7] bg-[#FBFAF8] px-3.5 py-3 space-y-3">
-                                          {hl.description?.trim() && (
-                                            <p className="text-[14px] leading-7 text-[var(--color-text-secondary)]">
-                                              {hl.description}
-                                            </p>
+                              <button onClick={() => store.toggleHlOpen(groupToggleKey)} className="flex w-full items-center gap-3 text-left">
+                                <div className="min-w-0 flex-1">
+                                  <div className="mb-1.5 text-[11px] font-semibold text-[var(--color-text-secondary)]">
+                                    {category?.label ?? '직접 입력'}
+                                  </div>
+                                  <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
+                                    {getGroupedHighlightSummary(entry.items, category?.label)}
+                                  </div>
+                                </div>
+                                {isGroupOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
+                              </button>
+                              {isGroupOpen && (
+                                <div className="pt-3 pb-3 pr-4">
+                                  <div className="rounded-[18px] border border-[#F0ECE7] bg-[#FBFAF8] px-3.5 py-3">
+                                    {entry.items.map((hl, index) => {
+                                      const metaParts = getHighlightMetaParts(hl)
+                                      return (
+                                        <div key={hl.id} className={index > 0 ? 'mt-3 border-t border-[#E7E2DC] pt-3' : ''}>
+                                          <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{hl.title}</div>
+                                          {metaParts.length > 0 && (
+                                            <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                                              {metaParts.map((part, partIndex) => (
+                                                <span
+                                                  key={`${hl.id}-meta-${partIndex}`}
+                                                  className={`text-[11px] ${partIndex === 0 ? 'font-semibold text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'}`}
+                                                >
+                                                  {part}
+                                                </span>
+                                              ))}
+                                            </div>
                                           )}
-                                          {hl.linkUrl && (
-                                            <a
-                                              href={hl.linkUrl}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              className="mt-3 block overflow-hidden rounded-[16px] border border-[#ECE6DF] bg-[var(--color-bg-soft)]"
-                                            >
-                                              <div className="flex min-h-[74px]">
-                                                {hl.thumbnailUrl ? (
-                                                  <div className="h-auto w-20 flex-shrink-0 overflow-hidden bg-[#F4F1EC]">
-                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                    <img src={hl.thumbnailUrl} alt={hl.title} className="h-full w-full object-cover" />
-                                                  </div>
-                                                ) : (
-                                                  <div className="flex w-20 flex-shrink-0 items-center justify-center bg-[linear-gradient(180deg,#F6F3EF_0%,#EDE7DF_100%)] px-3 text-center">
-                                                    <div>
-                                                      <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[#8E867E]">News</div>
-                                                      <div className="mt-1 text-[11px] font-semibold text-[#3D3833]">{hl.sourceLabel ?? '기사 링크'}</div>
+                                          {(hl.description?.trim() || hl.linkUrl) && (
+                                            <div className="mt-3 space-y-3">
+                                              {hl.description?.trim() && (
+                                                <p className="text-[14px] leading-7 text-[var(--color-text-secondary)]">
+                                                  {hl.description}
+                                                </p>
+                                              )}
+                                              {hl.linkUrl && (
+                                                <a
+                                                  href={hl.linkUrl}
+                                                  target="_blank"
+                                                  rel="noopener noreferrer"
+                                                  className="block overflow-hidden rounded-[16px] border border-[#ECE6DF] bg-[var(--color-bg-soft)]"
+                                                >
+                                                  <div className="flex min-h-[74px]">
+                                                    {hl.thumbnailUrl ? (
+                                                      <div className="h-auto w-20 flex-shrink-0 overflow-hidden bg-[#F4F1EC]">
+                                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                        <img src={hl.thumbnailUrl} alt={hl.title} className="h-full w-full object-cover" />
+                                                      </div>
+                                                    ) : (
+                                                      <div className="flex w-20 flex-shrink-0 items-center justify-center bg-[linear-gradient(180deg,#F6F3EF_0%,#EDE7DF_100%)] px-3 text-center">
+                                                        <div>
+                                                          <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[#8E867E]">News</div>
+                                                          <div className="mt-1 text-[11px] font-semibold text-[#3D3833]">{hl.sourceLabel ?? '기사 링크'}</div>
+                                                        </div>
+                                                      </div>
+                                                    )}
+                                                    <div className="flex min-w-0 flex-1 items-center px-3.5 py-2.5">
+                                                      <div className="min-w-0">
+                                                        <div className="text-[11px] font-semibold text-[#8E867E]">{hl.sourceLabel ?? '외부 링크'}</div>
+                                                        <div className="mt-1 line-clamp-2 text-[12px] font-bold leading-snug text-[#1F1B18]">{hl.title}</div>
+                                                        <div className="mt-2 text-[11px] font-medium text-[var(--color-text-secondary)]">보러가기</div>
+                                                      </div>
                                                     </div>
                                                   </div>
-                                                )}
-                                                <div className="flex min-w-0 flex-1 items-center px-3.5 py-2.5">
-                                                  <div className="min-w-0">
-                                                    <div className="text-[11px] font-semibold text-[#8E867E]">{hl.sourceLabel ?? '외부 링크'}</div>
-                                                    <div className="mt-1 line-clamp-2 text-[12px] font-bold leading-snug text-[#1F1B18]">{hl.title}</div>
-                                                    <div className="mt-2 text-[11px] font-medium text-[var(--color-text-secondary)]">보러가기</div>
-                                                  </div>
-                                                </div>
-                                              </div>
-                                            </a>
+                                                </a>
+                                              )}
+                                              <div className="micro-text">{getHighlightDetailFootnote(hl, category?.label)}</div>
+                                            </div>
                                           )}
-                                          <div className="micro-text">{getHighlightDetailFootnote(hl, category?.label)}</div>
                                         </div>
-                                      </div>
-                                    )}
+                                      )
+                                    })}
                                   </div>
-                                )
-                              })}
+                                </div>
+                              )}
                             </div>
                           </div>
                         </div>

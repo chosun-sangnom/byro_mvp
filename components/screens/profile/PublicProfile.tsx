@@ -665,7 +665,8 @@ export default function PublicProfile({
                                     {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
                                   </button>
                                   {isOpen && (
-                                    <div className="border-t border-[#F1ECE6] bg-[#FBFAF8] px-4 py-4">
+                                    <div className="border-t border-[#F1ECE6] px-4 py-4">
+                                      <div className="rounded-[18px] bg-[#FBFAF8] px-4 py-4">
                                       <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
                                         {hl.description || '세부 설명이 아직 없어요.'}
                                         {hl.linkUrl && (
@@ -703,6 +704,7 @@ export default function PublicProfile({
                                           {category?.label ?? hl.subtitle}
                                           {hl.year ? ` · ${hl.year}` : ''}
                                         </div>
+                                      </div>
                                       </div>
                                     </div>
                                   )}

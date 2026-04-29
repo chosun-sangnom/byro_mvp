@@ -722,7 +722,7 @@ function HighlightManageScreen({
   onBack: () => void
 }) {
   const store = useByroStore()
-  const [mode, setMode] = useState<'list' | 'picker' | 'form' | 'cert'>('list')
+  const [mode, setMode] = useState<'list' | 'picker' | 'group' | 'form' | 'cert'>('list')
   const [editingHl, setEditingHl] = useState<typeof SAMPLE_PROFILE.manualHighlights[0] | Highlight | null>(null)
   const [selectedCat, setSelectedCat] = useState<typeof HIGHLIGHT_CATEGORIES[0] | null>(null)
   const [hlTitle, setHlTitle] = useState('')
@@ -742,8 +742,10 @@ function HighlightManageScreen({
   const educationNeedsMajor = hlSchoolType !== '고등학교'
   const currentYear = new Date().getFullYear()
   const yearOptions = Array.from({ length: currentYear - 1979 }, (_, index) => String(currentYear - index))
-
   const allManualHighlights = [...SAMPLE_PROFILE.manualHighlights, ...store.highlights]
+  const selectedCategoryHighlights = selectedCat
+    ? sortHighlightsByPrimary(allManualHighlights.filter((item) => item.categoryId === selectedCat.id))
+    : []
   const groupedHighlights = HIGHLIGHT_GROUPS.map((group) => {
     const verifiedItems = CERTIFICATION_ITEMS.filter((item) => {
       const category = HIGHLIGHT_CATEGORIES.find((cat) => cat.id === item.categoryId)
@@ -830,7 +832,7 @@ function HighlightManageScreen({
       showToast('추가됐어요. 같은 항목을 계속 입력할 수 있어요!')
       return
     }
-    setMode('list')
+    setMode('group')
     resetAddForm()
     showToast(editingHl ? '수정됐어요!' : '추가됐어요!')
   }
@@ -922,14 +924,133 @@ function HighlightManageScreen({
     )
   }
 
-  if (mode === 'form') {
-    const existingCategoryItems = selectedCat
-      ? sortHighlightsByPrimary(allManualHighlights.filter((item) => item.categoryId === selectedCat.id))
-      : []
+  if (mode === 'group' && selectedCat) {
     return (
       <div className="flex flex-col h-full">
         <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
           <button onClick={() => { resetAddForm(); setMode('picker') }} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+          <span className="text-base font-black">{selectedCat.label} 관리</span>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-5 py-5">
+          <div className="surface-card mb-4 rounded-[26px] px-4 py-4">
+            <div className="flex items-center gap-3">
+              <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
+                <HighlightIcon id={selectedCat.icon as HighlightIconId} size={16} />
+              </span>
+              <div>
+                <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{selectedCat.label}</div>
+                <div className="micro-text">여러 항목을 추가하고 대표로 보여줄 항목을 선택할 수 있어요</div>
+              </div>
+            </div>
+          </div>
+
+          {selectedCategoryHighlights.length > 0 ? (
+            <div className="space-y-3">
+              {selectedCategoryHighlights.map((item) => {
+                const isEditable = store.highlights.some((highlight) => highlight.id === item.id)
+                const metaParts = getHighlightMetaParts(item)
+                return (
+                  <div key={item.id} className="surface-card rounded-[24px] p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{item.title}</div>
+                        {metaParts.length > 0 && (
+                          <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                            {metaParts.map((part, partIndex) => (
+                              <span
+                                key={`${item.id}-group-meta-${partIndex}`}
+                                className={`text-[11px] ${partIndex === 0 ? 'font-semibold text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'}`}
+                              >
+                                {part}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {item.description?.trim() && (
+                          <p className="mt-3 text-[14px] leading-7 text-[var(--color-text-secondary)]">{item.description}</p>
+                        )}
+                      </div>
+                      {isPrimaryHighlight(item) ? (
+                        <span className="rounded-full bg-[#E8F5EC] px-2.5 py-1 text-[11px] font-semibold text-[#217A43]">대표</span>
+                      ) : isEditable ? (
+                        <button
+                          onClick={() => {
+                            store.setHighlightPrimary(item.id)
+                            showToast('대표 항목으로 설정했어요')
+                          }}
+                          className="rounded-full border border-[#D7D0C8] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-secondary)]"
+                        >
+                          대표로 설정
+                        </button>
+                      ) : (
+                        <span className="rounded-full bg-[#F6F3EF] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-tertiary)]">기본</span>
+                      )}
+                    </div>
+                    <div className="mt-4 flex gap-2">
+                      <button
+                        onClick={() => {
+                          if (isEditable) openEditSheet(item)
+                          else showToast('기본 목업 항목은 수정하지 않습니다')
+                        }}
+                        className="rounded-lg border border-[#CFC7BF] px-3 py-1.5 text-xs font-medium text-[#555]"
+                      >
+                        수정
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (isEditable) {
+                            store.removeHighlight(item.id)
+                            showToast('삭제됐어요')
+                            return
+                          }
+                          showToast('기본 목업 항목은 삭제하지 않습니다')
+                        }}
+                        className="rounded-lg border border-[#F2C7C5] px-3 py-1.5 text-xs font-medium text-[#C9473D]"
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="rounded-[22px] border border-dashed border-[#E7E2DC] bg-white px-4 py-10 text-center text-sm text-[#A29B93]">
+              아직 추가한 {selectedCat.label.toLowerCase()} 항목이 없어요
+            </div>
+          )}
+        </div>
+
+        <div className="border-t border-[#EBEBEB] px-5 py-4">
+          <Button
+            onClick={() => {
+              setEditingHl(null)
+              setHlTitle('')
+              setHlRole('')
+              setHlSchoolType('')
+              setHlDegree('')
+              setHlStatus('')
+              setHlStartYear('')
+              setHlEndYear('')
+              setHlEducationYear('')
+              setHlDesc('')
+              setYearPickerTarget(null)
+              setMode('form')
+            }}
+          >
+            + {selectedCat.label} 추가
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  if (mode === 'form') {
+    return (
+      <div className="flex flex-col h-full">
+        <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
+          <button onClick={() => { resetAddForm(); setMode(selectedCat ? 'group' : 'picker') }} className="text-xl text-[#555] mr-3 leading-none">‹</button>
           <span className="text-base font-black">{editingHl ? '하이라이트 수정하기' : '하이라이트 추가하기'}</span>
         </div>
 
@@ -944,53 +1065,6 @@ function HighlightManageScreen({
                   <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{selectedCat.label}</div>
                   <div className="micro-text">프로필에 직접 입력한 경험으로 표시돼요</div>
                 </div>
-              </div>
-            </div>
-          )}
-          {selectedCat && existingCategoryItems.length > 0 && !editingHl && (
-            <div className="surface-card mb-4 rounded-[26px] p-4">
-              <div className="text-sm font-bold text-[var(--color-text-strong)]">이미 추가된 항목</div>
-              <div className="mt-3 space-y-2">
-                {existingCategoryItems.map((item) => {
-                  const isEditable = store.highlights.some((highlight) => highlight.id === item.id)
-                  const metaParts = getHighlightMetaParts(item)
-                  return (
-                    <div key={item.id} className="rounded-[18px] border border-[#E7E2DC] bg-white px-3.5 py-3">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0 flex-1">
-                          <div className="text-[14px] font-bold text-[var(--color-text-strong)]">{item.title}</div>
-                          {metaParts.length > 0 && (
-                            <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
-                              {metaParts.map((part, partIndex) => (
-                                <span
-                                  key={`${item.id}-existing-meta-${partIndex}`}
-                                  className={`text-[11px] ${partIndex === 0 ? 'font-semibold text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'}`}
-                                >
-                                  {part}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                        {isPrimaryHighlight(item) ? (
-                          <span className="rounded-full bg-[#E8F5EC] px-2.5 py-1 text-[11px] font-semibold text-[#217A43]">대표</span>
-                        ) : isEditable ? (
-                          <button
-                            onClick={() => {
-                              store.setHighlightPrimary(item.id)
-                              showToast('대표 항목으로 설정했어요')
-                            }}
-                            className="rounded-full border border-[#D7D0C8] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-secondary)]"
-                          >
-                            대표로 설정
-                          </button>
-                        ) : (
-                          <span className="rounded-full bg-[#F6F3EF] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-tertiary)]">기본</span>
-                        )}
-                      </div>
-                    </div>
-                  )
-                })}
               </div>
             </div>
           )}
@@ -1127,10 +1201,7 @@ function HighlightManageScreen({
               )}
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={() => setMode('picker')}>이전</Button>
-              {!editingHl && (
-                <Button variant="outline" onClick={() => handleSave(true)} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && (!hlRole.trim() || !hlStatus || !hlStartYear || (hlStatus === '종료' && !hlEndYear))) || (isEducationHistory && (!hlSchoolType || (educationNeedsDegree && !hlDegree) || (educationNeedsMajor && !hlRole.trim()) || !hlStatus))}>저장 후 계속 추가</Button>
-              )}
+              <Button variant="outline" onClick={() => setMode(selectedCat ? 'group' : 'picker')}>이전</Button>
               <Button onClick={() => handleSave(false)} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && (!hlRole.trim() || !hlStatus || !hlStartYear || (hlStatus === '종료' && !hlEndYear))) || (isEducationHistory && (!hlSchoolType || (educationNeedsDegree && !hlDegree) || (educationNeedsMajor && !hlRole.trim()) || !hlStatus))}>{editingHl ? '수정하기' : '저장하기'}</Button>
             </div>
           </div>
@@ -1166,7 +1237,7 @@ function HighlightManageScreen({
                           return
                         }
                         setSelectedCat(cat)
-                        setMode('form')
+                        setMode('group')
                       }}
                       className="relative overflow-visible rounded-[20px] border border-[var(--color-border-default)] bg-white px-3 py-4 text-center shadow-[0_4px_14px_rgba(17,17,17,0.03)]"
                     >

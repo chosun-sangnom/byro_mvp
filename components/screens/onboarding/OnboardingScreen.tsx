@@ -7,7 +7,7 @@ import { AlertCircle, BadgeCheck, CheckCircle2, Mail, MessageCircle, Pencil, Pho
 import { useByroStore } from '@/store/useByroStore'
 import {
   NavBar, StepBar, Button, Chip, CheckRow, BottomSheet, Modal,
-  InfoBox, TextArea, AiBounce, showToast,
+  InfoBox, TextArea, AiBounce, YearPickerSheet, showToast,
 } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import type { ContactChannel, HighlightIconId } from '@/types'
@@ -673,27 +673,35 @@ function Step7Highlight() {
   // 직접 입력 폼 상태
   const [selectedCat, setSelectedCat] = useState<typeof HIGHLIGHT_CATEGORIES[0] | null>(null)
   const [hlTitle, setHlTitle] = useState('')
-  const [hlYear, setHlYear] = useState('')
   const [hlRole, setHlRole] = useState('')
   const [hlSchoolType, setHlSchoolType] = useState('')
   const [hlDegree, setHlDegree] = useState('')
   const [hlStatus, setHlStatus] = useState('')
+  const [hlStartYear, setHlStartYear] = useState('')
+  const [hlEndYear, setHlEndYear] = useState('')
+  const [hlEducationYear, setHlEducationYear] = useState('')
   const [hlDesc, setHlDesc] = useState('')
+  const [yearPickerTarget, setYearPickerTarget] = useState<'career-start' | 'career-end' | 'education-year' | null>(null)
   const highlightLimitReached = store.highlights.length >= 5
   const isCareerRole = selectedCat?.id === 'career-role'
   const isEducationHistory = selectedCat?.id === 'education-history'
   const educationNeedsDegree = hlSchoolType === '대학교' || hlSchoolType === '대학원'
   const educationNeedsMajor = hlSchoolType !== '고등학교'
+  const currentYear = new Date().getFullYear()
+  const yearOptions = Array.from({ length: currentYear - 1979 }, (_, index) => String(currentYear - index))
 
   const resetForm = () => {
     setSelectedCat(null)
     setHlTitle('')
-    setHlYear('')
     setHlRole('')
     setHlSchoolType('')
     setHlDegree('')
     setHlStatus('')
+    setHlStartYear('')
+    setHlEndYear('')
+    setHlEducationYear('')
     setHlDesc('')
+    setYearPickerTarget(null)
   }
 
   const handleAddHighlight = () => {
@@ -725,15 +733,23 @@ function Step7Highlight() {
       showToast('상태를 선택해주세요')
       return
     }
-    if (isEducationHistory && !hlYear.trim()) {
-      showToast('년도를 입력해주세요')
+    if (isCareerRole && !hlStatus) {
+      showToast('상태를 선택해주세요')
+      return
+    }
+    if (isCareerRole && !hlStartYear) {
+      showToast('시작 연도를 선택해주세요')
+      return
+    }
+    if (isCareerRole && hlStatus === '종료' && !hlEndYear) {
+      showToast('종료 연도를 선택해주세요')
       return
     }
     let metadata: Record<string, string | boolean> | undefined
     if (isEducationHistory) {
       metadata = { status: hlStatus, role: hlRole, degree: hlDegree, schoolType: hlSchoolType }
     } else if (isCareerRole) {
-      metadata = { status: hlStatus || '재직 중', role: hlRole }
+      metadata = { status: hlStatus, role: hlRole, startYear: hlStartYear, endYear: hlStatus === '종료' ? hlEndYear : '' }
     }
     store.addHighlight({
       categoryId: selectedCat.id,
@@ -741,7 +757,9 @@ function Step7Highlight() {
       title: hlTitle,
       subtitle: isEducationHistory ? `${selectedCat.label} · ${hlSchoolType}` : `${selectedCat.label} · 직접 입력`,
       description: hlDesc,
-      year: hlYear,
+      year: isCareerRole
+        ? `${hlStartYear} - ${hlStatus === '재직 중' ? '현재' : hlEndYear}`
+        : hlEducationYear,
       metadata,
     })
     resetForm()
@@ -951,13 +969,37 @@ function Step7Highlight() {
                     style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-soft)' }}
                   />
                 )}
-                <input
-                  value={hlYear}
-                  onChange={(e) => setHlYear(e.target.value)}
-                  placeholder={isCareerRole ? '년도 또는 기간 (예: 2022 - 2024)' : isEducationHistory ? '년도 또는 기간 (예: 2018 - 2022)' : '연도 (예: 2023)'}
-                  className="w-full rounded-2xl border px-4 py-3 text-sm outline-none"
-                  style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-soft)' }}
-                />
+                {isCareerRole && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => setYearPickerTarget('career-start')}
+                      className="rounded-2xl border px-4 py-3 text-left text-sm"
+                      style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-soft)', color: hlStartYear ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}
+                    >
+                      {hlStartYear || '시작 연도'}
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (hlStatus !== '종료') return
+                        setYearPickerTarget('career-end')
+                      }}
+                      disabled={hlStatus !== '종료'}
+                      className="rounded-2xl border px-4 py-3 text-left text-sm disabled:opacity-40"
+                      style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-soft)', color: hlStatus === '재직 중' ? 'var(--color-text-tertiary)' : (hlEndYear ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)') }}
+                    >
+                      {hlStatus === '재직 중' ? '현재' : (hlEndYear || '종료 연도')}
+                    </button>
+                  </div>
+                )}
+                {isEducationHistory && (
+                  <button
+                    onClick={() => setYearPickerTarget('education-year')}
+                    className="w-full rounded-2xl border px-4 py-3 text-left text-sm"
+                    style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-soft)', color: hlEducationYear ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}
+                  >
+                    {hlEducationYear || '연도 선택'}
+                  </button>
+                )}
                 {isCareerRole && (
                   <div className="grid grid-cols-2 gap-2">
                     {['재직 중', '종료'].map((status) => (
@@ -1009,7 +1051,7 @@ function Step7Highlight() {
               </div>
               <div className="mt-4 flex gap-2">
                 <Button variant="outline" onClick={() => setSheetMode('picker')}>이전</Button>
-                <Button onClick={handleAddHighlight} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && !hlRole.trim()) || (isEducationHistory && (!hlSchoolType || (educationNeedsDegree && !hlDegree) || (educationNeedsMajor && !hlRole.trim()) || !hlStatus || !hlYear.trim()))}>저장하기</Button>
+                <Button onClick={handleAddHighlight} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && (!hlRole.trim() || !hlStatus || !hlStartYear || (hlStatus === '종료' && !hlEndYear))) || (isEducationHistory && (!hlSchoolType || (educationNeedsDegree && !hlDegree) || (educationNeedsMajor && !hlRole.trim()) || !hlStatus))}>저장하기</Button>
               </div>
             </div>
           </div>
@@ -1073,6 +1115,27 @@ function Step7Highlight() {
           </div>
         )}
       </BottomSheet>
+
+      <YearPickerSheet
+        open={yearPickerTarget !== null}
+        onClose={() => setYearPickerTarget(null)}
+        title={
+          yearPickerTarget === 'career-start' ? '시작 연도 선택'
+            : yearPickerTarget === 'career-end' ? '종료 연도 선택'
+              : '연도 선택'
+        }
+        value={
+          yearPickerTarget === 'career-start' ? hlStartYear
+            : yearPickerTarget === 'career-end' ? hlEndYear
+              : hlEducationYear
+        }
+        options={yearOptions}
+        onSelect={(value) => {
+          if (yearPickerTarget === 'career-start') setHlStartYear(value)
+          if (yearPickerTarget === 'career-end') setHlEndYear(value)
+          if (yearPickerTarget === 'education-year') setHlEducationYear(value)
+        }}
+      />
     </div>
   )
 }

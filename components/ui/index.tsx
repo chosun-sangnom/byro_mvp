@@ -302,6 +302,50 @@ export function BottomSheet({ open, onClose, children, dark }: BottomSheetProps)
   )
 }
 
+interface YearPickerSheetProps {
+  open: boolean
+  onClose: () => void
+  title: string
+  value?: string
+  options: string[]
+  onSelect: (value: string) => void
+}
+
+export function YearPickerSheet({
+  open, onClose, title, value, options, onSelect,
+}: YearPickerSheetProps) {
+  return (
+    <BottomSheet open={open} onClose={onClose}>
+      <div className="px-5 pb-6">
+        <div className="mb-4 text-[18px] font-black text-[var(--color-text-strong)]">{title}</div>
+        <div className="max-h-[44dvh] overflow-y-auto rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] p-2">
+          <div className="space-y-1">
+            {options.map((option) => {
+              const selected = value === option
+              return (
+                <button
+                  key={option}
+                  onClick={() => {
+                    onSelect(option)
+                    onClose()
+                  }}
+                  className="flex w-full items-center justify-between rounded-[18px] px-4 py-3 text-left"
+                  style={{
+                    backgroundColor: selected ? 'var(--color-accent-dark)' : 'transparent',
+                    color: selected ? '#fff' : 'var(--color-text-primary)',
+                  }}
+                >
+                  <span className="text-sm font-semibold">{option}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+    </BottomSheet>
+  )
+}
+
 // ─── Modal ───────────────────────────────────────────────
 interface ModalProps {
   open: boolean

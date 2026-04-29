@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { BadgeCheck, ChevronDown, ChevronUp, Camera, Mail, MessageCircle, Phone } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
-import { Button, BottomSheet, Modal, showToast, TextArea } from '@/components/ui'
+import { Button, BottomSheet, Modal, YearPickerSheet, showToast, TextArea } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { CareerContinuityChart } from '@/components/highlights/CareerContinuityChart'
 import { CorporateLongevityTimeline } from '@/components/highlights/CorporateLongevityTimeline'
@@ -725,17 +725,22 @@ function HighlightManageScreen({
   const [editingHl, setEditingHl] = useState<typeof SAMPLE_PROFILE.manualHighlights[0] | Highlight | null>(null)
   const [selectedCat, setSelectedCat] = useState<typeof HIGHLIGHT_CATEGORIES[0] | null>(null)
   const [hlTitle, setHlTitle] = useState('')
-  const [hlYear, setHlYear] = useState('')
   const [hlRole, setHlRole] = useState('')
   const [hlSchoolType, setHlSchoolType] = useState('')
   const [hlDegree, setHlDegree] = useState('')
   const [hlStatus, setHlStatus] = useState('')
+  const [hlStartYear, setHlStartYear] = useState('')
+  const [hlEndYear, setHlEndYear] = useState('')
+  const [hlEducationYear, setHlEducationYear] = useState('')
   const [hlDesc, setHlDesc] = useState('')
+  const [yearPickerTarget, setYearPickerTarget] = useState<'career-start' | 'career-end' | 'education-year' | null>(null)
   const [selectedCert, setSelectedCert] = useState<(typeof CERTIFICATION_ITEMS)[number] | null>(null)
   const isCareerRole = selectedCat?.id === 'career-role'
   const isEducationHistory = selectedCat?.id === 'education-history'
   const educationNeedsDegree = hlSchoolType === '대학교' || hlSchoolType === '대학원'
   const educationNeedsMajor = hlSchoolType !== '고등학교'
+  const currentYear = new Date().getFullYear()
+  const yearOptions = Array.from({ length: currentYear - 1979 }, (_, index) => String(currentYear - index))
 
   const allManualHighlights = [...SAMPLE_PROFILE.manualHighlights, ...store.highlights]
   const groupedHighlights = HIGHLIGHT_GROUPS.map((group) => {
@@ -766,11 +771,14 @@ function HighlightManageScreen({
     const cat = HIGHLIGHT_CATEGORIES.find((c) => c.id === hl.categoryId) ?? null
     setSelectedCat(cat)
     setHlTitle(hl.title)
-    setHlYear(hl.year)
     setHlRole(typeof hl.metadata?.role === 'string' ? hl.metadata.role : '')
     setHlSchoolType(typeof hl.metadata?.schoolType === 'string' ? hl.metadata.schoolType : '')
     setHlDegree(typeof hl.metadata?.degree === 'string' ? hl.metadata.degree : '')
     setHlStatus(typeof hl.metadata?.status === 'string' ? hl.metadata.status : '')
+    const [parsedStart = '', parsedEnd = ''] = hl.year.split(' - ')
+    setHlStartYear(typeof hl.metadata?.startYear === 'string' ? hl.metadata.startYear : parsedStart)
+    setHlEndYear(typeof hl.metadata?.endYear === 'string' ? hl.metadata.endYear : (parsedEnd === '현재' ? '' : parsedEnd))
+    setHlEducationYear(hl.categoryId === 'education-history' ? hl.year : '')
     setHlDesc(hl.description)
     setEditingHl(hl)
     setMode('form')
@@ -779,16 +787,18 @@ function HighlightManageScreen({
   const handleSave = () => {
     if (!selectedCat || !hlTitle.trim()) { showToast('필수 항목을 입력해주세요'); return }
     if (isCareerRole && !hlRole.trim()) { showToast('직함을 입력해주세요'); return }
+    if (isCareerRole && !hlStatus) { showToast('상태를 선택해주세요'); return }
+    if (isCareerRole && !hlStartYear) { showToast('시작 연도를 선택해주세요'); return }
+    if (isCareerRole && hlStatus === '종료' && !hlEndYear) { showToast('종료 연도를 선택해주세요'); return }
     if (isEducationHistory && !hlSchoolType) { showToast('학교 유형을 선택해주세요'); return }
     if (isEducationHistory && educationNeedsDegree && !hlDegree) { showToast('세부 학위를 선택해주세요'); return }
     if (isEducationHistory && educationNeedsMajor && !hlRole.trim()) { showToast('전공을 입력해주세요'); return }
     if (isEducationHistory && !hlStatus) { showToast('상태를 선택해주세요'); return }
-    if (isEducationHistory && !hlYear.trim()) { showToast('년도를 입력해주세요'); return }
     let metadata: Record<string, string | boolean> | undefined
     if (isEducationHistory) {
       metadata = { status: hlStatus, role: hlRole, degree: hlDegree, schoolType: hlSchoolType }
     } else if (isCareerRole) {
-      metadata = { status: hlStatus || '재직 중', role: hlRole }
+      metadata = { status: hlStatus, role: hlRole, startYear: hlStartYear, endYear: hlStatus === '종료' ? hlEndYear : '' }
     }
     const payload = {
       categoryId: selectedCat.id,
@@ -796,7 +806,9 @@ function HighlightManageScreen({
       title: hlTitle,
       subtitle: isEducationHistory ? `${selectedCat.label} · ${hlSchoolType}` : `${selectedCat.label} · 직접 입력`,
       description: hlDesc,
-      year: hlYear,
+      year: isCareerRole
+        ? `${hlStartYear} - ${hlStatus === '재직 중' ? '현재' : hlEndYear}`
+        : hlEducationYear,
       metadata,
     }
     if (editingHl && store.highlights.some((h) => h.id === editingHl.id)) {
@@ -817,13 +829,16 @@ function HighlightManageScreen({
   const resetAddForm = () => {
     setSelectedCat(null)
     setHlTitle('')
-    setHlYear('')
     setHlRole('')
     setHlSchoolType('')
     setHlDegree('')
     setHlStatus('')
+    setHlStartYear('')
+    setHlEndYear('')
+    setHlEducationYear('')
     setHlDesc('')
     setEditingHl(null)
+    setYearPickerTarget(null)
   }
 
   if (mode === 'cert' && selectedCert) {
@@ -974,8 +989,37 @@ function HighlightManageScreen({
                 <input value={hlRole} onChange={(e) => setHlRole(e.target.value)} placeholder="직함"
                   className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
               )}
-              <input value={hlYear} onChange={(e) => setHlYear(e.target.value)} placeholder={isCareerRole ? '년도 또는 기간 (예: 2022 - 2024)' : isEducationHistory ? '년도 또는 기간 (예: 2018 - 2022)' : '연도 (예: 2023)'}
-                className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
+              {isCareerRole && (
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setYearPickerTarget('career-start')}
+                    className="rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-left text-sm"
+                    style={{ color: hlStartYear ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}
+                  >
+                    {hlStartYear || '시작 연도'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      if (hlStatus !== '종료') return
+                      setYearPickerTarget('career-end')
+                    }}
+                    disabled={hlStatus !== '종료'}
+                    className="rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-left text-sm disabled:opacity-40"
+                    style={{ color: hlStatus === '재직 중' ? 'var(--color-text-tertiary)' : (hlEndYear ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)') }}
+                  >
+                    {hlStatus === '재직 중' ? '현재' : (hlEndYear || '종료 연도')}
+                  </button>
+                </div>
+              )}
+              {isEducationHistory && (
+                <button
+                  onClick={() => setYearPickerTarget('education-year')}
+                  className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-left text-sm"
+                  style={{ color: hlEducationYear ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}
+                >
+                  {hlEducationYear || '연도 선택'}
+                </button>
+              )}
               {isCareerRole && (
                 <div className="grid grid-cols-2 gap-2">
                   {['재직 중', '종료'].map((status) => (
@@ -1021,7 +1065,7 @@ function HighlightManageScreen({
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => setMode('picker')}>이전</Button>
-              <Button onClick={handleSave} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && !hlRole.trim()) || (isEducationHistory && (!hlSchoolType || (educationNeedsDegree && !hlDegree) || (educationNeedsMajor && !hlRole.trim()) || !hlStatus || !hlYear.trim()))}>{editingHl ? '수정하기' : '저장하기'}</Button>
+              <Button onClick={handleSave} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && (!hlRole.trim() || !hlStatus || !hlStartYear || (hlStatus === '종료' && !hlEndYear))) || (isEducationHistory && (!hlSchoolType || (educationNeedsDegree && !hlDegree) || (educationNeedsMajor && !hlRole.trim()) || !hlStatus))}>{editingHl ? '수정하기' : '저장하기'}</Button>
             </div>
           </div>
         </div>
@@ -1254,6 +1298,27 @@ function HighlightManageScreen({
           + 하이라이트 추가하기
         </button>
       </div>
+
+      <YearPickerSheet
+        open={yearPickerTarget !== null}
+        onClose={() => setYearPickerTarget(null)}
+        title={
+          yearPickerTarget === 'career-start' ? '시작 연도 선택'
+            : yearPickerTarget === 'career-end' ? '종료 연도 선택'
+              : '연도 선택'
+        }
+        value={
+          yearPickerTarget === 'career-start' ? hlStartYear
+            : yearPickerTarget === 'career-end' ? hlEndYear
+              : hlEducationYear
+        }
+        options={yearOptions}
+        onSelect={(value) => {
+          if (yearPickerTarget === 'career-start') setHlStartYear(value)
+          if (yearPickerTarget === 'career-end') setHlEndYear(value)
+          if (yearPickerTarget === 'education-year') setHlEducationYear(value)
+        }}
+      />
     </div>
   )
 }

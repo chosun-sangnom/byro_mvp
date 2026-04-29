@@ -569,12 +569,12 @@ export default function PublicProfile({
                               {isVerified ? (
                                 <>
                                   <div className="flex flex-wrap items-center gap-2">
-                                    <span className="text-[15px] font-bold text-[var(--color-text-strong)]">{hl.title}</span>
+                                    <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{hl.title}</span>
                                     <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-[#217A43] shadow-[0_2px_8px_rgba(17,17,17,0.08)]">
                                       <BadgeCheck size={12} />
                                     </span>
                                   </div>
-                                  <div className="micro-text mt-0.5">{hl.subtitle}</div>
+                                  <div className="mt-1 text-[15px] font-bold text-[var(--color-text-strong)]">{hl.subtitle}</div>
                                 </>
                               ) : (
                                 <>

@@ -61,6 +61,7 @@ interface ByroStore {
   addHighlight(h: Omit<Highlight, 'id'>): void
   updateHighlight(id: string, h: Omit<Highlight, 'id'>): void
   removeHighlight(id: string): void
+  setHighlightPrimary(id: string): void
   setBio(bio: string, mode: 'ai' | 'manual'): void
   setSelectedBioMethod(method: 'ai' | 'manual'): void
   completeOnboarding(): void
@@ -233,6 +234,35 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     set((state) => ({
       highlights: state.highlights.filter((h) => h.id !== id),
     }))
+  },
+
+  setHighlightPrimary(id) {
+    set((state) => {
+      const target = state.highlights.find((item) => item.id === id)
+      if (!target) return state
+
+      return {
+        highlights: state.highlights.map((item) => {
+          if (item.categoryId !== target.categoryId) return item
+          if (item.id === id) {
+            return {
+              ...item,
+              metadata: {
+                ...item.metadata,
+                isPrimary: true,
+              },
+            }
+          }
+          return {
+            ...item,
+            metadata: {
+              ...item.metadata,
+              isPrimary: false,
+            },
+          }
+        }),
+      }
+    })
   },
 
   setBio(bio, mode) {

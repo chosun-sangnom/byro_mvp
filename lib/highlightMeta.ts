@@ -1,5 +1,13 @@
 import type { Highlight } from '@/types'
 
+export function isPrimaryHighlight(highlight: Highlight): boolean {
+  return highlight.metadata?.isPrimary === true
+}
+
+export function sortHighlightsByPrimary(items: Highlight[]): Highlight[] {
+  return [...items].sort((a, b) => Number(isPrimaryHighlight(b)) - Number(isPrimaryHighlight(a)))
+}
+
 export function getHighlightMetaParts(highlight: Highlight): string[] {
   const metadata = highlight.metadata ?? {}
   const role = typeof metadata.role === 'string' ? metadata.role.trim() : ''
@@ -53,7 +61,7 @@ export function getGroupedHighlightSummary(items: Highlight[], categoryLabel?: s
 }
 
 export function getGroupedHighlightPreview(items: Highlight[]) {
-  const first = items[0]
+  const first = sortHighlightsByPrimary(items)[0]
   if (!first) {
     return { title: '', meta: '' }
   }

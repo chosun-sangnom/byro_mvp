@@ -15,7 +15,7 @@ import {
   SAMPLE_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE, getProfileAvatar,
   HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS, KEYWORD_GROUPS,
 } from '@/lib/mockData'
-import { getGroupedHighlightPreview, getHighlightDetailFootnote, getHighlightMetaParts } from '@/lib/highlightMeta'
+import { getGroupedHighlightPreview, getHighlightDetailFootnote, getHighlightMetaParts, isPrimaryHighlight, sortHighlightsByPrimary } from '@/lib/highlightMeta'
 import PublicProfile from '@/components/screens/profile/PublicProfile'
 
 type Screen = 'preview' | 'manage' | 'editBasic' | 'editHighlight' | 'editSNS' | 'editReputation' | 'editContact' | 'editGuestbook'
@@ -755,7 +755,7 @@ function HighlightManageScreen({
     )
 
     const manualGroups = Array.from(new Map(
-      manualItems.map((item) => [item.categoryId, manualItems.filter((manual) => manual.categoryId === item.categoryId)]),
+      manualItems.map((item) => [item.categoryId, sortHighlightsByPrimary(manualItems.filter((manual) => manual.categoryId === item.categoryId))]),
     ).entries()).map(([categoryId, items]) => ({
       kind: 'manual-group' as const,
       categoryId,
@@ -785,7 +785,7 @@ function HighlightManageScreen({
     setMode('form')
   }
 
-  const handleSave = () => {
+  const handleSave = (continueAdding = false) => {
     if (!selectedCat || !hlTitle.trim()) { showToast('필수 항목을 입력해주세요'); return }
     if (isCareerRole && !hlRole.trim()) { showToast('직함을 입력해주세요'); return }
     if (isCareerRole && !hlStatus) { showToast('상태를 선택해주세요'); return }
@@ -800,6 +800,10 @@ function HighlightManageScreen({
       metadata = { status: hlStatus, role: hlRole, degree: hlDegree, schoolType: hlSchoolType }
     } else if (isCareerRole) {
       metadata = { status: hlStatus, role: hlRole, startYear: hlStartYear, endYear: hlStatus === '종료' ? hlEndYear : '' }
+    }
+    const isNewPrimary = !editingHl && !store.highlights.some((item) => item.categoryId === selectedCat.id)
+    if (isNewPrimary) {
+      metadata = { ...metadata, isPrimary: true }
     }
     const payload = {
       categoryId: selectedCat.id,
@@ -817,8 +821,16 @@ function HighlightManageScreen({
     } else {
       store.addHighlight(payload)
     }
-    setMode('list')
     setEditingHl(null)
+    if (continueAdding && !editingHl) {
+      const preservedCategory = selectedCat
+      resetAddForm()
+      setSelectedCat(preservedCategory)
+      setMode('form')
+      showToast('추가됐어요. 같은 항목을 계속 입력할 수 있어요!')
+      return
+    }
+    setMode('list')
     resetAddForm()
     showToast(editingHl ? '수정됐어요!' : '추가됐어요!')
   }
@@ -911,6 +923,9 @@ function HighlightManageScreen({
   }
 
   if (mode === 'form') {
+    const existingCategoryItems = selectedCat
+      ? sortHighlightsByPrimary(allManualHighlights.filter((item) => item.categoryId === selectedCat.id))
+      : []
     return (
       <div className="flex flex-col h-full">
         <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
@@ -929,6 +944,53 @@ function HighlightManageScreen({
                   <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{selectedCat.label}</div>
                   <div className="micro-text">프로필에 직접 입력한 경험으로 표시돼요</div>
                 </div>
+              </div>
+            </div>
+          )}
+          {selectedCat && existingCategoryItems.length > 0 && !editingHl && (
+            <div className="surface-card mb-4 rounded-[26px] p-4">
+              <div className="text-sm font-bold text-[var(--color-text-strong)]">이미 추가된 항목</div>
+              <div className="mt-3 space-y-2">
+                {existingCategoryItems.map((item) => {
+                  const isEditable = store.highlights.some((highlight) => highlight.id === item.id)
+                  const metaParts = getHighlightMetaParts(item)
+                  return (
+                    <div key={item.id} className="rounded-[18px] border border-[#E7E2DC] bg-white px-3.5 py-3">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="text-[14px] font-bold text-[var(--color-text-strong)]">{item.title}</div>
+                          {metaParts.length > 0 && (
+                            <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                              {metaParts.map((part, partIndex) => (
+                                <span
+                                  key={`${item.id}-existing-meta-${partIndex}`}
+                                  className={`text-[11px] ${partIndex === 0 ? 'font-semibold text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'}`}
+                                >
+                                  {part}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        {isPrimaryHighlight(item) ? (
+                          <span className="rounded-full bg-[#E8F5EC] px-2.5 py-1 text-[11px] font-semibold text-[#217A43]">대표</span>
+                        ) : isEditable ? (
+                          <button
+                            onClick={() => {
+                              store.setHighlightPrimary(item.id)
+                              showToast('대표 항목으로 설정했어요')
+                            }}
+                            className="rounded-full border border-[#D7D0C8] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-secondary)]"
+                          >
+                            대표로 설정
+                          </button>
+                        ) : (
+                          <span className="rounded-full bg-[#F6F3EF] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-tertiary)]">기본</span>
+                        )}
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
             </div>
           )}
@@ -1066,7 +1128,10 @@ function HighlightManageScreen({
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => setMode('picker')}>이전</Button>
-              <Button onClick={handleSave} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && (!hlRole.trim() || !hlStatus || !hlStartYear || (hlStatus === '종료' && !hlEndYear))) || (isEducationHistory && (!hlSchoolType || (educationNeedsDegree && !hlDegree) || (educationNeedsMajor && !hlRole.trim()) || !hlStatus))}>{editingHl ? '수정하기' : '저장하기'}</Button>
+              {!editingHl && (
+                <Button variant="outline" onClick={() => handleSave(true)} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && (!hlRole.trim() || !hlStatus || !hlStartYear || (hlStatus === '종료' && !hlEndYear))) || (isEducationHistory && (!hlSchoolType || (educationNeedsDegree && !hlDegree) || (educationNeedsMajor && !hlRole.trim()) || !hlStatus))}>저장 후 계속 추가</Button>
+              )}
+              <Button onClick={() => handleSave(false)} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && (!hlRole.trim() || !hlStatus || !hlStartYear || (hlStatus === '종료' && !hlEndYear))) || (isEducationHistory && (!hlSchoolType || (educationNeedsDegree && !hlDegree) || (educationNeedsMajor && !hlRole.trim()) || !hlStatus))}>{editingHl ? '수정하기' : '저장하기'}</Button>
             </div>
           </div>
         </div>

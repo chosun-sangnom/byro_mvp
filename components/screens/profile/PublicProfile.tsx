@@ -670,8 +670,12 @@ export default function PublicProfile({
                                     </button>
                                     {hasDetail && isOpen && (
                                       <div className="pb-3 pr-4">
-                                        <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
-                                          {hl.description || '세부 설명이 아직 없어요.'}
+                                        <div className="space-y-3">
+                                          {hl.description?.trim() && (
+                                            <p className="text-[14px] leading-7 text-[var(--color-text-secondary)]">
+                                              {hl.description}
+                                            </p>
+                                          )}
                                           {hl.linkUrl && (
                                             <a
                                               href={hl.linkUrl}
@@ -703,7 +707,7 @@ export default function PublicProfile({
                                               </div>
                                             </a>
                                           )}
-                                          <div className="micro-text mt-2">{getHighlightDetailFootnote(hl, category?.label)}</div>
+                                          <div className="micro-text">{getHighlightDetailFootnote(hl, category?.label)}</div>
                                         </div>
                                       </div>
                                     )}

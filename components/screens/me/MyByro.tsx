@@ -1242,35 +1242,39 @@ function HighlightManageScreen({
                                   </button>
                                   {hasDetail && isOpen && (
                                     <div className="pb-3 pr-4">
-                                      <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
-                                        {item.description || '세부 설명이 아직 없어요.'}
-                                        <div className="micro-text mt-2">
+                                      <div className="space-y-3">
+                                        {item.description?.trim() && (
+                                          <p className="text-[14px] leading-7 text-[var(--color-text-secondary)]">
+                                            {item.description}
+                                          </p>
+                                        )}
+                                        <div className="micro-text">
                                           {getHighlightDetailFootnote(item, HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === item.categoryId)?.label)}
                                         </div>
-                                      </div>
-                                      <div className="mt-3 flex gap-2">
-                                        <button
-                                          onClick={() => {
-                                            if (isEditable) openEditSheet(item)
-                                            else showToast('기본 목업 항목은 수정하지 않습니다')
-                                          }}
-                                          className="rounded-lg border border-[#CFC7BF] px-3 py-1.5 text-xs font-medium text-[#555]"
-                                        >
-                                          수정
-                                        </button>
-                                        <button
-                                          onClick={() => {
-                                            if (isEditable) {
-                                              store.removeHighlight(item.id)
-                                              showToast('삭제됐어요')
-                                              return
-                                            }
-                                            showToast('기본 목업 항목은 삭제하지 않습니다')
-                                          }}
-                                          className="rounded-lg border border-[#F2C7C5] px-3 py-1.5 text-xs font-medium text-[#C9473D]"
-                                        >
-                                          삭제
-                                        </button>
+                                        <div className="flex gap-2 pt-0.5">
+                                          <button
+                                            onClick={() => {
+                                              if (isEditable) openEditSheet(item)
+                                              else showToast('기본 목업 항목은 수정하지 않습니다')
+                                            }}
+                                            className="rounded-lg border border-[#CFC7BF] px-3 py-1.5 text-xs font-medium text-[#555]"
+                                          >
+                                            수정
+                                          </button>
+                                          <button
+                                            onClick={() => {
+                                              if (isEditable) {
+                                                store.removeHighlight(item.id)
+                                                showToast('삭제됐어요')
+                                                return
+                                              }
+                                              showToast('기본 목업 항목은 삭제하지 않습니다')
+                                            }}
+                                            className="rounded-lg border border-[#F2C7C5] px-3 py-1.5 text-xs font-medium text-[#C9473D]"
+                                          >
+                                            삭제
+                                          </button>
+                                        </div>
                                       </div>
                                     </div>
                                   )}

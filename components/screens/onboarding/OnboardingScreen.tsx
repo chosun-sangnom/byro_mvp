@@ -675,19 +675,22 @@ function Step7Highlight() {
   const [hlTitle, setHlTitle] = useState('')
   const [hlYear, setHlYear] = useState('')
   const [hlRole, setHlRole] = useState('')
+  const [hlSchoolType, setHlSchoolType] = useState('')
   const [hlDegree, setHlDegree] = useState('')
   const [hlStatus, setHlStatus] = useState('')
   const [hlDesc, setHlDesc] = useState('')
   const highlightLimitReached = store.highlights.length >= 5
   const isCareerRole = selectedCat?.id === 'career-role'
   const isEducationHistory = selectedCat?.id === 'education-history'
-  const educationNeedsMajor = hlDegree !== '고등학교'
+  const educationNeedsDegree = hlSchoolType === '대학교' || hlSchoolType === '대학원'
+  const educationNeedsMajor = hlSchoolType !== '고등학교'
 
   const resetForm = () => {
     setSelectedCat(null)
     setHlTitle('')
     setHlYear('')
     setHlRole('')
+    setHlSchoolType('')
     setHlDegree('')
     setHlStatus('')
     setHlDesc('')
@@ -706,8 +709,12 @@ function Step7Highlight() {
       showToast('직함을 입력해주세요')
       return
     }
-    if (isEducationHistory && !hlDegree) {
-      showToast('학위 또는 학교 유형을 선택해주세요')
+    if (isEducationHistory && !hlSchoolType) {
+      showToast('학교 유형을 선택해주세요')
+      return
+    }
+    if (isEducationHistory && educationNeedsDegree && !hlDegree) {
+      showToast('세부 학위를 선택해주세요')
       return
     }
     if (isEducationHistory && educationNeedsMajor && !hlRole.trim()) {
@@ -724,7 +731,7 @@ function Step7Highlight() {
     }
     let metadata: Record<string, string | boolean> | undefined
     if (isEducationHistory) {
-      metadata = { status: hlStatus, role: hlRole, degree: hlDegree }
+      metadata = { status: hlStatus, role: hlRole, degree: hlDegree, schoolType: hlSchoolType }
     } else if (isCareerRole) {
       metadata = { status: hlStatus || '재직 중', role: hlRole }
     }
@@ -732,7 +739,7 @@ function Step7Highlight() {
       categoryId: selectedCat.id,
       icon: selectedCat.icon as HighlightIconId,
       title: hlTitle,
-      subtitle: isEducationHistory ? `${selectedCat.label} · ${hlDegree}` : `${selectedCat.label} · 직접 입력`,
+      subtitle: isEducationHistory ? `${selectedCat.label} · ${hlSchoolType}` : `${selectedCat.label} · 직접 입력`,
       description: hlDesc,
       year: hlYear,
       metadata,
@@ -875,9 +882,34 @@ function Step7Highlight() {
               <div className="space-y-3">
                 {isEducationHistory && (
                   <div className="space-y-2">
-                    <div className="micro-text">학교 유형 / 학위</div>
+                    <div className="micro-text">학교 유형</div>
                     <div className="grid grid-cols-3 gap-2">
-                      {['고등학교', '전문학사', '학사', '석사', '박사'].map((degree) => (
+                      {['고등학교', '대학교', '대학원'].map((schoolType) => (
+                        <button
+                          key={schoolType}
+                          onClick={() => {
+                            setHlSchoolType(schoolType)
+                            setHlDegree('')
+                            if (schoolType === '고등학교') setHlRole('')
+                          }}
+                          className="rounded-2xl border px-3 py-2.5 text-sm font-semibold"
+                          style={{
+                            borderColor: hlSchoolType === schoolType ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
+                            backgroundColor: hlSchoolType === schoolType ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
+                            color: hlSchoolType === schoolType ? '#fff' : 'var(--color-text-secondary)',
+                          }}
+                        >
+                          {schoolType}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {isEducationHistory && educationNeedsDegree && (
+                  <div className="space-y-2">
+                    <div className="micro-text">세부 학위</div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(hlSchoolType === '대학교' ? ['전문학사', '학사'] : ['석사', '박사']).map((degree) => (
                         <button
                           key={degree}
                           onClick={() => setHlDegree(degree)}
@@ -977,7 +1009,7 @@ function Step7Highlight() {
               </div>
               <div className="mt-4 flex gap-2">
                 <Button variant="outline" onClick={() => setSheetMode('picker')}>이전</Button>
-                <Button onClick={handleAddHighlight} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && !hlRole.trim()) || (isEducationHistory && (!hlDegree || (educationNeedsMajor && !hlRole.trim()) || !hlStatus || !hlYear.trim()))}>저장하기</Button>
+                <Button onClick={handleAddHighlight} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && !hlRole.trim()) || (isEducationHistory && (!hlSchoolType || (educationNeedsDegree && !hlDegree) || (educationNeedsMajor && !hlRole.trim()) || !hlStatus || !hlYear.trim()))}>저장하기</Button>
               </div>
             </div>
           </div>

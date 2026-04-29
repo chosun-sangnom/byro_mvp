@@ -128,7 +128,7 @@ export const SAMPLE_PROFILE = {
   corporateHighlight: {
     companyCount: 2,
     averageOperatingYears: 5,
-    summary: '2개 법인 · 평균 운영 5년 · 모두 정상 운영 중',
+    summary: '2개 법인 · 정상 운영 중',
     companies: [
       { name: 'Byro Inc.', startYear: 2020, endYear: null, years: 6, status: '정상 운영' },
       { name: 'MKG Studio', startYear: 2022, endYear: null, years: 4, status: '정상 운영' },
@@ -265,7 +265,7 @@ export const MK_PROFILE = {
   corporateHighlight: {
     companyCount: 1,
     years: 2,
-    summary: 'Byth CEO · 2년째 정상 운영 중',
+    summary: '1개 법인 · 정상 운영 중',
     companies: [
       { name: 'Byth', startYear: 2025, endYear: null, years: 2, status: '정상 운영' },
     ],
@@ -359,7 +359,7 @@ export const JIMIN_PROFILE = {
   corporateHighlight: {
     companyCount: 1,
     years: 4,
-    summary: '창업 4년차 · 정상 운영 중 · 폐업 이력 없음',
+    summary: '1개 법인 · 정상 운영 중',
     companies: [
       { name: 'Jimin Brand Lab', startYear: 2022, endYear: null, years: 4, status: '정상 운영' },
     ],

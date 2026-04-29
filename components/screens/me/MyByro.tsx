@@ -1200,12 +1200,12 @@ function HighlightManageScreen({
 
                     return (
                       <div key={`${entry.categoryId}-${group.id}`} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
-                        <div className="flex gap-3 px-4 py-3">
+                        <div className="flex gap-3 px-4 py-2.5">
                           <span className="flex w-8 shrink-0 items-center justify-center self-stretch text-[var(--color-text-strong)]">
                             <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={18} />
                           </span>
                           <div className="min-w-0 flex-1">
-                            <div className="mb-2 text-[11px] font-semibold text-[var(--color-text-secondary)]">
+                            <div className="mb-1.5 text-[11px] font-semibold text-[var(--color-text-secondary)]">
                               {HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === entry.categoryId)?.label ?? '직접 입력'}
                             </div>
                             {entry.items.map((item, index) => {
@@ -1215,13 +1215,13 @@ function HighlightManageScreen({
                                 <div key={item.id} className={index > 0 ? 'border-t border-[#F1ECE6]' : ''}>
                                   <button
                                     onClick={() => toggleCert(item.id)}
-                                    className={`${index === 0 ? 'pt-0' : 'pt-3'} flex w-full items-center gap-3 pb-3 text-left`}
+                                    className={`${index === 0 ? 'pt-0' : 'pt-2.5'} flex w-full items-center gap-3 pb-2.5 text-left`}
                                   >
                                     <div className="min-w-0 flex-1">
                                       <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
                                         {item.title}
                                       </div>
-                                      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                                      <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
                                         {item.metadata?.role && (
                                           <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{String(item.metadata.role)}</span>
                                         )}
@@ -1239,7 +1239,7 @@ function HighlightManageScreen({
                                     {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
                                   </button>
                                   {isOpen && (
-                                    <div className="pb-4 pr-4">
+                                    <div className="pb-3 pr-4">
                                       <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
                                         {item.description || '세부 설명이 아직 없어요.'}
                                         <div className="micro-text mt-2">

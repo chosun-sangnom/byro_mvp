@@ -1200,83 +1200,83 @@ function HighlightManageScreen({
 
                     return (
                       <div key={`${entry.categoryId}-${group.id}`} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
-                        <div className="flex items-center gap-2 px-4 pb-0.5 pt-3">
-                          <span className="flex h-5 w-5 items-center justify-center text-[var(--color-text-strong)]">
+                        <div className="flex gap-3 px-4 py-3">
+                          <span className="flex w-8 shrink-0 items-center justify-center self-stretch text-[var(--color-text-strong)]">
                             <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={18} />
                           </span>
-                          <div className="text-[11px] font-semibold text-[var(--color-text-secondary)]">
-                            {HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === entry.categoryId)?.label ?? '직접 입력'}
-                          </div>
-                        </div>
-                        <div className="pb-1 pl-[44px] pr-4">
-                          {entry.items.map((item, index) => {
-                            const isEditable = store.highlights.some((highlight) => highlight.id === item.id)
-                            const isOpen = certOpen[item.id]
-                            return (
-                              <div key={item.id} className={index > 0 ? 'border-t border-[#F1ECE6]' : ''}>
-                                <button
-                                  onClick={() => toggleCert(item.id)}
-                                  className={`flex w-full items-center gap-3 text-left ${index === 0 ? 'pb-3 pt-1' : 'py-3'}`}
-                                >
-                                  <div className="min-w-0 flex-1">
-                                    <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
-                                      {item.title}
-                                    </div>
-                                    <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                      {item.metadata?.role && (
-                                        <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{String(item.metadata.role)}</span>
-                                      )}
-                                      {item.metadata?.degree && (
-                                        <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(item.metadata.degree)}</span>
-                                      )}
-                                      {item.metadata?.status && (
-                                        <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(item.metadata.status)}</span>
-                                      )}
-                                      {item.year && (
-                                        <span className="text-[11px] text-[var(--color-text-tertiary)]">{item.year}</span>
-                                      )}
-                                    </div>
-                                  </div>
-                                  {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
-                                </button>
-                                {isOpen && (
-                                  <div className="px-4 py-4">
-                                    <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
-                                      {item.description || '세부 설명이 아직 없어요.'}
-                                      <div className="micro-text mt-2">
-                                        {HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === item.categoryId)?.label ?? item.subtitle}
-                                        {item.year ? ` · ${item.year}` : ''}
+                          <div className="min-w-0 flex-1">
+                            <div className="mb-2 text-[11px] font-semibold text-[var(--color-text-secondary)]">
+                              {HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === entry.categoryId)?.label ?? '직접 입력'}
+                            </div>
+                            {entry.items.map((item, index) => {
+                              const isEditable = store.highlights.some((highlight) => highlight.id === item.id)
+                              const isOpen = certOpen[item.id]
+                              return (
+                                <div key={item.id} className={index > 0 ? 'border-t border-[#F1ECE6]' : ''}>
+                                  <button
+                                    onClick={() => toggleCert(item.id)}
+                                    className={`${index === 0 ? 'pt-0' : 'pt-3'} flex w-full items-center gap-3 pb-3 text-left`}
+                                  >
+                                    <div className="min-w-0 flex-1">
+                                      <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
+                                        {item.title}
+                                      </div>
+                                      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                                        {item.metadata?.role && (
+                                          <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{String(item.metadata.role)}</span>
+                                        )}
+                                        {item.metadata?.degree && (
+                                          <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(item.metadata.degree)}</span>
+                                        )}
+                                        {item.metadata?.status && (
+                                          <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(item.metadata.status)}</span>
+                                        )}
+                                        {item.year && (
+                                          <span className="text-[11px] text-[var(--color-text-tertiary)]">{item.year}</span>
+                                        )}
                                       </div>
                                     </div>
-                                    <div className="mt-3 flex gap-2">
-                                      <button
-                                        onClick={() => {
-                                          if (isEditable) openEditSheet(item)
-                                          else showToast('기본 목업 항목은 수정하지 않습니다')
-                                        }}
-                                        className="rounded-lg border border-[#CFC7BF] px-3 py-1.5 text-xs font-medium text-[#555]"
-                                      >
-                                        수정
-                                      </button>
-                                      <button
-                                        onClick={() => {
-                                          if (isEditable) {
-                                            store.removeHighlight(item.id)
-                                            showToast('삭제됐어요')
-                                            return
-                                          }
-                                          showToast('기본 목업 항목은 삭제하지 않습니다')
-                                        }}
-                                        className="rounded-lg border border-[#F2C7C5] px-3 py-1.5 text-xs font-medium text-[#C9473D]"
-                                      >
-                                        삭제
-                                      </button>
+                                    {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
+                                  </button>
+                                  {isOpen && (
+                                    <div className="pb-4 pr-4">
+                                      <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
+                                        {item.description || '세부 설명이 아직 없어요.'}
+                                        <div className="micro-text mt-2">
+                                          {HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === item.categoryId)?.label ?? item.subtitle}
+                                          {item.year ? ` · ${item.year}` : ''}
+                                        </div>
+                                      </div>
+                                      <div className="mt-3 flex gap-2">
+                                        <button
+                                          onClick={() => {
+                                            if (isEditable) openEditSheet(item)
+                                            else showToast('기본 목업 항목은 수정하지 않습니다')
+                                          }}
+                                          className="rounded-lg border border-[#CFC7BF] px-3 py-1.5 text-xs font-medium text-[#555]"
+                                        >
+                                          수정
+                                        </button>
+                                        <button
+                                          onClick={() => {
+                                            if (isEditable) {
+                                              store.removeHighlight(item.id)
+                                              showToast('삭제됐어요')
+                                              return
+                                            }
+                                            showToast('기본 목업 항목은 삭제하지 않습니다')
+                                          }}
+                                          className="rounded-lg border border-[#F2C7C5] px-3 py-1.5 text-xs font-medium text-[#C9473D]"
+                                        >
+                                          삭제
+                                        </button>
+                                      </div>
                                     </div>
-                                  </div>
-                                )}
-                              </div>
-                            )
-                          })}
+                                  )}
+                                </div>
+                              )
+                            })}
+                          </div>
                         </div>
                       </div>
                     )

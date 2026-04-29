@@ -628,90 +628,90 @@ export default function PublicProfile({
                       const category = HIGHLIGHT_CATEGORIES.find((item) => item.id === entry.categoryId)
                       return (
                         <div key={`${entry.categoryId}-${group.id}`} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
-                          <div className="flex items-center gap-2 px-4 pb-0.5 pt-3">
-                            <span className="flex h-5 w-5 items-center justify-center text-[var(--color-text-strong)]">
+                          <div className="flex gap-3 px-4 py-3">
+                            <span className="flex w-8 shrink-0 items-center justify-center self-stretch text-[var(--color-text-strong)]">
                               <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={18} />
                             </span>
-                            <div className="text-[11px] font-semibold text-[var(--color-text-secondary)]">
-                              {category?.label ?? '직접 입력'}
-                            </div>
-                          </div>
-                          <div className="pb-1 pl-[44px] pr-4">
-                            {entry.items.map((hl, index) => {
-                              const toggleKey = `${hl.id}_${username}`
-                              const isOpen = store.hlOpenStates[toggleKey] ?? false
-                              return (
-                                <div key={hl.id} className={index > 0 ? 'border-t border-[#F1ECE6]' : ''}>
-                                  <button
-                                    onClick={() => store.toggleHlOpen(toggleKey)}
-                                    className={`flex w-full items-center gap-3 text-left ${index === 0 ? 'pb-3 pt-1' : 'py-3'}`}
-                                  >
-                                    <div className="min-w-0 flex-1">
-                                      <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
-                                        {hl.title}
-                                      </div>
-                                      <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                        {hl.metadata?.role && (
-                                          <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{String(hl.metadata.role)}</span>
-                                        )}
-                                        {hl.metadata?.degree && (
-                                          <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(hl.metadata.degree)}</span>
-                                        )}
-                                        {hl.metadata?.status && (
-                                          <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(hl.metadata.status)}</span>
-                                        )}
-                                        {hl.year && (
-                                          <span className="text-[11px] text-[var(--color-text-tertiary)]">{hl.year}</span>
-                                        )}
-                                      </div>
-                                    </div>
-                                    {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
-                                  </button>
-                                  {isOpen && (
-                                    <div className="px-4 py-4">
-                                      <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
-                                        {hl.description || '세부 설명이 아직 없어요.'}
-                                        {hl.linkUrl && (
-                                          <a
-                                            href={hl.linkUrl}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="mt-3 block overflow-hidden rounded-[18px] border border-[#E7E2DC] bg-white"
-                                          >
-                                            <div className="flex min-h-[84px]">
-                                              {hl.thumbnailUrl ? (
-                                                <div className="h-auto w-24 flex-shrink-0 overflow-hidden bg-[#F4F1EC]">
-                                                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                  <img src={hl.thumbnailUrl} alt={hl.title} className="h-full w-full object-cover" />
-                                                </div>
-                                              ) : (
-                                                <div className="flex w-24 flex-shrink-0 items-center justify-center bg-[linear-gradient(180deg,#F6F3EF_0%,#EDE7DF_100%)] px-3 text-center">
-                                                  <div>
-                                                    <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[#8E867E]">News</div>
-                                                    <div className="mt-1 text-[11px] font-semibold text-[#3D3833]">{hl.sourceLabel ?? '기사 링크'}</div>
-                                                  </div>
-                                                </div>
-                                              )}
-                                              <div className="flex min-w-0 flex-1 items-center px-4 py-3">
-                                                <div className="min-w-0">
-                                                  <div className="text-[12px] font-semibold text-[#8E867E]">{hl.sourceLabel ?? '외부 링크'}</div>
-                                                  <div className="mt-1 line-clamp-2 text-[13px] font-bold leading-snug text-[#1F1B18]">{hl.title}</div>
-                                                  <div className="mt-2 text-[11px] font-semibold text-[#0D47A1]">기사 보러가기</div>
-                                                </div>
-                                              </div>
-                                            </div>
-                                          </a>
-                                        )}
-                                        <div className="micro-text mt-2">
-                                          {category?.label ?? hl.subtitle}
-                                          {hl.year ? ` · ${hl.year}` : ''}
+                            <div className="min-w-0 flex-1">
+                              <div className="mb-2 text-[11px] font-semibold text-[var(--color-text-secondary)]">
+                                {category?.label ?? '직접 입력'}
+                              </div>
+                              {entry.items.map((hl, index) => {
+                                const toggleKey = `${hl.id}_${username}`
+                                const isOpen = store.hlOpenStates[toggleKey] ?? false
+                                return (
+                                  <div key={hl.id} className={index > 0 ? 'border-t border-[#F1ECE6]' : ''}>
+                                    <button
+                                      onClick={() => store.toggleHlOpen(toggleKey)}
+                                      className={`${index === 0 ? 'pt-0' : 'pt-3'} flex w-full items-center gap-3 pb-3 text-left`}
+                                    >
+                                      <div className="min-w-0 flex-1">
+                                        <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
+                                          {hl.title}
+                                        </div>
+                                        <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                                          {hl.metadata?.role && (
+                                            <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{String(hl.metadata.role)}</span>
+                                          )}
+                                          {hl.metadata?.degree && (
+                                            <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(hl.metadata.degree)}</span>
+                                          )}
+                                          {hl.metadata?.status && (
+                                            <span className="text-[11px] text-[var(--color-text-tertiary)]">{String(hl.metadata.status)}</span>
+                                          )}
+                                          {hl.year && (
+                                            <span className="text-[11px] text-[var(--color-text-tertiary)]">{hl.year}</span>
+                                          )}
                                         </div>
                                       </div>
-                                    </div>
-                                  )}
-                                </div>
-                              )
-                            })}
+                                      {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
+                                    </button>
+                                    {isOpen && (
+                                      <div className="pb-4 pr-4">
+                                        <div className="text-sm leading-relaxed text-[var(--color-text-secondary)]">
+                                          {hl.description || '세부 설명이 아직 없어요.'}
+                                          {hl.linkUrl && (
+                                            <a
+                                              href={hl.linkUrl}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="mt-3 block overflow-hidden rounded-[18px] border border-[#E7E2DC] bg-white"
+                                            >
+                                              <div className="flex min-h-[84px]">
+                                                {hl.thumbnailUrl ? (
+                                                  <div className="h-auto w-24 flex-shrink-0 overflow-hidden bg-[#F4F1EC]">
+                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                    <img src={hl.thumbnailUrl} alt={hl.title} className="h-full w-full object-cover" />
+                                                  </div>
+                                                ) : (
+                                                  <div className="flex w-24 flex-shrink-0 items-center justify-center bg-[linear-gradient(180deg,#F6F3EF_0%,#EDE7DF_100%)] px-3 text-center">
+                                                    <div>
+                                                      <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[#8E867E]">News</div>
+                                                      <div className="mt-1 text-[11px] font-semibold text-[#3D3833]">{hl.sourceLabel ?? '기사 링크'}</div>
+                                                    </div>
+                                                  </div>
+                                                )}
+                                                <div className="flex min-w-0 flex-1 items-center px-4 py-3">
+                                                  <div className="min-w-0">
+                                                    <div className="text-[12px] font-semibold text-[#8E867E]">{hl.sourceLabel ?? '외부 링크'}</div>
+                                                    <div className="mt-1 line-clamp-2 text-[13px] font-bold leading-snug text-[#1F1B18]">{hl.title}</div>
+                                                    <div className="mt-2 text-[11px] font-semibold text-[#0D47A1]">기사 보러가기</div>
+                                                  </div>
+                                                </div>
+                                              </div>
+                                            </a>
+                                          )}
+                                          <div className="micro-text mt-2">
+                                            {category?.label ?? hl.subtitle}
+                                            {hl.year ? ` · ${hl.year}` : ''}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+                                  </div>
+                                )
+                              })}
+                            </div>
                           </div>
                         </div>
                       )

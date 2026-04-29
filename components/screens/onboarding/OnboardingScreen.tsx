@@ -241,10 +241,10 @@ function Step1Login({ onClose: _onClose }: { onClose: () => void }) { // eslint-
   return (
     <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
       <div className="surface-card rounded-[32px] px-5 py-6 text-center mb-5">
-        <div className="micro-text uppercase tracking-[0.18em] mb-2">Welcome</div>
+        <div className="micro-text tracking-[0.08em] mb-2">진짜 나를 보여주는 브랜딩 프로필</div>
         <div className="text-3xl font-black mb-2">Byro</div>
         <div className="text-lg font-black text-[var(--color-text-strong)] leading-snug">
-          진짜 나를 보여주는<br />브랜딩 프로필, Byro
+          3분이면 시작할 수 있어요
         </div>
         <div className="meta-text mt-3 leading-relaxed">
           3분이면 프로필을 만들 수 있고,

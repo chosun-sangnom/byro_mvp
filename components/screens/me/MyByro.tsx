@@ -1094,7 +1094,7 @@ function HighlightManageScreen({
 
                     return (
                       <div key={`${entry.categoryId}-${group.id}`} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
-                        <div className="flex items-center gap-3 px-4 py-3">
+                        <div className="flex items-center gap-3 px-4 pb-1 pt-3">
                           <span className="flex h-11 w-8 items-center justify-center text-[var(--color-text-strong)]">
                             <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={18} />
                           </span>
@@ -1110,7 +1110,7 @@ function HighlightManageScreen({
                               <div key={item.id} className={index > 0 ? 'border-t border-[#F1ECE6]' : ''}>
                                 <button
                                   onClick={() => toggleCert(item.id)}
-                                  className="flex w-full items-center gap-3 py-3 text-left"
+                                  className={`flex w-full items-center gap-3 text-left ${index === 0 ? 'pb-3 pt-1' : 'py-3'}`}
                                 >
                                   <div className="min-w-0 flex-1">
                                     <div className="text-[15px] font-bold text-[var(--color-text-strong)]">

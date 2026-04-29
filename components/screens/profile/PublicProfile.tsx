@@ -630,7 +630,7 @@ export default function PublicProfile({
                       return (
                         <div key={`${entry.categoryId}-${group.id}`} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
                           <div className="flex gap-3 px-4 py-2.5">
-                            <span className="flex h-11 w-8 shrink-0 items-center justify-center self-center text-[var(--color-text-strong)]">
+                            <span className="flex h-11 w-8 shrink-0 items-center justify-center self-start pt-[18px] text-[var(--color-text-strong)]">
                               <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={18} />
                             </span>
                             <div className="min-w-0 flex-1">
@@ -670,7 +670,7 @@ export default function PublicProfile({
                                     </button>
                                     {hasDetail && isOpen && (
                                       <div className="pb-3 pr-4">
-                                        <div className="space-y-3">
+                                        <div className="rounded-[22px] border border-[#ECE6DF] bg-[var(--color-bg-soft)] px-4 py-4 space-y-3">
                                           {hl.description?.trim() && (
                                             <p className="text-[14px] leading-7 text-[var(--color-text-secondary)]">
                                               {hl.description}

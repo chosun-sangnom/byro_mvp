@@ -377,29 +377,26 @@ export default function PublicProfile({
               </div>
             )}
 
-            <div className="surface-card mt-4 rounded-[26px] px-4 py-4">
-              <div>
-                <div className="flex items-center gap-2">
-                  <div className="rounded-full bg-[var(--color-bg-muted)] px-2 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-text-secondary)]">Reputation</div>
+            <div className="mt-4 border-t border-[var(--color-border-soft)] px-1 pt-4">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Reputation</div>
+                  <div className="mt-1 text-[18px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">누적 평판</div>
                 </div>
-                <div className="mt-2 flex items-center gap-2">
-                  <div className="text-sm font-black text-[var(--color-text-strong)]">누적 평판</div>
-                  <div className="micro-text rounded-full border px-2 py-0.5" style={{ borderColor: 'var(--color-border-default)' }}>
-                    총 {totalKeywordCount}
-                  </div>
+                <div className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
+                  총 {totalKeywordCount}
                 </div>
-                <div className="micro-text mt-0.5">키워드와 최근 방명록으로 신뢰도를 보여줘요</div>
               </div>
 
               <div className="mt-3 flex flex-wrap gap-2">
                 {keywordCounts.map((item) => (
                   <span key={item.keyword} className="chip-metric">
-                    {item.keyword} <span className="ml-1 font-black text-[#111]">{item.count}</span>
+                    {item.keyword} <span className="ml-1 font-black text-[var(--color-text-strong)]">{item.count}</span>
                   </span>
                 ))}
               </div>
 
-              <div className="mt-4 divide-y divide-[#F1F1F1]">
+              <div className="mt-4 divide-y divide-[var(--color-border-soft)]">
                 {featuredGuestbook.map((entry) => (
                   <button
                     key={entry.id}
@@ -407,21 +404,21 @@ export default function PublicProfile({
                     className="flex w-full gap-2.5 py-3 text-left first:pt-0 last:pb-0"
                   >
                     {getProfileAvatar(entry.linkId) ? (
-                      <div className="mt-0.5 h-8 w-8 rounded-full overflow-hidden bg-[var(--color-bg-soft)] flex-shrink-0">
+                      <div className="mt-0.5 h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-[var(--color-bg-soft)]">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={getProfileAvatar(entry.linkId)} alt={`${entry.authorName} 프로필 사진`} className="w-full h-full object-cover" />
+                        <img src={getProfileAvatar(entry.linkId)} alt={`${entry.authorName} 프로필 사진`} className="h-full w-full object-cover" />
                       </div>
                     ) : (
-                      <div className="mt-0.5 h-8 w-8 rounded-full bg-[var(--color-bg-soft)] flex items-center justify-center text-xs font-bold text-[var(--color-text-secondary)] flex-shrink-0">
+                      <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-xs font-bold text-[var(--color-text-secondary)]">
                         {entry.authorName.charAt(0)}
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
-                        <div className="text-xs font-bold text-[var(--color-text-primary)]">{entry.authorName}</div>
+                        <div className="text-[12px] font-semibold text-[var(--color-text-primary)]">{entry.authorName}</div>
                         <div className="text-[10px] text-[var(--color-text-tertiary)]">{entry.date}</div>
                       </div>
-                      <div className="mt-1 text-sm leading-relaxed text-[var(--color-text-secondary)] line-clamp-2">{entry.message}</div>
+                      <div className="mt-1 text-[13px] leading-6 text-[var(--color-text-secondary)] line-clamp-2">{entry.message}</div>
                     </div>
                   </button>
                 ))}
@@ -430,8 +427,7 @@ export default function PublicProfile({
               {profile.guestbook.length > 0 && (
                 <button
                   onClick={() => router.push(`/${profile.linkId}/guestbook`)}
-                  className="mt-4 w-full rounded-[var(--radius-md)] border px-3 py-2.5 text-xs font-semibold"
-                  style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-secondary)' }}
+                  className="mt-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-secondary)]"
                 >
                   더보기
                 </button>
@@ -447,8 +443,8 @@ export default function PublicProfile({
           />
 
           {profile.instagramConnected && (
-            <div className="mb-3 overflow-hidden rounded-[20px] border bg-[rgba(23,24,28,0.74)]" style={{ borderColor: 'var(--color-border-default)' }}>
-              <div className="flex items-center gap-3 px-4 py-3.5">
+            <div className="mb-4 border-b border-[var(--color-border-soft)] pb-4">
+              <div className="flex items-center gap-3 py-1">
                 <button
                   onClick={() => store.toggleSnsOpen('instagram_' + username)}
                   className="flex min-w-0 flex-1 items-center text-left"
@@ -479,10 +475,10 @@ export default function PublicProfile({
                 </button>
               </div>
               {igOpen && (
-                <div className="px-4 pb-3.5">
-                  <div className="mb-3 rounded-[16px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.02)] px-3 py-3">
-                    <div className="text-[11px] text-[var(--color-text-tertiary)] mb-1">AI 요약</div>
-                    <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">{profile.instagram.aiSummary}</p>
+                <div className="pt-3">
+                  <div className="mb-3">
+                    <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-text-tertiary)]">AI 요약</div>
+                    <p className="text-xs leading-relaxed text-[var(--color-text-secondary)]">{profile.instagram.aiSummary}</p>
                   </div>
                   <div className="flex gap-2 overflow-x-auto pb-0.5 scrollbar-hide">
                     {profile.instagram.posts.map((post) => (
@@ -503,8 +499,8 @@ export default function PublicProfile({
           )}
 
           {profile.linkedinConnected && (
-            <div className="mb-3 overflow-hidden rounded-[20px] border bg-[rgba(23,24,28,0.74)]" style={{ borderColor: 'var(--color-border-default)' }}>
-              <div className="flex items-center gap-3 px-4 py-3.5">
+            <div className="mb-4 border-b border-[var(--color-border-soft)] pb-4">
+              <div className="flex items-center gap-3 py-1">
                 <button
                   onClick={() => store.toggleSnsOpen('linkedin_' + username)}
                   className="flex min-w-0 flex-1 items-center text-left"
@@ -535,10 +531,10 @@ export default function PublicProfile({
                 </button>
               </div>
               {liOpen && (
-                <div className="px-4 pb-3.5">
-                    <div className="mb-3 rounded-[16px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.02)] px-3 py-3">
-                      <div className="text-[11px] text-[var(--color-text-tertiary)] mb-1">AI 요약</div>
-                      <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">{profile.linkedin.aiSummary}</p>
+                <div className="pt-3">
+                    <div className="mb-3">
+                      <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-text-tertiary)]">AI 요약</div>
+                      <p className="text-xs leading-relaxed text-[var(--color-text-secondary)]">{profile.linkedin.aiSummary}</p>
                     </div>
                   <div className="space-y-2">
                     <div className="overflow-hidden rounded-[16px] border" style={{ borderColor: 'var(--color-border-default)' }}>
@@ -546,7 +542,7 @@ export default function PublicProfile({
                       <div className="relative max-h-48 overflow-hidden">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={profile.linkedin.previewImage} alt="LinkedIn 최근 게시물" className="w-full" />
-                        <div className="absolute bottom-0 inset-x-0 h-20 bg-gradient-to-t from-[var(--color-bg-surface)] to-transparent" />
+                        <div className="absolute bottom-0 inset-x-0 h-20 bg-gradient-to-t from-[var(--color-bg-page)] to-transparent" />
                       </div>
                     </div>
                   </div>
@@ -575,7 +571,7 @@ export default function PublicProfile({
                   </div>
                 </div>
                 {group.items.length > 0 ? (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {group.items.map((entry) => {
                       if (entry.kind === 'verified') {
                         const hl = entry.item
@@ -661,13 +657,13 @@ export default function PublicProfile({
                               </button>
                               {isGroupOpen && (
                                 <div className="border-t border-[var(--color-border-soft)] px-4 py-4">
-                                  <div className="space-y-3">
+                                  <div className="space-y-0 divide-y divide-[var(--color-border-soft)]">
                                     {entry.items.map((hl) => {
                                       const metaParts = getHighlightMetaParts(hl)
                                       return (
                                         <div
                                           key={hl.id}
-                                          className="rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4"
+                                          className="py-4 first:pt-0 last:pb-0"
                                         >
                                           <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{hl.title}</div>
                                           {metaParts.length > 0 && (
@@ -694,7 +690,7 @@ export default function PublicProfile({
                                                   href={hl.linkUrl}
                                                   target="_blank"
                                                   rel="noopener noreferrer"
-                                                  className="block overflow-hidden rounded-[18px] border border-[var(--color-border-default)] bg-[var(--color-bg-muted)] shadow-[0_8px_20px_rgba(0,0,0,0.16)]"
+                                                  className="block overflow-hidden rounded-[14px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.02)]"
                                                 >
                                                   <div className="flex min-h-[74px]">
                                                     {hl.thumbnailUrl ? (

@@ -729,11 +729,15 @@ function HighlightManageScreen({
   const [hlStartYear, setHlStartYear] = useState('')
   const [hlEndYear, setHlEndYear] = useState('')
   const [hlEducationYear, setHlEducationYear] = useState('')
+  const [hlSourceLabel, setHlSourceLabel] = useState('')
+  const [hlLinkUrl, setHlLinkUrl] = useState('')
   const [hlDesc, setHlDesc] = useState('')
   const [yearPickerTarget, setYearPickerTarget] = useState<'career-start' | 'career-end' | 'education-year' | null>(null)
   const [selectedCert, setSelectedCert] = useState<(typeof CERTIFICATION_ITEMS)[number] | null>(null)
   const isCareerRole = selectedCat?.id === 'career-role'
   const isEducationHistory = selectedCat?.id === 'education-history'
+  const isPublish = selectedCat?.id === 'publish'
+  const isArticleInterview = selectedCat?.id === 'article-interview'
   const educationNeedsDegree = hlSchoolType === '대학교' || hlSchoolType === '대학원'
   const educationNeedsMajor = hlSchoolType !== '고등학교'
   const currentYear = new Date().getFullYear()
@@ -784,7 +788,9 @@ function HighlightManageScreen({
     const [parsedStart = '', parsedEnd = ''] = hl.year.split(' - ')
     setHlStartYear(typeof hl.metadata?.startYear === 'string' ? hl.metadata.startYear : parsedStart)
     setHlEndYear(typeof hl.metadata?.endYear === 'string' ? hl.metadata.endYear : (parsedEnd === '현재' ? '' : parsedEnd))
-    setHlEducationYear(hl.categoryId === 'education-history' ? hl.year : '')
+    setHlEducationYear(hl.categoryId !== 'career-role' ? hl.year : '')
+    setHlSourceLabel(hl.sourceLabel ?? '')
+    setHlLinkUrl(hl.linkUrl ?? '')
     setHlDesc(hl.description)
     setEditingHl(hl)
     setMode('form')
@@ -820,6 +826,8 @@ function HighlightManageScreen({
         ? `${hlStartYear} - ${hlStatus === '재직 중' ? '현재' : hlEndYear}`
         : hlEducationYear,
       metadata,
+      sourceLabel: isPublish || isArticleInterview ? hlSourceLabel.trim() : undefined,
+      linkUrl: isArticleInterview && hlLinkUrl.trim() ? hlLinkUrl.trim() : undefined,
     }
     if (editingHl && store.highlights.some((h) => h.id === editingHl.id)) {
       store.updateHighlight(editingHl.id, payload)
@@ -843,6 +851,8 @@ function HighlightManageScreen({
     setHlStartYear('')
     setHlEndYear('')
     setHlEducationYear('')
+    setHlSourceLabel('')
+    setHlLinkUrl('')
     setHlDesc('')
     setEditingHl(null)
     setYearPickerTarget(null)
@@ -1024,6 +1034,8 @@ function HighlightManageScreen({
               setHlStartYear('')
               setHlEndYear('')
               setHlEducationYear('')
+              setHlSourceLabel('')
+              setHlLinkUrl('')
               setHlDesc('')
               setYearPickerTarget(null)
               setMode('form')
@@ -1108,6 +1120,14 @@ function HighlightManageScreen({
               )}
               <input value={hlTitle} onChange={(e) => setHlTitle(e.target.value)} placeholder={isCareerRole ? '회사명' : isEducationHistory ? '학교명' : '제목'}
                 className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
+              {(isPublish || isArticleInterview) && (
+                <input
+                  value={hlSourceLabel}
+                  onChange={(e) => setHlSourceLabel(e.target.value)}
+                  placeholder={isPublish ? '출판사 또는 매체명' : '매체명'}
+                  className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none"
+                />
+              )}
               {isEducationHistory && educationNeedsMajor && (
                 <input value={hlRole} onChange={(e) => setHlRole(e.target.value)} placeholder="전공"
                   className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
@@ -1186,8 +1206,25 @@ function HighlightManageScreen({
                   </div>
                 </div>
               )}
+              {(isPublish || isArticleInterview) && !isEducationHistory && !isCareerRole && (
+                <button
+                  onClick={() => setYearPickerTarget('education-year')}
+                  className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-left text-sm"
+                  style={{ color: hlEducationYear ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}
+                >
+                  {hlEducationYear || '연도 선택'}
+                </button>
+              )}
+              {isArticleInterview && (
+                <input
+                  value={hlLinkUrl}
+                  onChange={(e) => setHlLinkUrl(e.target.value)}
+                  placeholder="기사 URL"
+                  className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none"
+                />
+              )}
               {!isEducationHistory && (
-                <TextArea value={hlDesc} onChange={setHlDesc} placeholder={isCareerRole ? '어떤 일을 했는지 적어주세요' : '어떤 경험인지 간단히 적어주세요'} maxLength={150} rows={4} />
+                <TextArea value={hlDesc} onChange={setHlDesc} placeholder={isCareerRole ? '어떤 일을 했는지 적어주세요' : isPublish ? '어떤 출판 또는 기고인지 적어주세요' : isArticleInterview ? '기사나 인터뷰에 대한 설명을 적어주세요' : '어떤 경험인지 간단히 적어주세요'} maxLength={150} rows={4} />
               )}
             </div>
             <div className="flex gap-2">

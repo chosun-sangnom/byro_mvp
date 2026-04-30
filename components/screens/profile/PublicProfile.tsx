@@ -678,7 +678,7 @@ export default function PublicProfile({
               </Button>
             </div>
           )}
-          <div className="flex flex-wrap gap-2">
+          <div className="flex gap-6">
             {contactChannels.map((channel) => (
               <ContactActionButton
                 key={channel.id}
@@ -829,14 +829,14 @@ function ContactActionButton({
     <button
       onClick={onClick}
       className={[
-        'flex items-center gap-2 rounded-full border border-[var(--color-border-default)] px-4 py-2.5 transition-colors',
-        channel.enabled
-          ? 'text-[var(--color-text-primary)]'
-          : 'text-[var(--color-text-tertiary)] opacity-40',
+        'flex flex-col items-center gap-2.5 transition-opacity active:opacity-60',
+        channel.enabled ? '' : 'opacity-30',
       ].join(' ')}
     >
-      <Icon size={13} />
-      <span className="text-[13px] font-semibold">{channel.label}</span>
+      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-bg-soft)]">
+        <Icon size={20} color="var(--color-text-secondary)" />
+      </div>
+      <span className="text-[12px] font-medium text-[var(--color-text-secondary)]">{channel.label}</span>
     </button>
   )
 }

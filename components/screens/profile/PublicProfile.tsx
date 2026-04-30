@@ -665,20 +665,29 @@ export default function PublicProfile({
         <div className="px-5 pt-6 pb-8">
           <SectionTitle title="Connect" />
           {!isOwnerMode && (
-            <div className="flex gap-2 mb-5">
-              <Button variant="outline" onClick={() => showToast('피드백 요청을 보냈어요!')}>피드백 요청</Button>
-              <Button
+            <div className="flex gap-2 mb-6">
+              <button
+                onClick={() => showToast('피드백 요청을 보냈어요!')}
+                className="rounded-full border border-[var(--color-border-default)] px-4 py-2 text-[13px] font-semibold text-[var(--color-text-secondary)] active:opacity-60 transition-opacity"
+              >
+                피드백 요청
+              </button>
+              <button
                 onClick={() => {
                   if (alreadySubmitted) { showToast('이미 경험을 남겼어요'); return }
                   setExpSheetOpen(true)
                 }}
-                variant={alreadySubmitted ? 'outline' : 'primary'}
+                className="rounded-full px-4 py-2 text-[13px] font-semibold active:opacity-60 transition-opacity"
+                style={alreadySubmitted
+                  ? { border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)' }
+                  : { backgroundColor: 'var(--color-accent-dark)', color: '#fff' }
+                }
               >
                 {alreadySubmitted ? '경험 남겼어요 ✓' : '+ 경험 남기기'}
-              </Button>
+              </button>
             </div>
           )}
-          <div className="flex gap-6">
+          <div className="flex gap-8">
             {contactChannels.map((channel) => (
               <ContactActionButton
                 key={channel.id}
@@ -829,12 +838,12 @@ function ContactActionButton({
     <button
       onClick={onClick}
       className={[
-        'flex flex-col items-center gap-2.5 transition-opacity active:opacity-60',
+        'flex flex-col items-center gap-2 transition-opacity active:opacity-60',
         channel.enabled ? '' : 'opacity-30',
       ].join(' ')}
     >
-      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-bg-soft)]">
-        <Icon size={20} color="var(--color-text-secondary)" />
+      <div className="flex h-[52px] w-[52px] items-center justify-center rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-muted)]">
+        <Icon size={18} color="var(--color-text-secondary)" />
       </div>
       <span className="text-[12px] font-medium text-[var(--color-text-secondary)]">{channel.label}</span>
     </button>

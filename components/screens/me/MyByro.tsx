@@ -224,12 +224,12 @@ function ManageByroScreen({
             <div className="mt-2 text-[18px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">Byro 편집</div>
             <div className="meta-text mt-1 leading-relaxed">각 항목을 눌러 별도 페이지에서 수정하세요.</div>
           </div>
-          <div className="settings-shell overflow-hidden p-3">
+          <div className="settings-shell overflow-hidden p-2.5">
               {manageRows.map((row, index) => (
                 <button
                   key={row.title}
                   onClick={row.onClick}
-                  className={`settings-row flex w-full items-center gap-4 px-4 py-4 text-left ${index > 0 ? 'mt-2.5' : ''}`}
+                  className={`settings-row flex w-full items-center gap-4 px-4 py-3.5 text-left ${index > 0 ? 'mt-2' : ''}`}
                 >
                   <div className="min-w-0 flex-1">
                     <div className="text-[15px] font-semibold tracking-[-0.02em] text-white">{row.title}</div>

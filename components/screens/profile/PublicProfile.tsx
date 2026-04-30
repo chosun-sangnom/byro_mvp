@@ -448,7 +448,7 @@ export default function PublicProfile({
 
           {profile.instagramConnected && (
             <div className="mb-3 overflow-hidden rounded-[20px] border bg-[rgba(23,24,28,0.74)]" style={{ borderColor: 'var(--color-border-default)' }}>
-              <div className="flex items-center gap-3 px-4 py-3">
+              <div className="flex items-center gap-3 px-4 py-3.5">
                 <button
                   onClick={() => store.toggleSnsOpen('instagram_' + username)}
                   className="flex min-w-0 flex-1 items-center text-left"
@@ -479,12 +479,12 @@ export default function PublicProfile({
                 </button>
               </div>
               {igOpen && (
-                <div className="px-4 pb-4">
+                <div className="px-4 pb-3.5">
                   <div className="mb-3 rounded-[16px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.02)] px-3 py-3">
                     <div className="text-[11px] text-[var(--color-text-tertiary)] mb-1">AI 요약</div>
                     <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">{profile.instagram.aiSummary}</p>
                   </div>
-                  <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                  <div className="flex gap-2 overflow-x-auto pb-0.5 scrollbar-hide">
                     {profile.instagram.posts.map((post) => (
                       <button
                         key={post.id}
@@ -496,7 +496,7 @@ export default function PublicProfile({
                       </button>
                     ))}
                   </div>
-                  <p className="text-xs text-[var(--color-text-tertiary)] text-right mt-1">최근 게시물 미리보기</p>
+                  <p className="mt-1.5 text-right text-[10px] text-[var(--color-text-tertiary)]">최근 게시물 미리보기</p>
                 </div>
               )}
             </div>
@@ -504,7 +504,7 @@ export default function PublicProfile({
 
           {profile.linkedinConnected && (
             <div className="mb-3 overflow-hidden rounded-[20px] border bg-[rgba(23,24,28,0.74)]" style={{ borderColor: 'var(--color-border-default)' }}>
-              <div className="flex items-center gap-3 px-4 py-3">
+              <div className="flex items-center gap-3 px-4 py-3.5">
                 <button
                   onClick={() => store.toggleSnsOpen('linkedin_' + username)}
                   className="flex min-w-0 flex-1 items-center text-left"
@@ -535,7 +535,7 @@ export default function PublicProfile({
                 </button>
               </div>
               {liOpen && (
-                <div className="px-4 pb-4">
+                <div className="px-4 pb-3.5">
                     <div className="mb-3 rounded-[16px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.02)] px-3 py-3">
                       <div className="text-[11px] text-[var(--color-text-tertiary)] mb-1">AI 요약</div>
                       <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">{profile.linkedin.aiSummary}</p>
@@ -761,7 +761,7 @@ export default function PublicProfile({
                 </Button>
               </div>
             )}
-            <div className="grid grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-3 gap-2">
               {contactChannels.map((channel) => (
                 <ContactActionButton
                   key={channel.id}
@@ -941,12 +941,12 @@ function ContactActionButton({
     <button
       onClick={onClick}
       className={[
-        'rounded-[18px] border border-[var(--color-border-default)] bg-[rgba(23,24,28,0.72)] px-2 py-3 text-center transition-colors',
+        'rounded-[18px] border border-[var(--color-border-default)] bg-[rgba(23,24,28,0.72)] px-2 py-2.5 text-center transition-colors',
         channel.enabled ? 'text-[var(--color-text-primary)]' : 'text-[var(--color-text-tertiary)]',
       ].join(' ')}
     >
       <div className={[
-        'mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-[12px] border',
+        'mx-auto mb-1.5 flex h-9 w-9 items-center justify-center rounded-[12px] border',
         channel.enabled
           ? 'border-[var(--color-border-default)] bg-[rgba(255,255,255,0.03)]'
           : 'border-[var(--color-border-default)] bg-[var(--color-bg-soft)]',

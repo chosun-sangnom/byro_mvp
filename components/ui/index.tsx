@@ -119,13 +119,13 @@ interface ButtonProps {
 }
 
 const BUTTON_VARIANTS: Record<string, string> = {
-  primary: 'text-white active:opacity-80',
-  outline: 'border active:opacity-80',
-  ghost: 'bg-transparent active:opacity-70',
-  kakao: 'bg-[#FEE500] text-[#333] active:opacity-80',
-  google: 'border active:opacity-80',
-  naver: 'bg-[#03C75A] text-white active:opacity-80',
-  danger: 'border active:opacity-80',
+  primary: 'active:opacity-85',
+  outline: 'border active:opacity-85',
+  ghost: 'bg-transparent active:opacity-75',
+  kakao: 'bg-[#FEE500] text-[#333] active:opacity-85',
+  google: 'border active:opacity-85',
+  naver: 'bg-[#03C75A] text-white active:opacity-85',
+  danger: 'border active:opacity-85',
 }
 
 export function Button({
@@ -138,7 +138,7 @@ export function Button({
       onClick={onClick}
       disabled={disabled}
       className={[
-        'rounded-[var(--radius-md)] font-bold active:scale-[0.97] transition-all duration-100 select-none',
+        'rounded-[18px] font-semibold tracking-[-0.02em] active:scale-[0.985] transition-all duration-100 select-none',
         size === 'md' ? 'px-4 py-3 text-sm' : 'px-3 py-2 text-xs',
         fullWidth ? 'w-full' : '',
         disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer',
@@ -147,15 +147,15 @@ export function Button({
       ].join(' ')}
       style={{
         backgroundColor:
-          variant === 'primary' ? 'var(--color-accent-dark)'
-            : variant === 'outline' ? 'transparent'
+          variant === 'primary' ? '#F3EFE7'
+            : variant === 'outline' ? 'rgba(255,255,255,0.02)'
               : variant === 'google' ? 'var(--color-bg-surface)'
-            : variant === 'danger' ? 'transparent'
+            : variant === 'danger' ? 'rgba(54,27,26,0.28)'
               : variant === 'ghost' ? 'transparent'
               : undefined,
         color:
           variant === 'primary' ? '#111111'
-            : variant === 'outline' ? 'var(--color-text-strong)'
+            : variant === 'outline' ? 'var(--color-text-primary)'
             : variant === 'ghost' ? 'var(--color-text-secondary)'
               : variant === 'google' ? 'var(--color-text-primary)'
                 : variant === 'danger' ? 'var(--color-state-danger-text)'
@@ -163,8 +163,14 @@ export function Button({
         borderColor:
           variant === 'outline' ? 'var(--color-border-default)'
             : variant === 'google' ? 'var(--color-border-default)'
-              : variant === 'danger' ? 'var(--color-state-danger-text)'
+              : variant === 'danger' ? 'rgba(240,161,154,0.42)'
                 : undefined,
+        boxShadow:
+          variant === 'primary'
+            ? '0 10px 24px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.32)'
+            : variant === 'outline'
+              ? 'inset 0 1px 0 rgba(255,255,255,0.03)'
+              : undefined,
         ...style,
       }}
     >

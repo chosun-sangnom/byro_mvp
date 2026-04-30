@@ -100,7 +100,7 @@ function StepIntro({
   return (
     <div className="surface-card px-5 py-5 mb-5 rounded-[30px]">
       {eyebrow && (
-        <div className="mb-3 inline-flex rounded-full bg-[var(--color-bg-muted)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">
+        <div className="mb-3 inline-flex rounded-full bg-[#171717] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white">
           {eyebrow}
         </div>
       )}
@@ -133,8 +133,8 @@ function SelectionCard({
       className={[
         'w-full text-left rounded-[26px] border px-4 py-4 transition-colors shadow-[0_10px_24px_rgba(26,21,48,0.04)]',
         tone === 'accent'
-          ? 'border-[#E8A000] bg-[linear-gradient(180deg,#FFF9EA_0%,#FFF3CF_100%)]'
-          : 'border-[var(--color-border-default)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(249,247,252,0.96)_100%)]',
+          ? 'border-[#D8B15E] bg-[linear-gradient(180deg,#FFF8EB_0%,#F7E9C7_100%)]'
+          : 'border-[var(--color-border-default)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(248,245,240,0.96)_100%)]',
       ].join(' ')}
     >
       <div className="flex items-start gap-3">

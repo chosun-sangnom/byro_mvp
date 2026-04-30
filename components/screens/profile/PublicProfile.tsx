@@ -456,7 +456,7 @@ export default function PublicProfile({
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/images/Instagram.svg" alt="Instagram" className="w-5 h-5 mr-2 flex-shrink-0" />
                   <div className="min-w-0">
-                    <div className="text-sm font-bold text-[var(--color-text-primary)]">Instagram
+                    <div className="text-[15px] font-semibold tracking-[-0.02em] text-[var(--color-text-strong)]">Instagram
                       <span className="ml-1.5 text-[10px] font-bold rounded-full px-2 py-0.5" style={{ color: 'var(--color-state-success-text)', backgroundColor: 'var(--color-state-success-bg)' }}>연동됨</span>
                     </div>
                     <a
@@ -464,7 +464,7 @@ export default function PublicProfile({
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      className="block truncate text-xs text-[var(--color-state-info-text)] underline-offset-2 hover:underline"
+                      className="mt-0.5 block truncate text-[11px] font-medium text-[var(--color-text-tertiary)] underline-offset-2 hover:text-[var(--color-text-secondary)] hover:underline"
                     >
                       instagram.com/{profile.instagram.username}
                     </a>
@@ -512,7 +512,7 @@ export default function PublicProfile({
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/images/linkedin.png" alt="LinkedIn" className="w-5 h-5 mr-2 flex-shrink-0" />
                   <div className="min-w-0">
-                    <div className="text-sm font-bold text-[var(--color-text-primary)]">LinkedIn
+                    <div className="text-[15px] font-semibold tracking-[-0.02em] text-[var(--color-text-strong)]">LinkedIn
                       <span className="ml-1.5 text-[10px] font-bold rounded-full px-2 py-0.5" style={{ color: 'var(--color-state-success-text)', backgroundColor: 'var(--color-state-success-bg)' }}>연동됨</span>
                     </div>
                     <a
@@ -520,7 +520,7 @@ export default function PublicProfile({
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      className="block truncate text-xs text-[var(--color-state-info-text)] underline-offset-2 hover:underline"
+                      className="mt-0.5 block truncate text-[11px] font-medium text-[var(--color-text-tertiary)] underline-offset-2 hover:text-[var(--color-text-secondary)] hover:underline"
                     >
                       {profile.linkedin.profileUrl.replace(/^https?:\/\//, '')}
                     </a>
@@ -953,7 +953,7 @@ function ContactActionButton({
       ].join(' ')}>
         <Icon size={16} />
       </div>
-      <div className="text-[11px] font-semibold">{channel.label}</div>
+      <div className="text-[10px] font-semibold uppercase tracking-[0.08em]">{channel.label}</div>
     </button>
   )
 }

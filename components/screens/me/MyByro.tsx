@@ -232,8 +232,8 @@ function ManageByroScreen({
                   className={`settings-row flex w-full items-center gap-4 px-4 py-4 text-left ${index > 0 ? 'mt-2.5' : ''}`}
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="text-[15px] font-semibold text-white">{row.title}</div>
-                    <div className="mt-1 text-[12px] leading-[1.45] text-white/58">{row.meta}</div>
+                    <div className="text-[15px] font-semibold tracking-[-0.02em] text-white">{row.title}</div>
+                    <div className="mt-1 text-[11px] leading-[1.5] text-white/48">{row.meta}</div>
                   </div>
                   <span className="flex h-8 w-8 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-white/56">
                     <ChevronRight size={15} />

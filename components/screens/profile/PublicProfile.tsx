@@ -249,7 +249,7 @@ export default function PublicProfile({
   return (
     <div className="flex flex-col h-full">
       {/* 상단 네비 */}
-      <div className="flex items-center px-4 h-12 border-b border-[#EBEBEB] bg-white/92 backdrop-blur-sm flex-shrink-0">
+      <div className="flex items-center px-4 h-12 border-b border-[var(--color-border-soft)] bg-white/78 backdrop-blur-md flex-shrink-0">
         <button onClick={() => router.back()} className="text-sm text-[#555] mr-2">‹</button>
         <div className="flex-1 min-w-0">
           <div className="text-[11px] text-[#AAA] uppercase tracking-[0.18em]">{isOwnerMode ? 'My Byro' : 'Public Profile'}</div>
@@ -313,7 +313,7 @@ export default function PublicProfile({
       <div className="flex-1 overflow-y-auto">
         {/* 프로필 헤더 */}
         <div className="px-5 pt-4 pb-3">
-          <div className="hero-card bg-[var(--color-bg-soft)] p-[7px]">
+          <div className="hero-card border border-[var(--color-border-default)] bg-white/88 p-[8px] backdrop-blur-sm">
             <div className="relative h-[452px] overflow-hidden rounded-[30px] text-white ring-1 ring-black/4">
               {profile.avatarImage ? (
                 <>
@@ -340,7 +340,9 @@ export default function PublicProfile({
               <div className="absolute inset-x-0 bottom-0 p-5">
                 <div className="flex items-center gap-1.5">
                   <div className="text-[29px] font-black tracking-[-0.04em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.24)]">{profile.name}</div>
-                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[#43C07A] text-[10px] font-black text-white shadow-[0_8px_20px_rgba(67,192,122,0.35)]">✓</span>
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-white/40 bg-white/95 text-[#1F8B4E] shadow-[0_8px_20px_rgba(17,17,17,0.18)]">
+                    <BadgeCheck size={14} />
+                  </span>
                 </div>
                 <div className="mt-4 max-w-[318px] rounded-[18px] border border-white/12 bg-white/10 px-4 py-3 text-[15px] leading-[1.52] text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[8px]">
                   <p ref={bioRef} className={bioExpanded ? '' : 'line-clamp-3'}>
@@ -375,9 +377,12 @@ export default function PublicProfile({
               </div>
             )}
 
-            <div className="surface-card mt-4 px-4 py-4">
+            <div className="surface-card mt-4 rounded-[26px] px-4 py-4">
               <div>
                 <div className="flex items-center gap-2">
+                  <div className="rounded-full bg-[var(--color-bg-muted)] px-2 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-text-secondary)]">Reputation</div>
+                </div>
+                <div className="mt-2 flex items-center gap-2">
                   <div className="text-sm font-black text-[var(--color-text-strong)]">누적 평판</div>
                   <div className="micro-text rounded-full border px-2 py-0.5" style={{ borderColor: 'var(--color-border-default)' }}>
                     총 {totalKeywordCount}
@@ -442,7 +447,7 @@ export default function PublicProfile({
           />
 
           {profile.instagramConnected && (
-            <div className="mb-2 overflow-hidden rounded-[22px] border" style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-surface)' }}>
+            <div className="mb-3 overflow-hidden rounded-[24px] border bg-white/90 shadow-[0_10px_22px_rgba(26,21,48,0.04)]" style={{ borderColor: 'var(--color-border-default)' }}>
               <div className="flex items-center gap-3 px-4 py-3">
                 <button
                   onClick={() => store.toggleSnsOpen('instagram_' + username)}
@@ -475,7 +480,7 @@ export default function PublicProfile({
               </div>
               {igOpen && (
                 <div className="px-4 pb-4">
-                  <div className="surface-card-soft mb-3 rounded-2xl px-3 py-3">
+                  <div className="surface-card-soft mb-3 rounded-[20px] px-3 py-3">
                     <div className="text-[11px] text-[#888] mb-1">AI 요약</div>
                     <p className="text-xs text-[#555] leading-relaxed">{profile.instagram.aiSummary}</p>
                   </div>
@@ -498,7 +503,7 @@ export default function PublicProfile({
           )}
 
           {profile.linkedinConnected && (
-            <div className="mb-2 overflow-hidden rounded-[22px] border" style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-surface)' }}>
+            <div className="mb-3 overflow-hidden rounded-[24px] border bg-white/90 shadow-[0_10px_22px_rgba(26,21,48,0.04)]" style={{ borderColor: 'var(--color-border-default)' }}>
               <div className="flex items-center gap-3 px-4 py-3">
                 <button
                   onClick={() => store.toggleSnsOpen('linkedin_' + username)}
@@ -531,7 +536,7 @@ export default function PublicProfile({
               </div>
               {liOpen && (
                 <div className="px-4 pb-4">
-                    <div className="surface-card-soft mb-3 rounded-2xl px-3 py-3">
+                    <div className="surface-card-soft mb-3 rounded-[20px] px-3 py-3">
                       <div className="text-[11px] text-[#888] mb-1">AI 요약</div>
                       <p className="text-xs text-[#555] leading-relaxed">{profile.linkedin.aiSummary}</p>
                     </div>
@@ -563,7 +568,7 @@ export default function PublicProfile({
             {groupedHighlights.map((group) => (
               <div key={group.id}>
                 <div className="mb-3 flex items-center gap-3">
-                  <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#8E867E]">{group.label}</div>
+                  <div className="rounded-full bg-[var(--color-bg-muted)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-text-secondary)]">{group.label}</div>
                   <div className="h-px flex-1 bg-[#E7E2DC]" />
                   <div className="rounded-full border border-[#E7E2DC] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#9A958E]">
                     {group.items.length}
@@ -597,7 +602,7 @@ export default function PublicProfile({
                               {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
                             </button>
                             {isOpen && (
-                              <div className="border-t border-[#F1ECE6] bg-[#FBFAF8] px-4 py-4">
+                          <div className="border-t border-[#F1ECE6] bg-[linear-gradient(180deg,#FCFBFA_0%,#F8F6F3_100%)] px-4 py-4">
                                 {hl.categoryId === 'career-continuity' && (
                                   <CareerContinuityChart
                                     avgYears={profile.careerHighlight.avgYears}
@@ -642,9 +647,9 @@ export default function PublicProfile({
                             <div className="min-w-0 flex-1">
                               <button onClick={() => store.toggleHlOpen(groupToggleKey)} className="flex w-full items-center gap-3 text-left">
                                 <div className="min-w-0 flex-1">
-                                  <div className="mb-1.5 text-[11px] font-semibold text-[var(--color-text-secondary)]">
-                                    {category?.label ?? '직접 입력'}
-                                  </div>
+                                <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-secondary)]">
+                                  {category?.label ?? '직접 입력'}
+                                </div>
                                   <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
                                     {preview.title}
                                   </div>
@@ -655,7 +660,7 @@ export default function PublicProfile({
                                 {isGroupOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
                               </button>
                               {isGroupOpen && (
-                                <div className="border-t border-[#F1ECE6] bg-[#FBFAF8] px-4 py-4">
+                                <div className="border-t border-[#F1ECE6] bg-[linear-gradient(180deg,#FCFBFA_0%,#F8F6F3_100%)] px-4 py-4">
                                   <div className="space-y-3">
                                     {entry.items.map((hl) => {
                                       const metaParts = getHighlightMetaParts(hl)
@@ -689,7 +694,7 @@ export default function PublicProfile({
                                                   href={hl.linkUrl}
                                                   target="_blank"
                                                   rel="noopener noreferrer"
-                                                  className="block overflow-hidden rounded-[16px] border border-[#ECE6DF] bg-[var(--color-bg-soft)]"
+                                                  className="block overflow-hidden rounded-[18px] border border-[#ECE6DF] bg-[var(--color-bg-soft)] shadow-[0_8px_20px_rgba(17,17,17,0.03)]"
                                                 >
                                                   <div className="flex min-h-[74px]">
                                                     {hl.thumbnailUrl ? (
@@ -907,7 +912,8 @@ function SectionTitle({
 }) {
   return (
     <div className="mb-4">
-      <div className="text-[17px] font-bold tracking-[-0.02em] text-[var(--color-text-strong)]">{title}</div>
+      <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Section</div>
+      <div className="mt-1 text-[18px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">{title}</div>
       {subtitle && <div className="text-[11px] text-[var(--color-text-tertiary)] mt-1">{subtitle}</div>}
     </div>
   )
@@ -931,14 +937,14 @@ function ContactActionButton({
     <button
       onClick={onClick}
       className={[
-        'text-center transition-colors',
+        'rounded-[20px] border border-[var(--color-border-default)] bg-white/92 px-2 py-3 text-center shadow-[0_8px_18px_rgba(26,21,48,0.04)] transition-colors',
         channel.enabled ? 'text-[#222]' : 'text-[#B4B4B4]',
       ].join(' ')}
     >
       <div className={[
-        'mx-auto mb-1.5 flex h-11 w-11 items-center justify-center rounded-full border',
+        'mx-auto mb-2 flex h-11 w-11 items-center justify-center rounded-[14px] border',
         channel.enabled
-          ? 'border-[#E7E7E7] bg-white shadow-[0_6px_18px_rgba(0,0,0,0.06)]'
+          ? 'border-[#E7E7E7] bg-[var(--color-bg-muted)] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]'
           : 'border-[#EFEFEF] bg-white/70',
       ].join(' ')}>
         <Icon size={16} />

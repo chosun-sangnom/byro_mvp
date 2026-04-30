@@ -2,27 +2,19 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { BadgeCheck, ChevronDown, ChevronRight, ChevronUp, Camera, Mail, MessageCircle, Phone } from 'lucide-react'
+import { BadgeCheck, ChevronRight, Camera, Mail, MessageCircle, Phone } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { Button, BottomSheet, Modal, YearPickerSheet, showToast, TextArea } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import type { Highlight, ContactChannel, UserState, HighlightIconId } from '@/types'
 import {
-  SAMPLE_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE, getProfileAvatar,
+  SAMPLE_PROFILE, INSTAGRAM_PROFILE, getProfileAvatar,
   HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS, KEYWORD_GROUPS,
 } from '@/lib/mockData'
 import { getGroupedHighlightPreview, getHighlightMetaParts, isPrimaryHighlight, sortHighlightsByPrimary } from '@/lib/highlightMeta'
 import PublicProfile from '@/components/screens/profile/PublicProfile'
 
 type Screen = 'preview' | 'manage' | 'editBasic' | 'editHighlight' | 'editSNS' | 'editReputation' | 'editContact' | 'editGuestbook'
-type SectionKey = 'sns' | 'highlight' | 'reputation' | 'guestbook'
-
-const SECTION_LABELS: Record<SectionKey, string> = {
-  sns: 'SNS 연동',
-  highlight: '하이라이트',
-  reputation: '평판 키워드',
-  guestbook: '방명록',
-}
 
 const CERTIFICATION_ITEMS = [
   {
@@ -79,7 +71,6 @@ export default function MyByro() {
   }, [store.isLoggedIn, router])
 
   const [screen, setScreen] = useState<Screen>('preview')
-  const sectionOrder: SectionKey[] = ['reputation', 'guestbook', 'sns', 'highlight']
 
   if (!store.isLoggedIn) return null
   const user = store.user!
@@ -107,10 +98,7 @@ export default function MyByro() {
         allHighlights={allHighlights}
         connectedSnsCount={connectedSnsCount}
         totalReputationCount={totalReputationCount}
-        sectionOrder={sectionOrder}
-        store={store}
-        instagramConnected={instagramConnected}
-        linkedinConnected={linkedinConnected}
+        onLogout={() => store.logout()}
         onBack={() => setScreen('preview')}
         onEditBasic={() => setScreen('editBasic')}
         onEditHighlight={() => setScreen('editHighlight')}
@@ -159,10 +147,7 @@ function ManageByroScreen({
   allHighlights,
   connectedSnsCount,
   totalReputationCount,
-  sectionOrder,
-  store,
-  instagramConnected,
-  linkedinConnected,
+  onLogout,
   onBack,
   onEditBasic,
   onEditHighlight,
@@ -175,14 +160,7 @@ function ManageByroScreen({
   allHighlights: Highlight[]
   connectedSnsCount: number
   totalReputationCount: number
-  sectionOrder: SectionKey[]
-  store: {
-    logout: () => void
-    hlOpenStates: Record<string, boolean>
-    toggleHlOpen: (id: string) => void
-  }
-  instagramConnected: boolean
-  linkedinConnected: boolean
+  onLogout: () => void
   onBack: () => void
   onEditBasic: () => void
   onEditHighlight: () => void
@@ -202,13 +180,21 @@ function ManageByroScreen({
   ]
   const completionPercent = Math.round((completionChecks.filter((item) => item.done).length / completionChecks.length) * 100)
   const remainingItems = completionChecks.filter((item) => !item.done).slice(0, 3)
+  const manageRows = [
+    { title: '기본정보', meta: user.bio.trim() ? '사진, 이름, 자기소개 편집' : '사진, 이름, 자기소개를 설정하세요', onClick: onEditBasic },
+    { title: '연락 수단', meta: activeContactCount > 0 ? `${activeContactCount}개 연결됨` : '전화, 이메일, 카카오를 연결하세요', onClick: onEditContact },
+    { title: 'SNS 연동', meta: connectedSnsCount > 0 ? `${connectedSnsCount}개 연동됨` : '인스타그램과 링크드인을 연결하세요', onClick: onEditSNS },
+    { title: '하이라이트', meta: allHighlights.length > 0 ? `${allHighlights.length}개 항목 관리` : '프로필에 보여줄 경험을 추가하세요', onClick: onEditHighlight },
+    { title: '평판 키워드', meta: `선택 ${user.selectedKeywords.length}개 · 누적 ${totalReputationCount}회`, onClick: onEditReputation },
+    { title: '방명록', meta: `${SAMPLE_PROFILE.guestbook.length}개 메시지 관리`, onClick: onEditGuestbook },
+  ] as const
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
         <button onClick={onBack} className="text-xl text-[#555] mr-3 leading-none">‹</button>
         <span className="text-base font-black flex-1">Byro 편집</span>
-        <button onClick={() => store.logout()} className="text-xs text-[#888]">로그아웃</button>
+        <button onClick={onLogout} className="text-xs text-[#888]">로그아웃</button>
       </div>
 
       <div className="flex-1 overflow-y-auto pb-24">
@@ -233,166 +219,27 @@ function ManageByroScreen({
           </div>
 
           <div className="surface-card-soft p-4">
-            <div className="text-sm font-black text-[var(--color-text-strong)] mb-1">공개 프로필 관리</div>
-            <div className="meta-text mb-4 leading-relaxed">내 Byro와 공개 프로필은 같은 화면을 사용합니다. 아래에서 노출 정보와 연결 수단을 관리하세요.</div>
-            <div className="grid grid-cols-2 gap-2">
-              <button onClick={onEditBasic} className="rounded-[18px] border bg-white px-4 py-3 text-sm font-semibold text-[var(--color-text-primary)]" style={{ borderColor: 'var(--color-border-default)' }}>기본정보 편집</button>
-              <button onClick={onEditContact} className="rounded-[18px] px-4 py-3 text-sm font-semibold text-white" style={{ backgroundColor: 'var(--color-accent-dark)' }}>연락 수단 관리</button>
+            <div className="text-sm font-black text-[var(--color-text-strong)] mb-1">설정</div>
+            <div className="meta-text mb-3 leading-relaxed">각 항목을 눌러 별도 페이지에서 수정하세요.</div>
+            <div className="overflow-hidden rounded-[22px] border border-[var(--color-border-default)] bg-white">
+              {manageRows.map((row, index) => (
+                <button
+                  key={row.title}
+                  onClick={row.onClick}
+                  className={`flex w-full items-center gap-3 px-4 py-4 text-left ${index > 0 ? 'border-t border-[var(--color-border-soft)]' : ''}`}
+                >
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[15px] font-semibold text-[var(--color-text-strong)]">{row.title}</div>
+                    <div className="mt-1 text-[12px] text-[var(--color-text-secondary)]">{row.meta}</div>
+                  </div>
+                  <ChevronRight size={16} color="#999" />
+                </button>
+              ))}
             </div>
           </div>
-        </div>
-
-        <div className="px-5 pt-1">
-          {sectionOrder.map((key) => (
-            <div key={key} className="mb-1">
-              <div className="flex items-center py-2.5 border-b border-[#f5f5f5]">
-                <span className="mr-2">
-                  {key === 'sns' && '📱'}
-                  {key === 'highlight' && '✨'}
-                  {key === 'reputation' && '✏️'}
-                  {key === 'guestbook' && '🗣️'}
-                </span>
-                <div className="flex-1">
-                  <div className="text-sm font-bold">{SECTION_LABELS[key]}</div>
-                  <div className="text-[11px] text-[#888]">
-                    {key === 'sns' && `${connectedSnsCount}개 연동됨`}
-                    {key === 'highlight' && `인증 4개 · 직접 입력 ${allHighlights.length}개`}
-                    {key === 'reputation' && `방문자가 남긴 키워드 ${totalReputationCount}회`}
-                    {key === 'guestbook' && `최근 메시지 ${SAMPLE_PROFILE.guestbook.length}개`}
-                  </div>
-                </div>
-                {(key === 'sns' || key === 'highlight' || key === 'reputation') && (
-                  <button
-                    onClick={() => {
-                      if (key === 'sns') onEditSNS()
-                      if (key === 'highlight') onEditHighlight()
-                      if (key === 'reputation') onEditReputation()
-                    }}
-                    className="text-xs border border-[#90CAF9] text-[#0D47A1] rounded-full px-2.5 py-1"
-                  >
-                    관리
-                  </button>
-                )}
-              </div>
-
-              <div className="py-3">
-                {key === 'sns' && (
-                  <SectionSNS instagramConnected={instagramConnected} linkedinConnected={linkedinConnected} />
-                )}
-                {key === 'highlight' && (
-                  <div className="space-y-1.5 mb-2">
-                    <ExpandablePreviewRow
-                      icon="briefcase"
-                      title="커리어 지속성"
-                      subtitle="건강보험공단 기준 · 2026.04 인증"
-                      badge="인증됨"
-                      badgeTone="verified"
-                      open={store.hlOpenStates.career_main ?? false}
-                      onToggle={() => store.toggleHlOpen('career_main')}
-                      detail={<div className="text-[11px] text-[#666] mt-2">평균 재직 {SAMPLE_PROFILE.careerHighlight.avgYears}년 · 업계 대비 +{SAMPLE_PROFILE.careerHighlight.vsIndustryPercent}%</div>}
-                    />
-                    <ExpandablePreviewRow
-                      icon="users"
-                      title="리멤버 직업 네트워크"
-                      subtitle="스타트업·마케팅 중심 인맥"
-                      badge="인증됨"
-                      badgeTone="verified"
-                      open={store.hlOpenStates.remember_main ?? false}
-                      onToggle={() => store.toggleHlOpen('remember_main')}
-                      detail={<div className="text-[11px] text-[#666] mt-2">스타트업 38% · 마케팅 24% · IT 22% · 투자 16%</div>}
-                    />
-                    {allHighlights.slice(0, 2).map((h) => (
-                      <ExpandablePreviewRow
-                        key={h.id}
-                        icon={h.icon}
-                        title={h.title}
-                        subtitle={[h.year, h.subtitle].filter(Boolean).join(' · ')}
-                        badge="직접 입력"
-                        badgeTone="draft"
-                        open={store.hlOpenStates[`main_${h.id}`] ?? false}
-                        onToggle={() => store.toggleHlOpen(`main_${h.id}`)}
-                        detail={h.description ? <div className="text-[11px] text-[#666] mt-2">{h.description}</div> : undefined}
-                      />
-                    ))}
-                    {allHighlights.length > 2 && <div className="text-xs text-[#AAA]">외 {allHighlights.length - 2}개 더 있음</div>}
-                  </div>
-                )}
-                {key === 'reputation' && (
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {SAMPLE_PROFILE.reputationKeywords.map((item) => (
-                      <div key={item.keyword} className="bg-[#0A0A0A] text-white text-xs font-semibold px-3 py-1.5 rounded-full">
-                        {item.keyword} <span className="opacity-60">{item.count}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {key === 'guestbook' && (
-                  <>
-                    <SectionGuestbook entries={SAMPLE_PROFILE.guestbook.slice(0, 3)} />
-                    <button
-                      onClick={onEditGuestbook}
-                      className="mt-2 w-full rounded-[14px] border border-[#E5E5E5] px-3 py-2 text-xs font-semibold text-[#555]"
-                    >
-                      방명록 관리
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-          ))}
         </div>
       </div>
     </div>
-  )
-}
-
-function ExpandablePreviewRow({
-  icon,
-  title,
-  subtitle,
-  badge,
-  badgeTone,
-  open,
-  onToggle,
-  detail,
-}: {
-  icon: HighlightIconId
-  title: string
-  subtitle: string
-  badge: string
-  badgeTone: 'verified' | 'draft'
-  open: boolean
-  onToggle: () => void
-  detail?: React.ReactNode
-}) {
-  return (
-    <button onClick={onToggle} className="w-full text-left">
-      <div className="flex items-start gap-2 py-1.5">
-        <span className="mt-0.5 text-[var(--color-text-strong)]">
-          <HighlightIcon id={icon} size={18} />
-        </span>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5">
-            <div className="text-sm font-semibold text-[#111] truncate">{title}</div>
-            <span
-              className={[
-                'text-[10px] font-bold rounded-full px-2 py-0.5',
-                badgeTone === 'verified'
-                  ? 'text-[#1A7A1A] bg-[#E6F5E6]'
-                  : 'text-[#666] bg-[#EFEFEF]',
-              ].join(' ')}
-            >
-              {badge}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="text-[11px] text-[#888] leading-relaxed flex-1">{subtitle}</div>
-            {open ? <ChevronUp size={14} color="#888" /> : <ChevronDown size={14} color="#888" />}
-          </div>
-          {open && detail}
-        </div>
-      </div>
-    </button>
   )
 }
 
@@ -1793,98 +1640,6 @@ function ReputationManageScreen({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SNS 섹션
-// ─────────────────────────────────────────────────────────────────────────────
-function SectionSNS({ instagramConnected, linkedinConnected }: {
-  instagramConnected: boolean
-  linkedinConnected: boolean
-}) {
-  const store = useByroStore()
-  const [igOpen, setIgOpen] = useState(false)
-  const [liOpen, setLiOpen] = useState(false)
-
-  return (
-    <div>
-      {/* Instagram */}
-      <div className="border-b border-[#f0f0f0]">
-        <div className="flex items-center py-2.5">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/Instagram.svg" alt="Instagram" className="w-5 h-5 mr-2 flex-shrink-0" />
-          <div className="flex-1">
-            <div className="text-sm font-bold">Instagram
-              {instagramConnected && <span className="ml-1.5 text-xs font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded px-1 py-0.5">✓ 연동됨</span>}
-            </div>
-            {instagramConnected
-              ? <a href={INSTAGRAM_PROFILE.profileUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-[#0D47A1]">instagram.com/{INSTAGRAM_PROFILE.username}</a>
-              : <div className="text-xs text-[#888]">미연동</div>}
-          </div>
-          {instagramConnected ? (
-            <button onClick={() => setIgOpen(!igOpen)} className="p-1">
-              {igOpen ? <ChevronUp size={15} color="#888" /> : <ChevronDown size={15} color="#888" />}
-            </button>
-          ) : (
-            <button onClick={() => { window.open(INSTAGRAM_PROFILE.profileUrl, '_blank'); store.connectInstagram(); showToast('Instagram 연동이 완료됐어요!') }}
-              className="text-xs text-white bg-[#0A0A0A] rounded-lg px-2.5 py-1.5">연동하기</button>
-          )}
-        </div>
-        {igOpen && instagramConnected && (
-          <div className="pb-3">
-            <p className="text-xs text-[#555] mb-3 leading-relaxed">{INSTAGRAM_PROFILE.aiSummary}</p>
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-              {INSTAGRAM_PROFILE.posts.map((post) => (
-                <button key={post.id} onClick={() => window.open(INSTAGRAM_PROFILE.profileUrl, '_blank')}
-                  className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-[#e8e8e8]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={post.imageUrl} alt={post.caption} className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* LinkedIn */}
-      <div>
-        <div className="flex items-center py-2.5">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/linkedin.png" alt="LinkedIn" className="w-5 h-5 mr-2 flex-shrink-0" />
-          <div className="flex-1">
-            <div className="text-sm font-bold">LinkedIn
-              {linkedinConnected && <span className="ml-1.5 text-xs font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded px-1 py-0.5">✓ 연동됨</span>}
-            </div>
-            {linkedinConnected
-              ? <a href={LINKEDIN_PROFILE.profileUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-[#0D47A1]">linkedin.com/in/myongkoo-kang</a>
-              : <div className="text-xs text-[#888]">연동하면 AI 요약이 생성돼요</div>}
-          </div>
-          {linkedinConnected ? (
-            <button onClick={() => setLiOpen(!liOpen)} className="p-1">
-              {liOpen ? <ChevronUp size={15} color="#888" /> : <ChevronDown size={15} color="#888" />}
-            </button>
-          ) : (
-            <button onClick={() => { window.open(LINKEDIN_PROFILE.profileUrl, '_blank'); store.connectLinkedIn(); showToast('LinkedIn 연동이 완료됐어요!') }}
-              className="text-xs text-white bg-[#0A0A0A] rounded-lg px-2.5 py-1.5">연동하기</button>
-          )}
-        </div>
-        {liOpen && linkedinConnected && (
-          <div className="pb-3">
-            <p className="text-xs text-[#555] mb-3 leading-relaxed">{LINKEDIN_PROFILE.aiSummary}</p>
-            {LINKEDIN_PROFILE.recentPosts.map((post) => (
-              <div key={post.id} className="bg-[#f9f9f9] rounded-xl px-3 py-2.5 mb-2">
-                <p className="text-xs text-[#333] leading-relaxed line-clamp-2">{post.text}</p>
-                <div className="flex items-center gap-2 mt-1.5">
-                  <span className="text-[10px] text-[#888]">👍 {post.likes}</span>
-                  <span className="text-[10px] text-[#bbb]">{post.date}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  )
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 // 방명록 관리 화면
 // ─────────────────────────────────────────────────────────────────────────────
 function GuestbookManageScreen({ onBack }: { onBack: () => void }) {
@@ -1936,47 +1691,6 @@ function GuestbookManageScreen({ onBack }: { onBack: () => void }) {
           </div>
         )}
       </div>
-    </div>
-  )
-}
-
-// 방명록 섹션
-// ─────────────────────────────────────────────────────────────────────────────
-function SectionGuestbook({ entries }: {
-  entries: { id: string; linkId: string; authorName: string; message: string; date: string }[]
-}) {
-  const router = useRouter()
-  return (
-    <div>
-      {entries.map((entry) => {
-        const clickable = !!entry.linkId
-        return (
-          <button
-            key={entry.id}
-            onClick={() => { if (clickable) router.push(`/${entry.linkId}`) }}
-            className={['flex gap-2.5 py-2 border-b border-[#f5f5f5] last:border-0 w-full text-left',
-              clickable ? 'cursor-pointer' : 'cursor-default'].join(' ')}
-          >
-            {getProfileAvatar(entry.linkId) ? (
-              <div className="w-7 h-7 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={getProfileAvatar(entry.linkId)} alt={`${entry.authorName} 프로필 사진`} className="w-full h-full object-cover" />
-              </div>
-            ) : (
-              <div className="w-7 h-7 rounded-full bg-[#e0e0e0] flex items-center justify-center text-xs font-bold text-[#555] flex-shrink-0">
-                {entry.authorName.charAt(0)}
-              </div>
-            )}
-            <div className="flex-1">
-              <div className={['text-xs font-bold', clickable ? 'text-[#0D47A1]' : ''].join(' ')}>
-                {entry.authorName}
-              </div>
-              <div className="text-xs text-[#555]">{entry.message}</div>
-              <div className="text-[10px] text-[#bbb] mt-0.5">{entry.date}</div>
-            </div>
-          </button>
-        )
-      })}
     </div>
   )
 }

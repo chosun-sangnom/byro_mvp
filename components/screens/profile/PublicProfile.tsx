@@ -249,11 +249,11 @@ export default function PublicProfile({
   return (
     <div className="flex flex-col h-full">
       {/* 상단 네비 */}
-      <div className="flex items-center px-4 h-12 border-b border-[var(--color-border-soft)] bg-white/78 backdrop-blur-md flex-shrink-0">
-        <button onClick={() => router.back()} className="text-sm text-[#555] mr-2">‹</button>
+      <div className="flex items-center px-4 h-12 border-b border-[var(--color-border-soft)] bg-[rgba(16,17,20,0.78)] backdrop-blur-md flex-shrink-0">
+        <button onClick={() => router.back()} className="text-sm text-[var(--color-text-secondary)] mr-2">‹</button>
         <div className="flex-1 min-w-0">
-          <div className="text-[11px] text-[#AAA] uppercase tracking-[0.18em]">{isOwnerMode ? 'My Byro' : 'Public Profile'}</div>
-          <div className="text-xs text-[#555] truncate">byro.io/@{profile.linkId}</div>
+          <div className="text-[11px] text-[var(--color-text-tertiary)] uppercase tracking-[0.18em]">{isOwnerMode ? 'My Byro' : 'Public Profile'}</div>
+          <div className="text-xs text-[var(--color-text-secondary)] truncate">byro.io/@{profile.linkId}</div>
         </div>
         {!isOwnerMode ? (
           <div className="flex items-center gap-3">
@@ -269,17 +269,17 @@ export default function PublicProfile({
                 }}
                 className={[
                   'icon-button',
-                  bookmarked ? 'bg-[#0A0A0A] border-[#0A0A0A]' : 'bg-white border-[#ddd]',
+                  bookmarked ? 'bg-[var(--color-accent-dark)] border-[var(--color-accent-dark)]' : '',
                 ].join(' ')}
               >
-                <Bookmark size={14} color={bookmarked ? '#fff' : '#555'} />
+                <Bookmark size={14} color={bookmarked ? '#111111' : '#B5AEA3'} />
               </button>
             )}
             <button
               onClick={() => showToast('공유 링크를 준비 중이에요')}
               className="icon-button"
             >
-              <Share2 size={14} color="#555" />
+              <Share2 size={14} color="#B5AEA3" />
             </button>
           </div>
         ) : (
@@ -296,14 +296,14 @@ export default function PublicProfile({
               className="icon-button"
               aria-label="프로필 링크 복사"
             >
-              <Copy size={14} color="#555" />
+              <Copy size={14} color="#B5AEA3" />
             </button>
             <button
               onClick={handleShareProfile}
               className="icon-button"
               aria-label="프로필 공유"
             >
-              <Share2 size={14} color="#555" />
+              <Share2 size={14} color="#B5AEA3" />
             </button>
           </div>
         )}
@@ -313,7 +313,7 @@ export default function PublicProfile({
       <div className="flex-1 overflow-y-auto">
         {/* 프로필 헤더 */}
         <div className="px-5 pt-4 pb-3">
-          <div className="hero-card border border-[var(--color-border-default)] bg-white/88 p-[8px] backdrop-blur-sm">
+          <div className="hero-card border border-[var(--color-border-default)] bg-[rgba(23,24,28,0.92)] p-[8px] backdrop-blur-sm">
             <div className="relative h-[452px] overflow-hidden rounded-[30px] text-white ring-1 ring-black/4">
               {profile.avatarImage ? (
                 <>
@@ -364,13 +364,13 @@ export default function PublicProfile({
               <div className="flex gap-2 mt-4">
                 <button
                   onClick={onOpenArchive}
-                  className="flex-1 rounded-[18px] border border-[#D8D8D8] bg-white px-4 py-3 text-sm font-semibold text-[#555]"
+                  className="flex-1 rounded-[18px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm font-semibold text-[var(--color-text-secondary)]"
                 >
                   아카이브
                 </button>
                 <button
                   onClick={onOpenManage}
-                  className="flex-1 rounded-[18px] bg-[#111] px-4 py-3 text-sm font-semibold text-white"
+                  className="flex-1 rounded-[18px] bg-[var(--color-accent-dark)] px-4 py-3 text-sm font-semibold text-[#111111]"
                 >
                   Byro 편집
                 </button>
@@ -407,21 +407,21 @@ export default function PublicProfile({
                     className="flex w-full gap-2.5 py-3 text-left first:pt-0 last:pb-0"
                   >
                     {getProfileAvatar(entry.linkId) ? (
-                      <div className="mt-0.5 h-8 w-8 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
+                      <div className="mt-0.5 h-8 w-8 rounded-full overflow-hidden bg-[var(--color-bg-soft)] flex-shrink-0">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={getProfileAvatar(entry.linkId)} alt={`${entry.authorName} 프로필 사진`} className="w-full h-full object-cover" />
                       </div>
                     ) : (
-                      <div className="mt-0.5 h-8 w-8 rounded-full bg-[#e0e0e0] flex items-center justify-center text-xs font-bold text-[#555] flex-shrink-0">
+                      <div className="mt-0.5 h-8 w-8 rounded-full bg-[var(--color-bg-soft)] flex items-center justify-center text-xs font-bold text-[var(--color-text-secondary)] flex-shrink-0">
                         {entry.authorName.charAt(0)}
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2">
-                        <div className="text-xs font-bold text-[#222]">{entry.authorName}</div>
-                        <div className="text-[10px] text-[#BBB]">{entry.date}</div>
+                        <div className="text-xs font-bold text-[var(--color-text-primary)]">{entry.authorName}</div>
+                        <div className="text-[10px] text-[var(--color-text-tertiary)]">{entry.date}</div>
                       </div>
-                      <div className="mt-1 text-sm leading-relaxed text-[#555] line-clamp-2">{entry.message}</div>
+                      <div className="mt-1 text-sm leading-relaxed text-[var(--color-text-secondary)] line-clamp-2">{entry.message}</div>
                     </div>
                   </button>
                 ))}
@@ -447,7 +447,7 @@ export default function PublicProfile({
           />
 
           {profile.instagramConnected && (
-            <div className="mb-3 overflow-hidden rounded-[24px] border bg-white/90 shadow-[0_10px_22px_rgba(26,21,48,0.04)]" style={{ borderColor: 'var(--color-border-default)' }}>
+            <div className="mb-3 overflow-hidden rounded-[24px] border bg-[var(--color-bg-surface)] shadow-[0_10px_22px_rgba(0,0,0,0.16)]" style={{ borderColor: 'var(--color-border-default)' }}>
               <div className="flex items-center gap-3 px-4 py-3">
                 <button
                   onClick={() => store.toggleSnsOpen('instagram_' + username)}
@@ -456,15 +456,15 @@ export default function PublicProfile({
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/images/Instagram.svg" alt="Instagram" className="w-5 h-5 mr-2 flex-shrink-0" />
                   <div className="min-w-0">
-                    <div className="text-sm font-bold">Instagram
-                      <span className="ml-1.5 text-[10px] font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-full px-2 py-0.5">연동됨</span>
+                    <div className="text-sm font-bold text-[var(--color-text-primary)]">Instagram
+                      <span className="ml-1.5 text-[10px] font-bold rounded-full px-2 py-0.5" style={{ color: 'var(--color-state-success-text)', backgroundColor: 'var(--color-state-success-bg)' }}>연동됨</span>
                     </div>
                     <a
                       href={profile.instagram.profileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      className="block truncate text-xs text-[#0D47A1] underline-offset-2 hover:underline"
+                      className="block truncate text-xs text-[var(--color-state-info-text)] underline-offset-2 hover:underline"
                     >
                       instagram.com/{profile.instagram.username}
                     </a>
@@ -475,35 +475,35 @@ export default function PublicProfile({
                   className="flex-shrink-0 p-1"
                   aria-label={igOpen ? '인스타그램 섹션 접기' : '인스타그램 섹션 펼치기'}
                 >
-                  {igOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
+                  {igOpen ? <ChevronUp size={16} color="#8B857C" /> : <ChevronDown size={16} color="#8B857C" />}
                 </button>
               </div>
               {igOpen && (
                 <div className="px-4 pb-4">
                   <div className="surface-card-soft mb-3 rounded-[20px] px-3 py-3">
-                    <div className="text-[11px] text-[#888] mb-1">AI 요약</div>
-                    <p className="text-xs text-[#555] leading-relaxed">{profile.instagram.aiSummary}</p>
+                    <div className="text-[11px] text-[var(--color-text-tertiary)] mb-1">AI 요약</div>
+                    <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">{profile.instagram.aiSummary}</p>
                   </div>
                   <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
                     {profile.instagram.posts.map((post) => (
                       <button
                         key={post.id}
                         onClick={() => window.open(profile.instagram.profileUrl, '_blank')}
-                        className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-[#e8e8e8]"
+                        className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-[var(--color-bg-soft)]"
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={post.imageUrl} alt={post.caption} className="w-full h-full object-cover" />
                       </button>
                     ))}
                   </div>
-                  <p className="text-xs text-[#aaa] text-right mt-1">최근 게시물 미리보기</p>
+                  <p className="text-xs text-[var(--color-text-tertiary)] text-right mt-1">최근 게시물 미리보기</p>
                 </div>
               )}
             </div>
           )}
 
           {profile.linkedinConnected && (
-            <div className="mb-3 overflow-hidden rounded-[24px] border bg-white/90 shadow-[0_10px_22px_rgba(26,21,48,0.04)]" style={{ borderColor: 'var(--color-border-default)' }}>
+            <div className="mb-3 overflow-hidden rounded-[24px] border bg-[var(--color-bg-surface)] shadow-[0_10px_22px_rgba(0,0,0,0.16)]" style={{ borderColor: 'var(--color-border-default)' }}>
               <div className="flex items-center gap-3 px-4 py-3">
                 <button
                   onClick={() => store.toggleSnsOpen('linkedin_' + username)}
@@ -512,15 +512,15 @@ export default function PublicProfile({
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src="/images/linkedin.png" alt="LinkedIn" className="w-5 h-5 mr-2 flex-shrink-0" />
                   <div className="min-w-0">
-                    <div className="text-sm font-bold">LinkedIn
-                      <span className="ml-1.5 text-[10px] font-bold text-[#1A7A1A] bg-[#E6F5E6] rounded-full px-2 py-0.5">연동됨</span>
+                    <div className="text-sm font-bold text-[var(--color-text-primary)]">LinkedIn
+                      <span className="ml-1.5 text-[10px] font-bold rounded-full px-2 py-0.5" style={{ color: 'var(--color-state-success-text)', backgroundColor: 'var(--color-state-success-bg)' }}>연동됨</span>
                     </div>
                     <a
                       href={profile.linkedin.profileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
-                      className="block truncate text-xs text-[#0D47A1] underline-offset-2 hover:underline"
+                      className="block truncate text-xs text-[var(--color-state-info-text)] underline-offset-2 hover:underline"
                     >
                       {profile.linkedin.profileUrl.replace(/^https?:\/\//, '')}
                     </a>
@@ -531,22 +531,22 @@ export default function PublicProfile({
                   className="flex-shrink-0 p-1"
                   aria-label={liOpen ? '링크드인 섹션 접기' : '링크드인 섹션 펼치기'}
                 >
-                  {liOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
+                  {liOpen ? <ChevronUp size={16} color="#8B857C" /> : <ChevronDown size={16} color="#8B857C" />}
                 </button>
               </div>
               {liOpen && (
                 <div className="px-4 pb-4">
                     <div className="surface-card-soft mb-3 rounded-[20px] px-3 py-3">
-                      <div className="text-[11px] text-[#888] mb-1">AI 요약</div>
-                      <p className="text-xs text-[#555] leading-relaxed">{profile.linkedin.aiSummary}</p>
+                      <div className="text-[11px] text-[var(--color-text-tertiary)] mb-1">AI 요약</div>
+                      <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">{profile.linkedin.aiSummary}</p>
                     </div>
                   <div className="space-y-2">
-                    <div className="rounded-xl border border-[#EFEFEF] overflow-hidden">
-                      <div className="px-3 pt-2.5 pb-1 text-[11px] text-[#888]">최근 게시물</div>
+                    <div className="rounded-xl border overflow-hidden" style={{ borderColor: 'var(--color-border-default)' }}>
+                      <div className="px-3 pt-2.5 pb-1 text-[11px] text-[var(--color-text-tertiary)]">최근 게시물</div>
                       <div className="relative max-h-48 overflow-hidden">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={profile.linkedin.previewImage} alt="LinkedIn 최근 게시물" className="w-full" />
-                        <div className="absolute bottom-0 inset-x-0 h-20 bg-gradient-to-t from-white to-transparent" />
+                        <div className="absolute bottom-0 inset-x-0 h-20 bg-gradient-to-t from-[var(--color-bg-surface)] to-transparent" />
                       </div>
                     </div>
                   </div>
@@ -556,7 +556,7 @@ export default function PublicProfile({
           )}
 
           {!profile.instagramConnected && !profile.linkedinConnected && (
-            <p className="text-sm text-[#888]">연동된 SNS가 없습니다.</p>
+            <p className="text-sm text-[var(--color-text-secondary)]">연동된 SNS가 없습니다.</p>
           )}
         </div>
 

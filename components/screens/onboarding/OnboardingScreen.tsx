@@ -682,8 +682,10 @@ function Step7Highlight() {
   const [hlStartYear, setHlStartYear] = useState('')
   const [hlEndYear, setHlEndYear] = useState('')
   const [hlEducationYear, setHlEducationYear] = useState('')
+  const [hlEducationStartYear, setHlEducationStartYear] = useState('')
+  const [hlEducationEndYear, setHlEducationEndYear] = useState('')
   const [hlDesc, setHlDesc] = useState('')
-  const [yearPickerTarget, setYearPickerTarget] = useState<'career-start' | 'career-end' | 'education-year' | null>(null)
+  const [yearPickerTarget, setYearPickerTarget] = useState<'career-start' | 'career-end' | 'education-start' | 'education-end' | 'education-year' | null>(null)
   const highlightLimitReached = store.highlights.length >= 5
   const isCareerRole = selectedCat?.id === 'career-role'
   const isEducationHistory = selectedCat?.id === 'education-history'
@@ -731,7 +733,19 @@ function Step7Highlight() {
     const [parsedStart = '', parsedEnd = ''] = highlight.year.split(' - ')
     setHlStartYear(typeof highlight.metadata?.startYear === 'string' ? highlight.metadata.startYear : parsedStart)
     setHlEndYear(typeof highlight.metadata?.endYear === 'string' ? highlight.metadata.endYear : (parsedEnd === '현재' ? '' : parsedEnd))
-    setHlEducationYear(highlight.categoryId !== 'career-role' ? highlight.year : '')
+    setHlEducationYear(!isEducationHistory && highlight.categoryId !== 'career-role' ? highlight.year : '')
+    setHlEducationStartYear(
+      highlight.categoryId === 'education-history'
+        ? (typeof highlight.metadata?.startYear === 'string' ? highlight.metadata.startYear : parsedStart)
+        : '',
+    )
+    setHlEducationEndYear(
+      highlight.categoryId === 'education-history'
+        ? (typeof highlight.metadata?.endYear === 'string'
+          ? highlight.metadata.endYear
+          : (parsedEnd === '현재' ? '' : parsedEnd))
+        : '',
+    )
     setHlDesc(highlight.description)
     setSheetMode('form')
   }
@@ -765,6 +779,14 @@ function Step7Highlight() {
       showToast('상태를 선택해주세요')
       return
     }
+    if (isEducationHistory && !hlEducationStartYear) {
+      showToast('입학 연도를 선택해주세요')
+      return
+    }
+    if (isEducationHistory && hlStatus !== '재학' && !hlEducationEndYear) {
+      showToast(hlStatus === '중퇴' ? '중퇴 연도를 선택해주세요' : '졸업 연도를 선택해주세요')
+      return
+    }
     if (isCareerRole && !hlStatus) {
       showToast('상태를 선택해주세요')
       return
@@ -779,7 +801,7 @@ function Step7Highlight() {
     }
     let metadata: Record<string, string | boolean> | undefined
     if (isEducationHistory) {
-      metadata = { status: hlStatus, role: hlRole, degree: hlDegree, schoolType: hlSchoolType }
+      metadata = { status: hlStatus, role: hlRole, degree: hlDegree, schoolType: hlSchoolType, startYear: hlEducationStartYear, endYear: hlStatus === '재학' ? '' : hlEducationEndYear }
     } else if (isCareerRole) {
       metadata = { status: hlStatus, role: hlRole, startYear: hlStartYear, endYear: hlStatus === '종료' ? hlEndYear : '' }
     }
@@ -791,7 +813,9 @@ function Step7Highlight() {
       description: hlDesc,
       year: isCareerRole
         ? `${hlStartYear} - ${hlStatus === '재직 중' ? '현재' : hlEndYear}`
-        : hlEducationYear,
+        : isEducationHistory
+          ? `${hlEducationStartYear} - ${hlStatus === '재학' ? '현재' : hlEducationEndYear}`
+          : hlEducationYear,
       metadata,
     }
     if (editingHighlightId) {
@@ -1121,6 +1145,48 @@ function Step7Highlight() {
                   />
                 )}
                 {isCareerRole && (
+                  <div className="space-y-2">
+                    <div className="micro-text">현재 상태</div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {['재직 중', '종료'].map((status) => (
+                        <button
+                          key={status}
+                          onClick={() => setHlStatus(status)}
+                          className="rounded-2xl border px-4 py-3 text-sm font-semibold"
+                          style={{
+                            borderColor: hlStatus === status ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
+                            backgroundColor: hlStatus === status ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
+                            color: hlStatus === status ? '#fff' : 'var(--color-text-secondary)',
+                          }}
+                        >
+                          {status}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {isEducationHistory && (
+                  <div className="space-y-2">
+                    <div className="micro-text">현재 상태</div>
+                    <div className="grid grid-cols-3 gap-2">
+                      {['졸업', '재학', '중퇴'].map((status) => (
+                        <button
+                          key={status}
+                          onClick={() => setHlStatus(status)}
+                          className="rounded-2xl border px-3 py-2.5 text-sm font-semibold"
+                          style={{
+                            borderColor: hlStatus === status ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
+                            backgroundColor: hlStatus === status ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
+                            color: hlStatus === status ? '#fff' : 'var(--color-text-secondary)',
+                          }}
+                        >
+                          {status}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {isCareerRole && (
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => setYearPickerTarget('career-start')}
@@ -1143,51 +1209,25 @@ function Step7Highlight() {
                   </div>
                 )}
                 {isEducationHistory && (
-                  <button
-                    onClick={() => setYearPickerTarget('education-year')}
-                    className="w-full rounded-2xl border px-4 py-3 text-left text-sm"
-                    style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-soft)', color: hlEducationYear ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}
-                  >
-                    {hlEducationYear || '연도 선택'}
-                  </button>
-                )}
-                {isCareerRole && (
                   <div className="grid grid-cols-2 gap-2">
-                    {['재직 중', '종료'].map((status) => (
-                      <button
-                        key={status}
-                        onClick={() => setHlStatus(status)}
-                        className="rounded-2xl border px-4 py-3 text-sm font-semibold"
-                        style={{
-                          borderColor: hlStatus === status ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
-                          backgroundColor: hlStatus === status ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
-                          color: hlStatus === status ? '#fff' : 'var(--color-text-secondary)',
-                        }}
-                      >
-                        {status}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                {isEducationHistory && (
-                  <div className="space-y-2">
-                    <div className="micro-text">현재 상태</div>
-                    <div className="grid grid-cols-3 gap-2">
-                    {['졸업', '재학', '중퇴'].map((status) => (
-                      <button
-                        key={status}
-                        onClick={() => setHlStatus(status)}
-                        className="rounded-2xl border px-3 py-2.5 text-sm font-semibold"
-                        style={{
-                          borderColor: hlStatus === status ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
-                          backgroundColor: hlStatus === status ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
-                          color: hlStatus === status ? '#fff' : 'var(--color-text-secondary)',
-                        }}
-                      >
-                        {status}
-                      </button>
-                    ))}
-                    </div>
+                    <button
+                      onClick={() => setYearPickerTarget('education-start')}
+                      className="rounded-2xl border px-4 py-3 text-left text-sm"
+                      style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-soft)', color: hlEducationStartYear ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}
+                    >
+                      {hlEducationStartYear || '입학 연도'}
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (hlStatus === '재학') return
+                        setYearPickerTarget('education-end')
+                      }}
+                      disabled={hlStatus === '재학'}
+                      className="rounded-2xl border px-4 py-3 text-left text-sm disabled:opacity-40"
+                      style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-soft)', color: hlStatus === '재학' ? 'var(--color-text-tertiary)' : (hlEducationEndYear ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)') }}
+                    >
+                      {hlStatus === '재학' ? '현재' : (hlEducationEndYear || (hlStatus === '중퇴' ? '중퇴 연도' : '졸업 연도'))}
+                    </button>
                   </div>
                 )}
                 {!isEducationHistory && (
@@ -1202,7 +1242,7 @@ function Step7Highlight() {
               </div>
               <div className="mt-4 flex gap-2">
                 <Button variant="outline" onClick={() => setSheetMode(selectedCat ? 'group' : 'picker')}>이전</Button>
-                <Button onClick={handleAddHighlight} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && (!hlRole.trim() || !hlStatus || !hlStartYear || (hlStatus === '종료' && !hlEndYear))) || (isEducationHistory && (!hlSchoolType || (educationNeedsDegree && !hlDegree) || (educationNeedsMajor && !hlRole.trim()) || !hlStatus))}>{editingHighlightId ? '수정하기' : '저장하기'}</Button>
+                <Button onClick={handleAddHighlight} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && (!hlRole.trim() || !hlStatus || !hlStartYear || (hlStatus === '종료' && !hlEndYear))) || (isEducationHistory && (!hlSchoolType || (educationNeedsDegree && !hlDegree) || (educationNeedsMajor && !hlRole.trim()) || !hlStatus || !hlEducationStartYear || (hlStatus !== '재학' && !hlEducationEndYear)))}>{editingHighlightId ? '수정하기' : '저장하기'}</Button>
               </div>
             </div>
           </div>
@@ -1273,17 +1313,23 @@ function Step7Highlight() {
         title={
           yearPickerTarget === 'career-start' ? '시작 연도 선택'
             : yearPickerTarget === 'career-end' ? '종료 연도 선택'
-              : '연도 선택'
+              : yearPickerTarget === 'education-start' ? '입학 연도 선택'
+                : yearPickerTarget === 'education-end' ? (hlStatus === '중퇴' ? '중퇴 연도 선택' : '졸업 연도 선택')
+                  : '연도 선택'
         }
         value={
           yearPickerTarget === 'career-start' ? hlStartYear
             : yearPickerTarget === 'career-end' ? hlEndYear
-              : hlEducationYear
+              : yearPickerTarget === 'education-start' ? hlEducationStartYear
+                : yearPickerTarget === 'education-end' ? hlEducationEndYear
+                  : hlEducationYear
         }
         options={yearOptions}
         onSelect={(value) => {
           if (yearPickerTarget === 'career-start') setHlStartYear(value)
           if (yearPickerTarget === 'career-end') setHlEndYear(value)
+          if (yearPickerTarget === 'education-start') setHlEducationStartYear(value)
+          if (yearPickerTarget === 'education-end') setHlEducationEndYear(value)
           if (yearPickerTarget === 'education-year') setHlEducationYear(value)
         }}
       />

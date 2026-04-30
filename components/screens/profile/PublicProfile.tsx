@@ -602,7 +602,7 @@ export default function PublicProfile({
                               {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
                             </button>
                             {isOpen && (
-                          <div className="border-t border-[#F1ECE6] bg-[linear-gradient(180deg,#FCFBFA_0%,#F8F6F3_100%)] px-4 py-4">
+                          <div className="border-t border-[#F1ECE6] px-4 py-4">
                                 {hl.categoryId === 'career-continuity' && (
                                   <CareerContinuityChart
                                     avgYears={profile.careerHighlight.avgYears}
@@ -660,7 +660,7 @@ export default function PublicProfile({
                                 {isGroupOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
                               </button>
                               {isGroupOpen && (
-                                <div className="border-t border-[#F1ECE6] bg-[linear-gradient(180deg,#FCFBFA_0%,#F8F6F3_100%)] px-4 py-4">
+                                <div className="border-t border-[#F1ECE6] px-4 py-4">
                                   <div className="space-y-3">
                                     {entry.items.map((hl) => {
                                       const metaParts = getHighlightMetaParts(hl)

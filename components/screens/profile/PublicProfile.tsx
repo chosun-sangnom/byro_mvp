@@ -447,7 +447,7 @@ export default function PublicProfile({
           />
 
           {profile.instagramConnected && (
-            <div className="mb-3 overflow-hidden rounded-[24px] border bg-[var(--color-bg-surface)] shadow-[0_10px_22px_rgba(0,0,0,0.16)]" style={{ borderColor: 'var(--color-border-default)' }}>
+            <div className="mb-3 overflow-hidden rounded-[20px] border bg-[rgba(23,24,28,0.74)]" style={{ borderColor: 'var(--color-border-default)' }}>
               <div className="flex items-center gap-3 px-4 py-3">
                 <button
                   onClick={() => store.toggleSnsOpen('instagram_' + username)}
@@ -480,7 +480,7 @@ export default function PublicProfile({
               </div>
               {igOpen && (
                 <div className="px-4 pb-4">
-                  <div className="surface-card-soft mb-3 rounded-[20px] px-3 py-3">
+                  <div className="mb-3 rounded-[16px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.02)] px-3 py-3">
                     <div className="text-[11px] text-[var(--color-text-tertiary)] mb-1">AI 요약</div>
                     <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">{profile.instagram.aiSummary}</p>
                   </div>
@@ -489,7 +489,7 @@ export default function PublicProfile({
                       <button
                         key={post.id}
                         onClick={() => window.open(profile.instagram.profileUrl, '_blank')}
-                        className="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden bg-[var(--color-bg-soft)]"
+                        className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-[14px] bg-[var(--color-bg-soft)]"
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={post.imageUrl} alt={post.caption} className="w-full h-full object-cover" />
@@ -503,7 +503,7 @@ export default function PublicProfile({
           )}
 
           {profile.linkedinConnected && (
-            <div className="mb-3 overflow-hidden rounded-[24px] border bg-[var(--color-bg-surface)] shadow-[0_10px_22px_rgba(0,0,0,0.16)]" style={{ borderColor: 'var(--color-border-default)' }}>
+            <div className="mb-3 overflow-hidden rounded-[20px] border bg-[rgba(23,24,28,0.74)]" style={{ borderColor: 'var(--color-border-default)' }}>
               <div className="flex items-center gap-3 px-4 py-3">
                 <button
                   onClick={() => store.toggleSnsOpen('linkedin_' + username)}
@@ -536,12 +536,12 @@ export default function PublicProfile({
               </div>
               {liOpen && (
                 <div className="px-4 pb-4">
-                    <div className="surface-card-soft mb-3 rounded-[20px] px-3 py-3">
+                    <div className="mb-3 rounded-[16px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.02)] px-3 py-3">
                       <div className="text-[11px] text-[var(--color-text-tertiary)] mb-1">AI 요약</div>
                       <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed">{profile.linkedin.aiSummary}</p>
                     </div>
                   <div className="space-y-2">
-                    <div className="rounded-xl border overflow-hidden" style={{ borderColor: 'var(--color-border-default)' }}>
+                    <div className="overflow-hidden rounded-[16px] border" style={{ borderColor: 'var(--color-border-default)' }}>
                       <div className="px-3 pt-2.5 pb-1 text-[11px] text-[var(--color-text-tertiary)]">최근 게시물</div>
                       <div className="relative max-h-48 overflow-hidden">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -761,7 +761,7 @@ export default function PublicProfile({
                 </Button>
               </div>
             )}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2.5">
               {contactChannels.map((channel) => (
                 <ContactActionButton
                   key={channel.id}
@@ -912,8 +912,11 @@ function SectionTitle({
 }) {
   return (
     <div className="mb-4">
-      <div className="inline-flex rounded-full bg-[var(--color-bg-soft)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-strong)] border border-[var(--color-border-default)]">
-        {title}
+      <div className="flex items-center gap-3">
+        <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">
+          {title}
+        </div>
+        <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
       </div>
       {subtitle && <div className="text-[11px] text-[var(--color-text-tertiary)] mt-1">{subtitle}</div>}
     </div>
@@ -938,14 +941,14 @@ function ContactActionButton({
     <button
       onClick={onClick}
       className={[
-        'rounded-[20px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-2 py-3 text-center shadow-[0_8px_18px_rgba(0,0,0,0.18)] transition-colors',
+        'rounded-[18px] border border-[var(--color-border-default)] bg-[rgba(23,24,28,0.72)] px-2 py-3 text-center transition-colors',
         channel.enabled ? 'text-[var(--color-text-primary)]' : 'text-[var(--color-text-tertiary)]',
       ].join(' ')}
     >
       <div className={[
-        'mx-auto mb-2 flex h-11 w-11 items-center justify-center rounded-[14px] border',
+        'mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-[12px] border',
         channel.enabled
-          ? 'border-[var(--color-border-default)] bg-[var(--color-bg-muted)] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]'
+          ? 'border-[var(--color-border-default)] bg-[rgba(255,255,255,0.03)]'
           : 'border-[var(--color-border-default)] bg-[var(--color-bg-soft)]',
       ].join(' ')}>
         <Icon size={16} />

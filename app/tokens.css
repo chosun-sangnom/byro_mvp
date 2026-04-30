@@ -69,26 +69,22 @@
 body {
   color: var(--color-text-strong);
   background:
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.06), transparent 24%),
-    linear-gradient(180deg, #141518 0%, #101114 44%, #0C0D10 100%);
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.04), transparent 22%),
+    linear-gradient(180deg, #131417 0%, #0F1013 48%, #0B0C0F 100%);
 }
 
 .surface-card {
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-xl);
-  box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 .surface-card-soft {
   background: var(--color-bg-soft);
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-xl);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 8px 18px rgba(0, 0, 0, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .hero-card {
@@ -106,8 +102,7 @@ body {
   height: 36px;
   border: 1px solid var(--color-border-default);
   border-radius: 10px;
-  background: var(--color-bg-soft);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .chip-metric {
@@ -148,26 +143,20 @@ body {
   border-radius: 28px;
   border: 1px solid var(--color-border-default);
   background: rgba(18, 19, 23, 0.92);
-  box-shadow:
-    0 26px 48px rgba(0, 0, 0, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(10px);
 }
 
 .settings-row {
   border-radius: 18px;
   border: 1px solid #2B2E34;
-  background: linear-gradient(180deg, #1B1D22 0%, #14161A 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 12px 24px rgba(0, 0, 0, 0.18);
+  background: #17191d;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .settings-row-light {
   border-radius: 20px;
   border: 1px solid var(--color-border-default);
-  background: linear-gradient(180deg, #1A1C21 0%, #15171B 100%);
-  box-shadow:
-    0 10px 24px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  background: #17191d;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }

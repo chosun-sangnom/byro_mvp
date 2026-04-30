@@ -191,10 +191,10 @@ function ManageByroScreen({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] bg-white/78 backdrop-blur-md flex-shrink-0">
-        <button onClick={onBack} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] bg-[rgba(16,17,20,0.82)] backdrop-blur-md flex-shrink-0">
+        <button onClick={onBack} className="mr-3 text-xl leading-none text-[var(--color-text-secondary)]">‹</button>
         <span className="text-base font-black flex-1">Byro 편집</span>
-        <button onClick={onLogout} className="text-xs text-[#888]">로그아웃</button>
+        <button onClick={onLogout} className="text-xs text-[var(--color-text-tertiary)]">로그아웃</button>
       </div>
 
       <div className="flex-1 overflow-y-auto pb-24">
@@ -219,7 +219,7 @@ function ManageByroScreen({
             </div>
           </div>
 
-          <div className="mb-3">
+          <div className="mb-4">
             <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Manage</div>
             <div className="mt-2 text-[18px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">Byro 편집</div>
             <div className="meta-text mt-1 leading-relaxed">각 항목을 눌러 별도 페이지에서 수정하세요.</div>
@@ -229,13 +229,13 @@ function ManageByroScreen({
                 <button
                   key={row.title}
                   onClick={row.onClick}
-                  className={`settings-row flex w-full items-center gap-4 px-4 py-4 text-left transition-transform hover:translate-y-[-1px] ${index > 0 ? 'mt-2.5' : ''}`}
+                  className={`settings-row flex w-full items-center gap-4 px-4 py-4 text-left ${index > 0 ? 'mt-2.5' : ''}`}
                 >
                   <div className="min-w-0 flex-1">
                     <div className="text-[15px] font-semibold text-white">{row.title}</div>
                     <div className="mt-1 text-[12px] leading-[1.45] text-white/58">{row.meta}</div>
                   </div>
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/8 text-white/70 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-white/56">
                     <ChevronRight size={15} />
                   </span>
                 </button>

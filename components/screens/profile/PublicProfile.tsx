@@ -32,6 +32,27 @@ const AIRLINE_BADGE_LABELS = {
   business_traveler: '비즈니스 이동형',
 } as const
 
+const PROFILE_PRESENTATION = {
+  gangminjun: {
+    label: '프로덕트',
+    panel: 'rgba(24, 24, 30, 0.88)',
+    body: '#141318',
+    line: 'rgba(255,255,255,0.08)',
+  },
+  mk: {
+    label: '대표',
+    panel: '#1B2F72',
+    body: '#0D1220',
+    line: 'rgba(255,255,255,0.08)',
+  },
+  jiminlee: {
+    label: '마케터',
+    panel: '#A85719',
+    body: '#1C120E',
+    line: 'rgba(255,255,255,0.08)',
+  },
+} as const
+
 export default function PublicProfile({
   username,
   mode = 'public',
@@ -101,6 +122,8 @@ export default function PublicProfile({
   const topRememberIndustry = [...profile.rememberHighlight.industries].sort((a, b) => b.ratio - a.ratio)[0]
   const showCareerHighlight = username !== 'mk'
   const showAirlineHighlight = !['jiminlee', 'mk'].includes(username)
+  const deckTheme = PROFILE_PRESENTATION[username as keyof typeof PROFILE_PRESENTATION] ?? PROFILE_PRESENTATION.gangminjun
+  const quickContacts = contactChannels.filter((channel) => channel.enabled && channel.value.trim()).slice(0, 2)
 
   const [expSheetOpen, setExpSheetOpen] = useState(false)
   const [expDoneModal, setExpDoneModal] = useState(false)
@@ -314,48 +337,87 @@ export default function PublicProfile({
         {/* 프로필 헤더 */}
         <div className="px-5 pt-4 pb-3">
           <div className="hero-card border border-[var(--color-border-default)] bg-white/88 p-[8px] backdrop-blur-sm">
-            <div className="relative h-[452px] overflow-hidden rounded-[30px] text-white ring-1 ring-black/4">
-              {profile.avatarImage ? (
-                <>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={profile.avatarImage} alt={`${profile.name} 프로필 사진`} className="absolute inset-0 h-full w-full object-cover" />
-                  <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.10)_58%,rgba(0,0,0,0.74)_100%)]" />
-                </>
-              ) : (
-                <>
-                  <div className={`absolute inset-0 bg-gradient-to-b ${heroTheme.cover}`} />
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.24),rgba(255,255,255,0)_36%),linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.08)_56%,rgba(0,0,0,0.76)_100%)]" />
-                  <div className="absolute left-1/2 top-[16%] h-[196px] w-[196px] -translate-x-1/2 overflow-hidden rounded-[40px] border border-white/22 bg-gradient-to-br from-white/18 to-white/3 shadow-[0_28px_72px_rgba(0,0,0,0.18)] backdrop-blur-[6px]">
-                    <div
-                      className={`h-full w-full bg-gradient-to-br ${heroTheme.avatar}`}
-                      style={{ backgroundColor: profile.avatarColor }}
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center text-[72px] font-black text-[#4E3B32]/55">
-                      {profile.name.charAt(0)}
-                    </div>
-                  </div>
-                </>
-              )}
+            <div className="relative h-[530px] overflow-hidden rounded-[30px] text-white ring-1 ring-black/4">
+              <div className="absolute left-5 top-5 z-20 rounded-[10px] bg-white/90 px-3 py-2 text-[12px] font-bold text-[#141414] shadow-[0_10px_20px_rgba(17,17,17,0.08)]">
+                {deckTheme.label}
+              </div>
 
-              <div className="absolute inset-x-0 bottom-0 p-5">
-                <div className="flex items-center gap-1.5">
-                  <div className="text-[29px] font-black tracking-[-0.04em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.24)]">{profile.name}</div>
-                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-white/40 bg-white/95 text-[#1F8B4E] shadow-[0_8px_20px_rgba(17,17,17,0.18)]">
-                    <BadgeCheck size={14} />
-                  </span>
+              <div className="absolute inset-x-0 top-0 h-[64%] overflow-hidden">
+                {profile.avatarImage ? (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={profile.avatarImage} alt={`${profile.name} 프로필 사진`} className="absolute inset-0 h-full w-full object-cover" />
+                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.02)_26%,rgba(0,0,0,0.12)_76%,rgba(0,0,0,0.36)_100%)]" />
+                  </>
+                ) : (
+                  <>
+                    <div className={`absolute inset-0 bg-gradient-to-b ${heroTheme.cover}`} />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.24),rgba(255,255,255,0)_36%),linear-gradient(180deg,rgba(255,255,255,0.08)_0%,rgba(255,255,255,0.02)_34%,rgba(0,0,0,0.16)_100%)]" />
+                    <div className="absolute left-1/2 top-[15%] h-[208px] w-[208px] -translate-x-1/2 overflow-hidden rounded-[42px] border border-white/22 bg-gradient-to-br from-white/18 to-white/3 shadow-[0_28px_72px_rgba(0,0,0,0.18)] backdrop-blur-[6px]">
+                      <div
+                        className={`h-full w-full bg-gradient-to-br ${heroTheme.avatar}`}
+                        style={{ backgroundColor: profile.avatarColor }}
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center text-[76px] font-black text-[#4E3B32]/55">
+                        {profile.name.charAt(0)}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <div
+                className="absolute inset-x-0 bottom-0 h-[41%] px-5 pb-5 pt-[88px]"
+                style={{ background: `linear-gradient(180deg, rgba(0,0,0,0) 0%, ${deckTheme.body} 14%, ${deckTheme.body} 100%)` }}
+              >
+                <div className="space-y-3">
+                  {quickContacts.map((channel) => (
+                    <div
+                      key={`hero-${channel.id}`}
+                      className="flex items-center justify-between border-b pb-3 text-[12px]"
+                      style={{ borderColor: deckTheme.line }}
+                    >
+                      <span className="text-white/55">{channel.label}</span>
+                      <span className="max-w-[64%] text-right font-semibold text-white/88">{channel.value}</span>
+                    </div>
+                  ))}
                 </div>
-                <div className="mt-4 max-w-[318px] rounded-[18px] border border-white/12 bg-white/10 px-4 py-3 text-[15px] leading-[1.52] text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[8px]">
-                  <p ref={bioRef} className={bioExpanded ? '' : 'line-clamp-3'}>
+
+                <div className="mt-4 rounded-[18px] border border-white/10 bg-white/4 px-4 py-3 backdrop-blur-[6px]">
+                  <p ref={bioRef} className={`text-[14px] leading-[1.7] text-white/86 ${bioExpanded ? '' : 'line-clamp-3'}`}>
                     {profile.bio}
                   </p>
                   {bioOverflowing && (
                     <button
                       onClick={() => setBioExpanded((prev) => !prev)}
-                      className="mt-2 text-xs font-semibold text-white/82"
+                      className="mt-2 text-xs font-semibold text-white/74"
                     >
                       {bioExpanded ? '접기' : '더보기'}
                     </button>
                   )}
+                </div>
+              </div>
+
+              <div
+                className="absolute left-5 right-5 z-20 rounded-[18px] border border-white/12 px-4 py-4 shadow-[0_18px_36px_rgba(0,0,0,0.18)] backdrop-blur-[10px]"
+                style={{ bottom: '120px', background: deckTheme.panel }}
+              >
+                <div className="flex items-center gap-1.5">
+                  <div className="text-[27px] font-black tracking-[-0.04em] text-white">{profile.name}</div>
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/92 text-[#1F8B4E] shadow-[0_8px_18px_rgba(17,17,17,0.18)]">
+                    <BadgeCheck size={14} />
+                  </span>
+                </div>
+                <div className="mt-1 text-[13px] font-medium text-white/84">
+                  {profile.title}
+                  {profile.school ? ` · ${profile.school}` : ''}
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {(profile.selectedKeywords ?? []).slice(0, 3).map((keyword) => (
+                    <span key={keyword} className="rounded-[8px] bg-white/12 px-2.5 py-1 text-[10px] font-semibold text-white/82">
+                      {keyword}
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>

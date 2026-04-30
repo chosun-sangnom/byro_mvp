@@ -199,43 +199,48 @@ function ManageByroScreen({
 
       <div className="flex-1 overflow-y-auto pb-24">
         <div className="px-5 py-4">
-          <div className="surface-card mb-3 p-4">
-            <div className="flex items-center justify-between gap-3">
+          <div className="surface-card mb-4 rounded-[28px] px-4 py-4">
+            <div className="flex items-start justify-between gap-3">
               <div>
-                <div className="text-sm font-black text-[var(--color-text-strong)]">프로필 완성도 {completionPercent}%</div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Profile Completion</div>
+                <div className="mt-2 text-[19px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">{completionPercent}% 완성</div>
                 <div className="meta-text mt-1">
                   {remainingItems.length > 0
                     ? `${remainingItems.map((item) => item.label).join(', ')} 항목을 채우면 더 좋아져요.`
                     : '기본 프로필 구성이 완료됐어요.'}
                 </div>
               </div>
-              <div className="rounded-full bg-[var(--color-bg-muted)] px-3 py-1 text-xs font-semibold text-[var(--color-text-secondary)]">
+              <div className="rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-3 py-1 text-xs font-semibold text-[var(--color-text-secondary)]">
                 {completionChecks.filter((item) => item.done).length}/{completionChecks.length}
               </div>
             </div>
-            <div className="mt-3 h-2 overflow-hidden rounded-full bg-[var(--color-bg-muted)]">
+            <div className="mt-4 h-2 overflow-hidden rounded-full bg-[var(--color-bg-muted)]">
               <div className="h-full rounded-full bg-[var(--color-accent-dark)]" style={{ width: `${completionPercent}%` }} />
             </div>
           </div>
 
-          <div className="surface-card-soft p-4">
-            <div className="text-sm font-black text-[var(--color-text-strong)] mb-1">설정</div>
-            <div className="meta-text mb-3 leading-relaxed">각 항목을 눌러 별도 페이지에서 수정하세요.</div>
-            <div className="overflow-hidden rounded-[22px] border border-[var(--color-border-default)] bg-white">
-              {manageRows.map((row, index) => (
-                <button
-                  key={row.title}
-                  onClick={row.onClick}
-                  className={`flex w-full items-center gap-3 px-4 py-4 text-left ${index > 0 ? 'border-t border-[var(--color-border-soft)]' : ''}`}
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[15px] font-semibold text-[var(--color-text-strong)]">{row.title}</div>
-                    <div className="mt-1 text-[12px] text-[var(--color-text-secondary)]">{row.meta}</div>
-                  </div>
-                  <ChevronRight size={16} color="#999" />
-                </button>
-              ))}
-            </div>
+          <div className="mb-3">
+            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Manage</div>
+            <div className="mt-2 text-[17px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">Byro 편집</div>
+            <div className="meta-text mt-1">각 항목을 눌러 별도 페이지에서 수정하세요.</div>
+          </div>
+
+          <div className="overflow-hidden rounded-[26px] border border-[var(--color-border-default)] bg-white shadow-[0_10px_28px_rgba(17,17,17,0.04)]">
+            {manageRows.map((row, index) => (
+              <button
+                key={row.title}
+                onClick={row.onClick}
+                className={`flex w-full items-center gap-4 px-4 py-4 text-left ${index > 0 ? 'border-t border-[var(--color-border-soft)]' : ''}`}
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="text-[15px] font-semibold text-[var(--color-text-strong)]">{row.title}</div>
+                  <div className="mt-1 text-[12px] leading-[1.45] text-[var(--color-text-secondary)]">{row.meta}</div>
+                </div>
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-[var(--color-text-tertiary)]">
+                  <ChevronRight size={15} />
+                </span>
+              </button>
+            ))}
           </div>
         </div>
       </div>

@@ -844,7 +844,14 @@ function Step7Highlight() {
         </div>
 
         {store.highlights.length > 0 && (
-          <div className="space-y-2 mb-4">
+          <div className="mb-5">
+            <div className="mb-2 flex items-center justify-between">
+              <div className="text-[11px] font-semibold text-[var(--color-text-secondary)]">추가된 하이라이트</div>
+              <div className="rounded-full border border-[var(--color-border-default)] bg-white px-2.5 py-0.5 text-[10px] font-semibold text-[var(--color-text-tertiary)]">
+                {store.highlights.length}/5
+              </div>
+            </div>
+            <div className="space-y-2">
             {store.highlights.map((h) => (
               <div key={h.id} className="surface-card flex items-start rounded-[22px] p-3">
                 <span className="mr-2 mt-0.5 text-[var(--color-text-strong)]">
@@ -874,6 +881,7 @@ function Step7Highlight() {
               </div>
             ))}
           </div>
+          </div>
         )}
 
         <button
@@ -891,7 +899,7 @@ function Step7Highlight() {
         >
           {highlightLimitReached ? '하이라이트 5개를 모두 추가했어요' : '+ 하이라이트 추가하기'}
         </button>
-        <div className="micro-text mt-2 text-center">{store.highlights.length}/5</div>
+        <div className="micro-text mt-2 text-center">최대 5개까지 추가할 수 있어요</div>
       </div>
 
       <StepFooter
@@ -958,13 +966,18 @@ function Step7Highlight() {
             </div>
 
             <div className="surface-card mb-4 rounded-[26px] px-4 py-4">
-              <div className="flex items-center gap-3">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
                   <HighlightIcon id={selectedCat.icon as HighlightIconId} size={18} />
                 </div>
                 <div>
                   <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{selectedCat.label}</div>
                   <div className="micro-text">여러 항목을 추가하고 메인으로 보여줄 항목을 고를 수 있어요</div>
+                </div>
+              </div>
+                <div className="rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
+                  {selectedCategoryHighlights.length}개
                 </div>
               </div>
             </div>
@@ -1002,7 +1015,7 @@ function Step7Highlight() {
                               store.setHighlightPrimary(selectedCat.id, item.id)
                               showToast('메인 항목으로 설정했어요')
                             }}
-                            className="rounded-full border border-[#D7D0C8] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-secondary)]"
+                            className="rounded-full border border-[#D7D0C8] bg-[var(--color-bg-soft)] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-secondary)]"
                           >
                             메인으로 설정
                           </button>
@@ -1011,7 +1024,7 @@ function Step7Highlight() {
                       <div className="mt-4 flex gap-2">
                         <button
                           onClick={() => openEditForm(item)}
-                          className="rounded-lg border border-[#CFC7BF] px-3 py-1.5 text-xs font-medium text-[#555]"
+                          className="rounded-xl border border-[#D7D0C8] bg-white px-3 py-1.5 text-xs font-medium text-[#555]"
                         >
                           수정
                         </button>
@@ -1020,7 +1033,7 @@ function Step7Highlight() {
                             store.removeHighlight(item.id)
                             showToast('삭제됐어요')
                           }}
-                          className="rounded-lg border border-[#F2C7C5] px-3 py-1.5 text-xs font-medium text-[#C9473D]"
+                          className="rounded-xl border border-[#F2C7C5] bg-white px-3 py-1.5 text-xs font-medium text-[#C9473D]"
                         >
                           삭제
                         </button>
@@ -1065,7 +1078,7 @@ function Step7Highlight() {
                   </div>
                   <div>
                     <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{selectedCat.label}</div>
-                    <div className="micro-text">직접 입력으로 바로 추가돼요</div>
+                    <div className="micro-text">프로필에 직접 입력한 경험으로 반영돼요</div>
                   </div>
                 </div>
               </div>
@@ -1240,7 +1253,7 @@ function Step7Highlight() {
                   />
                 )}
               </div>
-              <div className="mt-4 flex gap-2">
+              <div className="mt-5 flex gap-2">
                 <Button variant="outline" onClick={() => setSheetMode(selectedCat ? 'group' : 'picker')}>이전</Button>
                 <Button onClick={handleAddHighlight} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && (!hlRole.trim() || !hlStatus || !hlStartYear || (hlStatus === '종료' && !hlEndYear))) || (isEducationHistory && (!hlSchoolType || (educationNeedsDegree && !hlDegree) || (educationNeedsMajor && !hlRole.trim()) || !hlStatus || !hlEducationStartYear || (hlStatus !== '재학' && !hlEducationEndYear)))}>{editingHighlightId ? '수정하기' : '저장하기'}</Button>
               </div>

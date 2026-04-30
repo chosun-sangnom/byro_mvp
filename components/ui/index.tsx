@@ -178,7 +178,6 @@ interface ChipProps {
   label: string
   selected?: boolean
   onClick?: () => void
-  dark?: boolean
 }
 
 export function Chip({ label, selected, onClick }: ChipProps) {
@@ -254,10 +253,9 @@ interface BottomSheetProps {
   open: boolean
   onClose: () => void
   children: React.ReactNode
-  dark?: boolean
 }
 
-export function BottomSheet({ open, onClose, children, dark }: BottomSheetProps) {
+export function BottomSheet({ open, onClose, children }: BottomSheetProps) {
   return (
     <AnimatePresence>
       {open && (

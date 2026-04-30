@@ -98,9 +98,13 @@ function StepIntro({
   description: string
 }) {
   return (
-    <div className="surface-card px-4 py-4 mb-5 rounded-[28px]">
-      {eyebrow && <div className="micro-text uppercase tracking-[0.18em] mb-2">{eyebrow}</div>}
-      <h2 className="text-[22px] font-black leading-tight mb-2">{title}</h2>
+    <div className="surface-card px-5 py-5 mb-5 rounded-[30px]">
+      {eyebrow && (
+        <div className="mb-3 inline-flex rounded-full bg-[var(--color-bg-muted)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">
+          {eyebrow}
+        </div>
+      )}
+      <h2 className="text-[24px] font-black leading-tight mb-2 tracking-[-0.03em]">{title}</h2>
       <p className="text-sm leading-relaxed whitespace-pre-line text-[var(--color-text-secondary)]">{description}</p>
     </div>
   )
@@ -127,10 +131,10 @@ function SelectionCard({
     <button
       onClick={onClick}
       className={[
-        'w-full text-left rounded-[24px] border px-4 py-4 transition-colors',
+        'w-full text-left rounded-[26px] border px-4 py-4 transition-colors shadow-[0_10px_24px_rgba(26,21,48,0.04)]',
         tone === 'accent'
-          ? 'border-[#E8A000] bg-[#FFF8E6]'
-          : 'border-[var(--color-border-default)] bg-[var(--color-bg-surface)]',
+          ? 'border-[#E8A000] bg-[linear-gradient(180deg,#FFF9EA_0%,#FFF3CF_100%)]'
+          : 'border-[var(--color-border-default)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(249,247,252,0.96)_100%)]',
       ].join(' ')}
     >
       <div className="flex items-start gap-3">
@@ -216,7 +220,7 @@ function StepFooter({
   skipLabel?: string
 }) {
   return (
-    <div className="px-5 pb-5 pt-3 border-t border-[#EBEBEB] space-y-2">
+      <div className="px-5 pb-5 pt-3 border-t border-[var(--color-border-soft)] bg-white/72 backdrop-blur-md space-y-2">
       <div className="grid grid-cols-2 gap-2">
         <Button variant="outline" onClick={onPrev} disabled={!onPrev}>{prevLabel}</Button>
         <Button onClick={onNext} disabled={!canNext}>{nextLabel}</Button>

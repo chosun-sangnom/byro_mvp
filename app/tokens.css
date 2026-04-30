@@ -69,8 +69,8 @@
 body {
   color: var(--color-text-strong);
   background:
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.8), transparent 32%),
-    linear-gradient(180deg, #F3F1FF 0%, var(--color-bg-page) 48%, #F7F4F1 100%);
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.92), transparent 30%),
+    linear-gradient(180deg, #F4F1FF 0%, #F1EEFF 36%, #F7F3EF 100%);
 }
 
 .surface-card {
@@ -78,7 +78,7 @@ body {
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-xl);
   box-shadow:
-    0 14px 32px rgba(26, 21, 48, 0.05),
+    0 18px 38px rgba(26, 21, 48, 0.045),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
@@ -94,8 +94,8 @@ body {
 .hero-card {
   border-radius: var(--radius-hero);
   box-shadow:
-    0 28px 60px rgba(26, 21, 48, 0.08),
-    0 6px 24px rgba(26, 21, 48, 0.04);
+    0 32px 64px rgba(26, 21, 48, 0.075),
+    0 8px 24px rgba(26, 21, 48, 0.035);
 }
 
 .icon-button {
@@ -116,11 +116,12 @@ body {
   gap: 6px;
   padding: 8px 12px;
   border-radius: 14px;
-  background: var(--color-bg-muted);
+  background: linear-gradient(180deg, #F4F1FA 0%, #ECE9F5 100%);
   color: var(--color-text-primary);
   font-size: var(--font-meta-1-size);
   line-height: var(--font-meta-1-line);
   font-weight: 600;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
 }
 
 .section-title {
@@ -146,25 +147,26 @@ body {
 .settings-shell {
   border-radius: 28px;
   border: 1px solid var(--color-border-default);
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.88);
   box-shadow:
-    0 20px 38px rgba(26, 21, 48, 0.05),
+    0 24px 42px rgba(26, 21, 48, 0.05),
     inset 0 1px 0 rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(10px);
 }
 
 .settings-row {
   border-radius: 18px;
-  background: linear-gradient(180deg, #17171C 0%, #101014 100%);
+  border: 1px solid var(--color-border-default);
+  background: linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(248,246,252,0.96) 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 8px 18px rgba(17, 17, 17, 0.1);
+    inset 0 1px 0 rgba(255, 255, 255, 0.94),
+    0 10px 22px rgba(26, 21, 48, 0.04);
 }
 
 .settings-row-light {
   border-radius: 20px;
   border: 1px solid var(--color-border-default);
-  background: rgba(255, 255, 255, 0.88);
+  background: linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(250,248,253,0.94) 100%);
   box-shadow:
     0 10px 24px rgba(26, 21, 48, 0.04),
     inset 0 1px 0 rgba(255, 255, 255, 0.88);

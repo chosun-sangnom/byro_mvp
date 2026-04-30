@@ -229,13 +229,13 @@ function ManageByroScreen({
                 <button
                   key={row.title}
                   onClick={row.onClick}
-                  className={`settings-row flex w-full items-center gap-4 px-4 py-4 text-left text-white transition-transform hover:translate-y-[-1px] ${index > 0 ? 'mt-2.5' : ''}`}
+                  className={`settings-row flex w-full items-center gap-4 px-4 py-4 text-left transition-transform hover:translate-y-[-1px] ${index > 0 ? 'mt-2.5' : ''}`}
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="text-[15px] font-semibold text-white">{row.title}</div>
-                    <div className="mt-1 text-[12px] leading-[1.45] text-white/62">{row.meta}</div>
+                    <div className="text-[15px] font-semibold text-[var(--color-text-strong)]">{row.title}</div>
+                    <div className="mt-1 text-[12px] leading-[1.45] text-[var(--color-text-secondary)]">{row.meta}</div>
                   </div>
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/8 text-white/72">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-muted)] text-[var(--color-text-tertiary)] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
                     <ChevronRight size={15} />
                   </span>
                 </button>

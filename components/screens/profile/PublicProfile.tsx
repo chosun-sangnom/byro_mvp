@@ -912,8 +912,9 @@ function SectionTitle({
 }) {
   return (
     <div className="mb-4">
-      <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Section</div>
-      <div className="mt-1 text-[18px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">{title}</div>
+      <div className="inline-flex rounded-full bg-[var(--color-bg-muted)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">
+        {title}
+      </div>
       {subtitle && <div className="text-[11px] text-[var(--color-text-tertiary)] mt-1">{subtitle}</div>}
     </div>
   )

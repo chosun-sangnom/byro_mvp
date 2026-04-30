@@ -668,7 +668,7 @@ export default function PublicProfile({
             <div className="flex gap-2 mb-6">
               <button
                 onClick={() => showToast('피드백 요청을 보냈어요!')}
-                className="rounded-full border border-[var(--color-border-default)] px-4 py-2 text-[13px] font-semibold text-[var(--color-text-secondary)] active:opacity-60 transition-opacity"
+                className="flex-1 rounded-full border border-[var(--color-border-default)] py-2.5 text-[13px] font-semibold text-[var(--color-text-secondary)] active:opacity-60 transition-opacity"
               >
                 피드백 요청
               </button>
@@ -677,7 +677,7 @@ export default function PublicProfile({
                   if (alreadySubmitted) { showToast('이미 경험을 남겼어요'); return }
                   setExpSheetOpen(true)
                 }}
-                className="rounded-full px-4 py-2 text-[13px] font-semibold active:opacity-60 transition-opacity"
+                className="flex-1 rounded-full py-2.5 text-[13px] font-semibold active:opacity-60 transition-opacity"
                 style={alreadySubmitted
                   ? { border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)' }
                   : { backgroundColor: 'var(--color-accent-dark)', color: '#fff' }
@@ -687,7 +687,7 @@ export default function PublicProfile({
               </button>
             </div>
           )}
-          <div className="flex gap-8">
+          <div className="flex justify-around">
             {contactChannels.map((channel) => (
               <ContactActionButton
                 key={channel.id}

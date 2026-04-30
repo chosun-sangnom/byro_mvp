@@ -10,12 +10,12 @@ import {
   InfoBox, TextArea, AiBounce, YearPickerSheet, showToast,
 } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
-import type { ContactChannel, HighlightIconId } from '@/types'
+import type { ContactChannel, Highlight, HighlightIconId } from '@/types'
 import {
   KEYWORD_GROUPS, HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS, AI_BIO_CANDIDATES,
   INSTAGRAM_PROFILE, LINKEDIN_PROFILE,
 } from '@/lib/mockData'
-import { getHighlightMetaParts } from '@/lib/highlightMeta'
+import { getHighlightMetaParts, isPrimaryHighlight, sortHighlightsByPrimary } from '@/lib/highlightMeta'
 
 const STEP_NUMS: Record<string, number> = {
   login: 0, verify: 1, linkid: 2, keywords: 3, sns: 4,
@@ -668,8 +668,9 @@ function Step6Contact() {
 function Step7Highlight() {
   const store = useByroStore()
   const [pickerOpen, setPickerOpen] = useState(false)
-  const [sheetMode, setSheetMode] = useState<'picker' | 'form' | 'cert'>('picker')
+  const [sheetMode, setSheetMode] = useState<'picker' | 'group' | 'form' | 'cert'>('picker')
   const [selectedCert, setSelectedCert] = useState<(typeof CERTIFICATION_HIGHLIGHTS)[number] | null>(null)
+  const [editingHighlightId, setEditingHighlightId] = useState<string | null>(null)
 
   // 직접 입력 폼 상태
   const [selectedCat, setSelectedCat] = useState<typeof HIGHLIGHT_CATEGORIES[0] | null>(null)
@@ -690,9 +691,14 @@ function Step7Highlight() {
   const educationNeedsMajor = hlSchoolType !== '고등학교'
   const currentYear = new Date().getFullYear()
   const yearOptions = Array.from({ length: currentYear - 1979 }, (_, index) => String(currentYear - index))
+  const selectedCategoryHighlights = selectedCat
+    ? sortHighlightsByPrimary(
+      store.highlights.filter((item) => item.categoryId === selectedCat.id),
+      store.primaryHighlightOverrides[selectedCat.id],
+    )
+    : []
 
   const resetForm = () => {
-    setSelectedCat(null)
     setHlTitle('')
     setHlRole('')
     setHlSchoolType('')
@@ -702,7 +708,32 @@ function Step7Highlight() {
     setHlEndYear('')
     setHlEducationYear('')
     setHlDesc('')
+    setEditingHighlightId(null)
     setYearPickerTarget(null)
+  }
+
+  const openFormForCategory = (cat: typeof HIGHLIGHT_CATEGORIES[0]) => {
+    setSelectedCat(cat)
+    resetForm()
+    setSheetMode('form')
+  }
+
+  const openEditForm = (highlight: Highlight) => {
+    const cat = HIGHLIGHT_CATEGORIES.find((item) => item.id === highlight.categoryId)
+    if (!cat) return
+    setSelectedCat(cat)
+    setEditingHighlightId(highlight.id)
+    setHlTitle(highlight.title)
+    setHlRole(typeof highlight.metadata?.role === 'string' ? highlight.metadata.role : '')
+    setHlSchoolType(typeof highlight.metadata?.schoolType === 'string' ? highlight.metadata.schoolType : '')
+    setHlDegree(typeof highlight.metadata?.degree === 'string' ? highlight.metadata.degree : '')
+    setHlStatus(typeof highlight.metadata?.status === 'string' ? highlight.metadata.status : '')
+    const [parsedStart = '', parsedEnd = ''] = highlight.year.split(' - ')
+    setHlStartYear(typeof highlight.metadata?.startYear === 'string' ? highlight.metadata.startYear : parsedStart)
+    setHlEndYear(typeof highlight.metadata?.endYear === 'string' ? highlight.metadata.endYear : (parsedEnd === '현재' ? '' : parsedEnd))
+    setHlEducationYear(highlight.categoryId !== 'career-role' ? highlight.year : '')
+    setHlDesc(highlight.description)
+    setSheetMode('form')
   }
 
   const handleAddHighlight = () => {
@@ -752,7 +783,7 @@ function Step7Highlight() {
     } else if (isCareerRole) {
       metadata = { status: hlStatus, role: hlRole, startYear: hlStartYear, endYear: hlStatus === '종료' ? hlEndYear : '' }
     }
-    store.addHighlight({
+    const payload = {
       categoryId: selectedCat.id,
       icon: selectedCat.icon as HighlightIconId,
       title: hlTitle,
@@ -762,11 +793,17 @@ function Step7Highlight() {
         ? `${hlStartYear} - ${hlStatus === '재직 중' ? '현재' : hlEndYear}`
         : hlEducationYear,
       metadata,
-    })
+    }
+    if (editingHighlightId) {
+      store.updateHighlight(editingHighlightId, payload)
+    } else {
+      store.addHighlight(payload)
+    }
+    const preservedCategory = selectedCat
     resetForm()
-    setPickerOpen(false)
-    setSheetMode('picker')
-    showToast('하이라이트가 추가됐어요!')
+    setSelectedCat(preservedCategory)
+    setSheetMode('group')
+    showToast(editingHighlightId ? '하이라이트를 수정했어요!' : '하이라이트가 추가됐어요!')
   }
 
   return (
@@ -866,7 +903,7 @@ function Step7Highlight() {
                               return
                             }
                             setSelectedCat(cat)
-                            setSheetMode('form')
+                            setSheetMode('group')
                           }}
                           className="relative overflow-visible rounded-[20px] border border-[var(--color-border-default)] bg-white px-3 py-4 text-center shadow-[0_4px_14px_rgba(17,17,17,0.03)]"
                         >
@@ -889,11 +926,111 @@ function Step7Highlight() {
           </div>
         )}
 
+        {sheetMode === 'group' && selectedCat && (
+          <div className="px-5 pb-6">
+            <div className="flex items-center mb-4">
+              <button onClick={() => { resetForm(); setSelectedCat(null); setSheetMode('picker') }} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+              <div className="text-[18px] font-black text-[var(--color-text-strong)]">{selectedCat.label} 관리</div>
+            </div>
+
+            <div className="surface-card mb-4 rounded-[26px] px-4 py-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
+                  <HighlightIcon id={selectedCat.icon as HighlightIconId} size={18} />
+                </div>
+                <div>
+                  <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{selectedCat.label}</div>
+                  <div className="micro-text">여러 항목을 추가하고 메인으로 보여줄 항목을 고를 수 있어요</div>
+                </div>
+              </div>
+            </div>
+
+            {selectedCategoryHighlights.length > 0 ? (
+              <div className="space-y-3 mb-4">
+                {selectedCategoryHighlights.map((item) => {
+                  const metaParts = getHighlightMetaParts(item)
+                  return (
+                    <div key={item.id} className="surface-card rounded-[24px] p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{item.title}</div>
+                          {metaParts.length > 0 && (
+                            <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                              {metaParts.map((part, index) => (
+                                <span
+                                  key={`${item.id}-meta-${index}`}
+                                  className={`text-[11px] ${index === 0 ? 'font-semibold text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'}`}
+                                >
+                                  {part}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          {item.description?.trim() && (
+                            <p className="mt-3 text-[14px] leading-7 text-[var(--color-text-secondary)]">{item.description}</p>
+                          )}
+                        </div>
+                        {isPrimaryHighlight(item, store.primaryHighlightOverrides[selectedCat.id]) ? (
+                          <span className="rounded-full bg-[#E8F5EC] px-2.5 py-1 text-[11px] font-semibold text-[#217A43]">메인 노출 중</span>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              store.setHighlightPrimary(selectedCat.id, item.id)
+                              showToast('메인 항목으로 설정했어요')
+                            }}
+                            className="rounded-full border border-[#D7D0C8] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-secondary)]"
+                          >
+                            메인으로 설정
+                          </button>
+                        )}
+                      </div>
+                      <div className="mt-4 flex gap-2">
+                        <button
+                          onClick={() => openEditForm(item)}
+                          className="rounded-lg border border-[#CFC7BF] px-3 py-1.5 text-xs font-medium text-[#555]"
+                        >
+                          수정
+                        </button>
+                        <button
+                          onClick={() => {
+                            store.removeHighlight(item.id)
+                            showToast('삭제됐어요')
+                          }}
+                          className="rounded-lg border border-[#F2C7C5] px-3 py-1.5 text-xs font-medium text-[#C9473D]"
+                        >
+                          삭제
+                        </button>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="rounded-[22px] border border-dashed border-[#E7E2DC] bg-white px-4 py-10 text-center text-sm text-[#A29B93] mb-4">
+                아직 추가한 {selectedCat.label.toLowerCase()} 항목이 없어요
+              </div>
+            )}
+
+            <Button
+              onClick={() => {
+                if (highlightLimitReached) {
+                  showToast('하이라이트는 최대 5개까지 추가할 수 있어요')
+                  return
+                }
+                openFormForCategory(selectedCat)
+              }}
+              disabled={highlightLimitReached}
+            >
+              + {selectedCat.label} 추가
+            </Button>
+          </div>
+        )}
+
         {sheetMode === 'form' && (
           <div className="px-5 pb-6">
             <div className="flex items-center mb-4">
-              <button onClick={() => setSheetMode('picker')} className="text-xl text-[#555] mr-3 leading-none">‹</button>
-              <div className="text-[18px] font-black text-[var(--color-text-strong)]">직접 입력 하이라이트</div>
+              <button onClick={() => setSheetMode(selectedCat ? 'group' : 'picker')} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+              <div className="text-[18px] font-black text-[var(--color-text-strong)]">{editingHighlightId ? '하이라이트 수정하기' : '직접 입력 하이라이트'}</div>
             </div>
 
             {selectedCat && (
@@ -1064,8 +1201,8 @@ function Step7Highlight() {
                 )}
               </div>
               <div className="mt-4 flex gap-2">
-                <Button variant="outline" onClick={() => setSheetMode('picker')}>이전</Button>
-                <Button onClick={handleAddHighlight} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && (!hlRole.trim() || !hlStatus || !hlStartYear || (hlStatus === '종료' && !hlEndYear))) || (isEducationHistory && (!hlSchoolType || (educationNeedsDegree && !hlDegree) || (educationNeedsMajor && !hlRole.trim()) || !hlStatus))}>저장하기</Button>
+                <Button variant="outline" onClick={() => setSheetMode(selectedCat ? 'group' : 'picker')}>이전</Button>
+                <Button onClick={handleAddHighlight} disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && (!hlRole.trim() || !hlStatus || !hlStartYear || (hlStatus === '종료' && !hlEndYear))) || (isEducationHistory && (!hlSchoolType || (educationNeedsDegree && !hlDegree) || (educationNeedsMajor && !hlRole.trim()) || !hlStatus))}>{editingHighlightId ? '수정하기' : '저장하기'}</Button>
               </div>
             </div>
           </div>

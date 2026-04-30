@@ -2,20 +2,16 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { BadgeCheck, ChevronDown, ChevronUp, Camera, Mail, MessageCircle, Phone } from 'lucide-react'
+import { BadgeCheck, ChevronDown, ChevronRight, ChevronUp, Camera, Mail, MessageCircle, Phone } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { Button, BottomSheet, Modal, YearPickerSheet, showToast, TextArea } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
-import { CareerContinuityChart } from '@/components/highlights/CareerContinuityChart'
-import { CorporateLongevityTimeline } from '@/components/highlights/CorporateLongevityTimeline'
-import { RememberNetworkGraph } from '@/components/highlights/RememberNetworkGraph'
-import { AirlineMileageSummary } from '@/components/highlights/AirlineMileageSummary'
 import type { Highlight, ContactChannel, UserState, HighlightIconId } from '@/types'
 import {
   SAMPLE_PROFILE, INSTAGRAM_PROFILE, LINKEDIN_PROFILE, getProfileAvatar,
   HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS, KEYWORD_GROUPS,
 } from '@/lib/mockData'
-import { getGroupedHighlightPreview, getHighlightDetailFootnote, getHighlightMetaParts, isPrimaryHighlight, sortHighlightsByPrimary } from '@/lib/highlightMeta'
+import { getGroupedHighlightPreview, getHighlightMetaParts, isPrimaryHighlight, sortHighlightsByPrimary } from '@/lib/highlightMeta'
 import PublicProfile from '@/components/screens/profile/PublicProfile'
 
 type Screen = 'preview' | 'manage' | 'editBasic' | 'editHighlight' | 'editSNS' | 'editReputation' | 'editContact' | 'editGuestbook'
@@ -746,29 +742,36 @@ function HighlightManageScreen({
   const selectedCategoryHighlights = selectedCat
     ? sortHighlightsByPrimary(allManualHighlights.filter((item) => item.categoryId === selectedCat.id), store.primaryHighlightOverrides[selectedCat.id])
     : []
-  const groupedHighlights = HIGHLIGHT_GROUPS.map((group) => {
-    const verifiedItems = CERTIFICATION_ITEMS.filter((item) => {
-      const category = HIGHLIGHT_CATEGORIES.find((cat) => cat.id === item.categoryId)
-      return category?.group === group.id
-    }).map((item) => ({ kind: 'verified' as const, item }))
+  const groupedCategoryCards = HIGHLIGHT_GROUPS.map((group) => ({
+    ...group,
+    items: HIGHLIGHT_CATEGORIES
+      .filter((cat) => cat.group === group.id)
+      .map((cat) => {
+        if (cat.certificationOnly) {
+          const certItem = CERTIFICATION_ITEMS.find((item) => item.categoryId === cat.id)
+          return {
+            kind: 'verified' as const,
+            category: cat,
+            title: VERIFIED_HIGHLIGHT_SUMMARIES[cat.id] ?? certItem?.summary ?? '',
+            meta: certItem?.automated ? '본인 확인 후 자동 연동' : '명함 파일 제출 후 확인',
+            countLabel: '인증 항목',
+          }
+        }
 
-    const manualItems = allManualHighlights.filter(
-      (item) => HIGHLIGHT_CATEGORIES.find((cat) => cat.id === item.categoryId)?.group === group.id,
-    )
-
-    const manualGroups = Array.from(new Map(
-      manualItems.map((item) => [item.categoryId, sortHighlightsByPrimary(manualItems.filter((manual) => manual.categoryId === item.categoryId), store.primaryHighlightOverrides[item.categoryId])]),
-    ).entries()).map(([categoryId, items]) => ({
-      kind: 'manual-group' as const,
-      categoryId,
-      items,
-    }))
-
-    return {
-      ...group,
-      items: [...verifiedItems, ...manualGroups],
-    }
-  })
+        const items = sortHighlightsByPrimary(
+          allManualHighlights.filter((item) => item.categoryId === cat.id),
+          store.primaryHighlightOverrides[cat.id],
+        )
+        const preview = getGroupedHighlightPreview(items, store.primaryHighlightOverrides[cat.id])
+        return {
+          kind: 'manual' as const,
+          category: cat,
+          title: preview.title || `${cat.label} 항목 추가`,
+          meta: preview.meta || '아직 추가된 항목이 없어요',
+          countLabel: items.length > 0 ? `${items.length}개 항목` : '0개 항목',
+        }
+      }),
+  }))
 
   const openEditSheet = (hl: Highlight) => {
     const cat = HIGHLIGHT_CATEGORIES.find((c) => c.id === hl.categoryId) ?? null
@@ -829,10 +832,6 @@ function HighlightManageScreen({
     setSelectedCat(preservedCategory)
     showToast(editingHl ? '수정됐어요!' : '추가됐어요!')
   }
-
-  const [certOpen, setCertOpen] = useState<Record<string, boolean>>({})
-
-  const toggleCert = (title: string) => setCertOpen((p) => ({ ...p, [title]: !p[title] }))
 
   const resetAddForm = () => {
     setSelectedCat(null)
@@ -921,7 +920,7 @@ function HighlightManageScreen({
     return (
       <div className="flex flex-col h-full">
         <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
-          <button onClick={() => { resetAddForm(); setMode('picker') }} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+          <button onClick={() => { resetAddForm(); setMode('list') }} className="text-xl text-[#555] mr-3 leading-none">‹</button>
           <span className="text-base font-black">{selectedCat.label} 관리</span>
         </div>
 
@@ -1261,165 +1260,62 @@ function HighlightManageScreen({
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-4 pb-8">
-        <div className="rounded-[18px] bg-[#EEF8F0] px-4 py-3 text-sm font-semibold text-[#3F7B54] mb-6">
-          표시 항목은 인증 연동이 가능해요
+        <div className="surface-card rounded-[24px] px-4 py-4 mb-5">
+          <div className="text-[17px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">하이라이트 관리</div>
+          <div className="mt-1 text-sm leading-6 text-[var(--color-text-secondary)]">
+            카테고리별로 항목을 정리하고, 메인으로 보여줄 내용을 선택하세요.
+          </div>
         </div>
 
         <div className="space-y-6">
-          {groupedHighlights.map((group) => (
+          {groupedCategoryCards.map((group) => (
             <div key={group.id}>
-              <div className="mb-3 text-sm font-bold text-[#7E766E]">{group.label}</div>
+              <div className="mb-3 flex items-center gap-3">
+                <div className="text-sm font-bold text-[#7E766E]">{group.label}</div>
+                <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
+              </div>
               {group.items.length > 0 ? (
                 <div className="space-y-3">
                   {group.items.map((entry) => {
-                    if (entry.kind === 'verified') {
-                      const isOpen = certOpen[entry.item.title]
-                      return (
-                        <div key={entry.item.categoryId} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
-                          <button onClick={() => toggleCert(entry.item.title)} className="flex w-full items-center gap-3 px-4 py-4 text-left">
-                            <span className="flex h-11 w-8 items-center justify-center text-[var(--color-text-strong)]">
-                              <HighlightIcon id={entry.item.icon as HighlightIconId} size={18} />
-                            </span>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{entry.item.title}</span>
-                                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-[#217A43] shadow-[0_2px_8px_rgba(17,17,17,0.08)]">
-                                  <BadgeCheck size={12} />
-                                </span>
-                              </div>
-                              <div className="mt-1 text-[15px] font-bold text-[var(--color-text-strong)]">
-                                {VERIFIED_HIGHLIGHT_SUMMARIES[entry.item.categoryId] ?? entry.item.summary}
-                              </div>
-                            </div>
-                            {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
-                          </button>
-                          {isOpen && (
-                            <div className="border-t border-[#F1ECE6] bg-[#FBFAF8] px-4 py-4">
-                              {entry.item.categoryId === 'career-continuity' && (
-                                <CareerContinuityChart
-                                  avgYears={SAMPLE_PROFILE.careerHighlight.avgYears}
-                                  vsIndustryPercent={SAMPLE_PROFILE.careerHighlight.vsIndustryPercent}
-                                />
-                              )}
-                              {entry.item.categoryId === 'corporate-longevity' && (
-                                <CorporateLongevityTimeline
-                                  summary={SAMPLE_PROFILE.corporateHighlight.summary}
-                                  companies={SAMPLE_PROFILE.corporateHighlight.companies}
-                                />
-                              )}
-                              {entry.item.categoryId === 'remember-network' && (
-                                <RememberNetworkGraph
-                                  total={SAMPLE_PROFILE.rememberHighlight.total}
-                                  industries={SAMPLE_PROFILE.rememberHighlight.industries}
-                                />
-                              )}
-                              {entry.item.categoryId === 'airline-mileage' && (
-                                <AirlineMileageSummary
-                                  badgeLabel="글로벌 비즈니스"
-                                  tierSummary={SAMPLE_PROFILE.airlineHighlight.tierSummary}
-                                  airlines={SAMPLE_PROFILE.airlineHighlight.airlines}
-                                />
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      )
-                    }
-
                     return (
-                      <div key={`${entry.categoryId}-${group.id}`} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
-                        <div className="flex gap-3 px-4 py-2.5">
-                          <span className="flex h-11 w-8 shrink-0 items-center justify-center self-start pt-[18px] text-[var(--color-text-strong)]">
-                            <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={18} />
-                          </span>
-                          <div className="min-w-0 flex-1">
-                            {(() => {
-                              const categoryLabel = HIGHLIGHT_CATEGORIES.find((categoryItem) => categoryItem.id === entry.categoryId)?.label ?? '직접 입력'
-                              const isGroupOpen = certOpen[entry.categoryId]
-                              const preview = getGroupedHighlightPreview(entry.items, store.primaryHighlightOverrides[entry.categoryId])
-                              return (
-                                <>
-                                  <button onClick={() => toggleCert(entry.categoryId)} className="flex w-full items-center gap-3 text-left">
-                                    <div className="min-w-0 flex-1">
-                                      <div className="mb-1.5 text-[11px] font-semibold text-[var(--color-text-secondary)]">
-                                        {categoryLabel}
-                                      </div>
-                                      <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
-                                        {preview.title}
-                                      </div>
-                                      {preview.meta && (
-                                        <div className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">{preview.meta}</div>
-                                      )}
-                                    </div>
-                                    {isGroupOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
-                                  </button>
-                                  {isGroupOpen && (
-                                    <div className="pt-3 pb-3 pr-4 space-y-3">
-                                        {entry.items.map((item) => {
-                                          const isEditable = store.highlights.some((highlight) => highlight.id === item.id)
-                                          const metaParts = getHighlightMetaParts(item)
-                                          return (
-                                            <div key={item.id} className="rounded-[18px] border border-[#F0ECE7] bg-[#FBFAF8] px-3.5 py-3">
-                                              <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{item.title}</div>
-                                              {metaParts.length > 0 && (
-                                                <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                                  {metaParts.map((part, partIndex) => (
-                                                    <span
-                                                      key={`${item.id}-meta-${partIndex}`}
-                                                      className={`text-[11px] ${partIndex === 0 ? 'font-semibold text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'}`}
-                                                    >
-                                                      {part}
-                                                    </span>
-                                                  ))}
-                                                </div>
-                                              )}
-                                              {(item.description?.trim() || item.linkUrl) && (
-                                                <div className="mt-3 space-y-3">
-                                                  {item.description?.trim() && (
-                                                    <p className="text-[14px] leading-7 text-[var(--color-text-secondary)]">
-                                                      {item.description}
-                                                    </p>
-                                                  )}
-                                                  <div className="micro-text">
-                                                    {getHighlightDetailFootnote(item, categoryLabel)}
-                                                  </div>
-                                                </div>
-                                              )}
-                                              <div className="mt-3 flex gap-2 pt-0.5">
-                                                <button
-                                                  onClick={() => {
-                                                    if (isEditable) openEditSheet(item)
-                                                    else showToast('기본 목업 항목은 수정하지 않습니다')
-                                                  }}
-                                                  className="rounded-lg border border-[#CFC7BF] px-3 py-1.5 text-xs font-medium text-[#555]"
-                                                >
-                                                  수정
-                                                </button>
-                                                <button
-                                                  onClick={() => {
-                                                    if (isEditable) {
-                                                      store.removeHighlight(item.id)
-                                                      showToast('삭제됐어요')
-                                                      return
-                                                    }
-                                                    showToast('기본 목업 항목은 삭제하지 않습니다')
-                                                  }}
-                                                  className="rounded-lg border border-[#F2C7C5] px-3 py-1.5 text-xs font-medium text-[#C9473D]"
-                                                >
-                                                  삭제
-                                                </button>
-                                              </div>
-                                            </div>
-                                          )
-                                        })}
-                                    </div>
-                                  )}
-                                </>
-                              )
-                            })()}
+                      <button
+                        key={`${entry.category.id}-${group.id}`}
+                        onClick={() => {
+                          if (entry.kind === 'verified') {
+                            const certItem = CERTIFICATION_ITEMS.find((item) => item.categoryId === entry.category.id)
+                            if (certItem) {
+                              setSelectedCert(certItem)
+                              setMode('cert')
+                            }
+                            return
+                          }
+                          setSelectedCat(entry.category)
+                          setMode('group')
+                        }}
+                        className="flex w-full items-center gap-3 rounded-[22px] border border-[#E7E2DC] bg-white px-4 py-4 text-left"
+                      >
+                        <span className="flex h-11 w-8 shrink-0 items-center justify-center text-[var(--color-text-strong)]">
+                          <HighlightIcon id={entry.category.icon as HighlightIconId} size={18} />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{entry.category.label}</span>
+                            {entry.kind === 'verified' && (
+                              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-[#217A43] shadow-[0_2px_8px_rgba(17,17,17,0.08)]">
+                                <BadgeCheck size={12} />
+                              </span>
+                            )}
+                          </div>
+                          <div className="mt-1 text-[15px] font-bold text-[var(--color-text-strong)]">
+                            {entry.title}
+                          </div>
+                          <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
+                            <span className="text-[11px] text-[var(--color-text-tertiary)]">{entry.meta}</span>
+                            <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{entry.countLabel}</span>
                           </div>
                         </div>
-                      </div>
+                        <ChevronRight size={16} color="#888" />
+                      </button>
                     )
                   })}
                 </div>

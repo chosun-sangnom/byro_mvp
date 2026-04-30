@@ -340,7 +340,7 @@ export default function PublicProfile({
               <div className="absolute inset-x-0 bottom-0 p-5">
                 <div className="flex items-center gap-1.5">
                   <div className="text-[29px] font-black tracking-[-0.04em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.24)]">{profile.name}</div>
-                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-white/40 bg-white/95 text-[#1F8B4E] shadow-[0_8px_20px_rgba(17,17,17,0.18)]">
+                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-white/95 text-[var(--color-state-success-text)] shadow-[0_8px_20px_rgba(17,17,17,0.18)]">
                     <BadgeCheck size={14} />
                   </span>
                 </div>
@@ -569,8 +569,8 @@ export default function PublicProfile({
               <div key={group.id}>
                 <div className="mb-3 flex items-center gap-3">
                   <div className="rounded-full bg-[var(--color-bg-muted)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-text-secondary)]">{group.label}</div>
-                  <div className="h-px flex-1 bg-[#E7E2DC]" />
-                  <div className="rounded-full border border-[#E7E2DC] bg-white px-2 py-0.5 text-[10px] font-semibold text-[#9A958E]">
+                  <div className="h-px flex-1 bg-[var(--color-border-default)]" />
+                  <div className="rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-2 py-0.5 text-[10px] font-semibold text-[var(--color-text-tertiary)]">
                     {group.items.length}
                   </div>
                 </div>
@@ -582,7 +582,7 @@ export default function PublicProfile({
                         const toggleKey = `${hl.id}_${username}`
                         const isOpen = store.hlOpenStates[toggleKey] ?? false
                         return (
-                          <div key={hl.id} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
+                          <div key={hl.id} className="overflow-hidden rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)]">
                             <button
                               onClick={() => store.toggleHlOpen(toggleKey)}
                               className="flex w-full items-center gap-3 px-4 py-3 text-left"
@@ -593,16 +593,16 @@ export default function PublicProfile({
                               <div className="min-w-0 flex-1">
                                 <div className="flex flex-wrap items-center gap-2">
                                   <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{hl.title}</span>
-                                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-[#217A43] shadow-[0_2px_8px_rgba(17,17,17,0.08)]">
+                                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-[var(--color-state-success-text)] shadow-[0_2px_8px_rgba(0,0,0,0.18)]">
                                     <BadgeCheck size={12} />
                                   </span>
                                 </div>
                                 <div className="mt-1 text-[15px] font-bold text-[var(--color-text-strong)]">{hl.subtitle}</div>
                               </div>
-                              {isOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
+                              {isOpen ? <ChevronUp size={16} color="var(--color-text-tertiary)" /> : <ChevronDown size={16} color="var(--color-text-tertiary)" />}
                             </button>
                             {isOpen && (
-                          <div className="border-t border-[#F1ECE6] px-4 py-4">
+                          <div className="border-t border-[var(--color-border-soft)] px-4 py-4">
                                 {hl.categoryId === 'career-continuity' && (
                                   <CareerContinuityChart
                                     avgYears={profile.careerHighlight.avgYears}
@@ -639,7 +639,7 @@ export default function PublicProfile({
                       const isGroupOpen = store.hlOpenStates[groupToggleKey] ?? false
                       const preview = getGroupedHighlightPreview(entry.items, store.primaryHighlightOverrides[entry.categoryId])
                       return (
-                        <div key={`${entry.categoryId}-${group.id}`} className="overflow-hidden rounded-[22px] border border-[#E7E2DC] bg-white">
+                        <div key={`${entry.categoryId}-${group.id}`} className="overflow-hidden rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)]">
                           <div className="flex gap-3 px-4 py-2.5">
                             <span className="flex h-11 w-8 shrink-0 items-center justify-center self-start pt-[18px] text-[var(--color-text-strong)]">
                               <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={18} />
@@ -657,17 +657,17 @@ export default function PublicProfile({
                                     <div className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">{preview.meta}</div>
                                   )}
                                 </div>
-                                {isGroupOpen ? <ChevronUp size={16} color="#888" /> : <ChevronDown size={16} color="#888" />}
+                                {isGroupOpen ? <ChevronUp size={16} color="var(--color-text-tertiary)" /> : <ChevronDown size={16} color="var(--color-text-tertiary)" />}
                               </button>
                               {isGroupOpen && (
-                                <div className="border-t border-[#F1ECE6] px-4 py-4">
+                                <div className="border-t border-[var(--color-border-soft)] px-4 py-4">
                                   <div className="space-y-3">
                                     {entry.items.map((hl) => {
                                       const metaParts = getHighlightMetaParts(hl)
                                       return (
                                         <div
                                           key={hl.id}
-                                          className="rounded-[22px] border border-[#EEE7DE] bg-white px-4 py-4"
+                                          className="rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4"
                                         >
                                           <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{hl.title}</div>
                                           {metaParts.length > 0 && (
@@ -694,26 +694,26 @@ export default function PublicProfile({
                                                   href={hl.linkUrl}
                                                   target="_blank"
                                                   rel="noopener noreferrer"
-                                                  className="block overflow-hidden rounded-[18px] border border-[#ECE6DF] bg-[var(--color-bg-soft)] shadow-[0_8px_20px_rgba(17,17,17,0.03)]"
+                                                  className="block overflow-hidden rounded-[18px] border border-[var(--color-border-default)] bg-[var(--color-bg-muted)] shadow-[0_8px_20px_rgba(0,0,0,0.16)]"
                                                 >
                                                   <div className="flex min-h-[74px]">
                                                     {hl.thumbnailUrl ? (
-                                                      <div className="h-auto w-20 flex-shrink-0 overflow-hidden bg-[#F4F1EC]">
+                                                      <div className="h-auto w-20 flex-shrink-0 overflow-hidden bg-[var(--color-bg-soft)]">
                                                         {/* eslint-disable-next-line @next/next/no-img-element */}
                                                         <img src={hl.thumbnailUrl} alt={hl.title} className="h-full w-full object-cover" />
                                                       </div>
                                                     ) : (
-                                                      <div className="flex w-20 flex-shrink-0 items-center justify-center bg-[linear-gradient(180deg,#F6F3EF_0%,#EDE7DF_100%)] px-3 text-center">
+                                                      <div className="flex w-20 flex-shrink-0 items-center justify-center bg-[linear-gradient(180deg,#22252B_0%,#1A1C20_100%)] px-3 text-center">
                                                         <div>
-                                                          <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[#8E867E]">News</div>
-                                                          <div className="mt-1 text-[11px] font-semibold text-[#3D3833]">{hl.sourceLabel ?? '기사 링크'}</div>
+                                                          <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">News</div>
+                                                          <div className="mt-1 text-[11px] font-semibold text-[var(--color-text-primary)]">{hl.sourceLabel ?? '기사 링크'}</div>
                                                         </div>
                                                       </div>
                                                     )}
                                                     <div className="flex min-w-0 flex-1 items-center px-3.5 py-2.5">
                                                       <div className="min-w-0">
-                                                        <div className="text-[11px] font-semibold text-[#8E867E]">{hl.sourceLabel ?? '외부 링크'}</div>
-                                                        <div className="mt-1 line-clamp-2 text-[12px] font-bold leading-snug text-[#1F1B18]">{hl.title}</div>
+                                                        <div className="text-[11px] font-semibold text-[var(--color-text-tertiary)]">{hl.sourceLabel ?? '외부 링크'}</div>
+                                                        <div className="mt-1 line-clamp-2 text-[12px] font-bold leading-snug text-[var(--color-text-primary)]">{hl.title}</div>
                                                         <div className="mt-2 text-[11px] font-medium text-[var(--color-text-secondary)]">보러가기</div>
                                                       </div>
                                                     </div>
@@ -736,7 +736,7 @@ export default function PublicProfile({
                     })}
                   </div>
                 ) : (
-                  <div className="rounded-[22px] border border-dashed border-[#E7E2DC] bg-white px-4 py-10 text-center text-sm text-[#A29B93]">
+                  <div className="rounded-[22px] border border-dashed border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-10 text-center text-sm text-[var(--color-text-tertiary)]">
                     아직 {group.label.toLowerCase()}이 없어요
                   </div>
                 )}
@@ -790,7 +790,7 @@ export default function PublicProfile({
         {store.isLoggedIn ? (
           <div className="px-5 pb-6">
             <div className="text-sm font-black mb-1">{profile.name}에게 경험 남기기</div>
-            <div className="text-xs text-[#888] mb-4">{store.user?.name ?? '나'}으로 남겨져요</div>
+            <div className="text-xs text-[var(--color-text-secondary)] mb-4">{store.user?.name ?? '나'}으로 남겨져요</div>
             <div className="flex flex-wrap gap-2 mb-4">
               {experienceOptions.map((kw) => (
                 <Chip
@@ -805,16 +805,16 @@ export default function PublicProfile({
                 />
               ))}
             </div>
-            <div className="text-xs text-[#888] mb-1">한마디 (선택)</div>
+            <div className="text-xs text-[var(--color-text-secondary)] mb-1">한마디 (선택)</div>
             <TextArea value={store.experienceMessage} onChange={store.setExperienceMessage}
               placeholder="이 분과의 경험을 한마디로 남겨보세요" maxLength={100} rows={3} />
-            <div className="mt-4 text-xs text-[#888] mb-3">{store.user?.name ?? '나'}으로 남기기</div>
+            <div className="mt-4 text-xs text-[var(--color-text-secondary)] mb-3">{store.user?.name ?? '나'}으로 남기기</div>
             <Button onClick={handleExpSubmit}>경험 남기기</Button>
           </div>
         ) : (
           <div className="px-5 pb-6">
             <div className="text-sm font-black text-white mb-1">{profile.name}에게 경험 남기기</div>
-            <div className="text-xs text-[#aaa] mb-4">익명 사용자로 남겨져요</div>
+            <div className="text-xs text-[var(--color-text-tertiary)] mb-4">익명 사용자로 남겨져요</div>
             <div className="flex flex-wrap gap-2 mb-4">
               {experienceOptions.map((kw) => (
                 <Chip key={kw} label={kw} dark
@@ -831,7 +831,7 @@ export default function PublicProfile({
             <TextArea value={store.experienceMessage} onChange={store.setExperienceMessage}
               placeholder="이 분과의 경험을 한마디로 남겨보세요" maxLength={100} rows={3} dark />
             <div className="mt-4">
-              <button onClick={handleExpSubmit} className="w-full bg-white text-[#0A0A0A] font-bold py-3 rounded-xl text-sm mb-3">
+              <button onClick={handleExpSubmit} className="w-full bg-[var(--color-accent-dark)] text-[#111111] font-bold py-3 rounded-xl text-sm mb-3">
                 경험 남기기
               </button>
               <div className="flex items-center gap-2 my-3">
@@ -840,7 +840,7 @@ export default function PublicProfile({
                 <div className="flex-1 h-px bg-[#333]" />
               </div>
               <button onClick={() => { setExpSheetOpen(false); store.login() }}
-                className="w-full border border-[#555] text-white font-bold py-3 rounded-xl text-sm">
+                className="w-full border border-[var(--color-border-default)] text-[var(--color-text-strong)] font-bold py-3 rounded-xl text-sm">
                 로그인하기
               </button>
             </div>
@@ -852,8 +852,8 @@ export default function PublicProfile({
       <BottomSheet open={memoSheetOpen} onClose={() => setMemoSheetOpen(false)}>
         <div className="px-5 pb-6">
           <div className="text-sm font-black mb-1">프로필 저장</div>
-          <div className="text-xs text-[#888] mb-4">{profile.name}</div>
-          <div className="text-xs text-[#555] mb-1">메모 (선택)</div>
+          <div className="text-xs text-[var(--color-text-secondary)] mb-4">{profile.name}</div>
+          <div className="text-xs text-[var(--color-text-secondary)] mb-1">메모 (선택)</div>
           <TextArea
             value={memoText}
             onChange={setMemoText}
@@ -912,7 +912,7 @@ function SectionTitle({
 }) {
   return (
     <div className="mb-4">
-      <div className="inline-flex rounded-full bg-[#171717] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white">
+      <div className="inline-flex rounded-full bg-[var(--color-bg-soft)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-strong)] border border-[var(--color-border-default)]">
         {title}
       </div>
       {subtitle && <div className="text-[11px] text-[var(--color-text-tertiary)] mt-1">{subtitle}</div>}
@@ -938,15 +938,15 @@ function ContactActionButton({
     <button
       onClick={onClick}
       className={[
-        'rounded-[20px] border border-[var(--color-border-default)] bg-white/92 px-2 py-3 text-center shadow-[0_8px_18px_rgba(26,21,48,0.04)] transition-colors',
-        channel.enabled ? 'text-[#222]' : 'text-[#B4B4B4]',
+        'rounded-[20px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-2 py-3 text-center shadow-[0_8px_18px_rgba(0,0,0,0.18)] transition-colors',
+        channel.enabled ? 'text-[var(--color-text-primary)]' : 'text-[var(--color-text-tertiary)]',
       ].join(' ')}
     >
       <div className={[
         'mx-auto mb-2 flex h-11 w-11 items-center justify-center rounded-[14px] border',
         channel.enabled
-          ? 'border-[#E7E7E7] bg-[var(--color-bg-muted)] shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]'
-          : 'border-[#EFEFEF] bg-white/70',
+          ? 'border-[var(--color-border-default)] bg-[var(--color-bg-muted)] shadow-[inset_0_1px_0_rgba(255,255,255,0.04)]'
+          : 'border-[var(--color-border-default)] bg-[var(--color-bg-soft)]',
       ].join(' ')}>
         <Icon size={16} />
       </div>

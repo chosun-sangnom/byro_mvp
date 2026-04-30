@@ -138,8 +138,8 @@ export function Button({
       onClick={onClick}
       disabled={disabled}
       className={[
-        'rounded-[18px] font-semibold tracking-[-0.02em] active:scale-[0.985] transition-all duration-100 select-none',
-        size === 'md' ? 'px-4 py-3 text-sm' : 'px-3 py-2 text-xs',
+        'rounded-xl font-semibold active:scale-[0.98] transition-all duration-100 select-none',
+        size === 'md' ? 'px-5 py-3 text-[14px]' : 'px-3.5 py-2 text-[13px]',
         fullWidth ? 'w-full' : '',
         disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer',
         BUTTON_VARIANTS[variant] ?? BUTTON_VARIANTS.primary,
@@ -147,16 +147,16 @@ export function Button({
       ].join(' ')}
       style={{
         backgroundColor:
-          variant === 'primary' ? '#F3EFE7'
-            : variant === 'outline' ? 'rgba(255,255,255,0.02)'
+          variant === 'primary' ? 'var(--color-accent-dark)'
+            : variant === 'outline' ? 'transparent'
               : variant === 'google' ? 'var(--color-bg-surface)'
             : variant === 'danger' ? 'rgba(54,27,26,0.28)'
               : variant === 'ghost' ? 'transparent'
               : undefined,
         color:
-          variant === 'primary' ? '#111111'
-            : variant === 'outline' ? 'var(--color-text-primary)'
-            : variant === 'ghost' ? 'var(--color-text-secondary)'
+          variant === 'primary' ? '#ffffff'
+            : variant === 'outline' ? 'var(--color-text-secondary)'
+            : variant === 'ghost' ? 'var(--color-text-tertiary)'
               : variant === 'google' ? 'var(--color-text-primary)'
                 : variant === 'danger' ? 'var(--color-state-danger-text)'
                   : undefined,
@@ -165,12 +165,6 @@ export function Button({
             : variant === 'google' ? 'var(--color-border-default)'
               : variant === 'danger' ? 'rgba(240,161,154,0.42)'
                 : undefined,
-        boxShadow:
-          variant === 'primary'
-            ? '0 10px 24px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.32)'
-            : variant === 'outline'
-              ? 'inset 0 1px 0 rgba(255,255,255,0.03)'
-              : undefined,
         ...style,
       }}
     >
@@ -187,31 +181,17 @@ interface ChipProps {
   dark?: boolean
 }
 
-export function Chip({ label, selected, onClick, dark }: ChipProps) {
-  if (dark) {
-    return (
-      <button
-        onClick={onClick}
-        className={[
-          'px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-100 select-none',
-          selected
-            ? 'bg-white text-[#0A0A0A] border-white'
-            : 'bg-transparent text-[#aaa] border-[#444]',
-        ].join(' ')}
-      >
-        {label}
-      </button>
-    )
-  }
+export function Chip({ label, selected, onClick }: ChipProps) {
   return (
     <button
       onClick={onClick}
       className={[
         'px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-100 select-none',
         selected
-          ? 'bg-[var(--color-accent-dark)] text-[#111111] border-[var(--color-accent-dark)]'
+          ? 'border-[var(--color-accent-dark)] text-white'
           : 'bg-[var(--color-bg-soft)] text-[var(--color-text-secondary)] border-[var(--color-border-default)]',
       ].join(' ')}
+      style={selected ? { backgroundColor: 'var(--color-accent-dark)' } : undefined}
     >
       {label}
     </button>
@@ -296,15 +276,13 @@ export function BottomSheet({ open, onClose, children, dark }: BottomSheetProps)
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-              className={[
-                'mx-auto w-full max-w-[430px] rounded-t-2xl max-h-[80dvh] overflow-y-auto pb-[max(env(safe-area-inset-bottom),16px)]',
-                dark ? 'bg-[#1a1a1a]' : 'bg-white',
-              ].join(' ')}
+              className="mx-auto w-full max-w-[430px] rounded-t-2xl max-h-[80dvh] overflow-y-auto pb-[max(env(safe-area-inset-bottom),16px)] border-t border-x"
+              style={{
+                backgroundColor: 'var(--color-bg-surface)',
+                borderColor: 'var(--color-border-default)',
+              }}
             >
-              <div className={[
-                'w-8 h-1 rounded-full mx-auto mt-3 mb-2',
-                dark ? 'bg-[#555]' : 'bg-[#ddd]',
-              ].join(' ')} />
+              <div className="w-8 h-1 rounded-full mx-auto mt-3 mb-2 bg-[var(--color-border-default)]" />
               {children}
             </motion.div>
           </div>
@@ -341,10 +319,10 @@ export function YearPickerSheet({
                     onSelect(option)
                     onClose()
                   }}
-                  className="flex w-full items-center justify-between rounded-[18px] px-4 py-3 text-left"
+                  className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left"
                   style={{
                     backgroundColor: selected ? 'var(--color-accent-dark)' : 'transparent',
-                    color: selected ? '#fff' : 'var(--color-text-primary)',
+                    color: selected ? '#ffffff' : 'var(--color-text-primary)',
                   }}
                 >
                   <span className="text-sm font-semibold">{option}</span>
@@ -375,15 +353,20 @@ export function Modal({ open, onClose, children }: ModalProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="absolute inset-0 bg-black/45"
+            className="absolute inset-0 bg-black/60"
             onClick={onClose}
           />
           <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
+            initial={{ scale: 0.94, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
-            transition={{ duration: 0.22 }}
-            className="relative bg-white rounded-2xl p-5 w-[260px] z-10 shadow-2xl"
+            exit={{ scale: 0.94, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="relative rounded-2xl p-5 w-[272px] z-10 border"
+            style={{
+              backgroundColor: 'var(--color-bg-surface)',
+              borderColor: 'var(--color-border-default)',
+              boxShadow: '0 24px 48px rgba(0,0,0,0.4)',
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             {children}

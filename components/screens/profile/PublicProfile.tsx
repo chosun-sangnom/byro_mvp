@@ -364,13 +364,13 @@ export default function PublicProfile({
               <div className="flex gap-2 mt-4">
                 <button
                   onClick={onOpenArchive}
-                  className="flex-1 rounded-[18px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm font-semibold text-[var(--color-text-secondary)]"
+                  className="flex-1 rounded-xl border border-[var(--color-border-default)] px-4 py-3 text-[14px] font-semibold text-[var(--color-text-secondary)] active:scale-[0.98] transition-all duration-100"
                 >
                   아카이브
                 </button>
                 <button
                   onClick={onOpenManage}
-                  className="flex-1 rounded-[18px] bg-[var(--color-accent-dark)] px-4 py-3 text-sm font-semibold text-[#111111]"
+                  className="flex-1 rounded-xl bg-[var(--color-accent-dark)] px-4 py-3 text-[14px] font-semibold text-white active:scale-[0.98] transition-all duration-100"
                 >
                   Byro 편집
                 </button>
@@ -437,425 +437,324 @@ export default function PublicProfile({
         </div>
 
         {/* ─── SNS 섹션 ─────────────────────────────── */}
-        <div className="px-5 py-4">
-          <SectionTitle
-            title="SNS"
-          />
-
-          {profile.instagramConnected && (
-            <div className="mb-4 border-b border-[var(--color-border-soft)] pb-4">
-              <div className="flex items-center gap-3 py-1">
-                <button
-                  onClick={() => store.toggleSnsOpen('instagram_' + username)}
-                  className="flex min-w-0 flex-1 items-center text-left"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/images/Instagram.svg" alt="Instagram" className="w-5 h-5 mr-2 flex-shrink-0" />
-                  <div className="min-w-0">
-                    <div className="text-[15px] font-semibold tracking-[-0.02em] text-[var(--color-text-strong)]">Instagram
-                      <span className="ml-1.5 text-[10px] font-bold rounded-full px-2 py-0.5" style={{ color: 'var(--color-state-success-text)', backgroundColor: 'var(--color-state-success-bg)' }}>연동됨</span>
+        <div className="px-5 pt-6 pb-2">
+          <SectionTitle title="SNS" />
+          {(profile.instagramConnected || profile.linkedinConnected) ? (
+            <div className="divide-y divide-[var(--color-border-soft)]">
+              {profile.instagramConnected && (
+                <div>
+                  <button
+                    onClick={() => store.toggleSnsOpen('instagram_' + username)}
+                    className="flex w-full items-center gap-3.5 py-3.5 text-left"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/images/Instagram.svg" alt="Instagram" className="w-[18px] h-[18px] flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">Instagram</div>
+                      <div className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5">@{profile.instagram.username}</div>
                     </div>
-                    <a
-                      href={profile.instagram.profileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="mt-0.5 block truncate text-[11px] font-medium text-[var(--color-text-tertiary)] underline-offset-2 hover:text-[var(--color-text-secondary)] hover:underline"
-                    >
-                      instagram.com/{profile.instagram.username}
-                    </a>
-                  </div>
-                </button>
-                <button
-                  onClick={() => store.toggleSnsOpen('instagram_' + username)}
-                  className="flex-shrink-0 p-1"
-                  aria-label={igOpen ? '인스타그램 섹션 접기' : '인스타그램 섹션 펼치기'}
-                >
-                  {igOpen ? <ChevronUp size={16} color="#8B857C" /> : <ChevronDown size={16} color="#8B857C" />}
-                </button>
-              </div>
-              {igOpen && (
-                <div className="pt-3">
-                  <div className="mb-3">
-                    <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-text-tertiary)]">AI 요약</div>
-                    <p className="text-xs leading-relaxed text-[var(--color-text-secondary)]">{profile.instagram.aiSummary}</p>
-                  </div>
-                  <div className="flex gap-2 overflow-x-auto pb-0.5 scrollbar-hide">
-                    {profile.instagram.posts.map((post) => (
-                      <button
-                        key={post.id}
-                        onClick={() => window.open(profile.instagram.profileUrl, '_blank')}
-                        className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-[14px] bg-[var(--color-bg-soft)]"
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={post.imageUrl} alt={post.caption} className="w-full h-full object-cover" />
-                      </button>
-                    ))}
-                  </div>
-                  <p className="mt-1.5 text-right text-[10px] text-[var(--color-text-tertiary)]">최근 게시물 미리보기</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {profile.linkedinConnected && (
-            <div className="mb-4 border-b border-[var(--color-border-soft)] pb-4">
-              <div className="flex items-center gap-3 py-1">
-                <button
-                  onClick={() => store.toggleSnsOpen('linkedin_' + username)}
-                  className="flex min-w-0 flex-1 items-center text-left"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/images/linkedin.png" alt="LinkedIn" className="w-5 h-5 mr-2 flex-shrink-0" />
-                  <div className="min-w-0">
-                    <div className="text-[15px] font-semibold tracking-[-0.02em] text-[var(--color-text-strong)]">LinkedIn
-                      <span className="ml-1.5 text-[10px] font-bold rounded-full px-2 py-0.5" style={{ color: 'var(--color-state-success-text)', backgroundColor: 'var(--color-state-success-bg)' }}>연동됨</span>
-                    </div>
-                    <a
-                      href={profile.linkedin.profileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="mt-0.5 block truncate text-[11px] font-medium text-[var(--color-text-tertiary)] underline-offset-2 hover:text-[var(--color-text-secondary)] hover:underline"
-                    >
-                      {profile.linkedin.profileUrl.replace(/^https?:\/\//, '')}
-                    </a>
-                  </div>
-                </button>
-                <button
-                  onClick={() => store.toggleSnsOpen('linkedin_' + username)}
-                  className="flex-shrink-0 p-1"
-                  aria-label={liOpen ? '링크드인 섹션 접기' : '링크드인 섹션 펼치기'}
-                >
-                  {liOpen ? <ChevronUp size={16} color="#8B857C" /> : <ChevronDown size={16} color="#8B857C" />}
-                </button>
-              </div>
-              {liOpen && (
-                <div className="pt-3">
-                    <div className="mb-3">
-                      <div className="mb-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-text-tertiary)]">AI 요약</div>
-                      <p className="text-xs leading-relaxed text-[var(--color-text-secondary)]">{profile.linkedin.aiSummary}</p>
-                    </div>
-                  <div className="space-y-2">
-                    <div className="overflow-hidden rounded-[16px] border" style={{ borderColor: 'var(--color-border-default)' }}>
-                      <div className="px-3 pt-2.5 pb-1 text-[11px] text-[var(--color-text-tertiary)]">최근 게시물</div>
-                      <div className="relative max-h-48 overflow-hidden">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={profile.linkedin.previewImage} alt="LinkedIn 최근 게시물" className="w-full" />
-                        <div className="absolute bottom-0 inset-x-0 h-20 bg-gradient-to-t from-[var(--color-bg-page)] to-transparent" />
+                    {igOpen ? <ChevronUp size={14} color="#8B857C" /> : <ChevronDown size={14} color="#8B857C" />}
+                  </button>
+                  {igOpen && (
+                    <div className="pb-4 pl-8">
+                      <p className="text-[13px] leading-relaxed text-[var(--color-text-secondary)] mb-3">{profile.instagram.aiSummary}</p>
+                      <div className="flex gap-2 overflow-x-auto pb-0.5 scrollbar-hide">
+                        {profile.instagram.posts.map((post) => (
+                          <button
+                            key={post.id}
+                            onClick={() => window.open(profile.instagram.profileUrl, '_blank')}
+                            className="h-[84px] w-[84px] flex-shrink-0 overflow-hidden rounded-[10px] bg-[var(--color-bg-soft)]"
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={post.imageUrl} alt={post.caption} className="w-full h-full object-cover" />
+                          </button>
+                        ))}
                       </div>
                     </div>
-                  </div>
+                  )}
+                </div>
+              )}
+              {profile.linkedinConnected && (
+                <div>
+                  <button
+                    onClick={() => store.toggleSnsOpen('linkedin_' + username)}
+                    className="flex w-full items-center gap-3.5 py-3.5 text-left"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/images/linkedin.png" alt="LinkedIn" className="w-[18px] h-[18px] flex-shrink-0" />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">LinkedIn</div>
+                      <div className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5">{profile.linkedin.profileUrl.replace(/^https?:\/\/(www\.)?/, '')}</div>
+                    </div>
+                    {liOpen ? <ChevronUp size={14} color="#8B857C" /> : <ChevronDown size={14} color="#8B857C" />}
+                  </button>
+                  {liOpen && (
+                    <div className="pb-4 pl-8">
+                      <p className="text-[13px] leading-relaxed text-[var(--color-text-secondary)] mb-3">{profile.linkedin.aiSummary}</p>
+                      <div className="overflow-hidden rounded-[10px] border border-[var(--color-border-soft)]">
+                        <div className="relative max-h-48 overflow-hidden">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={profile.linkedin.previewImage} alt="LinkedIn 최근 게시물" className="w-full" />
+                          <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-[var(--color-bg-page)] to-transparent" />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-          )}
-
-          {!profile.instagramConnected && !profile.linkedinConnected && (
-            <p className="text-sm text-[var(--color-text-secondary)]">연동된 SNS가 없습니다.</p>
+          ) : (
+            <p className="text-[13px] text-[var(--color-text-tertiary)]">연동된 SNS가 없습니다.</p>
           )}
         </div>
 
         {/* ─── 하이라이트 섹션 ─────────────────────── */}
-        <div className="px-5 py-4">
+        <div className="px-5 pt-6 pb-2">
           <SectionTitle title="하이라이트" />
-
-          <div className="space-y-6">
-            {groupedHighlights.map((group) => (
-              <div key={group.id}>
-                <div className="mb-3 flex items-center gap-3">
-                  <div className="rounded-full bg-[var(--color-bg-muted)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-text-secondary)]">{group.label}</div>
-                  <div className="h-px flex-1 bg-[var(--color-border-default)]" />
-                  <div className="rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-2 py-0.5 text-[10px] font-semibold text-[var(--color-text-tertiary)]">
-                    {group.items.length}
-                  </div>
-                </div>
-                {group.items.length > 0 ? (
-                  <div className="space-y-3">
-                    {group.items.map((entry) => {
-                      if (entry.kind === 'verified') {
-                        const hl = entry.item
-                        const toggleKey = `${hl.id}_${username}`
-                        const isOpen = store.hlOpenStates[toggleKey] ?? false
-                        return (
-                          <div key={hl.id} className="overflow-hidden rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)]">
-                            <button
-                              onClick={() => store.toggleHlOpen(toggleKey)}
-                              className="flex w-full items-center gap-3 px-4 py-3 text-left"
-                            >
-                              <span className="flex h-11 w-8 items-center justify-center text-[var(--color-text-strong)]">
-                                <HighlightIcon id={hl.icon as HighlightIconId} size={18} />
-                              </span>
-                              <div className="min-w-0 flex-1">
-                                <div className="flex flex-wrap items-center gap-2">
-                                  <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{hl.title}</span>
-                                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-[var(--color-state-success-text)] shadow-[0_2px_8px_rgba(0,0,0,0.18)]">
-                                    <BadgeCheck size={12} />
-                                  </span>
-                                </div>
-                                <div className="mt-1 text-[15px] font-bold text-[var(--color-text-strong)]">{hl.subtitle}</div>
-                              </div>
-                              {isOpen ? <ChevronUp size={16} color="var(--color-text-tertiary)" /> : <ChevronDown size={16} color="var(--color-text-tertiary)" />}
-                            </button>
-                            {isOpen && (
-                          <div className="border-t border-[var(--color-border-soft)] px-4 py-4">
-                                {hl.categoryId === 'career-continuity' && (
-                                  <CareerContinuityChart
-                                    avgYears={profile.careerHighlight.avgYears}
-                                    vsIndustryPercent={profile.careerHighlight.vsIndustryPercent}
-                                  />
-                                )}
-                                {hl.categoryId === 'remember-network' && (
-                                  <RememberNetworkGraph
-                                    total={profile.rememberHighlight.total}
-                                    industries={profile.rememberHighlight.industries}
-                                  />
-                                )}
-                                {hl.categoryId === 'corporate-longevity' && (
-                                  <CorporateLongevityTimeline
-                                    summary={corporateHighlight.summary}
-                                    companies={corporateHighlight.companies}
-                                  />
-                                )}
-                                {hl.categoryId === 'airline-mileage' && (
-                                  <AirlineMileageSummary
-                                    badgeLabel={airlineBadgeLabel}
-                                    tierSummary={airlineHighlight.tierSummary}
-                                    airlines={airlineHighlight.airlines}
-                                  />
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        )
-                      }
-
-                      const category = HIGHLIGHT_CATEGORIES.find((item) => item.id === entry.categoryId)
-                      const groupToggleKey = `group_${entry.categoryId}_${username}`
-                      const isGroupOpen = store.hlOpenStates[groupToggleKey] ?? false
-                      const preview = getGroupedHighlightPreview(entry.items, store.primaryHighlightOverrides[entry.categoryId])
-                      return (
-                        <div key={`${entry.categoryId}-${group.id}`} className="overflow-hidden rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)]">
-                          <div className="flex gap-3 px-4 py-2.5">
-                            <span className="flex h-11 w-8 shrink-0 items-center justify-center self-start pt-[18px] text-[var(--color-text-strong)]">
-                              <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={18} />
+          <div className="divide-y divide-[var(--color-border-soft)]">
+            {groupedHighlights.flatMap((group) =>
+              group.items.map((entry) => {
+                if (entry.kind === 'verified') {
+                  const hl = entry.item
+                  const toggleKey = `${hl.id}_${username}`
+                  const isOpen = store.hlOpenStates[toggleKey] ?? false
+                  return (
+                    <div key={hl.id}>
+                      <button
+                        onClick={() => store.toggleHlOpen(toggleKey)}
+                        className="flex w-full items-center gap-3.5 py-3.5 text-left"
+                      >
+                        <span className="flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center text-[var(--color-text-secondary)]">
+                          <HighlightIcon id={hl.icon as HighlightIconId} size={16} />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[14px] font-semibold text-[var(--color-text-primary)]">{hl.title}</span>
+                            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-[var(--color-state-success-text)]">
+                              <BadgeCheck size={10} />
                             </span>
-                            <div className="min-w-0 flex-1">
-                              <button onClick={() => store.toggleHlOpen(groupToggleKey)} className="flex w-full items-center gap-3 text-left">
-                                <div className="min-w-0 flex-1">
-                                <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--color-text-secondary)]">
-                                  {category?.label ?? '직접 입력'}
-                                </div>
-                                  <div className="text-[15px] font-bold text-[var(--color-text-strong)]">
-                                    {preview.title}
-                                  </div>
-                                  {preview.meta && (
-                                    <div className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">{preview.meta}</div>
-                                  )}
-                                </div>
-                                {isGroupOpen ? <ChevronUp size={16} color="var(--color-text-tertiary)" /> : <ChevronDown size={16} color="var(--color-text-tertiary)" />}
-                              </button>
-                              {isGroupOpen && (
-                                <div className="border-t border-[var(--color-border-soft)] px-4 py-4">
-                                  <div className="space-y-0 divide-y divide-[var(--color-border-soft)]">
-                                    {entry.items.map((hl) => {
-                                      const metaParts = getHighlightMetaParts(hl)
-                                      return (
-                                        <div
-                                          key={hl.id}
-                                          className="py-4 first:pt-0 last:pb-0"
-                                        >
-                                          <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{hl.title}</div>
-                                          {metaParts.length > 0 && (
-                                            <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
-                                              {metaParts.map((part, partIndex) => (
-                                                <span
-                                                  key={`${hl.id}-meta-${partIndex}`}
-                                                  className={`text-[11px] ${partIndex === 0 ? 'font-semibold text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'}`}
-                                                >
-                                                  {part}
-                                                </span>
-                                              ))}
-                                            </div>
-                                          )}
-                                          {(hl.description?.trim() || hl.linkUrl) && (
-                                            <div className="mt-3 space-y-3">
-                                              {hl.description?.trim() && (
-                                                <p className="text-[14px] leading-7 text-[var(--color-text-secondary)]">
-                                                  {hl.description}
-                                                </p>
-                                              )}
-                                              {hl.linkUrl && (
-                                                <a
-                                                  href={hl.linkUrl}
-                                                  target="_blank"
-                                                  rel="noopener noreferrer"
-                                                  className="block overflow-hidden rounded-[14px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.02)]"
-                                                >
-                                                  <div className="flex min-h-[74px]">
-                                                    {hl.thumbnailUrl ? (
-                                                      <div className="h-auto w-20 flex-shrink-0 overflow-hidden bg-[var(--color-bg-soft)]">
-                                                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                        <img src={hl.thumbnailUrl} alt={hl.title} className="h-full w-full object-cover" />
-                                                      </div>
-                                                    ) : (
-                                                      <div className="flex w-20 flex-shrink-0 items-center justify-center bg-[linear-gradient(180deg,#22252B_0%,#1A1C20_100%)] px-3 text-center">
-                                                        <div>
-                                                          <div className="text-[10px] font-black uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">News</div>
-                                                          <div className="mt-1 text-[11px] font-semibold text-[var(--color-text-primary)]">{hl.sourceLabel ?? '기사 링크'}</div>
-                                                        </div>
-                                                      </div>
-                                                    )}
-                                                    <div className="flex min-w-0 flex-1 items-center px-3.5 py-2.5">
-                                                      <div className="min-w-0">
-                                                        <div className="text-[11px] font-semibold text-[var(--color-text-tertiary)]">{hl.sourceLabel ?? '외부 링크'}</div>
-                                                        <div className="mt-1 line-clamp-2 text-[12px] font-bold leading-snug text-[var(--color-text-primary)]">{hl.title}</div>
-                                                        <div className="mt-2 text-[11px] font-medium text-[var(--color-text-secondary)]">보러가기</div>
-                                                      </div>
-                                                    </div>
-                                                  </div>
-                                                </a>
-                                              )}
-                                              <div className="micro-text">{getHighlightDetailFootnote(hl, category?.label)}</div>
-                                            </div>
-                                          )}
-                                        </div>
-                                      )
-                                    })}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
                           </div>
+                          <div className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5">{hl.subtitle}</div>
                         </div>
-                      )
-                    })}
+                        {isOpen ? <ChevronUp size={14} color="#8B857C" /> : <ChevronDown size={14} color="#8B857C" />}
+                      </button>
+                      {isOpen && (
+                        <div className="pb-4 pl-8">
+                          {hl.categoryId === 'career-continuity' && (
+                            <CareerContinuityChart
+                              avgYears={profile.careerHighlight.avgYears}
+                              vsIndustryPercent={profile.careerHighlight.vsIndustryPercent}
+                            />
+                          )}
+                          {hl.categoryId === 'remember-network' && (
+                            <RememberNetworkGraph
+                              total={profile.rememberHighlight.total}
+                              industries={profile.rememberHighlight.industries}
+                            />
+                          )}
+                          {hl.categoryId === 'corporate-longevity' && (
+                            <CorporateLongevityTimeline
+                              summary={corporateHighlight.summary}
+                              companies={corporateHighlight.companies}
+                            />
+                          )}
+                          {hl.categoryId === 'airline-mileage' && (
+                            <AirlineMileageSummary
+                              badgeLabel={airlineBadgeLabel}
+                              tierSummary={airlineHighlight.tierSummary}
+                              airlines={airlineHighlight.airlines}
+                            />
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )
+                }
+
+                const category = HIGHLIGHT_CATEGORIES.find((item) => item.id === entry.categoryId)
+                const groupToggleKey = `group_${entry.categoryId}_${username}`
+                const isGroupOpen = store.hlOpenStates[groupToggleKey] ?? false
+                const preview = getGroupedHighlightPreview(entry.items, store.primaryHighlightOverrides[entry.categoryId])
+                return (
+                  <div key={`${entry.categoryId}-${group.id}`}>
+                    <button
+                      onClick={() => store.toggleHlOpen(groupToggleKey)}
+                      className="flex w-full items-center gap-3.5 py-3.5 text-left"
+                    >
+                      <span className="flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center text-[var(--color-text-secondary)]">
+                        <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={16} />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{preview.title}</div>
+                        <div className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5">
+                          {category?.label ?? '직접 입력'}{preview.meta ? ` · ${preview.meta}` : ''}
+                        </div>
+                      </div>
+                      {isGroupOpen ? <ChevronUp size={14} color="#8B857C" /> : <ChevronDown size={14} color="#8B857C" />}
+                    </button>
+                    {isGroupOpen && (
+                      <div className="pb-4 pl-8">
+                        <div className="divide-y divide-[var(--color-border-soft)]">
+                          {entry.items.map((hl) => {
+                            const metaParts = getHighlightMetaParts(hl)
+                            return (
+                              <div key={hl.id} className="py-3 first:pt-0 last:pb-0">
+                                <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{hl.title}</div>
+                                {metaParts.length > 0 && (
+                                  <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                                    {metaParts.map((part, partIndex) => (
+                                      <span
+                                        key={`${hl.id}-meta-${partIndex}`}
+                                        className={`text-[12px] ${partIndex === 0 ? 'font-medium text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'}`}
+                                      >
+                                        {part}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                                {(hl.description?.trim() || hl.linkUrl) && (
+                                  <div className="mt-2 space-y-2">
+                                    {hl.description?.trim() && (
+                                      <p className="text-[13px] leading-relaxed text-[var(--color-text-secondary)]">
+                                        {hl.description}
+                                      </p>
+                                    )}
+                                    {hl.linkUrl && (
+                                      <a
+                                        href={hl.linkUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="block overflow-hidden rounded-[10px] border border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.02)]"
+                                      >
+                                        <div className="flex min-h-[64px]">
+                                          {hl.thumbnailUrl ? (
+                                            <div className="h-auto w-[68px] flex-shrink-0 overflow-hidden bg-[var(--color-bg-soft)]">
+                                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                                              <img src={hl.thumbnailUrl} alt={hl.title} className="h-full w-full object-cover" />
+                                            </div>
+                                          ) : (
+                                            <div className="flex w-[68px] flex-shrink-0 items-center justify-center bg-[var(--color-bg-soft)] px-3 text-center">
+                                              <div className="text-[11px] font-semibold text-[var(--color-text-tertiary)]">{hl.sourceLabel ?? 'Link'}</div>
+                                            </div>
+                                          )}
+                                          <div className="flex min-w-0 flex-1 items-center px-3 py-2.5">
+                                            <div className="min-w-0">
+                                              <div className="text-[11px] text-[var(--color-text-tertiary)]">{hl.sourceLabel ?? '외부 링크'}</div>
+                                              <div className="mt-0.5 line-clamp-2 text-[12px] font-semibold leading-snug text-[var(--color-text-primary)]">{hl.title}</div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </a>
+                                    )}
+                                    <div className="micro-text">{getHighlightDetailFootnote(hl, category?.label)}</div>
+                                  </div>
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                ) : (
-                  <div className="rounded-[22px] border border-dashed border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-10 text-center text-sm text-[var(--color-text-tertiary)]">
-                    아직 {group.label.toLowerCase()}이 없어요
-                  </div>
-                )}
-              </div>
-            ))}
+                )
+              })
+            )}
           </div>
         </div>
 
-        <div className="px-5 pt-2 pb-6">
+        <div className="px-5 pt-6 pb-8">
           <SectionTitle title="Connect" />
-            {!isOwnerMode && (
-              <div className="flex gap-2 mb-4">
-                <Button variant="outline" onClick={() => showToast('피드백 요청을 보냈어요!')}>피드백 요청</Button>
-                <Button
-                  onClick={() => {
-                    if (alreadySubmitted) { showToast('이미 경험을 남겼어요'); return }
-                    setExpSheetOpen(true)
-                  }}
-                  variant={alreadySubmitted ? 'outline' : 'primary'}
-                >
-                  {alreadySubmitted ? '경험 남겼어요 ✓' : '+ 경험 남기기'}
-                </Button>
-              </div>
-            )}
-            <div className="grid grid-cols-3 gap-2">
-              {contactChannels.map((channel) => (
-                <ContactActionButton
-                  key={channel.id}
-                  channel={channel}
-                  onClick={() => {
-                    if (!channel.enabled) {
-                      showToast(isOwnerMode ? 'Byro 편집에서 연동을 활성화해 주세요' : '비활성화된 연락 수단이에요')
-                      return
-                    }
-                    if (!channel.href) {
-                      showToast('연결 정보를 준비 중이에요')
-                      return
-                    }
-                    window.open(channel.href, channel.href.startsWith('http') ? '_blank' : '_self')
-                  }}
-                />
-              ))}
+          {!isOwnerMode && (
+            <div className="flex gap-2 mb-5">
+              <Button variant="outline" onClick={() => showToast('피드백 요청을 보냈어요!')}>피드백 요청</Button>
+              <Button
+                onClick={() => {
+                  if (alreadySubmitted) { showToast('이미 경험을 남겼어요'); return }
+                  setExpSheetOpen(true)
+                }}
+                variant={alreadySubmitted ? 'outline' : 'primary'}
+              >
+                {alreadySubmitted ? '경험 남겼어요 ✓' : '+ 경험 남기기'}
+              </Button>
             </div>
+          )}
+          <div className="flex flex-wrap gap-2">
+            {contactChannels.map((channel) => (
+              <ContactActionButton
+                key={channel.id}
+                channel={channel}
+                onClick={() => {
+                  if (!channel.enabled) {
+                    showToast(isOwnerMode ? 'Byro 편집에서 연동을 활성화해 주세요' : '비활성화된 연락 수단이에요')
+                    return
+                  }
+                  if (!channel.href) {
+                    showToast('연결 정보를 준비 중이에요')
+                    return
+                  }
+                  window.open(channel.href, channel.href.startsWith('http') ? '_blank' : '_self')
+                }}
+              />
+            ))}
+          </div>
         </div>
 
         <div className="h-24" />
       </div>
 
       {/* ─── 경험 남기기 바텀시트 ────────────────── */}
-      <BottomSheet open={expSheetOpen} onClose={() => setExpSheetOpen(false)} dark={!store.isLoggedIn}>
-        {store.isLoggedIn ? (
-          <div className="px-5 pb-6">
-            <div className="text-sm font-black mb-1">{profile.name}에게 경험 남기기</div>
-            <div className="text-xs text-[var(--color-text-secondary)] mb-4">{store.user?.name ?? '나'}으로 남겨져요</div>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {experienceOptions.map((kw) => (
-                <Chip
-                  key={kw} label={kw}
-                  selected={store.experienceKeywords.includes(kw)}
-                  onClick={() => {
-                    if (!store.experienceKeywords.includes(kw) && store.experienceKeywords.length >= 3) {
-                      showToast('키워드는 최대 3개까지 선택할 수 있어요'); return
-                    }
-                    store.setExperienceKeyword(kw)
-                  }}
-                />
-              ))}
-            </div>
-            <div className="text-xs text-[var(--color-text-secondary)] mb-1">한마디 (선택)</div>
-            <TextArea value={store.experienceMessage} onChange={store.setExperienceMessage}
-              placeholder="이 분과의 경험을 한마디로 남겨보세요" maxLength={100} rows={3} />
-            <div className="mt-4 text-xs text-[var(--color-text-secondary)] mb-3">{store.user?.name ?? '나'}으로 남기기</div>
+      <BottomSheet open={expSheetOpen} onClose={() => setExpSheetOpen(false)}>
+        <div className="px-5 pb-6">
+          <div className="text-[15px] font-bold text-[var(--color-text-strong)] mb-1">{profile.name}에게 경험 남기기</div>
+          <div className="text-[12px] text-[var(--color-text-tertiary)] mb-5">
+            {store.isLoggedIn ? `${store.user?.name ?? '나'}으로 남겨져요` : '익명 사용자로 남겨져요'}
+          </div>
+          <div className="flex flex-wrap gap-2 mb-4">
+            {experienceOptions.map((kw) => (
+              <Chip
+                key={kw} label={kw}
+                selected={store.experienceKeywords.includes(kw)}
+                onClick={() => {
+                  if (!store.experienceKeywords.includes(kw) && store.experienceKeywords.length >= 3) {
+                    showToast('키워드는 최대 3개까지 선택할 수 있어요'); return
+                  }
+                  store.setExperienceKeyword(kw)
+                }}
+              />
+            ))}
+          </div>
+          <div className="text-[12px] text-[var(--color-text-tertiary)] mb-1.5">한마디 (선택)</div>
+          <TextArea value={store.experienceMessage} onChange={store.setExperienceMessage}
+            placeholder="이 분과의 경험을 한마디로 남겨보세요" maxLength={100} rows={3} dark />
+          <div className="mt-4 space-y-2">
             <Button onClick={handleExpSubmit}>경험 남기기</Button>
+            {!store.isLoggedIn && (
+              <>
+                <div className="flex items-center gap-2 py-1">
+                  <div className="flex-1 h-px bg-[var(--color-border-soft)]" />
+                  <span className="text-[11px] text-[var(--color-text-tertiary)]">이름으로 남기고 싶다면</span>
+                  <div className="flex-1 h-px bg-[var(--color-border-soft)]" />
+                </div>
+                <Button variant="outline" onClick={() => { setExpSheetOpen(false); store.login() }}>로그인하기</Button>
+              </>
+            )}
           </div>
-        ) : (
-          <div className="px-5 pb-6">
-            <div className="text-sm font-black text-white mb-1">{profile.name}에게 경험 남기기</div>
-            <div className="text-xs text-[var(--color-text-tertiary)] mb-4">익명 사용자로 남겨져요</div>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {experienceOptions.map((kw) => (
-                <Chip key={kw} label={kw} dark
-                  selected={store.experienceKeywords.includes(kw)}
-                  onClick={() => {
-                    if (!store.experienceKeywords.includes(kw) && store.experienceKeywords.length >= 3) {
-                      showToast('키워드는 최대 3개까지 선택할 수 있어요'); return
-                    }
-                    store.setExperienceKeyword(kw)
-                  }}
-                />
-              ))}
-            </div>
-            <TextArea value={store.experienceMessage} onChange={store.setExperienceMessage}
-              placeholder="이 분과의 경험을 한마디로 남겨보세요" maxLength={100} rows={3} dark />
-            <div className="mt-4">
-              <button onClick={handleExpSubmit} className="w-full bg-[var(--color-accent-dark)] text-[#111111] font-bold py-3 rounded-xl text-sm mb-3">
-                경험 남기기
-              </button>
-              <div className="flex items-center gap-2 my-3">
-                <div className="flex-1 h-px bg-[#333]" />
-                <span className="text-xs text-[#666]">이름으로 남기고 싶다면</span>
-                <div className="flex-1 h-px bg-[#333]" />
-              </div>
-              <button onClick={() => { setExpSheetOpen(false); store.login() }}
-                className="w-full border border-[var(--color-border-default)] text-[var(--color-text-strong)] font-bold py-3 rounded-xl text-sm">
-                로그인하기
-              </button>
-            </div>
-          </div>
-        )}
+        </div>
       </BottomSheet>
 
       {/* ─── 프로필 저장 메모 바텀시트 ──────────── */}
       <BottomSheet open={memoSheetOpen} onClose={() => setMemoSheetOpen(false)}>
         <div className="px-5 pb-6">
-          <div className="text-sm font-black mb-1">프로필 저장</div>
-          <div className="text-xs text-[var(--color-text-secondary)] mb-4">{profile.name}</div>
-          <div className="text-xs text-[var(--color-text-secondary)] mb-1">메모 (선택)</div>
+          <div className="text-[15px] font-bold text-[var(--color-text-strong)] mb-1">프로필 저장</div>
+          <div className="text-[12px] text-[var(--color-text-tertiary)] mb-5">{profile.name}</div>
+          <div className="text-[12px] text-[var(--color-text-tertiary)] mb-1.5">메모 (선택)</div>
           <TextArea
             value={memoText}
             onChange={setMemoText}
             placeholder="어디서 만났는지, 어떤 분인지 메모해두세요"
             maxLength={80}
             rows={3}
+            dark
           />
           <div className="mt-4 space-y-2">
             <Button onClick={() => {
@@ -872,25 +771,23 @@ export default function PublicProfile({
       <Modal open={expDoneModal} onClose={() => setExpDoneModal(false)}>
         <div className="text-center">
           <div className="text-3xl mb-3">🤝</div>
-          <div className="text-sm font-black mb-3">경험을 남겼어요!</div>
-          <div className="meta-text mb-4">{profile.name} 님의 평판이 쌓였어요!</div>
+          <div className="text-[15px] font-bold text-[var(--color-text-strong)] mb-2">경험을 남겼어요!</div>
+          <div className="text-[13px] text-[var(--color-text-secondary)] mb-5">{profile.name} 님의 평판이 쌓였어요!</div>
           {store.isLoggedIn ? (
-            <>
-              <Button variant="outline" onClick={() => setExpDoneModal(false)}>프로필로 돌아가기</Button>
-            </>
+            <Button variant="outline" onClick={() => setExpDoneModal(false)}>프로필로 돌아가기</Button>
           ) : (
             <>
-              <div className="mb-4 text-left">
-                <div className="text-xs font-bold text-[var(--color-text-strong)]">나도 평판을 받고 싶다면?</div>
-                <div className="meta-text mt-2">
+              <div className="mb-5 text-left rounded-xl border border-[var(--color-border-soft)] px-3.5 py-3">
+                <div className="text-[12px] font-bold text-[var(--color-text-primary)]">나도 평판을 받고 싶다면?</div>
+                <div className="text-[12px] text-[var(--color-text-secondary)] mt-1 leading-relaxed">
                   로그인하면 {profile.name} 님에게 경험요청을 보내고, 나도 평판을 쌓을 수 있어요.
                 </div>
               </div>
               <div className="space-y-2">
                 <Button onClick={() => { setExpDoneModal(false); router.push('/onboarding') }}>내 Byro 만들기</Button>
                 <Button variant="outline" onClick={() => { setExpDoneModal(false); store.login() }}>로그인하기</Button>
+                <Button variant="ghost" onClick={() => setExpDoneModal(false)}>프로필로 돌아가기</Button>
               </div>
-              <Button variant="ghost" onClick={() => setExpDoneModal(false)}>프로필로 돌아가기</Button>
             </>
           )}
         </div>
@@ -908,13 +805,8 @@ function SectionTitle({
 }) {
   return (
     <div className="mb-4">
-      <div className="flex items-center gap-3">
-        <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-secondary)]">
-          {title}
-        </div>
-        <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
-      </div>
-      {subtitle && <div className="text-[11px] text-[var(--color-text-tertiary)] mt-1">{subtitle}</div>}
+      <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">{title}</div>
+      {subtitle && <div className="text-[12px] text-[var(--color-text-tertiary)] mt-1">{subtitle}</div>}
     </div>
   )
 }
@@ -937,19 +829,14 @@ function ContactActionButton({
     <button
       onClick={onClick}
       className={[
-        'rounded-[18px] border border-[var(--color-border-default)] bg-[rgba(23,24,28,0.72)] px-2 py-2.5 text-center transition-colors',
-        channel.enabled ? 'text-[var(--color-text-primary)]' : 'text-[var(--color-text-tertiary)]',
+        'flex items-center gap-2 rounded-full border border-[var(--color-border-default)] px-4 py-2.5 transition-colors',
+        channel.enabled
+          ? 'text-[var(--color-text-primary)]'
+          : 'text-[var(--color-text-tertiary)] opacity-40',
       ].join(' ')}
     >
-      <div className={[
-        'mx-auto mb-1.5 flex h-9 w-9 items-center justify-center rounded-[12px] border',
-        channel.enabled
-          ? 'border-[var(--color-border-default)] bg-[rgba(255,255,255,0.03)]'
-          : 'border-[var(--color-border-default)] bg-[var(--color-bg-soft)]',
-      ].join(' ')}>
-        <Icon size={16} />
-      </div>
-      <div className="text-[10px] font-semibold uppercase tracking-[0.08em]">{channel.label}</div>
+      <Icon size={13} />
+      <span className="text-[13px] font-semibold">{channel.label}</span>
     </button>
   )
 }

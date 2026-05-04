@@ -137,7 +137,7 @@ export function Button({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      whileTap={disabled ? undefined : { scale: 0.97 }}
+      whileTap={disabled ? undefined : { scale: 0.97, filter: 'brightness(0.88)' }}
       transition={{ type: 'spring', stiffness: 400, damping: 20 }}
       className={[
         'rounded-xl font-semibold select-none whitespace-nowrap',
@@ -167,6 +167,10 @@ export function Button({
             : variant === 'google' ? 'var(--color-border-default)'
               : variant === 'danger' ? 'rgba(240,161,154,0.42)'
                 : undefined,
+        boxShadow:
+          variant === 'primary' && !disabled
+            ? '0 0 18px rgba(75,108,245,0.38), 0 2px 8px rgba(75,108,245,0.22)'
+            : undefined,
         ...style,
       }}
     >

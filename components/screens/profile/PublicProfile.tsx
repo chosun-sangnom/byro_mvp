@@ -313,7 +313,9 @@ export default function PublicProfile({
       {/* 스크롤 영역 */}
       <div className="flex-1 overflow-y-auto">
         {/* 프로필 헤더 */}
-        <div className="px-5 pt-4 pb-3">
+        <div className="relative px-5 pt-4 pb-3">
+          {/* ambient glow */}
+          <div className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(75,108,245,0.14)_0%,transparent_68%)]" />
           <div className="hero-card border border-[var(--color-border-default)] bg-[rgba(23,24,28,0.92)] p-[8px] backdrop-blur-sm">
             <div className="relative h-[452px] overflow-hidden rounded-[30px] text-white ring-1 ring-black/4">
               {profile.avatarImage ? (

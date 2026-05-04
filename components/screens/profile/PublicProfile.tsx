@@ -544,13 +544,25 @@ export default function PublicProfile({
                           <HighlightIcon id={hl.icon as HighlightIconId} size={16} />
                         </span>
                         <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-[14px] font-semibold text-[var(--color-text-primary)]">{hl.title}</span>
-                            <span className="flex h-4 w-4 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-[var(--color-state-success-text)]">
-                              <BadgeCheck size={10} />
+                          <div className="flex items-center gap-1 mb-0.5">
+                            <span className="text-[11px] text-[var(--color-text-tertiary)]">{hl.title}</span>
+                            <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-[var(--color-state-success-text)]">
+                              <BadgeCheck size={9} />
                             </span>
                           </div>
-                          <div className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5">{hl.subtitle}</div>
+                          <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{hl.subtitle}</div>
+                          {hl.categoryId === 'career-continuity' && (
+                            <div className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5">업계 평균 대비 +{profile.careerHighlight.vsIndustryPercent}%</div>
+                          )}
+                          {hl.categoryId === 'corporate-longevity' && (
+                            <div className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5">{corporateHighlight.companyCount}개 법인 · 폐업 이력 없음</div>
+                          )}
+                          {hl.categoryId === 'remember-network' && (
+                            <div className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5">총 {profile.rememberHighlight.total}명 네트워크</div>
+                          )}
+                          {hl.categoryId === 'airline-mileage' && airlineBadgeLabel && (
+                            <div className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5">{airlineBadgeLabel}</div>
+                          )}
                         </div>
                         {isOpen ? <ChevronUp size={14} color="#8B857C" /> : <ChevronDown size={14} color="#8B857C" />}
                       </button>

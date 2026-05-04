@@ -131,19 +131,19 @@ function SelectionCard({
     <button
       onClick={onClick}
       className={[
-        'w-full text-left rounded-[26px] border px-4 py-4 transition-colors shadow-[0_10px_24px_rgba(26,21,48,0.04)]',
+        'w-full text-left rounded-[26px] border px-4 py-4',
         tone === 'accent'
-          ? 'border-[#D8B15E] bg-[linear-gradient(180deg,#FFF8EB_0%,#F7E9C7_100%)]'
-          : 'border-[var(--color-border-default)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(248,245,240,0.96)_100%)]',
+          ? 'border-[rgba(212,170,84,0.4)] bg-[rgba(212,170,84,0.08)]'
+          : 'border-[var(--color-border-default)] bg-[var(--color-bg-soft)]',
       ].join(' ')}
     >
       <div className="flex items-start gap-3">
-        <div className="text-2xl leading-none mt-0.5">{icon}</div>
+        <div className="text-2xl leading-none mt-0.5 text-[var(--color-text-secondary)]">{icon}</div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-1">
             <div className="text-sm font-black text-[var(--color-text-strong)]">{title}</div>
             {badge && (
-              <span className="text-[10px] font-bold rounded-full px-2 py-0.5 bg-white/80 border text-[var(--color-text-secondary)]" style={{ borderColor: 'var(--color-border-default)' }}>
+              <span className="text-[10px] font-bold rounded-full px-2 py-0.5 bg-[var(--color-bg-muted)] border border-[var(--color-border-default)] text-[var(--color-text-secondary)]">
                 {badge}
               </span>
             )}
@@ -220,7 +220,7 @@ function StepFooter({
   skipLabel?: string
 }) {
   return (
-      <div className="px-5 pb-5 pt-3 border-t border-[var(--color-border-soft)] bg-white/72 backdrop-blur-md space-y-2">
+      <div className="px-5 pb-5 pt-3 border-t border-[var(--color-border-soft)] bg-[rgba(16,17,20,0.85)] backdrop-blur-md space-y-2">
       <div className="grid grid-cols-2 gap-2">
         <Button variant="outline" onClick={onPrev} disabled={!onPrev}>{prevLabel}</Button>
         <Button onClick={onNext} disabled={!canNext}>{nextLabel}</Button>
@@ -937,10 +937,10 @@ function Step7Highlight() {
                             setSelectedCat(cat)
                             setSheetMode('group')
                           }}
-                          className="relative overflow-visible rounded-[22px] border border-[var(--color-border-default)] bg-white px-3 py-4 text-center shadow-[0_8px_18px_rgba(17,17,17,0.04)]"
+                          className="relative overflow-visible rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-3 py-4 text-center"
                         >
                           {cat.certificationOnly && (
-                            <span className="absolute -right-2 -top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-white text-[#217A43] shadow-[0_4px_12px_rgba(17,17,17,0.10)]">
+                            <span className="absolute -right-2 -top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-bg-surface)] border border-[var(--color-border-default)] text-[var(--color-state-success-text)]">
                               <BadgeCheck size={14} />
                             </span>
                           )}
@@ -961,7 +961,7 @@ function Step7Highlight() {
         {sheetMode === 'group' && selectedCat && (
           <div className="px-5 pb-6">
             <div className="flex items-center mb-4">
-              <button onClick={() => { resetForm(); setSelectedCat(null); setSheetMode('picker') }} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+              <button onClick={() => { resetForm(); setSelectedCat(null); setSheetMode('picker') }} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
               <div className="text-[18px] font-black text-[var(--color-text-strong)]">{selectedCat.label} 관리</div>
             </div>
 
@@ -1009,7 +1009,7 @@ function Step7Highlight() {
                           )}
                         </div>
                         {isPrimaryHighlight(item, store.primaryHighlightOverrides[selectedCat.id]) ? (
-                          <span className="rounded-full bg-[#E8F5EC] px-2.5 py-1 text-[11px] font-semibold text-[#217A43]">메인 노출 중</span>
+                          <span className="rounded-full bg-[var(--color-state-success-bg)] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-state-success-text)]">메인 노출 중</span>
                         ) : (
                           <button
                             onClick={() => {
@@ -1025,7 +1025,7 @@ function Step7Highlight() {
                       <div className="mt-4 flex gap-2">
                         <button
                           onClick={() => openEditForm(item)}
-                          className="rounded-xl border border-[#D7D0C8] bg-white px-3 py-1.5 text-xs font-medium text-[#555]"
+                          className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-muted)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)]"
                         >
                           수정
                         </button>
@@ -1034,7 +1034,7 @@ function Step7Highlight() {
                             store.removeHighlight(item.id)
                             showToast('삭제됐어요')
                           }}
-                          className="rounded-xl border border-[#F2C7C5] bg-white px-3 py-1.5 text-xs font-medium text-[#C9473D]"
+                          className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-muted)] px-3 py-1.5 text-xs font-medium text-[var(--color-state-danger-text)]"
                         >
                           삭제
                         </button>
@@ -1044,7 +1044,7 @@ function Step7Highlight() {
                 })}
               </div>
             ) : (
-              <div className="rounded-[22px] border border-dashed border-[#E7E2DC] bg-white px-4 py-10 text-center text-sm text-[#A29B93] mb-4">
+              <div className="rounded-[22px] border border-dashed border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-10 text-center text-sm text-[var(--color-text-tertiary)] mb-4">
                 아직 추가한 {selectedCat.label.toLowerCase()} 항목이 없어요
               </div>
             )}
@@ -1067,7 +1067,7 @@ function Step7Highlight() {
         {sheetMode === 'form' && (
           <div className="px-5 pb-6">
             <div className="flex items-center mb-4">
-              <button onClick={() => setSheetMode(selectedCat ? 'group' : 'picker')} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+              <button onClick={() => setSheetMode(selectedCat ? 'group' : 'picker')} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
               <div className="text-[18px] font-black text-[var(--color-text-strong)]">{editingHighlightId ? '하이라이트 수정하기' : '직접 입력 하이라이트'}</div>
             </div>
 
@@ -1266,7 +1266,7 @@ function Step7Highlight() {
         {sheetMode === 'cert' && selectedCert && (
           <div className="px-5 pb-6">
             <div className="flex items-center mb-4">
-              <button onClick={() => setSheetMode('picker')} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+              <button onClick={() => setSheetMode('picker')} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
               <div className="text-[18px] font-black text-[var(--color-text-strong)]">{selectedCert.title} 인증</div>
             </div>
 
@@ -1390,15 +1390,15 @@ function Step8Select() {
           onClick={handleAI}
         >
           {!hasData && (
-            <div className="rounded-lg px-2 py-1.5 text-xs" style={{ backgroundColor: '#FFF8E6', color: '#7A5A00' }}>
+            <div className="rounded-lg px-2 py-1.5 text-xs bg-[var(--color-state-warn-bg)] text-[var(--color-state-warn-text)]">
               AI 초안을 만들려면 키워드, SNS, 하이라이트 중 하나 이상이 필요해요
             </div>
           )}
           {hasData && (
             <div className="flex flex-wrap gap-1">
-              {store.instagramConnected && <span className="inline-flex items-center gap-1 text-xs bg-white rounded-full px-2 py-0.5 border" style={{ borderColor: 'var(--color-border-default)' }}><Image src="/images/Instagram.svg" alt="" width={12} height={12} className="w-3 h-3" /> Instagram</span>}
-              {store.linkedinConnected && <span className="inline-flex items-center gap-1 text-xs bg-white rounded-full px-2 py-0.5 border" style={{ borderColor: 'var(--color-border-default)' }}><Image src="/images/linkedin.png" alt="" width={12} height={12} className="w-3 h-3" /> LinkedIn</span>}
-              {store.selectedKeywords.length > 0 && <span className="text-xs bg-white rounded-full px-2 py-0.5 border" style={{ borderColor: 'var(--color-border-default)' }}>키워드 {store.selectedKeywords.length}개</span>}
+              {store.instagramConnected && <span className="inline-flex items-center gap-1 text-xs bg-[var(--color-bg-muted)] rounded-full px-2 py-0.5 border border-[var(--color-border-default)] text-[var(--color-text-secondary)]"><Image src="/images/Instagram.svg" alt="" width={12} height={12} className="w-3 h-3" /> Instagram</span>}
+              {store.linkedinConnected && <span className="inline-flex items-center gap-1 text-xs bg-[var(--color-bg-muted)] rounded-full px-2 py-0.5 border border-[var(--color-border-default)] text-[var(--color-text-secondary)]"><Image src="/images/linkedin.png" alt="" width={12} height={12} className="w-3 h-3" /> LinkedIn</span>}
+              {store.selectedKeywords.length > 0 && <span className="text-xs bg-[var(--color-bg-muted)] rounded-full px-2 py-0.5 border border-[var(--color-border-default)] text-[var(--color-text-secondary)]">키워드 {store.selectedKeywords.length}개</span>}
             </div>
           )}
         </SelectionCard>
@@ -1494,7 +1494,7 @@ function Step8AI() {
         description={'나를 잘 보여주는 문장으로 적어주세요.'}
       />
 
-        <label className="text-xs font-bold text-[#555] uppercase tracking-wide mb-2">자기소개</label>
+        <label className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wide mb-2">자기소개</label>
         <TextArea
           value={bioText}
           onChange={setBioText}
@@ -1502,13 +1502,13 @@ function Step8AI() {
           maxLength={200}
           rows={6}
         />
-        <div className="bg-[#E3F2FD] border border-[#90CAF9] rounded-lg px-3 py-2 text-xs text-[#0D47A1] mt-3 mb-6">
+        <div className="bg-[var(--color-state-info-bg)] border border-[var(--color-border-soft)] rounded-lg px-3 py-2 text-xs text-[var(--color-state-info-text)] mt-3 mb-6">
           나중에 AI 초안으로 바꿀 수 있어요.
         </div>
 
         <div className="space-y-2">
           <Button onClick={handleComplete}>완료</Button>
-          <button className="w-full text-center text-sm text-[#888]" onClick={() => { store.completeOnboarding(); store.goToStep('complete') }}>
+          <button className="w-full text-center text-sm text-[var(--color-text-tertiary)]" onClick={() => { store.completeOnboarding(); store.goToStep('complete') }}>
             나중에 작성하기
           </button>
         </div>
@@ -1528,18 +1528,18 @@ function Step8AI() {
       {phase === 'loading' && (
         <div className="flex-1 flex flex-col items-center justify-center gap-4">
           <AiBounce />
-          <div className="text-sm text-[#888]">소개 문구를 만들고 있어요</div>
+          <div className="text-sm text-[var(--color-text-tertiary)]">소개 문구를 만들고 있어요</div>
         </div>
       )}
 
       {phase === 'done' && (
         <>
-          <div className="relative bg-[#E6F5E6] border border-[#A5D6A7] rounded-xl p-4 mb-3">
-            <div className="text-xs font-bold text-[#1A7A1A] mb-2">AI 초안</div>
-            <p className="text-sm text-[#1A7A1A] leading-relaxed pr-10">{bioText}</p>
+          <div className="relative bg-[var(--color-bg-soft)] border border-[var(--color-border-default)] rounded-xl p-4 mb-3">
+            <div className="text-xs font-bold text-[var(--color-state-success-text)] mb-2">AI 초안</div>
+            <p className="text-sm text-[var(--color-text-primary)] leading-relaxed pr-10">{bioText}</p>
             <button
               onClick={() => setPhase('edit')}
-              className="absolute top-3 right-3 flex items-center gap-1 text-xs text-[#555] bg-white border border-[#ddd] rounded-lg px-2 py-1"
+              className="absolute top-3 right-3 flex items-center gap-1 text-xs text-[var(--color-text-secondary)] bg-[var(--color-bg-muted)] border border-[var(--color-border-default)] rounded-lg px-2 py-1"
             >
               수정
             </button>
@@ -1558,7 +1558,7 @@ function Step8AI() {
       {phase !== 'loading' && (
         <div className="space-y-2">
           <Button onClick={handleComplete}>완료</Button>
-          <button className="w-full text-center text-sm text-[#888]" onClick={() => { store.completeOnboarding(); store.goToStep('complete') }}>
+          <button className="w-full text-center text-sm text-[var(--color-text-tertiary)]" onClick={() => { store.completeOnboarding(); store.goToStep('complete') }}>
             나중에 작성하기
           </button>
         </div>
@@ -1587,17 +1587,17 @@ function Step9Complete() {
 
   return (
     <div className="flex flex-col h-full overflow-y-auto px-5 py-6 items-center text-center">
-      <div className="w-full rounded-[30px] border border-[#EBEBEB] bg-white px-5 py-7 mb-6">
+      <div className="w-full rounded-[30px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-5 py-7 mb-6">
         <div className="mb-4 flex justify-center text-[var(--color-state-success-text)]">
           <CheckCircle2 size={36} />
         </div>
-        <h2 className="text-2xl font-black mb-2">Byro를<br />만들었어요</h2>
-        <p className="text-sm text-[#555] mb-6">이제 링크로 바로 공유할 수 있어요.</p>
+        <h2 className="text-2xl font-black mb-2 text-[var(--color-text-strong)]">Byro를<br />만들었어요</h2>
+        <p className="text-sm text-[var(--color-text-secondary)] mb-6">이제 링크로 바로 공유할 수 있어요.</p>
 
         {/* 링크 복사 */}
-        <div className="w-full flex items-center bg-[#f8f8f8] border border-[#EBEBEB] rounded-xl px-4 py-3">
-          <span className="flex-1 text-sm text-[#333] text-left">byro.io/@{linkId}</span>
-          <button onClick={handleCopy} className="text-xs font-bold text-[#0A0A0A] ml-3 flex-shrink-0">복사</button>
+        <div className="w-full flex items-center bg-[var(--color-bg-muted)] border border-[var(--color-border-soft)] rounded-xl px-4 py-3">
+          <span className="flex-1 text-sm text-[var(--color-text-primary)] text-left">byro.io/@{linkId}</span>
+          <button onClick={handleCopy} className="text-xs font-bold text-[var(--color-accent-dark)] ml-3 flex-shrink-0">복사</button>
         </div>
       </div>
 

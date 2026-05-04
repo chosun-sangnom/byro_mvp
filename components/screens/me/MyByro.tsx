@@ -369,8 +369,8 @@ function BasicInfoEditScreen({
   return (
     <div className="flex flex-col h-full">
       {/* 헤더 */}
-      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] bg-white/78 backdrop-blur-md flex-shrink-0">
-        <button onClick={onBack} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] bg-[rgba(16,17,20,0.85)] backdrop-blur-md flex-shrink-0">
+        <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
         <span className="text-base font-black">프로필 편집</span>
       </div>
 
@@ -378,7 +378,7 @@ function BasicInfoEditScreen({
         <div className="px-5 py-5">
           {/* 아바타 */}
           <div className="flex flex-col items-center mb-6">
-            <div className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-black text-[#555] mb-2 bg-[#E8DED7] overflow-hidden">
+            <div className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-black text-[var(--color-text-secondary)] mb-2 bg-[var(--color-bg-muted)] overflow-hidden">
               {avatarImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={avatarImage} alt={`${user.name} 프로필 사진`} className="w-full h-full rounded-full object-cover" />
@@ -395,7 +395,7 @@ function BasicInfoEditScreen({
             />
             <label
               htmlFor={fileInputId}
-              className="flex cursor-pointer items-center gap-1 text-xs text-[#555]"
+              className="flex cursor-pointer items-center gap-1 text-xs text-[var(--color-text-secondary)]"
             >
               <Camera size={12} /> 사진 변경
             </label>
@@ -406,7 +406,7 @@ function BasicInfoEditScreen({
           <div className="space-y-4 mb-5">
             {/* 이름 — 변경 불가 */}
             <div>
-              <label className="text-xs text-[#888] mb-1 block">이름</label>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">이름</label>
               <input
                 value={user.name}
                 disabled
@@ -418,7 +418,7 @@ function BasicInfoEditScreen({
             {/* 자기소개 */}
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <label className="text-xs text-[#888]">자기소개</label>
+                <label className="text-xs text-[var(--color-text-tertiary)]">자기소개</label>
                 <button onClick={() => showToast('AI 자기소개 생성 중...')}
                   className="text-xs text-[#E8A000] font-bold">→ AI로 채우기</button>
               </div>
@@ -730,8 +730,8 @@ function HighlightManageScreen({
   if (mode === 'cert' && selectedCert) {
     return (
       <div className="flex flex-col h-full">
-        <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
-          <button onClick={() => { setSelectedCert(null); setMode('picker') }} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+        <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] flex-shrink-0">
+          <button onClick={() => { setSelectedCert(null); setMode('picker') }} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
           <span className="text-base font-black">{selectedCert.title} 인증</span>
         </div>
 
@@ -754,7 +754,7 @@ function HighlightManageScreen({
                   <p>1. 본인확인을 진행하면 필요한 정보를 자동으로 불러와요.</p>
                   <p>2. 확인이 끝나면 하이라이트에 인증 항목으로 바로 반영돼요.</p>
                 </div>
-                <div className="mt-5 rounded-[22px] border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-4 text-sm leading-6 text-[var(--color-text-secondary)]">
+                <div className="mt-5 rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4 text-sm leading-6 text-[var(--color-text-secondary)]">
                   별도 파일을 보내지 않아도 돼요. 본인확인만 완료되면 자동으로 진행됩니다.
                 </div>
               </>
@@ -764,7 +764,7 @@ function HighlightManageScreen({
                   <p>1. 리멤버 앱에서 명함 내보내기 파일을 준비해주세요.</p>
                   <p>2. 아래 이메일 주소로 파일을 보내주시면 확인 후 반영돼요.</p>
                 </div>
-                <div className="mt-5 rounded-[22px] border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-4">
+                <div className="mt-5 rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4">
                   <div className="micro-text mb-2">나의 Byro 인증 이메일 주소</div>
                   <div className="flex items-center gap-2">
                     <div className="min-w-0 flex-1 truncate text-sm font-mono font-bold text-[var(--color-text-strong)]">
@@ -798,8 +798,8 @@ function HighlightManageScreen({
   if (mode === 'group' && selectedCat) {
     return (
       <div className="flex flex-col h-full">
-        <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
-          <button onClick={() => { resetAddForm(); setMode('list') }} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+        <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] flex-shrink-0">
+          <button onClick={() => { resetAddForm(); setMode('list') }} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
           <span className="text-base font-black">{selectedCat.label} 관리</span>
         </div>
 
@@ -850,7 +850,7 @@ function HighlightManageScreen({
                             store.setHighlightPrimary(selectedCat.id, item.id)
                             showToast('메인 항목으로 설정했어요')
                           }}
-                          className="rounded-full border border-[#D7D0C8] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-secondary)]"
+                          className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-secondary)]"
                         >
                           메인으로 설정
                         </button>
@@ -862,7 +862,7 @@ function HighlightManageScreen({
                           if (isEditable) openEditSheet(item)
                           else showToast('기본 목업 항목은 수정하지 않습니다')
                         }}
-                        className="rounded-lg border border-[#CFC7BF] px-3 py-1.5 text-xs font-medium text-[#555]"
+                        className="rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-muted)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)]"
                       >
                         수정
                       </button>
@@ -885,13 +885,13 @@ function HighlightManageScreen({
               })}
             </div>
           ) : (
-            <div className="rounded-[22px] border border-dashed border-[#E7E2DC] bg-white px-4 py-10 text-center text-sm text-[#A29B93]">
+            <div className="rounded-[22px] border border-dashed border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-10 text-center text-sm text-[var(--color-text-tertiary)]">
               아직 추가한 {selectedCat.label.toLowerCase()} 항목이 없어요
             </div>
           )}
         </div>
 
-        <div className="border-t border-[#EBEBEB] px-5 py-4">
+        <div className="border-t border-[var(--color-border-soft)] px-5 py-4">
           <Button
             onClick={() => {
               setEditingHl(null)
@@ -920,8 +920,8 @@ function HighlightManageScreen({
   if (mode === 'form') {
     return (
       <div className="flex flex-col h-full">
-        <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
-          <button onClick={() => { resetAddForm(); setMode(selectedCat ? 'group' : 'picker') }} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+        <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] flex-shrink-0">
+          <button onClick={() => { resetAddForm(); setMode(selectedCat ? 'group' : 'picker') }} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
           <span className="text-base font-black">{editingHl ? '하이라이트 수정하기' : '하이라이트 추가하기'}</span>
         </div>
 
@@ -988,22 +988,22 @@ function HighlightManageScreen({
                 </div>
               )}
               <input value={hlTitle} onChange={(e) => setHlTitle(e.target.value)} placeholder={isCareerRole ? '회사명' : isEducationHistory ? '학교명' : '제목'}
-                className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
+                className="w-full rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
               {(isPublish || isArticleInterview) && (
                 <input
                   value={hlSourceLabel}
                   onChange={(e) => setHlSourceLabel(e.target.value)}
                   placeholder={isPublish ? '출판사 또는 매체명' : '매체명'}
-                  className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none"
+                  className="w-full rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none"
                 />
               )}
               {isEducationHistory && educationNeedsMajor && (
                 <input value={hlRole} onChange={(e) => setHlRole(e.target.value)} placeholder="전공"
-                  className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
+                  className="w-full rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
               )}
               {isCareerRole && (
                 <input value={hlRole} onChange={(e) => setHlRole(e.target.value)} placeholder="직함"
-                  className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
+                  className="w-full rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none" />
               )}
               {isCareerRole && (
                 <div className="space-y-2">
@@ -1051,7 +1051,7 @@ function HighlightManageScreen({
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => setYearPickerTarget('career-start')}
-                    className="rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-left text-sm"
+                    className="rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-left text-sm"
                     style={{ color: hlStartYear ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}
                   >
                     {hlStartYear || '시작 연도'}
@@ -1062,7 +1062,7 @@ function HighlightManageScreen({
                       setYearPickerTarget('career-end')
                     }}
                     disabled={hlStatus !== '종료'}
-                    className="rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-left text-sm disabled:opacity-40"
+                    className="rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-left text-sm disabled:opacity-40"
                     style={{ color: hlStatus === '재직 중' ? 'var(--color-text-tertiary)' : (hlEndYear ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)') }}
                   >
                     {hlStatus === '재직 중' ? '현재' : (hlEndYear || '종료 연도')}
@@ -1073,7 +1073,7 @@ function HighlightManageScreen({
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => setYearPickerTarget('education-start')}
-                      className="rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-left text-sm"
+                      className="rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-left text-sm"
                       style={{ color: hlEducationStartYear ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}
                     >
                       {hlEducationStartYear || '입학 연도'}
@@ -1084,7 +1084,7 @@ function HighlightManageScreen({
                         setYearPickerTarget('education-end')
                       }}
                       disabled={hlStatus === '재학'}
-                      className="rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-left text-sm disabled:opacity-40"
+                      className="rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-left text-sm disabled:opacity-40"
                       style={{ color: hlStatus === '재학' ? 'var(--color-text-tertiary)' : (hlEducationEndYear ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)') }}
                     >
                       {hlStatus === '재학' ? '현재' : (hlEducationEndYear || (hlStatus === '중퇴' ? '중퇴 연도' : '졸업 연도'))}
@@ -1094,7 +1094,7 @@ function HighlightManageScreen({
               {(isPublish || isArticleInterview) && !isEducationHistory && !isCareerRole && (
                 <button
                   onClick={() => setYearPickerTarget('education-year')}
-                  className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-left text-sm"
+                  className="w-full rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-left text-sm"
                   style={{ color: hlEducationYear ? 'var(--color-text-primary)' : 'var(--color-text-tertiary)' }}
                 >
                   {hlEducationYear || '연도 선택'}
@@ -1105,7 +1105,7 @@ function HighlightManageScreen({
                   value={hlLinkUrl}
                   onChange={(e) => setHlLinkUrl(e.target.value)}
                   placeholder="기사 URL"
-                  className="w-full rounded-2xl border border-[#E7E2DC] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none"
+                  className="w-full rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none"
                 />
               )}
               {!isEducationHistory && (
@@ -1125,8 +1125,8 @@ function HighlightManageScreen({
   if (mode === 'picker') {
     return (
       <div className="flex flex-col h-full">
-        <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
-          <button onClick={() => setMode('list')} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+        <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] flex-shrink-0">
+          <button onClick={() => setMode('list')} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
           <span className="text-base font-black">하이라이트 추가</span>
         </div>
 
@@ -1159,7 +1159,7 @@ function HighlightManageScreen({
                       className="settings-row-light relative overflow-visible px-3 py-4 text-center"
                     >
                       {cat.certificationOnly && (
-                        <span className="absolute -right-2 -top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-white text-[#217A43] shadow-[0_4px_12px_rgba(17,17,17,0.10)]">
+                        <span className="absolute -right-2 -top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-bg-surface)] border border-[var(--color-border-default)] text-[var(--color-state-success-text)]">
                           <BadgeCheck size={14} />
                         </span>
                       )}
@@ -1181,8 +1181,8 @@ function HighlightManageScreen({
   return (
     <div className="flex flex-col h-full">
       {/* 헤더 */}
-      <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
-        <button onClick={onBack} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] flex-shrink-0">
+        <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
         <span className="text-base font-black">하이라이트 관리</span>
       </div>
 
@@ -1228,7 +1228,7 @@ function HighlightManageScreen({
                           <div className="flex items-center gap-2">
                             <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{entry.category.label}</span>
                             {entry.kind === 'verified' && (
-                              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-white text-[#217A43] shadow-[0_2px_8px_rgba(17,17,17,0.08)]">
+                              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-bg-surface)] border border-[var(--color-border-default)] text-[var(--color-state-success-text)]">
                                 <BadgeCheck size={12} />
                               </span>
                             )}
@@ -1247,7 +1247,7 @@ function HighlightManageScreen({
                   })}
                 </div>
               ) : (
-                <div className="rounded-[22px] border border-dashed border-[#E7E2DC] bg-white px-4 py-10 text-center text-sm text-[#A29B93]">
+                <div className="rounded-[22px] border border-dashed border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-10 text-center text-sm text-[var(--color-text-tertiary)]">
                   아직 {group.label.toLowerCase()} 하이라이트가 없어요
                 </div>
               )}
@@ -1257,7 +1257,7 @@ function HighlightManageScreen({
 
         <button
           onClick={() => { resetAddForm(); setMode('picker') }}
-          className="w-full border border-[#D7D7D7] rounded-xl py-3 text-sm font-semibold text-[#111] mt-6"
+          className="w-full border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] rounded-xl py-3 text-sm font-semibold text-[var(--color-text-primary)] mt-6"
         >
           + 하이라이트 추가하기
         </button>
@@ -1320,13 +1320,13 @@ function SNSManageScreen({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
-        <button onClick={onBack} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] flex-shrink-0">
+        <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
         <span className="text-base font-black">SNS 연동 관리</span>
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
-        <div className="text-xs text-[#888] mb-5">연동하면 AI 요약과 게시물 미리보기를 확인할 수 있어요.</div>
+        <div className="text-xs text-[var(--color-text-tertiary)] mb-5">연동하면 AI 요약과 게시물 미리보기를 확인할 수 있어요.</div>
         <div className="space-y-0.5">
           <SnsManageRow
             icon={<SnsIcon label="ig" bg="#C13584" />}
@@ -1360,7 +1360,7 @@ function SNSManageScreen({ onBack }: { onBack: () => void }) {
           />
         </div>
 
-        <div className="mt-5 rounded-xl bg-[#F7F7F7] px-4 py-3 text-[11px] text-[#888] leading-relaxed">
+        <div className="mt-5 rounded-xl bg-[var(--color-bg-soft)] px-4 py-3 text-[11px] text-[var(--color-text-tertiary)] leading-relaxed">
           연동된 정보는 시안용 더미 데이터와 함께 표시됩니다.
           연동 해제는 하단 바텀시트에서만 가능합니다.
         </div>
@@ -1373,17 +1373,17 @@ function SNSManageScreen({ onBack }: { onBack: () => void }) {
             {selectedSns === 'linkedin' && <SnsIcon label="in" bg="#0A66C2" />}
             <div>
               <div className="text-sm font-black">{selectedSns === 'instagram' ? 'Instagram 연동하기' : 'LinkedIn 연동하기'}</div>
-              <div className="text-xs text-[#888]">
+              <div className="text-xs text-[var(--color-text-tertiary)]">
                 {selectedSns === 'instagram' ? '아이디만 입력하면 연동됩니다' : '프로필 URL 또는 아이디를 입력해주세요'}
               </div>
             </div>
           </div>
-          <div className="text-xs text-[#555] mb-1">{selectedSns === 'instagram' ? 'Instagram 아이디' : 'LinkedIn 아이디'}</div>
+          <div className="text-xs text-[var(--color-text-secondary)] mb-1">{selectedSns === 'instagram' ? 'Instagram 아이디' : 'LinkedIn 아이디'}</div>
           <input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={selectedSns === 'instagram' ? 'sss_uuo' : 'myongkoo-kang'}
-            className="w-full border border-[#D9D9D9] rounded-xl px-4 py-3 text-sm outline-none mb-2"
+            className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-3 text-sm outline-none mb-2 bg-[var(--color-bg-muted)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)]"
           />
           <div className="text-[11px] text-[#AAA] mb-4">
             {selectedSns === 'instagram' ? '예: instagram.com/' : '예: linkedin.com/in/'}{inputValue || (selectedSns === 'instagram' ? 'sss_uuo' : 'myongkoo-kang')}
@@ -1455,30 +1455,30 @@ function ContactManageScreen({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
-        <button onClick={onBack} className="text-xl text-[#555] mr-3 leading-none">‹</button>
-        <span className="text-base font-black">연락 수단 관리</span>
+      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] flex-shrink-0">
+        <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
+        <span className="text-base font-black text-[var(--color-text-strong)]">연락 수단 관리</span>
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
-        <div className="text-xs text-[#888] mb-5">공개 프로필 상단 버튼에 노출될 연락 수단을 켜고 끌 수 있어요.</div>
+        <div className="text-xs text-[var(--color-text-tertiary)] mb-5">공개 프로필 상단 버튼에 노출될 연락 수단을 켜고 끌 수 있어요.</div>
         <div className="space-y-1">
           {channels.map((channel) => (
             <button
               key={channel.id}
               onClick={() => openSheet(channel)}
-              className="flex items-center w-full py-3 border-b border-[#F1F1F1] text-left"
+              className="flex items-center w-full py-3 border-b border-[var(--color-border-soft)] text-left"
             >
               <div className="mr-3">
                 <ContactTypeIcon channelId={channel.id} enabled={channel.enabled} />
               </div>
               <div className="flex-1">
-                <div className="text-sm font-bold text-[#111]">{channel.label}</div>
-                <div className="text-xs text-[#888]">
+                <div className="text-sm font-bold text-[var(--color-text-primary)]">{channel.label}</div>
+                <div className="text-xs text-[var(--color-text-tertiary)]">
                   {channel.enabled ? channel.value || '연결됨' : '비활성화됨'}
                 </div>
               </div>
-              <span className={['text-[11px] font-semibold rounded-full px-2 py-1', channel.enabled ? 'bg-[#E6F5E6] text-[#1A7A1A]' : 'bg-[#F2F2F2] text-[#999]'].join(' ')}>
+              <span className={['text-[11px] font-semibold rounded-full px-2 py-1', channel.enabled ? 'bg-[var(--color-state-success-bg)] text-[var(--color-state-success-text)]' : 'bg-[var(--color-bg-muted)] text-[var(--color-text-tertiary)]'].join(' ')}>
                 {channel.enabled ? '활성' : '비활성'}
               </span>
             </button>
@@ -1486,7 +1486,7 @@ function ContactManageScreen({ onBack }: { onBack: () => void }) {
         </div>
       </div>
 
-      <div className="px-5 pb-5 pt-3 border-t border-[#EBEBEB]">
+      <div className="px-5 pb-5 pt-3 border-t border-[var(--color-border-soft)]">
         <Button onClick={handleApply}>적용하기</Button>
       </div>
 
@@ -1496,17 +1496,17 @@ function ContactManageScreen({ onBack }: { onBack: () => void }) {
             {selectedChannel && <ContactTypeIcon channelId={selectedChannel.id} enabled={selectedChannel.enabled} />}
             <div>
               <div className="text-sm font-black">{selectedChannel?.label} 연동</div>
-              <div className="text-xs text-[#888]">값이 있으면 활성화되고, 비우면 버튼만 비활성화됩니다.</div>
+              <div className="text-xs text-[var(--color-text-tertiary)]">값이 있으면 활성화되고, 비우면 버튼만 비활성화됩니다.</div>
             </div>
           </div>
-          <div className="text-xs text-[#555] mb-1">{selectedChannel?.label}</div>
+          <div className="text-xs text-[var(--color-text-secondary)] mb-1">{selectedChannel?.label}</div>
           <input
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={contactPlaceholder(selectedChannel?.id)}
-            className="w-full border border-[#D9D9D9] rounded-xl px-4 py-3 text-sm outline-none mb-2"
+            className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-3 text-sm outline-none mb-2 bg-[var(--color-bg-muted)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)]"
           />
-          <div className="text-[11px] text-[#AAA] mb-4">{contactPreview(selectedChannel?.id, inputValue)}</div>
+          <div className="text-[11px] text-[var(--color-text-tertiary)] mb-4">{contactPreview(selectedChannel?.id, inputValue)}</div>
           <div className="space-y-2">
             <Button onClick={handleSaveChannel}>저장하기</Button>
             <Button variant="outline" onClick={handleDisableChannel}>비활성화</Button>
@@ -1547,10 +1547,10 @@ function SnsManageRow({
     >
       <div className="mr-3">{icon}</div>
       <div className="flex-1">
-        <div className="text-sm font-bold text-[#111]">{title}</div>
-        <div className="text-xs text-[#888]">{subtitle}</div>
+        <div className="text-sm font-bold text-[var(--color-text-primary)]">{title}</div>
+        <div className="text-xs text-[var(--color-text-tertiary)]">{subtitle}</div>
       </div>
-      <span className="text-sm text-[#BBB]">{disabled ? '준비중' : '›'}</span>
+      <span className="text-sm text-[var(--color-text-tertiary)]">{disabled ? '준비중' : '›'}</span>
     </button>
   )
 }
@@ -1634,24 +1634,25 @@ function ReputationManageScreen({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
-        <button onClick={onBack} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] flex-shrink-0">
+        <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
         <span className="text-base font-black">평판 키워드 편집</span>
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
-        <div className="text-xs text-[#888] mb-4">선택된 키워드는 프로필 카드 안에 노출됩니다. 최대 5개까지 선택할 수 있어요.</div>
+        <div className="text-xs text-[var(--color-text-tertiary)] mb-4">선택된 키워드는 프로필 카드 안에 노출됩니다. 최대 5개까지 선택할 수 있어요.</div>
         <div className="space-y-4 mb-4">
           {KEYWORD_GROUPS.map((group) => (
             <div key={group.category}>
-              <div className="text-xs font-bold text-[#555] mb-2">{group.category}</div>
+              <div className="text-xs font-bold text-[var(--color-text-secondary)] mb-2">{group.category}</div>
               <div className="flex flex-wrap gap-1.5">
                 {group.keywords.map((kw) => {
                   const selected = keywords.includes(kw)
                   return (
                     <button key={kw} onClick={() => toggleKeyword(kw)}
                       className={['text-xs px-3 py-1.5 rounded-full border font-semibold',
-                        selected ? 'bg-[#0A0A0A] text-white border-[#0A0A0A]' : 'bg-white text-[#555] border-[#ddd]'].join(' ')}>
+                        selected ? 'border-[var(--color-accent-dark)] text-white' : 'bg-[var(--color-bg-soft)] text-[var(--color-text-secondary)] border-[var(--color-border-default)]'].join(' ')}
+                      style={selected ? { backgroundColor: 'var(--color-accent-dark)' } : undefined}>
                       {kw}
                     </button>
                   )
@@ -1662,7 +1663,7 @@ function ReputationManageScreen({
         </div>
       </div>
 
-      <div className="px-5 pb-5 pt-3 border-t border-[#EBEBEB]">
+      <div className="px-5 pb-5 pt-3 border-t border-[var(--color-border-soft)]">
         <Button onClick={() => { store.updateUserKeywords(keywords); showToast('키워드가 저장됐어요!'); onBack() }}>저장</Button>
       </div>
 
@@ -1670,7 +1671,7 @@ function ReputationManageScreen({
         <div className="text-center">
           <div className="text-xl mb-3">⚠️</div>
           <div className="text-sm font-black mb-2">누적 평판이 사라져요</div>
-          <div className="text-xs text-[#555] leading-relaxed mb-4">
+          <div className="text-xs text-[var(--color-text-secondary)] leading-relaxed mb-4">
             <span className="font-bold">&ldquo;{confirmKeyword}&rdquo;</span> 키워드에 쌓인{' '}
             <span className="font-bold">{confirmKeyword ? getReputationCount(confirmKeyword) : 0}개</span>의 평판이
             {' '}영구적으로 삭제돼요.<br />정말 해제하시겠어요?
@@ -1699,8 +1700,8 @@ function GuestbookManageScreen({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center px-5 h-12 border-b border-[#EBEBEB] flex-shrink-0">
-        <button onClick={onBack} className="text-xl text-[#555] mr-3 leading-none">‹</button>
+      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] flex-shrink-0">
+        <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
         <span className="text-base font-black">방명록 관리</span>
         <span className="ml-2 text-xs text-[#AAA]">{entries.length}개</span>
       </div>
@@ -1718,7 +1719,7 @@ function GuestbookManageScreen({ onBack }: { onBack: () => void }) {
                     <img src={getProfileAvatar(entry.linkId)} alt={entry.authorName} className="w-full h-full object-cover" />
                   </div>
                 ) : (
-                  <div className="w-7 h-7 rounded-full bg-[#e0e0e0] flex items-center justify-center text-xs font-bold text-[#555] flex-shrink-0">
+                  <div className="w-7 h-7 rounded-full bg-[var(--color-bg-muted)] flex items-center justify-center text-xs font-bold text-[var(--color-text-secondary)] flex-shrink-0">
                     {entry.authorName.charAt(0)}
                   </div>
                 )}

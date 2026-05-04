@@ -18,6 +18,8 @@
   --color-state-info-text: #9AC4F0;
   --color-state-danger-bg: #361B1A;
   --color-state-danger-text: #F0A19A;
+  --color-state-warn-bg: #2E2410;
+  --color-state-warn-text: #D4A84B;
 
   /* Radius */
   --radius-sm: 12px;

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { motion, AnimatePresence } from 'framer-motion'
 import { BadgeCheck, ChevronDown, ChevronUp, Bookmark, Copy, Mail, MessageCircle, Phone, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import {
@@ -463,23 +464,33 @@ export default function PublicProfile({
                     </div>
                     {igOpen ? <ChevronUp size={14} color="#8B857C" /> : <ChevronDown size={14} color="#8B857C" />}
                   </button>
-                  {igOpen && (
-                    <div className="pb-4 pl-8">
-                      <p className="text-[13px] leading-relaxed text-[var(--color-text-secondary)] mb-3">{profile.instagram.aiSummary}</p>
-                      <div className="flex gap-2 overflow-x-auto pb-0.5 scrollbar-hide">
-                        {profile.instagram.posts.map((post) => (
-                          <button
-                            key={post.id}
-                            onClick={() => window.open(profile.instagram.profileUrl, '_blank')}
-                            className="h-[84px] w-[84px] flex-shrink-0 overflow-hidden rounded-[10px] bg-[var(--color-bg-soft)]"
-                          >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={post.imageUrl} alt={post.caption} className="w-full h-full object-cover" />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  <AnimatePresence initial={false}>
+                    {igOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pb-4 pl-8">
+                          <p className="text-[13px] leading-relaxed text-[var(--color-text-secondary)] mb-3">{profile.instagram.aiSummary}</p>
+                          <div className="flex gap-2 overflow-x-auto pb-0.5 scrollbar-hide">
+                            {profile.instagram.posts.map((post) => (
+                              <button
+                                key={post.id}
+                                onClick={() => window.open(profile.instagram.profileUrl, '_blank')}
+                                className="h-[84px] w-[84px] flex-shrink-0 overflow-hidden rounded-[10px] bg-[var(--color-bg-soft)]"
+                              >
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={post.imageUrl} alt={post.caption} className="w-full h-full object-cover" />
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               )}
               {profile.linkedinConnected && (
@@ -504,18 +515,28 @@ export default function PublicProfile({
                     </div>
                     {liOpen ? <ChevronUp size={14} color="#8B857C" /> : <ChevronDown size={14} color="#8B857C" />}
                   </button>
-                  {liOpen && (
-                    <div className="pb-4 pl-8">
-                      <p className="text-[13px] leading-relaxed text-[var(--color-text-secondary)] mb-3">{profile.linkedin.aiSummary}</p>
-                      <div className="overflow-hidden rounded-[10px] border border-[var(--color-border-soft)]">
-                        <div className="relative max-h-48 overflow-hidden">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={profile.linkedin.previewImage} alt="LinkedIn 최근 게시물" className="w-full" />
-                          <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-[var(--color-bg-page)] to-transparent" />
+                  <AnimatePresence initial={false}>
+                    {liOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pb-4 pl-8">
+                          <p className="text-[13px] leading-relaxed text-[var(--color-text-secondary)] mb-3">{profile.linkedin.aiSummary}</p>
+                          <div className="overflow-hidden rounded-[10px] border border-[var(--color-border-soft)]">
+                            <div className="relative max-h-48 overflow-hidden">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={profile.linkedin.previewImage} alt="LinkedIn 최근 게시물" className="w-full" />
+                              <div className="absolute bottom-0 inset-x-0 h-16 bg-gradient-to-t from-[var(--color-bg-page)] to-transparent" />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               )}
             </div>
@@ -566,35 +587,45 @@ export default function PublicProfile({
                         </div>
                         {isOpen ? <ChevronUp size={14} color="#8B857C" /> : <ChevronDown size={14} color="#8B857C" />}
                       </button>
-                      {isOpen && (
-                        <div className="pb-4 pl-8">
-                          {hl.categoryId === 'career-continuity' && (
-                            <CareerContinuityChart
-                              avgYears={profile.careerHighlight.avgYears}
-                              vsIndustryPercent={profile.careerHighlight.vsIndustryPercent}
-                            />
-                          )}
-                          {hl.categoryId === 'remember-network' && (
-                            <RememberNetworkGraph
-                              total={profile.rememberHighlight.total}
-                              industries={profile.rememberHighlight.industries}
-                            />
-                          )}
-                          {hl.categoryId === 'corporate-longevity' && (
-                            <CorporateLongevityTimeline
-                              summary={corporateHighlight.summary}
-                              companies={corporateHighlight.companies}
-                            />
-                          )}
-                          {hl.categoryId === 'airline-mileage' && (
-                            <AirlineMileageSummary
-                              badgeLabel={airlineBadgeLabel}
-                              tierSummary={airlineHighlight.tierSummary}
-                              airlines={airlineHighlight.airlines}
-                            />
-                          )}
-                        </div>
-                      )}
+                      <AnimatePresence initial={false}>
+                        {isOpen && (
+                          <motion.div
+                            initial={{ height: 0, opacity: 0 }}
+                            animate={{ height: 'auto', opacity: 1 }}
+                            exit={{ height: 0, opacity: 0 }}
+                            transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+                            className="overflow-hidden"
+                          >
+                            <div className="pb-4 pl-8">
+                              {hl.categoryId === 'career-continuity' && (
+                                <CareerContinuityChart
+                                  avgYears={profile.careerHighlight.avgYears}
+                                  vsIndustryPercent={profile.careerHighlight.vsIndustryPercent}
+                                />
+                              )}
+                              {hl.categoryId === 'remember-network' && (
+                                <RememberNetworkGraph
+                                  total={profile.rememberHighlight.total}
+                                  industries={profile.rememberHighlight.industries}
+                                />
+                              )}
+                              {hl.categoryId === 'corporate-longevity' && (
+                                <CorporateLongevityTimeline
+                                  summary={corporateHighlight.summary}
+                                  companies={corporateHighlight.companies}
+                                />
+                              )}
+                              {hl.categoryId === 'airline-mileage' && (
+                                <AirlineMileageSummary
+                                  badgeLabel={airlineBadgeLabel}
+                                  tierSummary={airlineHighlight.tierSummary}
+                                  airlines={airlineHighlight.airlines}
+                                />
+                              )}
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                   )
                 }
@@ -621,8 +652,16 @@ export default function PublicProfile({
                       </div>
                       {isGroupOpen ? <ChevronUp size={14} color="#8B857C" /> : <ChevronDown size={14} color="#8B857C" />}
                     </button>
-                    {isGroupOpen && (
-                      <div className="pb-4 pl-8">
+                    <AnimatePresence initial={false}>
+                      {isGroupOpen && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+                          className="overflow-hidden"
+                        >
+                        <div className="pb-4 pl-8">
                         <div className="divide-y divide-[var(--color-border-soft)]">
                           {entry.items.map((hl) => {
                             const metaParts = getHighlightMetaParts(hl)
@@ -682,8 +721,10 @@ export default function PublicProfile({
                             )
                           })}
                         </div>
-                      </div>
-                    )}
+                        </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
                 )
               })
@@ -695,25 +736,29 @@ export default function PublicProfile({
           <SectionTitle title="Connect" />
           {!isOwnerMode && (
             <div className="flex gap-2 mb-6">
-              <button
+              <motion.button
                 onClick={() => showToast('피드백 요청을 보냈어요!')}
-                className="flex-1 rounded-full border border-[var(--color-border-default)] py-2.5 text-[13px] font-semibold text-[var(--color-text-secondary)] active:opacity-60 transition-opacity"
+                whileTap={{ scale: 0.96 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                className="flex-1 rounded-full border border-[var(--color-border-default)] py-2.5 text-[13px] font-semibold text-[var(--color-text-secondary)]"
               >
                 피드백 요청
-              </button>
-              <button
+              </motion.button>
+              <motion.button
                 onClick={() => {
                   if (alreadySubmitted) { showToast('이미 경험을 남겼어요'); return }
                   setExpSheetOpen(true)
                 }}
-                className="flex-1 rounded-full py-2.5 text-[13px] font-semibold active:opacity-60 transition-opacity"
+                whileTap={{ scale: 0.96 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                className="flex-1 rounded-full py-2.5 text-[13px] font-semibold"
                 style={alreadySubmitted
                   ? { border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)' }
                   : { backgroundColor: 'var(--color-accent-dark)', color: '#fff' }
                 }
               >
                 {alreadySubmitted ? '경험 남겼어요 ✓' : '+ 경험 남기기'}
-              </button>
+              </motion.button>
             </div>
           )}
           <div className="flex justify-around">
@@ -864,10 +909,12 @@ function ContactActionButton({
   const Icon = iconMap[channel.id as keyof typeof iconMap] ?? MessageCircle
 
   return (
-    <button
+    <motion.button
       onClick={onClick}
+      whileTap={{ scale: 0.88 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
       className={[
-        'flex flex-col items-center gap-2 transition-opacity active:opacity-60',
+        'flex flex-col items-center gap-2',
         channel.enabled ? '' : 'opacity-30',
       ].join(' ')}
     >
@@ -875,6 +922,6 @@ function ContactActionButton({
         <Icon size={18} color="var(--color-text-secondary)" />
       </div>
       <span className="text-[12px] font-medium text-[var(--color-text-secondary)]">{channel.label}</span>
-    </button>
+    </motion.button>
   )
 }

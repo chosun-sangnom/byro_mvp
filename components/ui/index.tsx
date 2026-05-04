@@ -133,12 +133,14 @@ export function Button({
   disabled, onClick, className = '', type = 'button', style,
 }: ButtonProps) {
   return (
-    <button
+    <motion.button
       type={type}
       onClick={onClick}
       disabled={disabled}
+      whileTap={disabled ? undefined : { scale: 0.97 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
       className={[
-        'rounded-xl font-semibold active:scale-[0.98] transition-all duration-100 select-none',
+        'rounded-xl font-semibold select-none',
         size === 'md' ? 'px-5 py-3 text-[14px]' : 'px-3.5 py-2 text-[13px]',
         fullWidth ? 'w-full' : '',
         disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer',
@@ -169,7 +171,7 @@ export function Button({
       }}
     >
       {children}
-    </button>
+    </motion.button>
   )
 }
 
@@ -182,10 +184,12 @@ interface ChipProps {
 
 export function Chip({ label, selected, onClick }: ChipProps) {
   return (
-    <button
+    <motion.button
       onClick={onClick}
+      whileTap={{ scale: 0.92 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 20 }}
       className={[
-        'px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-100 select-none',
+        'px-3 py-1.5 rounded-full text-xs font-semibold border select-none',
         selected
           ? 'border-[var(--color-accent-dark)] text-white'
           : 'bg-[var(--color-bg-soft)] text-[var(--color-text-secondary)] border-[var(--color-border-default)]',
@@ -193,7 +197,7 @@ export function Chip({ label, selected, onClick }: ChipProps) {
       style={selected ? { backgroundColor: 'var(--color-accent-dark)' } : undefined}
     >
       {label}
-    </button>
+    </motion.button>
   )
 }
 

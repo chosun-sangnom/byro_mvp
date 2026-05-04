@@ -98,9 +98,13 @@ function StepIntro({
   description: string
 }) {
   return (
-    <div className="surface-card px-4 py-4 mb-5 rounded-[28px]">
-      {eyebrow && <div className="micro-text uppercase tracking-[0.18em] mb-2">{eyebrow}</div>}
-      <h2 className="text-[22px] font-black leading-tight mb-2">{title}</h2>
+    <div className="surface-card px-5 py-5 mb-5 rounded-[30px]">
+      {eyebrow && (
+        <div className="mb-3 inline-flex rounded-full bg-[#171717] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white">
+          {eyebrow}
+        </div>
+      )}
+      <h2 className="text-[24px] font-black leading-tight mb-2 tracking-[-0.03em]">{title}</h2>
       <p className="text-sm leading-relaxed whitespace-pre-line text-[var(--color-text-secondary)]">{description}</p>
     </div>
   )
@@ -127,10 +131,10 @@ function SelectionCard({
     <button
       onClick={onClick}
       className={[
-        'w-full text-left rounded-[24px] border px-4 py-4 transition-colors',
+        'w-full text-left rounded-[26px] border px-4 py-4 transition-colors shadow-[0_10px_24px_rgba(26,21,48,0.04)]',
         tone === 'accent'
-          ? 'border-[#E8A000] bg-[#FFF8E6]'
-          : 'border-[var(--color-border-default)] bg-[var(--color-bg-surface)]',
+          ? 'border-[#D8B15E] bg-[linear-gradient(180deg,#FFF8EB_0%,#F7E9C7_100%)]'
+          : 'border-[var(--color-border-default)] bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(248,245,240,0.96)_100%)]',
       ].join(' ')}
     >
       <div className="flex items-start gap-3">
@@ -216,7 +220,7 @@ function StepFooter({
   skipLabel?: string
 }) {
   return (
-    <div className="px-5 pb-5 pt-3 border-t border-[#EBEBEB] space-y-2">
+      <div className="px-5 pb-5 pt-3 border-t border-[var(--color-border-soft)] bg-white/72 backdrop-blur-md space-y-2">
       <div className="grid grid-cols-2 gap-2">
         <Button variant="outline" onClick={onPrev} disabled={!onPrev}>{prevLabel}</Button>
         <Button onClick={onNext} disabled={!canNext}>{nextLabel}</Button>
@@ -905,6 +909,7 @@ function Step7Highlight() {
       <BottomSheet open={pickerOpen} onClose={() => setPickerOpen(false)}>
         {sheetMode === 'picker' && (
           <div className="px-5 pb-6">
+            <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Highlight Picker</div>
             <div className="text-[22px] font-black tracking-[-0.03em] text-[var(--color-text-strong)] mb-1">경험 추가하기</div>
             <div className="text-sm leading-6 text-[var(--color-text-secondary)] mb-5">
               프로필에 보여줄 경험을 선택하세요.
@@ -913,7 +918,10 @@ function Step7Highlight() {
             <div className="space-y-6">
               {HIGHLIGHT_GROUPS.map((group, groupIndex) => (
                 <div key={group.id} className={groupIndex > 0 ? 'border-t border-[var(--color-border-soft)] pt-5' : ''}>
-                  <div className="mb-3 text-sm font-bold text-[var(--color-text-secondary)]">{group.label}</div>
+                  <div className="mb-3 flex items-center gap-3">
+                    <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-secondary)]">{group.label}</div>
+                    <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
+                  </div>
                   <div className="grid grid-cols-4 gap-3">
                     {HIGHLIGHT_CATEGORIES.filter((cat) => cat.group === group.id).map((cat) => {
                       const certification = CERTIFICATION_HIGHLIGHTS.find((item) => item.categoryId === cat.id)
@@ -929,7 +937,7 @@ function Step7Highlight() {
                             setSelectedCat(cat)
                             setSheetMode('group')
                           }}
-                          className="relative overflow-visible rounded-[20px] border border-[var(--color-border-default)] bg-white px-3 py-4 text-center shadow-[0_4px_14px_rgba(17,17,17,0.03)]"
+                          className="relative overflow-visible rounded-[22px] border border-[var(--color-border-default)] bg-white px-3 py-4 text-center shadow-[0_8px_18px_rgba(17,17,17,0.04)]"
                         >
                           {cat.certificationOnly && (
                             <span className="absolute -right-2 -top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-white text-[#217A43] shadow-[0_4px_12px_rgba(17,17,17,0.10)]">
@@ -957,14 +965,20 @@ function Step7Highlight() {
               <div className="text-[18px] font-black text-[var(--color-text-strong)]">{selectedCat.label} 관리</div>
             </div>
 
-            <div className="surface-card mb-4 rounded-[26px] px-4 py-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
-                  <HighlightIcon id={selectedCat.icon as HighlightIconId} size={18} />
+            <div className="surface-card mb-4 rounded-[28px] px-4 py-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
+                    <HighlightIcon id={selectedCat.icon as HighlightIconId} size={18} />
+                  </div>
+                  <div>
+                    <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-text-tertiary)]">Collection</div>
+                    <div className="mt-1 text-[15px] font-bold text-[var(--color-text-strong)]">{selectedCat.label}</div>
+                    <div className="micro-text">여러 항목을 추가하고 메인으로 보여줄 항목을 고를 수 있어요</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{selectedCat.label}</div>
-                  <div className="micro-text">여러 항목을 추가하고 메인으로 보여줄 항목을 고를 수 있어요</div>
+                <div className="rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
+                  {selectedCategoryHighlights.length}개
                 </div>
               </div>
             </div>
@@ -1002,7 +1016,7 @@ function Step7Highlight() {
                               store.setHighlightPrimary(selectedCat.id, item.id)
                               showToast('메인 항목으로 설정했어요')
                             }}
-                            className="rounded-full border border-[#D7D0C8] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-secondary)]"
+                            className="rounded-full border border-[#D7D0C8] bg-[var(--color-bg-soft)] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-secondary)]"
                           >
                             메인으로 설정
                           </button>
@@ -1011,7 +1025,7 @@ function Step7Highlight() {
                       <div className="mt-4 flex gap-2">
                         <button
                           onClick={() => openEditForm(item)}
-                          className="rounded-lg border border-[#CFC7BF] px-3 py-1.5 text-xs font-medium text-[#555]"
+                          className="rounded-xl border border-[#D7D0C8] bg-white px-3 py-1.5 text-xs font-medium text-[#555]"
                         >
                           수정
                         </button>
@@ -1020,7 +1034,7 @@ function Step7Highlight() {
                             store.removeHighlight(item.id)
                             showToast('삭제됐어요')
                           }}
-                          className="rounded-lg border border-[#F2C7C5] px-3 py-1.5 text-xs font-medium text-[#C9473D]"
+                          className="rounded-xl border border-[#F2C7C5] bg-white px-3 py-1.5 text-xs font-medium text-[#C9473D]"
                         >
                           삭제
                         </button>
@@ -1058,13 +1072,14 @@ function Step7Highlight() {
             </div>
 
             {selectedCat && (
-              <div className="surface-card mb-4 rounded-[26px] px-4 py-4">
+              <div className="surface-card mb-4 rounded-[28px] px-4 py-4">
                 <div className="flex items-center gap-3">
                   <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
                     <HighlightIcon id={selectedCat.icon as HighlightIconId} size={18} />
                   </div>
                   <div>
-                    <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{selectedCat.label}</div>
+                    <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-text-tertiary)]">Entry Form</div>
+                    <div className="mt-1 text-[15px] font-bold text-[var(--color-text-strong)]">{selectedCat.label}</div>
                     <div className="micro-text">직접 입력으로 바로 추가돼요</div>
                   </div>
                 </div>

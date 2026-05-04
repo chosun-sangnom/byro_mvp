@@ -3,18 +3,20 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
-import { AlertCircle, BadgeCheck, CheckCircle2, Mail, MessageCircle, Pencil, Phone, Sparkles, Trash2 } from 'lucide-react'
+import { AlertCircle, BadgeCheck, CheckCircle2, Pencil, Sparkles, Trash2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import {
   NavBar, StepBar, Button, Chip, CheckRow, BottomSheet, Modal,
   InfoBox, TextArea, AiBounce, YearPickerSheet, showToast,
 } from '@/components/ui'
+import { ContactTypeIcon } from '@/components/contact/ContactTypeIcon'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import type { ContactChannel, Highlight, HighlightIconId } from '@/types'
 import {
   KEYWORD_GROUPS, HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS, AI_BIO_CANDIDATES,
   INSTAGRAM_PROFILE, LINKEDIN_PROFILE,
 } from '@/lib/mockData'
+import { buildContactHref, contactPlaceholder, contactPreview } from '@/lib/contactChannels'
 import { getHighlightMetaParts, isPrimaryHighlight, sortHighlightsByPrimary } from '@/lib/highlightMeta'
 
 const STEP_NUMS: Record<string, number> = {
@@ -154,52 +156,6 @@ function SelectionCard({
       </div>
     </button>
   )
-}
-
-function ContactTypeIcon({
-  channelId,
-  enabled,
-}: {
-  channelId: ContactChannel['id']
-  enabled: boolean
-}) {
-  const iconMap = {
-    phone: Phone,
-    email: Mail,
-    kakao: MessageCircle,
-  }
-  const Icon = iconMap[channelId] ?? MessageCircle
-
-  return (
-    <div className={[
-      'flex h-10 w-10 items-center justify-center rounded-xl',
-      enabled ? 'bg-[var(--color-accent-dark)] text-white' : 'bg-[var(--color-bg-muted)] text-[var(--color-text-tertiary)]',
-    ].join(' ')}>
-      <Icon size={16} />
-    </div>
-  )
-}
-
-function buildContactHref(id: ContactChannel['id'], value: string) {
-  const trimmed = value.trim()
-  if (!trimmed) return ''
-  if (id === 'phone') return `tel:${trimmed.replace(/[^0-9+]/g, '')}`
-  if (id === 'email') return `mailto:${trimmed}`
-  if (id === 'kakao') return trimmed.startsWith('http') ? trimmed : `https://open.kakao.com/o/${trimmed}`
-  return ''
-}
-
-function contactPlaceholder(id?: ContactChannel['id']) {
-  if (id === 'phone') return '010-1234-5678'
-  if (id === 'email') return 'name@byro.io'
-  if (id === 'kakao') return 'openchat 코드 또는 URL'
-  return ''
-}
-
-function contactPreview(id?: ContactChannel['id'], value?: string) {
-  if (!id) return ''
-  if (!value?.trim()) return '값을 비우면 비활성화 상태로 저장할 수 있어요.'
-  return buildContactHref(id, value)
 }
 
 function StepFooter({

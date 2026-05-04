@@ -100,6 +100,94 @@ export interface ContactChannel {
   enabled: boolean
 }
 
+export interface InstagramPost {
+  id: string
+  imageUrl: string
+  caption: string
+  timestamp?: string
+}
+
+export interface InstagramProfile {
+  username: string
+  profileUrl: string
+  aiSummary: string
+  posts: InstagramPost[]
+}
+
+export interface LinkedInPost {
+  id: string
+  text: string
+  likes: number
+  date: string
+}
+
+export interface LinkedInProfile {
+  profileUrl: string
+  aiSummary: string
+  previewImage?: string
+  recentPosts?: LinkedInPost[]
+}
+
+export interface HeroTheme {
+  cover: string
+  avatar: string
+}
+
+export interface CareerHighlight {
+  avgYears: number
+  vsIndustryPercent: number
+}
+
+export interface RememberIndustry {
+  name: string
+  ratio: number
+}
+
+export interface RememberHighlight {
+  total: number
+  industries: RememberIndustry[]
+}
+
+export interface CorporateCompany {
+  name: string
+  startYear: number
+  endYear: number | null
+  years: number
+  status: string
+}
+
+export interface CorporateHighlight {
+  companyCount: number
+  summary: string
+  companies: CorporateCompany[]
+  averageOperatingYears?: number
+  years?: number
+}
+
+export interface AirlineMembership {
+  name: string
+  tier: string
+}
+
+export interface AirlineHighlight {
+  tierSummary: string
+  badgeLevel: string
+  airlines: AirlineMembership[]
+}
+
+export interface ReputationKeyword {
+  keyword: string
+  count: number
+}
+
+export interface GuestbookEntry {
+  id: string
+  linkId: string
+  authorName: string
+  message: string
+  date: string
+}
+
 export interface PublicProfile {
   linkId: string
   name: string
@@ -112,21 +200,21 @@ export interface PublicProfile {
   avatarImage?: string
   instagramConnected: boolean
   linkedinConnected: boolean
-  careerHighlight: { avgYears: number; vsIndustryPercent: number }
-  rememberHighlight: {
-    total: number
-    industries: { name: string; ratio: number }[]
-  }
-  heroTheme?: {
-    cover: string
-    avatar: string
-  }
+  instagram?: InstagramProfile
+  linkedin?: LinkedInProfile
+  careerHighlight: CareerHighlight
+  rememberHighlight: RememberHighlight
+  heroTheme?: HeroTheme
   contactChannels?: ContactChannel[]
+  corporateHighlight?: CorporateHighlight
+  airlineHighlight?: AirlineHighlight
   manualHighlights: Highlight[]
   experiences: Experience[]
   savedProfiles: SavedProfile[]
   recentProfiles: RecentProfile[]
   receivedRequests: ReceivedRequest[]
+  reputationKeywords?: ReputationKeyword[]
+  guestbook?: GuestbookEntry[]
 }
 
 export interface UserState {

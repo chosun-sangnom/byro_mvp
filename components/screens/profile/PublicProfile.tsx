@@ -451,7 +451,15 @@ export default function PublicProfile({
                     <img src="/images/Instagram.svg" alt="Instagram" className="w-[18px] h-[18px] flex-shrink-0" />
                     <div className="min-w-0 flex-1">
                       <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">Instagram</div>
-                      <div className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5">@{profile.instagram.username}</div>
+                      <a
+                        href={profile.instagram.profileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="mt-0.5 block text-[12px] text-[var(--color-accent-dark)] underline-offset-2 hover:underline"
+                      >
+                        @{profile.instagram.username}
+                      </a>
                     </div>
                     {igOpen ? <ChevronUp size={14} color="#8B857C" /> : <ChevronDown size={14} color="#8B857C" />}
                   </button>
@@ -484,7 +492,15 @@ export default function PublicProfile({
                     <img src="/images/linkedin.png" alt="LinkedIn" className="w-[18px] h-[18px] flex-shrink-0" />
                     <div className="min-w-0 flex-1">
                       <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">LinkedIn</div>
-                      <div className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5">{profile.linkedin.profileUrl.replace(/^https?:\/\/(www\.)?/, '')}</div>
+                      <a
+                        href={profile.linkedin.profileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="mt-0.5 block truncate text-[12px] text-[var(--color-accent-dark)] underline-offset-2 hover:underline"
+                      >
+                        {profile.linkedin.profileUrl.replace(/^https?:\/\/(www\.)?/, '')}
+                      </a>
                     </div>
                     {liOpen ? <ChevronUp size={14} color="#8B857C" /> : <ChevronDown size={14} color="#8B857C" />}
                   </button>
@@ -585,10 +601,11 @@ export default function PublicProfile({
                         <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={16} />
                       </span>
                       <div className="min-w-0 flex-1">
+                        <div className="text-[11px] text-[var(--color-text-tertiary)] mb-0.5">{category?.label ?? '직접 입력'}</div>
                         <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{preview.title}</div>
-                        <div className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5">
-                          {category?.label ?? '직접 입력'}{preview.meta ? ` · ${preview.meta}` : ''}
-                        </div>
+                        {preview.meta && (
+                          <div className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5">{preview.meta}</div>
+                        )}
                       </div>
                       {isGroupOpen ? <ChevronUp size={14} color="#8B857C" /> : <ChevronDown size={14} color="#8B857C" />}
                     </button>

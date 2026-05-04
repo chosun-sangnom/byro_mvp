@@ -313,7 +313,12 @@ export default function PublicProfile({
       {/* 스크롤 영역 */}
       <div className="flex-1 overflow-y-auto">
         {/* 프로필 헤더 */}
-        <div className="relative px-5 pt-4 pb-3">
+        <motion.div
+          className="relative px-5 pt-4 pb-3"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        >
           {/* ambient glow */}
           <div className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(75,108,245,0.14)_0%,transparent_68%)]" />
           <div className="hero-card border border-[var(--color-border-default)] bg-[rgba(23,24,28,0.92)] p-[8px] backdrop-blur-sm">
@@ -341,10 +346,21 @@ export default function PublicProfile({
               )}
 
               <div className="absolute inset-x-0 bottom-0 p-5">
-                <div className="flex items-center gap-1.5">
-                  <div className="text-[29px] font-black tracking-[-0.04em] text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.24)]">{profile.name}</div>
-                  <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-white/95 text-[var(--color-state-success-text)] shadow-[0_8px_20px_rgba(17,17,17,0.18)]">
-                    <BadgeCheck size={14} />
+                <div className="flex items-end gap-2 mb-0.5">
+                  <div
+                    className="text-[38px] font-black leading-[1.08] tracking-[-0.05em]"
+                    style={{
+                      background: 'linear-gradient(170deg, #FFFFFF 40%, rgba(255,255,255,0.68) 100%)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                      filter: 'drop-shadow(0 2px 12px rgba(0,0,0,0.32))',
+                    }}
+                  >
+                    {profile.name}
+                  </div>
+                  <span className="mb-1.5 inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/95 text-[var(--color-state-success-text)] shadow-[0_4px_12px_rgba(0,0,0,0.22)]">
+                    <BadgeCheck size={12} />
                   </span>
                 </div>
                 <div className="mt-4 max-w-[318px] rounded-[18px] border border-white/12 bg-white/10 px-4 py-3 text-[15px] leading-[1.52] text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[8px]">
@@ -384,7 +400,7 @@ export default function PublicProfile({
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Reputation</div>
-                  <div className="mt-1 text-[18px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">누적 평판</div>
+                  <div className="mt-0.5 text-[22px] font-black tracking-[-0.04em] text-[var(--color-text-strong)]">누적 평판</div>
                 </div>
                 <div className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
                   총 {totalKeywordCount}
@@ -437,10 +453,16 @@ export default function PublicProfile({
               )}
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* ─── SNS 섹션 ─────────────────────────────── */}
-        <div className="px-5 pt-6 pb-2">
+        <motion.div
+          className="px-5 pt-6 pb-2"
+          initial={{ opacity: 0, y: 22 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+        >
           <SectionTitle title="SNS" />
           {(profile.instagramConnected || profile.linkedinConnected) ? (
             <div className="divide-y divide-[var(--color-border-soft)]">
@@ -545,10 +567,16 @@ export default function PublicProfile({
           ) : (
             <p className="text-[13px] text-[var(--color-text-tertiary)]">연동된 SNS가 없습니다.</p>
           )}
-        </div>
+        </motion.div>
 
         {/* ─── 하이라이트 섹션 ─────────────────────── */}
-        <div className="px-5 pt-6 pb-2">
+        <motion.div
+          className="px-5 pt-6 pb-2"
+          initial={{ opacity: 0, y: 22 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1], delay: 0.06 }}
+        >
           <SectionTitle title="하이라이트" />
           <div className="divide-y divide-[var(--color-border-soft)]">
             {groupedHighlights.flatMap((group) =>
@@ -732,9 +760,15 @@ export default function PublicProfile({
               })
             )}
           </div>
-        </div>
+        </motion.div>
 
-        <div className="px-5 pt-6 pb-8">
+        <motion.div
+          className="px-5 pt-6 pb-8"
+          initial={{ opacity: 0, y: 22 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
+        >
           <SectionTitle title="Connect" />
           {!isOwnerMode && (
             <div className="flex gap-2 mb-6">
@@ -782,7 +816,7 @@ export default function PublicProfile({
               />
             ))}
           </div>
-        </div>
+        </motion.div>
 
         <div className="h-24" />
       </div>

@@ -391,8 +391,11 @@ export function CheckRow({ label, sublabel, checked, onToggle, onDetail }: Check
         onClick={onToggle}
         className={[
           'w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 border-2 transition-all',
-          checked ? 'bg-[#0A0A0A] border-[#0A0A0A]' : 'bg-white border-[#ccc]',
+          checked
+            ? 'border-[var(--color-accent-dark)]'
+            : 'bg-transparent border-[var(--color-border-default)]',
         ].join(' ')}
+        style={checked ? { backgroundColor: 'var(--color-accent-dark)' } : undefined}
       >
         {checked && (
           <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
@@ -401,11 +404,11 @@ export function CheckRow({ label, sublabel, checked, onToggle, onDetail }: Check
         )}
       </button>
       <div className="flex-1">
-        <span className="text-sm text-[#333]">{label}</span>
-        {sublabel && <div className="text-xs text-[#888]">{sublabel}</div>}
+        <span className="text-sm text-[var(--color-text-primary)]">{label}</span>
+        {sublabel && <div className="text-xs text-[var(--color-text-tertiary)]">{sublabel}</div>}
       </div>
       {onDetail && (
-        <button onClick={onDetail} className="text-[#aaa] text-sm">›</button>
+        <button onClick={onDetail} className="text-[var(--color-text-tertiary)] text-sm">›</button>
       )}
     </div>
   )
@@ -430,14 +433,14 @@ interface InfoBoxProps {
 }
 
 const INFO_STYLES: Record<string, string> = {
-  info: 'bg-[#E3F2FD] border-[#90CAF9] text-[#0D47A1]',
-  warn: 'bg-[#FFF8E6] border-[#FFD54F] text-[#7A5A00]',
-  success: 'bg-[#E6F5E6] border-[#A5D6A7] text-[#1A7A1A]',
+  info: 'border-[var(--color-border-default)] text-[var(--color-state-info-text)]',
+  warn: 'border-[var(--color-border-default)] text-[var(--color-text-secondary)]',
+  success: 'border-[var(--color-border-default)] text-[var(--color-state-success-text)]',
 }
 
 export function InfoBox({ children, variant = 'info' }: InfoBoxProps) {
   return (
-    <div className={`rounded-lg border px-3 py-2 text-xs ${INFO_STYLES[variant]}`}>
+    <div className={`rounded-xl border px-3 py-2 text-xs bg-[var(--color-bg-soft)] ${INFO_STYLES[variant]}`}>
       {children}
     </div>
   )
@@ -480,8 +483,8 @@ export function TextArea({ value, onChange, placeholder, maxLength, rows = 4, da
 
 // ─── Divider ─────────────────────────────────────────────
 export function Divider({ thick }: { thick?: boolean }) {
-  if (thick) return <div className="h-2 bg-[#f0f0f0] -mx-4 my-3" />
-  return <div className="h-px bg-[#EBEBEB] my-3" />
+  if (thick) return <div className="h-px bg-[var(--color-border-soft)] -mx-4 my-3" />
+  return <div className="h-px bg-[var(--color-border-soft)] my-3" />
 }
 
 // ─── Avatar ──────────────────────────────────────────────

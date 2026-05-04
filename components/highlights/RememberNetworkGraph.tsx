@@ -32,7 +32,7 @@ export function RememberNetworkGraph({
   industries: IndustryNode[]
 }) {
   return (
-    <div className="rounded-[22px] border border-[#E7E2DC] bg-white px-4 py-4">
+    <div className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4">
       <div className="mb-4">
         <div className="text-sm font-bold text-[var(--color-text-strong)]">직업 네트워크 분포</div>
         <div className="mt-1 text-[11px] text-[var(--color-text-tertiary)]">
@@ -41,14 +41,7 @@ export function RememberNetworkGraph({
       </div>
 
       <svg viewBox="0 0 200 160" className="h-auto w-full">
-        <defs>
-          <radialGradient id="rememberGlow" cx="50%" cy="50%" r="65%">
-            <stop offset="0%" stopColor="#F8F5F1" />
-            <stop offset="100%" stopColor="#FFFFFF" />
-          </radialGradient>
-        </defs>
-
-        <rect x="0" y="0" width="200" height="160" rx="20" fill="url(#rememberGlow)" />
+        <rect x="0" y="0" width="200" height="160" rx="12" fill="#1D1F24" />
 
         {industries.slice(0, 8).map((industry, index) => {
           const pos = NODE_POSITIONS[index]
@@ -61,19 +54,19 @@ export function RememberNetworkGraph({
                 y1="84"
                 x2={pos.x}
                 y2={pos.y}
-                stroke="#D9D2CB"
+                stroke="#3A3D44"
                 strokeWidth="1.5"
                 strokeLinecap="round"
               />
-              <circle cx={pos.x} cy={pos.y} r={pos.r + 2} fill="#F7F4F0" />
-              <circle cx={pos.x} cy={pos.y} r={pos.r} fill="#FFFFFF" stroke="#E7E2DC" strokeWidth="1.5" />
+              <circle cx={pos.x} cy={pos.y} r={pos.r + 2} fill="#24272D" />
+              <circle cx={pos.x} cy={pos.y} r={pos.r} fill="#2A2D34" stroke="#3A3D44" strokeWidth="1.5" />
               <text
                 x={pos.x}
                 y={labelStartY}
                 textAnchor="middle"
                 fontSize="6.4"
                 fontWeight="700"
-                fill="#6F6B66"
+                fill="#8B857C"
               >
                 {labelLines.map((line, lineIndex) => (
                   <tspan key={line} x={pos.x} dy={lineIndex === 0 ? 0 : 6.8}>
@@ -87,7 +80,7 @@ export function RememberNetworkGraph({
                 textAnchor="middle"
                 fontSize="10"
                 fontWeight="800"
-                fill="#111111"
+                fill="#E8E3DA"
               >
                 {industry.ratio}%
               </text>
@@ -98,7 +91,7 @@ export function RememberNetworkGraph({
                   textAnchor="middle"
                   fontSize="5.8"
                   fontWeight="600"
-                  fill="#9A958E"
+                  fill="#6B6560"
                 >
                   {industry.count}명
                 </text>
@@ -107,13 +100,13 @@ export function RememberNetworkGraph({
           )
         })}
 
-        <circle cx="100" cy="84" r="26" fill="#111111" />
-        <circle cx="100" cy="84" r="29" fill="none" stroke="#EEE7DE" strokeWidth="2" />
+        <circle cx="100" cy="84" r="26" fill="#4B6CF5" />
+        <circle cx="100" cy="84" r="29" fill="none" stroke="#3A3D44" strokeWidth="2" />
         <text x="100" y="80" textAnchor="middle" fontSize="9" fontWeight="700" fill="#FFFFFF">나</text>
-        <text x="100" y="92" textAnchor="middle" fontSize="7" fontWeight="600" fill="#D7D2CB">Byro</text>
+        <text x="100" y="92" textAnchor="middle" fontSize="7" fontWeight="600" fill="rgba(255,255,255,0.6)">Byro</text>
       </svg>
 
-      <div className="mt-4 flex items-center justify-between border-t border-[#F1ECE6] pt-3">
+      <div className="mt-4 flex items-center justify-between border-t border-[var(--color-border-soft)] pt-3">
         <div className="text-[11px] text-[var(--color-text-tertiary)]">리멤버 명함 기준</div>
         <div className="text-[11px] font-semibold text-[var(--color-text-secondary)]">총 {total}명</div>
       </div>

@@ -13,13 +13,13 @@ export function CareerContinuityChart({
   const industryWidth = `${(industryYears / maxYears) * 100}%`
 
   return (
-    <div className="rounded-[22px] border border-[#E7E2DC] bg-white px-4 py-4">
+    <div className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4">
       <div className="flex items-end justify-between gap-3 mb-4">
         <div>
           <div className="text-sm font-bold text-[var(--color-text-strong)]">평균 재직 기간 비교</div>
           <div className="text-[11px] text-[var(--color-text-tertiary)] mt-1">건강보험공단 기준으로 업계 평균과 비교해요</div>
         </div>
-        <div className="rounded-full bg-[#E8F5EC] px-2.5 py-1 text-[11px] font-semibold text-[#217A43]">
+        <div className="rounded-full bg-[var(--color-state-success-bg)] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-state-success-text)]">
           +{vsIndustryPercent}%
         </div>
       </div>
@@ -30,8 +30,8 @@ export function CareerContinuityChart({
             <span className="font-semibold text-[var(--color-text-strong)]">나</span>
             <span className="font-black text-[var(--color-text-strong)]">{avgYears}년</span>
           </div>
-          <div className="h-3 rounded-full bg-[#F1EFEC] overflow-hidden">
-            <div className="h-full rounded-full bg-[#111111]" style={{ width: selfWidth }} />
+          <div className="h-2.5 rounded-full bg-[var(--color-bg-muted)] overflow-hidden">
+            <div className="h-full rounded-full bg-[var(--color-accent-dark)]" style={{ width: selfWidth }} />
           </div>
         </div>
 
@@ -40,8 +40,8 @@ export function CareerContinuityChart({
             <span className="font-semibold text-[var(--color-text-secondary)]">업계 평균</span>
             <span className="font-semibold text-[var(--color-text-secondary)]">{industryYears}년</span>
           </div>
-          <div className="h-3 rounded-full bg-[#F1EFEC] overflow-hidden">
-            <div className="h-full rounded-full bg-[#CFC7BF]" style={{ width: industryWidth }} />
+          <div className="h-2.5 rounded-full bg-[var(--color-bg-muted)] overflow-hidden">
+            <div className="h-full rounded-full bg-[var(--color-border-default)]" style={{ width: industryWidth }} />
           </div>
         </div>
       </div>

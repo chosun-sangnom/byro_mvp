@@ -79,8 +79,8 @@ export default function OnboardingScreen() {
             지금 나가면 입력한 정보가<br />저장되지 않아요.
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setShowExitModal(false)}>계속 작성하기</Button>
-            <Button variant="danger" onClick={handleExitConfirm}>종료하기</Button>
+            <Button variant="outline" size="sm" onClick={() => setShowExitModal(false)}>계속 작성하기</Button>
+            <Button variant="danger" size="sm" onClick={handleExitConfirm}>종료하기</Button>
           </div>
         </div>
       </Modal>

@@ -140,7 +140,7 @@ export function Button({
       whileTap={disabled ? undefined : { scale: 0.97 }}
       transition={{ type: 'spring', stiffness: 400, damping: 20 }}
       className={[
-        'rounded-xl font-semibold select-none',
+        'rounded-xl font-semibold select-none whitespace-nowrap',
         size === 'md' ? 'px-5 py-3 text-[14px]' : 'px-3.5 py-2 text-[13px]',
         fullWidth ? 'w-full' : '',
         disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer',

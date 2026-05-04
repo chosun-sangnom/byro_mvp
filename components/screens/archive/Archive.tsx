@@ -61,10 +61,10 @@ export default function Archive() {
             className={[
               'flex-1 min-w-fit py-2.5 px-3 text-xs font-semibold rounded-full border transition-colors',
               activeArchiveTab === tab.key
-                ? 'border-[#0A0A0A] bg-[#0A0A0A] text-white'
-                : 'bg-white text-[var(--color-text-secondary)]',
+                ? 'border-[var(--color-accent-dark)] text-white'
+                : 'bg-[var(--color-bg-soft)] text-[var(--color-text-secondary)] border-[var(--color-border-default)]',
             ].join(' ')}
-            style={activeArchiveTab === tab.key ? undefined : { borderColor: 'var(--color-border-default)' }}
+            style={activeArchiveTab === tab.key ? { backgroundColor: 'var(--color-accent-dark)' } : undefined}
           >
             {tab.label}
           </button>
@@ -84,12 +84,12 @@ export default function Archive() {
                 className="surface-card flex items-center gap-3 rounded-[22px] px-4 py-4 w-full text-left mb-3"
               >
                 {getProfileAvatar(p.linkId) ? (
-                  <div className="w-10 h-10 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-[var(--color-bg-muted)] flex-shrink-0">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={getProfileAvatar(p.linkId)} alt={`${p.name} 프로필 사진`} className="w-full h-full object-cover" />
                   </div>
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-[#e0e0e0] flex items-center justify-center font-bold text-[#555] text-sm flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-[var(--color-bg-muted)] flex items-center justify-center font-bold text-[var(--color-text-secondary)] text-sm flex-shrink-0">
                     {p.name.charAt(0)}
                   </div>
                 )}
@@ -100,7 +100,7 @@ export default function Archive() {
                   </div>
                   <div className="meta-text mt-0.5">{p.title}</div>
                   {p.memo && (
-                    <div className="text-xs text-[var(--color-text-primary)] rounded-full px-2.5 py-1 mt-2 inline-block" style={{ backgroundColor: '#FFF8E6' }}>
+                    <div className="text-xs text-[var(--color-text-secondary)] rounded-full px-2.5 py-1 mt-2 inline-block bg-[var(--color-bg-muted)] border border-[var(--color-border-default)]">
                       📝 {p.memo}
                     </div>
                   )}
@@ -122,12 +122,12 @@ export default function Archive() {
                 className="surface-card flex items-center gap-3 rounded-[22px] px-4 py-4 w-full text-left mb-3"
               >
                 {getProfileAvatar(p.linkId) ? (
-                  <div className="w-10 h-10 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-[var(--color-bg-muted)] flex-shrink-0">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={getProfileAvatar(p.linkId)} alt={`${p.name} 프로필 사진`} className="w-full h-full object-cover" />
                   </div>
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-[#e0e0e0] flex items-center justify-center font-bold text-[#555] text-sm flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-[var(--color-bg-muted)] flex items-center justify-center font-bold text-[var(--color-text-secondary)] text-sm flex-shrink-0">
                     {p.name.charAt(0)}
                   </div>
                 )}
@@ -149,12 +149,12 @@ export default function Archive() {
               <div key={r.id} className="surface-card rounded-[24px] p-4 mb-3">
                 <div className="flex items-center gap-2 mb-2">
                   {getProfileAvatar(r.linkId) ? (
-                    <div className="w-8 h-8 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full overflow-hidden bg-[var(--color-bg-muted)] flex-shrink-0">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={getProfileAvatar(r.linkId)} alt={`${r.name} 프로필 사진`} className="w-full h-full object-cover" />
                     </div>
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-[#e0e0e0] flex items-center justify-center font-bold text-[#555] text-sm flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-[var(--color-bg-muted)] flex items-center justify-center font-bold text-[var(--color-text-secondary)] text-sm flex-shrink-0">
                       {r.name.charAt(0)}
                     </div>
                   )}

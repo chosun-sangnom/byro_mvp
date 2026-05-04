@@ -134,7 +134,7 @@ export default function PublicProfile({
       categoryId: 'corporate-longevity',
       icon: 'building2',
       title: '법인 영속성',
-      subtitle: corporateHighlight.summary,
+      subtitle: `${'years' in corporateHighlight ? corporateHighlight.years : corporateHighlight.averageOperatingYears}년째 정상 운영 중`,
       description: '법인 운영 기간과 정상 운영 여부를 확인한 항목입니다.',
       year: '',
     },

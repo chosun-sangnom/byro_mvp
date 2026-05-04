@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BadgeCheck, ChevronDown, ChevronUp, Bookmark, Copy, Mail, MessageCircle, Phone, Share2 } from 'lucide-react'
+import { Award, BadgeCheck, ChevronDown, ChevronUp, Bookmark, Copy, Lightbulb, Mail, MessageCircle, Phone, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import {
   Button, Chip, BottomSheet, Modal, TextArea, showToast,
@@ -855,23 +855,49 @@ export default function PublicProfile({
       {/* ─── 경험 완료 모달 ─────────────────────── */}
       <Modal open={expDoneModal} onClose={() => setExpDoneModal(false)}>
         <div className="text-center">
-          <div className="text-3xl mb-3">🤝</div>
-          <div className="text-[15px] font-bold text-[var(--color-text-strong)] mb-2">경험을 남겼어요!</div>
-          <div className="text-[13px] text-[var(--color-text-secondary)] mb-5">{profile.name} 님의 평판이 쌓였어요!</div>
+          {/* icon */}
+          <div className="mb-4 flex justify-center">
+            <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-[var(--color-bg-muted)] border border-[var(--color-border-default)]"
+              style={{ boxShadow: '0 0 24px rgba(75,108,245,0.22)' }}>
+              <Award size={28} color="var(--color-accent-dark)" strokeWidth={1.8} />
+            </div>
+          </div>
+
+          <div className="text-[17px] font-black text-[var(--color-text-strong)] mb-2">경험을 남겼어요!</div>
+          <div className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed mb-5">
+            {profile.name} 님의 평판이 쌓였어요.{store.isLoggedIn && <><br />서로 연결된 신뢰가 만들어졌습니다.</>}
+          </div>
+
           {store.isLoggedIn ? (
-            <Button variant="outline" onClick={() => setExpDoneModal(false)}>프로필로 돌아가기</Button>
+            <>
+              <div className="mb-5 flex gap-2.5 rounded-xl border border-[var(--color-state-info-bg)] bg-[var(--color-state-info-bg)] px-3.5 py-3 text-left">
+                <Lightbulb size={14} className="mt-0.5 flex-shrink-0 text-[var(--color-state-info-text)]" />
+                <div>
+                  <div className="text-[12px] font-bold text-[var(--color-state-info-text)]">나도 평판을 받고 싶다면?</div>
+                  <div className="mt-0.5 text-[12px] leading-relaxed text-[var(--color-state-info-text)] opacity-80">
+                    {profile.name} 님에게 경험 남기기를 요청해 보세요.
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Button onClick={() => { setExpDoneModal(false); showToast(`${profile.name} 님에게 경험 요청을 보냈어요!`) }}>
+                  {profile.name} 님에게 경험 요청하기
+                </Button>
+                <Button variant="outline" onClick={() => setExpDoneModal(false)}>프로필로 돌아가기</Button>
+              </div>
+            </>
           ) : (
             <>
-              <div className="mb-5 text-left rounded-xl border border-[var(--color-border-soft)] px-3.5 py-3">
-                <div className="text-[12px] font-bold text-[var(--color-text-primary)]">나도 평판을 받고 싶다면?</div>
-                <div className="text-[12px] text-[var(--color-text-secondary)] mt-1 leading-relaxed">
-                  로그인하면 {profile.name} 님에게 경험요청을 보내고, 나도 평판을 쌓을 수 있어요.
+              <div className="mb-5 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3.5 text-left">
+                <div className="text-[13px] font-bold text-[var(--color-text-primary)] mb-1">나도 평판을 받고 싶다면?</div>
+                <div className="text-[12px] text-[var(--color-text-secondary)] leading-relaxed">
+                  Byro를 만들면 {profile.name} 님에게 경험 요청을 보내고,<br />평판을 쌓을 수 있어요.
                 </div>
               </div>
               <div className="space-y-2">
                 <Button onClick={() => { setExpDoneModal(false); router.push('/onboarding') }}>내 Byro 만들기</Button>
                 <Button variant="outline" onClick={() => { setExpDoneModal(false); store.login() }}>로그인하기</Button>
-                <Button variant="ghost" onClick={() => setExpDoneModal(false)}>프로필로 돌아가기</Button>
+                <Button variant="ghost" onClick={() => setExpDoneModal(false)}>{profile.name} 님 프로필로 돌아가기</Button>
               </div>
             </>
           )}

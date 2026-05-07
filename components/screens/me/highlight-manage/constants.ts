@@ -1,4 +1,5 @@
-import { HIGHLIGHT_CATEGORIES, SAMPLE_PROFILE } from '@/lib/mockData'
+import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
+import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
 export type HighlightManageMode = 'list' | 'picker' | 'group' | 'form' | 'cert'
 export type YearPickerTarget = 'career-start' | 'career-end' | 'education-start' | 'education-end' | 'education-year'

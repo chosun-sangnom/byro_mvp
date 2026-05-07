@@ -2,7 +2,7 @@
 
 import { ChevronRight } from 'lucide-react'
 import type { Highlight, UserState } from '@/types'
-import { SAMPLE_PROFILE } from '@/lib/mockData'
+import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
 interface ManageByroScreenProps {
   allHighlights: Highlight[]

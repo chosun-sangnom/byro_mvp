@@ -9,7 +9,7 @@ import { CorporateLongevityTimeline } from '@/components/highlights/CorporateLon
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { RememberNetworkGraph } from '@/components/highlights/RememberNetworkGraph'
 import { SectionTitle } from '@/components/screens/profile/PublicProfileSections'
-import { HIGHLIGHT_CATEGORIES } from '@/lib/mockData'
+import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
 import { getGroupedHighlightPreview, getHighlightDetailFootnote, getHighlightMetaParts } from '@/lib/highlightMeta'
 import type { Highlight, HighlightIconId } from '@/types'
 

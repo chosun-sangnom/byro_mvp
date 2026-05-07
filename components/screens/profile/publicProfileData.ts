@@ -1,8 +1,5 @@
-import {
-  INSTAGRAM_PROFILE,
-  LINKEDIN_PROFILE,
-  getPublicProfileByUsername,
-} from '@/lib/mockData'
+import { getPublicProfileByUsername } from '@/lib/mocks/publicProfiles'
+import { INSTAGRAM_PROFILE, LINKEDIN_PROFILE } from '@/lib/mocks/socialProfiles'
 import type {
   AirlineHighlight,
   ContactChannel,

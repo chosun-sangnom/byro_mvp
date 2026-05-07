@@ -3,7 +3,7 @@
 import { useState, type ReactNode } from 'react'
 import { useByroStore } from '@/store/useByroStore'
 import { BottomSheet, Button, showToast } from '@/components/ui'
-import { INSTAGRAM_PROFILE } from '@/lib/mockData'
+import { INSTAGRAM_PROFILE } from '@/lib/mocks/socialProfiles'
 
 export function SNSManageScreen({ onBack }: { onBack: () => void }) {
   const store = useByroStore()

@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { useByroStore } from '@/store/useByroStore'
 import { Button, Modal, showToast } from '@/components/ui'
-import { KEYWORD_GROUPS, SAMPLE_PROFILE } from '@/lib/mockData'
+import { KEYWORD_GROUPS } from '@/lib/mocks/keywords'
+import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
 export function ReputationManageScreen({
   currentKeywords,

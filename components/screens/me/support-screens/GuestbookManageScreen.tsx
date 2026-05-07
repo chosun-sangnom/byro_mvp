@@ -2,7 +2,7 @@
 
 import { useByroStore } from '@/store/useByroStore'
 import { showToast } from '@/components/ui'
-import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mockData'
+import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mocks/publicProfiles'
 
 export function GuestbookManageScreen({ onBack }: { onBack: () => void }) {
   const store = useByroStore()

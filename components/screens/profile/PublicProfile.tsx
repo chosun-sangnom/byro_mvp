@@ -5,11 +5,8 @@ import { useRouter } from 'next/navigation'
 import { Bookmark, Copy, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { showToast } from '@/components/ui'
-import {
-  HIGHLIGHT_CATEGORIES,
-  HIGHLIGHT_GROUPS,
-  getProfileAvatar,
-} from '@/lib/mockData'
+import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
+import { getProfileAvatar } from '@/lib/mocks/publicProfiles'
 import type { Highlight } from '@/types'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
 import {

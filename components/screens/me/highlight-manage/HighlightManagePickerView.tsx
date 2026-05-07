@@ -1,6 +1,6 @@
 import { BadgeCheck } from 'lucide-react'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
-import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mockData'
+import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
 import type { HighlightIconId } from '@/types'
 import type { HighlightManageCategory } from './constants'
 

@@ -4,7 +4,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { v4 as uuidv4 } from 'uuid'
 import type { OnboardingStep, Highlight, UserState, ContactChannel } from '@/types'
-import { SAMPLE_PROFILE } from '@/lib/mockData'
+import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
 const STEP_ORDER: OnboardingStep[] = [
   'login', 'verify', 'linkid', 'keywords', 'sns', 'contact', 'highlight', 'bio-select', 'bio-ai', 'complete',

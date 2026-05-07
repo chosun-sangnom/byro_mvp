@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
 import { showToast } from '@/components/ui'
-import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mockData'
+import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mocks/publicProfiles'
 
 export default function Archive() {
   const router = useRouter()

@@ -6,7 +6,7 @@ import { BottomSheet, Button, showToast } from '@/components/ui'
 import { ContactTypeIcon } from '@/components/contact/ContactTypeIcon'
 import type { ContactChannel } from '@/types'
 import { buildContactHref, contactPlaceholder, contactPreview } from '@/lib/contactChannels'
-import { SAMPLE_PROFILE } from '@/lib/mockData'
+import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
 export function ContactManageScreen({ onBack }: { onBack: () => void }) {
   const store = useByroStore()

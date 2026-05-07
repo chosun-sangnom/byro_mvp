@@ -7,7 +7,7 @@ import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { useByroStore } from '@/store/useByroStore'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
 import type { Highlight, HighlightIconId } from '@/types'
-import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mockData'
+import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
 import { getHighlightMetaParts, isPrimaryHighlight, sortHighlightsByPrimary } from '@/lib/highlightMeta'
 
 const CERTIFICATION_HIGHLIGHTS = [

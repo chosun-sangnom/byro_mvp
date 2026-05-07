@@ -7,7 +7,8 @@ import { BottomSheet, Button, Chip, InfoBox, showToast } from '@/components/ui'
 import { ContactTypeIcon } from '@/components/contact/ContactTypeIcon'
 import { StepFooter, StepIntro, SelectionCard } from '@/components/screens/onboarding/OnboardingShared'
 import type { ContactChannel } from '@/types'
-import { INSTAGRAM_PROFILE, KEYWORD_GROUPS, LINKEDIN_PROFILE } from '@/lib/mockData'
+import { KEYWORD_GROUPS } from '@/lib/mocks/keywords'
+import { INSTAGRAM_PROFILE, LINKEDIN_PROFILE } from '@/lib/mocks/socialProfiles'
 import { buildContactHref, contactPlaceholder, contactPreview } from '@/lib/contactChannels'
 
 export function Step4Keywords() {

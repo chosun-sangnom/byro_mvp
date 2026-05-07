@@ -7,7 +7,7 @@ import { AlertCircle, CheckCircle2, Pencil, Sparkles } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { AiBounce, Button, Modal, TextArea, showToast } from '@/components/ui'
 import { StepIntro, SelectionCard } from '@/components/screens/onboarding/OnboardingShared'
-import { AI_BIO_CANDIDATES } from '@/lib/mockData'
+import { AI_BIO_CANDIDATES } from '@/lib/mocks/bioCandidates'
 
 export function Step8Select() {
   const store = useByroStore()

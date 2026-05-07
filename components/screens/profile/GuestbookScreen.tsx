@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
-import { getPublicProfileByUsername, getProfileAvatar } from '@/lib/mockData'
+import { getPublicProfileByUsername, getProfileAvatar } from '@/lib/mocks/publicProfiles'
 
 export default function GuestbookScreen({ username }: { username: string }) {
   const router = useRouter()

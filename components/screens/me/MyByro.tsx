@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
-import { SAMPLE_PROFILE } from '@/lib/mockData'
+import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import PublicProfile from '@/components/screens/profile/PublicProfile'
 import { BasicInfoEditScreen } from '@/components/screens/me/MyByroBasicInfoScreen'
 import { HighlightManageScreen } from '@/components/screens/me/MyByroHighlightManageScreen'

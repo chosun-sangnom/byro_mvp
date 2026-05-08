@@ -9,6 +9,7 @@ import { getNormalizedPublicProfile } from '@/components/screens/profile/publicP
 import { ContactActionButton, ProfileHeroCard } from '@/components/screens/profile/PublicProfileSections'
 import { PublicProfileHeaderMeta } from '@/components/screens/profile/PublicProfileHeaderMeta'
 import { PublicProfileTabBar, type PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
+import { PublicProfileKemiZone } from '@/components/screens/profile/PublicProfileKemiZone'
 
 export function PublicProfileShell({
   username,
@@ -98,6 +99,7 @@ export function PublicProfileShell({
           />
         </div>
         <PublicProfileHeaderMeta meta={profile.headerMeta} />
+        <PublicProfileKemiZone kemi={profile.kemi} isLoggedIn={store.isLoggedIn} />
         <PublicProfileTabBar activeTab={activeTab} onTabChange={onTabChange} />
       </div>
 

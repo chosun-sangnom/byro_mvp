@@ -149,6 +149,18 @@ export interface PublicProfileWhoIAm {
   religion: string
 }
 
+export interface KemiMatchItem {
+  label: string
+  category: 'taste' | 'place' | 'lifestyle' | 'identity'
+}
+
+export interface KemiData {
+  matchCount: number
+  matchItems: KemiMatchItem[]
+  // TODO(AI): Replace aiCopy with LLM-generated conversation starter based on full profile match context
+  aiCopy: string
+}
+
 export interface PublicProfileLife {
   daily: {
     exercise: string[]
@@ -258,6 +270,7 @@ export interface PublicProfile {
   receivedRequests: ReceivedRequest[]
   reputationKeywords?: ReputationKeyword[]
   guestbook?: GuestbookEntry[]
+  kemi?: KemiData
 }
 
 export interface UserState {

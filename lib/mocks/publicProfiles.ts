@@ -142,6 +142,18 @@ export const SAMPLE_PROFILE = {
     { id: 'mh8', categoryId: 'volunteer', icon: 'globe', title: '청소년 창업 멘토링', subtitle: '봉사 / 사회공헌 · 직접 입력', description: '지역 청소년을 대상으로 문제 정의와 팀 프로젝트 멘토링을 진행했습니다.', year: '2023' },
     { id: 'mh9', categoryId: 'other', icon: 'pencil', title: '로컬 커뮤니티 살롱 운영', subtitle: '기타 · 직접 입력', description: '제품, 커리어, 브랜딩을 주제로 소규모 오프라인 살롱을 운영하고 있습니다.', year: '2024' },
   ] as Highlight[],
+  // TODO(real API): Replace with viewer-relative kemi payload from /profiles/:id/kemi?viewer_id=... endpoint
+  kemi: {
+    matchCount: 4,
+    matchItems: [
+      { label: '아이유', category: 'taste' },
+      { label: '한남동', category: 'place' },
+      { label: '서촌', category: 'place' },
+      { label: '일반식', category: 'lifestyle' },
+    ],
+    // TODO(AI): Replace with LLM-generated conversation starter based on full profile match context
+    aiCopy: '아이유를 좋아하고 한남동과 서촌을 자주 찾는 분이에요. 동네 얘기나 좋아하는 음악으로 먼저 말 걸어보세요.',
+  },
   experiences: [
     { id: 'e1', authorName: '김지수', isAnonymous: false, keywords: ['전문적인', '통찰력 있는'], message: '정말 통찰력 있는 분이에요. 같이 일하고 싶다!', date: '2일 전' },
     { id: 'e2', authorName: null, isAnonymous: true, keywords: ['신뢰할 수 있는', '실행력 있는'], message: '', date: '5일 전' },
@@ -308,6 +320,19 @@ export const MK_PROFILE = {
       sourceLabel: 'ZDNet Korea',
     },
   ] as Highlight[],
+  // TODO(real API): Replace with viewer-relative kemi payload from /profiles/:id/kemi?viewer_id=... endpoint
+  kemi: {
+    matchCount: 5,
+    matchItems: [
+      { label: '골프', category: 'lifestyle' },
+      { label: '축구', category: 'taste' },
+      { label: '성수동', category: 'place' },
+      { label: 'FC 온라인', category: 'taste' },
+      { label: '일반식', category: 'lifestyle' },
+    ],
+    // TODO(AI): Replace with LLM-generated conversation starter based on full profile match context
+    aiCopy: '골프와 축구를 즐기고 성수동을 자주 찾는 분이에요. FC 얘기나 성수 맛집으로 바로 들어가도 어색하지 않아요.',
+  },
   reputationKeywords: [
     { keyword: '진정성 있는', count: 9 },
     { keyword: '전문적인', count: 7 },
@@ -439,6 +464,17 @@ export const JIMIN_PROFILE = {
       metadata: { status: '졸업', role: '경영학', degree: '학사', schoolType: '대학교' },
     },
   ] as Highlight[],
+  // TODO(real API): Replace with viewer-relative kemi payload from /profiles/:id/kemi?viewer_id=... endpoint
+  kemi: {
+    matchCount: 3,
+    matchItems: [
+      { label: '아이유', category: 'taste' },
+      { label: '한남동', category: 'place' },
+      { label: '일반식', category: 'lifestyle' },
+    ],
+    // TODO(AI): Replace with LLM-generated conversation starter based on full profile match context
+    aiCopy: '아이유를 좋아하고 한남동을 자주 찾는 분이에요. 같은 동네 카페 얘기로 자연스럽게 시작해보세요.',
+  },
   reputationKeywords: [
     { keyword: '전문적인', count: 5 },
     { keyword: '신뢰할 수 있는', count: 4 },

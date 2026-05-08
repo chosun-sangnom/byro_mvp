@@ -1,165 +1,64 @@
 'use client'
 
-import { useState } from 'react'
 import {
-  ChevronDown,
-  ChevronUp,
+  BookOpen,
+  Coffee,
   Dumbbell,
+  Film,
+  Gamepad2,
   MapPin,
+  Music2,
   PawPrint,
   Plane,
-  Sparkles,
-  Tv,
-  UserRound,
+  Star,
+  Trophy,
   Utensils,
 } from 'lucide-react'
 import type { PublicProfileLife } from '@/types'
-import { SectionTitle } from '@/components/screens/profile/PublicProfileSections'
 
-function LifeSummary({
-  life,
+interface LifeRowDef {
+  icon: React.ReactNode
+  label: string
+  chips?: string[]
+  value?: string
+}
+
+function LifeSection({
+  label,
+  rows,
 }: {
-  life: PublicProfileLife
+  label: string
+  rows: LifeRowDef[]
 }) {
-  const exercises = life.daily.exercise.slice(0, 2).join(' · ')
-  const movie = life.tastes.movies[0]
-  const music = life.tastes.music[0]
-  const neighborhood = life.places.neighborhoods[0]
+  const visible = rows.filter((r) => (r.chips?.length ?? 0) > 0 || !!r.value)
+  if (!visible.length) return null
 
   return (
-    <div className="rounded-[28px] border border-[var(--color-border-default)] bg-[linear-gradient(180deg,rgba(255,255,255,0.08)_0%,rgba(255,255,255,0.03)_100%)] px-5 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
-      <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">
-        <Sparkles size={14} />
-        <span>Life Snapshot</span>
-      </div>
-      <p className="mt-3 text-[15px] leading-[1.65] text-[var(--color-text-primary)]">
-        {`${exercises} 같은 움직임을 즐기고, `}
-        {movie ? `${movie}` : '인상 깊은 작품들'}{`과 `}
-        {music ? `${music}` : '좋아하는 음악'}{`을 자주 찾습니다. `}
-        {neighborhood ? `${neighborhood}` : '익숙한 동네'}{`을 중심으로 시간을 보내는 편입니다.`}
+    <div>
+      <p className="mb-2 px-1 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">
+        {label}
       </p>
-    </div>
-  )
-}
-
-function LifeStatCard({
-  label,
-  value,
-  icon,
-  badges,
-}: {
-  label: string
-  value: string
-  icon: React.ReactNode
-  badges?: string[]
-}) {
-  return (
-    <div className="rounded-[22px] border border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.03)] px-4 py-4">
-      <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">
-        <span className="text-[var(--color-text-secondary)]">{icon}</span>
-        <span>{label}</span>
-      </div>
-      <div className="mt-2 text-[15px] font-semibold text-[var(--color-text-primary)]">{value}</div>
-      {badges && badges.length > 0 && (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {badges.map((badge) => (
-            <span key={badge} className="chip-metric">{badge}</span>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
-function LifeTagBlock({
-  label,
-  items,
-  icon,
-}: {
-  label: string
-  items: string[]
-  icon: React.ReactNode
-}) {
-  return (
-    <div className="rounded-[22px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.04)] px-4 py-4">
-      <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">
-        <span className="text-[var(--color-text-secondary)]">{icon}</span>
-        <span>{label}</span>
-      </div>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {items.map((item) => (
-          <span key={item} className="chip-metric">{item}</span>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function LifeAccordionRow({
-  label,
-  items,
-  icon,
-  initiallyOpen = false,
-}: {
-  label: string
-  items: string[]
-  icon: React.ReactNode
-  initiallyOpen?: boolean
-}) {
-  const [open, setOpen] = useState(initiallyOpen)
-
-  return (
-    <div className="rounded-[22px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.03)]">
-      <button
-        type="button"
-        onClick={() => setOpen((prev) => !prev)}
-        className="flex w-full items-center justify-between gap-3 px-4 py-4 text-left"
-      >
-        <div className="min-w-0">
-          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">
-            <span className="text-[var(--color-text-secondary)]">{icon}</span>
-            <span>{label}</span>
+      <div className="surface-card-soft">
+        {visible.map((row, i) => (
+          <div
+            key={row.label}
+            className={`px-4 py-4${i < visible.length - 1 ? ' border-b border-[var(--color-border-soft)]' : ''}`}
+          >
+            <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">
+              <span className="text-[var(--color-text-secondary)]">{row.icon}</span>
+              <span>{row.label}</span>
+            </div>
+            {row.chips && row.chips.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {row.chips.map((chip) => (
+                  <span key={chip} className="chip-metric">{chip}</span>
+                ))}
+              </div>
+            )}
+            {row.value && (
+              <p className="mt-2 text-[14px] font-semibold text-[var(--color-text-primary)]">{row.value}</p>
+            )}
           </div>
-          <div className="mt-2 text-[14px] font-semibold text-[var(--color-text-primary)]">
-            {items.slice(0, 2).join(' · ')}
-            {items.length > 2 ? ` 외 ${items.length - 2}` : ''}
-          </div>
-        </div>
-        <span className="flex-shrink-0 text-[var(--color-text-tertiary)]">
-          {open ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-        </span>
-      </button>
-      {open && (
-        <div className="border-t border-[var(--color-border-soft)] px-4 py-4">
-          <div className="flex flex-wrap gap-2">
-            {items.map((item) => (
-              <span key={item} className="chip-metric">{item}</span>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function LifePlaceRow({
-  label,
-  items,
-  icon,
-}: {
-  label: string
-  items: string[]
-  icon: React.ReactNode
-}) {
-  return (
-    <div className="rounded-[24px] border border-[var(--color-border-default)] bg-[linear-gradient(180deg,rgba(255,255,255,0.06)_0%,rgba(255,255,255,0.03)_100%)] px-4 py-4">
-      <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">
-        <span className="text-[var(--color-text-secondary)]">{icon}</span>
-        <span>{label}</span>
-      </div>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {items.map((item) => (
-          <span key={item} className="chip-metric">{item}</span>
         ))}
       </div>
     </div>
@@ -173,48 +72,48 @@ export function PublicProfileLifeSection({
 }) {
   if (!life) return null
 
+  const petText = life.daily.petName
+    ? `${life.daily.pet} · ${life.daily.petName}`
+    : life.daily.pet
+
   return (
-    <>
-      <div className="px-5 pt-6 pb-2">
-        <LifeSummary life={life} />
-      </div>
+    <div className="px-5 pt-6 pb-8 space-y-6">
+      <LifeSection
+        label="일상"
+        rows={[
+          { icon: <Dumbbell size={13} />, label: '운동', chips: life.daily.exercise },
+          { icon: <PawPrint size={13} />, label: '반려동물', value: petText },
+        ]}
+      />
 
-      <div className="px-5 pt-5 pb-2">
-        <SectionTitle title="일상" subtitle="하루 루틴과 생활 패턴" />
-        <div className="mt-4">
-          <LifeTagBlock label="하는 운동" items={life.daily.exercise} icon={<Dumbbell size={14} />} />
-        </div>
-        <div className="mt-4">
-          <LifeStatCard
-            label="반려동물"
-            value={life.daily.petName ? `${life.daily.pet} · ${life.daily.petName}` : life.daily.pet}
-            icon={<PawPrint size={14} />}
-          />
-        </div>
-      </div>
+      <LifeSection
+        label="미디어"
+        rows={[
+          { icon: <Film size={13} />, label: '영화 · 드라마', chips: life.tastes.movies },
+          { icon: <Music2 size={13} />, label: '음악', chips: life.tastes.music },
+          { icon: <BookOpen size={13} />, label: '책', chips: life.tastes.books },
+          { icon: <Gamepad2 size={13} />, label: '게임', chips: life.tastes.games },
+        ]}
+      />
 
-      <div className="px-5 pt-6 pb-2">
-        <SectionTitle title="취향" subtitle="구체적으로 좋아하는 것들" />
-        <div className="space-y-4">
-          <LifeAccordionRow label="영화 · 드라마" items={life.tastes.movies} icon={<Tv size={14} />} initiallyOpen />
-          <LifeAccordionRow label="음악" items={life.tastes.music} icon={<Sparkles size={14} />} />
-          <LifeAccordionRow label="책" items={life.tastes.books} icon={<UserRound size={14} />} />
-          <LifeAccordionRow label="게임" items={life.tastes.games} icon={<Sparkles size={14} />} />
-          <LifeAccordionRow label="스포츠" items={life.tastes.sports} icon={<Dumbbell size={14} />} />
-          <LifeAccordionRow label="최애" items={life.tastes.celebrities} icon={<UserRound size={14} />} />
-          <LifeStatCard label="식단" value={life.tastes.diet} icon={<Utensils size={14} />} />
-          <LifeAccordionRow label="맛집" items={life.tastes.restaurants} icon={<Utensils size={14} />} />
-          <LifeAccordionRow label="카페" items={life.tastes.cafes} icon={<Utensils size={14} />} />
-        </div>
-      </div>
+      <LifeSection
+        label="라이프스타일"
+        rows={[
+          { icon: <Trophy size={13} />, label: '스포츠', chips: life.tastes.sports },
+          { icon: <Star size={13} />, label: '최애', chips: life.tastes.celebrities },
+          { icon: <Utensils size={13} />, label: '식단', value: life.tastes.diet },
+        ]}
+      />
 
-      <div className="px-5 pt-6 pb-8">
-        <SectionTitle title="장소" subtitle="자주 가는 곳과 여행지" />
-        <div className="space-y-4">
-          <LifePlaceRow label="자주 가는 곳" items={life.places.neighborhoods} icon={<MapPin size={14} />} />
-          <LifePlaceRow label="여행지" items={life.places.travelDestinations} icon={<Plane size={14} />} />
-        </div>
-      </div>
-    </>
+      <LifeSection
+        label="장소"
+        rows={[
+          { icon: <Utensils size={13} />, label: '맛집', chips: life.tastes.restaurants },
+          { icon: <Coffee size={13} />, label: '카페', chips: life.tastes.cafes },
+          { icon: <MapPin size={13} />, label: '자주 가는 곳', chips: life.places.neighborhoods },
+          { icon: <Plane size={13} />, label: '여행지', chips: life.places.travelDestinations },
+        ]}
+      />
+    </div>
   )
 }

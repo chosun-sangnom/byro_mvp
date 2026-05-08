@@ -458,7 +458,7 @@ export function ProfileConnectSection({
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             className="flex-1 rounded-full border border-[var(--color-border-default)] py-2.5 text-[13px] font-semibold text-[var(--color-text-secondary)]"
           >
-            피드백 요청
+            연결 요청
           </motion.button>
           <motion.button
             onClick={onLeaveExperience}
@@ -469,7 +469,7 @@ export function ProfileConnectSection({
               ? { border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)' }
               : { backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
           >
-            {alreadySubmitted ? '경험 남겼어요 ✓' : '+ 경험 남기기'}
+            {alreadySubmitted ? '경험 남겼어요 ✓' : '경험 남겨요'}
           </motion.button>
         </div>
       )}

@@ -149,6 +149,33 @@ export interface PublicProfileWhoIAm {
   religion: string
 }
 
+export interface PublicProfileLife {
+  daily: {
+    housingType: string
+    workStyle: string
+    exercise: string[]
+    alcohol: string
+    smoking: string
+    coffee: string
+    pet: string
+  }
+  tastes: {
+    movies: string[]
+    music: string[]
+    books: string[]
+    games: string[]
+    sports: string[]
+    celebrities: string[]
+    diet: string
+    restaurants: string[]
+    cafes: string[]
+  }
+  places: {
+    neighborhoods: string[]
+    travelDestinations: string[]
+  }
+}
+
 export interface CareerHighlight {
   avgYears: number
   vsIndustryPercent: number
@@ -213,6 +240,7 @@ export interface PublicProfile {
   bio: string
   headerMeta?: ProfileHeaderMeta
   whoIAm?: PublicProfileWhoIAm
+  life?: PublicProfileLife
   selectedKeywords: string[]
   avatarColor?: string
   avatarImage?: string

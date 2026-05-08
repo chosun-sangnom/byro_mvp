@@ -13,6 +13,7 @@ import {
   ProfileSnsSection,
 } from '@/components/screens/profile/PublicProfileSections'
 import { ProfileHighlightsSection } from '@/components/screens/profile/PublicProfileHighlightsSection'
+import { PublicProfileLifeSection } from '@/components/screens/profile/PublicProfileLifeSection'
 import { PublicProfileWhoIAmSection } from '@/components/screens/profile/PublicProfileWhoIAmSection'
 
 const AIRLINE_BADGE_LABELS = {
@@ -118,23 +119,6 @@ function usePublicProfileTabData(username: string) {
   }
 }
 
-function PlaceholderCard({
-  title,
-  description,
-}: {
-  title: string
-  description: string
-}) {
-  return (
-    <div className="px-5 pt-6 pb-8">
-      <div className="glass-card rounded-[24px] border border-[var(--color-border-default)] px-5 py-5">
-        <div className="text-[16px] font-semibold text-[var(--color-text-strong)]">{title}</div>
-        <p className="mt-2 text-[13px] leading-6 text-[var(--color-text-secondary)]">{description}</p>
-      </div>
-    </div>
-  )
-}
-
 export function PublicProfileWhoTabPage({
   username,
 }: {
@@ -172,13 +156,13 @@ export function PublicProfileWhoTabPage({
   )
 }
 
-export function PublicProfileLifeTabPage() {
-  return (
-    <PlaceholderCard
-      title="라이프 탭 구조 준비"
-      description="여기에 주거형태, 근무유형, 운동, 술, 담배, 커피, 반려동물과 취향/장소 섹션을 순서대로 붙일 예정입니다. 현재는 탭 라우팅과 고정 헤더 구조만 먼저 잡아둔 상태입니다."
-    />
-  )
+export function PublicProfileLifeTabPage({
+  username,
+}: {
+  username: string
+}) {
+  const { profile } = usePublicProfileTabData(username)
+  return <PublicProfileLifeSection life={profile.life} />
 }
 
 export function PublicProfileReputationTabPage({
@@ -207,8 +191,8 @@ export function PublicProfileReputationTabPage({
         isOwnerMode={false}
         alreadySubmitted={alreadySubmitted}
         contactChannels={profile.contactChannels}
-        onRequestFeedback={() => showToast('피드백 요청을 보냈어요!')}
-        onLeaveExperience={() => showToast('경험 남기기 구조는 다음 단계에서 연결할 예정입니다.')}
+        onRequestFeedback={() => showToast('연결 요청을 보냈어요!')}
+        onLeaveExperience={() => showToast('경험 남겨요 구조는 다음 단계에서 연결할 예정입니다.')}
         onChannelClick={(channel) => {
           if (!channel.enabled) {
             showToast('비활성화된 연락 수단이에요')

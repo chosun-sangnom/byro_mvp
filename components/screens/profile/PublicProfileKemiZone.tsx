@@ -32,7 +32,7 @@ export function PublicProfileKemiZone({
             className="text-[11px] font-bold uppercase tracking-[0.08em]"
             style={{ color: 'var(--color-accent-dark)' }}
           >
-            {kemi.matchCount}가지 공통점
+            {kemi.matchCount}가지 케미
           </span>
         </div>
 
@@ -67,7 +67,7 @@ export function PublicProfileKemiZone({
               style={{ color: 'var(--color-accent-dark)' }}
               onClick={() => {}}
             >
-              궁합 리포트 전체 보기 →
+              케미 리포트 전체 보기 →
             </button>
           </>
         ) : (
@@ -86,7 +86,7 @@ export function PublicProfileKemiZone({
                 className="text-[12px] font-semibold"
                 style={{ color: 'var(--color-accent-dark)' }}
               >
-                로그인하면 공통점이 보여요
+                로그인하면 케미가 보여요
               </span>
             </div>
           </div>

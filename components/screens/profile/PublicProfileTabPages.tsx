@@ -2,13 +2,11 @@
 
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
-import { showToast } from '@/components/ui'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
 import { getProfileAvatar } from '@/lib/mocks/publicProfiles'
 import type { Highlight } from '@/types'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
 import {
-  ProfileConnectSection,
   ProfileReputationSummarySection,
   ProfileSnsSection,
 } from '@/components/screens/profile/PublicProfileSections'
@@ -171,40 +169,19 @@ export function PublicProfileReputationTabPage({
   username: string
 }) {
   const router = useRouter()
-  const { store, profile, keywordCounts, totalKeywordCount, featuredGuestbook } = usePublicProfileTabData(username)
-  const alreadySubmitted = store.expSubmittedProfiles.includes(profile.linkId)
+  const { profile, keywordCounts, totalKeywordCount, featuredGuestbook } = usePublicProfileTabData(username)
 
   return (
-    <>
-      <div className="px-5 pt-6 pb-2">
-        <ProfileReputationSummarySection
-          profile={profile}
-          keywordCounts={keywordCounts}
-          totalKeywordCount={totalKeywordCount}
-          featuredGuestbook={featuredGuestbook}
-          getProfileAvatar={getProfileAvatar}
-          onGuestbookEntryClick={(linkId) => router.push(`/${linkId}`)}
-          onOpenGuestbook={() => router.push(`/${profile.linkId}/guestbook`)}
-        />
-      </div>
-      <ProfileConnectSection
-        isOwnerMode={false}
-        alreadySubmitted={alreadySubmitted}
-        contactChannels={profile.contactChannels}
-        onRequestFeedback={() => showToast('연결 요청을 보냈어요!')}
-        onLeaveExperience={() => showToast('경험 남겨요 구조는 다음 단계에서 연결할 예정입니다.')}
-        onChannelClick={(channel) => {
-          if (!channel.enabled) {
-            showToast('비활성화된 연락 수단이에요')
-            return
-          }
-          if (!channel.href) {
-            showToast('연결 정보를 준비 중이에요')
-            return
-          }
-          window.open(channel.href, channel.href.startsWith('http') ? '_blank' : '_self')
-        }}
+    <div className="px-5 pt-6 pb-6">
+      <ProfileReputationSummarySection
+        profile={profile}
+        keywordCounts={keywordCounts}
+        totalKeywordCount={totalKeywordCount}
+        featuredGuestbook={featuredGuestbook}
+        getProfileAvatar={getProfileAvatar}
+        onGuestbookEntryClick={(linkId) => router.push(`/${linkId}`)}
+        onOpenGuestbook={() => router.push(`/${profile.linkId}/guestbook`)}
       />
-    </>
+    </div>
   )
 }

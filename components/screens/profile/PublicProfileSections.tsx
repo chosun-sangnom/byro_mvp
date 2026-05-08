@@ -505,7 +505,7 @@ function AnimatedSection({
   )
 }
 
-function ContactActionButton({
+export function ContactActionButton({
   channel,
   onClick,
 }: {

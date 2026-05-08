@@ -1,12 +1,12 @@
 'use client'
 
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSelectedLayoutSegment } from 'next/navigation'
 import { Bookmark, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { showToast } from '@/components/ui'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
-import { ProfileHeroCard } from '@/components/screens/profile/PublicProfileSections'
+import { ContactActionButton, ProfileHeroCard } from '@/components/screens/profile/PublicProfileSections'
 import { PublicProfileHeaderMeta } from '@/components/screens/profile/PublicProfileHeaderMeta'
 import { PublicProfileTabBar } from '@/components/screens/profile/PublicProfileTabBar'
 
@@ -18,6 +18,7 @@ export function PublicProfileShell({
   children: ReactNode
 }) {
   const router = useRouter()
+  const segment = useSelectedLayoutSegment()
   const store = useByroStore()
   const profile = getNormalizedPublicProfile({
     username,
@@ -45,6 +46,8 @@ export function PublicProfileShell({
     window.addEventListener('resize', checkOverflow)
     return () => window.removeEventListener('resize', checkOverflow)
   }, [profile.bio, bioExpanded])
+
+  const isReputationTab = segment === 'reputation'
 
   return (
     <div className="flex h-full flex-col">
@@ -97,6 +100,48 @@ export function PublicProfileShell({
 
       <div className="min-h-0 flex-1 overflow-y-auto">
         {children}
+      </div>
+
+      <div className="flex-shrink-0 border-t border-[var(--color-border-soft)] bg-[rgba(16,17,20,0.9)] px-5 pt-4 pb-[calc(env(safe-area-inset-bottom)+16px)] backdrop-blur-md">
+        {isReputationTab && (
+          <div className="mb-4 flex gap-3">
+            <button
+              onClick={() => showToast('연결 요청을 보냈어요!')}
+              className="flex-1 rounded-full border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.02)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)]"
+            >
+              연결 요청
+            </button>
+            <button
+              onClick={() => showToast('경험 남겨요 구조는 다음 단계에서 연결할 예정입니다.')}
+              className="flex-1 rounded-full bg-[linear-gradient(135deg,#6D8BFF_0%,#4E63FF_100%)] py-3 text-[13px] font-semibold text-white shadow-[0_10px_24px_rgba(78,99,255,0.28)]"
+            >
+              + 경험 남기기
+            </button>
+          </div>
+        )}
+
+        <div>
+          <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Contact</div>
+          <div className="flex justify-around">
+            {profile.contactChannels.map((channel) => (
+              <ContactActionButton
+                key={channel.id}
+                channel={channel}
+                onClick={() => {
+                  if (!channel.enabled) {
+                    showToast('비활성화된 연락 수단이에요')
+                    return
+                  }
+                  if (!channel.href) {
+                    showToast('연결 정보를 준비 중이에요')
+                    return
+                  }
+                  window.open(channel.href, channel.href.startsWith('http') ? '_blank' : '_self')
+                }}
+              />
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )

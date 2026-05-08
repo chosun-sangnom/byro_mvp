@@ -152,12 +152,15 @@ export interface PublicProfileWhoIAm {
 export interface PublicProfileLife {
   daily: {
     housingType: string
-    workStyle: string
+    workStyle: string[]
+    exerciseFrequency: string
     exercise: string[]
     alcohol: string
+    drinkType?: string[]
     smoking: string
     coffee: string
     pet: string
+    petName?: string
   }
   tastes: {
     movies: string[]
@@ -165,6 +168,7 @@ export interface PublicProfileLife {
     books: string[]
     games: string[]
     sports: string[]
+    teams?: string[]
     celebrities: string[]
     diet: string
     restaurants: string[]

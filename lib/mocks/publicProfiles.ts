@@ -31,12 +31,14 @@ export const SAMPLE_PROFILE = {
   },
   life: {
     daily: {
-      housingType: '복층 오피스텔',
-      workStyle: '주 3일 오피스, 나머지 원격',
+      housingType: '1인 가구',
+      workStyle: ['재택', '유연', '평일'],
+      exerciseFrequency: '주 2~3회',
       exercise: ['러닝', '골프'],
-      alcohol: '와인 / 하이볼 가끔',
+      alcohol: '가끔',
+      drinkType: ['와인', '하이볼'],
       smoking: '비흡연',
-      coffee: '하루 2잔',
+      coffee: '2잔',
       pet: '없음',
     },
     tastes: {
@@ -206,12 +208,14 @@ export const MK_PROFILE = {
   },
   life: {
     daily: {
-      housingType: '도심형 아파트',
-      workStyle: '미팅 중심 이동형',
+      housingType: '1인 가구',
+      workStyle: ['유연', '스케줄', '주말'],
+      exerciseFrequency: '주 2~3회',
       exercise: ['골프', '웨이트', '산책'],
-      alcohol: '위스키 / 하이볼',
+      alcohol: '즐겨 마심',
+      drinkType: ['위스키', '하이볼'],
       smoking: '비흡연',
-      coffee: '하루 3잔',
+      coffee: '3잔',
       pet: '없음',
     },
     tastes: {
@@ -358,12 +362,14 @@ export const JIMIN_PROFILE = {
   },
   life: {
     daily: {
-      housingType: '식물 많은 원룸',
-      workStyle: '하이브리드',
+      housingType: '1인 가구',
+      workStyle: ['재택', '유연', '평일'],
+      exerciseFrequency: '가끔',
       exercise: ['필라테스', '산책'],
-      alcohol: '내추럴 와인',
+      alcohol: '가끔',
+      drinkType: ['와인'],
       smoking: '비흡연',
-      coffee: '하루 1잔',
+      coffee: '1잔',
       pet: '없음',
     },
     tastes: {

@@ -4,10 +4,7 @@ import { useState } from 'react'
 import {
   ChevronDown,
   ChevronUp,
-  Coffee,
   Dumbbell,
-  GlassWater,
-  Home,
   MapPin,
   PawPrint,
   Plane,
@@ -15,8 +12,6 @@ import {
   Tv,
   UserRound,
   Utensils,
-  BriefcaseBusiness,
-  CigaretteOff,
 } from 'lucide-react'
 import type { PublicProfileLife } from '@/types'
 import { SectionTitle } from '@/components/screens/profile/PublicProfileSections'
@@ -26,9 +21,10 @@ function LifeSummary({
 }: {
   life: PublicProfileLife
 }) {
-  const workStyle = life.daily.workStyle.slice(0, 2).join(' · ')
   const exercises = life.daily.exercise.slice(0, 2).join(' · ')
-  const drinks = life.daily.drinkType?.join(' · ')
+  const movie = life.tastes.movies[0]
+  const music = life.tastes.music[0]
+  const neighborhood = life.places.neighborhoods[0]
 
   return (
     <div className="rounded-[28px] border border-[var(--color-border-default)] bg-[linear-gradient(180deg,rgba(255,255,255,0.08)_0%,rgba(255,255,255,0.03)_100%)] px-5 py-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
@@ -37,8 +33,10 @@ function LifeSummary({
         <span>Life Snapshot</span>
       </div>
       <p className="mt-3 text-[15px] leading-[1.65] text-[var(--color-text-primary)]">
-        {`평소 ${workStyle} 리듬으로 지내고, 운동은 ${life.daily.exerciseFrequency} ${exercises}을(를) 즐깁니다. `}
-        {`커피는 하루 ${life.daily.coffee} 정도, 술은 ${life.daily.alcohol}${drinks ? ` ${drinks} 위주` : ''}입니다.`}
+        {`${exercises} 같은 움직임을 즐기고, `}
+        {movie ? `${movie}` : '인상 깊은 작품들'}{`과 `}
+        {music ? `${music}` : '좋아하는 음악'}{`을 자주 찾습니다. `}
+        {neighborhood ? `${neighborhood}` : '익숙한 동네'}{`을 중심으로 시간을 보내는 편입니다.`}
       </p>
     </div>
   )
@@ -183,19 +181,6 @@ export function PublicProfileLifeSection({
 
       <div className="px-5 pt-5 pb-2">
         <SectionTitle title="일상" subtitle="하루 루틴과 생활 패턴" />
-        <div className="grid grid-cols-2 gap-3">
-          <LifeStatCard label="사는 방식" value={life.daily.housingType} icon={<Home size={14} />} />
-          <LifeStatCard label="근무 방식" value={life.daily.workStyle.join(' · ')} icon={<BriefcaseBusiness size={14} />} />
-          <LifeStatCard label="운동 빈도" value={life.daily.exerciseFrequency} icon={<Dumbbell size={14} />} />
-          <LifeStatCard
-            label="술은"
-            value={life.daily.alcohol}
-            icon={<GlassWater size={14} />}
-            badges={life.daily.drinkType}
-          />
-          <LifeStatCard label="담배" value={life.daily.smoking} icon={<CigaretteOff size={14} />} />
-          <LifeStatCard label="커피" value={`하루 ${life.daily.coffee}`} icon={<Coffee size={14} />} />
-        </div>
         <div className="mt-4">
           <LifeTagBlock label="하는 운동" items={life.daily.exercise} icon={<Dumbbell size={14} />} />
         </div>
@@ -219,7 +204,7 @@ export function PublicProfileLifeSection({
           <LifeAccordionRow label="최애" items={life.tastes.celebrities} icon={<UserRound size={14} />} />
           <LifeStatCard label="식단" value={life.tastes.diet} icon={<Utensils size={14} />} />
           <LifeAccordionRow label="맛집" items={life.tastes.restaurants} icon={<Utensils size={14} />} />
-          <LifeAccordionRow label="카페" items={life.tastes.cafes} icon={<Coffee size={14} />} />
+          <LifeAccordionRow label="카페" items={life.tastes.cafes} icon={<Utensils size={14} />} />
         </div>
       </div>
 

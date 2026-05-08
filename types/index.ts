@@ -151,14 +151,7 @@ export interface PublicProfileWhoIAm {
 
 export interface PublicProfileLife {
   daily: {
-    housingType: string
-    workStyle: string[]
-    exerciseFrequency: string
     exercise: string[]
-    alcohol: string
-    drinkType?: string[]
-    smoking: string
-    coffee: string
     pet: string
     petName?: string
   }

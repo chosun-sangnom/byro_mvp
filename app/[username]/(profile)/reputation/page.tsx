@@ -1,7 +1,9 @@
-'use client'
+import { redirect } from 'next/navigation'
 
-import { PublicProfileReputationTabPage } from '@/components/screens/profile/PublicProfileTabPages'
-
-export default function UserReputationPage({ params }: { params: { username: string } }) {
-  return <PublicProfileReputationTabPage username={params.username} />
+export default function UserReputationRedirectPage({
+  params,
+}: {
+  params: { username: string }
+}) {
+  redirect(`/${params.username}`)
 }

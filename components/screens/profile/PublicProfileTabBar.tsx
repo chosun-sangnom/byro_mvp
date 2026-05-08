@@ -1,23 +1,22 @@
 'use client'
 
-import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { useSelectedLayoutSegment } from 'next/navigation'
 
-const TABS = [
-  { id: 'who', label: '나', href: '' },
-  { id: 'life', label: '라이프', href: '/life' },
-  { id: 'reputation', label: '평판', href: '/reputation' },
+export type PublicProfileTabId = 'who' | 'life' | 'reputation'
+
+const TABS: Array<{ id: PublicProfileTabId; label: string }> = [
+  { id: 'who', label: '나' },
+  { id: 'life', label: '라이프' },
+  { id: 'reputation', label: '평판' },
 ] as const
 
 export function PublicProfileTabBar({
-  username,
+  activeTab,
+  onTabChange,
 }: {
-  username: string
+  activeTab: PublicProfileTabId
+  onTabChange: (tab: PublicProfileTabId) => void
 }) {
-  const segment = useSelectedLayoutSegment()
-  const activeTab = segment === 'life' || segment === 'reputation' ? segment : 'who'
-
   return (
     <div className="px-5 pt-3 pb-3">
       <div className="glass-card rounded-[20px] p-1.5">
@@ -25,9 +24,10 @@ export function PublicProfileTabBar({
           {TABS.map((tab) => {
             const selected = tab.id === activeTab
             return (
-              <Link
+              <button
                 key={tab.id}
-                href={`/${username}${tab.href}`}
+                type="button"
+                onClick={() => onTabChange(tab.id)}
                 className="relative overflow-hidden rounded-[16px] px-3 py-3 text-center text-[13px] font-semibold"
               >
                 {selected && (
@@ -40,7 +40,7 @@ export function PublicProfileTabBar({
                 <span className={`relative z-10 ${selected ? 'text-white' : 'text-[var(--color-text-secondary)]'}`}>
                   {tab.label}
                 </span>
-              </Link>
+              </button>
             )
           })}
         </div>

@@ -1,24 +1,27 @@
 'use client'
 
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { useRouter, useSelectedLayoutSegment } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { Bookmark, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { showToast } from '@/components/ui'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
 import { ContactActionButton, ProfileHeroCard } from '@/components/screens/profile/PublicProfileSections'
 import { PublicProfileHeaderMeta } from '@/components/screens/profile/PublicProfileHeaderMeta'
-import { PublicProfileTabBar } from '@/components/screens/profile/PublicProfileTabBar'
+import { PublicProfileTabBar, type PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
 
 export function PublicProfileShell({
   username,
+  activeTab,
+  onTabChange,
   children,
 }: {
   username: string
+  activeTab: PublicProfileTabId
+  onTabChange: (tab: PublicProfileTabId) => void
   children: ReactNode
 }) {
   const router = useRouter()
-  const segment = useSelectedLayoutSegment()
   const store = useByroStore()
   const profile = getNormalizedPublicProfile({
     username,
@@ -47,7 +50,7 @@ export function PublicProfileShell({
     return () => window.removeEventListener('resize', checkOverflow)
   }, [profile.bio, bioExpanded])
 
-  const isReputationTab = segment === 'reputation'
+  const isReputationTab = activeTab === 'reputation'
 
   return (
     <div className="flex h-full flex-col">
@@ -95,7 +98,7 @@ export function PublicProfileShell({
           />
         </div>
         <PublicProfileHeaderMeta meta={profile.headerMeta} />
-        <PublicProfileTabBar username={username} />
+        <PublicProfileTabBar activeTab={activeTab} onTabChange={onTabChange} />
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto">

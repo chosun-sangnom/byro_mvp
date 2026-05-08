@@ -104,136 +104,208 @@ export function ProfileHeroSection({
       transition={{ duration: 0.5, ease: SECTION_EASE }}
     >
       <div className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(75,108,245,0.14)_0%,transparent_68%)]" />
-      <div className="hero-card border border-[var(--color-border-default)] bg-[rgba(23,24,28,0.92)] p-[8px] backdrop-blur-sm">
-        <div className="relative h-[452px] overflow-hidden rounded-[30px] text-white ring-1 ring-black/4">
-          {profile.avatarImage ? (
-            <>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={profile.avatarImage} alt={`${profile.name} 프로필 사진`} className="absolute inset-0 h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.10)_58%,rgba(0,0,0,0.74)_100%)]" />
-            </>
-          ) : (
-            <>
-              <div className={`absolute inset-0 bg-gradient-to-b ${heroTheme.cover}`} />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.24),rgba(255,255,255,0)_36%),linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.08)_56%,rgba(0,0,0,0.76)_100%)]" />
-              <div className="absolute left-1/2 top-[16%] h-[196px] w-[196px] -translate-x-1/2 overflow-hidden rounded-[40px] border border-white/22 bg-gradient-to-br from-white/18 to-white/3 shadow-[0_28px_72px_rgba(0,0,0,0.18)] backdrop-blur-[6px]">
-                <div
-                  className={`h-full w-full bg-gradient-to-br ${heroTheme.avatar}`}
-                  style={{ backgroundColor: profile.avatarColor }}
-                />
-                <div className="absolute inset-0 flex items-center justify-center text-[72px] font-black text-[#4E3B32]/55">
-                  {profile.name.charAt(0)}
-                </div>
-              </div>
-            </>
-          )}
+      <ProfileHeroCard
+        profile={profile}
+        heroTheme={heroTheme}
+        isOwnerMode={isOwnerMode}
+        bioExpanded={bioExpanded}
+        bioOverflowing={bioOverflowing}
+        bioRef={bioRef}
+        onToggleBio={onToggleBio}
+        onOpenArchive={onOpenArchive}
+        onOpenManage={onOpenManage}
+      />
+      <ProfileReputationSummarySection
+        profile={profile}
+        keywordCounts={keywordCounts}
+        totalKeywordCount={totalKeywordCount}
+        featuredGuestbook={featuredGuestbook}
+        getProfileAvatar={getProfileAvatar}
+        onGuestbookEntryClick={onGuestbookEntryClick}
+        onOpenGuestbook={onOpenGuestbook}
+      />
+    </motion.div>
+  )
+}
 
-          <div className="absolute inset-x-0 bottom-0 p-5">
-            <div className="mb-0.5 flex items-end gap-2">
+export function ProfileHeroCard({
+  profile,
+  heroTheme,
+  isOwnerMode,
+  bioExpanded,
+  bioOverflowing,
+  bioRef,
+  onToggleBio,
+  onOpenArchive,
+  onOpenManage,
+}: {
+  profile: {
+    name: string
+    bio: string
+    avatarColor?: string
+    avatarImage?: string
+  }
+  heroTheme: HeroTheme
+  isOwnerMode: boolean
+  bioExpanded: boolean
+  bioOverflowing: boolean
+  bioRef: React.RefObject<HTMLParagraphElement>
+  onToggleBio: () => void
+  onOpenArchive?: () => void
+  onOpenManage?: () => void
+}) {
+  return (
+    <div className="hero-card border border-[var(--color-border-default)] bg-[rgba(23,24,28,0.92)] p-[8px] backdrop-blur-sm">
+      <div className="relative h-[452px] overflow-hidden rounded-[30px] text-white ring-1 ring-black/4">
+        {profile.avatarImage ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={profile.avatarImage} alt={`${profile.name} 프로필 사진`} className="absolute inset-0 h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.10)_58%,rgba(0,0,0,0.74)_100%)]" />
+          </>
+        ) : (
+          <>
+            <div className={`absolute inset-0 bg-gradient-to-b ${heroTheme.cover}`} />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.24),rgba(255,255,255,0)_36%),linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.08)_56%,rgba(0,0,0,0.76)_100%)]" />
+            <div className="absolute left-1/2 top-[16%] h-[196px] w-[196px] -translate-x-1/2 overflow-hidden rounded-[40px] border border-white/22 bg-gradient-to-br from-white/18 to-white/3 shadow-[0_28px_72px_rgba(0,0,0,0.18)] backdrop-blur-[6px]">
               <div
-                className="text-[38px] font-black leading-[1.08] tracking-[-0.05em]"
-                style={{
-                  background: 'linear-gradient(170deg, #FFFFFF 40%, rgba(255,255,255,0.68) 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  filter: 'drop-shadow(0 2px 12px rgba(0,0,0,0.32))',
-                }}
-              >
-                {profile.name}
+                className={`h-full w-full bg-gradient-to-br ${heroTheme.avatar}`}
+                style={{ backgroundColor: profile.avatarColor }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center text-[72px] font-black text-[#4E3B32]/55">
+                {profile.name.charAt(0)}
               </div>
-              <span className="mb-1.5 inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/95 text-[var(--color-state-success-text)] shadow-[0_4px_12px_rgba(0,0,0,0.22)]">
-                <BadgeCheck size={12} />
-              </span>
             </div>
-            <div className="mt-4 max-w-[318px] rounded-[18px] border border-white/12 bg-white/10 px-4 py-3 text-[15px] leading-[1.52] text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[8px]">
-              <p ref={bioRef} className={bioExpanded ? '' : 'line-clamp-3'}>
-                {profile.bio}
-              </p>
-              {bioOverflowing && (
-                <button onClick={onToggleBio} className="mt-2 text-xs font-semibold text-white/82">
-                  {bioExpanded ? '접기' : '더보기'}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {isOwnerMode && (
-          <div className="mt-4 flex gap-2">
-            <button
-              onClick={onOpenArchive}
-              className="flex-1 rounded-xl border border-[var(--color-border-default)] px-4 py-3 text-[14px] font-semibold text-[var(--color-text-secondary)] active:scale-[0.98] transition-all duration-100"
-            >
-              아카이브
-            </button>
-            <button
-              onClick={onOpenManage}
-              className="flex-1 rounded-xl bg-[var(--color-accent-dark)] px-4 py-3 text-[14px] font-semibold text-white active:scale-[0.98] transition-all duration-100"
-            >
-              Byro 편집
-            </button>
-          </div>
+          </>
         )}
 
-        <div className="mt-4 border-t border-[var(--color-border-soft)] px-1 pt-4">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Reputation</div>
-              <div className="mt-0.5 text-[22px] font-black tracking-[-0.04em] text-[var(--color-text-strong)]">누적 평판</div>
-            </div>
-            <div className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
-              총 {totalKeywordCount}
-            </div>
-          </div>
-
-          <div className="mt-3 flex flex-wrap gap-2">
-            {keywordCounts.map((item) => (
-              <span key={item.keyword} className="chip-metric">
-                {item.keyword} <span className="ml-1 font-black text-[var(--color-text-strong)]">{item.count}</span>
-              </span>
-            ))}
-          </div>
-
-          <div className="mt-4 divide-y divide-[var(--color-border-soft)]">
-            {featuredGuestbook.map((entry) => (
-              <button
-                key={entry.id}
-                onClick={() => onGuestbookEntryClick(entry.linkId)}
-                className="flex w-full gap-2.5 py-3 text-left first:pt-0 last:pb-0"
-              >
-                {getProfileAvatar(entry.linkId) ? (
-                  <div className="mt-0.5 h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-[var(--color-bg-soft)]">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={getProfileAvatar(entry.linkId)} alt={`${entry.authorName} 프로필 사진`} className="h-full w-full object-cover" />
-                  </div>
-                ) : (
-                  <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-xs font-bold text-[var(--color-text-secondary)]">
-                    {entry.authorName.charAt(0)}
-                  </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="text-[12px] font-semibold text-[var(--color-text-primary)]">{entry.authorName}</div>
-                    <div className="text-[10px] text-[var(--color-text-tertiary)]">{entry.date}</div>
-                  </div>
-                  <div className="mt-1 text-[13px] leading-6 text-[var(--color-text-secondary)] line-clamp-2">{entry.message}</div>
-                </div>
-              </button>
-            ))}
-          </div>
-
-          {profile.guestbook.length > 0 && (
-            <button
-              onClick={onOpenGuestbook}
-              className="mt-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-secondary)]"
+        <div className="absolute inset-x-0 bottom-0 p-5">
+          <div className="mb-0.5 flex items-end gap-2">
+            <div
+              className="text-[38px] font-black leading-[1.08] tracking-[-0.05em]"
+              style={{
+                background: 'linear-gradient(170deg, #FFFFFF 40%, rgba(255,255,255,0.68) 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                filter: 'drop-shadow(0 2px 12px rgba(0,0,0,0.32))',
+              }}
             >
-              더보기
-            </button>
-          )}
+              {profile.name}
+            </div>
+            <span className="mb-1.5 inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/95 text-[var(--color-state-success-text)] shadow-[0_4px_12px_rgba(0,0,0,0.22)]">
+              <BadgeCheck size={12} />
+            </span>
+          </div>
+          <div className="mt-4 max-w-[318px] rounded-[18px] border border-white/12 bg-white/10 px-4 py-3 text-[15px] leading-[1.52] text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[8px]">
+            <p ref={bioRef} className={bioExpanded ? '' : 'line-clamp-3'}>
+              {profile.bio}
+            </p>
+            {bioOverflowing && (
+              <button onClick={onToggleBio} className="mt-2 text-xs font-semibold text-white/82">
+                {bioExpanded ? '접기' : '더보기'}
+              </button>
+            )}
+          </div>
         </div>
       </div>
-    </motion.div>
+
+      {isOwnerMode && (
+        <div className="mt-4 flex gap-2">
+          <button
+            onClick={onOpenArchive}
+            className="flex-1 rounded-xl border border-[var(--color-border-default)] px-4 py-3 text-[14px] font-semibold text-[var(--color-text-secondary)] active:scale-[0.98] transition-all duration-100"
+          >
+            아카이브
+          </button>
+          <button
+            onClick={onOpenManage}
+            className="flex-1 rounded-xl bg-[var(--color-accent-dark)] px-4 py-3 text-[14px] font-semibold text-white active:scale-[0.98] transition-all duration-100"
+          >
+            Byro 편집
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export function ProfileReputationSummarySection({
+  profile,
+  keywordCounts,
+  totalKeywordCount,
+  featuredGuestbook,
+  getProfileAvatar,
+  onGuestbookEntryClick,
+  onOpenGuestbook,
+}: {
+  profile: {
+    guestbook: { length: number }
+  }
+  keywordCounts: KeywordCount[]
+  totalKeywordCount: number
+  featuredGuestbook: GuestbookPreview[]
+  getProfileAvatar: (linkId: string) => string
+  onGuestbookEntryClick: (linkId: string) => void
+  onOpenGuestbook: () => void
+}) {
+  return (
+    <div className="mt-4 border-t border-[var(--color-border-soft)] px-1 pt-4">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Reputation</div>
+          <div className="mt-0.5 text-[22px] font-black tracking-[-0.04em] text-[var(--color-text-strong)]">누적 평판</div>
+        </div>
+        <div className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
+          총 {totalKeywordCount}
+        </div>
+      </div>
+
+      <div className="mt-3 flex flex-wrap gap-2">
+        {keywordCounts.map((item) => (
+          <span key={item.keyword} className="chip-metric">
+            {item.keyword} <span className="ml-1 font-black text-[var(--color-text-strong)]">{item.count}</span>
+          </span>
+        ))}
+      </div>
+
+      <div className="mt-4 divide-y divide-[var(--color-border-soft)]">
+        {featuredGuestbook.map((entry) => (
+          <button
+            key={entry.id}
+            onClick={() => onGuestbookEntryClick(entry.linkId)}
+            className="flex w-full gap-2.5 py-3 text-left first:pt-0 last:pb-0"
+          >
+            {getProfileAvatar(entry.linkId) ? (
+              <div className="mt-0.5 h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-[var(--color-bg-soft)]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={getProfileAvatar(entry.linkId)} alt={`${entry.authorName} 프로필 사진`} className="h-full w-full object-cover" />
+              </div>
+            ) : (
+              <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-xs font-bold text-[var(--color-text-secondary)]">
+                {entry.authorName.charAt(0)}
+              </div>
+            )}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center justify-between gap-2">
+                <div className="text-[12px] font-semibold text-[var(--color-text-primary)]">{entry.authorName}</div>
+                <div className="text-[10px] text-[var(--color-text-tertiary)]">{entry.date}</div>
+              </div>
+              <div className="mt-1 text-[13px] leading-6 text-[var(--color-text-secondary)] line-clamp-2">{entry.message}</div>
+            </div>
+          </button>
+        ))}
+      </div>
+
+      {profile.guestbook.length > 0 && (
+        <button
+          onClick={onOpenGuestbook}
+          className="mt-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-secondary)]"
+        >
+          더보기
+        </button>
+      )}
+    </div>
   )
 }
 

@@ -15,6 +15,20 @@ export const SAMPLE_PROFILE = {
   headline: '커뮤니티 기반 성장을 설계하는 B2B SaaS 빌더',
   school: 'KAIST 경영학과 졸업',
   bio: 'B2B SaaS 분야에서 5년간 Product Owner로 활동해 온 강민준입니다. 파트너십을 통해 성장을 만들어가는 것을 즐깁니다.',
+  headerMeta: {
+    residence: '성수동',
+    mood: '집중 모드',
+    availability: '오늘 저녁 커피챗 가능',
+  },
+  whoIAm: {
+    mbti: 'ENTJ',
+    bloodType: 'A형',
+    sajuCompatibilityLabel: '사주 궁합 보기',
+    aiStyleSummary: ['신뢰감 있는 인상', '차분한 리더형 무드', '깔끔한 프로페셔널 스타일'],
+    relationshipStatus: '좋은 대화에 열려 있음',
+    children: '자녀 없음',
+    religion: '무교',
+  },
   heroTheme: {
     cover: 'from-[#B69B8B] via-[#836F66] to-[#121212]',
     avatar: 'from-[#DCC5B6] to-[#8F7265]',
@@ -150,6 +164,20 @@ export const MK_PROFILE = {
   headline: 'Entrepreneur, Writer, Connector',
   school: '',
   bio: 'Entrepreneur, Writer, Connector. Byth에서 Byro 만들고 운영하고 있어요.',
+  headerMeta: {
+    residence: '한남동',
+    mood: '사색 모드',
+    availability: '늦은 밤 산책 환영',
+  },
+  whoIAm: {
+    mbti: 'ENTP',
+    bloodType: 'B형',
+    sajuCompatibilityLabel: '궁합 먼저 보기',
+    aiStyleSummary: ['카리스마 있는 인상', '깊은 눈빛의 사색형', '내추럴한 블랙 스타일'],
+    relationshipStatus: '자연스러운 연결 선호',
+    children: '자녀 없음',
+    religion: '무교',
+  },
   heroTheme: {
     cover: 'from-[#8D887D] via-[#57534D] to-[#0E0E0E]',
     avatar: 'from-[#D8D0C7] to-[#8C8278]',
@@ -262,6 +290,20 @@ export const JIMIN_PROFILE = {
   headline: '브랜드와 사람을 연결하는 스타트업 마케터',
   school: '연세대학교 경영학 학사',
   bio: '스타트업 생태계에서 브랜드와 사람을 연결하는 마케터입니다. 브랜드의 방향성과 사람들의 경험이 자연스럽게 이어지도록 설계하는 일을 좋아하고, 성장 전략과 커뮤니티 빌딩에도 꾸준히 관심을 두고 있습니다.',
+  headerMeta: {
+    residence: '한남동',
+    mood: '산책 가고 싶은 날',
+    availability: '오늘의 펑 열려 있음',
+  },
+  whoIAm: {
+    mbti: 'ENFP',
+    bloodType: 'O형',
+    sajuCompatibilityLabel: '사주 궁합 보기',
+    aiStyleSummary: ['밝은 첫인상', '부드러운 페미닌 무드', '감각적인 블랙 자켓 스타일'],
+    relationshipStatus: '설레는 대화 환영',
+    children: '자녀 없음',
+    religion: '기독교',
+  },
   heroTheme: {
     cover: 'from-[#B9A597] via-[#7F6A61] to-[#101010]',
     avatar: 'from-[#D8C4B2] to-[#8A7167]',

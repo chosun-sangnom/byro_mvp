@@ -133,6 +133,22 @@ export interface HeroTheme {
   avatar: string
 }
 
+export interface ProfileHeaderMeta {
+  residence: string
+  mood: string
+  availability: string
+}
+
+export interface PublicProfileWhoIAm {
+  mbti: string
+  bloodType: string
+  sajuCompatibilityLabel: string
+  aiStyleSummary: string[]
+  relationshipStatus: string
+  children: string
+  religion: string
+}
+
 export interface CareerHighlight {
   avgYears: number
   vsIndustryPercent: number
@@ -195,6 +211,8 @@ export interface PublicProfile {
   headline?: string
   school: string
   bio: string
+  headerMeta?: ProfileHeaderMeta
+  whoIAm?: PublicProfileWhoIAm
   selectedKeywords: string[]
   avatarColor?: string
   avatarImage?: string

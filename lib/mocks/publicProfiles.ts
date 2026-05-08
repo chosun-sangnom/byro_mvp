@@ -35,15 +35,38 @@ export const SAMPLE_PROFILE = {
       pet: '없음',
     },
     tastes: {
-      movies: ['머니볼', '소셜 네트워크', '나 홀로 집에 2'],
-      music: ['혁오 - Tomboy', '검정치마 - Everything', '김동률 - Replay'],
-      books: ['린 스타트업', '제로 투 원', '좋은 전략 나쁜 전략'],
+      // TODO(real API): posterUrl from TMDB API — image.tmdb.org/t/p/w185/{poster_path}
+      movies: [
+        { label: '머니볼', posterUrl: 'https://picsum.photos/seed/moneyball/80/112' },
+        { label: '소셜 네트워크', posterUrl: 'https://picsum.photos/seed/socialnetwork/80/112' },
+        { label: '나 홀로 집에 2', posterUrl: 'https://picsum.photos/seed/homealone2/80/112' },
+      ],
+      // TODO(real API): posterUrl from Spotify API — i.scdn.co album art URL
+      music: [
+        { label: 'Tomboy', sublabel: '혁오', posterUrl: 'https://picsum.photos/seed/tomboy_hyukoh/80/80' },
+        { label: 'Everything', sublabel: '검정치마', posterUrl: 'https://picsum.photos/seed/blackskirts/80/80' },
+        { label: 'Replay', sublabel: '김동률', posterUrl: 'https://picsum.photos/seed/kimdongryul/80/80' },
+      ],
+      // TODO(real API): posterUrl from 알라딘 API — cover image URL
+      books: [
+        { label: '린 스타트업', posterUrl: 'https://picsum.photos/seed/leanstartup/80/112' },
+        { label: '제로 투 원', posterUrl: 'https://picsum.photos/seed/zerotone/80/112' },
+        { label: '좋은 전략 나쁜 전략', posterUrl: 'https://picsum.photos/seed/goodstrategy/80/112' },
+      ],
       games: ['EA SPORTS FC'],
       sports: ['축구', '골프'],
       celebrities: ['유재석', '아이유'],
       diet: '일반식',
-      restaurants: ['성수 우육미엔', '압구정 뜸들이다'],
-      cafes: ['센터커피', '프릳츠 원서점'],
+      // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
+      restaurants: [
+        { label: '성수 우육미엔', sublabel: '성수동', posterUrl: 'https://picsum.photos/seed/seongsu_uuk/148/96' },
+        { label: '압구정 뜸들이다', sublabel: '압구정', posterUrl: 'https://picsum.photos/seed/apgujeong_ddeum/148/96' },
+      ],
+      // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
+      cafes: [
+        { label: '센터커피', sublabel: '성수동', posterUrl: 'https://picsum.photos/seed/centercoffee/148/96' },
+        { label: '프릳츠 원서점', sublabel: '서촌', posterUrl: 'https://picsum.photos/seed/fritz_wonseo/148/96' },
+      ],
     },
     places: {
       neighborhoods: ['성수동', '한남동', '서촌'],
@@ -217,15 +240,33 @@ export const MK_PROFILE = {
       pet: '없음',
     },
     tastes: {
-      movies: ['인턴', '월터의 상상은 현실이 된다', '헤어질 결심'],
-      music: ['잔나비 - 주저하는 연인들을 위해', '성시경 - 희재', 'Coldplay - Yellow'],
-      books: ['당신의 엔진을 뜨겁게 달궈라', '원씽', '사피엔스'],
+      movies: [
+        { label: '인턴', posterUrl: 'https://picsum.photos/seed/intern_mk/80/112' },
+        { label: '월터의 상상은 현실이 된다', posterUrl: 'https://picsum.photos/seed/walter_mk/80/112' },
+        { label: '헤어질 결심', posterUrl: 'https://picsum.photos/seed/decision_mk/80/112' },
+      ],
+      music: [
+        { label: '주저하는 연인들을 위해', sublabel: '잔나비', posterUrl: 'https://picsum.photos/seed/jannabi_mk/80/80' },
+        { label: '희재', sublabel: '성시경', posterUrl: 'https://picsum.photos/seed/heejae_mk/80/80' },
+        { label: 'Yellow', sublabel: 'Coldplay', posterUrl: 'https://picsum.photos/seed/coldplay_mk/80/80' },
+      ],
+      books: [
+        { label: '당신의 엔진을 뜨겁게 달궈라', posterUrl: 'https://picsum.photos/seed/engine_mk/80/112' },
+        { label: '원씽', posterUrl: 'https://picsum.photos/seed/onething_mk/80/112' },
+        { label: '사피엔스', posterUrl: 'https://picsum.photos/seed/sapiens_mk/80/112' },
+      ],
       games: ['문명', 'FC'],
       sports: ['골프', '축구'],
       celebrities: ['손흥민', '전도연'],
       diet: '일반식',
-      restaurants: ['몽탄', '금돼지식당'],
-      cafes: ['테라로사', '블루보틀'],
+      restaurants: [
+        { label: '몽탄', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/mongtan_mk/148/96' },
+        { label: '금돼지식당', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/goldpig_mk/148/96' },
+      ],
+      cafes: [
+        { label: '테라로사', sublabel: '여러 지점', posterUrl: 'https://picsum.photos/seed/terarosa_mk/148/96' },
+        { label: '블루보틀', sublabel: '성수동', posterUrl: 'https://picsum.photos/seed/bluebottle_mk/148/96' },
+      ],
     },
     places: {
       neighborhoods: ['한남동', '압구정', '성수동'],
@@ -377,15 +418,33 @@ export const JIMIN_PROFILE = {
       pet: '없음',
     },
     tastes: {
-      movies: ['이터널 선샤인', '작은 아씨들', '비포 선셋'],
-      music: ['백예린 - Square', 'NewJeans - Ditto', 'Crush - Beautiful'],
-      books: ['아무튼, 여름', '보통의 언어들', '불편한 편의점'],
+      movies: [
+        { label: '이터널 선샤인', posterUrl: 'https://picsum.photos/seed/eternalsunshine_jm/80/112' },
+        { label: '작은 아씨들', posterUrl: 'https://picsum.photos/seed/littlewomen_jm/80/112' },
+        { label: '비포 선셋', posterUrl: 'https://picsum.photos/seed/beforesunset_jm/80/112' },
+      ],
+      music: [
+        { label: 'Square', sublabel: '백예린', posterUrl: 'https://picsum.photos/seed/square_jm/80/80' },
+        { label: 'Ditto', sublabel: 'NewJeans', posterUrl: 'https://picsum.photos/seed/ditto_jm/80/80' },
+        { label: 'Beautiful', sublabel: 'Crush', posterUrl: 'https://picsum.photos/seed/beautiful_jm/80/80' },
+      ],
+      books: [
+        { label: '아무튼, 여름', posterUrl: 'https://picsum.photos/seed/anyhow_jm/80/112' },
+        { label: '보통의 언어들', posterUrl: 'https://picsum.photos/seed/ordinary_jm/80/112' },
+        { label: '불편한 편의점', posterUrl: 'https://picsum.photos/seed/inconvenient_jm/80/112' },
+      ],
       games: ['심즈'],
       sports: ['테니스', '야구'],
       celebrities: ['아이유', '한소희'],
       diet: '일반식',
-      restaurants: ['진작다이닝', '을지다락'],
-      cafes: ['오츠커피', '레이어드'],
+      restaurants: [
+        { label: '진작다이닝', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/jinjak_jm/148/96' },
+        { label: '을지다락', sublabel: '을지로', posterUrl: 'https://picsum.photos/seed/euljiloft_jm/148/96' },
+      ],
+      cafes: [
+        { label: '오츠커피', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/oatscoffee_jm/148/96' },
+        { label: '레이어드', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/layered_jm/148/96' },
+      ],
     },
     places: {
       neighborhoods: ['한남동', '연남동', '서촌'],

@@ -149,6 +149,13 @@ export interface PublicProfileWhoIAm {
   religion: string
 }
 
+export interface LifeMediaItem {
+  label: string
+  sublabel?: string
+  // TODO(real API): posterUrl from TMDB (movies/books), Spotify (music), Kakao Maps / Google Places (restaurants/cafes)
+  posterUrl?: string
+}
+
 export interface KemiMatchItem {
   label: string
   category: 'taste' | 'place' | 'lifestyle' | 'identity'
@@ -168,16 +175,16 @@ export interface PublicProfileLife {
     petName?: string
   }
   tastes: {
-    movies: string[]
-    music: string[]
-    books: string[]
+    movies: LifeMediaItem[]
+    music: LifeMediaItem[]
+    books: LifeMediaItem[]
     games: string[]
     sports: string[]
     teams?: string[]
     celebrities: string[]
     diet: string
-    restaurants: string[]
-    cafes: string[]
+    restaurants: LifeMediaItem[]
+    cafes: LifeMediaItem[]
   }
   places: {
     neighborhoods: string[]

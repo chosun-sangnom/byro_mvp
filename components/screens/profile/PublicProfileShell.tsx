@@ -106,10 +106,10 @@ export function PublicProfileShell({
         {isReputationTab && (
           <div className="mb-4 flex gap-3">
             <button
-              onClick={() => showToast('연결 요청을 보냈어요!')}
+              onClick={() => showToast('피드백 요청을 보냈어요!')}
               className="flex-1 rounded-full border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.02)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)]"
             >
-              연결 요청
+              피드백 요청
             </button>
             <button
               onClick={() => showToast('경험 남겨요 구조는 다음 단계에서 연결할 예정입니다.')}
@@ -119,6 +119,13 @@ export function PublicProfileShell({
             </button>
           </div>
         )}
+
+        <button
+          onClick={() => showToast('연결 요청을 보냈어요!')}
+          className="mb-4 w-full rounded-full border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.02)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)]"
+        >
+          연결 요청
+        </button>
 
         <div>
           <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Contact</div>

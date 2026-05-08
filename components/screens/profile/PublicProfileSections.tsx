@@ -458,7 +458,7 @@ export function ProfileConnectSection({
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
             className="flex-1 rounded-full border border-[var(--color-border-default)] py-2.5 text-[13px] font-semibold text-[var(--color-text-secondary)]"
           >
-            연결 요청
+            피드백 요청
           </motion.button>
           <motion.button
             onClick={onLeaveExperience}

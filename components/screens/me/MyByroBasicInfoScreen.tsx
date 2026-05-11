@@ -40,6 +40,7 @@ export function BasicInfoEditScreen({
   const [birthTime, setBirthTime] = useState(initialSajuProfile.birthTime)
   const [birthPlace, setBirthPlace] = useState(initialSajuProfile.birthPlace)
   const [calendarType, setCalendarType] = useState<SajuProfileInput['calendarType']>(initialSajuProfile.calendarType)
+  const [showAge, setShowAge] = useState(initialSajuProfile.showAge ?? true)
   const [avatarImage, setAvatarImage] = useState(user.avatarImage ?? '')
   const [cropSource, setCropSource] = useState('')
   const [cropOpen, setCropOpen] = useState(false)
@@ -78,6 +79,7 @@ export function BasicInfoEditScreen({
       birthPlace,
       calendarType,
       isBirthTimeUnknown: !birthTime,
+      showAge,
     })
     store.updateUserWhoIAm({
       ...initialWhoIAm,
@@ -339,7 +341,19 @@ export function BasicInfoEditScreen({
 
             <div className="grid grid-cols-[1.2fr_0.8fr] gap-3">
               <div>
-                <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">생년월일</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs text-[var(--color-text-tertiary)]">생년월일</label>
+                  <button
+                    type="button"
+                    onClick={() => setShowAge((prev) => !prev)}
+                    className="flex items-center gap-1.5"
+                  >
+                    <div className={`relative w-7 h-4 rounded-full transition-colors ${showAge ? 'bg-[var(--color-accent-dark)]' : 'bg-[var(--color-border-default)]'}`}>
+                      <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white shadow transition-transform ${showAge ? 'translate-x-3.5' : 'translate-x-0.5'}`} />
+                    </div>
+                    <span className="text-[11px] text-[var(--color-text-tertiary)]">나이 공개</span>
+                  </button>
+                </div>
                 <input
                   type="date"
                   value={birthDate}

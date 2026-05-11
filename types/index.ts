@@ -290,6 +290,7 @@ export interface SajuProfileInput {
   birthPlace: string
   calendarType: 'solar' | 'lunar'
   isBirthTimeUnknown?: boolean
+  showAge?: boolean
 }
 
 export interface UserState {

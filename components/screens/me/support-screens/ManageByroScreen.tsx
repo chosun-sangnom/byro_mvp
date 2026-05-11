@@ -61,6 +61,17 @@ export function ManageByroScreen({
     0,
   )
 
+  const completionChecks = [
+    { label: '기본정보', done: Boolean(user.headline?.trim() && whoIAm.mbti) },
+    { label: '하이라이트', done: allHighlights.length > 0 },
+    { label: '라이프', done: activityCount + cultureCount + placeCount > 0 },
+    { label: 'SNS', done: connectedSnsCount > 0 },
+    { label: '연락수단', done: activeContactCount > 0 },
+  ]
+  const doneCount = completionChecks.filter((c) => c.done).length
+  const completionPercent = Math.round((doneCount / completionChecks.length) * 100)
+  const firstMissing = completionChecks.find((c) => !c.done)
+
   const rows: EditRow[] = [
     {
       title: '기본정보',
@@ -108,7 +119,31 @@ export function ManageByroScreen({
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        <div className="mx-5 mt-5 overflow-hidden rounded-2xl border border-[var(--color-border-soft)]">
+
+        {/* 완성도 */}
+        <div className="mx-5 mt-5 rounded-2xl border border-[var(--color-border-soft)] px-5 py-4">
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-[13px] font-semibold text-[var(--color-text-primary)]">
+              프로필 완성도
+            </p>
+            <p className="text-[13px] font-bold text-[var(--color-accent-dark)]">
+              {completionPercent}%
+            </p>
+          </div>
+          <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-bg-muted)]">
+            <div
+              className="h-full rounded-full bg-[var(--color-accent-dark)] transition-all"
+              style={{ width: `${completionPercent}%` }}
+            />
+          </div>
+          {firstMissing && (
+            <p className="mt-2 text-[11px] text-[var(--color-text-tertiary)]">
+              {firstMissing.label} 항목을 채우면 더 좋아져요
+            </p>
+          )}
+        </div>
+
+        <div className="mx-5 mt-4 overflow-hidden rounded-2xl border border-[var(--color-border-soft)]">
           {rows.map((row, i) => (
             <button
               key={row.title}

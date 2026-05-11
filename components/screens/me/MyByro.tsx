@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
-import { showToast } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { PublicProfileShell } from '@/components/screens/profile/PublicProfileShell'
 import { type PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
@@ -52,7 +51,7 @@ export default function MyByro() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onOwnerEdit={() => setScreen('manage')}
-        onOwnerManageConnections={() => showToast('연결 관리 준비 중이에요')}
+        onOwnerManageConnections={() => router.push('/archive')}
       >
         {activeTab === 'who' && <PublicProfileWhoTabPage username={user.linkId} />}
         {activeTab === 'life' && <PublicProfileLifeTabPage username={user.linkId} />}

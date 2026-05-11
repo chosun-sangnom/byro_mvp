@@ -4,7 +4,7 @@ import type { LifeMediaItem, PublicProfileLife } from '@/types'
 
 function BlockHeader({ label }: { label: string }) {
   return (
-    <div className="flex items-center gap-3 px-5 pb-1 pt-6">
+    <div className="flex items-center gap-3 px-5 pb-3 pt-6">
       <span className="text-[12px] font-black uppercase tracking-[0.12em] text-[var(--color-text-primary)]">
         {label}
       </span>
@@ -13,80 +13,69 @@ function BlockHeader({ label }: { label: string }) {
   )
 }
 
-function SubHeader({ label, count }: { label: string; count?: number }) {
-  return (
-    <div className="flex items-center gap-2 px-5 pb-0.5 pt-4">
-      <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-text-tertiary)]">
-        {label}
-      </span>
-      <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
-      {count != null && count > 0 && (
-        <span className="text-[10px] text-[var(--color-text-tertiary)] opacity-50">{count}</span>
-      )}
-    </div>
-  )
-}
-
-function ArchiveRow({
-  item,
-  shape,
-  isLast,
-}: {
-  item: LifeMediaItem
-  shape: 'portrait' | 'square' | 'landscape'
-  isLast: boolean
-}) {
-  const dims =
-    shape === 'portrait'
-      ? { w: 40, h: 56 }
-      : shape === 'landscape'
-        ? { w: 64, h: 44 }
-        : { w: 44, h: 44 }
-
-  return (
-    <div
-      className={`flex items-center gap-3 px-5 py-3 ${
-        !isLast ? 'border-b border-[var(--color-border-soft)]' : ''
-      }`}
-    >
-      <div
-        className="flex-shrink-0 overflow-hidden rounded-[8px] bg-[var(--color-bg-muted)]"
-        style={{ width: dims.w, height: dims.h }}
-      >
-        {item.posterUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={item.posterUrl} alt={item.label} className="h-full w-full object-cover" />
-        )}
-      </div>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-[13px] font-semibold text-[var(--color-text-primary)]">
-          {item.label}
-        </p>
-        {item.sublabel && (
-          <p className="mt-0.5 truncate text-[11px] text-[var(--color-text-tertiary)]">
-            {item.sublabel}
-          </p>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function ArchiveBlock({ items, shape }: { items: LifeMediaItem[]; shape: 'portrait' | 'square' | 'landscape' }) {
+function MediaScroll({ items, aspect = 'portrait' }: { items: LifeMediaItem[]; aspect?: 'portrait' | 'square' }) {
   if (!items.length) return null
+  const h = aspect === 'portrait' ? 112 : 84
+
   return (
-    <>
-      {items.map((item, i) => (
-        <ArchiveRow key={item.label} item={item} shape={shape} isLast={i === items.length - 1} />
-      ))}
-    </>
+    <div className="overflow-x-auto scrollbar-hide">
+      <div className="flex gap-3 px-5">
+        {items.map((item) => (
+          <div key={item.label} className="w-20 flex-shrink-0">
+            <div className="overflow-hidden rounded-[12px] bg-[var(--color-bg-muted)]" style={{ height: h }}>
+              {item.posterUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={item.posterUrl} alt={item.label} className="h-full w-full object-cover" />
+              )}
+            </div>
+            <p className="mt-1.5 truncate text-[11px] font-semibold leading-snug text-[var(--color-text-primary)]">
+              {item.label}
+            </p>
+            {item.sublabel && (
+              <p className="truncate text-[10px] leading-snug text-[var(--color-text-tertiary)]">
+                {item.sublabel}
+              </p>
+            )}
+          </div>
+        ))}
+        <div className="w-2 flex-shrink-0" />
+      </div>
+    </div>
+  )
+}
+
+function PlaceScroll({ items }: { items: LifeMediaItem[] }) {
+  if (!items.length) return null
+
+  return (
+    <div className="overflow-x-auto scrollbar-hide">
+      <div className="flex gap-3 px-5">
+        {items.map((item) => (
+          <div key={item.label} className="w-[140px] flex-shrink-0">
+            <div className="h-[88px] overflow-hidden rounded-[12px] bg-[var(--color-bg-muted)]">
+              {item.posterUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={item.posterUrl} alt={item.label} className="h-full w-full object-cover" />
+              )}
+            </div>
+            <p className="mt-1.5 truncate text-[12px] font-semibold text-[var(--color-text-primary)]">
+              {item.label}
+            </p>
+            {item.sublabel && (
+              <p className="truncate text-[10px] text-[var(--color-text-tertiary)]">{item.sublabel}</p>
+            )}
+          </div>
+        ))}
+        <div className="w-2 flex-shrink-0" />
+      </div>
+    </div>
   )
 }
 
 function ChipRow({ chips }: { chips: string[] }) {
   if (!chips.length) return null
   return (
-    <div className="flex flex-wrap gap-1.5 px-5 py-3">
+    <div className="flex flex-wrap gap-1.5 px-5">
       {chips.map((chip) => (
         <span key={chip} className="chip-metric">{chip}</span>
       ))}
@@ -106,15 +95,18 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
     life.tastes.books.length > 0 ||
     (life.tastes.plays?.length ?? 0) > 0
 
-  const hasPlace =
-    life.tastes.restaurants.length > 0 ||
-    life.tastes.cafes.length > 0 ||
-    life.places.travelDestinations.length > 0
+  const portraitItems = [
+    ...life.tastes.movies,
+    ...life.tastes.books,
+    ...(life.tastes.plays ?? []),
+  ]
+
+  const placeItems = [...life.tastes.restaurants, ...life.tastes.cafes]
+  const hasPlace = placeItems.length > 0 || life.places.travelDestinations.length > 0
 
   return (
     <div className="pb-10 pt-2">
 
-      {/* 활동 */}
       {hasActivity && (
         <>
           <BlockHeader label="활동" />
@@ -122,58 +114,26 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
         </>
       )}
 
-      {/* 문화 */}
       {hasCulture && (
         <>
           <BlockHeader label="문화" />
-          {life.tastes.movies.length > 0 && (
-            <>
-              <SubHeader label="영화" count={life.tastes.movies.length} />
-              <ArchiveBlock items={life.tastes.movies} shape="portrait" />
-            </>
-          )}
+          {portraitItems.length > 0 && <MediaScroll items={portraitItems} aspect="portrait" />}
           {life.tastes.music.length > 0 && (
-            <>
-              <SubHeader label="음악" count={life.tastes.music.length} />
-              <ArchiveBlock items={life.tastes.music} shape="square" />
-            </>
-          )}
-          {life.tastes.books.length > 0 && (
-            <>
-              <SubHeader label="책" count={life.tastes.books.length} />
-              <ArchiveBlock items={life.tastes.books} shape="portrait" />
-            </>
-          )}
-          {(life.tastes.plays?.length ?? 0) > 0 && (
-            <>
-              <SubHeader label="공연" count={life.tastes.plays!.length} />
-              <ArchiveBlock items={life.tastes.plays!} shape="portrait" />
-            </>
+            <div className={portraitItems.length > 0 ? 'mt-3' : ''}>
+              <MediaScroll items={life.tastes.music} aspect="square" />
+            </div>
           )}
         </>
       )}
 
-      {/* 장소 */}
       {hasPlace && (
         <>
           <BlockHeader label="장소" />
-          {life.tastes.restaurants.length > 0 && (
-            <>
-              <SubHeader label="맛집" count={life.tastes.restaurants.length} />
-              <ArchiveBlock items={life.tastes.restaurants} shape="landscape" />
-            </>
-          )}
-          {life.tastes.cafes.length > 0 && (
-            <>
-              <SubHeader label="카페" count={life.tastes.cafes.length} />
-              <ArchiveBlock items={life.tastes.cafes} shape="landscape" />
-            </>
-          )}
+          <PlaceScroll items={placeItems} />
           {life.places.travelDestinations.length > 0 && (
-            <>
-              <SubHeader label="여행" count={life.places.travelDestinations.length} />
+            <div className="mt-3">
               <ChipRow chips={life.places.travelDestinations} />
-            </>
+            </div>
           )}
         </>
       )}

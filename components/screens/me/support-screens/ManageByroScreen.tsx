@@ -22,6 +22,17 @@ interface ManageByroScreenProps {
   user: UserState
 }
 
+type ManageRow = {
+  title: string
+  meta: string
+  onClick: () => void
+}
+
+type ManageSection = {
+  title: string
+  rows: ManageRow[]
+}
+
 export function ManageByroScreen({
   allHighlights,
   connectedSnsCount,
@@ -49,7 +60,7 @@ export function ManageByroScreen({
   const placeCount = life.tastes.restaurants.length + life.tastes.cafes.length + life.places.travelDestinations.length
   const completionChecks = [
     { label: '프로필 사진', done: Boolean(user.avatarImage) },
-    { label: '프로필카드', done: Boolean(user.headline?.trim() && user.headerMeta?.mood?.trim() && user.headerMeta?.availability?.trim()) },
+    { label: '기본정보', done: Boolean(user.headline?.trim() && user.headerMeta?.mood?.trim() && user.headerMeta?.availability?.trim() && sajuProfile?.birthDate) },
     { label: '나', done: Boolean(whoIAm.mbti && petLabel) },
     {
       label: '사주 정보',
@@ -65,25 +76,51 @@ export function ManageByroScreen({
   ]
   const completionPercent = Math.round((completionChecks.filter((item) => item.done).length / completionChecks.length) * 100)
   const remainingItems = completionChecks.filter((item) => !item.done).slice(0, 3)
-  const manageRows = [
-    { title: '프로필카드', meta: user.headline?.trim() ? '사진, 한줄소개, 오늘의 기분, 펑 편집' : '프로필카드 정보를 먼저 채워주세요', onClick: onEditBasic },
-    { title: '나', meta: `${whoIAm.mbti} · ${petLabel}`, onClick: onEditWhoIAm },
+  const manageSections: ManageSection[] = [
     {
-      title: '사주 정보 추가',
-      meta: sajuProfile?.birthDate ? '궁합 보기 분석용 비공개 입력 완료' : '생년월일, 시간, 출생지를 입력하세요',
-      onClick: onEditSaju,
+      title: '기본정보',
+      rows: [
+        {
+          title: '기본정보',
+          meta: user.headline?.trim() ? '사진, 한줄소개, 생년월일, 오늘의 기분, 펑 편집' : '기본정보를 먼저 채워주세요',
+          onClick: onEditBasic,
+        },
+        {
+          title: '사주정보',
+          meta: sajuProfile?.birthPlace.trim()
+            ? '생시 · 출생지 입력 완료'
+            : '생시와 출생지를 입력하면 사주정보를 더 정확하게 볼 수 있어요',
+          onClick: onEditSaju,
+        },
+      ],
+    },
+    {
+      title: '나',
+      rows: [
+        { title: '나', meta: `${whoIAm.mbti} · ${petLabel}`, onClick: onEditWhoIAm },
+        { title: '하이라이트', meta: allHighlights.length > 0 ? `${allHighlights.length}개 항목 관리` : '프로필에 보여줄 경험을 추가하세요', onClick: onEditHighlight },
+      ],
     },
     {
       title: '라이프',
-      meta: `활동 ${activityCount}개 · 문화 ${cultureCount}개 · 장소 ${placeCount}개`,
-      onClick: onEditLife,
+      rows: [
+        {
+          title: '라이프',
+          meta: `활동 ${activityCount}개 · 문화 ${cultureCount}개 · 장소 ${placeCount}개`,
+          onClick: onEditLife,
+        },
+      ],
     },
-    { title: '연락 수단', meta: activeContactCount > 0 ? `${activeContactCount}개 연결됨` : '전화, 이메일, 카카오를 연결하세요', onClick: onEditContact },
-    { title: 'SNS 연동', meta: connectedSnsCount > 0 ? `${connectedSnsCount}개 연동됨` : '유튜브, 틱톡, 인스타그램, 링크드인을 관리하세요', onClick: onEditSNS },
-    { title: '하이라이트', meta: allHighlights.length > 0 ? `${allHighlights.length}개 항목 관리` : '프로필에 보여줄 경험을 추가하세요', onClick: onEditHighlight },
-    { title: '평판 키워드', meta: `선택 ${user.selectedKeywords.length}개 · 누적 ${totalReputationCount}회`, onClick: onEditReputation },
-    { title: '방명록', meta: `${SAMPLE_PROFILE.guestbook.length}개 메시지 관리`, onClick: onEditGuestbook },
-  ] as const
+    {
+      title: '관계',
+      rows: [
+        { title: '연락 수단', meta: activeContactCount > 0 ? `${activeContactCount}개 연결됨` : '전화, 이메일, 카카오를 연결하세요', onClick: onEditContact },
+        { title: 'SNS 연동', meta: connectedSnsCount > 0 ? `${connectedSnsCount}개 연동됨` : '유튜브, 틱톡, 인스타그램, 링크드인을 관리하세요', onClick: onEditSNS },
+        { title: '평판 키워드', meta: `선택 ${user.selectedKeywords.length}개 · 누적 ${totalReputationCount}회`, onClick: onEditReputation },
+        { title: '방명록', meta: `${SAMPLE_PROFILE.guestbook.length}개 메시지 관리`, onClick: onEditGuestbook },
+      ],
+    },
+  ]
 
   return (
     <div className="flex flex-col h-full">
@@ -120,21 +157,30 @@ export function ManageByroScreen({
             <div className="mt-2 text-[18px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">Byro 편집</div>
             <div className="meta-text mt-1 leading-relaxed">각 항목을 눌러 별도 페이지에서 수정하세요.</div>
           </div>
-          <div className="settings-shell overflow-hidden p-2.5">
-            {manageRows.map((row, index) => (
-              <button
-                key={row.title}
-                onClick={row.onClick}
-                className={`settings-row flex w-full items-center gap-4 px-4 py-3.5 text-left ${index > 0 ? 'mt-2' : ''}`}
-              >
-                <div className="min-w-0 flex-1">
-                  <div className="text-[15px] font-semibold tracking-[-0.02em] text-white">{row.title}</div>
-                  <div className="mt-1 text-[11px] leading-[1.5] text-white/48">{row.meta}</div>
+          <div className="space-y-4">
+            {manageSections.map((section) => (
+              <div key={section.title}>
+                <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">
+                  {section.title}
                 </div>
-                <span className="flex h-8 w-8 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-white/56">
-                  <ChevronRight size={15} />
-                </span>
-              </button>
+                <div className="settings-shell overflow-hidden p-2.5">
+                  {section.rows.map((row, index) => (
+                    <button
+                      key={`${section.title}-${row.title}`}
+                      onClick={row.onClick}
+                      className={`settings-row flex w-full items-center gap-4 px-4 py-3.5 text-left ${index > 0 ? 'mt-2' : ''}`}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[15px] font-semibold tracking-[-0.02em] text-white">{row.title}</div>
+                        <div className="mt-1 text-[11px] leading-[1.5] text-white/48">{row.meta}</div>
+                      </div>
+                      <span className="flex h-8 w-8 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-white/56">
+                        <ChevronRight size={15} />
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
         </div>

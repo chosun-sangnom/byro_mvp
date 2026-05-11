@@ -5,10 +5,10 @@ import { Camera } from 'lucide-react'
 import { Button, showToast, TextArea } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
-import type { UserState } from '@/types'
+import type { SajuProfileInput, UserState } from '@/types'
 
 interface BasicInfoEditScreenProps {
-  user: Pick<UserState, 'name' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'headerMeta'>
+  user: Pick<UserState, 'name' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'headerMeta' | 'sajuProfile'>
   onBack: () => void
 }
 
@@ -24,6 +24,8 @@ export function BasicInfoEditScreen({
   const [headline, setHeadline] = useState(user.headline ?? '')
   const [school, setSchool] = useState(user.school)
   const [bio, setBio] = useState(user.bio)
+  const initialSajuProfile: SajuProfileInput = user.sajuProfile ?? (SAMPLE_PROFILE.sajuProfile as SajuProfileInput)
+  const [birthDate, setBirthDate] = useState(initialSajuProfile.birthDate)
   const [mood, setMood] = useState(user.headerMeta?.mood ?? SAMPLE_PROFILE.headerMeta.mood)
   const [availability, setAvailability] = useState(user.headerMeta?.availability ?? SAMPLE_PROFILE.headerMeta.availability)
   const [avatarImage, setAvatarImage] = useState(user.avatarImage ?? '')
@@ -58,6 +60,10 @@ export function BasicInfoEditScreen({
         mood,
         availability,
       },
+    })
+    store.updateUserSajuProfile({
+      ...initialSajuProfile,
+      birthDate,
     })
     showToast('저장됐어요!')
     onBack()
@@ -149,7 +155,7 @@ export function BasicInfoEditScreen({
     <div className="flex flex-col h-full">
       <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] bg-[rgba(16,17,20,0.85)] backdrop-blur-md flex-shrink-0">
         <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
-        <span className="text-base font-black">프로필카드 편집</span>
+        <span className="text-base font-black">기본정보 편집</span>
       </div>
 
       <div className="flex-1 overflow-y-auto">
@@ -208,6 +214,19 @@ export function BasicInfoEditScreen({
                 placeholder="예: 브랜드와 사람을 연결하는 스타트업 마케터"
                 className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
               />
+            </div>
+
+            <div>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">생년월일</label>
+              <input
+                type="date"
+                value={birthDate}
+                onChange={(event) => setBirthDate(event.target.value)}
+                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
+              />
+              <div className="mt-1 text-[11px] text-[var(--color-text-tertiary)]">
+                나이 계산과 사주정보 기준값으로 사용됩니다.
+              </div>
             </div>
 
             <div>

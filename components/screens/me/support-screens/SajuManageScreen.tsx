@@ -37,8 +37,12 @@ export function SajuManageScreen({ onBack }: { onBack: () => void }) {
   )
 
   const handleSave = () => {
-    if (!sajuProfile.birthDate || !sajuProfile.birthPlace.trim()) {
-      showToast('생년월일과 출생지는 입력해 주세요')
+    if (!sajuProfile.birthDate) {
+      showToast('생년월일은 기본정보에서 먼저 입력해 주세요')
+      return
+    }
+    if (!sajuProfile.birthPlace.trim()) {
+      showToast('출생지는 입력해 주세요')
       return
     }
     if (!sajuProfile.isBirthTimeUnknown && !sajuProfile.birthTime) {
@@ -59,31 +63,31 @@ export function SajuManageScreen({ onBack }: { onBack: () => void }) {
     <div className="flex h-full flex-col">
       <div className="flex h-12 flex-shrink-0 items-center border-b border-[var(--color-border-soft)] px-5">
         <button onClick={onBack} className="mr-3 text-xl leading-none text-[var(--color-text-secondary)]">‹</button>
-        <span className="text-base font-black text-[var(--color-text-strong)]">사주 정보 추가</span>
+        <span className="text-base font-black text-[var(--color-text-strong)]">사주정보 보강</span>
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
         <InfoBox variant="warn">
-          입력한 원본 정보는 공개되지 않고, <span className="font-semibold">궁합 보기</span> 분석에만 사용됩니다.
+          생시와 출생지를 입력하면 <span className="font-semibold">사주정보</span>를 더 정확하게 계산할 수 있어요.
+          원본 정보는 공개되지 않습니다.
         </InfoBox>
 
         <div className="mt-4 rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4">
           <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">예상 사주 타입</div>
           <div className="mt-2 text-[20px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">{nextSajuType}</div>
           <p className="mt-1 text-[12px] leading-[1.6] text-[var(--color-text-secondary)]">
-            저장하면 궁합 보기 리포트에서 이 값이 반영됩니다.
+            저장하면 사주정보 계산 정확도가 높아집니다.
           </p>
         </div>
 
         <div className="mt-5 space-y-4">
-          <Field label="생년월일">
-            <input
-              type="date"
-              value={sajuProfile.birthDate}
-              onChange={(event) => setSajuProfile((prev) => ({ ...prev, birthDate: event.target.value }))}
-              className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none"
-            />
-          </Field>
+          <div className="rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4">
+            <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">생년월일</div>
+            <div className="mt-2 text-[15px] font-semibold text-[var(--color-text-primary)]">{sajuProfile.birthDate || '기본정보에서 입력해 주세요'}</div>
+            <p className="mt-1 text-[12px] leading-[1.6] text-[var(--color-text-secondary)]">
+              생년월일은 기본정보에서 관리하고, 여기서는 사주정보 정확도를 높이는 보강 입력만 받습니다.
+            </p>
+          </div>
 
           <Field label="양력 / 음력">
             <div className="flex gap-2">

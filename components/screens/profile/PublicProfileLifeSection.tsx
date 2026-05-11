@@ -2,6 +2,12 @@
 
 import type { LifeMediaItem, PublicProfileLife } from '@/types'
 
+function BlockTitle({ label }: { label: string }) {
+  return (
+    <p className="px-5 text-[16px] font-bold text-[var(--color-text-primary)]">{label}</p>
+  )
+}
+
 function MediaScroll({
   items,
   aspect = 'portrait',
@@ -84,17 +90,35 @@ function ChipGroup({ chips }: { chips: string[] }) {
 export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife }) {
   if (!life) return null
 
+  const hasActivity = life.daily.exercise.length > 0 || (life.tastes.teams?.length ?? 0) > 0
+  const hasCulture = life.tastes.movies.length > 0 || life.tastes.music.length > 0 || life.tastes.books.length > 0 || (life.tastes.plays?.length ?? 0) > 0
+  const hasPlace = life.tastes.restaurants.length > 0 || life.tastes.cafes.length > 0 || life.places.travelDestinations.length > 0
+
   return (
-    <div className="space-y-6 pb-8 pt-6">
-      {life.daily.exercise.length > 0 && <ChipGroup chips={life.daily.exercise} />}
-      {(life.tastes.teams?.length ?? 0) > 0 && <ChipGroup chips={life.tastes.teams!} />}
-      {life.tastes.movies.length > 0 && <MediaScroll items={life.tastes.movies} aspect="portrait" />}
-      {life.tastes.music.length > 0 && <MediaScroll items={life.tastes.music} aspect="square" />}
-      {life.tastes.books.length > 0 && <MediaScroll items={life.tastes.books} aspect="portrait" />}
-      {(life.tastes.plays?.length ?? 0) > 0 && <MediaScroll items={life.tastes.plays!} aspect="portrait" />}
-      {life.tastes.restaurants.length > 0 && <PlaceScroll items={life.tastes.restaurants} />}
-      {life.tastes.cafes.length > 0 && <PlaceScroll items={life.tastes.cafes} />}
-      {life.places.travelDestinations.length > 0 && <ChipGroup chips={life.places.travelDestinations} />}
+    <div className="space-y-8 pb-8 pt-6">
+      {hasActivity && (
+        <div className="space-y-3">
+          <BlockTitle label="활동" />
+          <ChipGroup chips={[...(life.daily.exercise ?? []), ...(life.tastes.teams ?? [])]} />
+        </div>
+      )}
+      {hasCulture && (
+        <div className="space-y-4">
+          <BlockTitle label="문화" />
+          {life.tastes.movies.length > 0 && <MediaScroll items={life.tastes.movies} aspect="portrait" />}
+          {life.tastes.music.length > 0 && <MediaScroll items={life.tastes.music} aspect="square" />}
+          {life.tastes.books.length > 0 && <MediaScroll items={life.tastes.books} aspect="portrait" />}
+          {(life.tastes.plays?.length ?? 0) > 0 && <MediaScroll items={life.tastes.plays!} aspect="portrait" />}
+        </div>
+      )}
+      {hasPlace && (
+        <div className="space-y-4">
+          <BlockTitle label="장소" />
+          {life.tastes.restaurants.length > 0 && <PlaceScroll items={life.tastes.restaurants} />}
+          {life.tastes.cafes.length > 0 && <PlaceScroll items={life.tastes.cafes} />}
+          {life.places.travelDestinations.length > 0 && <ChipGroup chips={life.places.travelDestinations} />}
+        </div>
+      )}
     </div>
   )
 }

@@ -28,11 +28,15 @@ export function PublicProfileShell({
   username,
   activeTab,
   onTabChange,
+  onOwnerEdit,
+  onOwnerManageConnections,
   children,
 }: {
   username: string
   activeTab: PublicProfileTabId
   onTabChange: (tab: PublicProfileTabId) => void
+  onOwnerEdit?: () => void
+  onOwnerManageConnections?: () => void
   children: ReactNode
 }) {
   const router = useRouter()
@@ -160,18 +164,24 @@ export function PublicProfileShell({
           </div>
         )}
 
-        {/* 메인 CTA — owner: 편집 진입 / visitor: 연결 요청 */}
+        {/* 메인 CTA — owner: 편집 + 연결 관리 / visitor: 연결 요청 */}
         {isOwnerMode ? (
-          // TODO(edit): 편집 화면 라우트 확정 후 /me/edit 또는 /me로 교체
-          <button
-            onClick={() => router.push('/me')}
-            className="mb-4 flex w-full items-center justify-center gap-2 rounded-full border border-[var(--color-accent-dark)] bg-[rgba(75,108,245,0.08)] py-3 text-[13px] font-semibold text-[var(--color-accent-dark)]"
-          >
-            <Pencil size={14} />
-            Byro 편집
-          </button>
+          <div className="mb-4 flex gap-3">
+            <button
+              onClick={onOwnerEdit ?? (() => router.push('/me'))}
+              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-[var(--color-accent-dark)] bg-[rgba(75,108,245,0.08)] py-3 text-[13px] font-semibold text-[var(--color-accent-dark)]"
+            >
+              <Pencil size={14} />
+              편집
+            </button>
+            <button
+              onClick={onOwnerManageConnections ?? (() => showToast('연결 관리를 준비 중이에요'))}
+              className="flex flex-1 items-center justify-center rounded-full border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.02)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)]"
+            >
+              연결 관리
+            </button>
+          </div>
         ) : (
-          // TODO(connect): 연결 요청 API 연동 — 중복 요청 방지, 상태 관리 필요
           <button
             onClick={() => showToast('연결 요청을 보냈어요!')}
             className="mb-4 w-full rounded-full border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.02)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)]"

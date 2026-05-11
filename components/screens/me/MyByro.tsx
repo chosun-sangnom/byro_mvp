@@ -3,8 +3,15 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
+import { showToast } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
-import PublicProfile from '@/components/screens/profile/PublicProfile'
+import { PublicProfileShell } from '@/components/screens/profile/PublicProfileShell'
+import { type PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
+import {
+  PublicProfileLifeTabPage,
+  PublicProfileReputationTabPage,
+  PublicProfileWhoTabPage,
+} from '@/components/screens/profile/PublicProfileTabPages'
 import { BasicInfoEditScreen } from '@/components/screens/me/MyByroBasicInfoScreen'
 import { HighlightManageScreen } from '@/components/screens/me/MyByroHighlightManageScreen'
 import {
@@ -27,6 +34,7 @@ export default function MyByro() {
   }, [store.isLoggedIn, router])
 
   const [screen, setScreen] = useState<Screen>('preview')
+  const [activeTab, setActiveTab] = useState<PublicProfileTabId>('who')
 
   if (!store.isLoggedIn) return null
   const user = store.user!
@@ -39,10 +47,17 @@ export default function MyByro() {
   // ── 화면 분기 ──────────────────────────────────────────────
   if (screen === 'preview') {
     return (
-      <PublicProfile
+      <PublicProfileShell
         username={user.linkId}
-        mode="owner"
-      />
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        onOwnerEdit={() => setScreen('manage')}
+        onOwnerManageConnections={() => showToast('연결 관리 준비 중이에요')}
+      >
+        {activeTab === 'who' && <PublicProfileWhoTabPage username={user.linkId} />}
+        {activeTab === 'life' && <PublicProfileLifeTabPage username={user.linkId} />}
+        {activeTab === 'reputation' && <PublicProfileReputationTabPage username={user.linkId} />}
+      </PublicProfileShell>
     )
   }
 

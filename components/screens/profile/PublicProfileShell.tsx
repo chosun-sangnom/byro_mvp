@@ -17,7 +17,8 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { Pencil, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
-import { showToast } from '@/components/ui'
+import { Button, BottomSheet, showToast } from '@/components/ui'
+import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
 import { ContactActionButton, ProfileHeroCard } from '@/components/screens/profile/PublicProfileSections'
 import { PublicProfileTabBar, type PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
@@ -47,11 +48,19 @@ export function PublicProfileShell({
 
   const [bioExpanded, setBioExpanded] = useState(false)
   const [bioOverflowing, setBioOverflowing] = useState(false)
+  const [metaSheetOpen, setMetaSheetOpen] = useState(false)
+  const [moodDraft, setMoodDraft] = useState(profile.headerMeta?.mood ?? '')
+  const [availabilityDraft, setAvailabilityDraft] = useState(profile.headerMeta?.availability ?? '')
   const bioRef = useRef<HTMLParagraphElement | null>(null)
 
   useEffect(() => {
     setBioExpanded(false)
   }, [profile.bio, username])
+
+  useEffect(() => {
+    setMoodDraft(profile.headerMeta?.mood ?? '')
+    setAvailabilityDraft(profile.headerMeta?.availability ?? '')
+  }, [profile.headerMeta?.mood, profile.headerMeta?.availability, username])
 
   useEffect(() => {
     const checkOverflow = () => {
@@ -67,6 +76,20 @@ export function PublicProfileShell({
 
   // 관계 탭에서만 "피드백 요청 / 경험 남기기" 버튼 표시 (visitor only)
   const showReputationActions = activeTab === 'reputation' && !isOwnerMode
+
+  const handleSaveHeaderMeta = () => {
+    if (!store.user) return
+    store.updateUserInfo({
+      headerMeta: {
+        ...profile.headerMeta,
+        residence: profile.headerMeta?.residence ?? store.user.headerMeta?.residence ?? SAMPLE_PROFILE.headerMeta.residence,
+        mood: moodDraft.trim(),
+        availability: availabilityDraft.trim(),
+      },
+    })
+    setMetaSheetOpen(false)
+    showToast('오늘의 기분과 펑이 저장됐어요')
+  }
 
   return (
     <div className="flex h-full flex-col">
@@ -123,6 +146,8 @@ export function PublicProfileShell({
             bioOverflowing={bioOverflowing}
             bioRef={bioRef}
             onToggleBio={() => setBioExpanded((prev) => !prev)}
+            isOwnerMode={isOwnerMode}
+            onEditHeaderMeta={isOwnerMode ? () => setMetaSheetOpen(true) : undefined}
           />
         </div>
 
@@ -213,6 +238,42 @@ export function PublicProfileShell({
           </div>
         </div>
       </div>
+
+      <BottomSheet open={metaSheetOpen} onClose={() => setMetaSheetOpen(false)}>
+        <div className="px-5 pb-6">
+          <div className="mb-1 text-[18px] font-black text-[var(--color-text-strong)]">오늘의 기분 · 펑 수정</div>
+          <div className="mb-4 text-sm leading-6 text-[var(--color-text-secondary)]">
+            프로필 카드에서 바로 보이는 상태값이라, 짧고 가볍게 적는 편이 좋습니다.
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="mb-2 block text-xs font-bold text-[var(--color-text-secondary)]">오늘의 기분</label>
+              <input
+                value={moodDraft}
+                onChange={(event) => setMoodDraft(event.target.value)}
+                placeholder="예: 집중 모드"
+                className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-xs font-bold text-[var(--color-text-secondary)]">펑</label>
+              <input
+                value={availabilityDraft}
+                onChange={(event) => setAvailabilityDraft(event.target.value)}
+                placeholder="예: 오늘 저녁 커피챗 가능"
+                className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="mt-5 flex gap-2">
+            <Button variant="outline" onClick={() => setMetaSheetOpen(false)}>닫기</Button>
+            <Button onClick={handleSaveHeaderMeta}>저장</Button>
+          </div>
+        </div>
+      </BottomSheet>
     </div>
   )
 }

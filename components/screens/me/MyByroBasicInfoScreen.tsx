@@ -5,15 +5,22 @@ import { Camera } from 'lucide-react'
 import { Button, showToast, TextArea } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
-import type { UserState } from '@/types'
+import type { PublicProfileLife, PublicProfileWhoIAm, SajuProfileInput, UserState } from '@/types'
 
 interface BasicInfoEditScreenProps {
-  user: Pick<UserState, 'name' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'headerMeta' | 'sajuProfile'>
+  user: Pick<UserState, 'name' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'headerMeta' | 'sajuProfile' | 'whoIAm' | 'life'>
   onBack: () => void
 }
 
 const CROP_RATIO = 4 / 5
 const DEFAULT_CROP_FRAME = { width: 256, height: 320 }
+const MBTI_OPTIONS = [
+  'INTJ', 'INTP', 'ENTJ', 'ENTP',
+  'INFJ', 'INFP', 'ENFJ', 'ENFP',
+  'ISTJ', 'ISFJ', 'ESTJ', 'ESFJ',
+  'ISTP', 'ISFP', 'ESTP', 'ESFP',
+]
+const PET_OPTIONS = ['없음', '강아지', '고양이', '기타']
 
 export function BasicInfoEditScreen({
   user,
@@ -22,7 +29,16 @@ export function BasicInfoEditScreen({
   const store = useByroStore()
   const [headline, setHeadline] = useState(user.headline ?? '')
   const [bio, setBio] = useState(user.bio)
-  const [mood, setMood] = useState(user.headerMeta?.mood ?? SAMPLE_PROFILE.headerMeta.mood)
+  const initialWhoIAm: PublicProfileWhoIAm = user.whoIAm ?? SAMPLE_PROFILE.whoIAm
+  const initialLife: PublicProfileLife = user.life ?? SAMPLE_PROFILE.life
+  const initialSajuProfile: SajuProfileInput = user.sajuProfile ?? (SAMPLE_PROFILE.sajuProfile as SajuProfileInput)
+  const [mbti, setMbti] = useState(initialWhoIAm.mbti)
+  const [pet, setPet] = useState(initialLife.daily.pet)
+  const [petName, setPetName] = useState(initialLife.daily.petName ?? '')
+  const [birthDate, setBirthDate] = useState(initialSajuProfile.birthDate)
+  const [birthTime, setBirthTime] = useState(initialSajuProfile.birthTime)
+  const [birthPlace, setBirthPlace] = useState(initialSajuProfile.birthPlace)
+  const [calendarType, setCalendarType] = useState<SajuProfileInput['calendarType']>(initialSajuProfile.calendarType)
   const [avatarImage, setAvatarImage] = useState(user.avatarImage ?? '')
   const [cropSource, setCropSource] = useState('')
   const [cropOpen, setCropOpen] = useState(false)
@@ -50,8 +66,28 @@ export function BasicInfoEditScreen({
       avatarImage,
       headerMeta: {
         residence: user.headerMeta?.residence ?? SAMPLE_PROFILE.headerMeta.residence,
-        mood,
+        mood: user.headerMeta?.mood ?? SAMPLE_PROFILE.headerMeta.mood,
         availability: user.headerMeta?.availability ?? SAMPLE_PROFILE.headerMeta.availability,
+      },
+    })
+    store.updateUserSajuProfile({
+      ...initialSajuProfile,
+      birthDate,
+      birthTime,
+      birthPlace,
+      calendarType,
+      isBirthTimeUnknown: !birthTime,
+    })
+    store.updateUserWhoIAm({
+      ...initialWhoIAm,
+      mbti,
+    })
+    store.updateUserLife({
+      ...initialLife,
+      daily: {
+        ...initialLife.daily,
+        pet,
+        petName: pet === '없음' ? undefined : petName.trim() || undefined,
       },
     })
     showToast('저장됐어요!')
@@ -196,15 +232,123 @@ export function BasicInfoEditScreen({
             </div>
 
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <label className="text-xs text-[var(--color-text-tertiary)]">오늘의 기분</label>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-2 block">MBTI</label>
+              <div className="flex flex-wrap gap-2">
+                {MBTI_OPTIONS.map((option) => {
+                  const selected = option === mbti
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => setMbti(option)}
+                      className="rounded-full border px-3 py-1.5 text-xs font-semibold"
+                      style={{
+                        borderColor: selected ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
+                        background: selected ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
+                        color: selected ? '#ffffff' : 'var(--color-text-secondary)',
+                      }}
+                    >
+                      {option}
+                    </button>
+                  )
+                })}
               </div>
+            </div>
+
+            <div>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-2 block">반려동물</label>
+              <div className="flex flex-wrap gap-2">
+                {PET_OPTIONS.map((option) => {
+                  const selected = option === pet
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => setPet(option)}
+                      className="rounded-full border px-3 py-1.5 text-xs font-semibold"
+                      style={{
+                        borderColor: selected ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
+                        background: selected ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
+                        color: selected ? '#ffffff' : 'var(--color-text-secondary)',
+                      }}
+                    >
+                      {option}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {pet !== '없음' && (
+              <div>
+                <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">반려동물 이름</label>
+                <input
+                  value={petName}
+                  onChange={(event) => setPetName(event.target.value)}
+                  placeholder="예: 몽이"
+                  className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
+                />
+              </div>
+            )}
+
+            <div>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">생년월일</label>
               <input
-                value={mood}
-                onChange={(event) => setMood(event.target.value)}
-                placeholder="예: 집중 모드"
+                type="date"
+                value={birthDate}
+                onChange={(event) => setBirthDate(event.target.value)}
+                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-2 block">양력 / 음력</label>
+              <div className="flex gap-2">
+                {[
+                  { id: 'solar', label: '양력' },
+                  { id: 'lunar', label: '음력' },
+                ].map((option) => {
+                  const selected = option.id === calendarType
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      onClick={() => setCalendarType(option.id as SajuProfileInput['calendarType'])}
+                      className="rounded-full border px-3 py-1.5 text-xs font-semibold"
+                      style={{
+                        borderColor: selected ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
+                        background: selected ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
+                        color: selected ? '#ffffff' : 'var(--color-text-secondary)',
+                      }}
+                    >
+                      {option.label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">생시</label>
+              <input
+                type="time"
+                value={birthTime}
+                onChange={(event) => setBirthTime(event.target.value)}
+                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">출생지</label>
+              <input
+                value={birthPlace}
+                onChange={(event) => setBirthPlace(event.target.value)}
+                placeholder="예: 서울, 부산, 대전"
                 className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
               />
+              <div className="mt-1 text-[11px] text-[var(--color-text-tertiary)]">
+                생년월일 아래에 생시와 출생지를 함께 입력하면 사주 해석 정확도를 높일 수 있어요.
+              </div>
             </div>
 
             <div>

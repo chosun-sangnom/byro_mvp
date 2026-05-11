@@ -11,8 +11,6 @@ interface ManageByroScreenProps {
   onLogout: () => void
   onBack: () => void
   onEditBasic: () => void
-  onEditWhoIAm: () => void
-  onEditAIInfo: () => void
   onEditLife: () => void
   onEditHighlight: () => void
   onEditSNS: () => void
@@ -41,8 +39,6 @@ export function ManageByroScreen({
   onLogout,
   onBack,
   onEditBasic,
-  onEditWhoIAm,
-  onEditAIInfo,
   onEditLife,
   onEditHighlight,
   onEditSNS,
@@ -66,42 +62,31 @@ export function ManageByroScreen({
     allHighlights.length > 0,
     totalReputationCount > 0,
   ].filter(Boolean).length
-  const aiReady = Boolean(sajuProfile?.birthDate)
-  const aiPrecise = Boolean(
-    sajuProfile?.birthDate
-    && sajuProfile.birthPlace.trim()
-    && (sajuProfile.isBirthTimeUnknown || sajuProfile.birthTime),
-  )
   const completionChecks = [
     {
-      label: '소개',
-      done: Boolean(user.avatarImage && user.headline?.trim() && user.headerMeta?.mood?.trim() && whoIAm.mbti),
+      label: '기본정보',
+      done: Boolean(user.avatarImage && user.headline?.trim() && sajuProfile?.birthDate && whoIAm.mbti && petLabel),
     },
     {
       label: '라이프',
       done: activityCount + cultureCount + placeCount > 0,
     },
     {
-      label: '신뢰와 연결',
+      label: '관계',
       done: trustSignalCount >= 2,
-    },
-    {
-      label: 'AI 분석용 정보',
-      done: aiReady,
     },
   ]
   const completionPercent = Math.round((completionChecks.filter((item) => item.done).length / completionChecks.length) * 100)
   const remainingItems = completionChecks.filter((item) => !item.done).slice(0, 3)
   const manageSections: ManageSection[] = [
     {
-      title: '소개',
+      title: '기본정보',
       rows: [
         {
           title: '기본정보',
-          meta: user.headline?.trim() ? '사진, 한줄소개, 오늘의 기분, 자기소개 편집' : '프로필 첫인상을 먼저 채워주세요',
+          meta: user.headline?.trim() ? '사진, 한줄소개, MBTI, 반려동물, 생년월일, 생시, 출생지, 자기소개 편집' : '프로필 첫인상과 기본 정보를 채워주세요',
           onClick: onEditBasic,
         },
-        { title: '나', meta: `${whoIAm.mbti} · ${petLabel}`, onClick: onEditWhoIAm },
       ],
     },
     {
@@ -115,7 +100,7 @@ export function ManageByroScreen({
       ],
     },
     {
-      title: '신뢰와 연결',
+      title: '관계',
       rows: [
         { title: '하이라이트', meta: allHighlights.length > 0 ? `${allHighlights.length}개 항목 관리` : '프로필에 보여줄 경험을 추가하세요', onClick: onEditHighlight },
         { title: '네트워크', meta: `${SAMPLE_PROFILE.rememberHighlight.total}명 리멤버 네트워크`, onClick: onEditNetwork },
@@ -123,20 +108,6 @@ export function ManageByroScreen({
         { title: '평판 키워드', meta: `선택 ${user.selectedKeywords.length}개 · 누적 ${totalReputationCount}회`, onClick: onEditReputation },
         { title: '방명록', meta: `${SAMPLE_PROFILE.guestbook.length}개 메시지 관리`, onClick: onEditGuestbook },
         { title: '연락 수단', meta: activeContactCount > 0 ? `${activeContactCount}개 연결됨` : '전화, 이메일, 카카오를 연결하세요', onClick: onEditContact },
-      ],
-    },
-    {
-      title: 'AI 분석용 정보',
-      rows: [
-        {
-          title: '궁합 · 사주 정확도',
-          meta: aiPrecise
-            ? '생년월일, 생시, 출생지 입력 완료'
-            : sajuProfile?.birthDate
-              ? '생시와 출생지를 더하면 더 정확한 해석이 가능해요'
-              : '생년월일, 생시, 출생지를 입력하면 더 정확한 해석이 가능해요',
-          onClick: onEditAIInfo,
-        },
       ],
     },
   ]
@@ -174,7 +145,7 @@ export function ManageByroScreen({
           <div className="mb-4">
             <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Manage</div>
             <div className="mt-2 text-[18px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">내 Byro 관리</div>
-            <div className="meta-text mt-1 leading-relaxed">소개, 신뢰 정보, AI 분석 재료를 한 곳에서 관리하세요.</div>
+            <div className="meta-text mt-1 leading-relaxed">기본정보, 라이프, 관계 정보를 한 곳에서 관리하세요.</div>
           </div>
           <div className="space-y-4">
             {manageSections.map((section) => (

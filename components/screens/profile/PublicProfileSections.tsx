@@ -65,6 +65,8 @@ export function ProfileHeroSection({
   bioOverflowing,
   bioRef,
   onToggleBio,
+  isOwnerMode,
+  onEditHeaderMeta,
 }: {
   profile: {
     name: string
@@ -85,6 +87,8 @@ export function ProfileHeroSection({
   bioOverflowing: boolean
   bioRef: RefObject<HTMLParagraphElement>
   onToggleBio: () => void
+  isOwnerMode?: boolean
+  onEditHeaderMeta?: () => void
 }) {
   return (
     <motion.div
@@ -101,6 +105,8 @@ export function ProfileHeroSection({
         bioOverflowing={bioOverflowing}
         bioRef={bioRef}
         onToggleBio={onToggleBio}
+        isOwnerMode={isOwnerMode}
+        onEditHeaderMeta={onEditHeaderMeta}
       />
     </motion.div>
   )
@@ -125,6 +131,8 @@ export function ProfileHeroCard({
   profile,
   heroTheme,
   bioRef,
+  isOwnerMode = false,
+  onEditHeaderMeta,
 }: {
   profile: {
     name: string
@@ -145,11 +153,19 @@ export function ProfileHeroCard({
   bioExpanded?: boolean
   bioOverflowing?: boolean
   onToggleBio?: () => void
+  isOwnerMode?: boolean
+  onEditHeaderMeta?: () => void
 }) {
   const intro = profile.headline?.trim() || profile.bio
   const metaChips = [
-    profile.headerMeta?.mood ? { label: '오늘의 기분', value: profile.headerMeta.mood } : null,
-    profile.headerMeta?.availability ? { label: '펑', value: profile.headerMeta.availability } : null,
+    {
+      label: '오늘의 기분',
+      value: profile.headerMeta?.mood || (isOwnerMode ? '입력하기' : ''),
+    },
+    {
+      label: '펑',
+      value: profile.headerMeta?.availability || (isOwnerMode ? '입력하기' : ''),
+    },
   ].filter(Boolean) as Array<{ label: string; value: string }>
 
   return (
@@ -211,12 +227,33 @@ export function ProfileHeroCard({
           {metaChips.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">
               {metaChips.map((item) => (
-                <span key={item.label} className="chip-metric">
-                  <span className="text-white/60">{item.label}</span>
-                  <span className="text-white">{item.value}</span>
-                </span>
+                onEditHeaderMeta ? (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={onEditHeaderMeta}
+                    className="chip-metric"
+                  >
+                    <span className="text-white/60">{item.label}</span>
+                    <span className="text-white">{item.value}</span>
+                  </button>
+                ) : (
+                  <span key={item.label} className="chip-metric">
+                    <span className="text-white/60">{item.label}</span>
+                    <span className="text-white">{item.value}</span>
+                  </span>
+                )
               ))}
             </div>
+          )}
+          {onEditHeaderMeta && (
+            <button
+              type="button"
+              onClick={onEditHeaderMeta}
+              className="mt-2 text-[11px] font-medium text-white/58"
+            >
+              오늘의 기분과 펑을 바로 수정하기
+            </button>
           )}
           <div className="mt-3 text-[12px] font-semibold text-white/72">
             @{profile.linkId}

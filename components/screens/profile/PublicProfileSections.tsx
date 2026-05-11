@@ -60,7 +60,6 @@ export function SectionTitle({
 export function ProfileHeroSection({
   profile,
   heroTheme,
-  isOwnerMode,
   keywordCounts,
   totalKeywordCount,
   featuredGuestbook,
@@ -69,8 +68,6 @@ export function ProfileHeroSection({
   bioRef,
   getProfileAvatar,
   onToggleBio,
-  onOpenArchive,
-  onOpenManage,
   onGuestbookEntryClick,
   onOpenGuestbook,
 }: {
@@ -82,7 +79,6 @@ export function ProfileHeroSection({
     guestbook: { length: number }
   }
   heroTheme: HeroTheme
-  isOwnerMode: boolean
   keywordCounts: KeywordCount[]
   totalKeywordCount: number
   featuredGuestbook: GuestbookPreview[]
@@ -91,8 +87,6 @@ export function ProfileHeroSection({
   bioRef: React.RefObject<HTMLParagraphElement>
   getProfileAvatar: (linkId: string) => string
   onToggleBio: () => void
-  onOpenArchive?: () => void
-  onOpenManage?: () => void
   onGuestbookEntryClick: (linkId: string) => void
   onOpenGuestbook: () => void
 }) {
@@ -107,13 +101,10 @@ export function ProfileHeroSection({
       <ProfileHeroCard
         profile={profile}
         heroTheme={heroTheme}
-        isOwnerMode={isOwnerMode}
         bioExpanded={bioExpanded}
         bioOverflowing={bioOverflowing}
         bioRef={bioRef}
         onToggleBio={onToggleBio}
-        onOpenArchive={onOpenArchive}
-        onOpenManage={onOpenManage}
       />
       <ProfileReputationSummarySection
         profile={profile}
@@ -128,16 +119,28 @@ export function ProfileHeroSection({
   )
 }
 
+/**
+ * ProfileHeroCard
+ *
+ * 프로필 최상단 히어로 카드.
+ * - 프로필 사진 있을 때: 풀블리드 이미지 + 그라디언트 오버레이
+ * - 프로필 사진 없을 때: 테마 그라디언트 배경 + 이니셜 아바타
+ * - 하단: 이름 + 인증 뱃지 + bio 글래스 카드
+ *
+ * owner 전용 편집/아카이브 버튼은 제거됨.
+ * → 편집: 푸터 "Byro 편집" 버튼 (PublicProfileShell)
+ * → 소셜 관리: /me 페이지
+ *
+ * TODO(profile-image): 프로필 사진 업로드/크롭 플로우 연동
+ * TODO(verified): BadgeCheck 표시 조건을 인증 여부 필드로 제어
+ */
 export function ProfileHeroCard({
   profile,
   heroTheme,
-  isOwnerMode,
   bioExpanded,
   bioOverflowing,
   bioRef,
   onToggleBio,
-  onOpenArchive,
-  onOpenManage,
 }: {
   profile: {
     name: string
@@ -146,13 +149,10 @@ export function ProfileHeroCard({
     avatarImage?: string
   }
   heroTheme: HeroTheme
-  isOwnerMode: boolean
   bioExpanded: boolean
   bioOverflowing: boolean
   bioRef: React.RefObject<HTMLParagraphElement>
   onToggleBio: () => void
-  onOpenArchive?: () => void
-  onOpenManage?: () => void
 }) {
   return (
     <div className="hero-card border border-[var(--color-border-default)] bg-[rgba(23,24,28,0.92)] p-[8px] backdrop-blur-sm">
@@ -210,22 +210,6 @@ export function ProfileHeroCard({
         </div>
       </div>
 
-      {isOwnerMode && (
-        <div className="mt-4 flex gap-2">
-          <button
-            onClick={onOpenArchive}
-            className="flex-1 rounded-xl border border-[var(--color-border-default)] px-4 py-3 text-[14px] font-semibold text-[var(--color-text-secondary)] active:scale-[0.98] transition-all duration-100"
-          >
-            아카이브
-          </button>
-          <button
-            onClick={onOpenManage}
-            className="flex-1 rounded-xl bg-[var(--color-accent-dark)] px-4 py-3 text-[14px] font-semibold text-white active:scale-[0.98] transition-all duration-100"
-          >
-            Byro 편집
-          </button>
-        </div>
-      )}
     </div>
   )
 }

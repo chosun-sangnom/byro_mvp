@@ -1,5 +1,27 @@
 'use client'
 
+/**
+ * PublicProfileLifeSection — 라이프 탭 콘텐츠
+ *
+ * 레이아웃 구조:
+ *   일상          — 운동(뱃지), 반려동물(뱃지)
+ *   영화·드라마   — 가로 스크롤 포스터 카드 (80×112)
+ *   음악          — 가로 스크롤 앨범아트 카드 (80×80)
+ *   책            — 가로 스크롤 표지 카드 (80×112)
+ *   라이프스타일  — 스포츠·게임·최애·식단 (뱃지)
+ *   맛집          — 가로 스크롤 장소 카드 (148×96)
+ *   카페          — 가로 스크롤 장소 카드 (148×96)
+ *   장소          — 자주 가는 곳·여행지 (뱃지)
+ *
+ * 이미지 소스 (현재 picsum placeholder):
+ *   영화·드라마 → TMDB API (image.tmdb.org/t/p/w185/{poster_path})
+ *   음악        → Spotify API (album art)
+ *   책          → 알라딘 API
+ *   맛집·카페   → Kakao Maps / Google Places photo API
+ *
+ * TODO(kemi-glow): 케미 매칭 항목 칩에 인디고 glow 효과 적용
+ */
+
 import {
   Dumbbell,
   Gamepad2,

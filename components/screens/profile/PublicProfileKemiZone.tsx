@@ -1,5 +1,23 @@
 'use client'
 
+/**
+ * PublicProfileKemiZone — 케미 공통점 섹션
+ *
+ * 헤더 메타와 탭바 사이에 위치.
+ * - 로그인 상태: viewer 기준 공통점 칩(인디고 glow) + AI 카피 + 케미 리포트 CTA
+ * - 비로그인:    blur 처리 + "로그인하면 케미가 보여요" 넛지
+ *
+ * 데이터 흐름 (현재 mock):
+ *   publicProfiles.ts의 kemi 필드 → getNormalizedPublicProfile → profile.kemi
+ *   TODO(real API): /profiles/:id/kemi?viewer_id=... 엔드포인트로 교체
+ *
+ * aiCopy:
+ *   TODO(AI): 서버사이드 LLM 호출로 교체 — 매칭 항목 + 전체 프로필 컨텍스트 기반 생성
+ *
+ * 케미 리포트:
+ *   TODO(premium): 유료 기능 — 전체 궁합 분석 화면으로 연결
+ */
+
 import { Sparkles } from 'lucide-react'
 import type { KemiData } from '@/types'
 

@@ -1,5 +1,16 @@
 'use client'
 
+/**
+ * PublicProfileTabBar
+ *
+ * 공개 프로필 탭 네비게이션 (나 / 라이프 / 평판).
+ * - owner / visitor 모두 동일한 탭 구조를 가짐
+ * - 선택된 탭은 인디고 배경 + 스프링 애니메이션으로 표시
+ * - 탭 상태는 부모(page.tsx)의 useState로 관리 — URL 변경 없음
+ *
+ * TODO(tabs): 탭 추가 시 TABS 배열에만 항목 추가하면 됨
+ */
+
 import { motion } from 'framer-motion'
 
 export type PublicProfileTabId = 'who' | 'life' | 'reputation'

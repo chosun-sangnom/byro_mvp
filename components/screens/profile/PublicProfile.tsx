@@ -271,7 +271,6 @@ export default function PublicProfile({
         <ProfileHeroSection
           profile={profile}
           heroTheme={heroTheme}
-          isOwnerMode={isOwnerMode}
           keywordCounts={keywordCounts}
           totalKeywordCount={totalKeywordCount}
           featuredGuestbook={featuredGuestbook}
@@ -280,8 +279,6 @@ export default function PublicProfile({
           bioRef={bioRef}
           getProfileAvatar={getProfileAvatar}
           onToggleBio={() => setBioExpanded((prev) => !prev)}
-          onOpenArchive={onOpenArchive}
-          onOpenManage={onOpenManage}
           onGuestbookEntryClick={(linkId) => router.push(`/${linkId}`)}
           onOpenGuestbook={() => router.push(`/${profile.linkId}/guestbook`)}
         />

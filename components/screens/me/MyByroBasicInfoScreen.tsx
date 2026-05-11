@@ -7,7 +7,7 @@ import { useByroStore } from '@/store/useByroStore'
 import type { UserState } from '@/types'
 
 interface BasicInfoEditScreenProps {
-  user: Pick<UserState, 'name' | 'linkId' | 'bio' | 'avatarImage'>
+  user: Pick<UserState, 'name' | 'linkId' | 'title' | 'school' | 'bio' | 'avatarImage'>
   onBack: () => void
 }
 
@@ -19,6 +19,8 @@ export function BasicInfoEditScreen({
   onBack,
 }: BasicInfoEditScreenProps) {
   const store = useByroStore()
+  const [title, setTitle] = useState(user.title)
+  const [school, setSchool] = useState(user.school)
   const [bio, setBio] = useState(user.bio)
   const [avatarImage, setAvatarImage] = useState(user.avatarImage ?? '')
   const [cropSource, setCropSource] = useState('')
@@ -41,7 +43,7 @@ export function BasicInfoEditScreen({
   const cropImageLayout = getCropImageLayout(cropNaturalSize.width, cropNaturalSize.height, cropStage)
 
   const handleSave = () => {
-    store.updateUserInfo({ bio, avatarImage })
+    store.updateUserInfo({ title, school, bio, avatarImage })
     showToast('저장됐어요!')
     onBack()
   }
@@ -170,6 +172,26 @@ export function BasicInfoEditScreen({
                 disabled
                 placeholder="변경 불가"
                 className="w-full border border-[#eee] rounded-xl px-4 py-2.5 text-sm bg-[#f9f9f9] text-[#aaa]"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">직함</label>
+              <input
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+                placeholder="예: 스타트업 마케터"
+                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">학교 / 소속</label>
+              <input
+                value={school}
+                onChange={(event) => setSchool(event.target.value)}
+                placeholder="예: 연세대학교 경영학 학사"
+                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
               />
             </div>
 

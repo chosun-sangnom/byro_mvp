@@ -3,7 +3,15 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { v4 as uuidv4 } from 'uuid'
-import type { OnboardingStep, Highlight, UserState, ContactChannel } from '@/types'
+import type {
+  OnboardingStep,
+  Highlight,
+  UserState,
+  ContactChannel,
+  PublicProfileLife,
+  PublicProfileWhoIAm,
+  SajuProfileInput,
+} from '@/types'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
 const STEP_ORDER: OnboardingStep[] = [
@@ -79,6 +87,9 @@ interface ByroStore {
   updateUserInfo(info: Partial<UserState>): void
   updateUserKeywords(keywords: string[]): void
   updateUserContactChannels(channels: ContactChannel[]): void
+  updateUserWhoIAm(whoIAm: PublicProfileWhoIAm): void
+  updateUserLife(life: PublicProfileLife): void
+  updateUserSajuProfile(sajuProfile: SajuProfileInput): void
   deleteGuestbookEntry(id: string): void
 }
 
@@ -100,6 +111,8 @@ const normalizeSampleUser = (user: UserState | null): UserState | null => {
       : user.bio,
   }
 }
+
+const sampleSajuProfile = SAMPLE_PROFILE.sajuProfile as SajuProfileInput
 
 export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   // 인증
@@ -290,6 +303,9 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
         selectedKeywords: selectedKeywords.length > 0 ? selectedKeywords : SAMPLE_PROFILE.selectedKeywords,
         avatarColor: SAMPLE_PROFILE.avatarColor,
         avatarImage: SAMPLE_PROFILE.avatarImage,
+        whoIAm: SAMPLE_PROFILE.whoIAm,
+        life: SAMPLE_PROFILE.life,
+        sajuProfile: sampleSajuProfile,
         contactChannels: onboardingContactChannels,
       },
       step: 'login',
@@ -311,6 +327,9 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
         selectedKeywords: SAMPLE_PROFILE.selectedKeywords,
         avatarColor: SAMPLE_PROFILE.avatarColor,
         avatarImage: SAMPLE_PROFILE.avatarImage,
+        whoIAm: SAMPLE_PROFILE.whoIAm,
+        life: SAMPLE_PROFILE.life,
+        sajuProfile: sampleSajuProfile,
         contactChannels: SAMPLE_PROFILE.contactChannels,
       },
     })
@@ -403,6 +422,24 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   updateUserContactChannels(channels) {
     set((state) => ({
       user: state.user ? { ...state.user, contactChannels: channels } : null,
+    }))
+  },
+
+  updateUserWhoIAm(whoIAm) {
+    set((state) => ({
+      user: state.user ? { ...state.user, whoIAm } : null,
+    }))
+  },
+
+  updateUserLife(life) {
+    set((state) => ({
+      user: state.user ? { ...state.user, life } : null,
+    }))
+  },
+
+  updateUserSajuProfile(sajuProfile) {
+    set((state) => ({
+      user: state.user ? { ...state.user, sajuProfile } : null,
     }))
   },
 

@@ -11,6 +11,9 @@ interface ManageByroScreenProps {
   onLogout: () => void
   onBack: () => void
   onEditBasic: () => void
+  onEditWhoIAm: () => void
+  onEditSaju: () => void
+  onEditLife: () => void
   onEditHighlight: () => void
   onEditSNS: () => void
   onEditReputation: () => void
@@ -26,6 +29,9 @@ export function ManageByroScreen({
   onLogout,
   onBack,
   onEditBasic,
+  onEditWhoIAm,
+  onEditSaju,
+  onEditLife,
   onEditHighlight,
   onEditSNS,
   onEditReputation,
@@ -34,9 +40,21 @@ export function ManageByroScreen({
   user,
 }: ManageByroScreenProps) {
   const activeContactCount = user.contactChannels?.filter((channel) => channel.enabled && channel.value.trim()).length ?? 0
+  const whoIAm = user.whoIAm ?? SAMPLE_PROFILE.whoIAm
+  const life = user.life ?? SAMPLE_PROFILE.life
+  const sajuProfile = user.sajuProfile ?? SAMPLE_PROFILE.sajuProfile
   const completionChecks = [
     { label: '프로필 사진', done: Boolean(user.avatarImage) },
     { label: '자기소개', done: user.bio.trim().length >= 20 },
+    { label: 'Who I am', done: Boolean(whoIAm.mbti && whoIAm.bloodType) },
+    {
+      label: '사주 정보',
+      done: Boolean(sajuProfile?.birthDate && sajuProfile.birthPlace.trim() && (sajuProfile.isBirthTimeUnknown || sajuProfile.birthTime)),
+    },
+    {
+      label: '라이프',
+      done: life.daily.exercise.length > 0 || life.places.neighborhoods.length > 0,
+    },
     { label: '연락 수단', done: activeContactCount > 0 },
     { label: 'SNS 연동', done: connectedSnsCount > 0 },
     { label: '하이라이트', done: allHighlights.length > 0 },
@@ -44,7 +62,18 @@ export function ManageByroScreen({
   const completionPercent = Math.round((completionChecks.filter((item) => item.done).length / completionChecks.length) * 100)
   const remainingItems = completionChecks.filter((item) => !item.done).slice(0, 3)
   const manageRows = [
-    { title: '기본정보', meta: user.bio.trim() ? '사진, 이름, 자기소개 편집' : '사진, 이름, 자기소개를 설정하세요', onClick: onEditBasic },
+    { title: '기본정보', meta: user.bio.trim() ? '사진, 직함, 학교, 자기소개 편집' : '기본 프로필을 먼저 채워주세요', onClick: onEditBasic },
+    { title: 'Who I am', meta: `${whoIAm.mbti} · ${whoIAm.bloodType} · ${whoIAm.sajuType}`, onClick: onEditWhoIAm },
+    {
+      title: '사주 정보 추가',
+      meta: sajuProfile?.birthDate ? `원본 비공개 · ${whoIAm.sajuType} 계산됨` : '생년월일, 시간, 출생지를 입력하세요',
+      onClick: onEditSaju,
+    },
+    {
+      title: '라이프',
+      meta: `운동 ${life.daily.exercise.length}개 · 동네 ${life.places.neighborhoods.length}곳`,
+      onClick: onEditLife,
+    },
     { title: '연락 수단', meta: activeContactCount > 0 ? `${activeContactCount}개 연결됨` : '전화, 이메일, 카카오를 연결하세요', onClick: onEditContact },
     { title: 'SNS 연동', meta: connectedSnsCount > 0 ? `${connectedSnsCount}개 연동됨` : '인스타그램과 링크드인을 연결하세요', onClick: onEditSNS },
     { title: '하이라이트', meta: allHighlights.length > 0 ? `${allHighlights.length}개 항목 관리` : '프로필에 보여줄 경험을 추가하세요', onClick: onEditHighlight },

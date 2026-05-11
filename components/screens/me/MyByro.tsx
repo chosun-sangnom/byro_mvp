@@ -16,12 +16,26 @@ import { HighlightManageScreen } from '@/components/screens/me/MyByroHighlightMa
 import {
   ContactManageScreen,
   GuestbookManageScreen,
+  LifeManageScreen,
   ManageByroScreen,
   ReputationManageScreen,
+  SajuManageScreen,
   SNSManageScreen,
+  WhoIAmManageScreen,
 } from '@/components/screens/me/MyByroSupportScreens'
 
-type Screen = 'preview' | 'manage' | 'editBasic' | 'editHighlight' | 'editSNS' | 'editReputation' | 'editContact' | 'editGuestbook'
+type Screen =
+  | 'preview'
+  | 'manage'
+  | 'editBasic'
+  | 'editWhoIAm'
+  | 'editSaju'
+  | 'editLife'
+  | 'editHighlight'
+  | 'editSNS'
+  | 'editReputation'
+  | 'editContact'
+  | 'editGuestbook'
 
 // ─────────────────────────────────────────────────────────────────────────────
 export default function MyByro() {
@@ -69,6 +83,9 @@ export default function MyByro() {
         onLogout={() => store.logout()}
         onBack={() => setScreen('preview')}
         onEditBasic={() => setScreen('editBasic')}
+        onEditWhoIAm={() => setScreen('editWhoIAm')}
+        onEditSaju={() => setScreen('editSaju')}
+        onEditLife={() => setScreen('editLife')}
         onEditHighlight={() => setScreen('editHighlight')}
         onEditSNS={() => setScreen('editSNS')}
         onEditReputation={() => setScreen('editReputation')}
@@ -81,6 +98,18 @@ export default function MyByro() {
 
   if (screen === 'editBasic') {
     return <BasicInfoEditScreen user={user} onBack={() => setScreen('manage')} />
+  }
+
+  if (screen === 'editWhoIAm') {
+    return <WhoIAmManageScreen onBack={() => setScreen('manage')} />
+  }
+
+  if (screen === 'editSaju') {
+    return <SajuManageScreen onBack={() => setScreen('manage')} />
+  }
+
+  if (screen === 'editLife') {
+    return <LifeManageScreen onBack={() => setScreen('manage')} />
   }
 
   if (screen === 'editHighlight') {

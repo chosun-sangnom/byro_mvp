@@ -29,6 +29,13 @@ export const SAMPLE_PROFILE = {
     children: '자녀 없음',
     religion: '무교',
   },
+  sajuProfile: {
+    birthDate: '1992-06-14',
+    birthTime: '08:30',
+    birthPlace: '서울',
+    calendarType: 'solar',
+    isBirthTimeUnknown: false,
+  },
   life: {
     daily: {
       exercise: ['러닝', '골프'],
@@ -234,6 +241,13 @@ export const MK_PROFILE = {
     children: '자녀 없음',
     religion: '무교',
   },
+  sajuProfile: {
+    birthDate: '1988-11-03',
+    birthTime: '22:15',
+    birthPlace: '서울',
+    calendarType: 'solar',
+    isBirthTimeUnknown: false,
+  },
   life: {
     daily: {
       exercise: ['골프', '웨이트', '산책'],
@@ -411,6 +425,13 @@ export const JIMIN_PROFILE = {
     relationshipStatus: '설레는 대화 환영',
     children: '자녀 없음',
     religion: '기독교',
+  },
+  sajuProfile: {
+    birthDate: '1995-03-27',
+    birthTime: '19:20',
+    birthPlace: '부산',
+    calendarType: 'solar',
+    isBirthTimeUnknown: false,
   },
   life: {
     daily: {

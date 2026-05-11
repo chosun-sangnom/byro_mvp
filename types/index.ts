@@ -280,6 +280,14 @@ export interface PublicProfile {
   kemi?: KemiData
 }
 
+export interface SajuProfileInput {
+  birthDate: string
+  birthTime: string
+  birthPlace: string
+  calendarType: 'solar' | 'lunar'
+  isBirthTimeUnknown?: boolean
+}
+
 export interface UserState {
   name: string
   linkId: string
@@ -289,5 +297,8 @@ export interface UserState {
   selectedKeywords: string[]
   avatarColor?: string
   avatarImage?: string
+  whoIAm?: PublicProfileWhoIAm
+  life?: PublicProfileLife
+  sajuProfile?: SajuProfileInput
   contactChannels?: ContactChannel[]
 }

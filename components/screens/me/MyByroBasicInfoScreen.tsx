@@ -20,14 +20,13 @@ export function BasicInfoEditScreen({
   onBack,
 }: BasicInfoEditScreenProps) {
   const store = useByroStore()
-  const [title, setTitle] = useState(user.title)
   const [headline, setHeadline] = useState(user.headline ?? '')
-  const [school, setSchool] = useState(user.school)
   const [bio, setBio] = useState(user.bio)
   const initialSajuProfile: SajuProfileInput = user.sajuProfile ?? (SAMPLE_PROFILE.sajuProfile as SajuProfileInput)
   const [birthDate, setBirthDate] = useState(initialSajuProfile.birthDate)
+  const [birthTime, setBirthTime] = useState(initialSajuProfile.birthTime)
+  const [birthPlace, setBirthPlace] = useState(initialSajuProfile.birthPlace)
   const [mood, setMood] = useState(user.headerMeta?.mood ?? SAMPLE_PROFILE.headerMeta.mood)
-  const [availability, setAvailability] = useState(user.headerMeta?.availability ?? SAMPLE_PROFILE.headerMeta.availability)
   const [avatarImage, setAvatarImage] = useState(user.avatarImage ?? '')
   const [cropSource, setCropSource] = useState('')
   const [cropOpen, setCropOpen] = useState(false)
@@ -50,20 +49,21 @@ export function BasicInfoEditScreen({
 
   const handleSave = () => {
     store.updateUserInfo({
-      title,
       headline,
-      school,
       bio,
       avatarImage,
       headerMeta: {
         residence: user.headerMeta?.residence ?? SAMPLE_PROFILE.headerMeta.residence,
         mood,
-        availability,
+        availability: user.headerMeta?.availability ?? SAMPLE_PROFILE.headerMeta.availability,
       },
     })
     store.updateUserSajuProfile({
       ...initialSajuProfile,
       birthDate,
+      birthTime,
+      birthPlace,
+      isBirthTimeUnknown: !birthTime,
     })
     showToast('저장됐어요!')
     onBack()
@@ -197,16 +197,6 @@ export function BasicInfoEditScreen({
             </div>
 
             <div>
-              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">직함</label>
-              <input
-                value={title}
-                onChange={(event) => setTitle(event.target.value)}
-                placeholder="예: 스타트업 마케터"
-                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-              />
-            </div>
-
-            <div>
               <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">한줄소개</label>
               <input
                 value={headline}
@@ -224,37 +214,39 @@ export function BasicInfoEditScreen({
                 onChange={(event) => setBirthDate(event.target.value)}
                 className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
               />
+            </div>
+
+            <div>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">생시</label>
+              <input
+                type="time"
+                value={birthTime}
+                onChange={(event) => setBirthTime(event.target.value)}
+                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">출생지</label>
+              <input
+                value={birthPlace}
+                onChange={(event) => setBirthPlace(event.target.value)}
+                placeholder="예: 서울, 부산, 대전"
+                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
+              />
               <div className="mt-1 text-[11px] text-[var(--color-text-tertiary)]">
-                나이 계산과 사주정보 기준값으로 사용됩니다.
+                입력한 생년월일, 생시, 출생지는 나이 표시와 사주정보 계산에 사용되며 공개되지 않습니다.
               </div>
             </div>
 
             <div>
-              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">오늘의 기분</label>
+              <div className="flex items-center gap-2 mb-1">
+                <label className="text-xs text-[var(--color-text-tertiary)]">오늘의 기분</label>
+              </div>
               <input
                 value={mood}
                 onChange={(event) => setMood(event.target.value)}
                 placeholder="예: 집중 모드"
-                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">펑</label>
-              <input
-                value={availability}
-                onChange={(event) => setAvailability(event.target.value)}
-                placeholder="예: 오늘 저녁 커피챗 가능"
-                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">학교 / 소속</label>
-              <input
-                value={school}
-                onChange={(event) => setSchool(event.target.value)}
-                placeholder="예: 연세대학교 경영학 학사"
                 className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
               />
             </div>

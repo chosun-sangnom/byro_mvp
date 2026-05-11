@@ -12,10 +12,10 @@ interface ManageByroScreenProps {
   onBack: () => void
   onEditBasic: () => void
   onEditWhoIAm: () => void
-  onEditSaju: () => void
   onEditLife: () => void
   onEditHighlight: () => void
   onEditSNS: () => void
+  onEditNetwork: () => void
   onEditReputation: () => void
   onEditContact: () => void
   onEditGuestbook: () => void
@@ -41,10 +41,10 @@ export function ManageByroScreen({
   onBack,
   onEditBasic,
   onEditWhoIAm,
-  onEditSaju,
   onEditLife,
   onEditHighlight,
   onEditSNS,
+  onEditNetwork,
   onEditReputation,
   onEditContact,
   onEditGuestbook,
@@ -60,12 +60,17 @@ export function ManageByroScreen({
   const placeCount = life.tastes.restaurants.length + life.tastes.cafes.length + life.places.travelDestinations.length
   const completionChecks = [
     { label: '프로필 사진', done: Boolean(user.avatarImage) },
-    { label: '기본정보', done: Boolean(user.headline?.trim() && user.headerMeta?.mood?.trim() && user.headerMeta?.availability?.trim() && sajuProfile?.birthDate) },
-    { label: '나', done: Boolean(whoIAm.mbti && petLabel) },
     {
-      label: '사주 정보',
-      done: Boolean(sajuProfile?.birthDate && sajuProfile.birthPlace.trim() && (sajuProfile.isBirthTimeUnknown || sajuProfile.birthTime)),
+      label: '기본정보',
+      done: Boolean(
+        user.headline?.trim()
+        && user.headerMeta?.mood?.trim()
+        && sajuProfile?.birthDate
+        && sajuProfile.birthPlace.trim()
+        && (sajuProfile.isBirthTimeUnknown || sajuProfile.birthTime),
+      ),
     },
+    { label: '나', done: Boolean(whoIAm.mbti && petLabel) },
     {
       label: '라이프',
       done: activityCount + cultureCount + placeCount > 0,
@@ -82,15 +87,8 @@ export function ManageByroScreen({
       rows: [
         {
           title: '기본정보',
-          meta: user.headline?.trim() ? '사진, 한줄소개, 생년월일, 오늘의 기분, 펑 편집' : '기본정보를 먼저 채워주세요',
+          meta: user.headline?.trim() ? '사진, 한줄소개, 생년월일, 생시, 출생지, 오늘의 기분 편집' : '기본정보를 먼저 채워주세요',
           onClick: onEditBasic,
-        },
-        {
-          title: '사주정보',
-          meta: sajuProfile?.birthPlace.trim()
-            ? '생시 · 출생지 입력 완료'
-            : '생시와 출생지를 입력하면 사주정보를 더 정확하게 볼 수 있어요',
-          onClick: onEditSaju,
         },
       ],
     },
@@ -114,10 +112,16 @@ export function ManageByroScreen({
     {
       title: '관계',
       rows: [
-        { title: '연락 수단', meta: activeContactCount > 0 ? `${activeContactCount}개 연결됨` : '전화, 이메일, 카카오를 연결하세요', onClick: onEditContact },
+        { title: '네트워크', meta: `${SAMPLE_PROFILE.rememberHighlight.total}명 리멤버 네트워크`, onClick: onEditNetwork },
         { title: 'SNS 연동', meta: connectedSnsCount > 0 ? `${connectedSnsCount}개 연동됨` : '유튜브, 틱톡, 인스타그램, 링크드인을 관리하세요', onClick: onEditSNS },
         { title: '평판 키워드', meta: `선택 ${user.selectedKeywords.length}개 · 누적 ${totalReputationCount}회`, onClick: onEditReputation },
         { title: '방명록', meta: `${SAMPLE_PROFILE.guestbook.length}개 메시지 관리`, onClick: onEditGuestbook },
+      ],
+    },
+    {
+      title: '연락수단',
+      rows: [
+        { title: '연락 수단', meta: activeContactCount > 0 ? `${activeContactCount}개 연결됨` : '전화, 이메일, 카카오를 연결하세요', onClick: onEditContact },
       ],
     },
   ]

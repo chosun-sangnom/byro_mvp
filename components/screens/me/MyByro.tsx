@@ -84,10 +84,10 @@ export default function MyByro() {
         onBack={() => setScreen('preview')}
         onEditBasic={() => setScreen('editBasic')}
         onEditWhoIAm={() => setScreen('editWhoIAm')}
-        onEditSaju={() => setScreen('editSaju')}
         onEditLife={() => setScreen('editLife')}
         onEditHighlight={() => setScreen('editHighlight')}
         onEditSNS={() => setScreen('editSNS')}
+        onEditNetwork={() => router.push('/archive')}
         onEditReputation={() => setScreen('editReputation')}
         onEditContact={() => setScreen('editContact')}
         onEditGuestbook={() => setScreen('editGuestbook')}

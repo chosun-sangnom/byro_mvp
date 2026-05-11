@@ -60,6 +60,10 @@ export const SAMPLE_PROFILE = {
         { label: '제로 투 원', posterUrl: 'https://picsum.photos/seed/zerotone/80/112' },
         { label: '좋은 전략 나쁜 전략', posterUrl: 'https://picsum.photos/seed/goodstrategy/80/112' },
       ],
+      plays: [
+        { label: '렛미플라이', posterUrl: 'https://picsum.photos/seed/letmefly_gmj/80/112' },
+      ],
+      teams: ['LG 트윈스'],
       games: ['EA SPORTS FC'],
       sports: ['축구', '골프'],
       celebrities: ['유재석', '아이유'],
@@ -269,6 +273,10 @@ export const MK_PROFILE = {
         { label: '원씽', posterUrl: 'https://picsum.photos/seed/onething_mk/80/112' },
         { label: '사피엔스', posterUrl: 'https://picsum.photos/seed/sapiens_mk/80/112' },
       ],
+      plays: [
+        { label: '웃는 남자', posterUrl: 'https://picsum.photos/seed/laughingman_mk/80/112' },
+      ],
+      teams: ['토트넘 홋스퍼'],
       games: ['문명', 'FC'],
       sports: ['골프', '축구'],
       celebrities: ['손흥민', '전도연'],
@@ -454,6 +462,10 @@ export const JIMIN_PROFILE = {
         { label: '보통의 언어들', posterUrl: 'https://picsum.photos/seed/ordinary_jm/80/112' },
         { label: '불편한 편의점', posterUrl: 'https://picsum.photos/seed/inconvenient_jm/80/112' },
       ],
+      plays: [
+        { label: '레드북', posterUrl: 'https://picsum.photos/seed/redbook_jm/80/112' },
+      ],
+      teams: ['두산 베어스'],
       games: ['심즈'],
       sports: ['테니스', '야구'],
       celebrities: ['아이유', '한소희'],

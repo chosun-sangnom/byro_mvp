@@ -64,14 +64,14 @@ export function SajuManageScreen({ onBack }: { onBack: () => void }) {
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
         <InfoBox variant="warn">
-          입력한 원본 정보는 공개되지 않고, 프로필에는 계산된 <span className="font-semibold">사주 타입</span>만 보여집니다.
+          입력한 원본 정보는 공개되지 않고, <span className="font-semibold">궁합 보기</span> 분석에만 사용됩니다.
         </InfoBox>
 
         <div className="mt-4 rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4">
           <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">예상 사주 타입</div>
           <div className="mt-2 text-[20px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">{nextSajuType}</div>
           <p className="mt-1 text-[12px] leading-[1.6] text-[var(--color-text-secondary)]">
-            저장하면 `Who I am`과 `궁합 보기`에 이 값이 반영됩니다.
+            저장하면 궁합 보기 리포트에서 이 값이 반영됩니다.
           </p>
         </div>
 

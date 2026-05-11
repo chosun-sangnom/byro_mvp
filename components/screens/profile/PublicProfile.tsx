@@ -6,7 +6,6 @@ import { Bookmark, Copy, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { showToast } from '@/components/ui'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
-import { getProfileAvatar } from '@/lib/mocks/publicProfiles'
 import type { Highlight } from '@/types'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
 import {
@@ -62,14 +61,6 @@ export default function PublicProfile({
   const [bioExpanded, setBioExpanded] = useState(false)
   const [bioOverflowing, setBioOverflowing] = useState(false)
   const bioRef = useRef<HTMLParagraphElement | null>(null)
-  const keywordCounts = profile.selectedKeywords
-    .slice(0, 5)
-    .map((keyword) => ({
-      keyword,
-      count: profile.reputationKeywords.find((item) => item.keyword === keyword)?.count ?? 0,
-    }))
-  const totalKeywordCount = keywordCounts.reduce((sum, item) => sum + item.count, 0)
-  const featuredGuestbook = profile.guestbook.slice(0, 3)
   const experienceOptions = profile.selectedKeywords.slice(0, 4)
   const verifiedHighlights: Highlight[] = [
     ...(showCareerHighlight ? [{
@@ -267,16 +258,10 @@ export default function PublicProfile({
         <ProfileHeroSection
           profile={profile}
           heroTheme={heroTheme}
-          keywordCounts={keywordCounts}
-          totalKeywordCount={totalKeywordCount}
-          featuredGuestbook={featuredGuestbook}
           bioExpanded={bioExpanded}
           bioOverflowing={bioOverflowing}
           bioRef={bioRef}
-          getProfileAvatar={getProfileAvatar}
           onToggleBio={() => setBioExpanded((prev) => !prev)}
-          onGuestbookEntryClick={(linkId) => router.push(`/${linkId}`)}
-          onOpenGuestbook={() => router.push(`/${profile.linkId}/guestbook`)}
         />
 
         {/* ─── SNS 섹션 ─────────────────────────────── */}

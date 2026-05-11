@@ -7,6 +7,8 @@ import { getProfileAvatar } from '@/lib/mocks/publicProfiles'
 import type { Highlight } from '@/types'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
 import {
+  ProfileFeedbackSection,
+  ProfileRememberSection,
   ProfileReputationSummarySection,
   ProfileSnsSection,
 } from '@/components/screens/profile/PublicProfileSections'
@@ -29,7 +31,6 @@ function usePublicProfileTabData(username: string) {
   const corporateHighlight = profile.corporateHighlight
   const airlineHighlight = profile.airlineHighlight
   const airlineBadgeLabel = AIRLINE_BADGE_LABELS[airlineHighlight.badgeLevel as keyof typeof AIRLINE_BADGE_LABELS] ?? null
-  const topRememberIndustry = [...profile.rememberHighlight.industries].sort((a, b) => b.ratio - a.ratio)[0]
   const showCareerHighlight = username !== 'mk'
   const showAirlineHighlight = !['jiminlee', 'mk'].includes(username)
 
@@ -50,15 +51,6 @@ function usePublicProfileTabData(username: string) {
       title: '법인 영속성',
       subtitle: `${'averageOperatingYears' in corporateHighlight ? corporateHighlight.averageOperatingYears : corporateHighlight.years}년째 정상 운영 중`,
       description: '법인 운영 기간과 정상 운영 여부를 확인한 항목입니다.',
-      year: '',
-    },
-    {
-      id: `verified-remember-${username}`,
-      categoryId: 'remember-network',
-      icon: 'users',
-      title: '리멤버 네트워크',
-      subtitle: topRememberIndustry ? `${topRememberIndustry.name} 네트워크 다수, ${topRememberIndustry.ratio}%` : '리멤버 명함 기반 직업 네트워크',
-      description: '명함 기반 직업 네트워크 구성이 인증되어 공개됩니다.',
       year: '',
     },
     ...(showAirlineHighlight ? [{
@@ -123,21 +115,9 @@ export function PublicProfileWhoTabPage({
   username: string
 }) {
   const { store, profile, groupedHighlights, corporateHighlight, airlineHighlight, airlineBadgeLabel } = usePublicProfileTabData(username)
-  const igOpen = store.snsOpenStates[`instagram_${username}`] ?? false
-  const liOpen = store.snsOpenStates[`linkedin_${username}`] ?? false
 
   return (
     <>
-      <ProfileSnsSection
-        instagramConnected={profile.instagramConnected}
-        linkedinConnected={profile.linkedinConnected}
-        instagram={profile.instagram}
-        linkedin={profile.linkedin}
-        igOpen={igOpen}
-        liOpen={liOpen}
-        onToggleInstagram={() => store.toggleSnsOpen(`instagram_${username}`)}
-        onToggleLinkedIn={() => store.toggleSnsOpen(`linkedin_${username}`)}
-      />
       <PublicProfileWhoIAmSection
         name={profile.name}
         whoIAm={profile.whoIAm}
@@ -173,18 +153,36 @@ export function PublicProfileReputationTabPage({
   username: string
 }) {
   const router = useRouter()
-  const { profile, keywordCounts, totalKeywordCount, featuredGuestbook } = usePublicProfileTabData(username)
+  const { store, profile, keywordCounts, totalKeywordCount, featuredGuestbook } = usePublicProfileTabData(username)
+  const igOpen = store.snsOpenStates[`instagram_${username}`] ?? false
+  const liOpen = store.snsOpenStates[`linkedin_${username}`] ?? false
 
   return (
-    <div className="px-5 pt-6 pb-6">
+    <div className="pb-6">
+      <ProfileRememberSection
+        total={profile.rememberHighlight.total}
+        industries={profile.rememberHighlight.industries}
+      />
       <ProfileReputationSummarySection
-        profile={profile}
         keywordCounts={keywordCounts}
         totalKeywordCount={totalKeywordCount}
+      />
+      <ProfileFeedbackSection
+        profile={profile}
         featuredGuestbook={featuredGuestbook}
         getProfileAvatar={getProfileAvatar}
         onGuestbookEntryClick={(linkId) => router.push(`/${linkId}`)}
         onOpenGuestbook={() => router.push(`/${profile.linkId}/guestbook`)}
+      />
+      <ProfileSnsSection
+        instagramConnected={profile.instagramConnected}
+        linkedinConnected={profile.linkedinConnected}
+        instagram={profile.instagram}
+        linkedin={profile.linkedin}
+        igOpen={igOpen}
+        liOpen={liOpen}
+        onToggleInstagram={() => store.toggleSnsOpen(`instagram_${username}`)}
+        onToggleLinkedIn={() => store.toggleSnsOpen(`linkedin_${username}`)}
       />
     </div>
   )

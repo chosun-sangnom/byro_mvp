@@ -53,20 +53,14 @@ export function SNSManageScreen({ onBack }: { onBack: () => void }) {
             onClick={() => openSheet('linkedin')}
           />
           <SnsManageRow
-            icon={<SnsIcon label="X" bg="#9F9F9F" />}
-            title="X (Twitter)"
+            icon={<SnsIcon label="YT" bg="#FF0000" />}
+            title="YouTube"
             subtitle="준비중"
             disabled
           />
           <SnsManageRow
-            icon={<SnsIcon label="@" bg="#B2B2B2" />}
-            title="Threads"
-            subtitle="준비중"
-            disabled
-          />
-          <SnsManageRow
-            icon={<SnsIcon label="f" bg="#9FC3F7" />}
-            title="Facebook"
+            icon={<SnsIcon label="TT" bg="#111111" />}
+            title="TikTok"
             subtitle="준비중"
             disabled
           />

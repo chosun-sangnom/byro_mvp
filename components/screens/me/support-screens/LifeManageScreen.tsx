@@ -45,40 +45,33 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
   const store = useByroStore()
   const initialLife: PublicProfileLife = store.user?.life ?? SAMPLE_PROFILE.life
   const [exercise, setExercise] = useState(formatList(initialLife.daily.exercise))
-  const [pet, setPet] = useState(initialLife.daily.pet)
-  const [petName, setPetName] = useState(initialLife.daily.petName ?? '')
+  const [teams, setTeams] = useState(formatList(initialLife.tastes.teams ?? []))
   const [movies, setMovies] = useState(formatMedia(initialLife.tastes.movies))
   const [music, setMusic] = useState(formatMedia(initialLife.tastes.music))
   const [books, setBooks] = useState(formatMedia(initialLife.tastes.books))
-  const [games, setGames] = useState(formatList(initialLife.tastes.games))
-  const [sports, setSports] = useState(formatList(initialLife.tastes.sports))
-  const [celebrities, setCelebrities] = useState(formatList(initialLife.tastes.celebrities))
-  const [diet, setDiet] = useState(initialLife.tastes.diet)
+  const [plays, setPlays] = useState(formatMedia(initialLife.tastes.plays ?? []))
   const [restaurants, setRestaurants] = useState(formatMedia(initialLife.tastes.restaurants))
   const [cafes, setCafes] = useState(formatMedia(initialLife.tastes.cafes))
-  const [neighborhoods, setNeighborhoods] = useState(formatList(initialLife.places.neighborhoods))
   const [travelDestinations, setTravelDestinations] = useState(formatList(initialLife.places.travelDestinations))
 
   const handleSave = () => {
     const nextLife: PublicProfileLife = {
       daily: {
+        ...initialLife.daily,
         exercise: parseList(exercise),
-        pet,
-        petName: pet === '없음' ? undefined : petName.trim() || undefined,
       },
       tastes: {
+        ...initialLife.tastes,
         movies: parseMedia(movies, initialLife.tastes.movies),
         music: parseMedia(music, initialLife.tastes.music),
         books: parseMedia(books, initialLife.tastes.books),
-        games: parseList(games),
-        sports: parseList(sports),
-        celebrities: parseList(celebrities),
-        diet: diet.trim(),
+        plays: parseMedia(plays, initialLife.tastes.plays ?? []),
+        teams: parseList(teams),
         restaurants: parseMedia(restaurants, initialLife.tastes.restaurants),
         cafes: parseMedia(cafes, initialLife.tastes.cafes),
       },
       places: {
-        neighborhoods: parseList(neighborhoods),
+        ...initialLife.places,
         travelDestinations: parseList(travelDestinations),
       },
     }
@@ -97,12 +90,13 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
         <InfoBox variant="warn">
-          쉼표로 여러 값을 나눌 수 있고, 미디어/장소는 <span className="font-semibold">한 줄에 하나씩</span> 입력하세요.
+          공개 프로필에서는 <span className="font-semibold">활동 · 문화 · 장소</span> 3개 블록으로 뭉쳐서 보여집니다.
+          세부 항목은 여기서 따로 입력하고, 미디어/장소는 <span className="font-semibold">한 줄에 하나씩</span> 적어 주세요.
           보조 정보는 <span className="font-semibold">이름 | 설명</span> 형식으로 적으면 됩니다.
         </InfoBox>
 
-        <Section title="일상">
-          <InputField label="운동">
+        <Section title="활동">
+          <InputField label="좋아하는 운동">
             <input
               value={exercise}
               onChange={(event) => setExercise(event.target.value)}
@@ -111,90 +105,26 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
             />
           </InputField>
 
-          <InputField label="반려동물">
-            <div className="flex flex-wrap gap-2">
-              {['없음', '강아지', '고양이', '기타'].map((option) => {
-                const selected = option === pet
-                return (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => setPet(option)}
-                    className="rounded-full border px-3 py-1.5 text-xs font-semibold"
-                    style={{
-                      borderColor: selected ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
-                      background: selected ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
-                      color: selected ? '#ffffff' : 'var(--color-text-secondary)',
-                    }}
-                  >
-                    {option}
-                  </button>
-                )
-              })}
-            </div>
+          <InputField label="응원하는 스포츠팀">
+            <input
+              value={teams}
+              onChange={(event) => setTeams(event.target.value)}
+              placeholder="예: LG 트윈스, 토트넘 홋스퍼"
+              className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
+            />
           </InputField>
-
-          {pet !== '없음' && (
-            <InputField label="반려동물 이름">
-              <input
-                value={petName}
-                onChange={(event) => setPetName(event.target.value)}
-                placeholder="예: 몽이"
-                className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-              />
-            </InputField>
-          )}
         </Section>
 
-        <Section title="취향">
-          <TextAreaField label="영화 · 드라마" value={movies} onChange={setMovies} placeholder={'머니볼\n소셜 네트워크'} />
+        <Section title="문화">
+          <TextAreaField label="영화" value={movies} onChange={setMovies} placeholder={'머니볼\n소셜 네트워크'} />
           <TextAreaField label="음악" value={music} onChange={setMusic} placeholder={'Tomboy | 혁오\nEverything | 검정치마'} />
           <TextAreaField label="책" value={books} onChange={setBooks} placeholder={'린 스타트업\n제로 투 원'} />
-          <InputField label="게임">
-            <input
-              value={games}
-              onChange={(event) => setGames(event.target.value)}
-              placeholder="예: EA SPORTS FC, 심즈"
-              className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-            />
-          </InputField>
-          <InputField label="스포츠">
-            <input
-              value={sports}
-              onChange={(event) => setSports(event.target.value)}
-              placeholder="예: 축구, 골프"
-              className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-            />
-          </InputField>
-          <InputField label="최애">
-            <input
-              value={celebrities}
-              onChange={(event) => setCelebrities(event.target.value)}
-              placeholder="예: 아이유, 유재석"
-              className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-            />
-          </InputField>
-          <InputField label="식단">
-            <input
-              value={diet}
-              onChange={(event) => setDiet(event.target.value)}
-              placeholder="예: 일반식"
-              className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-            />
-          </InputField>
-          <TextAreaField label="맛집" value={restaurants} onChange={setRestaurants} placeholder={'성수 우육미엔 | 성수동\n압구정 뜸들이다 | 압구정'} />
-          <TextAreaField label="카페" value={cafes} onChange={setCafes} placeholder={'센터커피 | 성수동\n프릳츠 원서점 | 서촌'} />
+          <TextAreaField label="연극" value={plays} onChange={setPlays} placeholder={'렛미플라이\n레드북'} />
         </Section>
 
         <Section title="장소">
-          <InputField label="자주 가는 곳">
-            <input
-              value={neighborhoods}
-              onChange={(event) => setNeighborhoods(event.target.value)}
-              placeholder="예: 성수동, 한남동, 서촌"
-              className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-            />
-          </InputField>
+          <TextAreaField label="맛집" value={restaurants} onChange={setRestaurants} placeholder={'성수 우육미엔 | 성수동\n압구정 뜸들이다 | 압구정'} />
+          <TextAreaField label="카페" value={cafes} onChange={setCafes} placeholder={'센터커피 | 성수동\n프릳츠 원서점 | 서촌'} />
           <InputField label="여행지">
             <input
               value={travelDestinations}

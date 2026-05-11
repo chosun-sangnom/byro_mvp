@@ -5,7 +5,7 @@
  *
  * 공개 프로필의 전체 레이아웃 컨테이너.
  * - 상단 nav: 뒤로가기 / URL / 액션 버튼
- * - 고정 헤더 영역: 히어로 카드 → 헤더 메타 → 케미 존 → 탭바
+ * - 고정 헤더 영역: 히어로 카드 → 케미 존 → 탭바
  * - 스크롤 영역: 탭 콘텐츠 (children)
  * - 고정 푸터: 편집(owner) or 연결 요청(visitor) + 연락처
  *
@@ -20,7 +20,6 @@ import { useByroStore } from '@/store/useByroStore'
 import { showToast } from '@/components/ui'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
 import { ContactActionButton, ProfileHeroCard } from '@/components/screens/profile/PublicProfileSections'
-import { PublicProfileHeaderMeta } from '@/components/screens/profile/PublicProfileHeaderMeta'
 import { PublicProfileTabBar, type PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
 import { PublicProfileKemiZone } from '@/components/screens/profile/PublicProfileKemiZone'
 
@@ -66,7 +65,7 @@ export function PublicProfileShell({
     return () => window.removeEventListener('resize', checkOverflow)
   }, [profile.bio, bioExpanded])
 
-  // 평판 탭에서만 "피드백 요청 / 경험 남기기" 버튼 표시 (visitor only)
+  // 관계 탭에서만 "피드백 요청 / 경험 남기기" 버튼 표시 (visitor only)
   const showReputationActions = activeTab === 'reputation' && !isOwnerMode
 
   return (
@@ -127,13 +126,10 @@ export function PublicProfileShell({
           />
         </div>
 
-        {/* 거주지 / 기분 / 오늘의 한 마디 */}
-        <PublicProfileHeaderMeta meta={profile.headerMeta} />
-
         {/* 케미 존 — 로그인 시 viewer 기준 공통점 표시, 비로그인 시 blur 처리 */}
         <PublicProfileKemiZone kemi={profile.kemi} isLoggedIn={store.isLoggedIn} />
 
-        {/* 나 / 라이프 / 평판 탭 */}
+        {/* 나 / 라이프 / 관계 탭 */}
         <PublicProfileTabBar activeTab={activeTab} onTabChange={onTabChange} />
       </div>
 

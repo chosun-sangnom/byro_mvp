@@ -3,11 +3,12 @@
 import { useRef, useState, type ChangeEvent, type PointerEvent } from 'react'
 import { Camera } from 'lucide-react'
 import { Button, showToast, TextArea } from '@/components/ui'
+import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
 import type { UserState } from '@/types'
 
 interface BasicInfoEditScreenProps {
-  user: Pick<UserState, 'name' | 'linkId' | 'title' | 'school' | 'bio' | 'avatarImage'>
+  user: Pick<UserState, 'name' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'headerMeta'>
   onBack: () => void
 }
 
@@ -20,8 +21,11 @@ export function BasicInfoEditScreen({
 }: BasicInfoEditScreenProps) {
   const store = useByroStore()
   const [title, setTitle] = useState(user.title)
+  const [headline, setHeadline] = useState(user.headline ?? '')
   const [school, setSchool] = useState(user.school)
   const [bio, setBio] = useState(user.bio)
+  const [mood, setMood] = useState(user.headerMeta?.mood ?? SAMPLE_PROFILE.headerMeta.mood)
+  const [availability, setAvailability] = useState(user.headerMeta?.availability ?? SAMPLE_PROFILE.headerMeta.availability)
   const [avatarImage, setAvatarImage] = useState(user.avatarImage ?? '')
   const [cropSource, setCropSource] = useState('')
   const [cropOpen, setCropOpen] = useState(false)
@@ -43,7 +47,18 @@ export function BasicInfoEditScreen({
   const cropImageLayout = getCropImageLayout(cropNaturalSize.width, cropNaturalSize.height, cropStage)
 
   const handleSave = () => {
-    store.updateUserInfo({ title, school, bio, avatarImage })
+    store.updateUserInfo({
+      title,
+      headline,
+      school,
+      bio,
+      avatarImage,
+      headerMeta: {
+        residence: user.headerMeta?.residence ?? SAMPLE_PROFILE.headerMeta.residence,
+        mood,
+        availability,
+      },
+    })
     showToast('저장됐어요!')
     onBack()
   }
@@ -134,7 +149,7 @@ export function BasicInfoEditScreen({
     <div className="flex flex-col h-full">
       <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] bg-[rgba(16,17,20,0.85)] backdrop-blur-md flex-shrink-0">
         <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
-        <span className="text-base font-black">프로필 편집</span>
+        <span className="text-base font-black">프로필카드 편집</span>
       </div>
 
       <div className="flex-1 overflow-y-auto">
@@ -181,6 +196,36 @@ export function BasicInfoEditScreen({
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
                 placeholder="예: 스타트업 마케터"
+                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">한줄소개</label>
+              <input
+                value={headline}
+                onChange={(event) => setHeadline(event.target.value)}
+                placeholder="예: 브랜드와 사람을 연결하는 스타트업 마케터"
+                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">오늘의 기분</label>
+              <input
+                value={mood}
+                onChange={(event) => setMood(event.target.value)}
+                placeholder="예: 집중 모드"
+                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">펑</label>
+              <input
+                value={availability}
+                onChange={(event) => setAvailability(event.target.value)}
+                placeholder="예: 오늘 저녁 커피챗 가능"
                 className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
               />
             </div>

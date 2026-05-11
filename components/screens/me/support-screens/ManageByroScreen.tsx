@@ -1,7 +1,7 @@
 'use client'
 
 import { ChevronRight } from 'lucide-react'
-import type { Highlight, UserState } from '@/types'
+import type { Highlight, PublicProfileLife, UserState } from '@/types'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
 interface ManageByroScreenProps {
@@ -41,19 +41,23 @@ export function ManageByroScreen({
 }: ManageByroScreenProps) {
   const activeContactCount = user.contactChannels?.filter((channel) => channel.enabled && channel.value.trim()).length ?? 0
   const whoIAm = user.whoIAm ?? SAMPLE_PROFILE.whoIAm
-  const life = user.life ?? SAMPLE_PROFILE.life
+  const life: PublicProfileLife = user.life ?? SAMPLE_PROFILE.life
   const sajuProfile = user.sajuProfile ?? SAMPLE_PROFILE.sajuProfile
+  const petLabel = life.daily.petName ? `${life.daily.pet} · ${life.daily.petName}` : life.daily.pet
+  const activityCount = life.daily.exercise.length + (life.tastes.teams?.length ?? 0)
+  const cultureCount = life.tastes.movies.length + life.tastes.music.length + life.tastes.books.length + (life.tastes.plays?.length ?? 0)
+  const placeCount = life.tastes.restaurants.length + life.tastes.cafes.length + life.places.travelDestinations.length
   const completionChecks = [
     { label: '프로필 사진', done: Boolean(user.avatarImage) },
-    { label: '자기소개', done: user.bio.trim().length >= 20 },
-    { label: 'Who I am', done: Boolean(whoIAm.mbti && whoIAm.bloodType) },
+    { label: '프로필카드', done: Boolean(user.headline?.trim() && user.headerMeta?.mood?.trim() && user.headerMeta?.availability?.trim()) },
+    { label: '나', done: Boolean(whoIAm.mbti && petLabel) },
     {
       label: '사주 정보',
       done: Boolean(sajuProfile?.birthDate && sajuProfile.birthPlace.trim() && (sajuProfile.isBirthTimeUnknown || sajuProfile.birthTime)),
     },
     {
       label: '라이프',
-      done: life.daily.exercise.length > 0 || life.places.neighborhoods.length > 0,
+      done: activityCount + cultureCount + placeCount > 0,
     },
     { label: '연락 수단', done: activeContactCount > 0 },
     { label: 'SNS 연동', done: connectedSnsCount > 0 },
@@ -62,20 +66,20 @@ export function ManageByroScreen({
   const completionPercent = Math.round((completionChecks.filter((item) => item.done).length / completionChecks.length) * 100)
   const remainingItems = completionChecks.filter((item) => !item.done).slice(0, 3)
   const manageRows = [
-    { title: '기본정보', meta: user.bio.trim() ? '사진, 직함, 학교, 자기소개 편집' : '기본 프로필을 먼저 채워주세요', onClick: onEditBasic },
-    { title: 'Who I am', meta: `${whoIAm.mbti} · ${whoIAm.bloodType} · ${whoIAm.sajuType}`, onClick: onEditWhoIAm },
+    { title: '프로필카드', meta: user.headline?.trim() ? '사진, 한줄소개, 오늘의 기분, 펑 편집' : '프로필카드 정보를 먼저 채워주세요', onClick: onEditBasic },
+    { title: '나', meta: `${whoIAm.mbti} · ${petLabel}`, onClick: onEditWhoIAm },
     {
       title: '사주 정보 추가',
-      meta: sajuProfile?.birthDate ? `원본 비공개 · ${whoIAm.sajuType} 계산됨` : '생년월일, 시간, 출생지를 입력하세요',
+      meta: sajuProfile?.birthDate ? '궁합 보기 분석용 비공개 입력 완료' : '생년월일, 시간, 출생지를 입력하세요',
       onClick: onEditSaju,
     },
     {
       title: '라이프',
-      meta: `운동 ${life.daily.exercise.length}개 · 동네 ${life.places.neighborhoods.length}곳`,
+      meta: `활동 ${activityCount}개 · 문화 ${cultureCount}개 · 장소 ${placeCount}개`,
       onClick: onEditLife,
     },
     { title: '연락 수단', meta: activeContactCount > 0 ? `${activeContactCount}개 연결됨` : '전화, 이메일, 카카오를 연결하세요', onClick: onEditContact },
-    { title: 'SNS 연동', meta: connectedSnsCount > 0 ? `${connectedSnsCount}개 연동됨` : '인스타그램과 링크드인을 연결하세요', onClick: onEditSNS },
+    { title: 'SNS 연동', meta: connectedSnsCount > 0 ? `${connectedSnsCount}개 연동됨` : '유튜브, 틱톡, 인스타그램, 링크드인을 관리하세요', onClick: onEditSNS },
     { title: '하이라이트', meta: allHighlights.length > 0 ? `${allHighlights.length}개 항목 관리` : '프로필에 보여줄 경험을 추가하세요', onClick: onEditHighlight },
     { title: '평판 키워드', meta: `선택 ${user.selectedKeywords.length}개 · 누적 ${totalReputationCount}회`, onClick: onEditReputation },
     { title: '방명록', meta: `${SAMPLE_PROFILE.guestbook.length}개 메시지 관리`, onClick: onEditGuestbook },

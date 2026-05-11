@@ -1,8 +1,9 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import type { ReactNode, RefObject } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BadgeCheck, ChevronDown, ChevronUp, Mail, MessageCircle, Phone } from 'lucide-react'
+import { BadgeCheck, ChevronDown, ChevronUp, Mail, MessageCircle, Phone, Play } from 'lucide-react'
+import { RememberNetworkGraph } from '@/components/highlights/RememberNetworkGraph'
 import type { ContactChannel } from '@/types'
 
 const SECTION_EASE = [0.22, 1, 0.36, 1] as const
@@ -60,35 +61,30 @@ export function SectionTitle({
 export function ProfileHeroSection({
   profile,
   heroTheme,
-  keywordCounts,
-  totalKeywordCount,
-  featuredGuestbook,
   bioExpanded,
   bioOverflowing,
   bioRef,
-  getProfileAvatar,
   onToggleBio,
-  onGuestbookEntryClick,
-  onOpenGuestbook,
 }: {
   profile: {
     name: string
+    title?: string
+    linkId?: string
+    headline?: string
+    age?: number
     bio: string
     avatarColor?: string
     avatarImage?: string
-    guestbook: { length: number }
+    headerMeta?: {
+      mood?: string
+      availability?: string
+    }
   }
   heroTheme: HeroTheme
-  keywordCounts: KeywordCount[]
-  totalKeywordCount: number
-  featuredGuestbook: GuestbookPreview[]
   bioExpanded: boolean
   bioOverflowing: boolean
-  bioRef: React.RefObject<HTMLParagraphElement>
-  getProfileAvatar: (linkId: string) => string
+  bioRef: RefObject<HTMLParagraphElement>
   onToggleBio: () => void
-  onGuestbookEntryClick: (linkId: string) => void
-  onOpenGuestbook: () => void
 }) {
   return (
     <motion.div
@@ -105,15 +101,6 @@ export function ProfileHeroSection({
         bioOverflowing={bioOverflowing}
         bioRef={bioRef}
         onToggleBio={onToggleBio}
-      />
-      <ProfileReputationSummarySection
-        profile={profile}
-        keywordCounts={keywordCounts}
-        totalKeywordCount={totalKeywordCount}
-        featuredGuestbook={featuredGuestbook}
-        getProfileAvatar={getProfileAvatar}
-        onGuestbookEntryClick={onGuestbookEntryClick}
-        onOpenGuestbook={onOpenGuestbook}
       />
     </motion.div>
   )
@@ -137,23 +124,34 @@ export function ProfileHeroSection({
 export function ProfileHeroCard({
   profile,
   heroTheme,
-  bioExpanded,
-  bioOverflowing,
   bioRef,
-  onToggleBio,
 }: {
   profile: {
     name: string
+    title?: string
+    linkId?: string
+    age?: number
+    headline?: string
     bio: string
     avatarColor?: string
     avatarImage?: string
+    headerMeta?: {
+      mood?: string
+      availability?: string
+    }
   }
   heroTheme: HeroTheme
-  bioExpanded: boolean
-  bioOverflowing: boolean
-  bioRef: React.RefObject<HTMLParagraphElement>
-  onToggleBio: () => void
+  bioRef: RefObject<HTMLParagraphElement>
+  bioExpanded?: boolean
+  bioOverflowing?: boolean
+  onToggleBio?: () => void
 }) {
+  const intro = profile.headline?.trim() || profile.bio
+  const metaChips = [
+    profile.headerMeta?.mood ? { label: '오늘의 기분', value: profile.headerMeta.mood } : null,
+    profile.headerMeta?.availability ? { label: '펑', value: profile.headerMeta.availability } : null,
+  ].filter(Boolean) as Array<{ label: string; value: string }>
+
   return (
     <div className="hero-card border border-[var(--color-border-default)] bg-[rgba(23,24,28,0.92)] p-[8px] backdrop-blur-sm">
       <div className="relative h-[452px] overflow-hidden rounded-[30px] text-white ring-1 ring-black/4">
@@ -193,19 +191,35 @@ export function ProfileHeroCard({
             >
               {profile.name}
             </div>
+            {typeof profile.age === 'number' && (
+              <span className="mb-1.5 text-[18px] font-semibold tracking-[-0.03em] text-white/78">
+                {profile.age}
+              </span>
+            )}
             <span className="mb-1.5 inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/95 text-[var(--color-state-success-text)] shadow-[0_4px_12px_rgba(0,0,0,0.22)]">
               <BadgeCheck size={12} />
             </span>
           </div>
+          <div className="mt-2 text-[14px] font-medium text-white/78">
+            {profile.title}
+          </div>
           <div className="mt-4 max-w-[318px] rounded-[18px] border border-white/12 bg-white/10 px-4 py-3 text-[15px] leading-[1.52] text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[8px]">
-            <p ref={bioRef} className={bioExpanded ? '' : 'line-clamp-3'}>
-              {profile.bio}
+            <p ref={bioRef} className="line-clamp-2">
+              {intro}
             </p>
-            {bioOverflowing && (
-              <button onClick={onToggleBio} className="mt-2 text-xs font-semibold text-white/82">
-                {bioExpanded ? '접기' : '더보기'}
-              </button>
-            )}
+          </div>
+          {metaChips.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {metaChips.map((item) => (
+                <span key={item.label} className="chip-metric">
+                  <span className="text-white/60">{item.label}</span>
+                  <span className="text-white">{item.value}</span>
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="mt-3 text-[12px] font-semibold text-white/72">
+            @{profile.linkId}
           </div>
         </div>
       </div>
@@ -215,9 +229,40 @@ export function ProfileHeroCard({
 }
 
 export function ProfileReputationSummarySection({
-  profile,
   keywordCounts,
   totalKeywordCount,
+}: {
+  keywordCounts: KeywordCount[]
+  totalKeywordCount: number
+}) {
+  return (
+    <AnimatedSection className="px-5 pt-6 pb-2" delay={0.04}>
+      <SectionTitle title="평판" />
+      <div className="rounded-[22px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.03)] px-4 py-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Reputation</div>
+            <div className="mt-0.5 text-[22px] font-black tracking-[-0.04em] text-[var(--color-text-strong)]">누적 평판</div>
+          </div>
+          <div className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
+            총 {totalKeywordCount}
+          </div>
+        </div>
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          {keywordCounts.map((item) => (
+            <span key={item.keyword} className="chip-metric">
+              {item.keyword} <span className="ml-1 font-black text-[var(--color-text-strong)]">{item.count}</span>
+            </span>
+          ))}
+        </div>
+      </div>
+    </AnimatedSection>
+  )
+}
+
+export function ProfileFeedbackSection({
+  profile,
   featuredGuestbook,
   getProfileAvatar,
   onGuestbookEntryClick,
@@ -226,70 +271,89 @@ export function ProfileReputationSummarySection({
   profile: {
     guestbook: { length: number }
   }
-  keywordCounts: KeywordCount[]
-  totalKeywordCount: number
   featuredGuestbook: GuestbookPreview[]
   getProfileAvatar: (linkId: string) => string
   onGuestbookEntryClick: (linkId: string) => void
   onOpenGuestbook: () => void
 }) {
   return (
-    <div className="mt-4 border-t border-[var(--color-border-soft)] px-1 pt-4">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Reputation</div>
-          <div className="mt-0.5 text-[22px] font-black tracking-[-0.04em] text-[var(--color-text-strong)]">누적 평판</div>
+    <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06}>
+      <SectionTitle title="피드백" />
+      <div className="rounded-[22px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.03)] px-4 py-4">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Feedback</div>
+            <div className="mt-0.5 text-[18px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">함께한 사람들이 남긴 메모</div>
+          </div>
+          <div className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
+            {profile.guestbook.length}개
+          </div>
         </div>
-        <div className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
-          총 {totalKeywordCount}
+
+        <div className="divide-y divide-[var(--color-border-soft)]">
+          {featuredGuestbook.map((entry) => (
+            <button
+              key={entry.id}
+              onClick={() => onGuestbookEntryClick(entry.linkId)}
+              className="flex w-full gap-2.5 py-3 text-left first:pt-0 last:pb-0"
+            >
+              {getProfileAvatar(entry.linkId) ? (
+                <div className="mt-0.5 h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-[var(--color-bg-soft)]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={getProfileAvatar(entry.linkId)} alt={`${entry.authorName} 프로필 사진`} className="h-full w-full object-cover" />
+                </div>
+              ) : (
+                <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-xs font-bold text-[var(--color-text-secondary)]">
+                  {entry.authorName.charAt(0)}
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-[12px] font-semibold text-[var(--color-text-primary)]">{entry.authorName}</div>
+                  <div className="text-[10px] text-[var(--color-text-tertiary)]">{entry.date}</div>
+                </div>
+                <div className="mt-1 text-[13px] leading-6 text-[var(--color-text-secondary)] line-clamp-2">{entry.message}</div>
+              </div>
+            </button>
+          ))}
         </div>
-      </div>
 
-      <div className="mt-3 flex flex-wrap gap-2">
-        {keywordCounts.map((item) => (
-          <span key={item.keyword} className="chip-metric">
-            {item.keyword} <span className="ml-1 font-black text-[var(--color-text-strong)]">{item.count}</span>
-          </span>
-        ))}
-      </div>
-
-      <div className="mt-4 divide-y divide-[var(--color-border-soft)]">
-        {featuredGuestbook.map((entry) => (
+        {profile.guestbook.length > 0 && (
           <button
-            key={entry.id}
-            onClick={() => onGuestbookEntryClick(entry.linkId)}
-            className="flex w-full gap-2.5 py-3 text-left first:pt-0 last:pb-0"
+            onClick={onOpenGuestbook}
+            className="mt-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-secondary)]"
           >
-            {getProfileAvatar(entry.linkId) ? (
-              <div className="mt-0.5 h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-[var(--color-bg-soft)]">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={getProfileAvatar(entry.linkId)} alt={`${entry.authorName} 프로필 사진`} className="h-full w-full object-cover" />
-              </div>
-            ) : (
-              <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-xs font-bold text-[var(--color-text-secondary)]">
-                {entry.authorName.charAt(0)}
-              </div>
-            )}
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center justify-between gap-2">
-                <div className="text-[12px] font-semibold text-[var(--color-text-primary)]">{entry.authorName}</div>
-                <div className="text-[10px] text-[var(--color-text-tertiary)]">{entry.date}</div>
-              </div>
-              <div className="mt-1 text-[13px] leading-6 text-[var(--color-text-secondary)] line-clamp-2">{entry.message}</div>
-            </div>
+            더보기
           </button>
-        ))}
+        )}
       </div>
+    </AnimatedSection>
+  )
+}
 
-      {profile.guestbook.length > 0 && (
-        <button
-          onClick={onOpenGuestbook}
-          className="mt-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-secondary)]"
-        >
-          더보기
-        </button>
-      )}
-    </div>
+export function ProfileRememberSection({
+  total,
+  industries,
+}: {
+  total: number
+  industries: Array<{ name: string; ratio: number }>
+}) {
+  return (
+    <AnimatedSection className="px-5 pt-6 pb-2" delay={0.02}>
+      <SectionTitle title="리멤버 네트워크" />
+      <div className="rounded-[22px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.03)] px-4 py-4">
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Remember</div>
+            <div className="mt-0.5 text-[18px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">명함 기반 관계 네트워크</div>
+          </div>
+          <div className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
+            총 {total}명
+          </div>
+        </div>
+        <RememberNetworkGraph total={total} industries={industries} />
+      </div>
+    </AnimatedSection>
   )
 }
 
@@ -315,104 +379,148 @@ export function ProfileSnsSection({
   return (
     <AnimatedSection className="px-5 pt-6 pb-2">
       <SectionTitle title="SNS" />
-      {(instagramConnected || linkedinConnected) ? (
-        <div className="divide-y divide-[var(--color-border-soft)]">
-          {instagramConnected && (
-            <div>
-              <button onClick={onToggleInstagram} className="flex w-full items-center gap-3.5 py-3.5 text-left">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/Instagram.svg" alt="Instagram" className="h-[18px] w-[18px] flex-shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">Instagram</div>
-                  <a
-                    href={instagram.profileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(event) => event.stopPropagation()}
-                    className="mt-0.5 block text-[12px] text-[var(--color-accent-dark)] underline-offset-2 hover:underline"
-                  >
-                    @{instagram.username}
-                  </a>
-                </div>
-                {igOpen ? <ChevronUp size={14} color="#8B857C" /> : <ChevronDown size={14} color="#8B857C" />}
-              </button>
-              <AnimatePresence initial={false}>
-                {igOpen && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
-                    className="overflow-hidden"
-                  >
-                    <div className="pb-4 pl-8">
-                      <p className="mb-3 text-[13px] leading-relaxed text-[var(--color-text-secondary)]">{instagram.aiSummary}</p>
-                      <div className="scrollbar-hide flex gap-2 overflow-x-auto pb-0.5">
-                        {instagram.posts.map((post) => (
-                          <button
-                            key={post.id}
-                            onClick={() => window.open(instagram.profileUrl, '_blank')}
-                            className="h-[84px] w-[84px] flex-shrink-0 overflow-hidden rounded-[10px] bg-[var(--color-bg-soft)]"
-                          >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={post.imageUrl} alt={post.caption} className="h-full w-full object-cover" />
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          )}
-          {linkedinConnected && (
-            <div>
-              <button onClick={onToggleLinkedIn} className="flex w-full items-center gap-3.5 py-3.5 text-left">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/linkedin.png" alt="LinkedIn" className="h-[18px] w-[18px] flex-shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">LinkedIn</div>
-                  <a
-                    href={linkedin.profileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(event) => event.stopPropagation()}
-                    className="mt-0.5 block truncate text-[12px] text-[var(--color-accent-dark)] underline-offset-2 hover:underline"
-                  >
-                    {linkedin.profileUrl.replace(/^https?:\/\/(www\.)?/, '')}
-                  </a>
-                </div>
-                {liOpen ? <ChevronUp size={14} color="#8B857C" /> : <ChevronDown size={14} color="#8B857C" />}
-              </button>
-              <AnimatePresence initial={false}>
-                {liOpen && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
-                    className="overflow-hidden"
-                  >
-                    <div className="pb-4 pl-8">
-                      <p className="mb-3 text-[13px] leading-relaxed text-[var(--color-text-secondary)]">{linkedin.aiSummary}</p>
-                      <div className="overflow-hidden rounded-[10px] border border-[var(--color-border-soft)]">
-                        <div className="relative max-h-48 overflow-hidden">
+      <div className="divide-y divide-[var(--color-border-soft)]">
+        <StaticSnsRow
+          icon={<Play size={15} color="#FF0000" />}
+          title="YouTube"
+          subtitle="연결 정보 준비 중"
+        />
+        <StaticSnsRow
+          icon={<span className="text-[13px] font-black text-black">T</span>}
+          title="TikTok"
+          subtitle="연결 정보 준비 중"
+        />
+        {instagramConnected ? (
+          <div>
+            <button onClick={onToggleInstagram} className="flex w-full items-center gap-3.5 py-3.5 text-left">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/Instagram.svg" alt="Instagram" className="h-[18px] w-[18px] flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">Instagram</div>
+                <a
+                  href={instagram.profileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(event) => event.stopPropagation()}
+                  className="mt-0.5 block text-[12px] text-[var(--color-accent-dark)] underline-offset-2 hover:underline"
+                >
+                  @{instagram.username}
+                </a>
+              </div>
+              {igOpen ? <ChevronUp size={14} color="#8B857C" /> : <ChevronDown size={14} color="#8B857C" />}
+            </button>
+            <AnimatePresence initial={false}>
+              {igOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+                  className="overflow-hidden"
+                >
+                  <div className="pb-4 pl-8">
+                    <p className="mb-3 text-[13px] leading-relaxed text-[var(--color-text-secondary)]">{instagram.aiSummary}</p>
+                    <div className="scrollbar-hide flex gap-2 overflow-x-auto pb-0.5">
+                      {instagram.posts.map((post) => (
+                        <button
+                          key={post.id}
+                          onClick={() => window.open(instagram.profileUrl, '_blank')}
+                          className="h-[84px] w-[84px] flex-shrink-0 overflow-hidden rounded-[10px] bg-[var(--color-bg-soft)]"
+                        >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={linkedin.previewImage} alt="LinkedIn 최근 게시물" className="w-full" />
-                          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[var(--color-bg-page)] to-transparent" />
-                        </div>
+                          <img src={post.imageUrl} alt={post.caption} className="h-full w-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        ) : (
+          <StaticSnsRow
+            icon={
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src="/images/Instagram.svg" alt="Instagram" className="h-[18px] w-[18px]" />
+            }
+            title="Instagram"
+            subtitle="연결된 계정이 없습니다"
+          />
+        )}
+        {linkedinConnected ? (
+          <div>
+            <button onClick={onToggleLinkedIn} className="flex w-full items-center gap-3.5 py-3.5 text-left">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/linkedin.png" alt="LinkedIn" className="h-[18px] w-[18px] flex-shrink-0" />
+              <div className="min-w-0 flex-1">
+                <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">LinkedIn</div>
+                <a
+                  href={linkedin.profileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(event) => event.stopPropagation()}
+                  className="mt-0.5 block truncate text-[12px] text-[var(--color-accent-dark)] underline-offset-2 hover:underline"
+                >
+                  {linkedin.profileUrl.replace(/^https?:\/\/(www\.)?/, '')}
+                </a>
+              </div>
+              {liOpen ? <ChevronUp size={14} color="#8B857C" /> : <ChevronDown size={14} color="#8B857C" />}
+            </button>
+            <AnimatePresence initial={false}>
+              {liOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
+                  className="overflow-hidden"
+                >
+                  <div className="pb-4 pl-8">
+                    <p className="mb-3 text-[13px] leading-relaxed text-[var(--color-text-secondary)]">{linkedin.aiSummary}</p>
+                    <div className="overflow-hidden rounded-[10px] border border-[var(--color-border-soft)]">
+                      <div className="relative max-h-48 overflow-hidden">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={linkedin.previewImage} alt="LinkedIn 최근 게시물" className="w-full" />
+                        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[var(--color-bg-page)] to-transparent" />
                       </div>
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          )}
-        </div>
-      ) : (
-        <p className="text-[13px] text-[var(--color-text-tertiary)]">연동된 SNS가 없습니다.</p>
-      )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        ) : (
+          <StaticSnsRow
+            icon={
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src="/images/linkedin.png" alt="LinkedIn" className="h-[18px] w-[18px]" />
+            }
+            title="LinkedIn"
+            subtitle="연결된 계정이 없습니다"
+          />
+        )}
+      </div>
     </AnimatedSection>
+  )
+}
+
+function StaticSnsRow({
+  icon,
+  title,
+  subtitle,
+}: {
+  icon: ReactNode
+  title: string
+  subtitle: string
+}) {
+  return (
+    <div className="flex items-center gap-3.5 py-3.5">
+      <span className="flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center">{icon}</span>
+      <div className="min-w-0 flex-1">
+        <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{title}</div>
+        <div className="mt-0.5 text-[12px] text-[var(--color-text-tertiary)]">{subtitle}</div>
+      </div>
+    </div>
   )
 }
 

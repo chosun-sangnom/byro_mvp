@@ -178,6 +178,7 @@ export interface PublicProfileLife {
     movies: LifeMediaItem[]
     music: LifeMediaItem[]
     books: LifeMediaItem[]
+    plays?: LifeMediaItem[]
     games: string[]
     sports: string[]
     teams?: string[]
@@ -250,12 +251,14 @@ export interface GuestbookEntry {
 export interface PublicProfile {
   linkId: string
   name: string
+  age?: number
   title: string
   headline?: string
   school: string
   bio: string
   headerMeta?: ProfileHeaderMeta
   whoIAm?: PublicProfileWhoIAm
+  sajuProfile?: SajuProfileInput
   life?: PublicProfileLife
   selectedKeywords: string[]
   avatarColor?: string
@@ -292,8 +295,10 @@ export interface UserState {
   name: string
   linkId: string
   title: string
+  headline?: string
   school: string
   bio: string
+  headerMeta?: ProfileHeaderMeta
   selectedKeywords: string[]
   avatarColor?: string
   avatarImage?: string

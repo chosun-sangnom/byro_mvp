@@ -3,7 +3,7 @@
 /**
  * PublicProfileTabBar
  *
- * 공개 프로필 탭 네비게이션 (나 / 라이프 / 평판).
+ * 공개 프로필 탭 네비게이션 (나 / 라이프 / 관계).
  * - owner / visitor 모두 동일한 탭 구조를 가짐
  * - 선택된 탭은 인디고 배경 + 스프링 애니메이션으로 표시
  * - 탭 상태는 부모(page.tsx)의 useState로 관리 — URL 변경 없음
@@ -18,7 +18,7 @@ export type PublicProfileTabId = 'who' | 'life' | 'reputation'
 const TABS: Array<{ id: PublicProfileTabId; label: string }> = [
   { id: 'who', label: '나' },
   { id: 'life', label: '라이프' },
-  { id: 'reputation', label: '평판' },
+  { id: 'reputation', label: '관계' },
 ] as const
 
 export function PublicProfileTabBar({

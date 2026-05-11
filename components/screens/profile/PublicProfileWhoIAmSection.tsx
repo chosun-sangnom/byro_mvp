@@ -32,19 +32,18 @@ export function PublicProfileWhoIAmSection({
   const [reportOpen, setReportOpen] = useState(false)
 
   if (!whoIAm) return null
+  const petText = life?.daily.petName
+    ? `${life.daily.pet} · ${life.daily.petName}`
+    : life?.daily.pet ?? '없음'
 
   return (
     <>
       <div className="px-5 pt-6 pb-2">
-        <SectionTitle title="Who I am" subtitle='MBTI, 혈액형, 사주 타입, AI 사진 분석과 개인 기본값을 모은 섹션' />
+        <SectionTitle title="나" subtitle='MBTI와 반려동물, 그리고 궁합 보기로 이 사람의 기본 결을 보여줍니다.' />
 
         <div className="grid grid-cols-2 gap-3">
           <IdentityRow label="MBTI" value={whoIAm.mbti} />
-          <IdentityRow label="혈액형" value={whoIAm.bloodType} />
-          <IdentityRow label="사주 타입" value={whoIAm.sajuType} />
-          <IdentityRow label="연애상태" value={whoIAm.relationshipStatus} />
-          <IdentityRow label="자녀" value={whoIAm.children} />
-          <IdentityRow label="종교" value={whoIAm.religion} />
+          <IdentityRow label="반려동물" value={petText} />
         </div>
 
         <div className="mt-4 rounded-[22px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.04)] px-4 py-4">
@@ -63,17 +62,6 @@ export function PublicProfileWhoIAmSection({
             >
               궁합 보기
             </button>
-          </div>
-        </div>
-
-        <div className="mt-4 rounded-[22px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.04)] px-4 py-4">
-          <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">AI 사진 분석</div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {whoIAm.aiStyleSummary.map((item) => (
-              <span key={item} className="chip-metric">
-                {item}
-              </span>
-            ))}
           </div>
         </div>
       </div>

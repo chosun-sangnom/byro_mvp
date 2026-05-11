@@ -28,6 +28,21 @@ type NormalizedPublicProfile = PublicProfile & {
   guestbook: GuestbookEntry[]
 }
 
+function deriveAgeFromBirthDate(birthDate?: string) {
+  if (!birthDate) return undefined
+  const birth = new Date(birthDate)
+  if (Number.isNaN(birth.getTime())) return undefined
+
+  const today = new Date()
+  let age = today.getFullYear() - birth.getFullYear()
+  const hasBirthdayPassed =
+    today.getMonth() > birth.getMonth()
+    || (today.getMonth() === birth.getMonth() && today.getDate() >= birth.getDate())
+
+  if (!hasBirthdayPassed) age -= 1
+  return age > 0 ? age : undefined
+}
+
 const PUBLIC_PROFILE_FALLBACKS: {
   instagram: InstagramProfile
   linkedin: NormalizedLinkedInProfile
@@ -94,12 +109,15 @@ function buildEditableOwnerProfile(
     name: user.name,
     linkId: user.linkId,
     title: user.title,
+    headline: user.headline ?? baseProfile.headline,
     school: user.school,
     bio: user.bio,
+    headerMeta: user.headerMeta ?? baseProfile.headerMeta,
     selectedKeywords: user.selectedKeywords,
     avatarColor: user.avatarColor ?? baseProfile.avatarColor,
     avatarImage: user.avatarImage || baseProfile.avatarImage,
     whoIAm: user.whoIAm ?? baseProfile.whoIAm,
+    sajuProfile: user.sajuProfile ?? baseProfile.sajuProfile,
     life: user.life ?? baseProfile.life,
     contactChannels: user.contactChannels ?? baseProfile.contactChannels,
   }
@@ -120,6 +138,7 @@ export function getNormalizedPublicProfile({
 
   return {
     ...rawProfile,
+    age: deriveAgeFromBirthDate(rawProfile.sajuProfile?.birthDate),
     instagram: {
       ...(instagram ?? {}),
       username: instagram?.username ?? PUBLIC_PROFILE_FALLBACKS.instagram.username,

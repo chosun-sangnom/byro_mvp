@@ -6,11 +6,7 @@ import type { LifeMediaItem, PublicProfileLife } from '@/types'
 
 function BlockTitle({ label }: { label: string }) {
   return (
-    <div className="px-5">
-      <span className="inline-block rounded-lg bg-[rgba(255,255,255,0.07)] px-3 py-1.5 text-[12px] font-bold text-[var(--color-text-primary)]">
-        {label}
-      </span>
-    </div>
+    <p className="px-5 text-[16px] font-bold text-[var(--color-text-primary)]">{label}</p>
   )
 }
 

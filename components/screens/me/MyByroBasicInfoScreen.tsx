@@ -5,7 +5,7 @@ import { Camera } from 'lucide-react'
 import { Button, showToast, TextArea } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
-import type { SajuProfileInput, UserState } from '@/types'
+import type { UserState } from '@/types'
 
 interface BasicInfoEditScreenProps {
   user: Pick<UserState, 'name' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'headerMeta' | 'sajuProfile'>
@@ -22,10 +22,6 @@ export function BasicInfoEditScreen({
   const store = useByroStore()
   const [headline, setHeadline] = useState(user.headline ?? '')
   const [bio, setBio] = useState(user.bio)
-  const initialSajuProfile: SajuProfileInput = user.sajuProfile ?? (SAMPLE_PROFILE.sajuProfile as SajuProfileInput)
-  const [birthDate, setBirthDate] = useState(initialSajuProfile.birthDate)
-  const [birthTime, setBirthTime] = useState(initialSajuProfile.birthTime)
-  const [birthPlace, setBirthPlace] = useState(initialSajuProfile.birthPlace)
   const [mood, setMood] = useState(user.headerMeta?.mood ?? SAMPLE_PROFILE.headerMeta.mood)
   const [avatarImage, setAvatarImage] = useState(user.avatarImage ?? '')
   const [cropSource, setCropSource] = useState('')
@@ -57,13 +53,6 @@ export function BasicInfoEditScreen({
         mood,
         availability: user.headerMeta?.availability ?? SAMPLE_PROFILE.headerMeta.availability,
       },
-    })
-    store.updateUserSajuProfile({
-      ...initialSajuProfile,
-      birthDate,
-      birthTime,
-      birthPlace,
-      isBirthTimeUnknown: !birthTime,
     })
     showToast('저장됐어요!')
     onBack()
@@ -204,39 +193,6 @@ export function BasicInfoEditScreen({
                 placeholder="예: 브랜드와 사람을 연결하는 스타트업 마케터"
                 className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
               />
-            </div>
-
-            <div>
-              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">생년월일</label>
-              <input
-                type="date"
-                value={birthDate}
-                onChange={(event) => setBirthDate(event.target.value)}
-                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">생시</label>
-              <input
-                type="time"
-                value={birthTime}
-                onChange={(event) => setBirthTime(event.target.value)}
-                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">출생지</label>
-              <input
-                value={birthPlace}
-                onChange={(event) => setBirthPlace(event.target.value)}
-                placeholder="예: 서울, 부산, 대전"
-                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-              />
-              <div className="mt-1 text-[11px] text-[var(--color-text-tertiary)]">
-                입력한 생년월일, 생시, 출생지는 나이 표시와 사주정보 계산에 사용되며 공개되지 않습니다.
-              </div>
             </div>
 
             <div>

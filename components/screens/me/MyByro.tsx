@@ -84,6 +84,7 @@ export default function MyByro() {
         onBack={() => setScreen('preview')}
         onEditBasic={() => setScreen('editBasic')}
         onEditWhoIAm={() => setScreen('editWhoIAm')}
+        onEditAIInfo={() => setScreen('editSaju')}
         onEditLife={() => setScreen('editLife')}
         onEditHighlight={() => setScreen('editHighlight')}
         onEditSNS={() => setScreen('editSNS')}

@@ -50,7 +50,7 @@ export function WhoIAmManageScreen({ onBack }: { onBack: () => void }) {
       <div className="flex-1 overflow-y-auto px-5 py-4">
         <InfoBox variant="warn">
           MBTI와 반려동물은 공개 프로필의 <span className="font-semibold">나</span> 탭에 노출됩니다.
-          사주 정보는 별도 페이지에서 입력하고, 공개 프로필에는 직접 노출되지 않습니다.
+          궁합과 사주 해석에 쓰는 정보는 <span className="font-semibold">AI 분석용 정보</span>에서 따로 관리합니다.
         </InfoBox>
 
         <div className="mt-5 space-y-5">

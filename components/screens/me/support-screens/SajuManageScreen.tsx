@@ -9,7 +9,7 @@ import type { PublicProfileWhoIAm, SajuProfileInput } from '@/types'
 const SAJU_TYPES = ['갑목', '을목', '병화', '정화', '무토', '기토', '경금', '신금', '임수', '계수']
 
 function deriveSajuType(profile: SajuProfileInput) {
-  if (!profile.birthDate || !profile.birthPlace.trim()) return null
+  if (!profile.birthDate) return null
   const seed = `${profile.birthDate}${profile.birthTime}${profile.birthPlace}${profile.calendarType}`
     .split('')
     .reduce((sum, char) => sum + char.charCodeAt(0), 0)
@@ -35,27 +35,29 @@ export function SajuManageScreen({ onBack }: { onBack: () => void }) {
     () => deriveSajuType(sajuProfile) ?? baseWhoIAm.sajuType,
     [baseWhoIAm.sajuType, sajuProfile],
   )
+  const analysisStatus = !sajuProfile.birthDate
+    ? '입력 필요'
+    : sajuProfile.birthPlace.trim() && (sajuProfile.isBirthTimeUnknown || sajuProfile.birthTime)
+      ? '정밀 분석 가능'
+      : '기본 분석 가능'
 
   const handleSave = () => {
     if (!sajuProfile.birthDate) {
-      showToast('생년월일은 기본정보에서 먼저 입력해 주세요')
-      return
-    }
-    if (!sajuProfile.birthPlace.trim()) {
-      showToast('출생지는 입력해 주세요')
-      return
-    }
-    if (!sajuProfile.isBirthTimeUnknown && !sajuProfile.birthTime) {
-      showToast('태어난 시간을 모르시면 체크해 주세요')
+      showToast('생년월일을 입력해 주세요')
       return
     }
 
-    store.updateUserSajuProfile(sajuProfile)
+    const normalizedProfile = {
+      ...sajuProfile,
+      isBirthTimeUnknown: sajuProfile.isBirthTimeUnknown || !sajuProfile.birthTime,
+    }
+
+    store.updateUserSajuProfile(normalizedProfile)
     store.updateUserWhoIAm({
       ...baseWhoIAm,
-      sajuType: nextSajuType,
+      sajuType: deriveSajuType(normalizedProfile) ?? nextSajuType,
     })
-    showToast('사주 정보가 저장됐어요')
+    showToast('AI 분석용 정보가 저장됐어요')
     onBack()
   }
 
@@ -63,31 +65,32 @@ export function SajuManageScreen({ onBack }: { onBack: () => void }) {
     <div className="flex h-full flex-col">
       <div className="flex h-12 flex-shrink-0 items-center border-b border-[var(--color-border-soft)] px-5">
         <button onClick={onBack} className="mr-3 text-xl leading-none text-[var(--color-text-secondary)]">‹</button>
-        <span className="text-base font-black text-[var(--color-text-strong)]">사주정보 보강</span>
+        <span className="text-base font-black text-[var(--color-text-strong)]">AI 분석용 정보</span>
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
         <InfoBox variant="warn">
-          생시와 출생지를 입력하면 <span className="font-semibold">사주정보</span>를 더 정확하게 계산할 수 있어요.
-          원본 정보는 공개되지 않습니다.
+          생년월일, 생시, 출생지를 입력하면 <span className="font-semibold">궁합과 사주 해석</span> 정확도를 높일 수 있어요.
+          원본 정보는 공개 프로필에 노출되지 않습니다.
         </InfoBox>
 
         <div className="mt-4 rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4">
-          <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">예상 사주 타입</div>
-          <div className="mt-2 text-[20px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">{nextSajuType}</div>
+          <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">분석 준비 상태</div>
+          <div className="mt-2 text-[20px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">{analysisStatus}</div>
           <p className="mt-1 text-[12px] leading-[1.6] text-[var(--color-text-secondary)]">
-            저장하면 사주정보 계산 정확도가 높아집니다.
+            생년월일만 있으면 기본 분석이 가능하고, 생시와 출생지까지 있으면 더 정밀한 궁합 리포트를 만들 수 있어요.
           </p>
         </div>
 
         <div className="mt-5 space-y-4">
-          <div className="rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4">
-            <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">생년월일</div>
-            <div className="mt-2 text-[15px] font-semibold text-[var(--color-text-primary)]">{sajuProfile.birthDate || '기본정보에서 입력해 주세요'}</div>
-            <p className="mt-1 text-[12px] leading-[1.6] text-[var(--color-text-secondary)]">
-              생년월일은 기본정보에서 관리하고, 여기서는 사주정보 정확도를 높이는 보강 입력만 받습니다.
-            </p>
-          </div>
+          <Field label="생년월일">
+            <input
+              type="date"
+              value={sajuProfile.birthDate}
+              onChange={(event) => setSajuProfile((prev) => ({ ...prev, birthDate: event.target.value }))}
+              className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm text-[var(--color-text-primary)] outline-none"
+            />
+          </Field>
 
           <Field label="양력 / 음력">
             <div className="flex gap-2">

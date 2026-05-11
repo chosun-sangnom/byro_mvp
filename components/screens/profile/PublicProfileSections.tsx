@@ -147,6 +147,9 @@ export function ProfileHeroCard({
       mood?: string
       availability?: string
     }
+    sajuProfile?: {
+      showAge?: boolean
+    }
   }
   heroTheme: HeroTheme
   bioRef: RefObject<HTMLParagraphElement>
@@ -156,17 +159,12 @@ export function ProfileHeroCard({
   isOwnerMode?: boolean
   onEditHeaderMeta?: () => void
 }) {
-  const intro = profile.headline?.trim() || profile.bio
-  const metaChips = [
-    {
-      label: '오늘의 기분',
-      value: profile.headerMeta?.mood || (isOwnerMode ? '입력하기' : ''),
-    },
-    {
-      label: '펑',
-      value: profile.headerMeta?.availability || (isOwnerMode ? '입력하기' : ''),
-    },
-  ].filter(Boolean) as Array<{ label: string; value: string }>
+  const showAge = typeof profile.age === 'number' && profile.sajuProfile?.showAge !== false
+  const mood = profile.headerMeta?.mood
+  const pung = profile.headerMeta?.availability
+
+  const MoodPill = onEditHeaderMeta ? 'button' : 'span'
+  const PungPill = onEditHeaderMeta ? 'button' : 'span'
 
   return (
     <div className="hero-card border border-[var(--color-border-default)] bg-[rgba(23,24,28,0.92)] p-[8px] backdrop-blur-sm">
@@ -194,7 +192,8 @@ export function ProfileHeroCard({
         )}
 
         <div className="absolute inset-x-0 bottom-0 p-5">
-          <div className="mb-0.5 flex items-end gap-2">
+          {/* 이름 + 인증 뱃지 */}
+          <div className="flex items-end gap-2">
             <div
               className="text-[38px] font-black leading-[1.08] tracking-[-0.05em]"
               style={{
@@ -207,60 +206,61 @@ export function ProfileHeroCard({
             >
               {profile.name}
             </div>
-            {typeof profile.age === 'number' && (
-              <span className="mb-1.5 text-[18px] font-semibold tracking-[-0.03em] text-white/78">
-                {profile.age}
-              </span>
-            )}
             <span className="mb-1.5 inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/95 text-[var(--color-state-success-text)] shadow-[0_4px_12px_rgba(0,0,0,0.22)]">
               <BadgeCheck size={12} />
             </span>
           </div>
-          <div className="mt-2 text-[14px] font-medium text-white/78">
-            {profile.title}
-          </div>
-          <div className="mt-4 max-w-[318px] rounded-[18px] border border-white/12 bg-white/10 px-4 py-3 text-[15px] leading-[1.52] text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[8px]">
-            <p ref={bioRef} className="line-clamp-2">
-              {intro}
-            </p>
-          </div>
-          {metaChips.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {metaChips.map((item) => (
-                onEditHeaderMeta ? (
-                  <button
-                    key={item.label}
-                    type="button"
-                    onClick={onEditHeaderMeta}
-                    className="chip-metric"
-                  >
-                    <span className="text-white/60">{item.label}</span>
-                    <span className="text-white">{item.value}</span>
-                  </button>
-                ) : (
-                  <span key={item.label} className="chip-metric">
-                    <span className="text-white/60">{item.label}</span>
-                    <span className="text-white">{item.value}</span>
-                  </span>
-                )
-              ))}
+
+          {/* 나이 */}
+          {showAge && (
+            <div className="mt-0.5 text-[13px] font-semibold text-white/50">
+              {profile.age}세
             </div>
           )}
-          {onEditHeaderMeta && (
-            <button
-              type="button"
-              onClick={onEditHeaderMeta}
-              className="mt-2 text-[11px] font-medium text-white/58"
-            >
-              오늘의 기분과 펑을 바로 수정하기
-            </button>
+
+          {/* 직함 */}
+          <div className={`text-[13px] font-medium text-white/68 ${showAge ? 'mt-1' : 'mt-2'}`}>
+            {profile.title}
+          </div>
+
+          {/* 오늘의 기분 */}
+          {(mood || isOwnerMode) && (
+            <div className="mt-2.5">
+              <MoodPill
+                {...(onEditHeaderMeta ? { type: 'button' as const, onClick: onEditHeaderMeta } : {})}
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/14 bg-white/10 px-3 py-1 text-[12px] font-semibold text-white/85 backdrop-blur-sm"
+              >
+                <span className="text-white/42">✦</span>
+                <span>{mood || '기분 추가하기'}</span>
+              </MoodPill>
+            </div>
           )}
-          <div className="mt-3 text-[12px] font-semibold text-white/72">
+
+          {/* bio */}
+          <div className="mt-2.5 max-w-[318px] rounded-[18px] border border-white/12 bg-white/10 px-4 py-3 text-[15px] leading-[1.52] text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[8px]">
+            <p ref={bioRef} className="line-clamp-2">
+              {profile.bio}
+            </p>
+          </div>
+
+          {/* 펑 (한마디) */}
+          {(pung || isOwnerMode) && (
+            <div className="mt-2">
+              <PungPill
+                {...(onEditHeaderMeta ? { type: 'button' as const, onClick: onEditHeaderMeta } : {})}
+                className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(75,108,245,0.45)] bg-[rgba(75,108,245,0.18)] px-3 py-1 text-[12px] font-semibold text-white/90"
+              >
+                <span>💬</span>
+                <span>{pung || '한마디 추가하기'}</span>
+              </PungPill>
+            </div>
+          )}
+
+          <div className="mt-2.5 text-[11px] font-semibold text-white/38">
             @{profile.linkId}
           </div>
         </div>
       </div>
-
     </div>
   )
 }

@@ -235,9 +235,19 @@ export function ProfileHeroCard({
 
           {/* bio */}
           <div className="mt-2.5 max-w-[318px] rounded-[18px] border border-white/12 bg-white/10 px-4 py-3 text-[15px] leading-[1.52] text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[8px]">
-            <p ref={bioRef} className="line-clamp-2">
+            <p ref={bioRef} className={bioExpanded ? undefined : 'line-clamp-2'}>
               {profile.bio}
             </p>
+            {(bioOverflowing || bioExpanded) && onToggleBio && (
+              <button
+                type="button"
+                onClick={onToggleBio}
+                className="mt-1.5 flex items-center gap-0.5 text-[12px] font-semibold text-white/55"
+              >
+                {bioExpanded ? '접기' : '더보기'}
+                {bioExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+              </button>
+            )}
           </div>
 
           {/* 펑 (한마디) */}

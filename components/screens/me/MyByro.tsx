@@ -18,6 +18,7 @@ import {
   GuestbookManageScreen,
   LifeManageScreen,
   ManageByroScreen,
+  RememberNetworkManageScreen,
   ReputationManageScreen,
   RelationshipManageScreen,
   SNSManageScreen,
@@ -29,6 +30,7 @@ type Screen =
   | 'editBasic'
   | 'editLife'
   | 'editRelationship'
+  | 'editNetwork'
   | 'editHighlight'
   | 'editSNS'
   | 'editReputation'
@@ -95,11 +97,20 @@ export default function MyByro() {
     return (
       <RelationshipManageScreen
         onBack={() => setScreen('manage')}
-        onEditNetwork={() => router.push('/archive')}
+        onEditNetwork={() => setScreen('editNetwork')}
         onEditSNS={() => setScreen('editSNS')}
         onEditReputation={() => setScreen('editReputation')}
         onEditContact={() => setScreen('editContact')}
         onEditGuestbook={() => setScreen('editGuestbook')}
+      />
+    )
+  }
+
+  if (screen === 'editNetwork') {
+    return (
+      <RememberNetworkManageScreen
+        userLinkId={user.linkId}
+        onBack={() => setScreen('editRelationship')}
       />
     )
   }

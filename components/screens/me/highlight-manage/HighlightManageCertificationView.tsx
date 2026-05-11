@@ -1,10 +1,19 @@
 import { Button } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import type { HighlightIconId } from '@/types'
-import type { CertificationItem } from './constants'
+
+export interface CertificationLikeItem {
+  categoryId: string
+  icon: HighlightIconId | string
+  title: string
+  summary: string
+  automated: boolean
+  pickerDescription?: string
+  emailLabel?: string
+}
 
 interface HighlightManageCertificationViewProps {
-  selectedCert: CertificationItem
+  selectedCert: CertificationLikeItem
   userLinkId: string
   onBack: () => void
   onCopyEmail: () => void

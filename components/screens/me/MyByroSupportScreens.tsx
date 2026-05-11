@@ -8,3 +8,4 @@ export { GuestbookManageScreen } from '@/components/screens/me/support-screens/G
 export { SajuManageScreen } from '@/components/screens/me/support-screens/SajuManageScreen'
 export { LifeManageScreen } from '@/components/screens/me/support-screens/LifeManageScreen'
 export { RelationshipManageScreen } from '@/components/screens/me/support-screens/RelationshipManageScreen'
+export { RememberNetworkManageScreen } from '@/components/screens/me/support-screens/RememberNetworkManageScreen'

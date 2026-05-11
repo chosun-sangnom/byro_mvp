@@ -80,6 +80,8 @@ export default function MyByro() {
         onEditLife={() => setScreen('editLife')}
         onEditHighlight={() => setScreen('editHighlight')}
         onEditRelationship={() => setScreen('editRelationship')}
+        onEditContact={() => setScreen('editContact')}
+        onEditSNS={() => setScreen('editSNS')}
         user={user}
       />
     )
@@ -98,9 +100,7 @@ export default function MyByro() {
       <RelationshipManageScreen
         onBack={() => setScreen('manage')}
         onEditNetwork={() => setScreen('editNetwork')}
-        onEditSNS={() => setScreen('editSNS')}
         onEditReputation={() => setScreen('editReputation')}
-        onEditContact={() => setScreen('editContact')}
         onEditGuestbook={() => setScreen('editGuestbook')}
       />
     )

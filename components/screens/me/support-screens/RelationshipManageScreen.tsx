@@ -7,24 +7,17 @@ import { useByroStore } from '@/store/useByroStore'
 interface RelationshipManageScreenProps {
   onBack: () => void
   onEditNetwork: () => void
-  onEditSNS: () => void
   onEditReputation: () => void
-  onEditContact: () => void
   onEditGuestbook: () => void
 }
 
 export function RelationshipManageScreen({
   onBack,
   onEditNetwork,
-  onEditSNS,
   onEditReputation,
-  onEditContact,
   onEditGuestbook,
 }: RelationshipManageScreenProps) {
   const store = useByroStore()
-  const activeContactCount = store.user?.contactChannels?.filter((channel) => channel.enabled && channel.value.trim()).length ?? 0
-  const connectedSnsCount = Number(store.instagramConnected || SAMPLE_PROFILE.instagramConnected)
-    + Number(store.linkedinConnected || SAMPLE_PROFILE.linkedinConnected)
   const totalReputationCount = SAMPLE_PROFILE.reputationKeywords.reduce((sum, item) => sum + item.count, 0)
 
   const rows = [
@@ -32,11 +25,6 @@ export function RelationshipManageScreen({
       title: '네트워크',
       meta: `${SAMPLE_PROFILE.rememberHighlight.total}명 리멤버 네트워크`,
       onClick: onEditNetwork,
-    },
-    {
-      title: 'SNS 연동',
-      meta: connectedSnsCount > 0 ? `${connectedSnsCount}개 연동됨` : '유튜브, 틱톡, 인스타그램, 링크드인을 관리하세요',
-      onClick: onEditSNS,
     },
     {
       title: '평판 키워드',
@@ -47,11 +35,6 @@ export function RelationshipManageScreen({
       title: '방명록',
       meta: `${SAMPLE_PROFILE.guestbook.length}개 메시지 관리`,
       onClick: onEditGuestbook,
-    },
-    {
-      title: '연락 수단',
-      meta: activeContactCount > 0 ? `${activeContactCount}개 연결됨` : '전화, 이메일, 카카오를 연결하세요',
-      onClick: onEditContact,
     },
   ]
 

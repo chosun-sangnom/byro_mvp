@@ -12,6 +12,8 @@ interface ManageByroScreenProps {
   onEditLife: () => void
   onEditHighlight: () => void
   onEditRelationship: () => void
+  onEditContact: () => void
+  onEditSNS: () => void
   user: UserState
 }
 
@@ -34,6 +36,8 @@ export function ManageByroScreen({
   onEditLife,
   onEditHighlight,
   onEditRelationship,
+  onEditContact,
+  onEditSNS,
   user,
 }: ManageByroScreenProps) {
   const whoIAm = user.whoIAm ?? SAMPLE_PROFILE.whoIAm
@@ -64,39 +68,47 @@ export function ManageByroScreen({
   ]
   const completionPercent = Math.round((completionChecks.filter((item) => item.done).length / completionChecks.length) * 100)
   const remainingItems = completionChecks.filter((item) => !item.done).slice(0, 3)
+  const activeContactCount = user.contactChannels?.filter((ch) => ch.enabled && ch.value.trim()).length ?? 0
+  const connectedSnsCount = Number(SAMPLE_PROFILE.instagramConnected) + Number(SAMPLE_PROFILE.linkedinConnected)
+
   const manageSections: ManageSection[] = [
     {
-      title: '기본정보',
+      title: '프로필',
       rows: [
         {
           title: '기본정보',
-          meta: user.headline?.trim() ? '사진, 한줄소개, MBTI, 반려동물, 생년월일, 생시, 출생지, 자기소개 편집' : '프로필 첫인상과 기본 정보를 채워주세요',
+          meta: user.headline?.trim() ?? '한줄소개, MBTI, 반려동물, 기분',
           onClick: onEditBasic,
         },
-        {
-          title: '하이라이트',
-          meta: allHighlights.length > 0 ? `${allHighlights.length}개 항목 관리` : '프로필에 보여줄 경험을 추가하세요',
-          onClick: onEditHighlight,
-        },
-      ],
-    },
-    {
-      title: '라이프',
-      rows: [
         {
           title: '라이프',
           meta: `활동 ${activityCount}개 · 문화 ${cultureCount}개 · 장소 ${placeCount}개`,
           onClick: onEditLife,
         },
+        {
+          title: '관계',
+          meta: '네트워크, 평판, 방명록',
+          onClick: onEditRelationship,
+        },
       ],
     },
     {
-      title: '관계',
+      title: '독립 항목',
       rows: [
         {
-          title: '관계',
-          meta: '네트워크, SNS, 평판, 방명록, 연락 수단 관리',
-          onClick: onEditRelationship,
+          title: '하이라이트',
+          meta: allHighlights.length > 0 ? `${allHighlights.length}개 항목` : '경험 추가',
+          onClick: onEditHighlight,
+        },
+        {
+          title: '연락수단',
+          meta: activeContactCount > 0 ? `${activeContactCount}개 연결` : '전화, 이메일, 카카오',
+          onClick: onEditContact,
+        },
+        {
+          title: 'SNS',
+          meta: connectedSnsCount > 0 ? `${connectedSnsCount}개 연동` : '유튜브, 틱톡, 인스타, 링크드인',
+          onClick: onEditSNS,
         },
       ],
     },

@@ -14,11 +14,11 @@ interface BasicInfoEditScreenProps {
 
 const CROP_RATIO = 4 / 5
 const DEFAULT_CROP_FRAME = { width: 256, height: 320 }
-const MBTI_OPTIONS = [
-  'INTJ', 'INTP', 'ENTJ', 'ENTP',
-  'INFJ', 'INFP', 'ENFJ', 'ENFP',
-  'ISTJ', 'ISFJ', 'ESTJ', 'ESFJ',
-  'ISTP', 'ISFP', 'ESTP', 'ESFP',
+const MBTI_DIMS = [
+  { options: ['E', 'I'] as const, labels: ['외향', '내향'] },
+  { options: ['N', 'S'] as const, labels: ['직관', '감각'] },
+  { options: ['T', 'F'] as const, labels: ['사고', '감정'] },
+  { options: ['J', 'P'] as const, labels: ['판단', '인식'] },
 ]
 const PET_OPTIONS = ['없음', '강아지', '고양이', '기타']
 
@@ -27,7 +27,6 @@ export function BasicInfoEditScreen({
   onBack,
 }: BasicInfoEditScreenProps) {
   const store = useByroStore()
-  const [headline, setHeadline] = useState(user.headline ?? '')
   const [bio, setBio] = useState(user.bio)
   const initialWhoIAm: PublicProfileWhoIAm = user.whoIAm ?? SAMPLE_PROFILE.whoIAm
   const initialLife: PublicProfileLife = user.life ?? SAMPLE_PROFILE.life
@@ -61,7 +60,7 @@ export function BasicInfoEditScreen({
 
   const handleSave = () => {
     store.updateUserInfo({
-      headline,
+      headline: user.headline,
       bio,
       avatarImage,
       headerMeta: {
@@ -222,34 +221,38 @@ export function BasicInfoEditScreen({
             </div>
 
             <div>
-              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">한줄소개</label>
-              <input
-                value={headline}
-                onChange={(event) => setHeadline(event.target.value)}
-                placeholder="예: 브랜드와 사람을 연결하는 스타트업 마케터"
-                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="text-xs text-[var(--color-text-tertiary)] mb-2 block">MBTI</label>
-              <div className="flex flex-wrap gap-2">
-                {MBTI_OPTIONS.map((option) => {
-                  const selected = option === mbti
+              <div className="flex items-center justify-between mb-3">
+                <label className="text-xs text-[var(--color-text-tertiary)]">MBTI</label>
+                <span className="text-sm font-bold text-[var(--color-text-primary)]">{mbti || '—'}</span>
+              </div>
+              <div className="space-y-2">
+                {MBTI_DIMS.map((dim, dimIndex) => {
+                  const selectedLetter = mbti?.[dimIndex] ?? ''
                   return (
-                    <button
-                      key={option}
-                      type="button"
-                      onClick={() => setMbti(option)}
-                      className="rounded-full border px-3 py-1.5 text-xs font-semibold"
-                      style={{
-                        borderColor: selected ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
-                        background: selected ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
-                        color: selected ? '#ffffff' : 'var(--color-text-secondary)',
-                      }}
-                    >
-                      {option}
-                    </button>
+                    <div key={dimIndex} className="flex rounded-xl overflow-hidden border border-[var(--color-border-default)]">
+                      {dim.options.map((letter, optIndex) => {
+                        const isSelected = selectedLetter === letter
+                        return (
+                          <button
+                            key={letter}
+                            type="button"
+                            onClick={() => {
+                              const parts = (mbti || '????').split('')
+                              parts[dimIndex] = letter
+                              setMbti(parts.join(''))
+                            }}
+                            className="flex-1 py-2.5 text-left px-4 transition-colors"
+                            style={{
+                              background: isSelected ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
+                              borderRight: optIndex === 0 ? '1px solid var(--color-border-default)' : undefined,
+                            }}
+                          >
+                            <span className={`text-[13px] font-black ${isSelected ? 'text-white' : 'text-[var(--color-text-secondary)]'}`}>{letter}</span>
+                            <span className={`ml-1.5 text-[11px] ${isSelected ? 'text-white/80' : 'text-[var(--color-text-tertiary)]'}`}>{dim.labels[optIndex]}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
                   )
                 })}
               </div>

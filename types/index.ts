@@ -173,6 +173,7 @@ export interface PublicProfileLife {
     exercise: string[]
     pet: string
     petName?: string
+    petImage?: string
   }
   tastes: {
     movies: LifeMediaItem[]

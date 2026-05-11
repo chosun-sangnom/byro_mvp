@@ -6,18 +6,12 @@ import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
 interface ManageByroScreenProps {
   allHighlights: Highlight[]
-  connectedSnsCount: number
-  totalReputationCount: number
   onLogout: () => void
   onBack: () => void
   onEditBasic: () => void
   onEditLife: () => void
   onEditHighlight: () => void
-  onEditSNS: () => void
-  onEditNetwork: () => void
-  onEditReputation: () => void
-  onEditContact: () => void
-  onEditGuestbook: () => void
+  onEditRelationship: () => void
   user: UserState
 }
 
@@ -34,21 +28,14 @@ type ManageSection = {
 
 export function ManageByroScreen({
   allHighlights,
-  connectedSnsCount,
-  totalReputationCount,
   onLogout,
   onBack,
   onEditBasic,
   onEditLife,
   onEditHighlight,
-  onEditSNS,
-  onEditNetwork,
-  onEditReputation,
-  onEditContact,
-  onEditGuestbook,
+  onEditRelationship,
   user,
 }: ManageByroScreenProps) {
-  const activeContactCount = user.contactChannels?.filter((channel) => channel.enabled && channel.value.trim()).length ?? 0
   const whoIAm = user.whoIAm ?? SAMPLE_PROFILE.whoIAm
   const life: PublicProfileLife = user.life ?? SAMPLE_PROFILE.life
   const sajuProfile = user.sajuProfile ?? SAMPLE_PROFILE.sajuProfile
@@ -56,11 +43,10 @@ export function ManageByroScreen({
   const activityCount = life.daily.exercise.length + (life.tastes.teams?.length ?? 0)
   const cultureCount = life.tastes.movies.length + life.tastes.music.length + life.tastes.books.length + (life.tastes.plays?.length ?? 0)
   const placeCount = life.tastes.restaurants.length + life.tastes.cafes.length + life.places.travelDestinations.length
-  const trustSignalCount = [
-    activeContactCount > 0,
-    connectedSnsCount > 0,
+  const relationCount = [
+    user.contactChannels?.some((channel) => channel.enabled && channel.value.trim()),
+    user.selectedKeywords.length > 0,
     allHighlights.length > 0,
-    totalReputationCount > 0,
   ].filter(Boolean).length
   const completionChecks = [
     {
@@ -73,7 +59,7 @@ export function ManageByroScreen({
     },
     {
       label: '관계',
-      done: trustSignalCount >= 2,
+      done: relationCount >= 2,
     },
   ]
   const completionPercent = Math.round((completionChecks.filter((item) => item.done).length / completionChecks.length) * 100)
@@ -86,6 +72,11 @@ export function ManageByroScreen({
           title: '기본정보',
           meta: user.headline?.trim() ? '사진, 한줄소개, MBTI, 반려동물, 생년월일, 생시, 출생지, 자기소개 편집' : '프로필 첫인상과 기본 정보를 채워주세요',
           onClick: onEditBasic,
+        },
+        {
+          title: '하이라이트',
+          meta: allHighlights.length > 0 ? `${allHighlights.length}개 항목 관리` : '프로필에 보여줄 경험을 추가하세요',
+          onClick: onEditHighlight,
         },
       ],
     },
@@ -102,12 +93,11 @@ export function ManageByroScreen({
     {
       title: '관계',
       rows: [
-        { title: '하이라이트', meta: allHighlights.length > 0 ? `${allHighlights.length}개 항목 관리` : '프로필에 보여줄 경험을 추가하세요', onClick: onEditHighlight },
-        { title: '네트워크', meta: `${SAMPLE_PROFILE.rememberHighlight.total}명 리멤버 네트워크`, onClick: onEditNetwork },
-        { title: 'SNS 연동', meta: connectedSnsCount > 0 ? `${connectedSnsCount}개 연동됨` : '유튜브, 틱톡, 인스타그램, 링크드인을 관리하세요', onClick: onEditSNS },
-        { title: '평판 키워드', meta: `선택 ${user.selectedKeywords.length}개 · 누적 ${totalReputationCount}회`, onClick: onEditReputation },
-        { title: '방명록', meta: `${SAMPLE_PROFILE.guestbook.length}개 메시지 관리`, onClick: onEditGuestbook },
-        { title: '연락 수단', meta: activeContactCount > 0 ? `${activeContactCount}개 연결됨` : '전화, 이메일, 카카오를 연결하세요', onClick: onEditContact },
+        {
+          title: '관계',
+          meta: '네트워크, SNS, 평판, 방명록, 연락 수단 관리',
+          onClick: onEditRelationship,
+        },
       ],
     },
   ]

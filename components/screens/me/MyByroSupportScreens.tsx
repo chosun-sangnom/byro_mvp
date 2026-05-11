@@ -5,6 +5,6 @@ export { SNSManageScreen } from '@/components/screens/me/support-screens/SNSMana
 export { ContactManageScreen } from '@/components/screens/me/support-screens/ContactManageScreen'
 export { ReputationManageScreen } from '@/components/screens/me/support-screens/ReputationManageScreen'
 export { GuestbookManageScreen } from '@/components/screens/me/support-screens/GuestbookManageScreen'
-export { WhoIAmManageScreen } from '@/components/screens/me/support-screens/WhoIAmManageScreen'
 export { SajuManageScreen } from '@/components/screens/me/support-screens/SajuManageScreen'
 export { LifeManageScreen } from '@/components/screens/me/support-screens/LifeManageScreen'
+export { RelationshipManageScreen } from '@/components/screens/me/support-screens/RelationshipManageScreen'

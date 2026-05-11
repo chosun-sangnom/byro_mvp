@@ -291,14 +291,26 @@ export function BasicInfoEditScreen({
               </div>
             )}
 
-            <div>
-              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">생년월일</label>
-              <input
-                type="date"
-                value={birthDate}
-                onChange={(event) => setBirthDate(event.target.value)}
-                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
-              />
+            <div className="grid grid-cols-[1.2fr_0.8fr] gap-3">
+              <div>
+                <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">생년월일</label>
+                <input
+                  type="date"
+                  value={birthDate}
+                  onChange={(event) => setBirthDate(event.target.value)}
+                  className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">생시</label>
+                <input
+                  type="time"
+                  value={birthTime}
+                  onChange={(event) => setBirthTime(event.target.value)}
+                  className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
+                />
+              </div>
             </div>
 
             <div>
@@ -326,16 +338,6 @@ export function BasicInfoEditScreen({
                   )
                 })}
               </div>
-            </div>
-
-            <div>
-              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">생시</label>
-              <input
-                type="time"
-                value={birthTime}
-                onChange={(event) => setBirthTime(event.target.value)}
-                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
-              />
             </div>
 
             <div>

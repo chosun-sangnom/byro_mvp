@@ -19,6 +19,7 @@ import {
   LifeManageScreen,
   ManageByroScreen,
   ReputationManageScreen,
+  RelationshipManageScreen,
   SNSManageScreen,
 } from '@/components/screens/me/MyByroSupportScreens'
 
@@ -27,6 +28,7 @@ type Screen =
   | 'manage'
   | 'editBasic'
   | 'editLife'
+  | 'editRelationship'
   | 'editHighlight'
   | 'editSNS'
   | 'editReputation'
@@ -48,11 +50,7 @@ export default function MyByro() {
   if (!store.isLoggedIn) return null
   const user = store.user!
 
-  const instagramConnected = store.instagramConnected || SAMPLE_PROFILE.instagramConnected
-  const linkedinConnected = store.linkedinConnected || SAMPLE_PROFILE.linkedinConnected
   const allHighlights = [...SAMPLE_PROFILE.manualHighlights, ...store.highlights]
-  const connectedSnsCount = Number(instagramConnected) + Number(linkedinConnected)
-  const totalReputationCount = SAMPLE_PROFILE.reputationKeywords.reduce((sum, item) => sum + item.count, 0)
   // ── 화면 분기 ──────────────────────────────────────────────
   if (screen === 'preview') {
     return (
@@ -74,18 +72,12 @@ export default function MyByro() {
     return (
       <ManageByroScreen
         allHighlights={allHighlights}
-        connectedSnsCount={connectedSnsCount}
-        totalReputationCount={totalReputationCount}
         onLogout={() => store.logout()}
         onBack={() => setScreen('preview')}
         onEditBasic={() => setScreen('editBasic')}
         onEditLife={() => setScreen('editLife')}
         onEditHighlight={() => setScreen('editHighlight')}
-        onEditSNS={() => setScreen('editSNS')}
-        onEditNetwork={() => router.push('/archive')}
-        onEditReputation={() => setScreen('editReputation')}
-        onEditContact={() => setScreen('editContact')}
-        onEditGuestbook={() => setScreen('editGuestbook')}
+        onEditRelationship={() => setScreen('editRelationship')}
         user={user}
       />
     )
@@ -97,6 +89,19 @@ export default function MyByro() {
 
   if (screen === 'editLife') {
     return <LifeManageScreen onBack={() => setScreen('manage')} />
+  }
+
+  if (screen === 'editRelationship') {
+    return (
+      <RelationshipManageScreen
+        onBack={() => setScreen('manage')}
+        onEditNetwork={() => router.push('/archive')}
+        onEditSNS={() => setScreen('editSNS')}
+        onEditReputation={() => setScreen('editReputation')}
+        onEditContact={() => setScreen('editContact')}
+        onEditGuestbook={() => setScreen('editGuestbook')}
+      />
+    )
   }
 
   if (screen === 'editHighlight') {

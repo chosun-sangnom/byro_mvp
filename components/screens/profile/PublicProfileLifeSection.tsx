@@ -2,16 +2,11 @@
 
 import type { LifeMediaItem, PublicProfileLife } from '@/types'
 
-// ─── Block title ──────────────────────────────────────────────
-
-function BlockTitle({ label }: { label: string }) {
+function MicroLabel({ label }: { label: string }) {
   return (
-    <p className="px-5 text-[16px] font-bold text-[var(--color-text-primary)]">{label}</p>
+    <p className="px-5 text-[10px] text-[var(--color-text-tertiary)]">{label}</p>
   )
 }
-
-// ─── Media card horizontal scroll ────────────────────────────
-// portrait (80×112): 영화, 책, 연극 / square (80×80): 음악
 
 function MediaScroll({
   items,
@@ -53,9 +48,6 @@ function MediaScroll({
   )
 }
 
-// ─── Place card horizontal scroll ────────────────────────────
-// landscape (148×96): 맛집, 카페
-
 function PlaceScroll({ items }: { items: LifeMediaItem[] }) {
   if (!items.length) return null
 
@@ -95,57 +87,65 @@ function ChipGroup({ chips }: { chips: string[] }) {
   )
 }
 
-// ─── Main ─────────────────────────────────────────────────────
+function LabeledItem({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-1.5">
+      <MicroLabel label={label} />
+      {children}
+    </div>
+  )
+}
 
 export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife }) {
   if (!life) return null
 
-  const hasActivity =
-    (life.daily.exercise?.length ?? 0) > 0 || (life.tastes.teams?.length ?? 0) > 0
-  const hasCulture =
-    life.tastes.movies.length > 0 ||
-    life.tastes.music.length > 0 ||
-    life.tastes.books.length > 0 ||
-    (life.tastes.plays?.length ?? 0) > 0
-  const hasPlace =
-    life.tastes.restaurants.length > 0 ||
-    life.tastes.cafes.length > 0 ||
-    life.places.travelDestinations.length > 0
-
-  if (!hasActivity && !hasCulture && !hasPlace) return null
-
   return (
-    <div className="space-y-8 pb-8 pt-6">
-
-      {/* 활동 */}
-      {hasActivity && (
-        <div className="space-y-3">
-          <BlockTitle label="활동" />
-          <ChipGroup chips={[...(life.daily.exercise ?? []), ...(life.tastes.teams ?? [])]} />
-        </div>
+    <div className="space-y-6 pb-8 pt-6">
+      {life.daily.exercise.length > 0 && (
+        <LabeledItem label="운동">
+          <ChipGroup chips={life.daily.exercise} />
+        </LabeledItem>
       )}
-
-      {/* 문화 */}
-      {hasCulture && (
-        <div className="space-y-4">
-          <BlockTitle label="문화" />
-          {life.tastes.movies.length > 0 && <MediaScroll items={life.tastes.movies} aspect="portrait" />}
-          {life.tastes.music.length > 0 && <MediaScroll items={life.tastes.music} aspect="square" />}
-          {life.tastes.books.length > 0 && <MediaScroll items={life.tastes.books} aspect="portrait" />}
-          {(life.tastes.plays?.length ?? 0) > 0 && <MediaScroll items={life.tastes.plays!} aspect="portrait" />}
-        </div>
+      {(life.tastes.teams?.length ?? 0) > 0 && (
+        <LabeledItem label="응원하는 팀">
+          <ChipGroup chips={life.tastes.teams!} />
+        </LabeledItem>
       )}
-
-      {/* 장소 */}
-      {hasPlace && (
-        <div className="space-y-4">
-          <BlockTitle label="장소" />
-          {life.tastes.restaurants.length > 0 && <PlaceScroll items={life.tastes.restaurants} />}
-          {life.tastes.cafes.length > 0 && <PlaceScroll items={life.tastes.cafes} />}
-          {life.places.travelDestinations.length > 0 && <ChipGroup chips={life.places.travelDestinations} />}
-        </div>
+      {life.tastes.movies.length > 0 && (
+        <LabeledItem label="영화">
+          <MediaScroll items={life.tastes.movies} aspect="portrait" />
+        </LabeledItem>
       )}
-
+      {life.tastes.music.length > 0 && (
+        <LabeledItem label="음악">
+          <MediaScroll items={life.tastes.music} aspect="square" />
+        </LabeledItem>
+      )}
+      {life.tastes.books.length > 0 && (
+        <LabeledItem label="책">
+          <MediaScroll items={life.tastes.books} aspect="portrait" />
+        </LabeledItem>
+      )}
+      {(life.tastes.plays?.length ?? 0) > 0 && (
+        <LabeledItem label="연극">
+          <MediaScroll items={life.tastes.plays!} aspect="portrait" />
+        </LabeledItem>
+      )}
+      {life.tastes.restaurants.length > 0 && (
+        <LabeledItem label="맛집">
+          <PlaceScroll items={life.tastes.restaurants} />
+        </LabeledItem>
+      )}
+      {life.tastes.cafes.length > 0 && (
+        <LabeledItem label="카페">
+          <PlaceScroll items={life.tastes.cafes} />
+        </LabeledItem>
+      )}
+      {life.places.travelDestinations.length > 0 && (
+        <LabeledItem label="여행지">
+          <ChipGroup chips={life.places.travelDestinations} />
+        </LabeledItem>
+      )}
     </div>
   )
 }

@@ -21,7 +21,6 @@ export const HIGHLIGHT_CATEGORIES: Array<{
   { id: 'education-history', icon: 'book-open', label: '학력', group: 'career' },
   { id: 'career-continuity', icon: 'briefcase', label: '커리어 지속성', group: 'career', certificationOnly: true },
   { id: 'corporate-longevity', icon: 'building2', label: '법인 영속성', group: 'career', certificationOnly: true },
-  { id: 'remember-network', icon: 'users', label: '리멤버 네트워크', group: 'career', certificationOnly: true },
   { id: 'talk', icon: 'mic', label: '강연 / 연설', group: 'career' },
   { id: 'collab', icon: 'handshake', label: '협업 프로젝트', group: 'career' },
   { id: 'education', icon: 'book-open', label: '강의 / 교육', group: 'career' },

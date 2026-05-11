@@ -18,6 +18,10 @@ export function HighlightManageCertificationView({
   onCopyEmail,
   onConfirm,
 }: HighlightManageCertificationViewProps) {
+  const emailLabel = 'emailLabel' in selectedCert && typeof selectedCert.emailLabel === 'string'
+    ? selectedCert.emailLabel
+    : null
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] flex-shrink-0">
@@ -67,7 +71,9 @@ export function HighlightManageCertificationView({
                     복사
                   </button>
                 </div>
-                <div className="micro-text mt-3">{selectedCert.emailLabel}</div>
+                {emailLabel && (
+                  <div className="micro-text mt-3">{emailLabel}</div>
+                )}
               </div>
             </>
           )}

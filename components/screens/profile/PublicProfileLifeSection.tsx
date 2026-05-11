@@ -72,6 +72,31 @@ function PlaceScroll({ items }: { items: LifeMediaItem[] }) {
   )
 }
 
+function SubHeader({ label }: { label: string }) {
+  return (
+    <p className="mb-2 px-5 text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)]">
+      {label}
+    </p>
+  )
+}
+
+function ActivityRow({ items }: { items: string[] }) {
+  if (!items.length) return null
+  return (
+    <div className="px-5">
+      {items.map((item, i) => (
+        <div
+          key={item}
+          className={`flex items-center gap-3 py-2.5 ${i < items.length - 1 ? 'border-b border-[var(--color-border-soft)]' : ''}`}
+        >
+          <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[var(--color-text-tertiary)] opacity-40" />
+          <span className="text-[13px] font-semibold text-[var(--color-text-primary)]">{item}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function ChipRow({ chips }: { chips: string[] }) {
   if (!chips.length) return null
   return (
@@ -86,8 +111,9 @@ function ChipRow({ chips }: { chips: string[] }) {
 export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife }) {
   if (!life) return null
 
-  const activityChips = [...(life.daily.exercise ?? []), ...(life.tastes.teams ?? [])]
-  const hasActivity = activityChips.length > 0
+  const exercise = life.daily.exercise ?? []
+  const teams = life.tastes.teams ?? []
+  const hasActivity = exercise.length > 0 || teams.length > 0
 
   const hasCulture =
     life.tastes.movies.length > 0 ||
@@ -110,7 +136,18 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
       {hasActivity && (
         <>
           <BlockHeader label="활동" />
-          <ChipRow chips={activityChips} />
+          {exercise.length > 0 && (
+            <div className="mb-3">
+              <SubHeader label="운동" />
+              <ActivityRow items={exercise} />
+            </div>
+          )}
+          {teams.length > 0 && (
+            <div>
+              <SubHeader label="스포츠팀" />
+              <ActivityRow items={teams} />
+            </div>
+          )}
         </>
       )}
 

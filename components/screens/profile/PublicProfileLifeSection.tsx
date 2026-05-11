@@ -2,15 +2,26 @@
 
 import type { LifeMediaItem, PublicProfileLife } from '@/types'
 
-function SectionHeader({ label, count }: { label: string; count?: number }) {
+function BlockHeader({ label }: { label: string }) {
   return (
-    <div className="flex items-center gap-3 px-5 pb-1 pt-5">
+    <div className="flex items-center gap-3 px-5 pb-1 pt-6">
+      <span className="text-[12px] font-black uppercase tracking-[0.12em] text-[var(--color-text-primary)]">
+        {label}
+      </span>
+      <div className="h-px flex-1 bg-[var(--color-border-default)]" />
+    </div>
+  )
+}
+
+function SubHeader({ label, count }: { label: string; count?: number }) {
+  return (
+    <div className="flex items-center gap-2 px-5 pb-0.5 pt-4">
       <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-text-tertiary)]">
         {label}
       </span>
       <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
       {count != null && count > 0 && (
-        <span className="text-[10px] text-[var(--color-text-tertiary)] opacity-60">{count}</span>
+        <span className="text-[10px] text-[var(--color-text-tertiary)] opacity-50">{count}</span>
       )}
     </div>
   )
@@ -87,63 +98,83 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
   if (!life) return null
 
   const activityChips = [...(life.daily.exercise ?? []), ...(life.tastes.teams ?? [])]
+  const hasActivity = activityChips.length > 0
+
+  const hasCulture =
+    life.tastes.movies.length > 0 ||
+    life.tastes.music.length > 0 ||
+    life.tastes.books.length > 0 ||
+    (life.tastes.plays?.length ?? 0) > 0
+
+  const hasPlace =
+    life.tastes.restaurants.length > 0 ||
+    life.tastes.cafes.length > 0 ||
+    life.places.travelDestinations.length > 0
 
   return (
     <div className="pb-10 pt-2">
 
-      {activityChips.length > 0 && (
+      {/* 활동 */}
+      {hasActivity && (
         <>
-          <SectionHeader label="활동" count={activityChips.length} />
+          <BlockHeader label="활동" />
           <ChipRow chips={activityChips} />
         </>
       )}
 
-      {life.tastes.movies.length > 0 && (
+      {/* 문화 */}
+      {hasCulture && (
         <>
-          <SectionHeader label="영화" count={life.tastes.movies.length} />
-          <ArchiveBlock items={life.tastes.movies} shape="portrait" />
+          <BlockHeader label="문화" />
+          {life.tastes.movies.length > 0 && (
+            <>
+              <SubHeader label="영화" count={life.tastes.movies.length} />
+              <ArchiveBlock items={life.tastes.movies} shape="portrait" />
+            </>
+          )}
+          {life.tastes.music.length > 0 && (
+            <>
+              <SubHeader label="음악" count={life.tastes.music.length} />
+              <ArchiveBlock items={life.tastes.music} shape="square" />
+            </>
+          )}
+          {life.tastes.books.length > 0 && (
+            <>
+              <SubHeader label="책" count={life.tastes.books.length} />
+              <ArchiveBlock items={life.tastes.books} shape="portrait" />
+            </>
+          )}
+          {(life.tastes.plays?.length ?? 0) > 0 && (
+            <>
+              <SubHeader label="공연" count={life.tastes.plays!.length} />
+              <ArchiveBlock items={life.tastes.plays!} shape="portrait" />
+            </>
+          )}
         </>
       )}
 
-      {life.tastes.music.length > 0 && (
+      {/* 장소 */}
+      {hasPlace && (
         <>
-          <SectionHeader label="음악" count={life.tastes.music.length} />
-          <ArchiveBlock items={life.tastes.music} shape="square" />
-        </>
-      )}
-
-      {life.tastes.books.length > 0 && (
-        <>
-          <SectionHeader label="책" count={life.tastes.books.length} />
-          <ArchiveBlock items={life.tastes.books} shape="portrait" />
-        </>
-      )}
-
-      {(life.tastes.plays?.length ?? 0) > 0 && (
-        <>
-          <SectionHeader label="공연" count={life.tastes.plays!.length} />
-          <ArchiveBlock items={life.tastes.plays!} shape="portrait" />
-        </>
-      )}
-
-      {life.tastes.restaurants.length > 0 && (
-        <>
-          <SectionHeader label="맛집" count={life.tastes.restaurants.length} />
-          <ArchiveBlock items={life.tastes.restaurants} shape="landscape" />
-        </>
-      )}
-
-      {life.tastes.cafes.length > 0 && (
-        <>
-          <SectionHeader label="카페" count={life.tastes.cafes.length} />
-          <ArchiveBlock items={life.tastes.cafes} shape="landscape" />
-        </>
-      )}
-
-      {life.places.travelDestinations.length > 0 && (
-        <>
-          <SectionHeader label="여행" count={life.places.travelDestinations.length} />
-          <ChipRow chips={life.places.travelDestinations} />
+          <BlockHeader label="장소" />
+          {life.tastes.restaurants.length > 0 && (
+            <>
+              <SubHeader label="맛집" count={life.tastes.restaurants.length} />
+              <ArchiveBlock items={life.tastes.restaurants} shape="landscape" />
+            </>
+          )}
+          {life.tastes.cafes.length > 0 && (
+            <>
+              <SubHeader label="카페" count={life.tastes.cafes.length} />
+              <ArchiveBlock items={life.tastes.cafes} shape="landscape" />
+            </>
+          )}
+          {life.places.travelDestinations.length > 0 && (
+            <>
+              <SubHeader label="여행" count={life.places.travelDestinations.length} />
+              <ChipRow chips={life.places.travelDestinations} />
+            </>
+          )}
         </>
       )}
 

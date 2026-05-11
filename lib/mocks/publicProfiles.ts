@@ -44,9 +44,9 @@ export const SAMPLE_PROFILE = {
     tastes: {
       // TODO(real API): posterUrl from TMDB API — image.tmdb.org/t/p/w185/{poster_path}
       movies: [
-        { label: '머니볼', posterUrl: 'https://picsum.photos/seed/moneyball/80/112' },
-        { label: '소셜 네트워크', posterUrl: 'https://picsum.photos/seed/socialnetwork/80/112' },
-        { label: '나 홀로 집에 2', posterUrl: 'https://picsum.photos/seed/homealone2/80/112' },
+        { label: '머니볼', sublabel: '2011', posterUrl: 'https://picsum.photos/seed/moneyball/80/112' },
+        { label: '소셜 네트워크', sublabel: '2010', posterUrl: 'https://picsum.photos/seed/socialnetwork/80/112' },
+        { label: '나 홀로 집에 2', sublabel: '1992', posterUrl: 'https://picsum.photos/seed/homealone2/80/112' },
       ],
       // TODO(real API): posterUrl from Spotify API — i.scdn.co album art URL
       music: [
@@ -56,12 +56,12 @@ export const SAMPLE_PROFILE = {
       ],
       // TODO(real API): posterUrl from 알라딘 API — cover image URL
       books: [
-        { label: '린 스타트업', posterUrl: 'https://picsum.photos/seed/leanstartup/80/112' },
-        { label: '제로 투 원', posterUrl: 'https://picsum.photos/seed/zerotone/80/112' },
-        { label: '좋은 전략 나쁜 전략', posterUrl: 'https://picsum.photos/seed/goodstrategy/80/112' },
+        { label: '린 스타트업', sublabel: '에릭 리스', posterUrl: 'https://picsum.photos/seed/leanstartup/80/112' },
+        { label: '제로 투 원', sublabel: '피터 틸', posterUrl: 'https://picsum.photos/seed/zerotone/80/112' },
+        { label: '좋은 전략 나쁜 전략', sublabel: '리처드 루멜트', posterUrl: 'https://picsum.photos/seed/goodstrategy/80/112' },
       ],
       plays: [
-        { label: '렛미플라이', posterUrl: 'https://picsum.photos/seed/letmefly_gmj/80/112' },
+        { label: '렛미플라이', sublabel: '뮤지컬', posterUrl: 'https://picsum.photos/seed/letmefly_gmj/80/112' },
       ],
       teams: ['LG 트윈스'],
       games: ['EA SPORTS FC'],
@@ -259,9 +259,9 @@ export const MK_PROFILE = {
     },
     tastes: {
       movies: [
-        { label: '인턴', posterUrl: 'https://picsum.photos/seed/intern_mk/80/112' },
-        { label: '월터의 상상은 현실이 된다', posterUrl: 'https://picsum.photos/seed/walter_mk/80/112' },
-        { label: '헤어질 결심', posterUrl: 'https://picsum.photos/seed/decision_mk/80/112' },
+        { label: '인턴', sublabel: '2015', posterUrl: 'https://picsum.photos/seed/intern_mk/80/112' },
+        { label: '월터의 상상은 현실이 된다', sublabel: '2013', posterUrl: 'https://picsum.photos/seed/walter_mk/80/112' },
+        { label: '헤어질 결심', sublabel: '2022', posterUrl: 'https://picsum.photos/seed/decision_mk/80/112' },
       ],
       music: [
         { label: '주저하는 연인들을 위해', sublabel: '잔나비', posterUrl: 'https://picsum.photos/seed/jannabi_mk/80/80' },
@@ -269,12 +269,12 @@ export const MK_PROFILE = {
         { label: 'Yellow', sublabel: 'Coldplay', posterUrl: 'https://picsum.photos/seed/coldplay_mk/80/80' },
       ],
       books: [
-        { label: '당신의 엔진을 뜨겁게 달궈라', posterUrl: 'https://picsum.photos/seed/engine_mk/80/112' },
-        { label: '원씽', posterUrl: 'https://picsum.photos/seed/onething_mk/80/112' },
-        { label: '사피엔스', posterUrl: 'https://picsum.photos/seed/sapiens_mk/80/112' },
+        { label: '당신의 엔진을 뜨겁게 달궈라', sublabel: '권도균', posterUrl: 'https://picsum.photos/seed/engine_mk/80/112' },
+        { label: '원씽', sublabel: '게리 켈러', posterUrl: 'https://picsum.photos/seed/onething_mk/80/112' },
+        { label: '사피엔스', sublabel: '유발 하라리', posterUrl: 'https://picsum.photos/seed/sapiens_mk/80/112' },
       ],
       plays: [
-        { label: '웃는 남자', posterUrl: 'https://picsum.photos/seed/laughingman_mk/80/112' },
+        { label: '웃는 남자', sublabel: '뮤지컬', posterUrl: 'https://picsum.photos/seed/laughingman_mk/80/112' },
       ],
       teams: ['토트넘 홋스퍼'],
       games: ['문명', 'FC'],
@@ -448,9 +448,9 @@ export const JIMIN_PROFILE = {
     },
     tastes: {
       movies: [
-        { label: '이터널 선샤인', posterUrl: 'https://picsum.photos/seed/eternalsunshine_jm/80/112' },
-        { label: '작은 아씨들', posterUrl: 'https://picsum.photos/seed/littlewomen_jm/80/112' },
-        { label: '비포 선셋', posterUrl: 'https://picsum.photos/seed/beforesunset_jm/80/112' },
+        { label: '이터널 선샤인', sublabel: '2004', posterUrl: 'https://picsum.photos/seed/eternalsunshine_jm/80/112' },
+        { label: '작은 아씨들', sublabel: '2019', posterUrl: 'https://picsum.photos/seed/littlewomen_jm/80/112' },
+        { label: '비포 선셋', sublabel: '2004', posterUrl: 'https://picsum.photos/seed/beforesunset_jm/80/112' },
       ],
       music: [
         { label: 'Square', sublabel: '백예린', posterUrl: 'https://picsum.photos/seed/square_jm/80/80' },
@@ -458,12 +458,12 @@ export const JIMIN_PROFILE = {
         { label: 'Beautiful', sublabel: 'Crush', posterUrl: 'https://picsum.photos/seed/beautiful_jm/80/80' },
       ],
       books: [
-        { label: '아무튼, 여름', posterUrl: 'https://picsum.photos/seed/anyhow_jm/80/112' },
-        { label: '보통의 언어들', posterUrl: 'https://picsum.photos/seed/ordinary_jm/80/112' },
-        { label: '불편한 편의점', posterUrl: 'https://picsum.photos/seed/inconvenient_jm/80/112' },
+        { label: '아무튼, 여름', sublabel: '위고', posterUrl: 'https://picsum.photos/seed/anyhow_jm/80/112' },
+        { label: '보통의 언어들', sublabel: '김이나', posterUrl: 'https://picsum.photos/seed/ordinary_jm/80/112' },
+        { label: '불편한 편의점', sublabel: '김호연', posterUrl: 'https://picsum.photos/seed/inconvenient_jm/80/112' },
       ],
       plays: [
-        { label: '레드북', posterUrl: 'https://picsum.photos/seed/redbook_jm/80/112' },
+        { label: '레드북', sublabel: '연극', posterUrl: 'https://picsum.photos/seed/redbook_jm/80/112' },
       ],
       teams: ['두산 베어스'],
       games: ['심즈'],

@@ -9,23 +9,19 @@ interface ManageByroScreenProps {
   onLogout: () => void
   onBack: () => void
   onEditBasic: () => void
-  onEditLife: () => void
   onEditHighlight: () => void
-  onEditRelationship: () => void
-  onEditContact: () => void
+  onEditLife: () => void
+  onEditNetwork: () => void
+  onEditReputation: () => void
   onEditSNS: () => void
+  onEditContact: () => void
   user: UserState
 }
 
-type ManageRow = {
+interface EditRow {
   title: string
   meta: string
   onClick: () => void
-}
-
-type ManageSection = {
-  title: string
-  rows: ManageRow[]
 }
 
 export function ManageByroScreen({
@@ -33,148 +29,102 @@ export function ManageByroScreen({
   onLogout,
   onBack,
   onEditBasic,
-  onEditLife,
   onEditHighlight,
-  onEditRelationship,
-  onEditContact,
+  onEditLife,
+  onEditNetwork,
+  onEditReputation,
   onEditSNS,
+  onEditContact,
   user,
 }: ManageByroScreenProps) {
   const whoIAm = user.whoIAm ?? SAMPLE_PROFILE.whoIAm
   const life: PublicProfileLife = user.life ?? SAMPLE_PROFILE.life
-  const sajuProfile = user.sajuProfile ?? SAMPLE_PROFILE.sajuProfile
-  const petLabel = life.daily.petName ? `${life.daily.pet} · ${life.daily.petName}` : life.daily.pet
+  const petLabel = life.daily.petName
+    ? `${life.daily.pet} · ${life.daily.petName}`
+    : life.daily.pet
   const activityCount = life.daily.exercise.length + (life.tastes.teams?.length ?? 0)
-  const cultureCount = life.tastes.movies.length + life.tastes.music.length + life.tastes.books.length + (life.tastes.plays?.length ?? 0)
-  const placeCount = life.tastes.restaurants.length + life.tastes.cafes.length + life.places.travelDestinations.length
-  const relationCount = [
-    user.contactChannels?.some((channel) => channel.enabled && channel.value.trim()),
-    user.selectedKeywords.length > 0,
-    allHighlights.length > 0,
-  ].filter(Boolean).length
-  const completionChecks = [
-    {
-      label: '기본정보',
-      done: Boolean(user.avatarImage && user.headline?.trim() && sajuProfile?.birthDate && whoIAm.mbti && petLabel),
-    },
-    {
-      label: '라이프',
-      done: activityCount + cultureCount + placeCount > 0,
-    },
-    {
-      label: '관계',
-      done: relationCount >= 2,
-    },
-  ]
-  const completionPercent = Math.round((completionChecks.filter((item) => item.done).length / completionChecks.length) * 100)
-  const remainingItems = completionChecks.filter((item) => !item.done).slice(0, 3)
-  const activeContactCount = user.contactChannels?.filter((ch) => ch.enabled && ch.value.trim()).length ?? 0
-  const connectedSnsCount = Number(SAMPLE_PROFILE.instagramConnected) + Number(SAMPLE_PROFILE.linkedinConnected)
+  const cultureCount =
+    life.tastes.movies.length +
+    life.tastes.music.length +
+    life.tastes.books.length +
+    (life.tastes.plays?.length ?? 0)
+  const placeCount =
+    life.tastes.restaurants.length +
+    life.tastes.cafes.length +
+    life.places.travelDestinations.length
+  const activeContactCount =
+    user.contactChannels?.filter((ch) => ch.enabled && ch.value.trim()).length ?? 0
+  const connectedSnsCount =
+    Number(SAMPLE_PROFILE.instagramConnected) + Number(SAMPLE_PROFILE.linkedinConnected)
+  const totalReputationCount = SAMPLE_PROFILE.reputationKeywords.reduce(
+    (sum, item) => sum + item.count,
+    0,
+  )
 
-  const manageSections: ManageSection[] = [
+  const rows: EditRow[] = [
     {
-      title: '프로필',
-      rows: [
-        {
-          title: '기본정보',
-          meta: user.headline?.trim() ?? '한줄소개, MBTI, 반려동물, 기분',
-          onClick: onEditBasic,
-        },
-        {
-          title: '라이프',
-          meta: `활동 ${activityCount}개 · 문화 ${cultureCount}개 · 장소 ${placeCount}개`,
-          onClick: onEditLife,
-        },
-        {
-          title: '관계',
-          meta: '네트워크, 평판, 방명록',
-          onClick: onEditRelationship,
-        },
-      ],
+      title: '기본정보',
+      meta: [user.headline?.trim(), whoIAm.mbti, petLabel].filter(Boolean).join(' · ') || '한줄소개, MBTI, 반려동물',
+      onClick: onEditBasic,
     },
     {
-      title: '독립 항목',
-      rows: [
-        {
-          title: '하이라이트',
-          meta: allHighlights.length > 0 ? `${allHighlights.length}개 항목` : '경험 추가',
-          onClick: onEditHighlight,
-        },
-        {
-          title: '연락수단',
-          meta: activeContactCount > 0 ? `${activeContactCount}개 연결` : '전화, 이메일, 카카오',
-          onClick: onEditContact,
-        },
-        {
-          title: 'SNS',
-          meta: connectedSnsCount > 0 ? `${connectedSnsCount}개 연동` : '유튜브, 틱톡, 인스타, 링크드인',
-          onClick: onEditSNS,
-        },
-      ],
+      title: '하이라이트',
+      meta: allHighlights.length > 0 ? `${allHighlights.length}개 항목` : '경험 추가',
+      onClick: onEditHighlight,
+    },
+    {
+      title: '라이프',
+      meta: `활동 ${activityCount} · 문화 ${cultureCount} · 장소 ${placeCount}`,
+      onClick: onEditLife,
+    },
+    {
+      title: '네트워크',
+      meta: `${SAMPLE_PROFILE.rememberHighlight.total}명 리멤버`,
+      onClick: onEditNetwork,
+    },
+    {
+      title: '평판',
+      meta: `키워드 ${user.selectedKeywords.length}개 · 누적 ${totalReputationCount}회`,
+      onClick: onEditReputation,
+    },
+    {
+      title: 'SNS',
+      meta: connectedSnsCount > 0 ? `${connectedSnsCount}개 연동` : '유튜브, 틱톡, 인스타, 링크드인',
+      onClick: onEditSNS,
+    },
+    {
+      title: '연락수단',
+      meta: activeContactCount > 0 ? `${activeContactCount}개 연결` : '전화, 이메일, 카카오',
+      onClick: onEditContact,
     },
   ]
 
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] bg-[rgba(16,17,20,0.82)] backdrop-blur-md flex-shrink-0">
+    <div className="flex h-full flex-col">
+      <div className="flex h-12 flex-shrink-0 items-center border-b border-[var(--color-border-soft)] bg-[rgba(16,17,20,0.82)] px-5 backdrop-blur-md">
         <button onClick={onBack} className="mr-3 text-xl leading-none text-[var(--color-text-secondary)]">‹</button>
-        <span className="text-base font-black flex-1">내 Byro 관리</span>
+        <span className="flex-1 text-[15px] font-bold text-[var(--color-text-primary)]">편집</span>
         <button onClick={onLogout} className="text-xs text-[var(--color-text-tertiary)]">로그아웃</button>
       </div>
 
-      <div className="flex-1 overflow-y-auto pb-24">
-        <div className="px-5 py-4">
-          <div className="settings-shell mb-4 p-5">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Profile Completion</div>
-                <div className="mt-2 text-[19px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">프로필 완성도 {completionPercent}%</div>
-                <div className="meta-text mt-1">
-                  {remainingItems.length > 0
-                    ? `${remainingItems.map((item) => item.label).join(', ')} 항목을 채우면 더 좋아져요.`
-                    : '기본 프로필 구성이 완료됐어요.'}
-                </div>
+      <div className="flex-1 overflow-y-auto">
+        <div className="mx-5 mt-5 overflow-hidden rounded-2xl border border-[var(--color-border-soft)]">
+          {rows.map((row, i) => (
+            <button
+              key={row.title}
+              onClick={row.onClick}
+              className={[
+                'flex w-full items-center justify-between px-5 py-4 text-left transition-colors active:bg-white/[0.03]',
+                i < rows.length - 1 ? 'border-b border-[var(--color-border-soft)]' : '',
+              ].join(' ')}
+            >
+              <div className="min-w-0 flex-1">
+                <p className="text-[15px] font-semibold text-[var(--color-text-primary)]">{row.title}</p>
+                <p className="mt-0.5 truncate text-[12px] text-[var(--color-text-tertiary)]">{row.meta}</p>
               </div>
-              <div className="rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-3 py-1 text-xs font-semibold text-[var(--color-text-secondary)]">
-                {completionChecks.filter((item) => item.done).length}/{completionChecks.length}
-              </div>
-            </div>
-            <div className="mt-4 h-2 overflow-hidden rounded-full bg-[var(--color-bg-muted)]">
-              <div className="h-full rounded-full bg-[var(--color-accent-dark)]" style={{ width: `${completionPercent}%` }} />
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Manage</div>
-            <div className="mt-2 text-[18px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">내 Byro 관리</div>
-            <div className="meta-text mt-1 leading-relaxed">기본정보, 라이프, 관계 정보를 한 곳에서 관리하세요.</div>
-          </div>
-          <div className="space-y-4">
-            {manageSections.map((section) => (
-              <div key={section.title}>
-                <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">
-                  {section.title}
-                </div>
-                <div className="settings-shell overflow-hidden p-2.5">
-                  {section.rows.map((row, index) => (
-                    <button
-                      key={`${section.title}-${row.title}`}
-                      onClick={row.onClick}
-                      className={`settings-row flex w-full items-center gap-4 px-4 py-3.5 text-left ${index > 0 ? 'mt-2' : ''}`}
-                    >
-                      <div className="min-w-0 flex-1">
-                        <div className="text-[15px] font-semibold tracking-[-0.02em] text-white">{row.title}</div>
-                        <div className="mt-1 text-[11px] leading-[1.5] text-white/48">{row.meta}</div>
-                      </div>
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-white/56">
-                        <ChevronRight size={15} />
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+              <ChevronRight size={14} className="ml-3 flex-shrink-0 text-[var(--color-text-tertiary)] opacity-30" />
+            </button>
+          ))}
         </div>
       </div>
     </div>

@@ -15,12 +15,10 @@ import { BasicInfoEditScreen } from '@/components/screens/me/MyByroBasicInfoScre
 import { HighlightManageScreen } from '@/components/screens/me/MyByroHighlightManageScreen'
 import {
   ContactManageScreen,
-  GuestbookManageScreen,
   LifeManageScreen,
   ManageByroScreen,
   RememberNetworkManageScreen,
   ReputationManageScreen,
-  RelationshipManageScreen,
   SNSManageScreen,
 } from '@/components/screens/me/MyByroSupportScreens'
 
@@ -28,14 +26,12 @@ type Screen =
   | 'preview'
   | 'manage'
   | 'editBasic'
-  | 'editLife'
-  | 'editRelationship'
-  | 'editNetwork'
   | 'editHighlight'
-  | 'editSNS'
+  | 'editLife'
+  | 'editNetwork'
   | 'editReputation'
+  | 'editSNS'
   | 'editContact'
-  | 'editGuestbook'
 
 // ─────────────────────────────────────────────────────────────────────────────
 export default function MyByro() {
@@ -77,11 +73,12 @@ export default function MyByro() {
         onLogout={() => store.logout()}
         onBack={() => setScreen('preview')}
         onEditBasic={() => setScreen('editBasic')}
-        onEditLife={() => setScreen('editLife')}
         onEditHighlight={() => setScreen('editHighlight')}
-        onEditRelationship={() => setScreen('editRelationship')}
-        onEditContact={() => setScreen('editContact')}
+        onEditLife={() => setScreen('editLife')}
+        onEditNetwork={() => setScreen('editNetwork')}
+        onEditReputation={() => setScreen('editReputation')}
         onEditSNS={() => setScreen('editSNS')}
+        onEditContact={() => setScreen('editContact')}
         user={user}
       />
     )
@@ -95,22 +92,11 @@ export default function MyByro() {
     return <LifeManageScreen onBack={() => setScreen('manage')} />
   }
 
-  if (screen === 'editRelationship') {
-    return (
-      <RelationshipManageScreen
-        onBack={() => setScreen('manage')}
-        onEditNetwork={() => setScreen('editNetwork')}
-        onEditReputation={() => setScreen('editReputation')}
-        onEditGuestbook={() => setScreen('editGuestbook')}
-      />
-    )
-  }
-
   if (screen === 'editNetwork') {
     return (
       <RememberNetworkManageScreen
         userLinkId={user.linkId}
-        onBack={() => setScreen('editRelationship')}
+        onBack={() => setScreen('manage')}
       />
     )
   }
@@ -134,10 +120,6 @@ export default function MyByro() {
 
   if (screen === 'editContact') {
     return <ContactManageScreen onBack={() => setScreen('manage')} />
-  }
-
-  if (screen === 'editGuestbook') {
-    return <GuestbookManageScreen onBack={() => setScreen('manage')} />
   }
 
   return null

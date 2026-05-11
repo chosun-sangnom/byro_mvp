@@ -142,7 +142,7 @@ export interface ProfileHeaderMeta {
 export interface PublicProfileWhoIAm {
   mbti: string
   bloodType: string
-  sajuCompatibilityLabel: string
+  sajuType: string
   aiStyleSummary: string[]
   relationshipStatus: string
   children: string

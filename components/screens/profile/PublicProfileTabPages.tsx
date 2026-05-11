@@ -138,7 +138,11 @@ export function PublicProfileWhoTabPage({
         onToggleInstagram={() => store.toggleSnsOpen(`instagram_${username}`)}
         onToggleLinkedIn={() => store.toggleSnsOpen(`linkedin_${username}`)}
       />
-      <PublicProfileWhoIAmSection whoIAm={profile.whoIAm} />
+      <PublicProfileWhoIAmSection
+        name={profile.name}
+        whoIAm={profile.whoIAm}
+        life={profile.life}
+      />
       <ProfileHighlightsSection
         profile={profile}
         corporateHighlight={corporateHighlight}

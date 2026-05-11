@@ -2,7 +2,7 @@
 
 import type { ReactNode, RefObject } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { BadgeCheck, ChevronDown, ChevronUp, Mail, MessageCircle, Phone, Play } from 'lucide-react'
+import { ChevronDown, ChevronUp, Mail, MessageCircle, Phone, Play } from 'lucide-react'
 import { RememberNetworkGraph } from '@/components/highlights/RememberNetworkGraph'
 import type { ContactChannel } from '@/types'
 
@@ -206,9 +206,6 @@ export function ProfileHeroCard({
             >
               {profile.name}
             </div>
-            <span className="mb-1.5 inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/95 text-[var(--color-state-success-text)] shadow-[0_4px_12px_rgba(0,0,0,0.22)]">
-              <BadgeCheck size={12} />
-            </span>
           </div>
 
           {/* 나이 */}

@@ -131,6 +131,9 @@ export function ProfileHeroCard({
   profile,
   heroTheme,
   bioRef,
+  bioExpanded,
+  bioOverflowing,
+  onToggleBio,
   isOwnerMode = false,
   onEditHeaderMeta,
 }: {

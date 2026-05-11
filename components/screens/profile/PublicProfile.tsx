@@ -24,8 +24,6 @@ import {
 interface PublicProfileProps {
   username: string
   mode?: 'public' | 'owner'
-  onOpenArchive?: () => void
-  onOpenManage?: () => void
 }
 
 const AIRLINE_BADGE_LABELS = {
@@ -37,9 +35,7 @@ const AIRLINE_BADGE_LABELS = {
 export default function PublicProfile({
   username,
   mode = 'public',
-  onOpenArchive,
-  onOpenManage,
-}: PublicProfileProps) { // eslint-disable-line @typescript-eslint/no-unused-vars
+}: PublicProfileProps) {
   const router = useRouter()
   const store = useByroStore()
   const isOwnerMode = mode === 'owner'

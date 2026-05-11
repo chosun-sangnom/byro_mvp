@@ -42,8 +42,6 @@ export default function MyByro() {
       <PublicProfile
         username={user.linkId}
         mode="owner"
-        onOpenArchive={() => router.push('/archive')}
-        onOpenManage={() => setScreen('manage')}
       />
     )
   }

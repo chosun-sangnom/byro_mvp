@@ -24,6 +24,15 @@ import { ContactActionButton, ProfileHeroCard } from '@/components/screens/profi
 import { PublicProfileTabBar, type PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
 import { PublicProfileKemiZone } from '@/components/screens/profile/PublicProfileKemiZone'
 
+const DEFAULT_MOOD_OPTIONS = [
+  '집중 모드',
+  '사색 모드',
+  '산책 가고 싶은 날',
+  '여유 있는 날',
+  '에너지 좋은 날',
+  '대화 환영',
+] as const
+
 export function PublicProfileShell({
   username,
   activeTab,
@@ -52,6 +61,9 @@ export function PublicProfileShell({
   const [moodDraft, setMoodDraft] = useState(profile.headerMeta?.mood ?? '')
   const [availabilityDraft, setAvailabilityDraft] = useState(profile.headerMeta?.availability ?? '')
   const bioRef = useRef<HTMLParagraphElement | null>(null)
+  const moodOptions = moodDraft && !DEFAULT_MOOD_OPTIONS.includes(moodDraft as (typeof DEFAULT_MOOD_OPTIONS)[number])
+    ? [moodDraft, ...DEFAULT_MOOD_OPTIONS]
+    : DEFAULT_MOOD_OPTIONS
 
   useEffect(() => {
     setBioExpanded(false)
@@ -244,18 +256,32 @@ export function PublicProfileShell({
         <div className="px-5 pb-6">
           <div className="mb-1 text-[18px] font-black text-[var(--color-text-strong)]">오늘의 기분 · 펑 수정</div>
           <div className="mb-4 text-sm leading-6 text-[var(--color-text-secondary)]">
-            프로필 카드에서 바로 보이는 상태값이라, 짧고 가볍게 적는 편이 좋습니다.
+            오늘의 기분은 고르고, 펑은 짧게 직접 적는 방식으로 관리합니다.
           </div>
 
           <div className="space-y-4">
             <div>
               <label className="mb-2 block text-xs font-bold text-[var(--color-text-secondary)]">오늘의 기분</label>
-              <input
-                value={moodDraft}
-                onChange={(event) => setMoodDraft(event.target.value)}
-                placeholder="예: 집중 모드"
-                className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-              />
+              <div className="flex flex-wrap gap-2">
+                {moodOptions.map((option) => {
+                  const selected = moodDraft === option
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => setMoodDraft(option)}
+                      className={[
+                        'rounded-full border px-3 py-2 text-xs font-semibold transition-colors',
+                        selected
+                          ? 'border-[var(--color-accent-dark)] bg-[rgba(75,108,245,0.14)] text-[var(--color-text-primary)]'
+                          : 'border-[var(--color-border-default)] bg-[var(--color-bg-soft)] text-[var(--color-text-secondary)]',
+                      ].join(' ')}
+                    >
+                      {option}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
 
             <div>
@@ -264,8 +290,12 @@ export function PublicProfileShell({
                 value={availabilityDraft}
                 onChange={(event) => setAvailabilityDraft(event.target.value)}
                 placeholder="예: 오늘 저녁 커피챗 가능"
+                maxLength={32}
                 className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
               />
+              <div className="mt-2 text-[11px] text-[var(--color-text-tertiary)]">
+                지금 가능한 상태나 한마디를 직접 적어주세요.
+              </div>
             </div>
           </div>
 

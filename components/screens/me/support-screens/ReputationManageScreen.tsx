@@ -1,67 +1,68 @@
 'use client'
 
-import { useState } from 'react'
-import { useByroStore } from '@/store/useByroStore'
-import { Button, Modal, showToast } from '@/components/ui'
-import { KEYWORD_GROUPS } from '@/lib/mocks/keywords'
+import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
 export function ReputationManageScreen({
-  currentKeywords,
   onBack,
 }: {
-  currentKeywords: string[]
   onBack: () => void
 }) {
-  const store = useByroStore()
-  const [keywords, setKeywords] = useState<string[]>([...currentKeywords])
-  const [confirmKeyword, setConfirmKeyword] = useState<string | null>(null)
+  const totalReputationCount = SAMPLE_PROFILE.reputationKeywords.reduce((sum, item) => sum + item.count, 0)
+  const topKeywords = [...SAMPLE_PROFILE.reputationKeywords]
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5)
 
   const getReputationCount = (keyword: string) =>
     SAMPLE_PROFILE.reputationKeywords.find((item) => item.keyword === keyword)?.count ?? 0
-
-  const toggleKeyword = (keyword: string) => {
-    if (keywords.includes(keyword)) {
-      const count = getReputationCount(keyword)
-      if (count > 0) {
-        setConfirmKeyword(keyword)
-        return
-      }
-      setKeywords((prev) => prev.filter((item) => item !== keyword))
-      return
-    }
-    if (keywords.length >= 5) {
-      showToast('최대 5개까지 선택할 수 있어요')
-      return
-    }
-    setKeywords((prev) => [...prev, keyword])
-  }
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] flex-shrink-0">
         <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
-        <span className="text-base font-black">평판 키워드 편집</span>
+        <span className="text-base font-black">받은 평판</span>
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
-        <div className="text-xs text-[var(--color-text-tertiary)] mb-4">선택된 키워드는 프로필 카드 안에 노출됩니다. 최대 5개까지 선택할 수 있어요.</div>
-        <div className="space-y-4 mb-4">
-          {KEYWORD_GROUPS.map((group) => (
+        <div className="rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-bg-soft)] px-4 py-4 mb-4">
+          <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-[var(--color-text-tertiary)]">Summary</div>
+          <div className="mt-1 text-[18px] font-black text-[var(--color-text-primary)]">받은 평판은 직접 고르지 않아요</div>
+          <div className="mt-2 text-xs leading-relaxed text-[var(--color-text-secondary)]">
+            다른 사람이 남긴 선택을 집계해서 보여줍니다. 프로필 주인이 미리 설정하는 값은 없고,
+            실제로 받은 평판만 관계 탭에 노출됩니다.
+          </div>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
+              누적 {totalReputationCount}회
+            </span>
+            {topKeywords.map((item) => (
+              <span key={item.keyword} className="chip-metric">
+                {item.keyword} <span className="ml-1 font-black text-[var(--color-text-strong)]">{item.count}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          {REPUTATION_KEYWORD_GROUPS.map((group) => (
             <div key={group.category}>
               <div className="text-xs font-bold text-[var(--color-text-secondary)] mb-2">{group.category}</div>
               <div className="flex flex-wrap gap-1.5">
                 {group.keywords.map((keyword) => {
-                  const selected = keywords.includes(keyword)
+                  const count = getReputationCount(keyword)
                   return (
-                    <button
+                    <div
                       key={keyword}
-                      onClick={() => toggleKeyword(keyword)}
-                      className={['text-xs px-3 py-1.5 rounded-full border font-semibold', selected ? 'border-[var(--color-accent-dark)] text-white' : 'bg-[var(--color-bg-soft)] text-[var(--color-text-secondary)] border-[var(--color-border-default)]'].join(' ')}
-                      style={selected ? { backgroundColor: 'var(--color-accent-dark)' } : undefined}
+                      className={[
+                        'rounded-full border px-3 py-1.5 text-xs font-semibold',
+                        count > 0
+                          ? 'border-[var(--color-accent-dark)] bg-[rgba(75,108,245,0.12)] text-[var(--color-text-primary)]'
+                          : 'border-[var(--color-border-default)] bg-[var(--color-bg-soft)] text-[var(--color-text-tertiary)]',
+                      ].join(' ')}
                     >
                       {keyword}
-                    </button>
+                      <span className="ml-1.5 text-[10px] font-black opacity-80">{count > 0 ? count : '0'}</span>
+                    </div>
                   )
                 })}
               </div>
@@ -69,34 +70,6 @@ export function ReputationManageScreen({
           ))}
         </div>
       </div>
-
-      <div className="px-5 pb-5 pt-3 border-t border-[var(--color-border-soft)]">
-        <Button onClick={() => { store.updateUserKeywords(keywords); showToast('키워드가 저장됐어요!'); onBack() }}>저장</Button>
-      </div>
-
-      <Modal open={confirmKeyword !== null} onClose={() => setConfirmKeyword(null)}>
-        <div className="text-center">
-          <div className="text-xl mb-3">⚠️</div>
-          <div className="text-sm font-black mb-2">누적 평판이 사라져요</div>
-          <div className="text-xs text-[var(--color-text-secondary)] leading-relaxed mb-4">
-            <span className="font-bold">&ldquo;{confirmKeyword}&rdquo;</span> 키워드에 쌓인{' '}
-            <span className="font-bold">{confirmKeyword ? getReputationCount(confirmKeyword) : 0}개</span>의 평판이 영구적으로 삭제돼요.
-            <br />
-            정말 해제하시겠어요?
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setConfirmKeyword(null)}>취소</Button>
-            <Button
-              onClick={() => {
-                if (confirmKeyword) setKeywords((prev) => prev.filter((item) => item !== confirmKeyword))
-                setConfirmKeyword(null)
-              }}
-            >
-              해제하기
-            </Button>
-          </div>
-        </div>
-      </Modal>
     </div>
   )
 }

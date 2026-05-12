@@ -102,7 +102,7 @@ export const SAMPLE_PROFILE = {
     { id: 'email', label: '이메일', value: 'gangminjun@byro.io', href: 'mailto:gangminjun@byro.io', enabled: true },
     { id: 'kakao', label: '카카오', value: 'gangminjun.kakao', href: 'https://open.kakao.com/o/sgangminjun', enabled: true },
   ] as ContactChannel[],
-  selectedKeywords: ['전문적인', '신뢰할 수 있는', '통찰력 있는', '실행력 있는', '창의적인'],
+  selectedKeywords: ['전문성이 느껴져요', '믿고 맡길 수 있어요', '대화하면 생각이 넓어져요', '일 처리가 빠르고 깔끔해요', '아이디어가 늘 신선해요'],
   instagramConnected: true,
   linkedinConnected: true,
   instagram: {
@@ -198,9 +198,9 @@ export const SAMPLE_PROFILE = {
     aiCopy: '아이유를 좋아하고 한남동과 서촌을 자주 찾는 분이에요. 동네 얘기나 좋아하는 음악으로 먼저 말 걸어보세요.',
   },
   experiences: [
-    { id: 'e1', authorName: '김지수', isAnonymous: false, keywords: ['전문적인', '통찰력 있는'], message: '정말 통찰력 있는 분이에요. 같이 일하고 싶다!', date: '2일 전' },
-    { id: 'e2', authorName: null, isAnonymous: true, keywords: ['신뢰할 수 있는', '실행력 있는'], message: '', date: '5일 전' },
-    { id: 'e3', authorName: '박소연', isAnonymous: false, keywords: ['창의적인'], message: '아이디어가 넘치는 분입니다 👏', date: '1주 전' },
+    { id: 'e1', authorName: '김지수', isAnonymous: false, keywords: ['전문성이 느껴져요', '대화하면 생각이 넓어져요'], message: '대화하면 생각이 넓어지고 일도 깔끔하게 풀어가는 분이에요.', date: '2일 전' },
+    { id: 'e2', authorName: null, isAnonymous: true, keywords: ['믿고 맡길 수 있어요', '일 처리가 빠르고 깔끔해요'], message: '', date: '5일 전' },
+    { id: 'e3', authorName: '박소연', isAnonymous: false, keywords: ['아이디어가 늘 신선해요'], message: '새로운 관점과 아이디어를 계속 주는 분입니다.', date: '1주 전' },
   ],
   savedProfiles: [
     { id: 'p1', linkId: 'jiminlee', name: '이지민', title: '스타트업 마케터', memo: '비즈니스 살롱 2026.03 · 마케팅 인사이트 굿', savedAt: '3일 전' },
@@ -217,11 +217,11 @@ export const SAMPLE_PROFILE = {
     { id: 'r2', linkId: 'chijiwon', name: '최지원', message: null, requestedAt: '2일 전' },
   ],
   reputationKeywords: [
-    { keyword: '전문적인', count: 8 },
-    { keyword: '신뢰할 수 있는', count: 6 },
-    { keyword: '통찰력 있는', count: 4 },
-    { keyword: '실행력 있는', count: 3 },
-    { keyword: '창의적인', count: 2 },
+    { keyword: '전문성이 느껴져요', count: 8 },
+    { keyword: '믿고 맡길 수 있어요', count: 6 },
+    { keyword: '대화하면 생각이 넓어져요', count: 4 },
+    { keyword: '일 처리가 빠르고 깔끔해요', count: 3 },
+    { keyword: '아이디어가 늘 신선해요', count: 2 },
   ],
   guestbook: [
     { id: 'g1', linkId: 'jiminlee', authorName: '이지민', message: '정말 인사이트 넘치는 분.', date: '3일 전' },
@@ -323,7 +323,7 @@ export const MK_PROFILE = {
     { id: 'email', label: '이메일', value: 'mk@byth.io', href: 'mailto:mk@byth.io', enabled: true },
     { id: 'kakao', label: '카카오', value: 'epicmkk', href: 'https://open.kakao.com/o/smkbyth', enabled: true },
   ] as ContactChannel[],
-  selectedKeywords: ['진정성 있는', '전문적인', '실행력 있는', '신뢰할 수 있는', '통찰력 있는'],
+  selectedKeywords: ['어려울 때 생각나는 사람이에요', '전문성이 느껴져요', '일 처리가 빠르고 깔끔해요', '믿고 맡길 수 있어요', '대화하면 생각이 넓어져요'],
   instagramConnected: true,
   linkedinConnected: true,
   instagram: {
@@ -416,11 +416,11 @@ export const MK_PROFILE = {
     aiCopy: '골프와 축구를 즐기고 성수동을 자주 찾는 분이에요. FC 얘기나 성수 맛집으로 바로 들어가도 어색하지 않아요.',
   },
   reputationKeywords: [
-    { keyword: '진정성 있는', count: 9 },
-    { keyword: '전문적인', count: 7 },
-    { keyword: '실행력 있는', count: 6 },
-    { keyword: '신뢰할 수 있는', count: 5 },
-    { keyword: '통찰력 있는', count: 4 },
+    { keyword: '어려울 때 생각나는 사람이에요', count: 9 },
+    { keyword: '전문성이 느껴져요', count: 7 },
+    { keyword: '일 처리가 빠르고 깔끔해요', count: 6 },
+    { keyword: '믿고 맡길 수 있어요', count: 5 },
+    { keyword: '대화하면 생각이 넓어져요', count: 4 },
   ],
   guestbook: [
     { id: 'mkg1', linkId: 'jiminlee', authorName: '이지민', message: '큰 방향을 빠르게 정리하고 실제 실행으로 옮기는 힘이 분명한 분이에요.', date: '2일 전' },
@@ -521,7 +521,7 @@ export const JIMIN_PROFILE = {
     { id: 'email', label: '이메일', value: 'jimin@byro.io', href: 'mailto:jimin@byro.io', enabled: true },
     { id: 'kakao', label: '카카오', value: 'jimin.marketer', href: 'https://open.kakao.com/o/sjimin', enabled: true },
   ] as ContactChannel[],
-  selectedKeywords: ['전문적인', '신뢰할 수 있는', '통찰력 있는', '창의적인'],
+  selectedKeywords: ['전문성이 느껴져요', '믿고 맡길 수 있어요', '대화하면 생각이 넓어져요', '스타일이 세련됐어요'],
   instagramConnected: true,
   linkedinConnected: false,
   corporateHighlight: {
@@ -596,13 +596,13 @@ export const JIMIN_PROFILE = {
     aiCopy: '아이유를 좋아하고 한남동을 자주 찾는 분이에요. 같은 동네 카페 얘기로 자연스럽게 시작해보세요.',
   },
   reputationKeywords: [
-    { keyword: '전문적인', count: 5 },
-    { keyword: '신뢰할 수 있는', count: 4 },
-    { keyword: '통찰력 있는', count: 2 },
-    { keyword: '창의적인', count: 1 },
+    { keyword: '전문성이 느껴져요', count: 5 },
+    { keyword: '믿고 맡길 수 있어요', count: 4 },
+    { keyword: '대화하면 생각이 넓어져요', count: 2 },
+    { keyword: '스타일이 세련됐어요', count: 1 },
   ],
   guestbook: [
-    { id: 'jg1', linkId: 'gangminjun', authorName: '강민준', message: '정말 통찰력 있는 분이에요.', date: '2일 전' },
+    { id: 'jg1', linkId: 'gangminjun', authorName: '강민준', message: '대화하면 생각이 넓어지는 분이에요.', date: '2일 전' },
     { id: 'jg2', linkId: 'mk', authorName: '강명구', message: '브랜딩 감각이 좋아서 같이 일하고 싶은 분입니다.', date: '5일 전' },
     { id: 'jg3', linkId: 'chijiwon', authorName: '최지원', message: '사람을 편하게 연결하는 힘이 있어요.', date: '1주 전' },
     { id: 'jg4', linkId: 'kimdohyeon', authorName: '김도현', message: '마케팅 관점이 실무적이라 대화가 특히 좋았습니다.', date: '2주 전' },

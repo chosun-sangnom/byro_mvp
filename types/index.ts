@@ -36,7 +36,6 @@ export type OnboardingStep =
   | 'login'
   | 'verify'
   | 'linkid'
-  | 'keywords'
   | 'sns'
   | 'contact'
   | 'highlight'

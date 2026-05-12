@@ -15,7 +15,7 @@ import type {
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
 const STEP_ORDER: OnboardingStep[] = [
-  'login', 'verify', 'linkid', 'keywords', 'sns', 'contact', 'highlight', 'bio-select', 'bio-ai', 'complete',
+  'login', 'verify', 'linkid', 'sns', 'contact', 'highlight', 'bio-select', 'bio-ai', 'complete',
 ]
 
 interface ByroStore {
@@ -462,7 +462,11 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     return {
       ...state,
       user: normalizeSampleUser(state.user),
-      step: persistedStep === 'basic-info' ? 'linkid' : state.step,
+      step: persistedStep === 'basic-info'
+        ? 'linkid'
+        : persistedStep === 'keywords'
+          ? 'sns'
+          : state.step,
     }
   },
   partialize: (state) => ({

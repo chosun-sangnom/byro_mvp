@@ -115,7 +115,7 @@ export default function MyByro() {
   }
 
   if (screen === 'editReputation') {
-    return <ReputationManageScreen currentKeywords={user.selectedKeywords ?? SAMPLE_PROFILE.selectedKeywords} onBack={() => setScreen('manage')} />
+    return <ReputationManageScreen onBack={() => setScreen('manage')} />
   }
 
   if (screen === 'editContact') {

@@ -1,6 +1,7 @@
 'use client'
 
 import { Award, Lightbulb } from 'lucide-react'
+import type { ReputationKeywordGroup } from '@/lib/mocks/reputationKeywords'
 import { Button, BottomSheet, Chip, Modal, TextArea } from '@/components/ui'
 
 export function ExperienceBottomSheet({
@@ -8,7 +9,7 @@ export function ExperienceBottomSheet({
   profileName,
   currentUserName,
   isLoggedIn,
-  experienceOptions,
+  experienceKeywordGroups,
   selectedKeywords,
   experienceMessage,
   onToggleKeyword,
@@ -21,7 +22,7 @@ export function ExperienceBottomSheet({
   profileName: string
   currentUserName?: string
   isLoggedIn: boolean
-  experienceOptions: string[]
+  experienceKeywordGroups: ReputationKeywordGroup[]
   selectedKeywords: string[]
   experienceMessage: string
   onToggleKeyword: (keyword: string) => void
@@ -37,14 +38,21 @@ export function ExperienceBottomSheet({
         <div className="mb-5 text-[12px] text-[var(--color-text-tertiary)]">
           {isLoggedIn ? `${currentUserName ?? '나'}으로 남겨져요` : '익명 사용자로 남겨져요'}
         </div>
-        <div className="mb-4 flex flex-wrap gap-2">
-          {experienceOptions.map((keyword) => (
-            <Chip
-              key={keyword}
-              label={keyword}
-              selected={selectedKeywords.includes(keyword)}
-              onClick={() => onToggleKeyword(keyword)}
-            />
+        <div className="mb-4 space-y-4">
+          {experienceKeywordGroups.map((group) => (
+            <div key={group.category}>
+              <div className="mb-2 text-[11px] font-bold text-[var(--color-text-secondary)]">{group.category}</div>
+              <div className="flex flex-wrap gap-2">
+                {group.keywords.map((keyword) => (
+                  <Chip
+                    key={keyword}
+                    label={keyword}
+                    selected={selectedKeywords.includes(keyword)}
+                    onClick={() => onToggleKeyword(keyword)}
+                  />
+                ))}
+              </div>
+            </div>
           ))}
         </div>
         <div className="mb-1.5 text-[12px] text-[var(--color-text-tertiary)]">한마디 (선택)</div>

@@ -87,11 +87,12 @@ function usePublicProfileTabData(username: string) {
     }
   }).filter((group) => group.items.length > 0)
 
-  const keywordCounts = profile.selectedKeywords
+  const keywordCounts = [...profile.reputationKeywords]
+    .sort((a, b) => b.count - a.count)
     .slice(0, 5)
-    .map((keyword) => ({
-      keyword,
-      count: profile.reputationKeywords.find((item) => item.keyword === keyword)?.count ?? 0,
+    .map((item) => ({
+      keyword: item.keyword,
+      count: item.count,
     }))
   const totalKeywordCount = keywordCounts.reduce((sum, item) => sum + item.count, 0)
   const featuredGuestbook = profile.guestbook.slice(0, 3)

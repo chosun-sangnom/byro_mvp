@@ -53,7 +53,7 @@ export const solutionSteps: Array<{
   {
     icon: Link2,
     title: '연결하기',
-    items: ['SNS 연결', '키워드 선택', '하이라이트 추가'],
+    items: ['SNS 연결', '라이프 입력', '하이라이트 추가'],
   },
   {
     icon: Sparkles,
@@ -182,14 +182,14 @@ export const uiElements: Array<{
 ]
 
 export const reputationKeywords = [
-  '신뢰할 수 있는',
-  '통찰력 있는',
-  '전략적인',
-  '전문적인',
-  '사람을 잘 연결하는',
-  '실행력 있는',
-  '배려심 있는',
-  '창의적인',
+  '믿고 맡길 수 있어요',
+  '대화하면 생각이 넓어져요',
+  '전문성이 느껴져요',
+  '주변에 소개하고 싶어요',
+  '일 처리가 빠르고 깔끔해요',
+  '유머 감각이 좋아요',
+  '스타일이 세련됐어요',
+  '트렌드에 밝아요',
 ]
 
 export const testimonials = [

@@ -1,8 +1,8 @@
 'use client'
 
 import { ChevronRight } from 'lucide-react'
+import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
-import { useByroStore } from '@/store/useByroStore'
 
 interface RelationshipManageScreenProps {
   onBack: () => void
@@ -17,8 +17,10 @@ export function RelationshipManageScreen({
   onEditReputation,
   onEditGuestbook,
 }: RelationshipManageScreenProps) {
-  const store = useByroStore()
   const totalReputationCount = SAMPLE_PROFILE.reputationKeywords.reduce((sum, item) => sum + item.count, 0)
+  const visibleReputationCount = SAMPLE_PROFILE.reputationKeywords.filter((item) =>
+    REPUTATION_KEYWORD_GROUPS.some((group) => group.keywords.includes(item.keyword)),
+  ).length
 
   const rows = [
     {
@@ -27,8 +29,8 @@ export function RelationshipManageScreen({
       onClick: onEditNetwork,
     },
     {
-      title: '평판 키워드',
-      meta: `선택 ${store.user?.selectedKeywords.length ?? 0}개 · 누적 ${totalReputationCount}회`,
+      title: '평판',
+      meta: `누적 ${totalReputationCount}회 · 상위 ${visibleReputationCount}개 키워드`,
       onClick: onEditReputation,
     },
     {

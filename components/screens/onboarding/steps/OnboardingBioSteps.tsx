@@ -13,7 +13,7 @@ export function Step8Select() {
   const store = useByroStore()
   const [noDataModal, setNoDataModal] = useState(false)
 
-  const hasData = store.instagramConnected || store.linkedinConnected || store.selectedKeywords.length > 0
+  const hasData = store.instagramConnected || store.linkedinConnected || store.highlights.length > 0
 
   const handleAI = () => {
     if (!hasData) {
@@ -41,20 +41,20 @@ export function Step8Select() {
         <SelectionCard
           icon={<Sparkles size={18} />}
           title="AI가 자기소개 작성하기"
-          subtitle="SNS·키워드 기반으로 초안을 만들어드려요"
+          subtitle="SNS·하이라이트 기반으로 초안을 만들어드려요"
           tone="accent"
           onClick={handleAI}
         >
           {!hasData && (
             <div className="rounded-lg px-2 py-1.5 text-xs bg-[var(--color-state-warn-bg)] text-[var(--color-state-warn-text)]">
-              AI 초안을 만들려면 키워드, SNS, 하이라이트 중 하나 이상이 필요해요
+              AI 초안을 만들려면 SNS나 하이라이트가 하나 이상 필요해요
             </div>
           )}
           {hasData && (
             <div className="flex flex-wrap gap-1">
               {store.instagramConnected && <span className="inline-flex items-center gap-1 text-xs bg-[var(--color-bg-muted)] rounded-full px-2 py-0.5 border border-[var(--color-border-default)] text-[var(--color-text-secondary)]"><Image src="/images/Instagram.svg" alt="" width={12} height={12} className="w-3 h-3" /> Instagram</span>}
               {store.linkedinConnected && <span className="inline-flex items-center gap-1 text-xs bg-[var(--color-bg-muted)] rounded-full px-2 py-0.5 border border-[var(--color-border-default)] text-[var(--color-text-secondary)]"><Image src="/images/linkedin.png" alt="" width={12} height={12} className="w-3 h-3" /> LinkedIn</span>}
-              {store.selectedKeywords.length > 0 && <span className="text-xs bg-[var(--color-bg-muted)] rounded-full px-2 py-0.5 border border-[var(--color-border-default)] text-[var(--color-text-secondary)]">키워드 {store.selectedKeywords.length}개</span>}
+              {store.highlights.length > 0 && <span className="text-xs bg-[var(--color-bg-muted)] rounded-full px-2 py-0.5 border border-[var(--color-border-default)] text-[var(--color-text-secondary)]">하이라이트 {store.highlights.length}개</span>}
             </div>
           )}
         </SelectionCard>
@@ -86,12 +86,11 @@ export function Step8Select() {
           <div className="meta-text leading-relaxed mb-4">
             AI 초안을 만들려면 아래 정보가 하나 이상 필요해요.
             <br /><br />
-            <b>· 평판 키워드</b><br />
             <b>· SNS 연동</b><br />
             <b>· 하이라이트</b>
           </div>
           <div className="space-y-2">
-            <Button onClick={() => { setNoDataModal(false); store.goToStep('keywords') }}>정보 추가하러 가기</Button>
+            <Button onClick={() => { setNoDataModal(false); store.goToStep('sns') }}>정보 추가하러 가기</Button>
             <Button variant="outline" onClick={() => { setNoDataModal(false); handleManual() }}>직접 작성하기</Button>
             <button className="text-xs text-[var(--color-text-secondary)] mt-1" onClick={() => { setNoDataModal(false); store.completeOnboarding(); store.goToStep('complete') }}>나중에 작성하기</button>
           </div>

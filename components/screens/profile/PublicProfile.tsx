@@ -6,6 +6,7 @@ import { Bookmark, Copy, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { showToast } from '@/components/ui'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
+import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import type { Highlight } from '@/types'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
 import {
@@ -61,7 +62,6 @@ export default function PublicProfile({
   const [bioExpanded, setBioExpanded] = useState(false)
   const [bioOverflowing, setBioOverflowing] = useState(false)
   const bioRef = useRef<HTMLParagraphElement | null>(null)
-  const experienceOptions = profile.selectedKeywords.slice(0, 4)
   const verifiedHighlights: Highlight[] = [
     ...(showCareerHighlight ? [{
       id: `verified-career-${username}`,
@@ -321,7 +321,7 @@ export default function PublicProfile({
         profileName={profile.name}
         currentUserName={store.user?.name}
         isLoggedIn={store.isLoggedIn}
-        experienceOptions={experienceOptions}
+        experienceKeywordGroups={REPUTATION_KEYWORD_GROUPS}
         selectedKeywords={store.experienceKeywords}
         experienceMessage={store.experienceMessage}
         onToggleKeyword={(keyword) => {

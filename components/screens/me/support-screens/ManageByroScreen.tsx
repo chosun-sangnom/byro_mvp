@@ -1,6 +1,7 @@
 'use client'
 
 import { ChevronRight } from 'lucide-react'
+import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import type { Highlight, PublicProfileLife, UserState } from '@/types'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
@@ -60,6 +61,9 @@ export function ManageByroScreen({
     (sum, item) => sum + item.count,
     0,
   )
+  const visibleReputationCount = SAMPLE_PROFILE.reputationKeywords.filter((item) =>
+    REPUTATION_KEYWORD_GROUPS.some((group) => group.keywords.includes(item.keyword)),
+  ).length
 
   const completionChecks = [
     { label: '기본정보', done: Boolean(user.headline?.trim() && whoIAm.mbti) },
@@ -95,7 +99,7 @@ export function ManageByroScreen({
     },
     {
       title: '평판',
-      meta: `키워드 ${user.selectedKeywords.length}개 · 누적 ${totalReputationCount}회`,
+      meta: `누적 ${totalReputationCount}회 · 상위 ${visibleReputationCount}개 키워드`,
       onClick: onEditReputation,
     },
     {

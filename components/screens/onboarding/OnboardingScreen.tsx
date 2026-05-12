@@ -6,7 +6,7 @@ import { useByroStore } from '@/store/useByroStore'
 import { Button, Modal, NavBar, StepBar } from '@/components/ui'
 import type { OnboardingStep } from '@/types'
 import { Step1Login, Step2Verify, Step3LinkId } from '@/components/screens/onboarding/steps/OnboardingIntroSteps'
-import { Step4Keywords, Step5SNS, Step6Contact } from '@/components/screens/onboarding/steps/OnboardingSocialContactSteps'
+import { Step5SNS, Step6Contact } from '@/components/screens/onboarding/steps/OnboardingSocialContactSteps'
 import { Step7Highlight } from '@/components/screens/onboarding/steps/OnboardingHighlightStep'
 import { Step8AI, Step8Select, Step9Complete } from '@/components/screens/onboarding/steps/OnboardingBioSteps'
 
@@ -14,20 +14,18 @@ const STEP_NUMS: Record<OnboardingStep, number> = {
   login: 0,
   verify: 1,
   linkid: 2,
-  keywords: 3,
-  sns: 4,
-  contact: 5,
-  highlight: 6,
-  'bio-select': 7,
-  'bio-ai': 8,
-  complete: 9,
+  sns: 3,
+  contact: 4,
+  highlight: 5,
+  'bio-select': 6,
+  'bio-ai': 7,
+  complete: 8,
 }
 
 const STEP_COMPONENTS: Record<OnboardingStep, () => JSX.Element> = {
   login: Step1Login,
   verify: Step2Verify,
   linkid: Step3LinkId,
-  keywords: Step4Keywords,
   sns: Step5SNS,
   contact: Step6Contact,
   highlight: Step7Highlight,
@@ -43,7 +41,7 @@ export default function OnboardingScreen() {
 
   const stepNum = STEP_NUMS[store.step]
   const CurrentStep = STEP_COMPONENTS[store.step]
-  const hasBack = stepNum >= 1 && stepNum <= 8
+  const hasBack = stepNum >= 1 && stepNum <= 7
 
   const handleClose = () => setShowExitModal(true)
   const handleExitConfirm = () => {
@@ -58,8 +56,8 @@ export default function OnboardingScreen() {
         onClose={handleClose}
       />
 
-      {stepNum >= 1 && stepNum <= 8 && (
-        <StepBar current={stepNum} total={8} />
+      {stepNum >= 1 && stepNum <= 7 && (
+        <StepBar current={stepNum} total={7} />
       )}
 
       <div className="flex-1 overflow-hidden">

@@ -80,33 +80,6 @@ function SubHeader({ label }: { label: string }) {
   )
 }
 
-function ActivityRow({ items }: { items: string[] }) {
-  if (!items.length) return null
-  return (
-    <div className="px-5">
-      {items.map((item, i) => (
-        <div
-          key={item}
-          className={`flex items-center gap-3 py-2.5 ${i < items.length - 1 ? 'border-b border-[var(--color-border-soft)]' : ''}`}
-        >
-          <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[var(--color-text-tertiary)] opacity-40" />
-          <span className="text-[13px] font-semibold text-[var(--color-text-primary)]">{item}</span>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function ChipRow({ chips }: { chips: string[] }) {
-  if (!chips.length) return null
-  return (
-    <div className="flex flex-wrap gap-1.5 px-5">
-      {chips.map((chip) => (
-        <span key={chip} className="chip-metric">{chip}</span>
-      ))}
-    </div>
-  )
-}
 
 export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife }) {
   if (!life) return null
@@ -139,13 +112,13 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
           {exercise.length > 0 && (
             <div className="mb-3">
               <SubHeader label="운동" />
-              <ActivityRow items={exercise} />
+              <MediaScroll items={exercise} aspect="square" />
             </div>
           )}
           {teams.length > 0 && (
             <div>
               <SubHeader label="스포츠팀" />
-              <ActivityRow items={teams} />
+              <MediaScroll items={teams} aspect="square" />
             </div>
           )}
         </>
@@ -169,7 +142,7 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
           <PlaceScroll items={placeItems} />
           {life.places.travelDestinations.length > 0 && (
             <div className="mt-3">
-              <ChipRow chips={life.places.travelDestinations} />
+              <PlaceScroll items={life.places.travelDestinations} />
             </div>
           )}
         </>

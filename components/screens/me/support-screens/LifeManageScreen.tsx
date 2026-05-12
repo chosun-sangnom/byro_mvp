@@ -44,21 +44,21 @@ function parseMedia(value: string, previous: LifeMediaItem[]) {
 export function LifeManageScreen({ onBack }: { onBack: () => void }) {
   const store = useByroStore()
   const initialLife: PublicProfileLife = store.user?.life ?? SAMPLE_PROFILE.life
-  const [exercise, setExercise] = useState(formatList(initialLife.daily.exercise))
-  const [teams, setTeams] = useState(formatList(initialLife.tastes.teams ?? []))
+  const [exercise, setExercise] = useState(formatMedia(initialLife.daily.exercise))
+  const [teams, setTeams] = useState(formatMedia(initialLife.tastes.teams ?? []))
   const [movies, setMovies] = useState(formatMedia(initialLife.tastes.movies))
   const [music, setMusic] = useState(formatMedia(initialLife.tastes.music))
   const [books, setBooks] = useState(formatMedia(initialLife.tastes.books))
   const [plays, setPlays] = useState(formatMedia(initialLife.tastes.plays ?? []))
   const [restaurants, setRestaurants] = useState(formatMedia(initialLife.tastes.restaurants))
   const [cafes, setCafes] = useState(formatMedia(initialLife.tastes.cafes))
-  const [travelDestinations, setTravelDestinations] = useState(formatList(initialLife.places.travelDestinations))
+  const [travelDestinations, setTravelDestinations] = useState(formatMedia(initialLife.places.travelDestinations))
 
   const handleSave = () => {
     const nextLife: PublicProfileLife = {
       daily: {
         ...initialLife.daily,
-        exercise: parseList(exercise),
+        exercise: parseMedia(exercise, initialLife.daily.exercise),
       },
       tastes: {
         ...initialLife.tastes,
@@ -66,13 +66,13 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
         music: parseMedia(music, initialLife.tastes.music),
         books: parseMedia(books, initialLife.tastes.books),
         plays: parseMedia(plays, initialLife.tastes.plays ?? []),
-        teams: parseList(teams),
+        teams: parseMedia(teams, initialLife.tastes.teams ?? []),
         restaurants: parseMedia(restaurants, initialLife.tastes.restaurants),
         cafes: parseMedia(cafes, initialLife.tastes.cafes),
       },
       places: {
         ...initialLife.places,
-        travelDestinations: parseList(travelDestinations),
+        travelDestinations: parseMedia(travelDestinations, initialLife.places.travelDestinations),
       },
     }
 
@@ -96,23 +96,8 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
         </InfoBox>
 
         <Section title="활동">
-          <InputField label="좋아하는 운동">
-            <input
-              value={exercise}
-              onChange={(event) => setExercise(event.target.value)}
-              placeholder="예: 러닝, 골프"
-              className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-            />
-          </InputField>
-
-          <InputField label="응원하는 스포츠팀">
-            <input
-              value={teams}
-              onChange={(event) => setTeams(event.target.value)}
-              placeholder="예: LG 트윈스, 토트넘 홋스퍼"
-              className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-            />
-          </InputField>
+          <TextAreaField label="좋아하는 운동" value={exercise} onChange={setExercise} placeholder={'러닝\n골프'} />
+          <TextAreaField label="응원하는 스포츠팀" value={teams} onChange={setTeams} placeholder={'LG 트윈스 | KBO\n토트넘 홋스퍼 | EPL\nT1 | e스포츠'} />
         </Section>
 
         <Section title="문화">
@@ -125,14 +110,7 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
         <Section title="장소">
           <TextAreaField label="맛집" value={restaurants} onChange={setRestaurants} placeholder={'성수 우육미엔 | 성수동\n압구정 뜸들이다 | 압구정'} />
           <TextAreaField label="카페" value={cafes} onChange={setCafes} placeholder={'센터커피 | 성수동\n프릳츠 원서점 | 서촌'} />
-          <InputField label="여행지">
-            <input
-              value={travelDestinations}
-              onChange={(event) => setTravelDestinations(event.target.value)}
-              placeholder="예: 도쿄, 교토, 샌프란시스코"
-              className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-            />
-          </InputField>
+          <TextAreaField label="여행지" value={travelDestinations} onChange={setTravelDestinations} placeholder={'도쿄\n교토\n샌프란시스코'} />
         </Section>
       </div>
 

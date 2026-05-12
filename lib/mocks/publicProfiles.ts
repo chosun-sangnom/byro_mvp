@@ -38,7 +38,10 @@ export const SAMPLE_PROFILE = {
   },
   life: {
     daily: {
-      exercise: ['러닝', '골프'],
+      exercise: [
+        { label: '러닝', posterUrl: 'https://picsum.photos/seed/running_gmj/80/80' },
+        { label: '골프', posterUrl: 'https://picsum.photos/seed/golf_gmj/80/80' },
+      ],
       pet: '없음',
     },
     tastes: {
@@ -63,7 +66,9 @@ export const SAMPLE_PROFILE = {
       plays: [
         { label: '렛미플라이', sublabel: '뮤지컬', posterUrl: 'https://picsum.photos/seed/letmefly_gmj/80/112' },
       ],
-      teams: ['LG 트윈스'],
+      teams: [
+        { label: 'LG 트윈스', sublabel: 'KBO', posterUrl: 'https://picsum.photos/seed/lgtwins_gmj/80/80' },
+      ],
       games: ['EA SPORTS FC'],
       sports: ['축구', '골프'],
       celebrities: ['유재석', '아이유'],
@@ -81,7 +86,11 @@ export const SAMPLE_PROFILE = {
     },
     places: {
       neighborhoods: ['성수동', '한남동', '서촌'],
-      travelDestinations: ['도쿄', '교토', '샌프란시스코'],
+      travelDestinations: [
+        { label: '도쿄', posterUrl: 'https://picsum.photos/seed/tokyo_gmj/148/96' },
+        { label: '교토', posterUrl: 'https://picsum.photos/seed/kyoto_gmj/148/96' },
+        { label: '샌프란시스코', posterUrl: 'https://picsum.photos/seed/sf_gmj/148/96' },
+      ],
     },
   },
   heroTheme: {
@@ -254,7 +263,11 @@ export const MK_PROFILE = {
   },
   life: {
     daily: {
-      exercise: ['골프', '웨이트', '산책'],
+      exercise: [
+        { label: '골프', posterUrl: 'https://picsum.photos/seed/golf_mk/80/80' },
+        { label: '웨이트', posterUrl: 'https://picsum.photos/seed/weight_mk/80/80' },
+        { label: '산책', posterUrl: 'https://picsum.photos/seed/walk_mk/80/80' },
+      ],
       pet: '없음',
     },
     tastes: {
@@ -276,7 +289,9 @@ export const MK_PROFILE = {
       plays: [
         { label: '웃는 남자', sublabel: '뮤지컬', posterUrl: 'https://picsum.photos/seed/laughingman_mk/80/112' },
       ],
-      teams: ['토트넘 홋스퍼'],
+      teams: [
+        { label: '토트넘 홋스퍼', sublabel: 'EPL', posterUrl: 'https://picsum.photos/seed/tottenham_mk/80/80' },
+      ],
       games: ['문명', 'FC'],
       sports: ['골프', '축구'],
       celebrities: ['손흥민', '전도연'],
@@ -292,7 +307,11 @@ export const MK_PROFILE = {
     },
     places: {
       neighborhoods: ['한남동', '압구정', '성수동'],
-      travelDestinations: ['뉴욕', '런던', '파리'],
+      travelDestinations: [
+        { label: '뉴욕', posterUrl: 'https://picsum.photos/seed/newyork_mk/148/96' },
+        { label: '런던', posterUrl: 'https://picsum.photos/seed/london_mk/148/96' },
+        { label: '파리', posterUrl: 'https://picsum.photos/seed/paris_mk/148/96' },
+      ],
     },
   },
   heroTheme: {
@@ -443,7 +462,10 @@ export const JIMIN_PROFILE = {
   },
   life: {
     daily: {
-      exercise: ['필라테스', '산책'],
+      exercise: [
+        { label: '필라테스', posterUrl: 'https://picsum.photos/seed/pilates_jm/80/80' },
+        { label: '산책', posterUrl: 'https://picsum.photos/seed/walk_jm/80/80' },
+      ],
       pet: '없음',
     },
     tastes: {
@@ -465,7 +487,9 @@ export const JIMIN_PROFILE = {
       plays: [
         { label: '레드북', sublabel: '연극', posterUrl: 'https://picsum.photos/seed/redbook_jm/80/112' },
       ],
-      teams: ['두산 베어스'],
+      teams: [
+        { label: '두산 베어스', sublabel: 'KBO', posterUrl: 'https://picsum.photos/seed/doosan_jm/80/80' },
+      ],
       games: ['심즈'],
       sports: ['테니스', '야구'],
       celebrities: ['아이유', '한소희'],
@@ -481,7 +505,11 @@ export const JIMIN_PROFILE = {
     },
     places: {
       neighborhoods: ['한남동', '연남동', '서촌'],
-      travelDestinations: ['오사카', '런던', '제주'],
+      travelDestinations: [
+        { label: '오사카', posterUrl: 'https://picsum.photos/seed/osaka_jm/148/96' },
+        { label: '런던', posterUrl: 'https://picsum.photos/seed/london_jm/148/96' },
+        { label: '제주', posterUrl: 'https://picsum.photos/seed/jeju_jm/148/96' },
+      ],
     },
   },
   heroTheme: {

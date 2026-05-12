@@ -170,7 +170,7 @@ export interface KemiData {
 
 export interface PublicProfileLife {
   daily: {
-    exercise: string[]
+    exercise: LifeMediaItem[]
     pet: string
     petName?: string
     petImage?: string
@@ -182,7 +182,7 @@ export interface PublicProfileLife {
     plays?: LifeMediaItem[]
     games: string[]
     sports: string[]
-    teams?: string[]
+    teams?: LifeMediaItem[]
     celebrities: string[]
     diet: string
     restaurants: LifeMediaItem[]
@@ -190,7 +190,7 @@ export interface PublicProfileLife {
   }
   places: {
     neighborhoods: string[]
-    travelDestinations: string[]
+    travelDestinations: LifeMediaItem[]
   }
 }
 

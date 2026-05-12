@@ -6,16 +6,6 @@ import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
 import type { LifeMediaItem, PublicProfileLife } from '@/types'
 
-function parseList(value: string) {
-  return value
-    .split(',')
-    .map((item) => item.trim())
-    .filter(Boolean)
-}
-
-function formatList(items: string[]) {
-  return items.join(', ')
-}
 
 function formatMedia(items: LifeMediaItem[]) {
   return items

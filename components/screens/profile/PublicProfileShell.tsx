@@ -17,7 +17,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { Pencil, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
-import { Button, BottomSheet, showToast } from '@/components/ui'
+import { Button, BottomSheet, TextArea, showToast } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
 import { ContactActionButton, ProfileHeroCard } from '@/components/screens/profile/PublicProfileSections'
@@ -57,13 +57,18 @@ export function PublicProfileShell({
 
   const [bioExpanded, setBioExpanded] = useState(false)
   const [bioOverflowing, setBioOverflowing] = useState(false)
-  const [metaSheetOpen, setMetaSheetOpen] = useState(false)
+  const [moodSheetOpen, setMoodSheetOpen] = useState(false)
+  const [pungSheetOpen, setPungSheetOpen] = useState(false)
   const [moodDraft, setMoodDraft] = useState(profile.headerMeta?.mood ?? '')
   const [availabilityDraft, setAvailabilityDraft] = useState(profile.headerMeta?.availability ?? '')
   const bioRef = useRef<HTMLParagraphElement | null>(null)
   const moodOptions = moodDraft && !DEFAULT_MOOD_OPTIONS.includes(moodDraft as (typeof DEFAULT_MOOD_OPTIONS)[number])
     ? [moodDraft, ...DEFAULT_MOOD_OPTIONS]
     : DEFAULT_MOOD_OPTIONS
+  const resetHeaderDrafts = () => {
+    setMoodDraft(profile.headerMeta?.mood ?? '')
+    setAvailabilityDraft(profile.headerMeta?.availability ?? '')
+  }
 
   useEffect(() => {
     setBioExpanded(false)
@@ -89,18 +94,37 @@ export function PublicProfileShell({
   // 관계 탭에서만 "피드백 요청 / 경험 남기기" 버튼 표시 (visitor only)
   const showReputationActions = activeTab === 'reputation' && !isOwnerMode
 
-  const handleSaveHeaderMeta = () => {
+  const updateHeaderMeta = (next: {
+    mood?: string
+    availability?: string
+  }) => {
     if (!store.user) return
     store.updateUserInfo({
       headerMeta: {
         ...profile.headerMeta,
         residence: profile.headerMeta?.residence ?? store.user.headerMeta?.residence ?? SAMPLE_PROFILE.headerMeta.residence,
-        mood: moodDraft.trim(),
-        availability: availabilityDraft.trim(),
+        mood: next.mood ?? profile.headerMeta?.mood ?? '',
+        availability: next.availability ?? profile.headerMeta?.availability ?? '',
       },
     })
-    setMetaSheetOpen(false)
-    showToast('오늘의 기분과 펑이 저장됐어요')
+  }
+
+  const handleSaveMood = () => {
+    updateHeaderMeta({
+      mood: moodDraft.trim(),
+      availability: profile.headerMeta?.availability ?? availabilityDraft.trim(),
+    })
+    setMoodSheetOpen(false)
+    showToast('오늘의 기분이 저장됐어요')
+  }
+
+  const handleSavePung = () => {
+    updateHeaderMeta({
+      mood: profile.headerMeta?.mood ?? moodDraft.trim(),
+      availability: availabilityDraft.trim(),
+    })
+    setPungSheetOpen(false)
+    showToast('펑이 저장됐어요')
   }
 
   return (
@@ -160,7 +184,8 @@ export function PublicProfileShell({
             bioRef={bioRef}
             onToggleBio={() => setBioExpanded((prev) => !prev)}
             isOwnerMode={isOwnerMode}
-            onEditHeaderMeta={isOwnerMode ? () => setMetaSheetOpen(true) : undefined}
+            onEditMood={isOwnerMode ? () => setMoodSheetOpen(true) : undefined}
+            onEditPung={isOwnerMode ? () => setPungSheetOpen(true) : undefined}
           />
         </div>
 
@@ -252,56 +277,79 @@ export function PublicProfileShell({
         </div>
       </div>
 
-      <BottomSheet open={metaSheetOpen} onClose={() => setMetaSheetOpen(false)}>
+      <BottomSheet open={moodSheetOpen} onClose={() => { resetHeaderDrafts(); setMoodSheetOpen(false) }}>
         <div className="px-5 pb-6">
-          <div className="mb-1 text-[18px] font-black text-[var(--color-text-strong)]">오늘의 기분 · 펑 수정</div>
+          <div className="mb-1 text-[18px] font-black text-[var(--color-text-strong)]">오늘의 기분</div>
           <div className="mb-4 text-sm leading-6 text-[var(--color-text-secondary)]">
-            오늘의 기분은 고르고, 펑은 짧게 직접 적는 방식으로 관리합니다.
+            지금의 상태를 빠르게 고르는 값입니다. 카드에서는 짧은 배지로 노출됩니다.
+          </div>
+
+          <div>
+            <label className="mb-2 block text-xs font-bold text-[var(--color-text-secondary)]">선택</label>
+            <div className="flex flex-wrap gap-2">
+              {moodOptions.map((option) => {
+                const selected = moodDraft === option
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => setMoodDraft(option)}
+                    className={[
+                      'rounded-full border px-3 py-2 text-xs font-semibold transition-colors',
+                      selected
+                        ? 'border-[var(--color-accent-dark)] bg-[rgba(75,108,245,0.14)] text-[var(--color-text-primary)]'
+                        : 'border-[var(--color-border-default)] bg-[var(--color-bg-soft)] text-[var(--color-text-secondary)]',
+                    ].join(' ')}
+                  >
+                    {option}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          <div className="mt-5 flex gap-2">
+            <Button variant="outline" onClick={() => { resetHeaderDrafts(); setMoodSheetOpen(false) }}>닫기</Button>
+            <Button onClick={handleSaveMood}>저장</Button>
+          </div>
+        </div>
+      </BottomSheet>
+
+      <BottomSheet open={pungSheetOpen} onClose={() => { resetHeaderDrafts(); setPungSheetOpen(false) }}>
+        <div className="px-5 pb-6">
+          <div className="mb-1 text-[18px] font-black text-[var(--color-text-strong)]">펑 열기</div>
+          <div className="mb-4 text-sm leading-6 text-[var(--color-text-secondary)]">
+            펑은 지금 가능한 제안이나 한마디를 직접 적는 별도 입력입니다.
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="mb-2 block text-xs font-bold text-[var(--color-text-secondary)]">오늘의 기분</label>
-              <div className="flex flex-wrap gap-2">
-                {moodOptions.map((option) => {
-                  const selected = moodDraft === option
-                  return (
-                    <button
-                      key={option}
-                      type="button"
-                      onClick={() => setMoodDraft(option)}
-                      className={[
-                        'rounded-full border px-3 py-2 text-xs font-semibold transition-colors',
-                        selected
-                          ? 'border-[var(--color-accent-dark)] bg-[rgba(75,108,245,0.14)] text-[var(--color-text-primary)]'
-                          : 'border-[var(--color-border-default)] bg-[var(--color-bg-soft)] text-[var(--color-text-secondary)]',
-                      ].join(' ')}
-                    >
-                      {option}
-                    </button>
-                  )
-                })}
+              <label className="mb-2 block text-xs font-bold text-[var(--color-text-secondary)]">내용</label>
+              <TextArea
+                value={availabilityDraft}
+                onChange={setAvailabilityDraft}
+                placeholder="예: 오늘 저녁 성수에서 커피챗 가능"
+                maxLength={48}
+                rows={3}
+                dark
+              />
+              <div className="mt-2 text-[11px] text-[var(--color-text-tertiary)]">
+                짧지만 구체적으로 적는 편이 좋습니다. 지금 가능한 시간이나 장소가 있으면 함께 적어주세요.
               </div>
             </div>
 
-            <div>
-              <label className="mb-2 block text-xs font-bold text-[var(--color-text-secondary)]">펑</label>
-              <input
-                value={availabilityDraft}
-                onChange={(event) => setAvailabilityDraft(event.target.value)}
-                placeholder="예: 오늘 저녁 커피챗 가능"
-                maxLength={32}
-                className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-              />
-              <div className="mt-2 text-[11px] text-[var(--color-text-tertiary)]">
-                지금 가능한 상태나 한마디를 직접 적어주세요.
+            <div className="rounded-2xl border border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.03)] px-4 py-3">
+              <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)]">Preview</div>
+              <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[rgba(75,108,245,0.45)] bg-[rgba(75,108,245,0.18)] px-3 py-1 text-[12px] font-semibold text-white/90">
+                <span>💬</span>
+                <span>{availabilityDraft.trim() || '오늘 가능한 제안을 적어보세요'}</span>
               </div>
             </div>
           </div>
 
           <div className="mt-5 flex gap-2">
-            <Button variant="outline" onClick={() => setMetaSheetOpen(false)}>닫기</Button>
-            <Button onClick={handleSaveHeaderMeta}>저장</Button>
+            <Button variant="outline" onClick={() => { resetHeaderDrafts(); setPungSheetOpen(false) }}>닫기</Button>
+            <Button onClick={handleSavePung}>저장</Button>
           </div>
         </div>
       </BottomSheet>

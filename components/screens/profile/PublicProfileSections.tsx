@@ -66,7 +66,8 @@ export function ProfileHeroSection({
   bioRef,
   onToggleBio,
   isOwnerMode,
-  onEditHeaderMeta,
+  onEditMood,
+  onEditPung,
 }: {
   profile: {
     name: string
@@ -88,7 +89,8 @@ export function ProfileHeroSection({
   bioRef: RefObject<HTMLParagraphElement>
   onToggleBio: () => void
   isOwnerMode?: boolean
-  onEditHeaderMeta?: () => void
+  onEditMood?: () => void
+  onEditPung?: () => void
 }) {
   return (
     <motion.div
@@ -106,7 +108,8 @@ export function ProfileHeroSection({
         bioRef={bioRef}
         onToggleBio={onToggleBio}
         isOwnerMode={isOwnerMode}
-        onEditHeaderMeta={onEditHeaderMeta}
+        onEditMood={onEditMood}
+        onEditPung={onEditPung}
       />
     </motion.div>
   )
@@ -135,7 +138,8 @@ export function ProfileHeroCard({
   bioOverflowing,
   onToggleBio,
   isOwnerMode = false,
-  onEditHeaderMeta,
+  onEditMood,
+  onEditPung,
 }: {
   profile: {
     name: string
@@ -160,14 +164,15 @@ export function ProfileHeroCard({
   bioOverflowing?: boolean
   onToggleBio?: () => void
   isOwnerMode?: boolean
-  onEditHeaderMeta?: () => void
+  onEditMood?: () => void
+  onEditPung?: () => void
 }) {
   const showAge = typeof profile.age === 'number' && profile.sajuProfile?.showAge !== false
   const mood = profile.headerMeta?.mood
   const pung = profile.headerMeta?.availability
 
-  const MoodPill = onEditHeaderMeta ? 'button' : 'span'
-  const PungPill = onEditHeaderMeta ? 'button' : 'span'
+  const MoodPill = onEditMood ? 'button' : 'span'
+  const PungPill = onEditPung ? 'button' : 'span'
 
   return (
     <div className="hero-card border border-[var(--color-border-default)] bg-[rgba(23,24,28,0.92)] p-[8px] backdrop-blur-sm">
@@ -227,11 +232,11 @@ export function ProfileHeroCard({
           {(mood || isOwnerMode) && (
             <div className="mt-2.5">
               <MoodPill
-                {...(onEditHeaderMeta ? { type: 'button' as const, onClick: onEditHeaderMeta } : {})}
+                {...(onEditMood ? { type: 'button' as const, onClick: onEditMood } : {})}
                 className="inline-flex items-center gap-1.5 rounded-full border border-white/14 bg-white/10 px-3 py-1 text-[12px] font-semibold text-white/85 backdrop-blur-sm"
               >
                 <span className="text-white/42">✦</span>
-                <span>{mood || '기분 추가하기'}</span>
+                <span>{mood || '오늘의 기분 선택'}</span>
               </MoodPill>
             </div>
           )}
@@ -257,11 +262,11 @@ export function ProfileHeroCard({
           {(pung || isOwnerMode) && (
             <div className="mt-2">
               <PungPill
-                {...(onEditHeaderMeta ? { type: 'button' as const, onClick: onEditHeaderMeta } : {})}
+                {...(onEditPung ? { type: 'button' as const, onClick: onEditPung } : {})}
                 className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(75,108,245,0.45)] bg-[rgba(75,108,245,0.18)] px-3 py-1 text-[12px] font-semibold text-white/90"
               >
                 <span>💬</span>
-                <span>{pung || '한마디 추가하기'}</span>
+                <span>{pung || '펑 열기'}</span>
               </PungPill>
             </div>
           )}

@@ -112,15 +112,16 @@ export function PublicProfileShell({
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          {/* owner: /me 아바타 진입점 | visitor: 로그인 시 북마크 없음 (추후 추가) */}
-          {isOwnerMode ? (
-            // TODO(me): 아바타 이미지 / 미확인 알림 뱃지 연동
+        <div className="flex items-center gap-2.5">
+          {store.isLoggedIn ? (
             <button
               onClick={() => router.push('/me')}
-              className="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-[var(--color-accent-dark)] text-[12px] font-bold text-white"
+              className="inline-flex h-8 items-center gap-2 rounded-full border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.04)] pl-1.5 pr-3 text-[11px] font-semibold text-[var(--color-text-primary)]"
             >
-              {store.user?.name?.charAt(0) ?? 'M'}
+              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-accent-dark)] text-[10px] font-black text-white">
+                {store.user?.name?.charAt(0) ?? 'M'}
+              </span>
+              <span>{isOwnerMode ? '내 Byro' : '내 프로필'}</span>
             </button>
           ) : null}
 

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
-import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
+import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
 import { PublicProfileShell } from '@/components/screens/profile/PublicProfileShell'
 import { type PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
 import {
@@ -47,8 +47,9 @@ export default function MyByro() {
 
   if (!store.isLoggedIn) return null
   const user = store.user!
+  const profile = getNormalizedPublicProfile({ username: user.linkId, user })
 
-  const allHighlights = [...SAMPLE_PROFILE.manualHighlights, ...store.highlights]
+  const allHighlights = [...profile.manualHighlights, ...store.highlights]
   // ── 화면 분기 ──────────────────────────────────────────────
   if (screen === 'preview') {
     return (
@@ -70,6 +71,9 @@ export default function MyByro() {
     return (
       <ManageByroScreen
         allHighlights={allHighlights}
+        profile={profile}
+        instagramConnected={store.instagramConnected}
+        linkedinConnected={store.linkedinConnected}
         onLogout={() => store.logout()}
         onBack={() => setScreen('preview')}
         onEditBasic={() => setScreen('editBasic')}

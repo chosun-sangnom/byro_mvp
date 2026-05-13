@@ -7,6 +7,11 @@ import {
 } from 'lucide-react'
 import { BottomSheet } from '@/components/ui'
 import type { PublicProfileLife, PublicProfileWhoIAm } from '@/types'
+import {
+  getLifestyleSignals,
+  getMbtiTraits,
+  getTasteHook,
+} from '@/components/screens/profile/profileAnalysis'
 
 type CompatibilitySection = {
   title: string
@@ -23,7 +28,7 @@ type CompatibilityReport = {
   opener: string
 }
 
-function getSignalChips(whoIAm: PublicProfileWhoIAm, life?: PublicProfileLife) {
+function getSignalChips(life?: PublicProfileLife) {
   return [
     life?.places.neighborhoods[0],
     life?.daily.exercise[0]?.label,
@@ -32,32 +37,14 @@ function getSignalChips(whoIAm: PublicProfileWhoIAm, life?: PublicProfileLife) {
     life?.tastes.movies[0]?.label,
   ].filter(Boolean) as string[]
 }
-
-function getTasteHook(life?: PublicProfileLife) {
-  return (
-    life?.tastes.cafes[0]?.label
-    ?? life?.tastes.restaurants[0]?.label
-    ?? life?.tastes.music[0]?.label
-    ?? life?.tastes.movies[0]?.label
-    ?? life?.tastes.books[0]?.label
-    ?? life?.daily.exercise[0]?.label
-    ?? null
-  )
-}
-
 function buildCompatibilityReport(
   profileName: string,
   whoIAm: PublicProfileWhoIAm,
   life: PublicProfileLife | undefined,
 ): CompatibilityReport {
-  const mbti = whoIAm.mbti.toUpperCase()
-  const extrovert = mbti.startsWith('E')
-  const intuitive = mbti[1] === 'N'
-  const thinking = mbti[2] === 'T'
-  const judging = mbti[3] === 'J'
-  const signalChips = getSignalChips(whoIAm, life)
-  const neighborhood = life?.places.neighborhoods[0]
-  const exercise = life?.daily.exercise[0]?.label
+  const { extrovert, intuitive, thinking, judging } = getMbtiTraits(whoIAm.mbti)
+  const signalChips = getSignalChips(life)
+  const { neighborhood, exercise } = getLifestyleSignals(life)
   const tasteHook = getTasteHook(life)
 
   const topicStyle = intuitive ? '맥락과 방향을 함께 이야기할 수 있는' : '생활 루틴과 현실 감각이 자연스럽게 맞는'

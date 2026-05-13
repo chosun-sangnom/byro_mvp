@@ -22,6 +22,10 @@ import { useState } from 'react'
 import { Sparkles } from 'lucide-react'
 import { BottomSheet } from '@/components/ui'
 import type { KemiData, PublicProfileLife, PublicProfileWhoIAm } from '@/types'
+import {
+  getLifestyleSignals,
+  getMbtiTraits,
+} from '@/components/screens/profile/profileAnalysis'
 
 // TODO(AI): When real kemi endpoint is wired up, this component receives
 // viewer-relative match data. The aiCopy field should be replaced with a
@@ -148,23 +152,11 @@ type OwnerCompatibilitySummary = {
   caution: OwnerKemiSection
 }
 
-function getLifestyleSignals(life?: PublicProfileLife) {
-  return {
-    activity: life?.daily.exercise[0]?.label ?? life?.tastes.teams?.[0]?.label ?? null,
-    culture: life?.tastes.movies[0]?.label ?? life?.tastes.music[0]?.label ?? life?.tastes.books[0]?.label ?? null,
-    place: life?.tastes.cafes[0]?.label ?? life?.tastes.restaurants[0]?.label ?? life?.places.travelDestinations[0]?.label ?? null,
-  }
-}
-
 function buildOwnerCompatibilitySummary(
   whoIAm: PublicProfileWhoIAm,
   life: PublicProfileLife | undefined,
 ): OwnerCompatibilitySummary {
-  const mbti = whoIAm.mbti.toUpperCase()
-  const extrovert = mbti.startsWith('E')
-  const intuitive = mbti[1] === 'N'
-  const thinking = mbti[2] === 'T'
-  const judging = mbti[3] === 'J'
+  const { extrovert, intuitive, thinking, judging } = getMbtiTraits(whoIAm.mbti)
   const lifestyle = getLifestyleSignals(life)
 
   const lifestyleChips = [lifestyle.activity, lifestyle.culture, lifestyle.place].filter(Boolean) as string[]

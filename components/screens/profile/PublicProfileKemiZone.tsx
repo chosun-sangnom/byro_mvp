@@ -20,6 +20,7 @@
 
 import { useState } from 'react'
 import { BriefcaseBusiness, Heart, Sparkles, Users } from 'lucide-react'
+import { BottomSheet } from '@/components/ui'
 import type { KemiData, PublicProfileLife, PublicProfileWhoIAm } from '@/types'
 
 // TODO(AI): When real kemi endpoint is wired up, this component receives
@@ -308,36 +309,90 @@ export function PublicProfileOwnerMatchZone({
   whoIAm?: PublicProfileWhoIAm
   life?: PublicProfileLife
 }) {
-  const [activeMode, setActiveMode] = useState<OwnerKemiMode>('romance')
+  const [reportOpen, setReportOpen] = useState(false)
 
   if (!whoIAm) return null
 
+  return (
+    <>
+      <div className="px-5 pb-3">
+        <div
+          className="rounded-[20px] px-4 py-4"
+          style={{
+            border: '1px solid rgba(75,108,245,0.18)',
+            background: 'linear-gradient(135deg, rgba(75,108,245,0.09) 0%, rgba(255,255,255,0.03) 100%)',
+          }}
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <div className="flex items-center gap-1.5">
+                <Sparkles size={12} style={{ color: 'var(--color-accent-dark)' }} />
+                <span
+                  className="text-[11px] font-bold uppercase tracking-[0.08em]"
+                  style={{ color: 'var(--color-accent-dark)' }}
+                >
+                  내 케미 리포트
+                </span>
+              </div>
+              <div className="mt-1 text-[15px] font-semibold text-[var(--color-text-primary)]">
+                이성 · 비즈니스 · 친구 관점으로 보는 내 관계 결
+              </div>
+              <p className="mt-2 text-[12px] leading-[1.6] text-[var(--color-text-secondary)]">
+                사주, MBTI, 라이프스타일을 조합해 어떤 유형의 사람과 잘 맞는지 읽어줍니다.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setReportOpen(true)}
+              className="shrink-0 rounded-full bg-[var(--color-accent-dark)] px-3 py-2 text-[12px] font-semibold text-white"
+            >
+              리포트 보기
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <OwnerKemiReportSheet
+        open={reportOpen}
+        onClose={() => setReportOpen(false)}
+        whoIAm={whoIAm}
+        life={life}
+      />
+    </>
+  )
+}
+
+function OwnerKemiReportSheet({
+  open,
+  onClose,
+  whoIAm,
+  life,
+}: {
+  open: boolean
+  onClose: () => void
+  whoIAm: PublicProfileWhoIAm
+  life?: PublicProfileLife
+}) {
+  const [activeMode, setActiveMode] = useState<OwnerKemiMode>('romance')
   const report = buildOwnerKemiReport(whoIAm, life, activeMode)
 
   return (
-    <div className="px-5 pb-3">
-      <div
-        className="rounded-[20px] px-4 py-4"
-        style={{
-          border: '1px solid rgba(75,108,245,0.18)',
-          background: 'linear-gradient(135deg, rgba(75,108,245,0.09) 0%, rgba(255,255,255,0.03) 100%)',
-        }}
-      >
-        <div className="mb-3 flex items-center gap-1.5">
-          <Sparkles size={12} style={{ color: 'var(--color-accent-dark)' }} />
-          <span
-            className="text-[11px] font-bold uppercase tracking-[0.08em]"
-            style={{ color: 'var(--color-accent-dark)' }}
-          >
-            내 케미 리포트
-          </span>
+    <BottomSheet open={open} onClose={onClose}>
+      <div className="px-5 pb-6">
+        <div className="mb-5">
+          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">
+            <Sparkles size={14} />
+            <span>My Kemi Report</span>
+          </div>
+          <h3 className="mt-3 text-[24px] font-black leading-[1.2] text-[var(--color-text-primary)]">
+            나는 어떤 유형과 잘 맞을까
+          </h3>
+          <p className="mt-2 text-[13px] leading-[1.7] text-[var(--color-text-secondary)]">
+            사주, MBTI, 라이프스타일을 기준으로 이성, 비즈니스, 친구 관점의 잘 맞는 결을 해석합니다.
+          </p>
         </div>
 
-        <p className="text-[13px] leading-[1.65] text-[var(--color-text-secondary)]">
-          사주, MBTI, 라이프스타일을 조합해 어떤 유형의 사람과 결이 잘 맞는지 먼저 읽어봅니다.
-        </p>
-
-        <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+        <div className="grid grid-cols-3 gap-2 rounded-[24px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.03)] p-1.5">
           {OWNER_KEMI_MODES.map((mode) => {
             const active = mode.id === activeMode
 
@@ -346,10 +401,9 @@ export function PublicProfileOwnerMatchZone({
                 key={mode.id}
                 type="button"
                 onClick={() => setActiveMode(mode.id)}
-                className="flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-[12px] font-semibold transition"
+                className="flex items-center justify-center gap-1.5 rounded-[18px] px-3 py-3 text-[12px] font-semibold transition"
                 style={{
-                  background: active ? 'rgba(75,108,245,0.16)' : 'rgba(255,255,255,0.04)',
-                  border: active ? '1px solid rgba(75,108,245,0.34)' : '1px solid rgba(255,255,255,0.06)',
+                  backgroundColor: active ? 'rgba(75,108,245,0.16)' : 'transparent',
                   color: active ? 'var(--color-accent-dark)' : 'var(--color-text-secondary)',
                 }}
               >
@@ -360,13 +414,7 @@ export function PublicProfileOwnerMatchZone({
           })}
         </div>
 
-        <div
-          className="mt-4 rounded-[18px] px-4 py-4"
-          style={{
-            border: '1px solid rgba(255,255,255,0.06)',
-            background: 'rgba(8,11,20,0.42)',
-          }}
-        >
+        <div className="mt-4 rounded-[24px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.04)] p-4">
           <div className="flex items-center justify-between gap-3">
             <span
               className="rounded-full px-2.5 py-1 text-[11px] font-semibold"
@@ -382,9 +430,9 @@ export function PublicProfileOwnerMatchZone({
             </span>
           </div>
 
-          <h3 className="mt-3 text-[16px] font-semibold text-[var(--color-text-primary)]">
+          <h4 className="mt-3 text-[18px] font-bold leading-[1.35] text-[var(--color-text-primary)]">
             {report.title}
-          </h3>
+          </h4>
           <p className="mt-2 text-[13px] leading-[1.7] text-[var(--color-text-secondary)]">
             {report.summary}
           </p>
@@ -396,21 +444,24 @@ export function PublicProfileOwnerMatchZone({
               </span>
             ))}
           </div>
+        </div>
 
-          <div className="mt-4 space-y-4">
-            {[report.fit, report.chemistry, report.caution].map((section) => (
-              <div key={section.title}>
-                <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-tertiary)]">
-                  {section.title}
-                </div>
-                <p className="mt-1.5 text-[13px] leading-[1.7] text-[var(--color-text-secondary)]">
-                  {section.body}
-                </p>
+        <div className="mt-4 space-y-3">
+          {[report.fit, report.chemistry, report.caution].map((section) => (
+            <div
+              key={section.title}
+              className="rounded-[22px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.03)] p-4"
+            >
+              <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-tertiary)]">
+                {section.title}
               </div>
-            ))}
-          </div>
+              <p className="mt-2 text-[13px] leading-[1.7] text-[var(--color-text-secondary)]">
+                {section.body}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
-    </div>
+    </BottomSheet>
   )
 }

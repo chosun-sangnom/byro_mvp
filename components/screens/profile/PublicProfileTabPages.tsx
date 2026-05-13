@@ -10,8 +10,8 @@ import {
   ProfileFeedbackSection,
   ProfileRememberSection,
   ProfileReputationSummarySection,
-  ProfileSnsSection,
 } from '@/components/screens/profile/PublicProfileSections'
+import { ProfileSnsSection } from '@/components/screens/profile/PublicProfileSnsSection'
 import { ProfileHighlightsSection } from '@/components/screens/profile/PublicProfileHighlightsSection'
 import { PublicProfileLifeSection } from '@/components/screens/profile/PublicProfileLifeSection'
 import { PublicProfileWhoIAmSection } from '@/components/screens/profile/PublicProfileWhoIAmSection'

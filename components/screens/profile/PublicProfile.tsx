@@ -9,11 +9,9 @@ import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import type { Highlight } from '@/types'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
-import {
-  ProfileConnectSection,
-  ProfileHeroSection,
-  ProfileSnsSection,
-} from '@/components/screens/profile/PublicProfileSections'
+import { ProfileConnectSection } from '@/components/screens/profile/PublicProfileSections'
+import { ProfileHeroSection } from '@/components/screens/profile/PublicProfileHeroSection'
+import { ProfileSnsSection } from '@/components/screens/profile/PublicProfileSnsSection'
 import { ProfileHighlightsSection } from '@/components/screens/profile/PublicProfileHighlightsSection'
 import {
   ExperienceBottomSheet,

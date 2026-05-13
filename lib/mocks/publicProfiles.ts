@@ -267,7 +267,9 @@ export const MK_PROFILE = {
         { label: '웨이트', posterUrl: 'https://picsum.photos/seed/weight_mk/80/80' },
         { label: '산책', posterUrl: 'https://picsum.photos/seed/walk_mk/80/80' },
       ],
-      pet: '없음',
+      pet: '고양이',
+      petName: '모카',
+      petImage: 'https://picsum.photos/seed/moca_mk/160/160',
     },
     tastes: {
       movies: [
@@ -464,7 +466,8 @@ export const JIMIN_PROFILE = {
         { label: '필라테스', posterUrl: 'https://picsum.photos/seed/pilates_jm/80/80' },
         { label: '산책', posterUrl: 'https://picsum.photos/seed/walk_jm/80/80' },
       ],
-      pet: '없음',
+      pet: '강아지',
+      petName: '두부',
     },
     tastes: {
       movies: [

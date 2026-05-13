@@ -392,7 +392,7 @@ function OwnerKemiReportSheet({
           </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 rounded-[24px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.03)] p-1.5">
+        <div className="grid grid-cols-3 gap-2 rounded-[24px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] p-1.5">
           {OWNER_KEMI_MODES.map((mode) => {
             const active = mode.id === activeMode
 
@@ -414,7 +414,7 @@ function OwnerKemiReportSheet({
           })}
         </div>
 
-        <div className="mt-4 rounded-[24px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.04)] p-4">
+        <div className="mt-4 rounded-[24px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] p-4">
           <div className="flex items-center justify-between gap-3">
             <span
               className="rounded-full px-2.5 py-1 text-[11px] font-semibold"
@@ -450,7 +450,7 @@ function OwnerKemiReportSheet({
           {[report.fit, report.chemistry, report.caution].map((section) => (
             <div
               key={section.title}
-              className="rounded-[22px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.03)] p-4"
+              className="rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] p-4"
             >
               <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-tertiary)]">
                 {section.title}

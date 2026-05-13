@@ -627,7 +627,7 @@ export function ProfileConnectSection({
 }
 
 
-function AnimatedSection({
+export function AnimatedSection({
   children,
   className,
   delay = 0,

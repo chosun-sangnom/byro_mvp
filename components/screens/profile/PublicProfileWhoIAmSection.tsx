@@ -14,7 +14,7 @@ function IdentityRow({
   value: string
 }) {
   return (
-    <div className="rounded-[18px] border border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.03)] px-4 py-3">
+    <div className="rounded-[18px] border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-4 py-3">
       <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">{label}</div>
       <div className="mt-1 text-[15px] font-semibold text-[var(--color-text-primary)]">{value}</div>
     </div>
@@ -31,14 +31,14 @@ function PetCard({
   petImage?: string
 }) {
   return (
-    <div className="mt-3 rounded-[22px] border border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.04)] px-4 py-4">
+    <div className="mt-3 rounded-[22px] border border-[var(--color-border-soft)] bg-[var(--color-bg-soft)] px-4 py-4">
       <div className="flex items-center gap-3">
         {petImage ? (
-          <div className="h-[76px] w-[76px] shrink-0 overflow-hidden rounded-[18px] border border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.05)]">
+          <div className="h-[76px] w-[76px] shrink-0 overflow-hidden rounded-[18px] border border-[var(--color-border-soft)] bg-[var(--color-bg-soft)]">
             <img src={petImage} alt={`${petName ?? pet} 사진`} className="h-full w-full object-cover" />
           </div>
         ) : (
-          <div className="flex h-[64px] w-[64px] shrink-0 items-center justify-center rounded-[18px] border border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.05)]">
+          <div className="flex h-[64px] w-[64px] shrink-0 items-center justify-center rounded-[18px] border border-[var(--color-border-soft)] bg-[var(--color-bg-soft)]">
             <PawPrint size={24} className="text-[var(--color-text-secondary)]" />
           </div>
         )}
@@ -100,7 +100,7 @@ export function PublicProfileWhoIAmSection({
         )}
 
         {!isOwnerMode && (
-          <div className="mt-4 rounded-[22px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.04)] px-4 py-4">
+          <div className="mt-4 rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4">
             <div className="flex items-center justify-between gap-3">
               <div>
                 <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">궁합 리포트</div>

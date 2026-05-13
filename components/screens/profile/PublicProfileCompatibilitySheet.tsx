@@ -350,10 +350,10 @@ export function PublicProfileCompatibilitySheet({
           })}
         </div>
 
-        <div className="rounded-[24px] border border-[var(--color-border-default)] bg-[linear-gradient(180deg,rgba(255,255,255,0.07)_0%,rgba(255,255,255,0.03)_100%)] p-4">
+        <div className="rounded-[24px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] p-4">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <div className="inline-flex rounded-full border border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.05)] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-secondary)]">
+              <div className="inline-flex rounded-full border border-[var(--color-border-soft)] bg-[var(--color-bg-soft)] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-secondary)]">
                 {report.badge}
               </div>
               <div className="mt-3 text-[18px] font-black leading-[1.35] tracking-[-0.03em] text-[var(--color-text-strong)]">
@@ -399,7 +399,7 @@ export function PublicProfileCompatibilitySheet({
             title="주의할 점"
             items={report.cautions}
           />
-          <div className="rounded-[20px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.03)] px-4 py-4">
+          <div className="rounded-[20px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-4">
             <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">추천 첫 마디</div>
             <p className="mt-2 text-[14px] font-semibold leading-[1.6] text-[var(--color-text-primary)]">{report.opener}</p>
           </div>
@@ -419,7 +419,7 @@ function ReportSection({
   body: string
 }) {
   return (
-    <div className="rounded-[20px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.03)] px-4 py-4">
+    <div className="rounded-[20px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-4">
       <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">
         <MessageCircle size={13} />
         <span>{title}</span>
@@ -438,7 +438,7 @@ function ReportBlock({
   items: string[]
 }) {
   return (
-    <div className="rounded-[20px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.03)] px-4 py-4">
+    <div className="rounded-[20px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-4">
       <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">
         <Star size={13} />
         <span>{title}</span>

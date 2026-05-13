@@ -152,7 +152,7 @@ export function PublicProfileShell({
           {store.isLoggedIn ? (
             <button
               onClick={() => router.push('/me')}
-              className="inline-flex h-8 items-center gap-2 rounded-full border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.04)] pl-1.5 pr-3 text-[11px] font-semibold text-[var(--color-text-primary)]"
+              className="inline-flex h-8 items-center gap-2 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] pl-1.5 pr-3 text-[11px] font-semibold text-[var(--color-text-primary)]"
             >
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-accent-dark)] text-[10px] font-black text-white">
                 {store.user?.name?.charAt(0) ?? 'M'}
@@ -205,7 +205,7 @@ export function PublicProfileShell({
       </div>
 
       {/* ── 고정 푸터 ── */}
-      <div className="flex-shrink-0 border-t border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.94)] px-5 pt-4 pb-[calc(env(safe-area-inset-bottom)+16px)] backdrop-blur-md">
+      <div className="flex-shrink-0 border-t border-[var(--color-border-soft)] bg-[var(--color-glass-strong)] px-5 pt-4 pb-[calc(env(safe-area-inset-bottom)+16px)] backdrop-blur-md">
 
         {/* 평판 탭 visitor 전용 액션 — 방문자가 평판을 남길 수 있는 버튼 */}
         {/* TODO(reputation): 피드백 요청 / 경험 남기기 실제 플로우 연결 */}
@@ -213,7 +213,7 @@ export function PublicProfileShell({
           <div className="mb-4 flex gap-3">
             <button
               onClick={() => showToast('피드백 요청을 보냈어요!')}
-              className="flex-1 rounded-full border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.02)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)]"
+              className="flex-1 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)]"
             >
               피드백 요청
             </button>
@@ -238,7 +238,7 @@ export function PublicProfileShell({
             </button>
             <button
               onClick={onOwnerManageConnections ?? (() => showToast('연결 관리를 준비 중이에요'))}
-              className="flex flex-1 items-center justify-center rounded-full border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.02)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)]"
+              className="flex flex-1 items-center justify-center rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)]"
             >
               연결 관리
             </button>
@@ -246,7 +246,7 @@ export function PublicProfileShell({
         ) : (
           <button
             onClick={() => showToast('연결 요청을 보냈어요!')}
-            className="mb-4 w-full rounded-full border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.02)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)]"
+            className="mb-4 w-full rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)]"
           >
             연결 요청
           </button>
@@ -341,7 +341,7 @@ export function PublicProfileShell({
               </div>
             </div>
 
-            <div className="rounded-2xl border border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.03)] px-4 py-3">
+            <div className="rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-4 py-3">
               <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)]">Preview</div>
               <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[var(--color-accent-border)] bg-[var(--color-accent-bg)] px-3 py-1 text-[12px] font-semibold text-[var(--color-text-primary)]">
                 <span>💬</span>

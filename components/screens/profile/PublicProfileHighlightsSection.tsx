@@ -1,6 +1,5 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BadgeCheck, ChevronDown, ChevronUp } from 'lucide-react'
 import { AirlineMileageSummary } from '@/components/highlights/AirlineMileageSummary'
@@ -8,12 +7,11 @@ import { CareerContinuityChart } from '@/components/highlights/CareerContinuityC
 import { CorporateLongevityTimeline } from '@/components/highlights/CorporateLongevityTimeline'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { RememberNetworkGraph } from '@/components/highlights/RememberNetworkGraph'
-import { SectionTitle } from '@/components/screens/profile/PublicProfileSections'
+import { AnimatedSection, SectionTitle } from '@/components/screens/profile/PublicProfileSections'
 import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
 import { getGroupedHighlightPreview, getHighlightDetailFootnote, getHighlightMetaParts } from '@/lib/highlightMeta'
 import type { Highlight, HighlightIconId } from '@/types'
 
-const SECTION_EASE = [0.22, 1, 0.36, 1] as const
 
 type HighlightGroupEntry =
   | { kind: 'verified'; item: Highlight }
@@ -204,7 +202,7 @@ export function ProfileHighlightsSection({
                                         href={hl.linkUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="block overflow-hidden rounded-[10px] border border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.02)]"
+                                        className="block overflow-hidden rounded-[10px] border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)]"
                                       >
                                         <div className="flex min-h-[64px]">
                                           {hl.thumbnailUrl ? (
@@ -246,24 +244,3 @@ export function ProfileHighlightsSection({
   )
 }
 
-function AnimatedSection({
-  children,
-  className,
-  delay = 0,
-}: {
-  children: ReactNode
-  className: string
-  delay?: number
-}) {
-  return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 22 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.42, ease: SECTION_EASE, delay }}
-    >
-      {children}
-    </motion.div>
-  )
-}

@@ -84,7 +84,7 @@ export function PublicProfileKemiZone({
 
             <div className="mt-5">
               <p className="mb-3 text-[12px] leading-[1.65] text-[var(--color-text-secondary)]">
-                MBTI · 사주 · 라이프스타일을 함께 읽는 분석으로, 이성 · 사업 파트너 · 친구 관점에서 관계의 흐름을 다르게 해석해요.
+                이성 · 비즈니스 · 친구 관점으로 더 깊이 알고 싶다면, MBTI · 사주 · 라이프스타일을 조합한 케미 리포트를 확인해보세요.
               </p>
               <button
                 type="button"
@@ -95,7 +95,7 @@ export function PublicProfileKemiZone({
                   boxShadow: '0 0 0 1px var(--color-accent-border), 0 0 20px var(--color-accent-bg)',
                 }}
               >
-                궁합 리포트 보기
+                케미 리포트 보기
               </button>
             </div>
           </>

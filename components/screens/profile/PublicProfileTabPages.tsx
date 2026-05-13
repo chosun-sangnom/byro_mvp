@@ -116,8 +116,6 @@ export function PublicProfileWhoTabPage({
   username: string
 }) {
   const { store, profile, groupedHighlights, corporateHighlight, airlineHighlight, airlineBadgeLabel } = usePublicProfileTabData(username)
-  const igOpen = store.snsOpenStates[`instagram_${username}`] ?? false
-  const liOpen = store.snsOpenStates[`linkedin_${username}`] ?? false
 
   return (
     <>
@@ -140,10 +138,6 @@ export function PublicProfileWhoTabPage({
         linkedinConnected={profile.linkedinConnected}
         instagram={profile.instagram}
         linkedin={profile.linkedin}
-        igOpen={igOpen}
-        liOpen={liOpen}
-        onToggleInstagram={() => store.toggleSnsOpen(`instagram_${username}`)}
-        onToggleLinkedIn={() => store.toggleSnsOpen(`linkedin_${username}`)}
       />
     </>
   )

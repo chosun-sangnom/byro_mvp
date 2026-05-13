@@ -121,10 +121,6 @@ export default function PublicProfile({
     }
   }).filter((group) => group.items.length > 0)
 
-  // SNS 토글
-  const igOpen = store.snsOpenStates['instagram_' + username] ?? false
-  const liOpen = store.snsOpenStates['linkedin_' + username] ?? false
-
   useEffect(() => {
     setBioExpanded(false)
   }, [profile.bio, username])
@@ -268,10 +264,6 @@ export default function PublicProfile({
           linkedinConnected={profile.linkedinConnected}
           instagram={profile.instagram}
           linkedin={profile.linkedin}
-          igOpen={igOpen}
-          liOpen={liOpen}
-          onToggleInstagram={() => store.toggleSnsOpen(`instagram_${username}`)}
-          onToggleLinkedIn={() => store.toggleSnsOpen(`linkedin_${username}`)}
         />
 
         <ProfileHighlightsSection

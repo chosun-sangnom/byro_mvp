@@ -3,11 +3,13 @@
 import { ChevronRight } from 'lucide-react'
 import { NavBar } from '@/components/ui'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
-import type { Highlight, PublicProfileLife, UserState } from '@/types'
-import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
+import type { Highlight, PublicProfile, PublicProfileLife, PublicProfileWhoIAm, UserState } from '@/types'
 
 interface ManageByroScreenProps {
   allHighlights: Highlight[]
+  profile: PublicProfile
+  instagramConnected: boolean
+  linkedinConnected: boolean
   onLogout: () => void
   onBack: () => void
   onEditBasic: () => void
@@ -28,6 +30,9 @@ interface EditRow {
 
 export function ManageByroScreen({
   allHighlights,
+  profile,
+  instagramConnected,
+  linkedinConnected,
   onLogout,
   onBack,
   onEditBasic,
@@ -39,8 +44,8 @@ export function ManageByroScreen({
   onEditContact,
   user,
 }: ManageByroScreenProps) {
-  const whoIAm = user.whoIAm ?? SAMPLE_PROFILE.whoIAm
-  const life: PublicProfileLife = user.life ?? SAMPLE_PROFILE.life
+  const whoIAm = (profile.whoIAm ?? user.whoIAm) as PublicProfileWhoIAm
+  const life = (profile.life ?? user.life) as PublicProfileLife
   const petLabel = life.daily.petName
     ? `${life.daily.pet} · ${life.daily.petName}`
     : life.daily.pet
@@ -56,13 +61,13 @@ export function ManageByroScreen({
     life.places.travelDestinations.length
   const activeContactCount =
     user.contactChannels?.filter((ch) => ch.enabled && ch.value.trim()).length ?? 0
-  const connectedSnsCount =
-    Number(SAMPLE_PROFILE.instagramConnected) + Number(SAMPLE_PROFILE.linkedinConnected)
-  const totalReputationCount = SAMPLE_PROFILE.reputationKeywords.reduce(
+  const connectedSnsCount = Number(instagramConnected) + Number(linkedinConnected)
+  const reputationKeywords = profile.reputationKeywords ?? []
+  const totalReputationCount = reputationKeywords.reduce(
     (sum, item) => sum + item.count,
     0,
   )
-  const visibleReputationCount = SAMPLE_PROFILE.reputationKeywords.filter((item) =>
+  const visibleReputationCount = reputationKeywords.filter((item) =>
     REPUTATION_KEYWORD_GROUPS.some((group) => group.keywords.includes(item.keyword)),
   ).length
 
@@ -95,7 +100,7 @@ export function ManageByroScreen({
     },
     {
       title: '네트워크',
-      meta: `${SAMPLE_PROFILE.rememberHighlight.total}명 리멤버`,
+      meta: `${profile.rememberHighlight.total}명 리멤버`,
       onClick: onEditNetwork,
     },
     {

@@ -10,6 +10,8 @@ export default function Archive() {
   const router = useRouter()
   const store = useByroStore()
 
+  const [activeRequestTab, setActiveRequestTab] = useState<'connection' | 'feedback'>('connection')
+
   useEffect(() => {
     if (!store.isLoggedIn) {
       router.replace('/onboarding')
@@ -20,7 +22,6 @@ export default function Archive() {
 
   const { activeArchiveTab, setActiveArchiveTab } = store
   const { savedProfiles, recentProfiles, receivedRequests, connectionRequests } = SAMPLE_PROFILE
-  const [activeRequestTab, setActiveRequestTab] = useState<'connection' | 'feedback'>('connection')
 
   const totalRequests = receivedRequests.length + connectionRequests.length
 

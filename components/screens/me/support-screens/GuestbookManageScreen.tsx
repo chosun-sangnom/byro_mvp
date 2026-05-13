@@ -1,7 +1,7 @@
 'use client'
 
 import { useByroStore } from '@/store/useByroStore'
-import { showToast } from '@/components/ui'
+import { NavBar, showToast } from '@/components/ui'
 import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mocks/publicProfiles'
 
 export function GuestbookManageScreen({ onBack }: { onBack: () => void }) {
@@ -10,11 +10,7 @@ export function GuestbookManageScreen({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] flex-shrink-0">
-        <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
-        <span className="text-base font-black">방명록 관리</span>
-        <span className="ml-2 text-xs text-[var(--color-text-tertiary)]">{entries.length}개</span>
-      </div>
+      <NavBar title="방명록 관리" onBack={onBack} right={<span className="text-xs text-[var(--color-text-tertiary)]">{entries.length}개</span>} />
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
         {entries.length === 0 ? (

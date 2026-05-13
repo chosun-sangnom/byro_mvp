@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useByroStore } from '@/store/useByroStore'
-import { BottomSheet, Button, showToast } from '@/components/ui'
+import { BottomSheet, Button, NavBar, showToast } from '@/components/ui'
 import { ContactTypeIcon } from '@/components/contact/ContactTypeIcon'
 import type { ContactChannel } from '@/types'
 import { buildContactHref, contactPlaceholder, contactPreview } from '@/lib/contactChannels'
@@ -53,10 +53,7 @@ export function ContactManageScreen({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] flex-shrink-0">
-        <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
-        <span className="text-base font-black text-[var(--color-text-strong)]">연락 수단 관리</span>
-      </div>
+      <NavBar title="연락 수단 관리" onBack={onBack} />
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
         <div className="text-xs text-[var(--color-text-tertiary)] mb-5">공개 프로필 상단 버튼에 노출될 연락 수단을 켜고 끌 수 있어요.</div>

@@ -2,7 +2,7 @@
 
 import { useRef, useState, type ChangeEvent, type PointerEvent } from 'react'
 import { Camera } from 'lucide-react'
-import { Button, showToast, TextArea } from '@/components/ui'
+import { Button, NavBar, showToast, TextArea } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
 import type { PublicProfileLife, PublicProfileWhoIAm, SajuProfileInput, UserState } from '@/types'
@@ -198,10 +198,7 @@ export function BasicInfoEditScreen({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] bg-[var(--color-glass-strong)] backdrop-blur-md flex-shrink-0">
-        <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
-        <span className="text-base font-black">기본정보 편집</span>
-      </div>
+      <NavBar title="기본정보 편집" onBack={onBack} />
 
       <div className="flex-1 overflow-y-auto">
         <div className="px-5 py-5">

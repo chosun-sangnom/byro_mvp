@@ -1,6 +1,7 @@
 'use client'
 
 import { ChevronRight } from 'lucide-react'
+import { NavBar } from '@/components/ui'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
@@ -42,10 +43,7 @@ export function RelationshipManageScreen({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex h-12 flex-shrink-0 items-center border-b border-[var(--color-border-soft)] px-5">
-        <button onClick={onBack} className="mr-3 text-xl leading-none text-[var(--color-text-secondary)]">‹</button>
-        <span className="text-base font-black text-[var(--color-text-strong)]">관계 관리</span>
-      </div>
+      <NavBar title="관계 관리" onBack={onBack} />
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
         <div className="text-xs leading-relaxed text-[var(--color-text-tertiary)] mb-4">

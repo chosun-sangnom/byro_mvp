@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from 'react'
 import { useByroStore } from '@/store/useByroStore'
-import { BottomSheet, Button, showToast } from '@/components/ui'
+import { BottomSheet, Button, NavBar, showToast } from '@/components/ui'
 import { INSTAGRAM_PROFILE } from '@/lib/mocks/socialProfiles'
 
 export function SNSManageScreen({ onBack }: { onBack: () => void }) {
@@ -32,10 +32,7 @@ export function SNSManageScreen({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] flex-shrink-0">
-        <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
-        <span className="text-base font-black">SNS 연동 관리</span>
-      </div>
+      <NavBar title="SNS 연동 관리" onBack={onBack} />
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
         <div className="text-xs text-[var(--color-text-tertiary)] mb-5">연동하면 AI 요약과 게시물 미리보기를 확인할 수 있어요.</div>

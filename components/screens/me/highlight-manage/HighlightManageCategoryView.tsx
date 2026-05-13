@@ -1,4 +1,4 @@
-import { Button, showToast } from '@/components/ui'
+import { Button, NavBar, showToast } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { getHighlightMetaParts, isPrimaryHighlight } from '@/lib/highlightMeta'
 import type { Highlight, HighlightIconId } from '@/types'
@@ -29,10 +29,7 @@ export function HighlightManageCategoryView({
 }: HighlightManageCategoryViewProps) {
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] flex-shrink-0">
-        <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
-        <span className="text-base font-black">{selectedCat.label} 관리</span>
-      </div>
+      <NavBar title={`${selectedCat.label} 관리`} onBack={onBack} />
 
       <div className="flex-1 overflow-y-auto px-5 py-5">
         <div className="surface-card mb-4 rounded-[26px] px-4 py-4">

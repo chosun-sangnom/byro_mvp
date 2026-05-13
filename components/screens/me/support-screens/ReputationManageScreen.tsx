@@ -1,5 +1,6 @@
 'use client'
 
+import { NavBar } from '@/components/ui'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
@@ -18,10 +19,7 @@ export function ReputationManageScreen({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] flex-shrink-0">
-        <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
-        <span className="text-base font-black">받은 평판</span>
-      </div>
+      <NavBar title="받은 평판" onBack={onBack} />
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
         <div className="rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-bg-soft)] px-4 py-4 mb-4">

@@ -1,6 +1,7 @@
 'use client'
 
 import { ChevronRight } from 'lucide-react'
+import { NavBar } from '@/components/ui'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import type { Highlight, PublicProfileLife, UserState } from '@/types'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
@@ -116,11 +117,7 @@ export function ManageByroScreen({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex h-12 flex-shrink-0 items-center border-b border-[var(--color-border-soft)] bg-[var(--color-glass-mid)] px-5 backdrop-blur-md">
-        <button onClick={onBack} className="mr-3 text-xl leading-none text-[var(--color-text-secondary)]">‹</button>
-        <span className="flex-1 text-[15px] font-bold text-[var(--color-text-primary)]">편집</span>
-        <button onClick={onLogout} className="text-xs text-[var(--color-text-tertiary)]">로그아웃</button>
-      </div>
+      <NavBar title="편집" onBack={onBack} right={<button onClick={onLogout} className="text-xs text-[var(--color-text-tertiary)]">로그아웃</button>} />
 
       <div className="flex-1 overflow-y-auto">
 

@@ -1,4 +1,5 @@
 import { BadgeCheck } from 'lucide-react'
+import { NavBar } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
 import type { HighlightIconId } from '@/types'
@@ -17,10 +18,7 @@ export function HighlightManagePickerView({
 }: HighlightManagePickerViewProps) {
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] flex-shrink-0">
-        <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
-        <span className="text-base font-black">하이라이트 추가</span>
-      </div>
+      <NavBar title="하이라이트 추가" onBack={onBack} />
 
       <div className="flex-1 overflow-y-auto px-5 py-5 pb-8">
         <div className="space-y-6">

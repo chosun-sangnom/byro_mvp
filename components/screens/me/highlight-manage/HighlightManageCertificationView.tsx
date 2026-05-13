@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui'
+import { Button, NavBar } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import type { HighlightIconId } from '@/types'
 
@@ -33,10 +33,7 @@ export function HighlightManageCertificationView({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] flex-shrink-0">
-        <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
-        <span className="text-base font-black">{selectedCert.title} 인증</span>
-      </div>
+      <NavBar title={`${selectedCert.title} 인증`} onBack={onBack} />
 
       <div className="flex-1 overflow-y-auto px-5 py-5">
         <div className="surface-card rounded-[28px] p-5">

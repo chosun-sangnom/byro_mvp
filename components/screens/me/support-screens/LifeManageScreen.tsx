@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, type ReactNode } from 'react'
-import { Button, InfoBox, TextArea, showToast } from '@/components/ui'
+import { Button, InfoBox, NavBar, TextArea, showToast } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
 import type { LifeMediaItem, PublicProfileLife } from '@/types'
@@ -73,10 +73,7 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex h-12 flex-shrink-0 items-center border-b border-[var(--color-border-soft)] px-5">
-        <button onClick={onBack} className="mr-3 text-xl leading-none text-[var(--color-text-secondary)]">‹</button>
-        <span className="text-base font-black text-[var(--color-text-strong)]">라이프 편집</span>
-      </div>
+      <NavBar title="라이프 편집" onBack={onBack} />
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
         <InfoBox variant="warn">

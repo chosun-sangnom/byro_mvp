@@ -1,4 +1,5 @@
 import { BadgeCheck, ChevronRight } from 'lucide-react'
+import { NavBar } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import type { HighlightIconId } from '@/types'
 import type { HighlightCategoryCardGroup, HighlightManageCategory } from './constants'
@@ -20,10 +21,7 @@ export function HighlightManageListView({
 }: HighlightManageListViewProps) {
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] flex-shrink-0">
-        <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
-        <span className="text-base font-black">하이라이트 관리</span>
-      </div>
+      <NavBar title="하이라이트 관리" onBack={onBack} />
 
       <div className="flex-1 overflow-y-auto px-5 py-4 pb-8">
         <div className="settings-shell mb-5 px-4 py-4">

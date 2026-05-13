@@ -116,7 +116,6 @@ export function PublicProfileWhoTabPage({
   username: string
 }) {
   const { store, profile, groupedHighlights, corporateHighlight, airlineHighlight, airlineBadgeLabel } = usePublicProfileTabData(username)
-  const isOwnerMode = store.isLoggedIn && store.user?.linkId === username
 
   return (
     <>

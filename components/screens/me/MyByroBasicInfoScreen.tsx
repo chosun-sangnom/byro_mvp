@@ -7,7 +7,6 @@ import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
 import type { PublicProfileLife, PublicProfileWhoIAm, SajuProfileInput, UserState } from '@/types'
 import {
-  CROP_RATIO,
   DEFAULT_CROP_FRAME,
   clampCropFrameRect,
   getCropImageLayout,

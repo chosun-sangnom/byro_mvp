@@ -82,17 +82,20 @@ export function PublicProfileKemiZone({
               {kemi.aiCopy}
             </p>
 
-            <div className="mt-4 border-t border-[var(--color-accent-border-soft)] pt-4">
+            <div className="mt-5">
               <p className="mb-3 text-[12px] leading-[1.65] text-[var(--color-text-secondary)]">
                 MBTI · 사주 · 라이프스타일을 함께 읽는 분석으로, 이성 · 사업 파트너 · 친구 관점에서 관계의 흐름을 다르게 해석해요.
               </p>
               <button
                 type="button"
                 onClick={onCompatibilityOpen}
-                className="w-full rounded-full py-3 text-[13px] font-semibold text-white"
-                style={{ backgroundColor: 'var(--color-accent-dark)' }}
+                className="w-full rounded-full py-3 text-[13px] font-semibold text-white transition-opacity active:opacity-80"
+                style={{
+                  backgroundColor: 'var(--color-accent-dark)',
+                  boxShadow: '0 0 0 1px var(--color-accent-border), 0 0 20px var(--color-accent-bg)',
+                }}
               >
-                궁합 리포트 보기 →
+                궁합 리포트 보기
               </button>
             </div>
           </>

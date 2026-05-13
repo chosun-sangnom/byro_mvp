@@ -107,6 +107,7 @@ export function ProfileHeroCard({
     }
     sajuProfile?: {
       showAge?: boolean
+      birthDate?: string
     }
   }
   heroTheme: HeroTheme
@@ -171,6 +172,11 @@ export function ProfileHeroCard({
           {showAge && (
             <div className="mt-0.5 text-[13px] font-semibold text-white/50">
               {profile.age}세
+              {profile.sajuProfile?.birthDate && (
+                <span className="ml-1 font-normal">
+                  ({profile.sajuProfile.birthDate.replace(/-/g, '.')})
+                </span>
+              )}
             </div>
           )}
 

@@ -116,12 +116,13 @@ export function PublicProfileWhoTabPage({
   username: string
 }) {
   const { store, profile, groupedHighlights, corporateHighlight, airlineHighlight, airlineBadgeLabel } = usePublicProfileTabData(username)
+  const igOpen = store.snsOpenStates[`instagram_${username}`] ?? false
+  const liOpen = store.snsOpenStates[`linkedin_${username}`] ?? false
 
   return (
     <>
       <PublicProfileWhoIAmSection
         whoIAm={profile.whoIAm}
-        life={profile.life}
       />
       <ProfileHighlightsSection
         profile={profile}
@@ -133,6 +134,16 @@ export function PublicProfileWhoTabPage({
         primaryHighlightOverrides={store.primaryHighlightOverrides}
         getHighlightOpen={(key) => store.hlOpenStates[key] ?? false}
         onToggleHighlight={(key) => store.toggleHlOpen(key)}
+      />
+      <ProfileSnsSection
+        instagramConnected={profile.instagramConnected}
+        linkedinConnected={profile.linkedinConnected}
+        instagram={profile.instagram}
+        linkedin={profile.linkedin}
+        igOpen={igOpen}
+        liOpen={liOpen}
+        onToggleInstagram={() => store.toggleSnsOpen(`instagram_${username}`)}
+        onToggleLinkedIn={() => store.toggleSnsOpen(`linkedin_${username}`)}
       />
     </>
   )
@@ -153,9 +164,7 @@ export function PublicProfileReputationTabPage({
   username: string
 }) {
   const router = useRouter()
-  const { store, profile, keywordCounts, totalKeywordCount, featuredGuestbook } = usePublicProfileTabData(username)
-  const igOpen = store.snsOpenStates[`instagram_${username}`] ?? false
-  const liOpen = store.snsOpenStates[`linkedin_${username}`] ?? false
+  const { profile, keywordCounts, totalKeywordCount, featuredGuestbook } = usePublicProfileTabData(username)
 
   return (
     <div className="pb-6">
@@ -173,16 +182,6 @@ export function PublicProfileReputationTabPage({
         getProfileAvatar={getProfileAvatar}
         onGuestbookEntryClick={(linkId) => router.push(`/${linkId}`)}
         onOpenGuestbook={() => router.push(`/${profile.linkId}/guestbook`)}
-      />
-      <ProfileSnsSection
-        instagramConnected={profile.instagramConnected}
-        linkedinConnected={profile.linkedinConnected}
-        instagram={profile.instagram}
-        linkedin={profile.linkedin}
-        igOpen={igOpen}
-        liOpen={liOpen}
-        onToggleInstagram={() => store.toggleSnsOpen(`instagram_${username}`)}
-        onToggleLinkedIn={() => store.toggleSnsOpen(`linkedin_${username}`)}
       />
     </div>
   )

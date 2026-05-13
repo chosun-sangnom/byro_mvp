@@ -22,7 +22,7 @@ import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
 import { ContactActionButton, ProfileHeroCard } from '@/components/screens/profile/PublicProfileSections'
 import { PublicProfileTabBar, type PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
-import { PublicProfileKemiZone } from '@/components/screens/profile/PublicProfileKemiZone'
+import { PublicProfileKemiZone, PublicProfileOwnerMatchZone } from '@/components/screens/profile/PublicProfileKemiZone'
 
 const DEFAULT_MOOD_OPTIONS = [
   '집중 모드',
@@ -189,8 +189,11 @@ export function PublicProfileShell({
           />
         </div>
 
-        {/* 케미 존 — 로그인 시 viewer 기준 공통점 표시, 비로그인 시 blur 처리 */}
-        <PublicProfileKemiZone kemi={profile.kemi} isLoggedIn={store.isLoggedIn} />
+        {isOwnerMode ? (
+          <PublicProfileOwnerMatchZone whoIAm={profile.whoIAm} life={profile.life} />
+        ) : (
+          <PublicProfileKemiZone kemi={profile.kemi} isLoggedIn={store.isLoggedIn} />
+        )}
 
         {/* 나 / 라이프 / 관계 탭 */}
         <PublicProfileTabBar activeTab={activeTab} onTabChange={onTabChange} />

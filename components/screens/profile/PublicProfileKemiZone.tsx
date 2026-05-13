@@ -18,8 +18,8 @@
  *   TODO(premium): 유료 기능 — 전체 궁합 분석 화면으로 연결
  */
 
-import { Sparkles } from 'lucide-react'
-import type { KemiData } from '@/types'
+import { Sparkles, Users } from 'lucide-react'
+import type { KemiData, PublicProfileLife, PublicProfileWhoIAm } from '@/types'
 
 // TODO(AI): When real kemi endpoint is wired up, this component receives
 // viewer-relative match data. The aiCopy field should be replaced with a
@@ -109,6 +109,78 @@ export function PublicProfileKemiZone({
             </div>
           </div>
         )}
+      </div>
+    </div>
+  )
+}
+
+function getOwnerMatchSignals(whoIAm?: PublicProfileWhoIAm, life?: PublicProfileLife) {
+  if (!whoIAm) return []
+
+  const mbti = whoIAm.mbti.toUpperCase()
+  const extrovert = mbti.startsWith('E')
+  const intuitive = mbti[1] === 'N'
+  const thinking = mbti[2] === 'T'
+
+  const tasteHook = life?.tastes.cafes[0]?.label
+    ?? life?.tastes.restaurants[0]?.label
+    ?? life?.tastes.music[0]?.label
+    ?? life?.tastes.movies[0]?.label
+    ?? life?.tastes.books[0]?.label
+    ?? life?.daily.exercise[0]
+    ?? null
+
+  return [
+    extrovert ? '대화 템포가 빠른 사람' : '조용하지만 깊은 사람',
+    intuitive ? '맥락 대화가 잘 통하는 사람' : '생활 루틴이 잘 맞는 사람',
+    thinking ? '기준이 분명한 사람' : '공감 표현이 편한 사람',
+    life?.places.neighborhoods[0] ? `${life.places.neighborhoods[0]} 생활권` : null,
+    tasteHook ? `${tasteHook} 취향이 겹치는 사람` : null,
+  ].filter(Boolean) as string[]
+}
+
+export function PublicProfileOwnerMatchZone({
+  whoIAm,
+  life,
+}: {
+  whoIAm?: PublicProfileWhoIAm
+  life?: PublicProfileLife
+}) {
+  if (!whoIAm) return null
+
+  const signals = getOwnerMatchSignals(whoIAm, life)
+
+  return (
+    <div className="px-5 pb-3">
+      <div
+        className="rounded-[20px] px-4 py-4"
+        style={{
+          border: '1px solid rgba(255,255,255,0.08)',
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%)',
+        }}
+      >
+        <div className="mb-3 flex items-center gap-1.5">
+          <Users size={12} className="text-[var(--color-text-primary)]" />
+          <span className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-secondary)]">
+            나와 잘 맞는 사람들
+          </span>
+        </div>
+
+        <p className="text-[13px] leading-[1.65] text-[var(--color-text-secondary)]">
+          내 MBTI와 라이프스타일 기준으로 대화가 잘 붙을 가능성이 높은 사람의 결을 먼저 읽어봅니다.
+        </p>
+
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {signals.map((signal) => (
+            <span key={signal} className="chip-metric">
+              {signal}
+            </span>
+          ))}
+        </div>
+
+        <div className="mt-3 text-[12px] font-semibold text-[var(--color-text-tertiary)]">
+          실제 추천 프로필 매칭은 다음 단계에서 연결할 예정입니다.
+        </div>
       </div>
     </div>
   )

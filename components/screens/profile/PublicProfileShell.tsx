@@ -25,6 +25,8 @@ import { ProfileHeroCard } from '@/components/screens/profile/PublicProfileHeroS
 import { PublicProfileTabBar, type PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
 import { PublicProfileKemiZone, PublicProfileOwnerMatchZone } from '@/components/screens/profile/PublicProfileKemiZone'
 import { PublicProfileCompatibilitySheet } from '@/components/screens/profile/PublicProfileCompatibilitySheet'
+import { ExperienceBottomSheet, ExperienceDoneModal } from '@/components/screens/profile/PublicProfileOverlays'
+import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 
 const DEFAULT_MOOD_OPTIONS = [
   '집중 모드',
@@ -64,6 +66,11 @@ export function PublicProfileShell({
   const [compatibilityOpen, setCompatibilityOpen] = useState(false)
   const [connectionRequestOpen, setConnectionRequestOpen] = useState(false)
   const [connectionMessage, setConnectionMessage] = useState('')
+  const [expSheetOpen, setExpSheetOpen] = useState(false)
+  const [expDoneModal, setExpDoneModal] = useState(false)
+  const [feedbackRequestOpen, setFeedbackRequestOpen] = useState(false)
+  const [feedbackMessage, setFeedbackMessage] = useState('')
+  const alreadySubmitted = store.expSubmittedProfiles.includes(profile.linkId)
   const [moodDraft, setMoodDraft] = useState(profile.headerMeta?.mood ?? '')
   const [availabilityDraft, setAvailabilityDraft] = useState(profile.headerMeta?.availability ?? '')
   const bioRef = useRef<HTMLParagraphElement | null>(null)
@@ -217,20 +224,25 @@ export function PublicProfileShell({
       <div className="flex-shrink-0 border-t border-[var(--color-border-soft)] bg-[var(--color-glass-strong)] px-5 pt-4 pb-[calc(env(safe-area-inset-bottom)+16px)] backdrop-blur-md">
 
         {/* 평판 탭 visitor 전용 액션 — 방문자가 평판을 남길 수 있는 버튼 */}
-        {/* TODO(reputation): 피드백 요청 / 경험 남기기 실제 플로우 연결 */}
         {showReputationActions && (
           <div className="mb-4 flex gap-3">
             <button
-              onClick={() => showToast('피드백 요청을 보냈어요!')}
+              onClick={() => setFeedbackRequestOpen(true)}
               className="flex-1 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)]"
             >
               피드백 요청
             </button>
             <button
-              onClick={() => showToast('경험 남겨요 구조는 다음 단계에서 연결할 예정입니다.')}
-              className="flex-1 rounded-full bg-[linear-gradient(135deg,var(--color-accent-light)_0%,var(--color-accent-dark)_100%)] py-3 text-[13px] font-semibold text-white shadow-[0_10px_24px_var(--color-accent-glow)]"
+              onClick={() => {
+                if (alreadySubmitted) { showToast('이미 경험을 남겼어요'); return }
+                setExpSheetOpen(true)
+              }}
+              className="flex-1 rounded-full py-3 text-[13px] font-semibold"
+              style={alreadySubmitted
+                ? { border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)' }
+                : { background: 'linear-gradient(135deg,var(--color-accent-light) 0%,var(--color-accent-dark) 100%)', color: '#fff', boxShadow: '0 10px 24px var(--color-accent-glow)' }}
             >
-              + 경험 남기기
+              {alreadySubmitted ? '경험 남겼어요 ✓' : '+ 경험 남기기'}
             </button>
           </div>
         )}
@@ -297,6 +309,81 @@ export function PublicProfileShell({
           whoIAm={profile.whoIAm}
           life={profile.life}
         />
+      )}
+
+      <ExperienceBottomSheet
+        open={expSheetOpen}
+        profileName={profile.name}
+        currentUserName={store.user?.name}
+        isLoggedIn={store.isLoggedIn}
+        experienceKeywordGroups={REPUTATION_KEYWORD_GROUPS}
+        selectedKeywords={store.experienceKeywords}
+        experienceMessage={store.experienceMessage}
+        onToggleKeyword={(keyword) => {
+          if (!store.experienceKeywords.includes(keyword) && store.experienceKeywords.length >= 3) {
+            showToast('키워드는 최대 3개까지 선택할 수 있어요')
+            return
+          }
+          store.setExperienceKeyword(keyword)
+        }}
+        onMessageChange={store.setExperienceMessage}
+        onSubmit={() => {
+          if (store.experienceKeywords.length === 0) { showToast('키워드를 하나 이상 선택해주세요'); return }
+          store.markExpSubmitted(profile.linkId)
+          store.clearExperience()
+          setExpSheetOpen(false)
+          setExpDoneModal(true)
+        }}
+        onLogin={() => { setExpSheetOpen(false); store.login() }}
+        onClose={() => setExpSheetOpen(false)}
+      />
+
+      <ExperienceDoneModal
+        open={expDoneModal}
+        profileName={profile.name}
+        isLoggedIn={store.isLoggedIn}
+        onRequestExperience={() => { setExpDoneModal(false); setFeedbackRequestOpen(true) }}
+        onCreateByro={() => { setExpDoneModal(false); router.push('/onboarding') }}
+        onLogin={() => { setExpDoneModal(false); store.login() }}
+        onClose={() => setExpDoneModal(false)}
+      />
+
+      {!isOwnerMode && (
+        <BottomSheet open={feedbackRequestOpen} onClose={() => { setFeedbackRequestOpen(false); setFeedbackMessage('') }}>
+          <div className="px-5 pb-6">
+            <div className="mb-1 text-[18px] font-black text-[var(--color-text-strong)]">
+              {profile.name}님께 피드백 요청
+            </div>
+            <p className="mb-5 text-[13px] leading-[1.65] text-[var(--color-text-secondary)]">
+              {profile.name}님이 나에 대한 경험을 남겨줄 수 있도록 요청해요.
+            </p>
+            <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-tertiary)]">
+              한마디 <span className="font-normal normal-case tracking-normal text-[var(--color-text-tertiary)]">(선택)</span>
+            </label>
+            <TextArea
+              value={feedbackMessage}
+              onChange={setFeedbackMessage}
+              placeholder="요청 이유나 인사를 남겨보세요."
+              maxLength={100}
+              rows={3}
+              dark
+            />
+            <div className="mb-5 text-right text-[11px] text-[var(--color-text-tertiary)]">
+              {feedbackMessage.length}/100
+            </div>
+            <button
+              onClick={() => {
+                setFeedbackRequestOpen(false)
+                setFeedbackMessage('')
+                showToast('피드백 요청을 보냈어요')
+              }}
+              className="w-full rounded-full py-3.5 text-[14px] font-semibold text-white"
+              style={{ backgroundColor: 'var(--color-accent-dark)' }}
+            >
+              요청 보내기
+            </button>
+          </div>
+        </BottomSheet>
       )}
 
       {!isOwnerMode && (

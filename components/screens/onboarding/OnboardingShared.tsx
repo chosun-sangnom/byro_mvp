@@ -46,7 +46,7 @@ export function SelectionCard({
       className={[
         'w-full text-left rounded-[26px] border px-4 py-4',
         tone === 'accent'
-          ? 'border-[rgba(212,170,84,0.4)] bg-[rgba(212,170,84,0.08)]'
+          ? 'border-[var(--color-accent-border)] bg-[var(--color-accent-bg-subtle)]'
           : 'border-[var(--color-border-default)] bg-[var(--color-bg-soft)]',
       ].join(' ')}
     >
@@ -87,7 +87,7 @@ export function StepFooter({
   skipLabel?: string
 }) {
   return (
-    <div className="px-5 pb-5 pt-3 border-t border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.92)] backdrop-blur-md space-y-2">
+    <div className="px-5 pb-5 pt-3 border-t border-[var(--color-border-soft)] bg-[var(--color-glass-strong)] backdrop-blur-md space-y-2">
       <div className="grid grid-cols-2 gap-2">
         <Button variant="outline" onClick={onPrev} disabled={!onPrev}>{prevLabel}</Button>
         <Button onClick={onNext} disabled={!canNext}>{nextLabel}</Button>

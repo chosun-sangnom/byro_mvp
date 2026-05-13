@@ -13,18 +13,18 @@ export function GuestbookManageScreen({ onBack }: { onBack: () => void }) {
       <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] flex-shrink-0">
         <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
         <span className="text-base font-black">방명록 관리</span>
-        <span className="ml-2 text-xs text-[#AAA]">{entries.length}개</span>
+        <span className="ml-2 text-xs text-[var(--color-text-tertiary)]">{entries.length}개</span>
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-4">
         {entries.length === 0 ? (
-          <div className="text-center text-sm text-[#AAA] mt-16">받은 방명록이 없어요</div>
+          <div className="text-center text-sm text-[var(--color-text-tertiary)] mt-16">받은 방명록이 없어요</div>
         ) : (
           <div className="space-y-2">
             {entries.map((entry) => (
-              <div key={entry.id} className="flex items-start gap-2.5 rounded-[18px] border border-[#F0F0F0] bg-[#FCFCFC] px-3 py-3">
+              <div key={entry.id} className="flex items-start gap-2.5 rounded-[18px] border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-3 py-3">
                 {getProfileAvatar(entry.linkId) ? (
-                  <div className="w-7 h-7 rounded-full overflow-hidden bg-[#e0e0e0] flex-shrink-0">
+                  <div className="w-7 h-7 rounded-full overflow-hidden bg-[var(--color-bg-muted)] flex-shrink-0">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={getProfileAvatar(entry.linkId)} alt={entry.authorName} className="w-full h-full object-cover" />
                   </div>
@@ -35,14 +35,14 @@ export function GuestbookManageScreen({ onBack }: { onBack: () => void }) {
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
-                    <div className="text-xs font-bold text-[#222]">{entry.authorName}</div>
-                    <div className="text-[10px] text-[#BBB]">{entry.date}</div>
+                    <div className="text-xs font-bold text-[var(--color-text-strong)]">{entry.authorName}</div>
+                    <div className="text-[10px] text-[var(--color-text-tertiary)]">{entry.date}</div>
                   </div>
-                  <div className="text-xs text-[#666] mt-0.5">{entry.message}</div>
+                  <div className="text-xs text-[var(--color-text-secondary)] mt-0.5">{entry.message}</div>
                 </div>
                 <button
                   onClick={() => { store.deleteGuestbookEntry(entry.id); showToast('방명록을 삭제했어요') }}
-                  className="flex-shrink-0 text-[#CCC] hover:text-[#E53935] transition-colors p-1"
+                  className="flex-shrink-0 text-[var(--color-text-tertiary)] hover:text-[var(--color-state-danger-text)] transition-colors p-1"
                 >
                   ✕
                 </button>

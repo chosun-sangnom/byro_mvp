@@ -12,7 +12,7 @@ export function ReputationSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-3xl tracking-tight text-center mb-4 text-[#111]"
+          className="text-3xl tracking-tight text-center mb-4 text-[var(--color-text-strong)]"
         >
           프로필은 한 번 만들고,
           <br />
@@ -24,7 +24,7 @@ export function ReputationSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-sm text-[#111]/60 text-center mb-12 leading-relaxed"
+          className="text-sm text-[var(--color-text-strong)]/60 text-center mb-12 leading-relaxed"
         >
           평판 키워드가 누적되고, 방명록과 피드백이 쌓이며,
           <br />
@@ -38,7 +38,7 @@ export function ReputationSection() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 mb-6"
         >
-          <div className="text-xs text-[#111]/50 uppercase tracking-wide mb-4">평판 키워드</div>
+          <div className="text-xs text-[var(--color-text-strong)]/50 uppercase tracking-wide mb-4">평판 키워드</div>
           <div className="flex flex-wrap gap-2">
             {reputationKeywords.map((keyword, index) => (
               <motion.span
@@ -65,14 +65,14 @@ export function ReputationSection() {
               transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
               className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100"
             >
-              <p className="text-sm text-[#111]/70 leading-relaxed mb-4 italic">
+              <p className="text-sm text-[var(--color-text-strong)]/70 leading-relaxed mb-4 italic">
                 &quot;{testimonial.text}&quot;
               </p>
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500" />
                 <div className="text-left">
-                  <div className="text-xs text-[#111]">{testimonial.author}</div>
-                  <div className="text-[10px] text-[#111]/50">{testimonial.role}</div>
+                  <div className="text-xs text-[var(--color-text-strong)]">{testimonial.author}</div>
+                  <div className="text-[10px] text-[var(--color-text-strong)]/50">{testimonial.role}</div>
                 </div>
               </div>
             </motion.div>

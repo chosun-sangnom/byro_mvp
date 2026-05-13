@@ -74,7 +74,7 @@ export function HighlightManageListView({
                           <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{entry.countLabel}</span>
                         </div>
                       </div>
-                      <ChevronRight size={16} color="#888" />
+                      <ChevronRight size={16} color="var(--color-text-tertiary)" />
                     </button>
                   ))}
                 </div>

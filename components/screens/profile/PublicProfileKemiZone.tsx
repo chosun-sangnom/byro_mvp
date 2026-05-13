@@ -41,8 +41,8 @@ export function PublicProfileKemiZone({
       <div
         className="rounded-[20px] px-4 py-4"
         style={{
-          border: '1px solid rgba(75,108,245,0.22)',
-          background: 'linear-gradient(135deg, rgba(75,108,245,0.09) 0%, rgba(75,108,245,0.03) 100%)',
+          border: '1px solid var(--color-accent-border-soft)',
+          background: 'linear-gradient(135deg, var(--color-accent-bg-subtle) 0%, transparent 100%)',
         }}
       >
         {/* Header */}
@@ -66,7 +66,7 @@ export function PublicProfileKemiZone({
                   className="chip-metric"
                   style={{
                     boxShadow:
-                      '0 0 0 1px rgba(75,108,245,0.45), 0 0 12px rgba(75,108,245,0.18), inset 0 1px 0 rgba(255,255,255,0.06)',
+                      '0 0 0 1px var(--color-accent-border), 0 0 12px var(--color-accent-bg), inset 0 1px 0 rgba(255,255,255,0.06)',
                   }}
                 >
                   {item.label}
@@ -319,8 +319,8 @@ export function PublicProfileOwnerMatchZone({
         <div
           className="rounded-[20px] px-4 py-4"
           style={{
-            border: '1px solid rgba(75,108,245,0.18)',
-            background: 'linear-gradient(135deg, rgba(75,108,245,0.09) 0%, rgba(255,255,255,0.03) 100%)',
+            border: '1px solid var(--color-accent-border-soft)',
+            background: 'linear-gradient(135deg, var(--color-accent-bg-subtle) 0%, transparent 100%)',
           }}
         >
           <div className="flex items-center justify-between gap-3">
@@ -403,7 +403,7 @@ function OwnerKemiReportSheet({
                 onClick={() => setActiveMode(mode.id)}
                 className="flex items-center justify-center gap-1.5 rounded-[18px] px-3 py-3 text-[12px] font-semibold transition"
                 style={{
-                  backgroundColor: active ? 'rgba(75,108,245,0.16)' : 'transparent',
+                  backgroundColor: active ? 'var(--color-accent-bg)' : 'transparent',
                   color: active ? 'var(--color-accent-dark)' : 'var(--color-text-secondary)',
                 }}
               >
@@ -420,7 +420,7 @@ function OwnerKemiReportSheet({
               className="rounded-full px-2.5 py-1 text-[11px] font-semibold"
               style={{
                 color: 'var(--color-accent-dark)',
-                background: 'rgba(75,108,245,0.12)',
+                background: 'var(--color-accent-bg)',
               }}
             >
               {report.badge}

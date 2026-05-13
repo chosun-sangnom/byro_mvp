@@ -99,7 +99,7 @@ export function ProfileHeroSection({
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: SECTION_EASE }}
     >
-      <div className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(75,108,245,0.14)_0%,transparent_68%)]" />
+      <div className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,var(--color-accent-bg-subtle)_0%,transparent_68%)]" />
       <ProfileHeroCard
         profile={profile}
         heroTheme={heroTheme}
@@ -175,7 +175,7 @@ export function ProfileHeroCard({
   const PungPill = onEditPung ? 'button' : 'span'
 
   return (
-    <div className="hero-card border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.92)] p-[8px] backdrop-blur-sm">
+    <div className="hero-card border border-[var(--color-border-default)] bg-[var(--color-glass-strong)] p-[8px] backdrop-blur-sm">
       <div className="relative h-[452px] overflow-hidden rounded-[30px] text-white ring-1 ring-black/4">
         {profile.avatarImage ? (
           <>
@@ -263,7 +263,7 @@ export function ProfileHeroCard({
             <div className="mt-2">
               <PungPill
                 {...(onEditPung ? { type: 'button' as const, onClick: onEditPung } : {})}
-                className="inline-flex items-center gap-1.5 rounded-full border border-[rgba(75,108,245,0.45)] bg-[rgba(75,108,245,0.18)] px-3 py-1 text-[12px] font-semibold text-white/90"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-accent-border)] bg-[var(--color-accent-bg)] px-3 py-1 text-[12px] font-semibold text-[var(--color-text-primary)]"
               >
                 <span>💬</span>
                 <span>{pung || '펑 열기'}</span>
@@ -290,7 +290,7 @@ export function ProfileReputationSummarySection({
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.04}>
       <SectionTitle title="평판" />
-      <div className="rounded-[22px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.03)] px-4 py-4">
+      <div className="rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-4">
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Reputation</div>
@@ -331,7 +331,7 @@ export function ProfileFeedbackSection({
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06}>
       <SectionTitle title="피드백" />
-      <div className="rounded-[22px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.03)] px-4 py-4">
+      <div className="rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-4">
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
             <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Feedback</div>
@@ -393,7 +393,7 @@ export function ProfileRememberSection({
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.02}>
       <SectionTitle title="리멤버 네트워크" />
-      <div className="rounded-[22px] border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.03)] px-4 py-4">
+      <div className="rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-4">
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
             <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Remember</div>
@@ -459,7 +459,7 @@ export function ProfileSnsSection({
                   @{instagram.username}
                 </a>
               </div>
-              {igOpen ? <ChevronUp size={14} color="#8B857C" /> : <ChevronDown size={14} color="#8B857C" />}
+              {igOpen ? <ChevronUp size={14} color="var(--color-text-tertiary)" /> : <ChevronDown size={14} color="var(--color-text-tertiary)" />}
             </button>
             <AnimatePresence initial={false}>
               {igOpen && (
@@ -516,7 +516,7 @@ export function ProfileSnsSection({
                   {linkedin.profileUrl.replace(/^https?:\/\/(www\.)?/, '')}
                 </a>
               </div>
-              {liOpen ? <ChevronUp size={14} color="#8B857C" /> : <ChevronDown size={14} color="#8B857C" />}
+              {liOpen ? <ChevronUp size={14} color="var(--color-text-tertiary)" /> : <ChevronDown size={14} color="var(--color-text-tertiary)" />}
             </button>
             <AnimatePresence initial={false}>
               {liOpen && (

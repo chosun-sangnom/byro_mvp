@@ -198,7 +198,7 @@ export function BasicInfoEditScreen({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.92)] backdrop-blur-md flex-shrink-0">
+      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] bg-[var(--color-glass-strong)] backdrop-blur-md flex-shrink-0">
         <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
         <span className="text-base font-black">기본정보 편집</span>
       </div>
@@ -227,7 +227,7 @@ export function BasicInfoEditScreen({
             >
               <Camera size={12} /> 사진 변경
             </label>
-            <div className="text-[11px] text-[#AAA] mt-1">직사각형 메인 카드와 원형 프로필 이미지에 같이 사용됩니다.</div>
+            <div className="text-[11px] text-[var(--color-text-tertiary)] mt-1">직사각형 메인 카드와 원형 프로필 이미지에 같이 사용됩니다.</div>
           </div>
 
           <div className="space-y-4 mb-5">
@@ -237,7 +237,7 @@ export function BasicInfoEditScreen({
                 value={user.name}
                 disabled
                 placeholder="변경 불가"
-                className="w-full border border-[#eee] rounded-xl px-4 py-2.5 text-sm bg-[#f9f9f9] text-[#aaa]"
+                className="w-full border border-[var(--color-border-soft)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-surface)] text-[var(--color-text-tertiary)]"
               />
             </div>
 

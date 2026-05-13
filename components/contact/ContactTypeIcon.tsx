@@ -23,8 +23,8 @@ export function ContactTypeIcon({
   const Icon = ICON_MAP[channelId] ?? MessageCircle
   const palette = variant === 'mono'
     ? {
-      enabled: 'bg-[#111] text-white',
-      disabled: 'bg-[#F1F1F1] text-[#AAA]',
+      enabled: 'bg-[var(--color-text-strong)] text-white',
+      disabled: 'bg-[var(--color-bg-muted)] text-[var(--color-text-tertiary)]',
     }
     : {
       enabled: 'bg-[var(--color-accent-dark)] text-white',

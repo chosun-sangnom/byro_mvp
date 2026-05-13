@@ -192,7 +192,7 @@ export default function PublicProfile({
   return (
     <div className="flex flex-col h-full">
       {/* 상단 네비 */}
-      <div className="flex items-center px-4 h-12 border-b border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.88)] backdrop-blur-md flex-shrink-0">
+      <div className="flex items-center px-4 h-12 border-b border-[var(--color-border-soft)] bg-[var(--color-glass-mid)] backdrop-blur-md flex-shrink-0">
         <button onClick={() => router.back()} className="text-sm text-[var(--color-text-secondary)] mr-2">‹</button>
         <div className="flex-1 min-w-0">
           <div className="text-[11px] text-[var(--color-text-tertiary)] uppercase tracking-[0.18em]">{isOwnerMode ? 'My Byro' : 'Public Profile'}</div>
@@ -215,14 +215,14 @@ export default function PublicProfile({
                   bookmarked ? 'bg-[var(--color-accent-dark)] border-[var(--color-accent-dark)]' : '',
                 ].join(' ')}
               >
-                <Bookmark size={14} color={bookmarked ? '#111111' : '#B5AEA3'} />
+                <Bookmark size={14} color={bookmarked ? 'var(--color-text-strong)' : 'var(--color-text-tertiary)'} />
               </button>
             )}
             <button
               onClick={() => showToast('공유 링크를 준비 중이에요')}
               className="icon-button"
             >
-              <Share2 size={14} color="#B5AEA3" />
+              <Share2 size={14} color="var(--color-text-tertiary)" />
             </button>
           </div>
         ) : (
@@ -239,14 +239,14 @@ export default function PublicProfile({
               className="icon-button"
               aria-label="프로필 링크 복사"
             >
-              <Copy size={14} color="#B5AEA3" />
+              <Copy size={14} color="var(--color-text-tertiary)" />
             </button>
             <button
               onClick={handleShareProfile}
               className="icon-button"
               aria-label="프로필 공유"
             >
-              <Share2 size={14} color="#B5AEA3" />
+              <Share2 size={14} color="var(--color-text-tertiary)" />
             </button>
           </div>
         )}

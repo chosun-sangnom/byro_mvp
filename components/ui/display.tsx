@@ -11,7 +11,7 @@ export function Avatar({ name, size = 'md' }: { name: string; size?: 'sm' | 'md'
   const char = name.charAt(0)
   const sizeClass = size === 'sm' ? 'w-8 h-8 text-sm' : size === 'lg' ? 'w-14 h-14 text-xl' : 'w-10 h-10 text-base'
   return (
-    <div className={`${sizeClass} rounded-full bg-[#e0e0e0] flex items-center justify-center font-bold text-[#555] flex-shrink-0`}>
+    <div className={`${sizeClass} rounded-full bg-[var(--color-bg-muted)] flex items-center justify-center font-bold text-[var(--color-text-secondary)] flex-shrink-0`}>
       {char}
     </div>
   )

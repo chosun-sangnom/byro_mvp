@@ -96,7 +96,7 @@ export function ProfileHighlightsSection({
                         <div className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">{airlineBadgeLabel}</div>
                       )}
                     </div>
-                    {isOpen ? <ChevronUp size={14} color="#8B857C" /> : <ChevronDown size={14} color="#8B857C" />}
+                    {isOpen ? <ChevronUp size={14} color="var(--color-text-tertiary)" /> : <ChevronDown size={14} color="var(--color-text-tertiary)" />}
                   </button>
                   <AnimatePresence initial={false}>
                     {isOpen && (
@@ -162,7 +162,7 @@ export function ProfileHighlightsSection({
                       <div className="mt-0.5 text-[12px] text-[var(--color-text-tertiary)]">{preview.meta}</div>
                     )}
                   </div>
-                  {isGroupOpen ? <ChevronUp size={14} color="#8B857C" /> : <ChevronDown size={14} color="#8B857C" />}
+                  {isGroupOpen ? <ChevronUp size={14} color="var(--color-text-tertiary)" /> : <ChevronDown size={14} color="var(--color-text-tertiary)" />}
                 </button>
                 <AnimatePresence initial={false}>
                   {isGroupOpen && (

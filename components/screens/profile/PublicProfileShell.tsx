@@ -131,7 +131,7 @@ export function PublicProfileShell({
     <div className="flex h-full flex-col">
 
       {/* ── 상단 Nav ── */}
-      <div className="flex h-12 flex-shrink-0 items-center border-b border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.88)] px-4 backdrop-blur-md">
+      <div className="flex h-12 flex-shrink-0 items-center border-b border-[var(--color-border-soft)] bg-[var(--color-glass-mid)] px-4 backdrop-blur-md">
         <button
           onClick={() => router.back()}
           className="mr-2 text-sm text-[var(--color-text-secondary)]"
@@ -166,7 +166,7 @@ export function PublicProfileShell({
             onClick={() => showToast('공유 링크를 준비 중이에요')}
             className="icon-button"
           >
-            <Share2 size={14} color="#B5AEA3" />
+            <Share2 size={14} color="var(--color-text-tertiary)" />
           </button>
         </div>
       </div>
@@ -175,7 +175,7 @@ export function PublicProfileShell({
       <div className="flex-shrink-0">
         <div className="relative px-5 pt-4 pb-1">
           {/* 인디고 ambient glow — 배경 분위기용 */}
-          <div className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,rgba(75,108,245,0.14)_0%,transparent_68%)]" />
+          <div className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,var(--color-accent-bg-subtle)_0%,transparent_68%)]" />
           <ProfileHeroCard
             profile={profile}
             heroTheme={profile.heroTheme}
@@ -219,7 +219,7 @@ export function PublicProfileShell({
             </button>
             <button
               onClick={() => showToast('경험 남겨요 구조는 다음 단계에서 연결할 예정입니다.')}
-              className="flex-1 rounded-full bg-[linear-gradient(135deg,#6D8BFF_0%,#4E63FF_100%)] py-3 text-[13px] font-semibold text-white shadow-[0_10px_24px_rgba(78,99,255,0.28)]"
+              className="flex-1 rounded-full bg-[linear-gradient(135deg,var(--color-accent-light)_0%,var(--color-accent-dark)_100%)] py-3 text-[13px] font-semibold text-white shadow-[0_10px_24px_var(--color-accent-glow)]"
             >
               + 경험 남기기
             </button>
@@ -231,7 +231,7 @@ export function PublicProfileShell({
           <div className="mb-4 flex gap-3">
             <button
               onClick={onOwnerEdit ?? (() => router.push('/me'))}
-              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-[var(--color-accent-dark)] bg-[rgba(75,108,245,0.08)] py-3 text-[13px] font-semibold text-[var(--color-accent-dark)]"
+              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-[var(--color-accent-dark)] bg-[var(--color-accent-bg-subtle)] py-3 text-[13px] font-semibold text-[var(--color-accent-dark)]"
             >
               <Pencil size={14} />
               편집
@@ -300,7 +300,7 @@ export function PublicProfileShell({
                     className={[
                       'rounded-full border px-3 py-2 text-xs font-semibold transition-colors',
                       selected
-                        ? 'border-[var(--color-accent-dark)] bg-[rgba(75,108,245,0.14)] text-[var(--color-text-primary)]'
+                        ? 'border-[var(--color-accent-dark)] bg-[var(--color-accent-bg)] text-[var(--color-text-primary)]'
                         : 'border-[var(--color-border-default)] bg-[var(--color-bg-soft)] text-[var(--color-text-secondary)]',
                     ].join(' ')}
                   >
@@ -343,7 +343,7 @@ export function PublicProfileShell({
 
             <div className="rounded-2xl border border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.03)] px-4 py-3">
               <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)]">Preview</div>
-              <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[rgba(75,108,245,0.45)] bg-[rgba(75,108,245,0.18)] px-3 py-1 text-[12px] font-semibold text-white/90">
+              <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-[var(--color-accent-border)] bg-[var(--color-accent-bg)] px-3 py-1 text-[12px] font-semibold text-[var(--color-text-primary)]">
                 <span>💬</span>
                 <span>{availabilityDraft.trim() || '오늘 가능한 제안을 적어보세요'}</span>
               </div>

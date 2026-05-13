@@ -91,7 +91,7 @@ export function SNSManageScreen({ onBack }: { onBack: () => void }) {
             placeholder={selectedSns === 'instagram' ? 'sss_uuo' : 'myongkoo-kang'}
             className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-3 text-sm outline-none mb-2 bg-[var(--color-bg-muted)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)]"
           />
-          <div className="text-[11px] text-[#AAA] mb-4">
+          <div className="text-[11px] text-[var(--color-text-tertiary)] mb-4">
             {selectedSns === 'instagram' ? '예: instagram.com/' : '예: linkedin.com/in/'}{inputValue || (selectedSns === 'instagram' ? 'sss_uuo' : 'myongkoo-kang')}
           </div>
           <div className="space-y-2">
@@ -141,7 +141,7 @@ function SnsManageRow({
     <button
       onClick={onClick}
       disabled={disabled}
-      className="flex items-center w-full py-3 border-b border-[#F1F1F1] text-left disabled:opacity-45"
+      className="flex items-center w-full py-3 border-b border-[var(--color-border-soft)] text-left disabled:opacity-45"
     >
       <div className="mr-3">{icon}</div>
       <div className="flex-1">

@@ -338,7 +338,7 @@ export function PublicProfileCompatibilitySheet({
                 className="rounded-[16px] border px-3 py-3 text-left transition-colors"
                 style={{
                   borderColor: selected ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
-                  background: selected ? 'rgba(78, 99, 255, 0.14)' : 'rgba(255,255,255,0.03)',
+                  background: selected ? 'var(--color-accent-bg)' : 'transparent',
                 }}
               >
                 <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-tertiary)]">

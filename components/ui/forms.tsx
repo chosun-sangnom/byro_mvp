@@ -42,7 +42,7 @@ export function CheckRow({ label, sublabel, checked, onToggle, onDetail }: Check
 
 export function ProgressBar({ value }: { value: number }) {
   return (
-    <div className="h-1.5 bg-[#e0e0e0] rounded-full overflow-hidden">
+    <div className="h-1.5 bg-[var(--color-bg-muted)] rounded-full overflow-hidden">
       <div
         className="h-full bg-[var(--color-accent-dark)] rounded-full transition-all duration-300"
         style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
@@ -91,12 +91,12 @@ export function TextArea({ value, onChange, placeholder, maxLength, rows = 4, da
         className={[
           'w-full rounded-xl border px-3 py-2.5 text-sm resize-none outline-none transition-colors',
           dark
-            ? 'bg-[#2a2a2a] border-[#444] text-white placeholder:text-[#666] focus:border-[#888]'
-            : 'bg-[#fafafa] border-[#ddd] text-[#333] placeholder:text-[#aaa] focus:border-[var(--color-accent-dark)]',
+            ? 'bg-[var(--color-bg-soft)] border-[var(--color-border-default)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-accent-dark)]'
+            : 'bg-[var(--color-bg-surface)] border-[var(--color-border-default)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] focus:border-[var(--color-accent-dark)]',
         ].join(' ')}
       />
       {maxLength && (
-        <div className={`text-right text-xs mt-1 ${dark ? 'text-[#666]' : 'text-[#aaa]'}`}>
+        <div className={`text-right text-xs mt-1 ${dark ? 'text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'}`}>
           {value.length}/{maxLength}
         </div>
       )}

@@ -30,7 +30,7 @@ export default function MobileFrame({ children }: MobileFrameProps) {
 
 function StatusBar() {
   return (
-    <div className="flex justify-between items-center px-6 py-2 text-xs font-bold text-[#0A0A0A] bg-white flex-shrink-0 max-sm:hidden">
+    <div className="flex justify-between items-center px-6 py-2 text-xs font-bold text-[var(--color-text-strong)] bg-white flex-shrink-0 max-sm:hidden">
       <span>9:41</span>
       <span>●●●</span>
     </div>

@@ -143,7 +143,7 @@ export function ExperienceDoneModal({
         <div className="mb-4 flex justify-center">
           <div
             className="relative flex h-16 w-16 items-center justify-center rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-muted)]"
-            style={{ boxShadow: '0 0 24px rgba(75,108,245,0.22)' }}
+            style={{ boxShadow: '0 0 24px var(--color-accent-border-soft)' }}
           >
             <Award size={28} color="var(--color-accent-dark)" strokeWidth={1.8} />
           </div>

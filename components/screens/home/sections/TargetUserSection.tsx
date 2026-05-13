@@ -12,7 +12,7 @@ export function TargetUserSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-3xl tracking-tight text-center mb-12 text-[#111]"
+          className="text-3xl tracking-tight text-center mb-12 text-[var(--color-text-strong)]"
         >
           사람을 자주 만나는 사람에게
           <br />
@@ -32,7 +32,7 @@ export function TargetUserSection() {
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center mb-3">
                 <item.icon className="w-5 h-5 text-indigo-600" />
               </div>
-              <div className="text-sm text-[#111]">{item.label}</div>
+              <div className="text-sm text-[var(--color-text-strong)]">{item.label}</div>
             </motion.div>
           ))}
         </div>

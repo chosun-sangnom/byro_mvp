@@ -41,7 +41,7 @@ export function RememberNetworkGraph({
       </div>
 
       <svg viewBox="0 0 200 160" className="h-auto w-full">
-        <rect x="0" y="0" width="200" height="160" rx="12" fill="#1D1F24" />
+        <rect x="0" y="0" width="200" height="160" rx="12" fill="#F2F3F5" />
 
         {industries.slice(0, 8).map((industry, index) => {
           const pos = NODE_POSITIONS[index]
@@ -54,19 +54,19 @@ export function RememberNetworkGraph({
                 y1="84"
                 x2={pos.x}
                 y2={pos.y}
-                stroke="#3A3D44"
+                stroke="#E4E4E8"
                 strokeWidth="1.5"
                 strokeLinecap="round"
               />
-              <circle cx={pos.x} cy={pos.y} r={pos.r + 2} fill="#24272D" />
-              <circle cx={pos.x} cy={pos.y} r={pos.r} fill="#2A2D34" stroke="#3A3D44" strokeWidth="1.5" />
+              <circle cx={pos.x} cy={pos.y} r={pos.r + 2} fill="#FFFFFF" />
+              <circle cx={pos.x} cy={pos.y} r={pos.r} fill="#F8F9FA" stroke="#E4E4E8" strokeWidth="1.5" />
               <text
                 x={pos.x}
                 y={labelStartY}
                 textAnchor="middle"
                 fontSize="6.4"
                 fontWeight="700"
-                fill="#8B857C"
+                fill="#98989D"
               >
                 {labelLines.map((line, lineIndex) => (
                   <tspan key={line} x={pos.x} dy={lineIndex === 0 ? 0 : 6.8}>
@@ -80,7 +80,7 @@ export function RememberNetworkGraph({
                 textAnchor="middle"
                 fontSize="10"
                 fontWeight="800"
-                fill="#E8E3DA"
+                fill="#0F0F10"
               >
                 {industry.ratio}%
               </text>
@@ -91,7 +91,7 @@ export function RememberNetworkGraph({
                   textAnchor="middle"
                   fontSize="5.8"
                   fontWeight="600"
-                  fill="#6B6560"
+                  fill="#636366"
                 >
                   {industry.count}명
                 </text>
@@ -100,10 +100,10 @@ export function RememberNetworkGraph({
           )
         })}
 
-        <circle cx="100" cy="84" r="26" fill="#4B6CF5" />
-        <circle cx="100" cy="84" r="29" fill="none" stroke="#3A3D44" strokeWidth="2" />
+        <circle cx="100" cy="84" r="26" fill="#1DC8A0" />
+        <circle cx="100" cy="84" r="29" fill="none" stroke="#0FA87F" strokeWidth="2" />
         <text x="100" y="80" textAnchor="middle" fontSize="9" fontWeight="700" fill="#FFFFFF">나</text>
-        <text x="100" y="92" textAnchor="middle" fontSize="7" fontWeight="600" fill="rgba(255,255,255,0.6)">Byro</text>
+        <text x="100" y="92" textAnchor="middle" fontSize="7" fontWeight="600" fill="rgba(255,255,255,0.7)">Byro</text>
       </svg>
 
       <div className="mt-4 flex items-center justify-between border-t border-[var(--color-border-soft)] pt-3">

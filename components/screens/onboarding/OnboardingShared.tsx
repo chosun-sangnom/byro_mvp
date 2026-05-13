@@ -13,7 +13,7 @@ export function StepIntro({
   return (
     <div className="surface-card px-5 py-5 mb-5 rounded-[30px]">
       {eyebrow && (
-        <div className="mb-3 inline-flex rounded-full bg-[#171717] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white">
+        <div className="mb-3 inline-flex rounded-full bg-[var(--color-accent-dark)] px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.18em] text-white">
           {eyebrow}
         </div>
       )}
@@ -87,7 +87,7 @@ export function StepFooter({
   skipLabel?: string
 }) {
   return (
-    <div className="px-5 pb-5 pt-3 border-t border-[var(--color-border-soft)] bg-[rgba(16,17,20,0.85)] backdrop-blur-md space-y-2">
+    <div className="px-5 pb-5 pt-3 border-t border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.92)] backdrop-blur-md space-y-2">
       <div className="grid grid-cols-2 gap-2">
         <Button variant="outline" onClick={onPrev} disabled={!onPrev}>{prevLabel}</Button>
         <Button onClick={onNext} disabled={!canNext}>{nextLabel}</Button>

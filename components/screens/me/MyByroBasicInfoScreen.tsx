@@ -198,7 +198,7 @@ export function BasicInfoEditScreen({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] bg-[rgba(16,17,20,0.85)] backdrop-blur-md flex-shrink-0">
+      <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.92)] backdrop-blur-md flex-shrink-0">
         <button onClick={onBack} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
         <span className="text-base font-black">기본정보 편집</span>
       </div>
@@ -418,7 +418,7 @@ export function BasicInfoEditScreen({
                 <label className="text-xs text-[var(--color-text-tertiary)]">자기소개</label>
                 <button
                   onClick={() => showToast('AI 자기소개 생성 중...')}
-                  className="text-xs text-[#E8A000] font-bold"
+                  className="text-xs text-[var(--color-accent-dark)] font-bold"
                 >
                   → AI로 채우기
                 </button>

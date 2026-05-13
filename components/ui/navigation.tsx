@@ -16,7 +16,7 @@ export function NavBar({ title, onBack, onClose, right }: NavBarProps) {
       className="flex items-center px-4 h-12 border-b flex-shrink-0"
       style={{
         borderColor: 'var(--color-border-soft)',
-        backgroundColor: 'rgba(16,17,20,0.78)',
+        backgroundColor: 'rgba(255,255,255,0.88)',
         color: 'var(--color-text-strong)',
       }}
     >

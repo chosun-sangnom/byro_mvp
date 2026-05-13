@@ -23,7 +23,7 @@ export function AiBounce() {
       {[0, 1, 2].map((index) => (
         <div
           key={index}
-          className="w-2 h-2 rounded-full bg-[#0A0A0A]"
+          className="w-2 h-2 rounded-full bg-[var(--color-text-strong)]"
           style={{
             animation: `bounceDot 1s ${index * 0.15}s infinite`,
           }}

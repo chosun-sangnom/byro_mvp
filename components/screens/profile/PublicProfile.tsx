@@ -192,7 +192,7 @@ export default function PublicProfile({
   return (
     <div className="flex flex-col h-full">
       {/* 상단 네비 */}
-      <div className="flex items-center px-4 h-12 border-b border-[var(--color-border-soft)] bg-[rgba(16,17,20,0.78)] backdrop-blur-md flex-shrink-0">
+      <div className="flex items-center px-4 h-12 border-b border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.88)] backdrop-blur-md flex-shrink-0">
         <button onClick={() => router.back()} className="text-sm text-[var(--color-text-secondary)] mr-2">‹</button>
         <div className="flex-1 min-w-0">
           <div className="text-[11px] text-[var(--color-text-tertiary)] uppercase tracking-[0.18em]">{isOwnerMode ? 'My Byro' : 'Public Profile'}</div>

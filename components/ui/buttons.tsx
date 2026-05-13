@@ -60,7 +60,7 @@ export function Button({
               : variant === 'google'
                 ? 'var(--color-bg-surface)'
                 : variant === 'danger'
-                  ? 'rgba(54,27,26,0.28)'
+                  ? 'var(--color-state-danger-bg)'
                   : variant === 'ghost'
                     ? 'transparent'
                     : undefined,
@@ -82,11 +82,11 @@ export function Button({
             : variant === 'google'
               ? 'var(--color-border-default)'
               : variant === 'danger'
-                ? 'rgba(240,161,154,0.42)'
+                ? 'rgba(198,40,40,0.28)'
                 : undefined,
         boxShadow:
           variant === 'primary' && !disabled
-            ? '0 0 18px rgba(75,108,245,0.38), 0 2px 8px rgba(75,108,245,0.22)'
+            ? '0 0 18px rgba(29,200,160,0.30), 0 2px 8px rgba(29,200,160,0.18)'
             : undefined,
         ...style,
       }}

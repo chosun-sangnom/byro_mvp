@@ -175,7 +175,7 @@ export function ProfileHeroCard({
   const PungPill = onEditPung ? 'button' : 'span'
 
   return (
-    <div className="hero-card border border-[var(--color-border-default)] bg-[rgba(23,24,28,0.92)] p-[8px] backdrop-blur-sm">
+    <div className="hero-card border border-[var(--color-border-default)] bg-[rgba(255,255,255,0.92)] p-[8px] backdrop-blur-sm">
       <div className="relative h-[452px] overflow-hidden rounded-[30px] text-white ring-1 ring-black/4">
         {profile.avatarImage ? (
           <>

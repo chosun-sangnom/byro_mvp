@@ -20,7 +20,7 @@ export default function GuestbookScreen({ username }: { username: string }) {
 
   return (
     <div className="flex h-full flex-col" style={{ backgroundColor: 'var(--color-bg-page)' }}>
-      <div className="flex items-center px-5 h-12 border-b flex-shrink-0" style={{ borderColor: 'var(--color-border-soft)', backgroundColor: 'rgba(16,17,20,0.78)', backdropFilter: 'blur(12px)' }}>
+      <div className="flex items-center px-5 h-12 border-b flex-shrink-0" style={{ borderColor: 'var(--color-border-soft)', backgroundColor: 'rgba(255,255,255,0.88)', backdropFilter: 'blur(12px)' }}>
         <button onClick={() => router.back()} className="text-sm text-[var(--color-text-secondary)] mr-3">‹</button>
         <div>
           <div className="text-[11px] text-[var(--color-text-tertiary)] uppercase tracking-[0.18em]">Guestbook</div>

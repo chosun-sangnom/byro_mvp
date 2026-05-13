@@ -116,7 +116,7 @@ export function ManageByroScreen({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex h-12 flex-shrink-0 items-center border-b border-[var(--color-border-soft)] bg-[rgba(16,17,20,0.82)] px-5 backdrop-blur-md">
+      <div className="flex h-12 flex-shrink-0 items-center border-b border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.88)] px-5 backdrop-blur-md">
         <button onClick={onBack} className="mr-3 text-xl leading-none text-[var(--color-text-secondary)]">‹</button>
         <span className="flex-1 text-[15px] font-bold text-[var(--color-text-primary)]">편집</span>
         <button onClick={onLogout} className="text-xs text-[var(--color-text-tertiary)]">로그아웃</button>

@@ -131,7 +131,7 @@ export function PublicProfileShell({
     <div className="flex h-full flex-col">
 
       {/* ── 상단 Nav ── */}
-      <div className="flex h-12 flex-shrink-0 items-center border-b border-[var(--color-border-soft)] bg-[rgba(16,17,20,0.78)] px-4 backdrop-blur-md">
+      <div className="flex h-12 flex-shrink-0 items-center border-b border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.88)] px-4 backdrop-blur-md">
         <button
           onClick={() => router.back()}
           className="mr-2 text-sm text-[var(--color-text-secondary)]"
@@ -205,7 +205,7 @@ export function PublicProfileShell({
       </div>
 
       {/* ── 고정 푸터 ── */}
-      <div className="flex-shrink-0 border-t border-[var(--color-border-soft)] bg-[rgba(16,17,20,0.9)] px-5 pt-4 pb-[calc(env(safe-area-inset-bottom)+16px)] backdrop-blur-md">
+      <div className="flex-shrink-0 border-t border-[var(--color-border-soft)] bg-[rgba(255,255,255,0.94)] px-5 pt-4 pb-[calc(env(safe-area-inset-bottom)+16px)] backdrop-blur-md">
 
         {/* 평판 탭 visitor 전용 액션 — 방문자가 평판을 남길 수 있는 버튼 */}
         {/* TODO(reputation): 피드백 요청 / 경험 남기기 실제 플로우 연결 */}

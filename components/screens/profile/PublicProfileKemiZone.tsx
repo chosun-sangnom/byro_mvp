@@ -82,9 +82,18 @@ export function PublicProfileKemiZone({
               {kemi.aiCopy}
             </p>
 
-            <div className="mt-5">
+            <div className="mt-5 border-t border-[var(--color-accent-border-soft)] pt-4">
+              <div className="mb-1.5 flex items-center gap-1.5">
+                <Sparkles size={11} style={{ color: 'var(--color-accent-dark)' }} />
+                <span
+                  className="text-[11px] font-bold uppercase tracking-[0.08em]"
+                  style={{ color: 'var(--color-accent-dark)' }}
+                >
+                  케미 리포트
+                </span>
+              </div>
               <p className="mb-3 text-[12px] leading-[1.65] text-[var(--color-text-secondary)]">
-                이성 · 비즈니스 · 친구 관점으로 더 깊이 알고 싶다면, MBTI · 사주 · 라이프스타일을 조합한 케미 리포트를 확인해보세요.
+                MBTI · 사주 · 라이프스타일을 조합해 이성 · 비즈니스 · 친구 관점에서 두 사람의 관계 흐름을 깊이 있게 해석해요.
               </p>
               <button
                 type="button"

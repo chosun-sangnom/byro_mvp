@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
 import { showToast } from '@/components/ui'
@@ -20,6 +20,7 @@ export default function Archive() {
 
   const { activeArchiveTab, setActiveArchiveTab } = store
   const { savedProfiles, recentProfiles, receivedRequests, connectionRequests } = SAMPLE_PROFILE
+  const [activeRequestTab, setActiveRequestTab] = useState<'connection' | 'feedback'>('connection')
 
   const totalRequests = receivedRequests.length + connectionRequests.length
 
@@ -109,90 +110,129 @@ export default function Archive() {
 
         {/* 받은 요청 탭 */}
         {activeArchiveTab === 'requests' && (
-          <div className="px-5 py-2 space-y-5">
+          <div className="flex flex-col h-full">
+            {/* 세그먼트 탭 */}
+            <div className="px-5 pb-3">
+              <div className="grid grid-cols-2 gap-1 rounded-[20px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] p-1">
+                <button
+                  onClick={() => setActiveRequestTab('connection')}
+                  className="flex items-center justify-center gap-1.5 rounded-[14px] py-2.5 text-[12px] font-semibold transition"
+                  style={{
+                    backgroundColor: activeRequestTab === 'connection' ? 'var(--color-accent-bg)' : 'transparent',
+                    color: activeRequestTab === 'connection' ? 'var(--color-accent-dark)' : 'var(--color-text-secondary)',
+                  }}
+                >
+                  연결 요청
+                  {connectionRequests.length > 0 && (
+                    <span className="rounded-full px-1.5 py-0.5 text-[10px] font-bold leading-none"
+                      style={{
+                        backgroundColor: activeRequestTab === 'connection' ? 'var(--color-accent-dark)' : 'var(--color-bg-muted)',
+                        color: activeRequestTab === 'connection' ? 'white' : 'var(--color-text-tertiary)',
+                      }}
+                    >
+                      {connectionRequests.length}
+                    </span>
+                  )}
+                </button>
+                <button
+                  onClick={() => setActiveRequestTab('feedback')}
+                  className="flex items-center justify-center gap-1.5 rounded-[14px] py-2.5 text-[12px] font-semibold transition"
+                  style={{
+                    backgroundColor: activeRequestTab === 'feedback' ? 'var(--color-accent-bg)' : 'transparent',
+                    color: activeRequestTab === 'feedback' ? 'var(--color-accent-dark)' : 'var(--color-text-secondary)',
+                  }}
+                >
+                  피드백 요청
+                  {receivedRequests.length > 0 && (
+                    <span className="rounded-full px-1.5 py-0.5 text-[10px] font-bold leading-none"
+                      style={{
+                        backgroundColor: activeRequestTab === 'feedback' ? 'var(--color-accent-dark)' : 'var(--color-bg-muted)',
+                        color: activeRequestTab === 'feedback' ? 'white' : 'var(--color-text-tertiary)',
+                      }}
+                    >
+                      {receivedRequests.length}
+                    </span>
+                  )}
+                </button>
+              </div>
+            </div>
 
-            {/* 연결 요청 */}
-            {connectionRequests.length > 0 && (
-              <section>
-                <div className="micro-text mb-2">연결 요청 {connectionRequests.length}</div>
-                <div className="space-y-3">
-                  {connectionRequests.map((r) => (
-                    <div key={r.id} className="surface-card rounded-[22px] p-4">
-                      <div className="flex items-center gap-3 mb-3">
-                        <ProfileAvatar linkId={r.linkId} name={r.name} size={36} />
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm font-bold">{r.name}</div>
-                          <div className="meta-text">{r.title}</div>
-                        </div>
-                        <span className="micro-text flex-shrink-0">{r.requestedAt}</span>
+            {/* 연결 요청 목록 */}
+            {activeRequestTab === 'connection' && (
+              <div className="flex-1 overflow-y-auto px-5 space-y-3">
+                {connectionRequests.length === 0 ? (
+                  <p className="micro-text text-center pt-10">받은 연결 요청이 없어요</p>
+                ) : connectionRequests.map((r) => (
+                  <div key={r.id} className="surface-card rounded-[22px] p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <ProfileAvatar linkId={r.linkId} name={r.name} size={36} />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-bold">{r.name}</div>
+                        <div className="meta-text">{r.title}</div>
                       </div>
-                      {r.message && (
-                        <p className="surface-card-soft text-xs text-[var(--color-text-secondary)] leading-relaxed rounded-2xl px-3 py-3 mb-3">{r.message}</p>
-                      )}
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => showToast('연결 요청을 수락했어요')}
-                          className="flex-1 text-white text-xs font-bold py-2 rounded-xl"
-                          style={{ backgroundColor: 'var(--color-accent-dark)' }}
-                        >
-                          수락
-                        </button>
-                        <button
-                          onClick={() => showToast('연결 요청을 거절했어요')}
-                          className="flex-1 border text-xs font-bold py-2 rounded-xl text-[var(--color-text-secondary)]"
-                          style={{ borderColor: 'var(--color-border-default)' }}
-                        >
-                          거절
-                        </button>
-                      </div>
+                      <span className="micro-text flex-shrink-0">{r.requestedAt}</span>
                     </div>
-                  ))}
-                </div>
-              </section>
+                    {r.message && (
+                      <p className="surface-card-soft text-xs text-[var(--color-text-secondary)] leading-relaxed rounded-2xl px-3 py-3 mb-3">{r.message}</p>
+                    )}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => showToast('연결 요청을 수락했어요')}
+                        className="flex-1 text-white text-xs font-bold py-2 rounded-xl"
+                        style={{ backgroundColor: 'var(--color-accent-dark)' }}
+                      >
+                        수락
+                      </button>
+                      <button
+                        onClick={() => showToast('연결 요청을 거절했어요')}
+                        className="flex-1 border text-xs font-bold py-2 rounded-xl text-[var(--color-text-secondary)]"
+                        style={{ borderColor: 'var(--color-border-default)' }}
+                      >
+                        거절
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
 
-            {/* 피드백 요청 */}
-            {receivedRequests.length > 0 && (
-              <section>
-                <div className="micro-text mb-2">피드백 요청 {receivedRequests.length}</div>
-                <div className="space-y-3">
-                  {receivedRequests.map((r) => (
-                    <div key={r.id} className="surface-card rounded-[22px] p-4">
-                      <div className="flex items-center gap-3 mb-3">
-                        <ProfileAvatar linkId={r.linkId} name={r.name} size={36} />
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm font-bold">{r.name}</div>
-                          <div className="meta-text">피드백 요청</div>
-                        </div>
-                        <span className="micro-text flex-shrink-0">{r.requestedAt}</span>
+            {/* 피드백 요청 목록 */}
+            {activeRequestTab === 'feedback' && (
+              <div className="flex-1 overflow-y-auto px-5 space-y-3">
+                {receivedRequests.length === 0 ? (
+                  <p className="micro-text text-center pt-10">받은 피드백 요청이 없어요</p>
+                ) : receivedRequests.map((r) => (
+                  <div key={r.id} className="surface-card rounded-[22px] p-4">
+                    <div className="flex items-center gap-3 mb-3">
+                      <ProfileAvatar linkId={r.linkId} name={r.name} size={36} />
+                      <div className="flex-1 min-w-0">
+                        <div className="text-sm font-bold">{r.name}</div>
+                        <div className="meta-text">피드백 요청</div>
                       </div>
-                      {r.message && (
-                        <p className="surface-card-soft text-xs text-[var(--color-text-secondary)] leading-relaxed rounded-2xl px-3 py-3 mb-3">{r.message}</p>
-                      )}
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => router.push(`/${r.linkId}`)}
-                          className="flex-1 text-white text-xs font-bold py-2 rounded-xl"
-                          style={{ backgroundColor: 'var(--color-accent-dark)' }}
-                        >
-                          피드백 남기기
-                        </button>
-                        <button
-                          onClick={() => showToast('나중에 목록 하단으로 이동했어요')}
-                          className="flex-1 border text-xs font-bold py-2 rounded-xl text-[var(--color-text-secondary)]"
-                          style={{ borderColor: 'var(--color-border-default)' }}
-                        >
-                          나중에
-                        </button>
-                      </div>
+                      <span className="micro-text flex-shrink-0">{r.requestedAt}</span>
                     </div>
-                  ))}
-                </div>
-              </section>
-            )}
-
-            {connectionRequests.length === 0 && receivedRequests.length === 0 && (
-              <p className="micro-text text-center pt-10">받은 요청이 없어요</p>
+                    {r.message && (
+                      <p className="surface-card-soft text-xs text-[var(--color-text-secondary)] leading-relaxed rounded-2xl px-3 py-3 mb-3">{r.message}</p>
+                    )}
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => router.push(`/${r.linkId}`)}
+                        className="flex-1 text-white text-xs font-bold py-2 rounded-xl"
+                        style={{ backgroundColor: 'var(--color-accent-dark)' }}
+                      >
+                        피드백 남기기
+                      </button>
+                      <button
+                        onClick={() => showToast('나중에 목록 하단으로 이동했어요')}
+                        className="flex-1 border text-xs font-bold py-2 rounded-xl text-[var(--color-text-secondary)]"
+                        style={{ borderColor: 'var(--color-border-default)' }}
+                      >
+                        나중에
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         )}

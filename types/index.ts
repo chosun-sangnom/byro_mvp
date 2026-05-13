@@ -91,6 +91,15 @@ export interface ReceivedRequest {
   requestedAt: string
 }
 
+export interface ConnectionRequest {
+  id: string
+  linkId: string
+  name: string
+  title: string
+  message: string | null
+  requestedAt: string
+}
+
 export interface ContactChannel {
   id: 'phone' | 'email' | 'kakao'
   label: string
@@ -277,6 +286,7 @@ export interface PublicProfile {
   savedProfiles: SavedProfile[]
   recentProfiles: RecentProfile[]
   receivedRequests: ReceivedRequest[]
+  connectionRequests: ConnectionRequest[]
   reputationKeywords?: ReputationKeyword[]
   guestbook?: GuestbookEntry[]
   kemi?: KemiData

@@ -215,6 +215,10 @@ export const SAMPLE_PROFILE = {
     { id: 'r1', linkId: 'jiminlee', name: '이지민', message: '"같이 일해봤는데 꼭 남겨주세요 🙏"', requestedAt: '방금 전' },
     { id: 'r2', linkId: 'chijiwon', name: '최지원', message: null, requestedAt: '2일 전' },
   ],
+  connectionRequests: [
+    { id: 'c1', linkId: 'mk', name: '강명구', title: 'Byth CEO', message: '안녕하세요, 네트워크 연결 요청드립니다.', requestedAt: '3시간 전' },
+    { id: 'c2', linkId: 'kimdohyeon', name: '김도현', title: '독립 재무설계사', message: null, requestedAt: '1일 전' },
+  ],
   reputationKeywords: [
     { keyword: '전문성이 느껴져요', count: 8 },
     { keyword: '믿고 맡길 수 있어요', count: 6 },

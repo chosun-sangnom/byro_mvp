@@ -44,7 +44,7 @@ interface ByroStore {
   hlOpenStates: Record<string, boolean>
   primaryHighlightOverrides: Record<string, string>
   snsOpenStates: Record<string, boolean>
-  activeArchiveTab: 'saved' | 'recent' | 'requests'
+  activeArchiveTab: 'connected' | 'recent' | 'requests'
   experienceKeywords: string[]
   experienceMessage: string
   expSubmittedProfiles: string[]
@@ -81,7 +81,7 @@ interface ByroStore {
   setExperienceMessage(msg: string): void
   clearExperience(): void
   markExpSubmitted(profileId: string): void
-  setActiveArchiveTab(tab: 'saved' | 'recent' | 'requests'): void
+  setActiveArchiveTab(tab: 'connected' | 'recent' | 'requests'): void
   updateUserInfo(info: Partial<UserState>): void
   updateUserContactChannels(channels: ContactChannel[]): void
   updateUserWhoIAm(whoIAm: PublicProfileWhoIAm): void
@@ -137,7 +137,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   hlOpenStates: {},
   primaryHighlightOverrides: {},
   snsOpenStates: {},
-  activeArchiveTab: 'saved',
+  activeArchiveTab: 'connected',
   experienceKeywords: [],
   experienceMessage: '',
   expSubmittedProfiles: [],

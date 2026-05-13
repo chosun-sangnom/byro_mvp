@@ -24,6 +24,7 @@ import { ContactActionButton } from '@/components/screens/profile/PublicProfileS
 import { ProfileHeroCard } from '@/components/screens/profile/PublicProfileHeroSection'
 import { PublicProfileTabBar, type PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
 import { PublicProfileKemiZone, PublicProfileOwnerMatchZone } from '@/components/screens/profile/PublicProfileKemiZone'
+import { PublicProfileCompatibilitySheet } from '@/components/screens/profile/PublicProfileCompatibilitySheet'
 
 const DEFAULT_MOOD_OPTIONS = [
   '집중 모드',
@@ -60,6 +61,7 @@ export function PublicProfileShell({
   const [bioOverflowing, setBioOverflowing] = useState(false)
   const [moodSheetOpen, setMoodSheetOpen] = useState(false)
   const [pungSheetOpen, setPungSheetOpen] = useState(false)
+  const [compatibilityOpen, setCompatibilityOpen] = useState(false)
   const [moodDraft, setMoodDraft] = useState(profile.headerMeta?.mood ?? '')
   const [availabilityDraft, setAvailabilityDraft] = useState(profile.headerMeta?.availability ?? '')
   const bioRef = useRef<HTMLParagraphElement | null>(null)
@@ -196,6 +198,24 @@ export function PublicProfileShell({
           <PublicProfileKemiZone kemi={profile.kemi} isLoggedIn={store.isLoggedIn} />
         )}
 
+        {!isOwnerMode && profile.whoIAm && (
+          <div className="mx-5 mb-3 rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">궁합 리포트</div>
+                <div className="mt-1 text-[14px] font-semibold text-[var(--color-text-primary)]">MBTI · 사주 · 라이프스타일을 함께 읽는 분석</div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setCompatibilityOpen(true)}
+                className="shrink-0 rounded-full bg-[var(--color-accent-dark)] px-3 py-2 text-[12px] font-semibold text-white"
+              >
+                궁합 보기
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* 나 / 라이프 / 관계 탭 */}
         <PublicProfileTabBar activeTab={activeTab} onTabChange={onTabChange} />
       </div>
@@ -280,6 +300,16 @@ export function PublicProfileShell({
           </div>
         </div>
       </div>
+
+      {!isOwnerMode && profile.whoIAm && (
+        <PublicProfileCompatibilitySheet
+          open={compatibilityOpen}
+          onClose={() => setCompatibilityOpen(false)}
+          profileName={profile.name}
+          whoIAm={profile.whoIAm}
+          life={profile.life}
+        />
+      )}
 
       <BottomSheet open={moodSheetOpen} onClose={() => { resetHeaderDrafts(); setMoodSheetOpen(false) }}>
         <div className="px-5 pb-6">

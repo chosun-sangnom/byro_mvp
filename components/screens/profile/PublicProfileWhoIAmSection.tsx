@@ -1,10 +1,8 @@
 'use client'
 
-import { useState } from 'react'
 import { PawPrint } from 'lucide-react'
 import type { PublicProfileLife, PublicProfileWhoIAm } from '@/types'
 import { SectionTitle } from '@/components/screens/profile/PublicProfileSections'
-import { PublicProfileCompatibilitySheet } from '@/components/screens/profile/PublicProfileCompatibilitySheet'
 
 function IdentityRow({
   label,
@@ -60,18 +58,12 @@ function PetCard({
 }
 
 export function PublicProfileWhoIAmSection({
-  name,
   whoIAm,
   life,
-  isOwnerMode = false,
 }: {
-  name: string
   whoIAm?: PublicProfileWhoIAm
   life?: PublicProfileLife
-  isOwnerMode?: boolean
 }) {
-  const [reportOpen, setReportOpen] = useState(false)
-
   if (!whoIAm) return null
   const pet = life?.daily.pet
   const hasPet = Boolean(pet && pet !== '없음')
@@ -82,9 +74,7 @@ export function PublicProfileWhoIAmSection({
       <div className="px-5 pt-6 pb-2">
         <SectionTitle
           title="나"
-          subtitle={isOwnerMode
-            ? 'MBTI와 생활감 있는 정보로 내 프로필의 기본 결을 정리합니다.'
-            : 'MBTI와 생활감 있는 정보, 그리고 궁합 보기로 이 사람의 기본 결을 보여줍니다.'}
+          subtitle="MBTI와 생활감 있는 정보로 프로필의 기본 결을 정리합니다."
         />
 
         <div className="grid grid-cols-1 gap-3">
@@ -99,37 +89,7 @@ export function PublicProfileWhoIAmSection({
           />
         )}
 
-        {!isOwnerMode && (
-          <div className="mt-4 rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4">
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">궁합 리포트</div>
-                <div className="mt-1 text-[15px] font-semibold text-[var(--color-text-primary)]">MBTI · 사주 · 라이프스타일을 함께 읽는 분석</div>
-                <p className="mt-2 text-[12px] leading-[1.6] text-[var(--color-text-secondary)]">
-                  이성, 사업 파트너, 친구 · 동료 관점으로 관계의 흐름을 다르게 해석해요.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setReportOpen(true)}
-                className="rounded-full bg-[var(--color-accent-dark)] px-3 py-2 text-[12px] font-semibold text-white"
-              >
-                궁합 보기
-              </button>
-            </div>
-          </div>
-        )}
       </div>
-
-      {!isOwnerMode && (
-        <PublicProfileCompatibilitySheet
-          open={reportOpen}
-          onClose={() => setReportOpen(false)}
-          profileName={name}
-          whoIAm={whoIAm}
-          life={life}
-        />
-      )}
     </>
   )
 }

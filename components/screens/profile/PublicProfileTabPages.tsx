@@ -121,10 +121,8 @@ export function PublicProfileWhoTabPage({
   return (
     <>
       <PublicProfileWhoIAmSection
-        name={profile.name}
         whoIAm={profile.whoIAm}
         life={profile.life}
-        isOwnerMode={isOwnerMode}
       />
       <ProfileHighlightsSection
         profile={profile}

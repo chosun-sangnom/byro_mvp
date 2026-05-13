@@ -62,6 +62,8 @@ export function PublicProfileShell({
   const [moodSheetOpen, setMoodSheetOpen] = useState(false)
   const [pungSheetOpen, setPungSheetOpen] = useState(false)
   const [compatibilityOpen, setCompatibilityOpen] = useState(false)
+  const [connectionRequestOpen, setConnectionRequestOpen] = useState(false)
+  const [connectionMessage, setConnectionMessage] = useState('')
   const [moodDraft, setMoodDraft] = useState(profile.headerMeta?.mood ?? '')
   const [availabilityDraft, setAvailabilityDraft] = useState(profile.headerMeta?.availability ?? '')
   const bioRef = useRef<HTMLParagraphElement | null>(null)
@@ -252,7 +254,7 @@ export function PublicProfileShell({
           </div>
         ) : (
           <button
-            onClick={() => showToast('연결 요청을 보냈어요!')}
+            onClick={() => setConnectionRequestOpen(true)}
             className="mb-4 w-full rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)]"
           >
             연결 요청
@@ -295,6 +297,44 @@ export function PublicProfileShell({
           whoIAm={profile.whoIAm}
           life={profile.life}
         />
+      )}
+
+      {!isOwnerMode && (
+        <BottomSheet open={connectionRequestOpen} onClose={() => { setConnectionRequestOpen(false); setConnectionMessage('') }}>
+          <div className="px-5 pb-6">
+            <div className="mb-1 text-[18px] font-black text-[var(--color-text-strong)]">
+              {profile.name}님께 연결 요청
+            </div>
+            <p className="mb-5 text-[13px] leading-[1.65] text-[var(--color-text-secondary)]">
+              요청이 수락되면 연결된 사람 목록에 추가돼요.
+            </p>
+            <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-tertiary)]">
+              한마디 <span className="font-normal normal-case tracking-normal text-[var(--color-text-tertiary)]">(선택)</span>
+            </label>
+            <textarea
+              value={connectionMessage}
+              onChange={(e) => setConnectionMessage(e.target.value)}
+              placeholder="연결을 원하는 이유나 간단한 인사를 남겨보세요."
+              maxLength={100}
+              rows={3}
+              className="mb-1 w-full resize-none rounded-[16px] border border-[var(--color-border-default)] bg-[var(--color-bg-muted)] px-4 py-3 text-[14px] text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)]"
+            />
+            <div className="mb-5 text-right text-[11px] text-[var(--color-text-tertiary)]">
+              {connectionMessage.length}/100
+            </div>
+            <button
+              onClick={() => {
+                setConnectionRequestOpen(false)
+                setConnectionMessage('')
+                showToast('연결 요청을 보냈어요')
+              }}
+              className="w-full rounded-full py-3.5 text-[14px] font-semibold text-white"
+              style={{ backgroundColor: 'var(--color-accent-dark)' }}
+            >
+              요청 보내기
+            </button>
+          </div>
+        </BottomSheet>
       )}
 
       <BottomSheet open={moodSheetOpen} onClose={() => { resetHeaderDrafts(); setMoodSheetOpen(false) }}>

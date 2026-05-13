@@ -388,7 +388,7 @@ export function Step7Highlight() {
                               store.setHighlightPrimary(selectedCat.id, item.id)
                               showToast('메인 항목으로 설정했어요')
                             }}
-                            className="rounded-full border border-[#D7D0C8] bg-[var(--color-bg-soft)] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-secondary)]"
+                            className="rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-secondary)]"
                           >
                             메인으로 설정
                           </button>

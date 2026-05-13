@@ -12,24 +12,16 @@ interface NavBarProps {
 
 export function NavBar({ title, onBack, onClose, right }: NavBarProps) {
   return (
-    <div
-      className="flex items-center px-4 h-12 border-b flex-shrink-0"
-      style={{
-        borderColor: 'var(--color-border-soft)',
-        backgroundColor: 'rgba(255,255,255,0.88)',
-        color: 'var(--color-text-strong)',
-      }}
-    >
+    <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] bg-[var(--color-glass-mid)] backdrop-blur-md flex-shrink-0">
       {onBack && (
-        <button onClick={onBack} className="mr-2 p-1 -ml-1 text-[var(--color-text-secondary)]">
+        <button onClick={onBack} className="-ml-1 mr-3 p-1 text-[var(--color-text-secondary)]">
           <ChevronLeft size={20} />
         </button>
       )}
-      {title && <span className="text-sm font-bold flex-1">{title}</span>}
-      {!title && <div className="flex-1" />}
-      {right && <div className="ml-auto">{right}</div>}
-      {onClose && !right && (
-        <button onClick={onClose} className="ml-auto p-1 text-[var(--color-text-secondary)]">
+      <span className="flex-1 text-[15px] font-black text-[var(--color-text-primary)]">{title}</span>
+      {right}
+      {!right && onClose && (
+        <button onClick={onClose} className="p-1 text-[var(--color-text-secondary)]">
           <X size={18} />
         </button>
       )}

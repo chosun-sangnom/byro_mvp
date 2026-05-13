@@ -134,7 +134,7 @@ export function Step3LinkId() {
         placeholder="예: myongkoo"
         className={[
           'w-full border rounded-xl px-4 py-3 text-sm outline-none mb-1',
-          status === 'valid' ? 'border-[#1A7A1A]' : status === 'error' ? 'border-[#E53935]' : 'border-[#ddd]',
+          status === 'valid' ? 'border-[var(--color-state-success-text)]' : status === 'error' ? 'border-[var(--color-state-danger-text)]' : 'border-[var(--color-border-default)]',
         ].join(' ')}
       />
       {status === 'valid' && <p className="text-xs text-[var(--color-state-success-text)] mb-3">사용할 수 있는 ID예요</p>}

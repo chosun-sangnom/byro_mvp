@@ -35,7 +35,7 @@ export function HighlightManageListView({
           {groupedCategoryCards.map((group) => (
             <div key={group.id}>
               <div className="mb-3 flex items-center gap-3">
-                <div className="text-sm font-bold text-[#7E766E]">{group.label}</div>
+                <div className="text-sm font-bold text-[var(--color-text-tertiary)]">{group.label}</div>
                 <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
               </div>
               {group.items.length > 0 ? (

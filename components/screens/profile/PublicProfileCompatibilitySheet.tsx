@@ -126,7 +126,7 @@ function getSignalChips(whoIAm: PublicProfileWhoIAm, life?: PublicProfileLife) {
     whoIAm.mbti,
     whoIAm.sajuType,
     life?.places.neighborhoods[0],
-    life?.daily.exercise[0],
+    life?.daily.exercise[0]?.label,
     life?.tastes.music[0]?.label,
     life?.tastes.cafes[0]?.label,
   ].filter(Boolean) as string[]
@@ -140,7 +140,7 @@ function getTasteHook(life?: PublicProfileLife) {
     ?? life?.tastes.movies[0]?.label
     ?? life?.tastes.books[0]?.label
     ?? life?.tastes.sports[0]
-    ?? life?.daily.exercise[0]
+    ?? life?.daily.exercise[0]?.label
     ?? null
   )
 }
@@ -190,7 +190,7 @@ function buildCompatibilityReport(
   const saju = getSajuProfile(whoIAm.sajuType)
   const signalChips = getSignalChips(whoIAm, life)
   const neighborhood = life?.places.neighborhoods[0]
-  const exercise = life?.daily.exercise[0]
+  const exercise = life?.daily.exercise[0]?.label
   const tasteHook = getTasteHook(life)
   const mbtiSection = getMbtiSection(whoIAm, mode)
 
@@ -342,7 +342,7 @@ export function PublicProfileCompatibilitySheet({
                 }}
               >
                 <div className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-tertiary)]">
-                  <span className={selected ? 'text-white' : 'text-[var(--color-text-secondary)]'}>{mode.icon}</span>
+                  <span className={selected ? 'text-[var(--color-accent-dark)]' : 'text-[var(--color-text-secondary)]'}>{mode.icon}</span>
                   <span>{mode.label}</span>
                 </div>
               </button>
@@ -362,7 +362,7 @@ export function PublicProfileCompatibilitySheet({
             </div>
             <div className="text-right">
               <div className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">예상 지수</div>
-              <div className="mt-1 text-[26px] font-black tracking-[-0.05em] text-white">{report.score}</div>
+              <div className="mt-1 text-[26px] font-black tracking-[-0.05em] text-[var(--color-accent-dark)]">{report.score}</div>
             </div>
           </div>
           <p className="mt-3 text-[13px] leading-[1.65] text-[var(--color-text-secondary)]">{report.summary}</p>

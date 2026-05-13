@@ -72,7 +72,7 @@ export function HighlightManageCategoryView({
                       )}
                     </div>
                     {isPrimaryHighlight(item, primaryHighlightId) ? (
-                      <span className="rounded-full bg-[#E8F5EC] px-2.5 py-1 text-[11px] font-semibold text-[#217A43]">메인 노출 중</span>
+                      <span className="rounded-full bg-[var(--color-state-success-bg)] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-state-success-text)]">메인 노출 중</span>
                     ) : (
                       <button
                         onClick={() => onSetPrimary(item.id)}
@@ -103,7 +103,7 @@ export function HighlightManageCategoryView({
                         }
                         showToast('기본 목업 항목은 삭제하지 않습니다')
                       }}
-                      className="rounded-lg border border-[#F2C7C5] px-3 py-1.5 text-xs font-medium text-[#C9473D]"
+                      className="rounded-lg border border-[var(--color-state-danger-bg)] px-3 py-1.5 text-xs font-medium text-[var(--color-state-danger-text)]"
                     >
                       삭제
                     </button>

@@ -113,7 +113,6 @@ function buildEditableOwnerProfile(
     school: user.school,
     bio: user.bio,
     headerMeta: user.headerMeta ?? baseProfile.headerMeta,
-    selectedKeywords: user.selectedKeywords,
     avatarColor: user.avatarColor ?? baseProfile.avatarColor,
     avatarImage: user.avatarImage || baseProfile.avatarImage,
     whoIAm: user.whoIAm ?? baseProfile.whoIAm,

@@ -102,7 +102,6 @@ export const SAMPLE_PROFILE = {
     { id: 'email', label: '이메일', value: 'gangminjun@byro.io', href: 'mailto:gangminjun@byro.io', enabled: true },
     { id: 'kakao', label: '카카오', value: 'gangminjun.kakao', href: 'https://open.kakao.com/o/sgangminjun', enabled: true },
   ] as ContactChannel[],
-  selectedKeywords: ['전문성이 느껴져요', '믿고 맡길 수 있어요', '대화하면 생각이 넓어져요', '일 처리가 빠르고 깔끔해요', '아이디어가 늘 신선해요'],
   instagramConnected: true,
   linkedinConnected: true,
   instagram: {
@@ -323,7 +322,6 @@ export const MK_PROFILE = {
     { id: 'email', label: '이메일', value: 'mk@byth.io', href: 'mailto:mk@byth.io', enabled: true },
     { id: 'kakao', label: '카카오', value: 'epicmkk', href: 'https://open.kakao.com/o/smkbyth', enabled: true },
   ] as ContactChannel[],
-  selectedKeywords: ['어려울 때 생각나는 사람이에요', '전문성이 느껴져요', '일 처리가 빠르고 깔끔해요', '믿고 맡길 수 있어요', '대화하면 생각이 넓어져요'],
   instagramConnected: true,
   linkedinConnected: true,
   instagram: {
@@ -521,7 +519,6 @@ export const JIMIN_PROFILE = {
     { id: 'email', label: '이메일', value: 'jimin@byro.io', href: 'mailto:jimin@byro.io', enabled: true },
     { id: 'kakao', label: '카카오', value: 'jimin.marketer', href: 'https://open.kakao.com/o/sjimin', enabled: true },
   ] as ContactChannel[],
-  selectedKeywords: ['전문성이 느껴져요', '믿고 맡길 수 있어요', '대화하면 생각이 넓어져요', '스타일이 세련됐어요'],
   instagramConnected: true,
   linkedinConnected: false,
   corporateHighlight: {

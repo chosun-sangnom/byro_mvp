@@ -31,7 +31,6 @@ interface ByroStore {
   onboardingTitle: string
   onboardingSchool: string
   linkId: string
-  selectedKeywords: string[]      // max 5
   instagramConnected: boolean
   linkedinConnected: boolean
   onboardingContactChannels: ContactChannel[]
@@ -61,7 +60,6 @@ interface ByroStore {
   toggleAllAgreed(): void
   setOnboardingBasicInfo(info: { title?: string; school?: string }): void
   setLinkId(id: string): void
-  toggleKeyword(kw: string): void
   connectInstagram(): void
   disconnectInstagram(): void
   connectLinkedIn(): void
@@ -85,7 +83,6 @@ interface ByroStore {
   markExpSubmitted(profileId: string): void
   setActiveArchiveTab(tab: 'saved' | 'recent' | 'requests'): void
   updateUserInfo(info: Partial<UserState>): void
-  updateUserKeywords(keywords: string[]): void
   updateUserContactChannels(channels: ContactChannel[]): void
   updateUserWhoIAm(whoIAm: PublicProfileWhoIAm): void
   updateUserLife(life: PublicProfileLife): void
@@ -127,7 +124,6 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   onboardingTitle: SAMPLE_PROFILE.title,
   onboardingSchool: SAMPLE_PROFILE.school,
   linkId: '',
-  selectedKeywords: [],
   instagramConnected: false,
   linkedinConnected: false,
   onboardingContactChannels: SAMPLE_PROFILE.contactChannels,
@@ -199,18 +195,6 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
 
   setLinkId(id) {
     set({ linkId: id })
-  },
-
-  toggleKeyword(kw) {
-    const { selectedKeywords } = get()
-    if (selectedKeywords.includes(kw)) {
-      set({ selectedKeywords: selectedKeywords.filter((k) => k !== kw) })
-    } else {
-      if (selectedKeywords.length >= 5) {
-        return // caller handles toast
-      }
-      set({ selectedKeywords: [...selectedKeywords, kw] })
-    }
   },
 
   connectInstagram() {
@@ -289,7 +273,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
 
   completeOnboarding() {
     const {
-      linkId, bio, selectedKeywords, instagramConnected, linkedinConnected,
+      linkId, bio, instagramConnected, linkedinConnected,
       onboardingContactChannels, highlights, onboardingTitle, onboardingSchool,
     } = get()
     set({
@@ -302,7 +286,6 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
         school: onboardingSchool.trim() || SAMPLE_PROFILE.school,
         bio: bio || SAMPLE_PROFILE.bio,
         headerMeta: SAMPLE_PROFILE.headerMeta,
-        selectedKeywords: selectedKeywords.length > 0 ? selectedKeywords : SAMPLE_PROFILE.selectedKeywords,
         avatarColor: SAMPLE_PROFILE.avatarColor,
         avatarImage: SAMPLE_PROFILE.avatarImage,
         whoIAm: SAMPLE_PROFILE.whoIAm,
@@ -328,7 +311,6 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
         school: SAMPLE_PROFILE.school,
         bio: SAMPLE_PROFILE.bio,
         headerMeta: SAMPLE_PROFILE.headerMeta,
-        selectedKeywords: SAMPLE_PROFILE.selectedKeywords,
         avatarColor: SAMPLE_PROFILE.avatarColor,
         avatarImage: SAMPLE_PROFILE.avatarImage,
         whoIAm: SAMPLE_PROFILE.whoIAm,
@@ -350,7 +332,6 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       onboardingTitle: SAMPLE_PROFILE.title,
       onboardingSchool: SAMPLE_PROFILE.school,
       linkId: '',
-      selectedKeywords: [],
       instagramConnected: false,
       linkedinConnected: false,
       onboardingContactChannels: SAMPLE_PROFILE.contactChannels,
@@ -417,12 +398,6 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     }))
   },
 
-  updateUserKeywords(keywords) {
-    set((state) => ({
-      user: state.user ? { ...state.user, selectedKeywords: keywords } : null,
-    }))
-  },
-
   updateUserContactChannels(channels) {
     set((state) => ({
       user: state.user ? { ...state.user, contactChannels: channels } : null,
@@ -454,7 +429,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   },
 }), {
   name: 'byro-store',
-  version: 2,
+  version: 3,
   migrate: (persistedState: unknown) => {
     const state = persistedState as ByroStore | undefined
     if (!state) return persistedState
@@ -479,7 +454,6 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     onboardingTitle: state.onboardingTitle,
     onboardingSchool: state.onboardingSchool,
     linkId: state.linkId,
-    selectedKeywords: state.selectedKeywords,
     instagramConnected: state.instagramConnected,
     linkedinConnected: state.linkedinConnected,
     onboardingContactChannels: state.onboardingContactChannels,

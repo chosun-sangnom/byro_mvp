@@ -3,68 +3,12 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import { useByroStore } from '@/store/useByroStore'
-import { BottomSheet, Button, Chip, InfoBox, showToast } from '@/components/ui'
+import { BottomSheet, Button, InfoBox, showToast } from '@/components/ui'
 import { ContactTypeIcon } from '@/components/contact/ContactTypeIcon'
 import { StepFooter, StepIntro, SelectionCard } from '@/components/screens/onboarding/OnboardingShared'
 import type { ContactChannel } from '@/types'
-import { KEYWORD_GROUPS } from '@/lib/mocks/keywords'
 import { INSTAGRAM_PROFILE, LINKEDIN_PROFILE } from '@/lib/mocks/socialProfiles'
 import { buildContactHref, contactPlaceholder, contactPreview } from '@/lib/contactChannels'
-
-export function Step4Keywords() {
-  const store = useByroStore()
-  const { selectedKeywords } = store
-
-  const handleToggle = (keyword: string) => {
-    if (!selectedKeywords.includes(keyword) && selectedKeywords.length >= 5) {
-      showToast('키워드는 최대 5개까지 선택할 수 있어요')
-      return
-    }
-    store.toggleKeyword(keyword)
-  }
-
-  return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto px-5 py-4">
-        <StepIntro
-          eyebrow="Keywords"
-          title={'나를 표현하는 키워드를\n골라보세요'}
-          description={'다른 사람이 나를 표현할 때 쓰는 키워드예요.\n최대 5개까지 고를 수 있어요.'}
-        />
-        <div className="rounded-lg px-3 py-2 text-xs flex justify-between mb-4" style={{ backgroundColor: 'var(--color-state-info-bg)', border: '1px solid var(--color-state-info-text)', color: 'var(--color-state-info-text)' }}>
-          <span>AI 자기소개를 만들 때도 활용돼요</span>
-          <span className="font-black">{selectedKeywords.length} / 5</span>
-        </div>
-
-        {KEYWORD_GROUPS.map((group, index) => (
-          <div key={group.category} className="mb-5">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="bg-[var(--color-accent-dark)] text-white text-xs font-bold rounded px-1.5 py-0.5">{index + 1}</span>
-              <span className="text-xs font-bold text-[var(--color-text-secondary)]">{group.category}</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {group.keywords.map((keyword) => (
-                <Chip
-                  key={keyword}
-                  label={keyword}
-                  selected={selectedKeywords.includes(keyword)}
-                  onClick={() => handleToggle(keyword)}
-                />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <StepFooter
-        canNext={selectedKeywords.length > 0}
-        onNext={() => store.nextStep()}
-        onPrev={() => store.prevStep()}
-        onSkip={() => store.nextStep()}
-      />
-    </div>
-  )
-}
 
 export function Step5SNS() {
   const store = useByroStore()

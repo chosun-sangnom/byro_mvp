@@ -260,7 +260,6 @@ export interface PublicProfile {
   whoIAm?: PublicProfileWhoIAm
   sajuProfile?: SajuProfileInput
   life?: PublicProfileLife
-  selectedKeywords: string[]
   avatarColor?: string
   avatarImage?: string
   instagramConnected: boolean
@@ -300,7 +299,6 @@ export interface UserState {
   school: string
   bio: string
   headerMeta?: ProfileHeaderMeta
-  selectedKeywords: string[]
   avatarColor?: string
   avatarImage?: string
   whoIAm?: PublicProfileWhoIAm

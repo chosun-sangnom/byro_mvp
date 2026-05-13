@@ -54,7 +54,7 @@ export function ReputationManageScreen({
                       className={[
                         'rounded-full border px-3 py-1.5 text-xs font-semibold',
                         count > 0
-                          ? 'border-[var(--color-accent-dark)] bg-[rgba(75,108,245,0.12)] text-[var(--color-text-primary)]'
+                          ? 'border-[var(--color-accent-dark)] bg-[var(--color-accent-bg)] text-[var(--color-text-primary)]'
                           : 'border-[var(--color-border-default)] bg-[var(--color-bg-soft)] text-[var(--color-text-tertiary)]',
                       ].join(' ')}
                     >

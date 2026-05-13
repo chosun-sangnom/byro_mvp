@@ -101,7 +101,7 @@ export const highlightCards: Array<{
     icon: Globe2,
     label: '글로벌 활동',
     value: '최근 3년간 국제 활동 이력 다수',
-    gradient: 'from-indigo-500 to-blue-500',
+    gradient: 'from-[#3DD6B2] to-[#1DC8A0]',
   },
   {
     icon: Crown,
@@ -143,7 +143,7 @@ export const comparisons: Array<{
   {
     icon: Sparkles,
     name: 'Byro',
-    color: 'from-indigo-600 to-purple-600',
+    color: 'from-[#3DD6B2] to-[#1DC8A0]',
     isHighlight: true,
     features: [
       { text: '정제된 정보', available: true },

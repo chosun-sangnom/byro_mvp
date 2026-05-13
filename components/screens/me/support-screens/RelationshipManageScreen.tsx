@@ -58,10 +58,10 @@ export function RelationshipManageScreen({
               className={`settings-row flex w-full items-center gap-4 px-4 py-3.5 text-left ${index > 0 ? 'mt-2' : ''}`}
             >
               <div className="min-w-0 flex-1">
-                <div className="text-[15px] font-semibold tracking-[-0.02em] text-white">{row.title}</div>
-                <div className="mt-1 text-[11px] leading-[1.5] text-white/48">{row.meta}</div>
+                <div className="text-[15px] font-semibold tracking-[-0.02em] text-[var(--color-text-primary)]">{row.title}</div>
+                <div className="mt-1 text-[11px] leading-[1.5] text-[var(--color-text-tertiary)]">{row.meta}</div>
               </div>
-              <span className="flex h-8 w-8 items-center justify-center rounded-full border border-white/8 bg-white/[0.03] text-white/56">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] text-[var(--color-text-tertiary)]">
                 <ChevronRight size={15} />
               </span>
             </button>

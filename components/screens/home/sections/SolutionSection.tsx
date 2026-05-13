@@ -29,14 +29,14 @@ export function SolutionSection() {
               transition={{ duration: 0.5, delay: index * 0.15 }}
               className="relative"
             >
-              <div className="absolute -left-3 top-0 w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm shadow-lg">
+              <div className="absolute -left-3 top-0 w-8 h-8 rounded-full bg-[var(--color-accent-dark)] flex items-center justify-center text-white text-sm shadow-lg">
                 {index + 1}
               </div>
 
               <div className="surface-card rounded-2xl p-6 pl-10">
                 <div className="flex items-start gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center flex-shrink-0">
-                    <step.icon className="w-5 h-5 text-indigo-600" />
+                  <div className="w-10 h-10 rounded-xl bg-[var(--color-accent-bg)] flex items-center justify-center flex-shrink-0">
+                    <step.icon className="w-5 h-5 text-[var(--color-accent-dark)]" />
                   </div>
                   <h3 className="text-lg pt-2 text-[var(--color-text-strong)]">{step.title}</h3>
                 </div>
@@ -44,7 +44,7 @@ export function SolutionSection() {
                 <ul className="space-y-2 ml-1">
                   {step.items.map((item) => (
                     <li key={item} className="flex items-start gap-2 text-sm text-[var(--color-text-primary)]">
-                      <span className="text-indigo-500 mt-1">•</span>
+                      <span className="text-[var(--color-accent-dark)] mt-1">•</span>
                       <span className="flex-1">{item}</span>
                     </li>
                   ))}
@@ -52,7 +52,7 @@ export function SolutionSection() {
               </div>
 
               {index < solutionSteps.length - 1 && (
-                <div className="absolute left-1 top-full w-0.5 h-6 bg-gradient-to-b from-purple-300 to-transparent -mt-2" />
+                <div className="absolute left-1 top-full w-0.5 h-6 bg-gradient-to-b from-[var(--color-accent-border)] to-transparent -mt-2" />
               )}
             </motion.div>
           ))}

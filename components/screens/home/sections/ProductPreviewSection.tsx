@@ -34,7 +34,7 @@ export function ProductPreviewSection() {
             <div className="surface-card rounded-[1.5rem] p-6 shadow-inner">
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600" />
+                  <div className="w-16 h-16 rounded-2xl bg-[var(--color-accent-dark)]" />
                   <div className="flex-1 text-left">
                     <div className="text-base text-[var(--color-text-strong)] mb-0.5">이서연</div>
                     <div className="text-xs text-[var(--color-text-secondary)]">Growth Product Manager</div>
@@ -49,12 +49,12 @@ export function ProductPreviewSection() {
 
                 <div className="space-y-2">
                   <div className="text-[10px] text-[var(--color-text-tertiary)] uppercase tracking-wide mb-2">Highlights</div>
-                  <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-3">
-                    <div className="text-[10px] text-indigo-600 mb-1">리멤버 네트워크</div>
+                  <div className="bg-[var(--color-accent-soft)] rounded-xl p-3">
+                    <div className="text-[10px] text-[var(--color-accent-dark)] mb-1">리멤버 네트워크</div>
                     <div className="text-xs text-[var(--color-text-primary)]">스타트업 중심 인맥 구조</div>
                   </div>
-                  <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-3">
-                    <div className="text-[10px] text-blue-600 mb-1">강연 경험</div>
+                  <div className="bg-[var(--color-state-info-bg)] rounded-xl p-3">
+                    <div className="text-[10px] text-[var(--color-state-info-text)] mb-1">강연 경험</div>
                     <div className="text-xs text-[var(--color-text-primary)]">Startup Conference 2025</div>
                   </div>
                 </div>
@@ -117,8 +117,8 @@ export function ProductPreviewSection() {
               transition={{ duration: 0.4, delay: index * 0.1 }}
               className="surface-card rounded-xl p-4 shadow-sm"
             >
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center mb-3">
-                <element.icon className="w-4 h-4 text-indigo-600" />
+              <div className="w-8 h-8 rounded-lg bg-[var(--color-accent-bg)] flex items-center justify-center mb-3">
+                <element.icon className="w-4 h-4 text-[var(--color-accent-dark)]" />
               </div>
               <div className="text-xs text-[var(--color-text-strong)] mb-1">{element.title}</div>
               <div className="text-[10px] text-[var(--color-text-tertiary)] leading-relaxed">

@@ -97,7 +97,7 @@ export function HeroSection({
           >
             <div className="surface-card rounded-[1.5rem] p-6 shadow-inner">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600" />
+                <div className="w-12 h-12 rounded-full bg-[var(--color-accent-dark)]" />
                 <div className="flex-1 text-left">
                   <div className="text-sm text-[var(--color-text-strong)]">김지원</div>
                   <div className="text-xs text-[var(--color-text-secondary)]">Product Designer</div>
@@ -109,12 +109,12 @@ export function HeroSection({
               </p>
 
               <div className="space-y-2 mb-4">
-                <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-3 text-left">
-                  <div className="text-[10px] text-indigo-600 mb-1">커리어 지속성</div>
+                <div className="bg-[var(--color-accent-soft)] rounded-xl p-3 text-left">
+                  <div className="text-[10px] text-[var(--color-accent-dark)] mb-1">커리어 지속성</div>
                   <div className="text-xs text-[var(--color-text-primary)]">평균 대비 128% 장기 재직</div>
                 </div>
-                <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-3 text-left">
-                  <div className="text-[10px] text-blue-600 mb-1">글로벌 활동</div>
+                <div className="bg-[var(--color-state-info-bg)] rounded-xl p-3 text-left">
+                  <div className="text-[10px] text-[var(--color-state-info-text)] mb-1">글로벌 활동</div>
                   <div className="text-xs text-[var(--color-text-primary)]">국제 프로젝트 다수 참여</div>
                 </div>
               </div>

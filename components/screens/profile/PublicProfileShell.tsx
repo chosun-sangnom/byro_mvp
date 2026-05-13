@@ -195,25 +195,11 @@ export function PublicProfileShell({
         {isOwnerMode ? (
           <PublicProfileOwnerMatchZone whoIAm={profile.whoIAm} life={profile.life} />
         ) : (
-          <PublicProfileKemiZone kemi={profile.kemi} isLoggedIn={store.isLoggedIn} />
-        )}
-
-        {!isOwnerMode && profile.whoIAm && (
-          <div className="mx-5 mb-3 rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4">
-            <div className="flex items-center justify-between gap-3">
-              <div className="min-w-0 flex-1">
-                <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">궁합 리포트</div>
-                <div className="mt-1 text-[14px] font-semibold text-[var(--color-text-primary)]">MBTI · 사주 · 라이프스타일을 함께 읽는 분석</div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setCompatibilityOpen(true)}
-                className="shrink-0 rounded-full bg-[var(--color-accent-dark)] px-3 py-2 text-[12px] font-semibold text-white"
-              >
-                궁합 보기
-              </button>
-            </div>
-          </div>
+          <PublicProfileKemiZone
+            kemi={profile.kemi}
+            isLoggedIn={store.isLoggedIn}
+            onCompatibilityOpen={profile.whoIAm ? () => setCompatibilityOpen(true) : undefined}
+          />
         )}
 
         {/* 나 / 라이프 / 관계 탭 */}

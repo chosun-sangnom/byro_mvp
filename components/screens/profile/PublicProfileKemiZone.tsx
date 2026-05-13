@@ -30,9 +30,11 @@ import type { KemiData, PublicProfileLife, PublicProfileWhoIAm } from '@/types'
 export function PublicProfileKemiZone({
   kemi,
   isLoggedIn,
+  onCompatibilityOpen,
 }: {
   kemi?: KemiData
   isLoggedIn: boolean
+  onCompatibilityOpen?: () => void
 }) {
   if (!kemi) return null
 
@@ -80,14 +82,13 @@ export function PublicProfileKemiZone({
               {kemi.aiCopy}
             </p>
 
-            {/* TODO(premium): Unlock full Kemi Report */}
             <button
               type="button"
               className="mt-3 text-[12px] font-semibold"
               style={{ color: 'var(--color-accent-dark)' }}
-              onClick={() => {}}
+              onClick={onCompatibilityOpen}
             >
-              케미 리포트 전체 보기 →
+              궁합 리포트 보기 →
             </button>
           </>
         ) : (

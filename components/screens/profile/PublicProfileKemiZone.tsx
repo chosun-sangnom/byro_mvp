@@ -82,14 +82,23 @@ export function PublicProfileKemiZone({
               {kemi.aiCopy}
             </p>
 
-            <button
-              type="button"
-              className="mt-3 text-[12px] font-semibold"
-              style={{ color: 'var(--color-accent-dark)' }}
-              onClick={onCompatibilityOpen}
-            >
-              궁합 리포트 보기 →
-            </button>
+            <div className="mt-4 rounded-[14px] border border-[var(--color-accent-border-soft)] bg-[var(--color-bg-surface)] px-3.5 py-3">
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.1em]" style={{ color: 'var(--color-accent-dark)' }}>궁합 리포트</div>
+                  <div className="mt-0.5 text-[13px] font-semibold text-[var(--color-text-primary)]">MBTI · 사주 · 라이프스타일을 함께 읽는 분석</div>
+                  <p className="mt-1 text-[11px] leading-[1.6] text-[var(--color-text-tertiary)]">이성, 사업 파트너, 친구 · 동료 관점으로 관계의 흐름을 다르게 해석해요.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={onCompatibilityOpen}
+                  className="shrink-0 rounded-full px-3 py-2 text-[11px] font-semibold text-white"
+                  style={{ backgroundColor: 'var(--color-accent-dark)' }}
+                >
+                  보기
+                </button>
+              </div>
+            </div>
           </>
         ) : (
           /* Non-logged-in: blurred nudge */

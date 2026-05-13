@@ -4,8 +4,5 @@ export { ManageByroScreen } from '@/components/screens/me/support-screens/Manage
 export { SNSManageScreen } from '@/components/screens/me/support-screens/SNSManageScreen'
 export { ContactManageScreen } from '@/components/screens/me/support-screens/ContactManageScreen'
 export { ReputationManageScreen } from '@/components/screens/me/support-screens/ReputationManageScreen'
-export { GuestbookManageScreen } from '@/components/screens/me/support-screens/GuestbookManageScreen'
-export { SajuManageScreen } from '@/components/screens/me/support-screens/SajuManageScreen'
 export { LifeManageScreen } from '@/components/screens/me/support-screens/LifeManageScreen'
-export { RelationshipManageScreen } from '@/components/screens/me/support-screens/RelationshipManageScreen'
 export { RememberNetworkManageScreen } from '@/components/screens/me/support-screens/RememberNetworkManageScreen'

@@ -91,7 +91,7 @@ export function HighlightSection() {
                 {[
                   '같은 업종 · 비슷한 연차',
                   '둘 다 강남 거주',
-                  'MBTI 궁합 좋음',
+                  '종합 궁합 좋음',
                 ].map((item) => (
                   <div key={item} className="flex items-center gap-2 text-[12px] text-[var(--color-text-secondary)]">
                     <div className="w-1 h-1 rounded-full bg-[var(--color-text-tertiary)]" />

@@ -79,7 +79,7 @@ export const useCases: Array<{
   {
     icon: Heart,
     title: '소개팅',
-    scenario: '만나기 전에 Byro를 교환한다. 사주 궁합도 나쁘지 않고, 좋아하는 동네도 겹친다.',
+    scenario: '만나기 전에 Byro를 교환한다. 종합 궁합도 나쁘지 않고, 좋아하는 동네도 겹친다.',
     highlight: '어색한 첫 질문을 건너뛰고 바로 공통점 얘기부터 시작할 수 있다.',
   },
 ]
@@ -95,7 +95,7 @@ export const comparisons: Array<{
 }> = [
   {
     icon: Building2,
-    name: 'LinkedIn / SNS',
+    name: '커리어 · 소셜 플랫폼',
     color: 'from-blue-500 to-blue-600',
     description: '커리어나 콘텐츠는 있지만',
     missing: '라이프스타일, 성향, 공통점은 알 수 없다',

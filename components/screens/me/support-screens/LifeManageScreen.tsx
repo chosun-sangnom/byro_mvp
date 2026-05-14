@@ -1,10 +1,13 @@
 'use client'
 
-import { useState, type ReactNode } from 'react'
+import { useRef, useState, type ChangeEvent, type ReactNode } from 'react'
+import { Camera } from 'lucide-react'
 import { Button, InfoBox, NavBar, TextArea, showToast } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
 import type { LifeMediaItem, PublicProfileLife } from '@/types'
+
+const PET_OPTIONS = ['없음', '강아지', '고양이', '기타']
 
 
 function formatMedia(items: LifeMediaItem[]) {
@@ -34,6 +37,10 @@ function parseMedia(value: string, previous: LifeMediaItem[]) {
 export function LifeManageScreen({ onBack }: { onBack: () => void }) {
   const store = useByroStore()
   const initialLife: PublicProfileLife = store.user?.life ?? SAMPLE_PROFILE.life
+  const [pet, setPet] = useState(initialLife.daily.pet)
+  const [petName, setPetName] = useState(initialLife.daily.petName ?? '')
+  const [petImage, setPetImage] = useState(initialLife.daily.petImage ?? '')
+  const petFileInputRef = useRef<HTMLInputElement>(null)
   const [exercise, setExercise] = useState(formatMedia(initialLife.daily.exercise))
   const [teams, setTeams] = useState(formatMedia(initialLife.tastes.teams ?? []))
   const [movies, setMovies] = useState(formatMedia(initialLife.tastes.movies))
@@ -48,6 +55,9 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
     const nextLife: PublicProfileLife = {
       daily: {
         ...initialLife.daily,
+        pet,
+        petName: pet === '없음' ? undefined : petName.trim() || undefined,
+        petImage: pet === '없음' ? undefined : petImage || undefined,
         exercise: parseMedia(exercise, initialLife.daily.exercise),
       },
       tastes: {
@@ -71,6 +81,22 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
     onBack()
   }
 
+  const handlePetFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      showToast('이미지 파일만 업로드할 수 있어요')
+      event.target.value = ''
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (typeof reader.result === 'string') setPetImage(reader.result)
+    }
+    reader.readAsDataURL(file)
+    event.target.value = ''
+  }
+
   return (
     <div className="flex h-full flex-col">
       <NavBar title="라이프 편집" onBack={onBack} />
@@ -85,6 +111,65 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
         <Section title="활동">
           <TextAreaField label="좋아하는 운동" value={exercise} onChange={setExercise} placeholder={'러닝\n골프'} />
           <TextAreaField label="응원하는 스포츠팀" value={teams} onChange={setTeams} placeholder={'LG 트윈스 | KBO\n토트넘 홋스퍼 | EPL\nT1 | e스포츠'} />
+          <InputField label="반려동물">
+            <div className="space-y-3">
+              <div className="flex flex-wrap gap-2">
+                {PET_OPTIONS.map((option) => {
+                  const selected = option === pet
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      onClick={() => setPet(option)}
+                      className="rounded-full border px-3 py-1.5 text-xs font-semibold"
+                      style={{
+                        borderColor: selected ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
+                        background: selected ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
+                        color: selected ? '#ffffff' : 'var(--color-text-secondary)',
+                      }}
+                    >
+                      {option}
+                    </button>
+                  )
+                })}
+              </div>
+              {pet !== '없음' && (
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => petFileInputRef.current?.click()}
+                    className="relative flex-shrink-0 w-16 h-16 rounded-2xl overflow-hidden bg-[var(--color-bg-muted)] border border-[var(--color-border-default)] flex items-center justify-center"
+                  >
+                    {petImage ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={petImage} alt="반려동물 사진" className="w-full h-full object-cover" />
+                    ) : (
+                      <Camera size={18} className="text-[var(--color-text-tertiary)]" />
+                    )}
+                    <div className="absolute inset-0 bg-black/20 flex items-end justify-center pb-1 opacity-0 hover:opacity-100 transition-opacity">
+                      <span className="text-[10px] text-white font-semibold">변경</span>
+                    </div>
+                  </button>
+                  <input
+                    ref={petFileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="sr-only"
+                    onChange={handlePetFileChange}
+                  />
+                  <div className="flex-1">
+                    <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">반려동물 이름</label>
+                    <input
+                      value={petName}
+                      onChange={(event) => setPetName(event.target.value)}
+                      placeholder="예: 몽이"
+                      className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </InputField>
         </Section>
 
         <Section title="문화">

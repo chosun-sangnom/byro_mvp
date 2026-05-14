@@ -5,7 +5,7 @@ import { Camera } from 'lucide-react'
 import { Button, NavBar, showToast, TextArea } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
-import type { PublicProfileLife, PublicProfileWhoIAm, SajuProfileInput, UserState } from '@/types'
+import type { PublicProfileWhoIAm, SajuProfileInput, UserState } from '@/types'
 import {
   DEFAULT_CROP_FRAME,
   clampCropFrameRect,
@@ -29,7 +29,6 @@ const MBTI_DIMS = [
   { options: ['T', 'F'] as const, labels: ['사고', '감정'] },
   { options: ['J', 'P'] as const, labels: ['판단', '인식'] },
 ]
-const PET_OPTIONS = ['없음', '강아지', '고양이', '기타']
 
 function normalizeProfileImages(images?: string[], avatarImage?: string) {
   const merged = [...(images ?? [])]
@@ -91,13 +90,8 @@ export function BasicInfoEditScreen({
   const store = useByroStore()
   const [bio, setBio] = useState(user.bio)
   const initialWhoIAm: PublicProfileWhoIAm = user.whoIAm ?? SAMPLE_PROFILE.whoIAm
-  const initialLife: PublicProfileLife = user.life ?? SAMPLE_PROFILE.life
   const initialSajuProfile: SajuProfileInput = user.sajuProfile ?? (SAMPLE_PROFILE.sajuProfile as SajuProfileInput)
   const [mbti, setMbti] = useState(initialWhoIAm.mbti)
-  const [pet, setPet] = useState(initialLife.daily.pet)
-  const [petName, setPetName] = useState(initialLife.daily.petName ?? '')
-  const [petImage, setPetImage] = useState(initialLife.daily.petImage ?? '')
-  const petFileInputRef = useRef<HTMLInputElement>(null)
   const [birthDate, setBirthDate] = useState(initialSajuProfile.birthDate)
   const [birthTime, setBirthTime] = useState(initialSajuProfile.birthTime)
   const [birthPlace, setBirthPlace] = useState(initialSajuProfile.birthPlace)
@@ -150,33 +144,8 @@ export function BasicInfoEditScreen({
       ...initialWhoIAm,
       mbti,
     })
-    store.updateUserLife({
-      ...initialLife,
-      daily: {
-        ...initialLife.daily,
-        pet,
-        petName: pet === '없음' ? undefined : petName.trim() || undefined,
-        petImage: pet === '없음' ? undefined : petImage || undefined,
-      },
-    })
     showToast('저장됐어요!')
     onBack()
-  }
-
-  const handlePetFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-    if (!file.type.startsWith('image/')) {
-      showToast('이미지 파일만 업로드할 수 있어요')
-      event.target.value = ''
-      return
-    }
-    const reader = new FileReader()
-    reader.onload = () => {
-      if (typeof reader.result === 'string') setPetImage(reader.result)
-    }
-    reader.readAsDataURL(file)
-    event.target.value = ''
   }
 
   const handleAvatarFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -389,66 +358,6 @@ export function BasicInfoEditScreen({
                 })}
               </div>
             </div>
-
-            <div>
-              <label className="text-xs text-[var(--color-text-tertiary)] mb-2 block">반려동물</label>
-              <div className="flex flex-wrap gap-2">
-                {PET_OPTIONS.map((option) => {
-                  const selected = option === pet
-                  return (
-                    <button
-                      key={option}
-                      type="button"
-                      onClick={() => setPet(option)}
-                      className="rounded-full border px-3 py-1.5 text-xs font-semibold"
-                      style={{
-                        borderColor: selected ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
-                        background: selected ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
-                        color: selected ? '#ffffff' : 'var(--color-text-secondary)',
-                      }}
-                    >
-                      {option}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            {pet !== '없음' && (
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => petFileInputRef.current?.click()}
-                  className="relative flex-shrink-0 w-16 h-16 rounded-2xl overflow-hidden bg-[var(--color-bg-muted)] border border-[var(--color-border-default)] flex items-center justify-center"
-                >
-                  {petImage ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={petImage} alt="반려동물 사진" className="w-full h-full object-cover" />
-                  ) : (
-                    <Camera size={18} className="text-[var(--color-text-tertiary)]" />
-                  )}
-                  <div className="absolute inset-0 bg-black/20 flex items-end justify-center pb-1 opacity-0 hover:opacity-100 transition-opacity">
-                    <span className="text-[10px] text-white font-semibold">변경</span>
-                  </div>
-                </button>
-                <input
-                  ref={petFileInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="sr-only"
-                  onChange={handlePetFileChange}
-                />
-                <div className="flex-1">
-                  <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">반려동물 이름</label>
-                  <input
-                    value={petName}
-                    onChange={(event) => setPetName(event.target.value)}
-                    placeholder="예: 몽이"
-                    className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-                  />
-                </div>
-              </div>
-            )}
 
             <div className="grid grid-cols-[1.2fr_0.8fr] gap-3">
               <div>

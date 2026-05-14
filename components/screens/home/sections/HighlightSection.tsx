@@ -67,7 +67,7 @@ export function HighlightSection() {
                 ))}
               </div>
               <p className="text-[11px] text-[var(--color-text-secondary)] mt-3">
-                카톡을 보낼 이유가 생긴다. "저 혹시 연대 나오셨어요?" 한 줄이면 된다.
+                카톡을 보낼 이유가 생긴다. &quot;저 혹시 연대 나오셨어요?&quot; 한 줄이면 된다.
               </p>
             </div>
           </motion.div>
@@ -104,7 +104,7 @@ export function HighlightSection() {
                 style={{ backgroundColor: 'var(--color-accent-soft)' }}
               >
                 <p className="text-[12px] font-medium text-[var(--color-accent-dark)] leading-relaxed">
-                  "비슷한 시기에 비슷한 환경에서 일해온 사람, 대화가 잘 통할 가능성 높음"
+                  &quot;비슷한 시기에 비슷한 환경에서 일해온 사람, 대화가 잘 통할 가능성 높음&quot;
                 </p>
               </div>
             </div>

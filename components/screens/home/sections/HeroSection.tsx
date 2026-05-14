@@ -123,7 +123,7 @@ export function HeroSection({
 
               <div className="mt-4 rounded-xl p-3" style={{ backgroundColor: 'var(--color-bg-soft)' }}>
                 <p className="text-[11px] text-[var(--color-text-secondary)] leading-relaxed">
-                  "저 혹시 연대 나오셨어요?" — 한 줄이면 된다
+                  &quot;저 혹시 연대 나오셨어요?&quot; — 한 줄이면 된다
                 </p>
               </div>
             </div>

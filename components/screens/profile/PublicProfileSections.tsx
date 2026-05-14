@@ -2,7 +2,7 @@
 
 import type { ReactNode } from 'react'
 import { motion } from 'framer-motion'
-import { Mail, MessageCircle, Phone } from 'lucide-react'
+import { ChevronRight, Mail, MessageCircle, Phone } from 'lucide-react'
 import { RememberNetworkGraph } from '@/components/highlights/RememberNetworkGraph'
 import type { ContactChannel } from '@/types'
 
@@ -130,9 +130,12 @@ export function ProfileFeedbackSection({
         {profile.guestbook.length > 0 && (
           <button
             onClick={onOpenGuestbook}
-            className="mt-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-secondary)]"
+            className="mt-4 flex w-full items-center justify-between rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-left active:opacity-70"
           >
-            더보기
+            <span className="text-[12px] font-semibold text-[var(--color-text-secondary)]">
+              피드백 전체보기
+            </span>
+            <ChevronRight className="h-4 w-4 text-[var(--color-text-tertiary)]" />
           </button>
         )}
       </div>

@@ -59,7 +59,8 @@ export function ProfileHeroSection({
     setActiveImageIndex(0)
   }, [profile.linkId, profile.avatarImage, profileImagesKey])
 
-  const activeImage = galleryImages[activeImageIndex] ?? galleryImages[0]
+  const mainImage = galleryImages[0]
+  const activeImage = galleryImages[activeImageIndex] ?? mainImage
 
   return (
     <motion.div
@@ -72,7 +73,7 @@ export function ProfileHeroSection({
       <ProfileHeroCard
         profile={profile}
         heroTheme={heroTheme}
-        activeImage={activeImage}
+        activeImage={mainImage}
         bioExpanded={bioExpanded}
         bioOverflowing={bioOverflowing}
         bioRef={bioRef}
@@ -80,7 +81,10 @@ export function ProfileHeroSection({
         isOwnerMode={isOwnerMode}
         onEditMood={onEditMood}
         onEditPung={onEditPung}
-        onOpenGallery={() => setGalleryOpen(true)}
+        onOpenGallery={() => {
+          setActiveImageIndex(0)
+          setGalleryOpen(true)
+        }}
       />
 
       {galleryImages.length > 1 && (
@@ -94,10 +98,11 @@ export function ProfileHeroSection({
                 onClick={() => {
                   if (!image) return
                   setActiveImageIndex(index)
+                  setGalleryOpen(true)
                 }}
                 className={[
                   'relative aspect-square overflow-hidden rounded-[18px] border bg-[var(--color-bg-soft)]',
-                  activeImageIndex === index
+                  activeImageIndex === index && galleryOpen
                     ? 'border-[var(--color-text-primary)] ring-1 ring-[var(--color-border-default)]'
                     : 'border-[var(--color-border-default)]',
                 ].join(' ')}

@@ -4,6 +4,209 @@ import { useRef, useState } from 'react'
 import { Pause, PawPrint, Play, X } from 'lucide-react'
 import type { LifeMediaItem, PublicProfileLife } from '@/types'
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type AspectType = 'portrait' | 'square' | 'place'
+
+type VibeItem = LifeMediaItem & {
+  category: string
+  aspectType: AspectType
+  isMusic: boolean
+}
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function buildVibeItems(life: PublicProfileLife): VibeItem[] {
+  const sources: [LifeMediaItem[], string, AspectType, boolean][] = [
+    [life.tastes.movies, '영화', 'portrait', false],
+    [life.tastes.music, '음악', 'square', true],
+    [life.tastes.books, '책', 'portrait', false],
+    [life.tastes.plays ?? [], '뮤지컬', 'portrait', false],
+    [life.daily.exercise, '운동', 'square', false],
+    [life.tastes.teams ?? [], '스포츠팀', 'square', false],
+    [life.tastes.restaurants, '맛집', 'place', false],
+    [life.tastes.cafes, '카페', 'place', false],
+    [life.places.travelDestinations, '여행지', 'place', false],
+  ]
+
+  const result: VibeItem[] = []
+  const maxLen = Math.max(...sources.map(([arr]) => arr.length), 0)
+
+  for (let i = 0; i < maxLen; i++) {
+    for (const [arr, category, aspectType, isMusic] of sources) {
+      if (arr[i]) result.push({ ...arr[i], category, aspectType, isMusic })
+    }
+  }
+
+  return result
+}
+
+function getItemId(item: LifeMediaItem) {
+  return item.label + (item.sublabel ?? '')
+}
+
+const ASPECT_CLASS: Record<AspectType, string> = {
+  portrait: 'aspect-[2/3]',
+  square: 'aspect-square',
+  place: 'aspect-[4/3]',
+}
+
+const CATEGORY_COLORS: Record<string, string> = {
+  영화: '#3B82F6',
+  음악: '#22C55E',
+  책: '#F59E0B',
+  뮤지컬: '#A855F7',
+  운동: '#EF4444',
+  스포츠팀: '#F97316',
+  맛집: '#EC4899',
+  카페: '#92400E',
+  여행지: '#0D9488',
+}
+
+// ─── Vibe Board ───────────────────────────────────────────────────────────────
+
+function VibeCard({
+  item,
+  playingId,
+  isPlaying,
+  onMusicToggle,
+}: {
+  item: VibeItem
+  playingId: string | null
+  isPlaying: boolean
+  onMusicToggle: (item: LifeMediaItem) => void
+}) {
+  const id = getItemId(item)
+  const active = item.isMusic && playingId === id
+  const color = CATEGORY_COLORS[item.category] ?? 'var(--color-accent-dark)'
+
+  const inner = (
+    <div className={`relative w-full overflow-hidden rounded-2xl ${ASPECT_CLASS[item.aspectType]}`}>
+      {item.posterUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={item.posterUrl}
+          alt={item.label}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      ) : (
+        <div
+          className="absolute inset-0"
+          style={{ backgroundColor: `${color}18` }}
+        />
+      )}
+
+      {/* gradient overlay for readability */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+
+      {/* category badge */}
+      <div
+        className="absolute left-2 top-2 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white"
+        style={{ backgroundColor: `${color}CC` }}
+      >
+        {item.category}
+      </div>
+
+      {/* music play overlay */}
+      {item.isMusic && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div
+            className="flex h-9 w-9 items-center justify-center rounded-full"
+            style={{ backgroundColor: active ? `${color}DD` : 'rgba(0,0,0,0.45)' }}
+          >
+            {active && isPlaying ? (
+              <Pause size={16} className="text-white" />
+            ) : (
+              <Play size={16} className="translate-x-0.5 text-white" />
+            )}
+          </div>
+          {active && isPlaying && (
+            <div className="absolute bottom-8 flex justify-center gap-[3px]">
+              {[0, 1, 2].map((i) => (
+                <div
+                  key={i}
+                  className="w-[3px] rounded-full bg-white"
+                  style={{
+                    height: 10,
+                    animation: 'musicBar 0.8s ease-in-out infinite',
+                    animationDelay: `${i * 0.15}s`,
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* label */}
+      <div className="absolute bottom-0 left-0 right-0 p-2.5">
+        <p className="truncate text-[12px] font-semibold leading-tight text-white drop-shadow">
+          {item.label}
+        </p>
+        {item.sublabel && (
+          <p className="truncate text-[10px] text-white/70">{item.sublabel}</p>
+        )}
+      </div>
+    </div>
+  )
+
+  if (item.isMusic) {
+    return (
+      <button className="w-full text-left" onClick={() => onMusicToggle(item)}>
+        {inner}
+      </button>
+    )
+  }
+
+  return <div>{inner}</div>
+}
+
+function VibeBoard({
+  items,
+  playingId,
+  isPlaying,
+  onMusicToggle,
+}: {
+  items: VibeItem[]
+  playingId: string | null
+  isPlaying: boolean
+  onMusicToggle: (item: LifeMediaItem) => void
+}) {
+  if (items.length === 0) return null
+
+  const left = items.filter((_, i) => i % 2 === 0)
+  const right = items.filter((_, i) => i % 2 === 1)
+
+  return (
+    <div className="px-5 pt-4 pb-2">
+      <div className="flex gap-2.5">
+        <div className="flex flex-1 flex-col gap-2.5">
+          {left.map((item) => (
+            <VibeCard
+              key={getItemId(item) + item.category}
+              item={item}
+              playingId={playingId}
+              isPlaying={isPlaying}
+              onMusicToggle={onMusicToggle}
+            />
+          ))}
+        </div>
+        <div className="flex flex-1 flex-col gap-2.5">
+          {right.map((item) => (
+            <VibeCard
+              key={getItemId(item) + item.category}
+              item={item}
+              playingId={playingId}
+              isPlaying={isPlaying}
+              onMusicToggle={onMusicToggle}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── Section & Sub-category headers ──────────────────────────────────────────
 
 function BlockHeader({ label }: { label: string }) {
@@ -25,7 +228,19 @@ function SubHeader({ label }: { label: string }) {
   )
 }
 
-// ─── Portrait scroll (영화 · 책 · 뮤지컬 — 2:3) ──────────────────────────────
+function SectionDivider() {
+  return (
+    <div className="flex items-center gap-3 px-5 pt-6 pb-2">
+      <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
+      <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)]">
+        전체
+      </span>
+      <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
+    </div>
+  )
+}
+
+// ─── Scroll rows ──────────────────────────────────────────────────────────────
 
 function PortraitScroll({ items }: { items: LifeMediaItem[] }) {
   if (!items.length) return null
@@ -33,7 +248,7 @@ function PortraitScroll({ items }: { items: LifeMediaItem[] }) {
     <div className="overflow-x-auto scrollbar-hide">
       <div className="flex gap-3 px-5">
         {items.map((item) => (
-          <div key={item.label + (item.sublabel ?? '')} className="w-[76px] flex-shrink-0">
+          <div key={getItemId(item)} className="w-[76px] flex-shrink-0">
             <div className="h-[114px] w-[76px] overflow-hidden rounded-[12px] bg-[var(--color-bg-muted)]">
               {item.posterUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -56,15 +271,13 @@ function PortraitScroll({ items }: { items: LifeMediaItem[] }) {
   )
 }
 
-// ─── Square scroll (운동 · 스포츠팀 — 1:1) ───────────────────────────────────
-
 function SquareScroll({ items }: { items: LifeMediaItem[] }) {
   if (!items.length) return null
   return (
     <div className="overflow-x-auto scrollbar-hide">
       <div className="flex gap-3 px-5">
         {items.map((item) => (
-          <div key={item.label + (item.sublabel ?? '')} className="w-[76px] flex-shrink-0">
+          <div key={getItemId(item)} className="w-[76px] flex-shrink-0">
             <div className="h-[76px] w-[76px] overflow-hidden rounded-[12px] bg-[var(--color-bg-muted)]">
               {item.posterUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -87,15 +300,13 @@ function SquareScroll({ items }: { items: LifeMediaItem[] }) {
   )
 }
 
-// ─── Place scroll (맛집 · 카페 · 여행지 — 4:3) ───────────────────────────────
-
 function PlaceScroll({ items }: { items: LifeMediaItem[] }) {
   if (!items.length) return null
   return (
     <div className="overflow-x-auto scrollbar-hide">
       <div className="flex gap-3 px-5">
         {items.map((item) => (
-          <div key={item.label + (item.sublabel ?? '')} className="w-[136px] flex-shrink-0">
+          <div key={getItemId(item)} className="w-[136px] flex-shrink-0">
             <div className="h-[102px] w-[136px] overflow-hidden rounded-[12px] bg-[var(--color-bg-muted)]">
               {item.posterUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -116,8 +327,6 @@ function PlaceScroll({ items }: { items: LifeMediaItem[] }) {
   )
 }
 
-// ─── Music scroll (음악 — 1:1 + play button) ─────────────────────────────────
-
 function MusicScroll({
   items,
   playingId,
@@ -134,7 +343,7 @@ function MusicScroll({
     <div className="overflow-x-auto scrollbar-hide">
       <div className="flex gap-3 px-5">
         {items.map((item) => {
-          const id = item.label + (item.sublabel ?? '')
+          const id = getItemId(item)
           const active = playingId === id
           return (
             <div key={id} className="w-[76px] flex-shrink-0">
@@ -147,13 +356,13 @@ function MusicScroll({
                   <img src={item.posterUrl} alt={item.label} className="h-full w-full object-cover" />
                 )}
                 <div
-                  className="absolute inset-0 flex items-center justify-center rounded-[12px] transition-opacity"
+                  className="absolute inset-0 flex items-center justify-center rounded-[12px]"
                   style={{ backgroundColor: active ? 'rgba(0,0,0,0.45)' : 'rgba(0,0,0,0.28)' }}
                 >
                   {active && isPlaying ? (
-                    <Pause size={22} className="text-white drop-shadow" />
+                    <Pause size={20} className="text-white drop-shadow" />
                   ) : (
-                    <Play size={22} className="translate-x-0.5 text-white drop-shadow" />
+                    <Play size={20} className="translate-x-0.5 text-white drop-shadow" />
                   )}
                 </div>
                 {active && isPlaying && (
@@ -164,7 +373,7 @@ function MusicScroll({
                         className="w-[3px] rounded-full bg-white"
                         style={{
                           height: 10,
-                          animation: `musicBar 0.8s ease-in-out infinite`,
+                          animation: 'musicBar 0.8s ease-in-out infinite',
                           animationDelay: `${i * 0.15}s`,
                         }}
                       />
@@ -215,10 +424,7 @@ function MiniPlayer({
     >
       <div
         className="h-0.5 transition-all duration-300"
-        style={{
-          width: `${progress * 100}%`,
-          backgroundColor: 'var(--color-accent-dark)',
-        }}
+        style={{ width: `${progress * 100}%`, backgroundColor: 'var(--color-accent-dark)' }}
       />
       <div className="flex items-center gap-3 px-4 py-3">
         <div className="h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg bg-[var(--color-bg-muted)]">
@@ -238,11 +444,7 @@ function MiniPlayer({
           className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full"
           style={{ backgroundColor: 'var(--color-accent-dark)' }}
         >
-          {isPlaying ? (
-            <Pause size={15} className="text-white" />
-          ) : (
-            <Play size={15} className="translate-x-0.5 text-white" />
-          )}
+          {isPlaying ? <Pause size={15} className="text-white" /> : <Play size={15} className="translate-x-0.5 text-white" />}
         </button>
         <button onClick={onClose} className="flex-shrink-0 p-1">
           <X size={16} className="text-[var(--color-text-tertiary)]" />
@@ -279,7 +481,7 @@ function PetCard({ pet, petName, petImage }: { pet: string; petName?: string; pe
   )
 }
 
-// ─── Main section ─────────────────────────────────────────────────────────────
+// ─── Main ─────────────────────────────────────────────────────────────────────
 
 export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife }) {
   const audioRef = useRef<HTMLAudioElement>(null)
@@ -303,19 +505,16 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
   const placeItems = [...life.tastes.restaurants, ...life.tastes.cafes]
   const hasPlace = placeItems.length > 0 || life.places.travelDestinations.length > 0
 
+  const vibeItems = buildVibeItems(life)
+
   const handleMusicToggle = (item: LifeMediaItem) => {
-    const id = item.label + (item.sublabel ?? '')
+    const id = getItemId(item)
     const audio = audioRef.current
     if (!audio) return
 
     if (playingId === id) {
-      if (isPlaying) {
-        audio.pause()
-        setIsPlaying(false)
-      } else {
-        audio.play()
-        setIsPlaying(true)
-      }
+      if (isPlaying) { audio.pause(); setIsPlaying(false) }
+      else { audio.play(); setIsPlaying(true) }
       return
     }
 
@@ -341,18 +540,24 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
         ref={audioRef}
         onTimeUpdate={() => {
           const audio = audioRef.current
-          if (!audio || !audio.duration) return
+          if (!audio?.duration) return
           setProgress(audio.currentTime / audio.duration)
         }}
-        onEnded={() => {
-          setIsPlaying(false)
-          setProgress(1)
-        }}
+        onEnded={() => { setIsPlaying(false); setProgress(1) }}
       />
 
       {hasPet && (
         <PetCard pet={pet ?? ''} petName={life.daily.petName} petImage={life.daily.petImage} />
       )}
+
+      <VibeBoard
+        items={vibeItems}
+        playingId={playingId}
+        isPlaying={isPlaying}
+        onMusicToggle={handleMusicToggle}
+      />
+
+      {(hasActivity || hasCulture || hasPlace) && <SectionDivider />}
 
       {hasActivity && (
         <>
@@ -384,12 +589,7 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
           {life.tastes.music.length > 0 && (
             <div className="mb-4">
               <SubHeader label="음악" />
-              <MusicScroll
-                items={life.tastes.music}
-                playingId={playingId}
-                isPlaying={isPlaying}
-                onToggle={handleMusicToggle}
-              />
+              <MusicScroll items={life.tastes.music} playingId={playingId} isPlaying={isPlaying} onToggle={handleMusicToggle} />
             </div>
           )}
           {life.tastes.books.length > 0 && (

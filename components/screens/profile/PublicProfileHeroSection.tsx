@@ -147,23 +147,23 @@ export function ProfileHeroCard({
   return (
     <>
       <div className="hero-card border border-[var(--color-border-default)] bg-[var(--color-glass-strong)] p-[8px] backdrop-blur-sm">
-        <div className="overflow-hidden rounded-[30px] bg-[#121212] text-white ring-1 ring-black/4">
-          <div className="relative">
+        <div className="relative h-[452px] overflow-hidden rounded-[30px] bg-[#121212] text-white ring-1 ring-black/4">
+          <div className="relative h-full">
             {activeImage ? (
               <button
                 type="button"
                 onClick={() => setGalleryOpen(true)}
-                className="relative block h-[332px] w-full overflow-hidden"
+                className="relative block h-full w-full overflow-hidden"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={activeImage} alt={`${profile.name} 프로필 사진`} className="h-full w-full object-cover" />
-                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,rgba(255,255,255,0.02)_30%,rgba(0,0,0,0.22)_100%)]" />
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.10)_58%,rgba(0,0,0,0.74)_100%)]" />
                 <div className="absolute right-4 top-4 rounded-full border border-white/14 bg-black/38 px-3 py-1 text-[11px] font-semibold text-white/88 backdrop-blur-sm">
                   탭해서 크게 보기
                 </div>
               </button>
             ) : (
-              <div className="relative h-[332px] overflow-hidden">
+              <div className="relative h-full overflow-hidden">
                 <div className={`absolute inset-0 bg-gradient-to-b ${heroTheme.cover}`} />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.24),rgba(255,255,255,0)_36%),linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.08)_56%,rgba(0,0,0,0.76)_100%)]" />
                 <div className="absolute left-1/2 top-[18%] h-[180px] w-[180px] -translate-x-1/2 overflow-hidden rounded-[40px] border border-white/22 bg-gradient-to-br from-white/18 to-white/3 shadow-[0_28px_72px_rgba(0,0,0,0.18)] backdrop-blur-[6px]">
@@ -178,41 +178,9 @@ export function ProfileHeroCard({
               </div>
             )}
 
-            {galleryImages.length > 1 && (
-              <div className="grid grid-cols-3 gap-2 px-3 pb-3 pt-3">
-                {[1, 2, 3].map((index) => {
-                  const image = galleryImages[index]
-                  return (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => {
-                        if (!image) return
-                        setActiveImageIndex(index)
-                      }}
-                      className={[
-                        'relative aspect-square overflow-hidden rounded-[18px] border bg-white/6',
-                        activeImageIndex === index
-                          ? 'border-white/46 ring-1 ring-white/24'
-                          : 'border-white/10',
-                      ].join(' ')}
-                    >
-                      {image ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={image} alt={`${profile.name} 서브 사진 ${index}`} className="h-full w-full object-cover" />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-[11px] font-semibold text-white/36">
-                          비어 있음
-                        </div>
-                      )}
-                    </button>
-                  )
-                })}
-              </div>
-            )}
           </div>
 
-          <div className="bg-[linear-gradient(180deg,#161616_0%,#101010_100%)] px-5 pb-5 pt-4">
+          <div className="absolute inset-x-0 bottom-0 p-5">
             <div className="flex items-end gap-2">
               <div
                 className="text-[38px] font-black leading-[1.08] tracking-[-0.05em]"
@@ -239,9 +207,38 @@ export function ProfileHeroCard({
               </div>
             )}
 
-            <div className={`text-[13px] font-medium text-white/68 ${showAge ? 'mt-1' : 'mt-2'}`}>
-              {profile.title}
-            </div>
+            {galleryImages.length > 1 && (
+              <div className="mt-3 grid max-w-[220px] grid-cols-3 gap-2">
+                {[1, 2, 3].map((index) => {
+                  const image = galleryImages[index]
+                  return (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => {
+                        if (!image) return
+                        setActiveImageIndex(index)
+                      }}
+                      className={[
+                        'relative aspect-square overflow-hidden rounded-[16px] border bg-white/8 backdrop-blur-sm',
+                        activeImageIndex === index
+                          ? 'border-white/46 ring-1 ring-white/24'
+                          : 'border-white/12',
+                      ].join(' ')}
+                    >
+                      {image ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={image} alt={`${profile.name} 서브 사진 ${index}`} className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-[11px] font-semibold text-white/36">
+                          비어 있음
+                        </div>
+                      )}
+                    </button>
+                  )
+                })}
+              </div>
+            )}
 
             {(mood || isOwnerMode) && (
               <div className="mt-2.5">

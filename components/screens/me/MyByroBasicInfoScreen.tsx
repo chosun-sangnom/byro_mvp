@@ -369,41 +369,25 @@ export function BasicInfoEditScreen({
 
               <div>
                 <label className="text-xs text-[var(--color-text-tertiary)] mb-2 block">생시</label>
-                <div className="flex flex-wrap gap-1.5">
-                  {[
-                    { label: '자시', range: '23~01시', value: '23:00' },
-                    { label: '축시', range: '01~03시', value: '01:00' },
-                    { label: '인시', range: '03~05시', value: '03:00' },
-                    { label: '묘시', range: '05~07시', value: '05:00' },
-                    { label: '진시', range: '07~09시', value: '07:00' },
-                    { label: '사시', range: '09~11시', value: '09:00' },
-                    { label: '오시', range: '11~13시', value: '11:00' },
-                    { label: '미시', range: '13~15시', value: '13:00' },
-                    { label: '신시', range: '15~17시', value: '15:00' },
-                    { label: '유시', range: '17~19시', value: '17:00' },
-                    { label: '술시', range: '19~21시', value: '19:00' },
-                    { label: '해시', range: '21~23시', value: '21:00' },
-                    { label: '모름', range: '', value: '' },
-                  ].map((hour) => {
-                    const selected = birthTime === hour.value
-                    return (
-                      <button
-                        key={hour.value || 'unknown'}
-                        type="button"
-                        onClick={() => setBirthTime(hour.value)}
-                        className="flex flex-col items-center rounded-xl border px-2.5 py-2 transition"
-                        style={{
-                          borderColor: selected ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
-                          background: selected ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
-                          color: selected ? '#ffffff' : 'var(--color-text-secondary)',
-                        }}
-                      >
-                        <span className="text-[12px] font-bold leading-none">{hour.label}</span>
-                        {hour.range && <span className="mt-0.5 text-[9px] leading-none opacity-70">{hour.range}</span>}
-                      </button>
-                    )
-                  })}
-                </div>
+                <select
+                  value={birthTime}
+                  onChange={(e) => setBirthTime(e.target.value)}
+                  className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none appearance-none"
+                >
+                  <option value="">모름</option>
+                  <option value="23:00">23:00 ~ 01:00</option>
+                  <option value="01:00">01:00 ~ 03:00</option>
+                  <option value="03:00">03:00 ~ 05:00</option>
+                  <option value="05:00">05:00 ~ 07:00</option>
+                  <option value="07:00">07:00 ~ 09:00</option>
+                  <option value="09:00">09:00 ~ 11:00</option>
+                  <option value="11:00">11:00 ~ 13:00</option>
+                  <option value="13:00">13:00 ~ 15:00</option>
+                  <option value="15:00">15:00 ~ 17:00</option>
+                  <option value="17:00">17:00 ~ 19:00</option>
+                  <option value="19:00">19:00 ~ 21:00</option>
+                  <option value="21:00">21:00 ~ 23:00</option>
+                </select>
               </div>
             </div>
 

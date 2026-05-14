@@ -271,6 +271,7 @@ export interface PublicProfile {
   life?: PublicProfileLife
   avatarColor?: string
   avatarImage?: string
+  profileImages?: string[]
   instagramConnected: boolean
   linkedinConnected: boolean
   instagram?: InstagramProfile
@@ -311,6 +312,7 @@ export interface UserState {
   headerMeta?: ProfileHeaderMeta
   avatarColor?: string
   avatarImage?: string
+  profileImages?: string[]
   whoIAm?: PublicProfileWhoIAm
   life?: PublicProfileLife
   sajuProfile?: SajuProfileInput

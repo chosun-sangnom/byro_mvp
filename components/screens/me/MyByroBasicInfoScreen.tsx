@@ -17,10 +17,11 @@ import {
 } from '@/lib/imageCropUtils'
 
 interface BasicInfoEditScreenProps {
-  user: Pick<UserState, 'name' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'headerMeta' | 'sajuProfile' | 'whoIAm' | 'life'>
+  user: Pick<UserState, 'name' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'profileImages' | 'headerMeta' | 'sajuProfile' | 'whoIAm' | 'life'>
   onBack: () => void
 }
 
+const EMPTY_PROFILE_IMAGES = ['', '', '', '']
 
 const MBTI_DIMS = [
   { options: ['E', 'I'] as const, labels: ['외향', '내향'] },
@@ -29,6 +30,62 @@ const MBTI_DIMS = [
   { options: ['J', 'P'] as const, labels: ['판단', '인식'] },
 ]
 const PET_OPTIONS = ['없음', '강아지', '고양이', '기타']
+
+function normalizeProfileImages(images?: string[], avatarImage?: string) {
+  const merged = [...(images ?? [])]
+
+  if (!merged[0] && avatarImage) {
+    merged[0] = avatarImage
+  }
+
+  return EMPTY_PROFILE_IMAGES.map((_, index) => merged[index] ?? '')
+}
+
+function PhotoSlot({
+  image,
+  label,
+  compact = false,
+  onClick,
+}: {
+  image?: string
+  label: string
+  compact?: boolean
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={[
+        'group relative overflow-hidden rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)]',
+        compact ? 'aspect-square' : 'aspect-[1.08/1.28] w-full',
+      ].join(' ')}
+    >
+      {image ? (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={image} alt={label} className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-active:scale-[1.02]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.04)_0%,rgba(0,0,0,0.10)_100%)]" />
+        </>
+      ) : (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-[var(--color-text-tertiary)]">
+          <Camera size={compact ? 18 : 22} />
+          <span className="text-[11px] font-semibold">{label}</span>
+        </div>
+      )}
+
+      <div className="absolute left-2.5 top-2.5 rounded-full border border-white/15 bg-black/50 px-2 py-1 text-[10px] font-semibold text-white/92 backdrop-blur-sm">
+        {label}
+      </div>
+
+      {image && (
+        <div className="absolute inset-x-0 bottom-0 flex items-center justify-center bg-[linear-gradient(180deg,transparent_0%,rgba(0,0,0,0.42)_100%)] px-3 py-2 text-[11px] font-semibold text-white/92">
+          눌러서 변경
+        </div>
+      )}
+    </button>
+  )
+}
 
 export function BasicInfoEditScreen({
   user,
@@ -49,12 +106,14 @@ export function BasicInfoEditScreen({
   const [birthPlace, setBirthPlace] = useState(initialSajuProfile.birthPlace)
   const [calendarType, setCalendarType] = useState<SajuProfileInput['calendarType']>(initialSajuProfile.calendarType)
   const [showAge, setShowAge] = useState(initialSajuProfile.showAge ?? true)
-  const [avatarImage, setAvatarImage] = useState(user.avatarImage ?? '')
+  const [profileImages, setProfileImages] = useState(() => normalizeProfileImages(user.profileImages, user.avatarImage))
   const [cropSource, setCropSource] = useState('')
   const [cropOpen, setCropOpen] = useState(false)
   const [cropFrame, setCropFrame] = useState({ x: 44, y: 74, width: DEFAULT_CROP_FRAME.width, height: DEFAULT_CROP_FRAME.height })
   const [cropNaturalSize, setCropNaturalSize] = useState({ width: 1, height: 1 })
-  const fileInputId = `profile-photo-input-${user.linkId}`
+  const mainPhotoInputRef = useRef<HTMLInputElement>(null)
+  const subPhotoInputRef = useRef<HTMLInputElement>(null)
+  const pendingSubIndexRef = useRef<number | null>(null)
   const dragStartRef = useRef<{ x: number; y: number; frameX: number; frameY: number } | null>(null)
   const resizeStartRef = useRef<{
     x: number
@@ -73,7 +132,8 @@ export function BasicInfoEditScreen({
     store.updateUserInfo({
       headline: user.headline,
       bio,
-      avatarImage,
+      avatarImage: profileImages[0] || '',
+      profileImages: profileImages.filter(Boolean),
       headerMeta: {
         residence: user.headerMeta?.residence ?? SAMPLE_PROFILE.headerMeta.residence,
         mood: user.headerMeta?.mood ?? SAMPLE_PROFILE.headerMeta.mood,
@@ -149,6 +209,33 @@ export function BasicInfoEditScreen({
     event.target.value = ''
   }
 
+  const handleSubPhotoFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    const targetIndex = pendingSubIndexRef.current
+
+    if (!file || targetIndex === null) return
+    if (!file.type.startsWith('image/')) {
+      showToast('이미지 파일만 업로드할 수 있어요')
+      event.target.value = ''
+      pendingSubIndexRef.current = null
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setProfileImages((prev) => {
+          const next = [...prev]
+          next[targetIndex] = reader.result as string
+          return next
+        })
+      }
+    }
+    reader.readAsDataURL(file)
+    event.target.value = ''
+    pendingSubIndexRef.current = null
+  }
+
   const handleCropPointerDown = (event: PointerEvent<HTMLDivElement>) => {
     dragStartRef.current = {
       x: event.clientX,
@@ -199,7 +286,11 @@ export function BasicInfoEditScreen({
   const handleApplyCrop = async () => {
     if (!cropSource) return
     const cropped = await renderCroppedImage(cropSource, cropNaturalSize, cropImageLayout, cropFrame)
-    setAvatarImage(cropped)
+    setProfileImages((prev) => {
+      const next = [...prev]
+      next[0] = cropped
+      return next
+    })
     setCropOpen(false)
     showToast('사진이 적용됐어요')
   }
@@ -210,29 +301,47 @@ export function BasicInfoEditScreen({
 
       <div className="flex-1 overflow-y-auto">
         <div className="px-5 py-5">
-          <div className="flex flex-col items-center mb-6">
-            <div className="w-20 h-20 rounded-full flex items-center justify-center text-3xl font-black text-[var(--color-text-secondary)] mb-2 bg-[var(--color-bg-muted)] overflow-hidden">
-              {avatarImage ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={avatarImage} alt={`${user.name} 프로필 사진`} className="w-full h-full rounded-full object-cover" />
-              ) : (
-                user.name.charAt(0)
-              )}
+          <div className="mb-7">
+            <div className="mb-1 text-[24px] font-black tracking-[-0.03em] text-[var(--color-text-primary)]">프로필 사진</div>
+            <div className="text-[13px] text-[var(--color-text-secondary)]">
+              얼굴이 나온 대표 사진 1장과 분위기를 보여주는 서브 사진 3장을 넣어주세요.
             </div>
             <input
-              id={fileInputId}
+              ref={mainPhotoInputRef}
               type="file"
               accept="image/*"
               className="sr-only"
               onChange={handleAvatarFileChange}
             />
-            <label
-              htmlFor={fileInputId}
-              className="flex cursor-pointer items-center gap-1 text-xs text-[var(--color-text-secondary)]"
-            >
-              <Camera size={12} /> 사진 변경
-            </label>
-            <div className="text-[11px] text-[var(--color-text-tertiary)] mt-1">직사각형 메인 카드와 원형 프로필 이미지에 같이 사용됩니다.</div>
+            <input
+              ref={subPhotoInputRef}
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              onChange={handleSubPhotoFileChange}
+            />
+
+            <div className="mt-4 grid grid-cols-[minmax(0,1fr)_104px] gap-3">
+              <PhotoSlot
+                image={profileImages[0]}
+                label="메인"
+                onClick={() => mainPhotoInputRef.current?.click()}
+              />
+              <div className="grid grid-rows-3 gap-3">
+                {[1, 2, 3].map((index) => (
+                  <PhotoSlot
+                    key={index}
+                    image={profileImages[index]}
+                    label={`서브 ${index}`}
+                    compact
+                    onClick={() => {
+                      pendingSubIndexRef.current = index
+                      subPhotoInputRef.current?.click()
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
 
           <div className="space-y-4 mb-5">
@@ -577,4 +686,3 @@ export function BasicInfoEditScreen({
     </div>
   )
 }
-

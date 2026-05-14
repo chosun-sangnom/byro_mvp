@@ -115,6 +115,7 @@ function buildEditableOwnerProfile(
     headerMeta: user.headerMeta ?? baseProfile.headerMeta,
     avatarColor: user.avatarColor ?? baseProfile.avatarColor,
     avatarImage: user.avatarImage || baseProfile.avatarImage,
+    profileImages: user.profileImages ?? baseProfile.profileImages,
     whoIAm: user.whoIAm ?? baseProfile.whoIAm,
     sajuProfile: user.sajuProfile ?? baseProfile.sajuProfile,
     life: user.life ?? baseProfile.life,

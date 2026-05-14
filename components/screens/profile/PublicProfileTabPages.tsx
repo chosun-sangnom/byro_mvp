@@ -175,7 +175,7 @@ export function PublicProfileReputationTabPage({
         featuredGuestbook={featuredGuestbook}
         getProfileAvatar={getProfileAvatar}
         onGuestbookEntryClick={(linkId) => router.push(`/${linkId}`)}
-        onOpenGuestbook={() => router.push(`/${profile.linkId}/guestbook`)}
+        onOpenGuestbook={() => router.push(`/${profile.linkId}/feedback`)}
       />
     </div>
   )

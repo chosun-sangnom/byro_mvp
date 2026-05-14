@@ -49,7 +49,12 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
   const [plays, setPlays] = useState(formatMedia(initialLife.tastes.plays ?? []))
   const [restaurants, setRestaurants] = useState(formatMedia(initialLife.tastes.restaurants))
   const [cafes, setCafes] = useState(formatMedia(initialLife.tastes.cafes))
-  const [travelDestinations, setTravelDestinations] = useState(formatMedia(initialLife.places.travelDestinations))
+  const [travelDestinations, setTravelDestinations] = useState<LifeMediaItem[]>(
+    initialLife.places.travelDestinations.length > 0
+      ? initialLife.places.travelDestinations
+      : []
+  )
+  const travelFileInputRefs = useRef<(HTMLInputElement | null)[]>([])
 
   const handleSave = () => {
     const nextLife: PublicProfileLife = {
@@ -72,7 +77,7 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
       },
       places: {
         ...initialLife.places,
-        travelDestinations: parseMedia(travelDestinations, initialLife.places.travelDestinations),
+        travelDestinations: travelDestinations.filter((d) => d.label.trim()),
       },
     }
 
@@ -95,6 +100,40 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
     }
     reader.readAsDataURL(file)
     event.target.value = ''
+  }
+
+  const handleTravelPhotoChange = (index: number, event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      showToast('이미지 파일만 업로드할 수 있어요')
+      event.target.value = ''
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => {
+      if (typeof reader.result === 'string') {
+        setTravelDestinations((prev) =>
+          prev.map((item, i) => (i === index ? { ...item, posterUrl: reader.result as string } : item))
+        )
+      }
+    }
+    reader.readAsDataURL(file)
+    event.target.value = ''
+  }
+
+  const handleTravelLabelChange = (index: number, value: string) => {
+    setTravelDestinations((prev) =>
+      prev.map((item, i) => (i === index ? { ...item, label: value } : item))
+    )
+  }
+
+  const handleTravelAdd = () => {
+    setTravelDestinations((prev) => [...prev, { label: '' }])
+  }
+
+  const handleTravelRemove = (index: number) => {
+    setTravelDestinations((prev) => prev.filter((_, i) => i !== index))
   }
 
   return (
@@ -182,7 +221,54 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
         <Section title="장소">
           <TextAreaField label="맛집" value={restaurants} onChange={setRestaurants} placeholder={'성수 우육미엔 | 성수동\n압구정 뜸들이다 | 압구정'} />
           <TextAreaField label="카페" value={cafes} onChange={setCafes} placeholder={'센터커피 | 성수동\n프릳츠 원서점 | 서촌'} />
-          <TextAreaField label="여행지" value={travelDestinations} onChange={setTravelDestinations} placeholder={'도쿄\n교토\n샌프란시스코'} />
+          <InputField label="여행지">
+            <div className="space-y-2">
+              {travelDestinations.map((dest, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => travelFileInputRefs.current[index]?.click()}
+                    className="relative flex-shrink-0 w-14 h-14 rounded-xl overflow-hidden bg-[var(--color-bg-muted)] border border-[var(--color-border-default)] flex items-center justify-center"
+                  >
+                    {dest.posterUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={dest.posterUrl} alt={dest.label} className="w-full h-full object-cover" />
+                    ) : (
+                      <Camera size={16} className="text-[var(--color-text-tertiary)]" />
+                    )}
+                  </button>
+                  <input
+                    ref={(el) => { travelFileInputRefs.current[index] = el }}
+                    type="file"
+                    accept="image/*"
+                    className="sr-only"
+                    onChange={(e) => handleTravelPhotoChange(index, e)}
+                  />
+                  <input
+                    value={dest.label}
+                    onChange={(e) => handleTravelLabelChange(index, e.target.value)}
+                    placeholder="예: 도쿄"
+                    className="flex-1 border border-[var(--color-border-default)] rounded-xl px-3 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleTravelRemove(index)}
+                    className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-[var(--color-text-tertiary)]"
+                    style={{ backgroundColor: 'var(--color-bg-muted)' }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={handleTravelAdd}
+                className="w-full rounded-xl border border-dashed border-[var(--color-border-default)] py-2.5 text-sm text-[var(--color-text-tertiary)]"
+              >
+                + 여행지 추가
+              </button>
+            </div>
+          </InputField>
         </Section>
       </div>
 

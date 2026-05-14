@@ -86,7 +86,7 @@ export function ManageByroScreen({
   const rows: EditRow[] = [
     {
       title: '기본정보',
-      hint: '프로필사진 · MBTI · 자기소개 · 반려동물',
+      hint: '프로필사진 · MBTI · 자기소개',
       meta: [user.headline?.trim(), whoIAm.mbti, petLabel].filter(Boolean).join(' · ') || undefined,
       onClick: onEditBasic,
     },
@@ -98,7 +98,7 @@ export function ManageByroScreen({
     },
     {
       title: '라이프',
-      hint: '운동 · 음식 · 카페 · 여행지 · 문화',
+      hint: '반려동물 · 운동 · 음식 · 카페 · 여행지 · 문화',
       meta: activityCount + cultureCount + placeCount > 0
         ? `활동 ${activityCount} · 문화 ${cultureCount} · 장소 ${placeCount}`
         : undefined,

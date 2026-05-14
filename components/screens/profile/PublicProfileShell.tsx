@@ -216,7 +216,7 @@ export function PublicProfileShell({
       </div>
 
       {/* ── 탭 콘텐츠 스크롤 영역 ── */}
-      <div className="min-h-0 flex-1 overflow-y-auto">
+      <div className="min-h-0 flex-1 overflow-y-auto" style={{ scrollbarGutter: 'stable' }}>
         {children}
       </div>
 

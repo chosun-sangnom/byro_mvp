@@ -21,7 +21,7 @@ import { Button, BottomSheet, TextArea, showToast } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
 import { ContactActionButton } from '@/components/screens/profile/PublicProfileSections'
-import { ProfileHeroCard } from '@/components/screens/profile/PublicProfileHeroSection'
+import { ProfileHeroSection } from '@/components/screens/profile/PublicProfileHeroSection'
 import { PublicProfileTabBar, type PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
 import { PublicProfileKemiZone, PublicProfileOwnerMatchZone } from '@/components/screens/profile/PublicProfileKemiZone'
 import { PublicProfileCompatibilitySheet } from '@/components/screens/profile/PublicProfileCompatibilitySheet'
@@ -185,10 +185,8 @@ export function PublicProfileShell({
 
       {/* ── 고정 헤더 영역 ── */}
       <div className="flex-shrink-0">
-        <div className="relative px-5 pt-4 pb-1">
-          {/* 인디고 ambient glow — 배경 분위기용 */}
-          <div className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,var(--color-accent-bg-subtle)_0%,transparent_68%)]" />
-          <ProfileHeroCard
+        <div className="relative pb-1">
+          <ProfileHeroSection
             profile={profile}
             heroTheme={profile.heroTheme}
             bioExpanded={bioExpanded}

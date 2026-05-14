@@ -14,9 +14,9 @@ export function ReputationSection() {
           transition={{ duration: 0.5 }}
           className="text-3xl tracking-tight text-center mb-4 text-[var(--color-text-strong)]"
         >
-          프로필은 한 번 만들고,
+          만남이 쌓일수록
           <br />
-          신뢰는 계속 쌓입니다
+          프로필이 두꺼워집니다
         </motion.h2>
 
         <motion.p
@@ -26,9 +26,9 @@ export function ReputationSection() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-sm text-[var(--color-text-strong)]/60 text-center mb-12 leading-relaxed"
         >
-          평판 키워드가 누적되고, 방명록과 피드백이 쌓이며,
+          함께한 사람들이 남긴 평판 키워드와 피드백이 쌓이며,
           <br />
-          오프라인 만남의 인상이 기록으로 남습니다
+          나를 설명하는 증거가 되어갑니다
         </motion.p>
 
         <motion.div

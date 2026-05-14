@@ -1,22 +1,13 @@
 import type { ComponentType } from 'react'
 import {
-  Award,
-  Boxes,
   Briefcase,
   Building2,
   CreditCard,
-  Crown,
-  FileText,
-  Globe2,
-  Lightbulb,
-  Link as LinkIcon,
-  Link2,
-  Megaphone,
+  Heart,
+  MessageCircle,
   Rocket,
-  Settings,
+  Search,
   Sparkles,
-  Star,
-  TrendingUp,
   User,
   Users,
 } from 'lucide-react'
@@ -29,85 +20,67 @@ export const problems: Array<{
   description: string
 }> = [
   {
+    icon: MessageCircle,
+    title: '스몰토크가 생각보다 어렵습니다',
+    description: '처음 만난 사람과 대화를 이어가는 건 쉽지 않다. 어색한 침묵, 형식적인 질문들.',
+  },
+  {
     icon: CreditCard,
-    title: '명함은 너무 얕습니다',
-    description: '이름, 직함, 회사는 보여주지만 어떤 사람인지 전달되지 않습니다.',
+    title: '명함엔 이름과 직함뿐입니다',
+    description: '명함엔 연락처만, SNS엔 콘텐츠만 있다. 그 사람 자체를 알 수 있는 정보가 없다.',
   },
   {
-    icon: Building2,
-    title: 'SNS는 비즈니스 맥락에 맞지 않습니다',
-    description: '개인적인 콘텐츠와 섞여있고, 첫인상을 만들기엔 정리되지 않았습니다.',
-  },
-  {
-    icon: Sparkles,
-    title: '신뢰와 평판은 흩어져 있습니다',
-    description: '경험, 관계, 인상, 활동 이력이 한 곳에 정리되어 있지 않습니다.',
+    icon: Search,
+    title: '공통점을 찾기까지 시간이 걸립니다',
+    description: '사실 겹치는 게 있어도 대화하기 전엔 알 수 없다. 공통점을 발견하기까지 한참이 걸린다.',
   },
 ]
 
 export const solutionSteps: Array<{
   icon: HomeIcon
   title: string
-  items: string[]
+  description: string
 }> = [
   {
-    icon: Link2,
-    title: '연결하기',
-    items: ['SNS 연결', '라이프 입력', '하이라이트 추가'],
+    icon: User,
+    title: '나를 설명하는 정보를 한 프로필에',
+    description: '커리어, 라이프스타일, 검증된 하이라이트, 평판 키워드까지. 흩어져 있던 정보를 하나의 링크로.',
   },
   {
     icon: Sparkles,
-    title: '정리하기',
-    items: ['AI가 자기소개 초안 생성', '프로필을 더 명확한 정체성으로 구조화'],
+    title: 'Kemi Glow — 공통점이 즉시 보인다',
+    description: '상대방의 Byro를 열면, 나와 겹치는 항목이 시각적으로 강조된다. 같은 대학, 같은 동네, 같은 MBTI를 한눈에.',
   },
   {
-    icon: TrendingUp,
-    title: '쌓이기',
-    items: ['평판 키워드 누적', '방명록/피드백 축적', '관계 속 신뢰 자산이 계속 쌓임'],
+    icon: MessageCircle,
+    title: 'Kemi Report — 맥락 기반 해석을 제공한다',
+    description: '단순 공통점 나열이 아니라, 전체 맥락을 묶어 해석해준다. 미팅 전에 리포트를 보고 들어가면 첫 마디부터 다르다.',
   },
 ]
 
-export const highlightCards: Array<{
+export const useCases: Array<{
   icon: HomeIcon
-  label: string
-  value: string
-  gradient: string
+  title: string
+  scenario: string
+  highlight: string
 }> = [
   {
-    icon: Briefcase,
-    label: '커리어 지속성',
-    value: '평균 대비 128% 장기 재직',
-    gradient: 'from-blue-500 to-cyan-500',
-  },
-  {
     icon: Users,
-    label: '리멤버 네트워크',
-    value: '스타트업 중심 인맥 구조',
-    gradient: 'from-purple-500 to-pink-500',
+    title: '네트워킹 행사',
+    scenario: '행사 끝나고 명함 다섯 장을 받았다. 다음날 Byro 링크를 하나씩 열어본다. 세 명은 겹치는 게 별로 없다.',
+    highlight: '한 명은 같은 고향, 같은 업종, 취향도 비슷하다. 그 사람한테만 카톡을 보낸다. 어색하지 않다.',
   },
   {
-    icon: Award,
-    label: '강연 / 협업 경험',
-    value: 'TEDx Seoul 발표',
-    gradient: 'from-orange-500 to-red-500',
+    icon: Briefcase,
+    title: '비즈니스 미팅',
+    scenario: '처음 만나는 잠재 파트너와 미팅이 잡혔다. 미팅 전날 상대 Byro를 확인한다. 전 직장이 겹치고, 관심사도 비슷하다.',
+    highlight: '"혹시 카카오 계셨던 거 맞죠?" — 본론 들어가기 전에 이미 분위기가 풀렸다.',
   },
   {
-    icon: FileText,
-    label: '특허 / 출판',
-    value: '등록 특허 보유',
-    gradient: 'from-green-500 to-emerald-500',
-  },
-  {
-    icon: Globe2,
-    label: '글로벌 활동',
-    value: '최근 3년간 국제 활동 이력 다수',
-    gradient: 'from-[#3DD6B2] to-[#1DC8A0]',
-  },
-  {
-    icon: Crown,
-    label: '프리미엄 멤버십',
-    value: '상위 등급 멤버십 보유',
-    gradient: 'from-amber-500 to-yellow-500',
+    icon: Heart,
+    title: '소개팅',
+    scenario: '만나기 전에 Byro를 교환한다. 사주 궁합도 나쁘지 않고, 좋아하는 동네도 겹친다.',
+    highlight: '어색한 첫 질문을 건너뛰고 바로 공통점 얘기부터 시작할 수 있다.',
   },
 ]
 
@@ -116,68 +89,31 @@ export const comparisons: Array<{
   name: string
   color: string
   isHighlight?: boolean
-  features: Array<{ text: string; available: boolean }>
+  description: string
+  missing?: string
+  highlight?: string
 }> = [
   {
-    icon: CreditCard,
-    name: '전통 명함',
-    color: 'from-gray-400 to-gray-500',
-    features: [
-      { text: '이름, 직함, 연락처', available: true },
-      { text: '신뢰 검증', available: false },
-      { text: '평판 정보', available: false },
-      { text: '오프라인 활용', available: true },
-    ],
+    icon: Building2,
+    name: 'LinkedIn / SNS',
+    color: 'from-blue-500 to-blue-600',
+    description: '커리어나 콘텐츠는 있지만',
+    missing: '라이프스타일, 성향, 공통점은 알 수 없다',
   },
   {
-    icon: Building2,
-    name: 'SNS 프로필',
-    color: 'from-blue-600 to-blue-700',
-    features: [
-      { text: '정제된 정보', available: false },
-      { text: '신뢰 검증', available: false },
-      { text: '평판 정보', available: true },
-      { text: '오프라인 활용', available: false },
-    ],
+    icon: CreditCard,
+    name: '명함 앱',
+    color: 'from-gray-400 to-gray-500',
+    description: '이름, 직함, 연락처만 있다',
+    missing: '저장하고 끝 — 관계로 이어지는 맥락이 없다',
   },
   {
     icon: Sparkles,
     name: 'Byro',
     color: 'from-[#3DD6B2] to-[#1DC8A0]',
     isHighlight: true,
-    features: [
-      { text: '정제된 정보', available: true },
-      { text: '신뢰 검증', available: true },
-      { text: '평판 정보', available: true },
-      { text: '오프라인 활용', available: true },
-    ],
-  },
-]
-
-export const uiElements: Array<{
-  icon: HomeIcon
-  title: string
-  description: string
-}> = [
-  {
-    icon: User,
-    title: '프로필 헤더',
-    description: '간결하고 인상적인 첫인상',
-  },
-  {
-    icon: Lightbulb,
-    title: 'AI 자기소개',
-    description: '핵심만 담은 명확한 소개',
-  },
-  {
-    icon: Star,
-    title: '검증 하이라이트',
-    description: '신뢰를 만드는 증거들',
-  },
-  {
-    icon: LinkIcon,
-    title: 'SNS 연결',
-    description: '모든 채널을 한 곳에',
+    description: '커리어 + 라이프스타일 + 검증된 평판',
+    highlight: '만나는 순간 공통점이 보이고, 대화의 재료가 생긴다',
   },
 ]
 
@@ -205,11 +141,9 @@ export const testimonials = [
   },
 ]
 
-export const targetUsers: Array<{ icon: HomeIcon; label: string }> = [
-  { icon: Rocket, label: '창업가' },
-  { icon: Boxes, label: '프로덕트 매니저' },
-  { icon: Megaphone, label: '마케터' },
-  { icon: TrendingUp, label: '투자자' },
-  { icon: Users, label: '사업개발' },
-  { icon: Settings, label: '운영 리더' },
+export const targetUsers: Array<{ icon: HomeIcon; label: string; description: string }> = [
+  { icon: Users, label: '네트워킹을 자주 하는 사람', description: '행사 후 관계를 이어가고 싶은 사람' },
+  { icon: Briefcase, label: '비즈니스 미팅이 잦은 사람', description: '첫인상이 결과에 영향을 미치는 사람' },
+  { icon: Rocket, label: '창업가 · 프리랜서', description: '나를 설명해야 하는 상황이 많은 사람' },
+  { icon: Heart, label: '새로운 인연을 만드는 사람', description: '소개팅, 동호회, 커뮤니티 활동' },
 ]

@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { uiElements } from '@/components/screens/home/content'
+import { useCases } from '@/components/screens/home/content'
 
 export function ProductPreviewSection() {
   return (
@@ -12,117 +12,54 @@ export function ProductPreviewSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-3xl tracking-tight text-center mb-12 text-[var(--color-text-strong)]"
+          className="text-3xl tracking-tight text-center mb-3 text-[var(--color-text-strong)]"
         >
-          실제로는 이렇게 보입니다
+          어떤 상황에서
+          <br />
+          쓰이나요
         </motion.h2>
 
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="mb-10"
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="text-sm text-[var(--color-text-secondary)] text-center mb-12"
         >
-          <div
-            className="rounded-[2rem] p-4 shadow-2xl max-w-[360px] mx-auto"
-            style={{
-              background: 'linear-gradient(135deg, var(--color-bg-surface), var(--color-bg-soft))',
-              border: '1px solid var(--color-border-default)',
-            }}
-          >
-            <div className="surface-card rounded-[1.5rem] p-6 shadow-inner">
-              <div className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-16 h-16 rounded-2xl bg-[var(--color-accent-dark)]" />
-                  <div className="flex-1 text-left">
-                    <div className="text-base text-[var(--color-text-strong)] mb-0.5">이서연</div>
-                    <div className="text-xs text-[var(--color-text-secondary)]">Growth Product Manager</div>
-                  </div>
-                </div>
+          처음 만나는 상황이라면 어디서든
+        </motion.p>
 
-                <div className="rounded-xl p-4" style={{ backgroundColor: 'var(--color-bg-soft)' }}>
-                  <p className="text-xs text-[var(--color-text-primary)] leading-relaxed">
-                    데이터 기반 성장 전략을 설계하고 실행합니다. B2B SaaS 프로덕트 경험 4년차
-                  </p>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="text-[10px] text-[var(--color-text-tertiary)] uppercase tracking-wide mb-2">Highlights</div>
-                  <div className="bg-[var(--color-accent-soft)] rounded-xl p-3">
-                    <div className="text-[10px] text-[var(--color-accent-dark)] mb-1">리멤버 네트워크</div>
-                    <div className="text-xs text-[var(--color-text-primary)]">스타트업 중심 인맥 구조</div>
-                  </div>
-                  <div className="bg-[var(--color-state-info-bg)] rounded-xl p-3">
-                    <div className="text-[10px] text-[var(--color-state-info-text)] mb-1">강연 경험</div>
-                    <div className="text-xs text-[var(--color-text-primary)]">Startup Conference 2025</div>
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <div className="flex-1 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-muted)' }}>
-                    <div className="w-5 h-5 rounded" style={{ backgroundColor: 'var(--color-text-tertiary)' }} />
-                  </div>
-                  <div className="flex-1 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-muted)' }}>
-                    <div className="w-5 h-5 rounded" style={{ backgroundColor: 'var(--color-text-tertiary)' }} />
-                  </div>
-                  <div className="flex-1 h-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-muted)' }}>
-                    <div className="w-5 h-5 rounded" style={{ backgroundColor: 'var(--color-text-tertiary)' }} />
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-1.5">
-                  <span
-                    className="text-[10px] px-2.5 py-1 rounded-full"
-                    style={{ backgroundColor: 'var(--color-bg-muted)', color: 'var(--color-text-primary)' }}
-                  >
-                    전략적인
-                  </span>
-                  <span
-                    className="text-[10px] px-2.5 py-1 rounded-full"
-                    style={{ backgroundColor: 'var(--color-bg-muted)', color: 'var(--color-text-primary)' }}
-                  >
-                    데이터 기반
-                  </span>
-                  <span
-                    className="text-[10px] px-2.5 py-1 rounded-full"
-                    style={{ backgroundColor: 'var(--color-bg-muted)', color: 'var(--color-text-primary)' }}
-                  >
-                    실행력 있는
-                  </span>
-                </div>
-
-                <div className="rounded-xl p-3" style={{ backgroundColor: 'var(--color-bg-soft)' }}>
-                  <div className="flex items-start gap-2">
-                    <div className="w-6 h-6 rounded-full flex-shrink-0" style={{ backgroundColor: 'var(--color-text-tertiary)' }} />
-                    <div className="flex-1">
-                      <p className="text-[10px] text-[var(--color-text-secondary)] leading-relaxed italic">
-                        &quot;문제를 빠르게 파악하고 해결하는 능력이 인상적이었습니다&quot;
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        <div className="grid grid-cols-2 gap-3">
-          {uiElements.map((element, index) => (
+        <div className="space-y-4">
+          {useCases.map((item, index) => (
             <motion.div
-              key={element.title}
+              key={item.title}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: index * 0.1 }}
-              className="surface-card rounded-xl p-4 shadow-sm"
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="surface-card rounded-2xl p-6"
             >
-              <div className="w-8 h-8 rounded-lg bg-[var(--color-accent-bg)] flex items-center justify-center mb-3">
-                <element.icon className="w-4 h-4 text-[var(--color-accent-dark)]" />
+              <div className="flex items-center gap-3 mb-3">
+                <div
+                  className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ backgroundColor: 'var(--color-accent-bg)' }}
+                >
+                  <item.icon className="w-4 h-4 text-[var(--color-accent-dark)]" />
+                </div>
+                <h3 className="text-base font-semibold text-[var(--color-text-strong)]">{item.title}</h3>
               </div>
-              <div className="text-xs text-[var(--color-text-strong)] mb-1">{element.title}</div>
-              <div className="text-[10px] text-[var(--color-text-tertiary)] leading-relaxed">
-                {element.description}
+
+              <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-3">
+                {item.scenario}
+              </p>
+
+              <div
+                className="rounded-xl px-4 py-3"
+                style={{ backgroundColor: 'var(--color-accent-soft)' }}
+              >
+                <p className="text-[13px] font-medium text-[var(--color-accent-dark)] leading-relaxed">
+                  {item.highlight}
+                </p>
               </div>
             </motion.div>
           ))}

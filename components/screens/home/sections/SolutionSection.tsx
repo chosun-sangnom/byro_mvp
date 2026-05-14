@@ -12,14 +12,22 @@ export function SolutionSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-3xl tracking-tight text-center mb-12 text-[var(--color-text-strong)]"
+          className="text-3xl tracking-tight text-center mb-3 text-[var(--color-text-strong)]"
         >
-          Byro는 흩어진 신호를
-          <br />
-          하나의 신뢰 프로필로 정리합니다
+          Byro가 해결합니다
         </motion.h2>
 
-        <div className="space-y-6">
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="text-sm text-[var(--color-text-secondary)] text-center mb-12"
+        >
+          첫 만남에 필요한 정보를 한 곳에 모읍니다
+        </motion.p>
+
+        <div className="space-y-5">
           {solutionSteps.map((step, index) => (
             <motion.div
               key={step.title}
@@ -29,31 +37,23 @@ export function SolutionSection() {
               transition={{ duration: 0.5, delay: index * 0.15 }}
               className="relative"
             >
-              <div className="absolute -left-3 top-0 w-8 h-8 rounded-full bg-[var(--color-accent-dark)] flex items-center justify-center text-white text-sm shadow-lg">
+              <div className="absolute -left-3 top-5 w-7 h-7 rounded-full bg-[var(--color-accent-dark)] flex items-center justify-center text-white text-xs shadow-lg z-10">
                 {index + 1}
               </div>
 
-              <div className="surface-card rounded-2xl p-6 pl-10">
-                <div className="flex items-start gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-xl bg-[var(--color-accent-bg)] flex items-center justify-center flex-shrink-0">
-                    <step.icon className="w-5 h-5 text-[var(--color-accent-dark)]" />
-                  </div>
-                  <h3 className="text-lg pt-2 text-[var(--color-text-strong)]">{step.title}</h3>
-                </div>
-
-                <ul className="space-y-2 ml-1">
-                  {step.items.map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-sm text-[var(--color-text-primary)]">
-                      <span className="text-[var(--color-accent-dark)] mt-1">•</span>
-                      <span className="flex-1">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
               {index < solutionSteps.length - 1 && (
-                <div className="absolute left-1 top-full w-0.5 h-6 bg-gradient-to-b from-[var(--color-accent-border)] to-transparent -mt-2" />
+                <div className="absolute left-0.5 top-12 w-0.5 h-8 bg-gradient-to-b from-[var(--color-accent-border)] to-transparent" />
               )}
+
+              <div className="surface-card rounded-2xl p-5 pl-9">
+                <div className="flex items-center gap-2.5 mb-2">
+                  <step.icon className="w-4 h-4 text-[var(--color-accent-dark)] flex-shrink-0" />
+                  <h3 className="text-[15px] font-semibold text-[var(--color-text-strong)]">{step.title}</h3>
+                </div>
+                <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+                  {step.description}
+                </p>
+              </div>
             </motion.div>
           ))}
         </div>

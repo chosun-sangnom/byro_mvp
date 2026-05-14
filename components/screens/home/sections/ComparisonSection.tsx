@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Check, Sparkles, X } from 'lucide-react'
+import { Check, X } from 'lucide-react'
 import { comparisons } from '@/components/screens/home/content'
 
 export function ComparisonSection() {
@@ -16,11 +16,11 @@ export function ComparisonSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-3xl tracking-tight text-center mb-4 text-[var(--color-text-strong)]"
+          className="text-3xl tracking-tight text-center mb-3 text-[var(--color-text-strong)]"
         >
-          간단함과 전문성,
+          다른 도구들과
           <br />
-          그 사이의 완벽한 균형
+          무엇이 다른가요
         </motion.h2>
 
         <motion.p
@@ -30,80 +30,62 @@ export function ComparisonSection() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-sm text-[var(--color-text-secondary)] text-center mb-12"
         >
-          오프라인 네트워킹에 최적화된 신뢰 프로필
+          그 사람을 알 수 있는 맥락을 제공하는 도구는 없었습니다
         </motion.p>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="space-y-3">
           {comparisons.map((item, index) => (
             <motion.div
               key={item.name}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className={`${
-                item.isHighlight ? 'bg-[var(--color-bg-page)] border-2 shadow-lg' : 'bg-[var(--color-bg-page)] border shadow-sm'
-              } rounded-2xl p-4 relative`}
+              transition={{ duration: 0.45, delay: index * 0.1 }}
+              className={`relative rounded-2xl p-5 border ${item.isHighlight ? 'border-2' : 'border'}`}
               style={
                 item.isHighlight
-                  ? { borderColor: 'var(--color-accent-brand-soft)' }
-                  : { borderColor: 'var(--color-border-default)' }
+                  ? { borderColor: 'var(--color-accent-brand-soft)', backgroundColor: 'var(--color-bg-page)' }
+                  : { borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-page)' }
               }
             >
               {item.isHighlight && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                <div className="absolute -top-3 left-5">
                   <div className="bg-[var(--color-accent-dark)] text-white text-[10px] px-3 py-1 rounded-full shadow-md">
-                    Best
+                    Byro만의 차이
                   </div>
                 </div>
               )}
 
-              <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center mb-3 mx-auto`}>
-                <item.icon className="w-5 h-5 text-white" />
-              </div>
-
-              <div className={`text-sm text-center mb-4 ${item.isHighlight ? 'text-[var(--color-text-strong)]' : 'text-[var(--color-text-primary)]'}`}>
-                {item.name}
-              </div>
-
-              <div className="space-y-2">
-                {item.features.map((feature) => (
-                  <div key={feature.text} className="flex items-center gap-1.5">
-                    {feature.available ? (
-                      <Check className={`w-3 h-3 flex-shrink-0 ${item.isHighlight ? 'text-[var(--color-accent-dark)]' : 'text-[var(--color-text-tertiary)]'}`} />
-                    ) : (
-                      <X className="w-3 h-3 flex-shrink-0 text-[var(--color-border-default)]" />
-                    )}
-                    <span
-                      className={`text-[10px] leading-tight ${
-                        feature.available
-                          ? item.isHighlight
-                            ? 'text-[var(--color-text-strong)]'
-                            : 'text-[var(--color-text-secondary)]'
-                          : 'text-[var(--color-text-tertiary)]'
-                      }`}
-                    >
-                      {feature.text}
+              <div className="flex items-start gap-3">
+                <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${item.color} flex items-center justify-center flex-shrink-0`}>
+                  <item.icon className="w-4 h-4 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className={`text-sm font-semibold ${item.isHighlight ? 'text-[var(--color-text-strong)]' : 'text-[var(--color-text-primary)]'}`}>
+                      {item.name}
                     </span>
                   </div>
-                ))}
+                  <p className="text-[13px] text-[var(--color-text-secondary)] leading-snug mb-2">
+                    {item.description}
+                  </p>
+                  {item.missing && (
+                    <div className="flex items-center gap-1.5">
+                      <X className="w-3 h-3 text-[var(--color-text-tertiary)] flex-shrink-0" />
+                      <span className="text-[12px] text-[var(--color-text-tertiary)]">{item.missing}</span>
+                    </div>
+                  )}
+                  {item.highlight && (
+                    <div className="flex items-center gap-1.5">
+                      <Check className="w-3 h-3 text-[var(--color-accent-dark)] flex-shrink-0" />
+                      <span className="text-[12px] font-medium text-[var(--color-accent-dark)]">{item.highlight}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             </motion.div>
           ))}
         </div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="mt-8 text-center"
-        >
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--color-accent-soft)] rounded-full border border-[var(--color-accent-border-soft)]">
-            <Sparkles className="w-3.5 h-3.5 text-[var(--color-accent-dark)]" />
-            <span className="text-xs text-[var(--color-accent-dark)]">신뢰 기반 오프라인 네트워킹의 새로운 기준</span>
-          </div>
-        </motion.div>
       </div>
     </section>
   )

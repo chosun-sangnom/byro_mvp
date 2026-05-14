@@ -15,12 +15,22 @@ export function ProblemSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-3xl tracking-tight text-center mb-12 text-[var(--color-text-strong)]"
+          className="text-3xl tracking-tight text-center mb-3 text-[var(--color-text-strong)]"
         >
-          명함은 연락처를 보여주지만,
+          첫 만남은 언제나
           <br />
-          나를 증명해주지는 않습니다
+          어색합니다
         </motion.h2>
+
+        <motion.p
+          initial={{ opacity: 0, y: 10 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="text-sm text-[var(--color-text-secondary)] text-center mb-12"
+        >
+          뭘 좋아하는지, 어디 출신인지, 어떤 사람인지 모르니 대화 소재가 없다
+        </motion.p>
 
         <div className="space-y-4">
           {problems.map((problem, index) => (

@@ -1,7 +1,6 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Stars } from 'lucide-react'
 import { Button } from '@/components/ui'
 
 type HeroSectionProps = {
@@ -29,28 +28,23 @@ export function HeroSection({
         transition={{ duration: 0.6 }}
         className="w-full max-w-md text-center"
       >
-        <div className="mb-12">
+        <div className="mb-10">
           <div
-            className="inline-flex items-center gap-2 rounded-full border bg-white px-3 py-1.5 text-[11px] font-semibold shadow-sm"
+            className="inline-flex items-center gap-2 rounded-full border bg-white px-3 py-1.5 text-[11px] font-semibold shadow-sm mb-6"
             style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-secondary)' }}
           >
-            <Stars size={12} style={{ color: 'var(--color-accent-brand)' }} />
-            Live it, Prove It
+            사람과의 만남에서 맥락이 먼저다
           </div>
-          <h1 className="mt-6 text-2xl tracking-tight text-[var(--color-text-strong)]">Byro</h1>
+
+          <h1 className="text-[42px] leading-[1.15] tracking-tight text-[var(--color-text-strong)] mb-4">
+            프로필 하나로<br />첫 만남이 달라진다
+          </h1>
+
+          <p className="text-base leading-relaxed text-[var(--color-text-secondary)] max-w-sm mx-auto">
+            커리어, 라이프스타일, 평판을 한 링크에 담아—<br />
+            열어보는 순간 할 말이 생깁니다
+          </p>
         </div>
-
-        <h2 className="text-5xl tracking-tight mb-4 text-[var(--color-text-strong)]">
-          Live it, Prove It
-        </h2>
-
-        <p className="text-xl mb-6 text-[var(--color-text-primary)]">
-          설명하기 전에, 먼저 증명되는 프로필
-        </p>
-
-        <p className="text-sm leading-relaxed mb-10 text-[var(--color-text-secondary)] max-w-sm mx-auto">
-          하나의 링크로 정체성, 검증된 하이라이트, 평판, SNS, 자기소개를 정리해 오프라인 비즈니스 네트워킹에 활용할 수 있는 프로필 서비스
-        </p>
 
         <div className="flex flex-col gap-3 mb-12">
           <Button
@@ -75,18 +69,12 @@ export function HeroSection({
               샘플 프로필 보기
             </button>
           )}
-          {!isLoggedIn && (
-            <div className="text-xs text-[var(--color-text-tertiary)]">
-              샘플 프로필은 실제 기능이 아니라 플로우 검증용 화면이에요.
-            </div>
-          )}
         </div>
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="relative"
         >
           <div
             className="rounded-[2rem] p-4 shadow-2xl max-w-[320px] mx-auto"
@@ -95,53 +83,48 @@ export function HeroSection({
               border: '1px solid var(--color-border-default)',
             }}
           >
-            <div className="surface-card rounded-[1.5rem] p-6 shadow-inner">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full bg-[var(--color-accent-dark)]" />
-                <div className="flex-1 text-left">
-                  <div className="text-sm text-[var(--color-text-strong)]">김지원</div>
-                  <div className="text-xs text-[var(--color-text-secondary)]">Product Designer</div>
+            <div className="surface-card rounded-[1.5rem] p-5 shadow-inner">
+              <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--color-accent-dark)] mb-3">
+                Kemi Glow
+              </div>
+
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-8 h-8 rounded-full bg-[var(--color-accent-dark)]" />
+                  <div className="text-xs text-[var(--color-text-strong)]">나</div>
+                </div>
+                <div className="flex-1 h-px bg-[var(--color-border-soft)]" />
+                <div className="text-[10px] text-[var(--color-accent-dark)] font-semibold px-2 py-0.5 rounded-full bg-[var(--color-accent-soft)]">
+                  공통점 3개
+                </div>
+                <div className="flex-1 h-px bg-[var(--color-border-soft)]" />
+                <div className="flex items-center gap-1.5">
+                  <div className="text-xs text-[var(--color-text-strong)]">상대</div>
+                  <div className="w-8 h-8 rounded-full bg-[var(--color-bg-muted)]" />
                 </div>
               </div>
 
-              <p className="text-xs text-[var(--color-text-primary)] mb-4 text-left leading-relaxed">
-                사용자 경험과 비즈니스 임팩트를 연결하는 디자이너입니다
-              </p>
-
-              <div className="space-y-2 mb-4">
-                <div className="bg-[var(--color-accent-soft)] rounded-xl p-3 text-left">
-                  <div className="text-[10px] text-[var(--color-accent-dark)] mb-1">커리어 지속성</div>
-                  <div className="text-xs text-[var(--color-text-primary)]">평균 대비 128% 장기 재직</div>
-                </div>
-                <div className="bg-[var(--color-state-info-bg)] rounded-xl p-3 text-left">
-                  <div className="text-[10px] text-[var(--color-state-info-text)] mb-1">글로벌 활동</div>
-                  <div className="text-xs text-[var(--color-text-primary)]">국제 프로젝트 다수 참여</div>
-                </div>
+              <div className="space-y-2">
+                {[
+                  { label: '출신 학교', value: '연세대학교' },
+                  { label: '거주지', value: '마포구' },
+                  { label: 'MBTI', value: 'ENTJ' },
+                ].map((item) => (
+                  <div
+                    key={item.label}
+                    className="flex items-center justify-between rounded-xl px-3 py-2"
+                    style={{ backgroundColor: 'var(--color-accent-soft)' }}
+                  >
+                    <span className="text-[11px] text-[var(--color-text-tertiary)]">{item.label}</span>
+                    <span className="text-[12px] font-semibold text-[var(--color-accent-dark)]">{item.value}</span>
+                  </div>
+                ))}
               </div>
 
-              <div className="flex flex-wrap gap-1.5 mb-4">
-                <span
-                  className="text-[10px] px-2 py-1 rounded-full"
-                  style={{ backgroundColor: 'var(--color-bg-muted)', color: 'var(--color-text-primary)' }}
-                >
-                  신뢰할 수 있는
-                </span>
-                <span
-                  className="text-[10px] px-2 py-1 rounded-full"
-                  style={{ backgroundColor: 'var(--color-bg-muted)', color: 'var(--color-text-primary)' }}
-                >
-                  통찰력 있는
-                </span>
-                <span
-                  className="text-[10px] px-2 py-1 rounded-full"
-                  style={{ backgroundColor: 'var(--color-bg-muted)', color: 'var(--color-text-primary)' }}
-                >
-                  전문적인
-                </span>
-              </div>
-
-              <div className="rounded-xl p-3 text-left" style={{ backgroundColor: 'var(--color-bg-soft)' }}>
-                <p className="text-[10px] text-[var(--color-text-secondary)] italic">&quot;함께 일하고 싶은 사람이에요&quot;</p>
+              <div className="mt-4 rounded-xl p-3" style={{ backgroundColor: 'var(--color-bg-soft)' }}>
+                <p className="text-[11px] text-[var(--color-text-secondary)] leading-relaxed">
+                  "저 혹시 연대 나오셨어요?" — 한 줄이면 된다
+                </p>
               </div>
             </div>
           </div>

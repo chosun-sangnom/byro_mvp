@@ -15,8 +15,6 @@ export const SAMPLE_PROFILE = {
   profileImages: [
     '/images/MK_img.jpeg',
     '/images/mk-photo-2.jpg',
-    '/images/mk-photo-3.jpg',
-    '/images/mk-photo-4.jpg',
   ],
   headline: '커뮤니티 기반 성장을 설계하는 B2B SaaS 빌더',
   school: 'KAIST 경영학과 졸업',
@@ -249,8 +247,6 @@ export const MK_PROFILE = {
   profileImages: [
     '/images/MK_img.jpeg',
     '/images/mk-photo-2.jpg',
-    '/images/mk-photo-3.jpg',
-    '/images/mk-photo-4.jpg',
   ],
   headline: 'Entrepreneur, Writer, Connector',
   school: '',

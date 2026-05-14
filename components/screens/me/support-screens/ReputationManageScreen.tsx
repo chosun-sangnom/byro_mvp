@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+import { Trash2 } from 'lucide-react'
 import { NavBar } from '@/components/ui'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mocks/publicProfiles'
@@ -17,7 +19,12 @@ export function ReputationManageScreen({
   const getReputationCount = (keyword: string) =>
     SAMPLE_PROFILE.reputationKeywords.find((item) => item.keyword === keyword)?.count ?? 0
 
-  const guestbook = SAMPLE_PROFILE.guestbook
+  const [deletedIds, setDeletedIds] = useState<string[]>([])
+  const [expanded, setExpanded] = useState(false)
+
+  const allEntries = SAMPLE_PROFILE.guestbook.filter((e) => !deletedIds.includes(e.id))
+  const displayedEntries = expanded ? allEntries : allEntries.slice(0, 3)
+  const hasMore = allEntries.length > 3 && !expanded
 
   return (
     <div className="flex flex-col h-full">
@@ -37,7 +44,7 @@ export function ReputationManageScreen({
               키워드 누적 {totalReputationCount}회
             </span>
             <span className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
-              피드백 {guestbook.length}개
+              피드백 {allEntries.length}개
             </span>
             {topKeywords.slice(0, 3).map((item) => (
               <span key={item.keyword} className="chip-metric">
@@ -81,37 +88,57 @@ export function ReputationManageScreen({
         {/* 받은 피드백 */}
         <div>
           <div className="mb-3 text-[13px] font-bold text-[var(--color-text-primary)]">받은 피드백</div>
-          {guestbook.length === 0 ? (
+          {allEntries.length === 0 ? (
             <div className="rounded-2xl border border-[var(--color-border-soft)] px-4 py-6 text-center text-[12px] text-[var(--color-text-tertiary)]">
               아직 받은 피드백이 없어요
             </div>
           ) : (
-            <div className="rounded-2xl border border-[var(--color-border-soft)] divide-y divide-[var(--color-border-soft)] overflow-hidden">
-              {guestbook.map((entry) => {
-                const avatar = getProfileAvatar(entry.linkId)
-                return (
-                  <div key={entry.id} className="flex gap-3 px-4 py-3.5">
-                    {avatar ? (
-                      <div className="mt-0.5 h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-[var(--color-bg-soft)]">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={avatar} alt={entry.authorName} className="h-full w-full object-cover" />
+            <>
+              <div className="divide-y divide-[var(--color-border-soft)]">
+                {displayedEntries.map((entry) => {
+                  const avatar = getProfileAvatar(entry.linkId)
+                  return (
+                    <div key={entry.id} className="flex gap-3 py-3.5 first:pt-0">
+                      {avatar ? (
+                        <div className="mt-0.5 h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-[var(--color-bg-soft)]">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={avatar} alt={entry.authorName} className="h-full w-full object-cover" />
+                        </div>
+                      ) : (
+                        <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-xs font-bold text-[var(--color-text-secondary)]">
+                          {entry.authorName.charAt(0)}
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="text-[12px] font-semibold text-[var(--color-text-primary)]">{entry.authorName}</div>
+                          <div className="flex items-center gap-2">
+                            <div className="text-[10px] text-[var(--color-text-tertiary)]">{entry.date}</div>
+                            <button
+                              onClick={() => setDeletedIds((prev) => [...prev, entry.id])}
+                              className="flex h-6 w-6 items-center justify-center rounded-full text-[var(--color-text-tertiary)] opacity-40 active:opacity-100 transition-opacity"
+                              aria-label="삭제"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
+                        </div>
+                        <div className="mt-1 text-[13px] leading-snug text-[var(--color-text-secondary)]">{entry.message}</div>
                       </div>
-                    ) : (
-                      <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-xs font-bold text-[var(--color-text-secondary)]">
-                        {entry.authorName.charAt(0)}
-                      </div>
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="text-[12px] font-semibold text-[var(--color-text-primary)]">{entry.authorName}</div>
-                        <div className="text-[10px] text-[var(--color-text-tertiary)]">{entry.date}</div>
-                      </div>
-                      <div className="mt-1 text-[13px] leading-snug text-[var(--color-text-secondary)]">{entry.message}</div>
                     </div>
-                  </div>
-                )
-              })}
-            </div>
+                  )
+                })}
+              </div>
+
+              {hasMore && (
+                <button
+                  onClick={() => setExpanded(true)}
+                  className="mt-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-secondary)]"
+                >
+                  더보기
+                </button>
+              )}
+            </>
           )}
         </div>
 

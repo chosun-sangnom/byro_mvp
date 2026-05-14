@@ -58,7 +58,7 @@ function PhotoSlot({
       onClick={onClick}
       className={[
         'group relative overflow-hidden rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)]',
-        compact ? 'aspect-square' : 'aspect-[1.08/1.28] w-full',
+        'aspect-[1.08/1.28] w-full',
       ].join(' ')}
     >
       {image ? (
@@ -321,7 +321,7 @@ export function BasicInfoEditScreen({
               onChange={handleSubPhotoFileChange}
             />
 
-            <div className="mt-4 grid grid-cols-[minmax(0,1fr)_104px] gap-3">
+            <div className="mt-4 grid grid-cols-[minmax(0,1fr)_86px] gap-3">
               <PhotoSlot
                 image={profileImages[0]}
                 label="메인"

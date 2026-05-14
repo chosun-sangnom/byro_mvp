@@ -12,10 +12,7 @@ export const SAMPLE_PROFILE = {
   title: 'B2B SaaS Product Owner · 스타트업 공동창업자',
   avatarColor: '#DCC5B6',
   avatarImage: '',
-  profileImages: [
-    '/images/MK_img.jpeg',
-    '/images/mk-photo-2.jpg',
-  ],
+  profileImages: [],
   headline: '커뮤니티 기반 성장을 설계하는 B2B SaaS 빌더',
   school: 'KAIST 경영학과 졸업',
   bio: 'B2B SaaS 분야에서 5년간 Product Owner로 활동해 온 강민준입니다. 파트너십을 통해 성장을 만들어가는 것을 즐깁니다.',

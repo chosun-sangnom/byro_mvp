@@ -21,6 +21,12 @@ body {
   user-select: none;
 }
 
+/* Music playing bar animation */
+@keyframes musicBar {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+
 /* Hide scrollbar but allow scrolling */
 .scrollbar-hide {
   -ms-overflow-style: none;

@@ -162,6 +162,8 @@ export interface LifeMediaItem {
   sublabel?: string
   // TODO(real API): posterUrl from TMDB (movies/books), Spotify (music), Kakao Maps / Google Places (restaurants/cafes)
   posterUrl?: string
+  // TODO(real API): Spotify 30s preview URL
+  previewUrl?: string
 }
 
 export interface KemiMatchItem {

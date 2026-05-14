@@ -54,9 +54,9 @@ export const SAMPLE_PROFILE = {
       ],
       // TODO(real API): posterUrl from Spotify API — i.scdn.co album art URL
       music: [
-        { label: 'Tomboy', sublabel: '혁오', posterUrl: 'https://picsum.photos/seed/tomboy_hyukoh/80/80' },
-        { label: 'Everything', sublabel: '검정치마', posterUrl: 'https://picsum.photos/seed/blackskirts/80/80' },
-        { label: 'Replay', sublabel: '김동률', posterUrl: 'https://picsum.photos/seed/kimdongryul/80/80' },
+        { label: 'Tomboy', sublabel: '혁오', posterUrl: 'https://picsum.photos/seed/tomboy_hyukoh/80/80', previewUrl: 'https://p.scdn.co/mp3-preview/e195d59e5dc7869fa3657f58e35748c3e48b7e3f' },
+        { label: 'Everything', sublabel: '검정치마', posterUrl: 'https://picsum.photos/seed/blackskirts/80/80', previewUrl: 'https://p.scdn.co/mp3-preview/5b1b3a88c94516e3b1e25a0de7f0dd17e89c7c9f' },
+        { label: 'Replay', sublabel: '김동률', posterUrl: 'https://picsum.photos/seed/kimdongryul/80/80', previewUrl: 'https://p.scdn.co/mp3-preview/e30a8d1f9285c5e30a8d1f9285c5e300' },
       ],
       // TODO(real API): posterUrl from 알라딘 API — cover image URL
       books: [

@@ -56,10 +56,7 @@ function PhotoSlot({
     <button
       type="button"
       onClick={onClick}
-      className={[
-        'group relative overflow-hidden rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)]',
-        'aspect-[1.08/1.28] w-full',
-      ].join(' ')}
+      className="group relative h-full w-full overflow-hidden rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)]"
     >
       {image ? (
         <>
@@ -321,13 +318,13 @@ export function BasicInfoEditScreen({
               onChange={handleSubPhotoFileChange}
             />
 
-            <div className="mt-4 grid grid-cols-[minmax(0,1fr)_86px] gap-3">
+            <div className="mt-4 grid h-[336px] grid-cols-[minmax(0,1fr)_86px] items-stretch gap-3">
               <PhotoSlot
                 image={profileImages[0]}
                 label="메인"
                 onClick={() => mainPhotoInputRef.current?.click()}
               />
-              <div className="grid grid-rows-3 gap-3">
+              <div className="grid h-full grid-rows-3 gap-3">
                 {[1, 2, 3].map((index) => (
                   <PhotoSlot
                     key={index}

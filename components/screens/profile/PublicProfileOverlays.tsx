@@ -166,7 +166,7 @@ export function ExperienceDoneModal({
               </div>
             </div>
             <div className="space-y-2">
-              <Button onClick={onRequestExperience}>{profileName} 님에게 경험 요청하기</Button>
+              <Button onClick={onRequestExperience}>경험 요청 보내기</Button>
               <Button variant="outline" onClick={onClose}>프로필로 돌아가기</Button>
             </div>
           </>
@@ -181,7 +181,7 @@ export function ExperienceDoneModal({
             <div className="space-y-2">
               <Button onClick={onCreateByro}>내 Byro 만들기</Button>
               <Button variant="outline" onClick={onLogin}>로그인하기</Button>
-              <Button variant="ghost" onClick={onClose}>{profileName} 님 프로필로 돌아가기</Button>
+              <Button variant="ghost" onClick={onClose}>프로필로 돌아가기</Button>
             </div>
           </>
         )}

@@ -226,7 +226,7 @@ export function PublicProfileShell({
           <div className="mb-4 flex gap-3">
             <button
               onClick={() => setFeedbackRequestOpen(true)}
-              className="flex-1 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)]"
+              className="flex-1 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)] whitespace-nowrap"
             >
               피드백 요청
             </button>
@@ -235,7 +235,7 @@ export function PublicProfileShell({
                 if (alreadySubmitted) { showToast('이미 경험을 남겼어요'); return }
                 setExpSheetOpen(true)
               }}
-              className="flex-1 rounded-full py-3 text-[13px] font-semibold"
+              className="flex-1 rounded-full py-3 text-[13px] font-semibold whitespace-nowrap"
               style={alreadySubmitted
                 ? { border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)' }
                 : { background: 'linear-gradient(135deg,var(--color-accent-light) 0%,var(--color-accent-dark) 100%)', color: '#fff', boxShadow: '0 10px 24px var(--color-accent-glow)' }}
@@ -250,14 +250,14 @@ export function PublicProfileShell({
           <div className="mb-4 flex gap-3">
             <button
               onClick={onOwnerEdit ?? (() => router.push('/me'))}
-              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-[var(--color-accent-dark)] bg-[var(--color-accent-bg-subtle)] py-3 text-[13px] font-semibold text-[var(--color-accent-dark)]"
+              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-[var(--color-accent-dark)] bg-[var(--color-accent-bg-subtle)] py-3 text-[13px] font-semibold text-[var(--color-accent-dark)] whitespace-nowrap"
             >
               <Pencil size={14} />
               편집
             </button>
             <button
               onClick={onOwnerManageConnections ?? (() => showToast('연결 관리를 준비 중이에요'))}
-              className="flex flex-1 items-center justify-center rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)]"
+              className="flex flex-1 items-center justify-center rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)] whitespace-nowrap"
             >
               연결 관리
             </button>
@@ -265,7 +265,7 @@ export function PublicProfileShell({
         ) : (
           <button
             onClick={() => setConnectionRequestOpen(true)}
-            className="mb-4 w-full rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)]"
+            className="mb-4 w-full rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)] whitespace-nowrap"
           >
             연결 요청
           </button>
@@ -375,7 +375,7 @@ export function PublicProfileShell({
                 setFeedbackMessage('')
                 showToast('피드백 요청을 보냈어요')
               }}
-              className="w-full rounded-full py-3.5 text-[14px] font-semibold text-white"
+              className="w-full rounded-full py-3.5 text-[14px] font-semibold text-white whitespace-nowrap"
               style={{ backgroundColor: 'var(--color-accent-dark)' }}
             >
               요청 보내기
@@ -413,7 +413,7 @@ export function PublicProfileShell({
                 setConnectionMessage('')
                 showToast('연결 요청을 보냈어요')
               }}
-              className="w-full rounded-full py-3.5 text-[14px] font-semibold text-white"
+              className="w-full rounded-full py-3.5 text-[14px] font-semibold text-white whitespace-nowrap"
               style={{ backgroundColor: 'var(--color-accent-dark)' }}
             >
               요청 보내기

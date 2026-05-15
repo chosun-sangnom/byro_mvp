@@ -53,7 +53,7 @@ function buildVibeItems(life: PublicProfileLife): VibeItem[] {
   // 이미지 있는 항목 우선
   rest.sort((a, b) => (b.posterUrl ? 1 : 0) - (a.posterUrl ? 1 : 0))
 
-  return [...petItems, ...rest].slice(0, 8)
+  return [...petItems, ...rest].slice(0, 7)
 }
 
 function getItemId(item: LifeMediaItem) {
@@ -78,13 +78,11 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 function VibeCard({
   item,
-  aspectClass,
   playingId,
   isPlaying,
   onMusicToggle,
 }: {
   item: VibeItem
-  aspectClass: string
   playingId: string | null
   isPlaying: boolean
   onMusicToggle: (item: LifeMediaItem) => void
@@ -94,7 +92,8 @@ function VibeCard({
   const color = CATEGORY_COLORS[item.category] ?? 'var(--color-accent-dark)'
 
   const inner = (
-    <div className={`relative w-full overflow-hidden rounded-2xl ${aspectClass}`}>
+    // 카드가 그리드 셀을 꽉 채우도록 h-full w-full 사용
+    <div className="relative h-full w-full overflow-hidden rounded-xl">
       {item.posterUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -103,16 +102,11 @@ function VibeCard({
           className="absolute inset-0 h-full w-full object-cover"
         />
       ) : (
-        <div
-          className="absolute inset-0"
-          style={{ backgroundColor: `${color}18` }}
-        />
+        <div className="absolute inset-0" style={{ backgroundColor: `${color}18` }} />
       )}
 
-      {/* gradient overlay for readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
-      {/* category badge */}
       <div
         className="absolute left-2 top-2 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white"
         style={{ backgroundColor: `${color}CC` }}
@@ -120,7 +114,6 @@ function VibeCard({
         {item.category}
       </div>
 
-      {/* music play overlay */}
       {item.isMusic && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div
@@ -139,11 +132,7 @@ function VibeCard({
                 <div
                   key={i}
                   className="w-[3px] rounded-full bg-white"
-                  style={{
-                    height: 10,
-                    animation: 'musicBar 0.8s ease-in-out infinite',
-                    animationDelay: `${i * 0.15}s`,
-                  }}
+                  style={{ height: 10, animation: 'musicBar 0.8s ease-in-out infinite', animationDelay: `${i * 0.15}s` }}
                 />
               ))}
             </div>
@@ -151,7 +140,6 @@ function VibeCard({
         </div>
       )}
 
-      {/* label */}
       <div className="absolute bottom-0 left-0 right-0 p-2.5">
         <p className="truncate text-[12px] font-semibold leading-tight text-white drop-shadow">
           {item.label}
@@ -165,32 +153,13 @@ function VibeCard({
 
   if (item.isMusic) {
     return (
-      <button className="w-full text-left" onClick={() => onMusicToggle(item)}>
+      <button className="h-full w-full text-left" onClick={() => onMusicToggle(item)}>
         {inner}
       </button>
     )
   }
 
-  return <div>{inner}</div>
-}
-
-type CardSlot = { item: VibeItem; colSpan: 1 | 2; aspectClass: string }
-
-function buildCardSlots(items: VibeItem[]): CardSlot[] {
-  const slots: CardSlot[] = []
-  // Row 1: portrait(1col 2:3) + landscape(2col 4:3) — 수학적으로 높이 동일
-  // Row 2: square × 3
-  // Row 3: portrait(1col 2:3, pet과 동일 크기) + square × 2
-  const [r0, r1, r2, r3, r4, r5, r6, r7] = items
-  if (r0) slots.push({ item: r0, colSpan: 1, aspectClass: 'aspect-[2/3]' })
-  if (r1) slots.push({ item: r1, colSpan: 2, aspectClass: 'aspect-[4/3]' })
-  if (r2) slots.push({ item: r2, colSpan: 1, aspectClass: 'aspect-square' })
-  if (r3) slots.push({ item: r3, colSpan: 1, aspectClass: 'aspect-square' })
-  if (r4) slots.push({ item: r4, colSpan: 1, aspectClass: 'aspect-square' })
-  if (r5) slots.push({ item: r5, colSpan: 1, aspectClass: 'aspect-[2/3]' })
-  if (r6) slots.push({ item: r6, colSpan: 1, aspectClass: 'aspect-square' })
-  if (r7) slots.push({ item: r7, colSpan: 1, aspectClass: 'aspect-square' })
-  return slots
+  return <div className="h-full">{inner}</div>
 }
 
 function VibeBoard({
@@ -206,22 +175,24 @@ function VibeBoard({
 }) {
   if (items.length === 0) return null
 
-  const slots = buildCardSlots(items)
+  const [a, b, c, d, e, f, g] = items
 
+  // 3×3 그리드에 aspect-ratio 1:1 + gridTemplateRows repeat(3,1fr) 적용 시
+  // 전체 콜라주가 정방형이 됨
+  // 배치: [A row-span-2][B col-span-2] / [C][D] / [E][F][G]
   return (
-    <div className="px-5 pt-4 pb-2">
-      <div className="grid grid-cols-3 items-start gap-2">
-        {slots.map(({ item, colSpan, aspectClass }) => (
-          <div key={getItemId(item) + item.category} className={colSpan === 2 ? 'col-span-2' : 'col-span-1'}>
-            <VibeCard
-              item={item}
-              aspectClass={aspectClass}
-              playingId={playingId}
-              isPlaying={isPlaying}
-              onMusicToggle={onMusicToggle}
-            />
-          </div>
-        ))}
+    <div className="px-4 pt-4 pb-2">
+      <div
+        className="grid w-full grid-cols-3 gap-1.5"
+        style={{ aspectRatio: '1/1', gridTemplateRows: 'repeat(3, 1fr)' }}
+      >
+        {a && <div className="row-span-2"><VibeCard item={a} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
+        {b && <div className="col-span-2"><VibeCard item={b} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
+        {c && <div><VibeCard item={c} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
+        {d && <div><VibeCard item={d} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
+        {e && <div><VibeCard item={e} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
+        {f && <div><VibeCard item={f} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
+        {g && <div><VibeCard item={g} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
       </div>
     </div>
   )

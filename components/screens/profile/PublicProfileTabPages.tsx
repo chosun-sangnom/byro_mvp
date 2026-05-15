@@ -149,7 +149,7 @@ export function PublicProfileLifeTabPage({
   username: string
 }) {
   const { profile } = usePublicProfileTabData(username)
-  return <PublicProfileLifeSection life={profile.life} />
+  return <PublicProfileLifeSection life={profile.life} hideDetailLists={username === 'mk'} />
 }
 
 export function PublicProfileReputationTabPage({

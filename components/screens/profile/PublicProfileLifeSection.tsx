@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { Pause, PawPrint, Play, X } from 'lucide-react'
+import { Pause, Play, X } from 'lucide-react'
 import type { LifeMediaItem, PublicProfileLife } from '@/types'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -17,6 +17,20 @@ type VibeItem = LifeMediaItem & {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function buildVibeItems(life: PublicProfileLife): VibeItem[] {
+  const result: VibeItem[] = []
+
+  const pet = life.daily.pet
+  if (pet && pet !== '없음') {
+    result.push({
+      label: life.daily.petName ?? pet,
+      sublabel: life.daily.petName ? pet : undefined,
+      posterUrl: life.daily.petImage,
+      category: '반려동물',
+      aspectType: 'square',
+      isMusic: false,
+    })
+  }
+
   const sources: [LifeMediaItem[], string, AspectType, boolean][] = [
     [life.tastes.movies, '영화', 'portrait', false],
     [life.tastes.music, '음악', 'square', true],
@@ -29,7 +43,6 @@ function buildVibeItems(life: PublicProfileLife): VibeItem[] {
     [life.places.travelDestinations, '여행지', 'place', false],
   ]
 
-  const result: VibeItem[] = []
   const maxLen = Math.max(...sources.map(([arr]) => arr.length), 0)
 
   for (let i = 0; i < maxLen; i++) {
@@ -61,6 +74,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   맛집: '#EC4899',
   카페: '#92400E',
   여행지: '#0D9488',
+  반려동물: '#FB923C',
 }
 
 // ─── Vibe Board ───────────────────────────────────────────────────────────────
@@ -439,33 +453,6 @@ function MiniPlayer({
   )
 }
 
-// ─── Pet card ─────────────────────────────────────────────────────────────────
-
-function PetCard({ pet, petName, petImage }: { pet: string; petName?: string; petImage?: string }) {
-  return (
-    <div className="mx-5 mt-4 mb-2 rounded-[22px] border border-[var(--color-border-soft)] bg-[var(--color-bg-soft)] px-4 py-4">
-      <div className="flex items-center gap-3">
-        {petImage ? (
-          <div className="h-[76px] w-[76px] shrink-0 overflow-hidden rounded-[18px] border border-[var(--color-border-soft)]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={petImage} alt={`${petName ?? pet} 사진`} className="h-full w-full object-cover" />
-          </div>
-        ) : (
-          <div className="flex h-[64px] w-[64px] shrink-0 items-center justify-center rounded-[18px] border border-[var(--color-border-soft)] bg-[var(--color-bg-muted)]">
-            <PawPrint size={24} className="text-[var(--color-text-secondary)]" />
-          </div>
-        )}
-        <div className="min-w-0">
-          <div className="text-[10px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">반려동물</div>
-          <div className="mt-1 text-[17px] font-semibold text-[var(--color-text-primary)]">
-            {petName ? `${pet} · ${petName}` : pet}
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife }) {
@@ -477,8 +464,6 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
 
   if (!life) return null
 
-  const pet = life.daily.pet
-  const hasPet = Boolean(pet && pet !== '없음')
   const exercise = life.daily.exercise ?? []
   const teams = life.tastes.teams ?? []
   const hasActivity = exercise.length > 0 || teams.length > 0
@@ -530,10 +515,6 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
         }}
         onEnded={() => { setIsPlaying(false); setProgress(1) }}
       />
-
-      {hasPet && (
-        <PetCard pet={pet ?? ''} petName={life.daily.petName} petImage={life.daily.petImage} />
-      )}
 
       <VibeBoard
         items={vibeItems}

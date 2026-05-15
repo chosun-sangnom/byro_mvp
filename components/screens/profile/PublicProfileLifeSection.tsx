@@ -58,11 +58,6 @@ function getItemId(item: LifeMediaItem) {
   return item.label + (item.sublabel ?? '')
 }
 
-const ASPECT_CLASS: Record<AspectType, string> = {
-  portrait: 'aspect-[2/3]',
-  square: 'aspect-square',
-  place: 'aspect-[4/3]',
-}
 
 const CATEGORY_COLORS: Record<string, string> = {
   영화: '#3B82F6',

@@ -53,7 +53,7 @@ function buildVibeItems(life: PublicProfileLife): VibeItem[] {
   // 이미지 있는 항목 우선
   rest.sort((a, b) => (b.posterUrl ? 1 : 0) - (a.posterUrl ? 1 : 0))
 
-  return [...petItems, ...rest].slice(0, 5)
+  return [...petItems, ...rest].slice(0, 8)
 }
 
 function getItemId(item: LifeMediaItem) {
@@ -178,30 +178,18 @@ type CardSlot = { item: VibeItem; colSpan: 1 | 2; aspectClass: string }
 
 function buildCardSlots(items: VibeItem[]): CardSlot[] {
   const slots: CardSlot[] = []
-  const GROUP = 5
-
-  for (let g = 0; g < items.length; g += GROUP) {
-    const group = items.slice(g, g + GROUP)
-    const isOdd = Math.floor(g / GROUP) % 2 === 1
-
-    if (group.length >= 2) {
-      const [first, second, ...rest] = group
-      // 4:3 큰 카드 + 2:3 세로 카드는 3열 그리드에서 높이가 수학적으로 동일
-      if (isOdd) {
-        slots.push({ item: second, colSpan: 1, aspectClass: 'aspect-[2/3]' })
-        slots.push({ item: first,  colSpan: 2, aspectClass: 'aspect-[4/3]' })
-      } else {
-        slots.push({ item: first,  colSpan: 2, aspectClass: 'aspect-[4/3]' })
-        slots.push({ item: second, colSpan: 1, aspectClass: 'aspect-[2/3]' })
-      }
-      for (const item of rest) {
-        slots.push({ item, colSpan: 1, aspectClass: 'aspect-square' })
-      }
-    } else {
-      slots.push({ item: group[0], colSpan: 2, aspectClass: 'aspect-[4/3]' })
-    }
-  }
-
+  // Row 1: portrait(1col 2:3) + landscape(2col 4:3) — 수학적으로 높이 동일
+  // Row 2: square × 3
+  // Row 3: portrait(1col 2:3, pet과 동일 크기) + square × 2
+  const [r0, r1, r2, r3, r4, r5, r6, r7] = items
+  if (r0) slots.push({ item: r0, colSpan: 1, aspectClass: 'aspect-[2/3]' })
+  if (r1) slots.push({ item: r1, colSpan: 2, aspectClass: 'aspect-[4/3]' })
+  if (r2) slots.push({ item: r2, colSpan: 1, aspectClass: 'aspect-square' })
+  if (r3) slots.push({ item: r3, colSpan: 1, aspectClass: 'aspect-square' })
+  if (r4) slots.push({ item: r4, colSpan: 1, aspectClass: 'aspect-square' })
+  if (r5) slots.push({ item: r5, colSpan: 1, aspectClass: 'aspect-[2/3]' })
+  if (r6) slots.push({ item: r6, colSpan: 1, aspectClass: 'aspect-square' })
+  if (r7) slots.push({ item: r7, colSpan: 1, aspectClass: 'aspect-square' })
   return slots
 }
 
@@ -222,7 +210,7 @@ function VibeBoard({
 
   return (
     <div className="px-5 pt-4 pb-2">
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 items-start gap-2">
         {slots.map(({ item, colSpan, aspectClass }) => (
           <div key={getItemId(item) + item.category} className={colSpan === 2 ? 'col-span-2' : 'col-span-1'}>
             <VibeCard

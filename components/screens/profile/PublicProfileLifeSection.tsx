@@ -81,11 +81,13 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 function VibeCard({
   item,
+  isBig = false,
   playingId,
   isPlaying,
   onMusicToggle,
 }: {
   item: VibeItem
+  isBig?: boolean
   playingId: string | null
   isPlaying: boolean
   onMusicToggle: (item: LifeMediaItem) => void
@@ -93,9 +95,10 @@ function VibeCard({
   const id = getItemId(item)
   const active = item.isMusic && playingId === id
   const color = CATEGORY_COLORS[item.category] ?? 'var(--color-accent-dark)'
+  const aspectClass = isBig ? 'aspect-[4/3]' : ASPECT_CLASS[item.aspectType]
 
   const inner = (
-    <div className={`relative w-full overflow-hidden rounded-2xl ${ASPECT_CLASS[item.aspectType]}`}>
+    <div className={`relative w-full overflow-hidden rounded-2xl ${aspectClass}`}>
       {item.posterUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -191,16 +194,20 @@ function VibeBoard({
   return (
     <div className="px-5 pt-4 pb-2">
       <div className="grid grid-cols-3 gap-2">
-        {items.map((item, i) => (
-          <div key={getItemId(item) + item.category} className={i % 5 === 0 ? 'col-span-2' : 'col-span-1'}>
-            <VibeCard
-              item={item}
-              playingId={playingId}
-              isPlaying={isPlaying}
-              onMusicToggle={onMusicToggle}
-            />
-          </div>
-        ))}
+        {items.map((item, i) => {
+          const isBig = i % 5 === 0
+          return (
+            <div key={getItemId(item) + item.category} className={isBig ? 'col-span-2' : 'col-span-1'}>
+              <VibeCard
+                item={item}
+                isBig={isBig}
+                playingId={playingId}
+                isPlaying={isPlaying}
+                onMusicToggle={onMusicToggle}
+              />
+            </div>
+          )
+        })}
       </div>
     </div>
   )

@@ -486,13 +486,7 @@ function MiniPlayer({
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-export function PublicProfileLifeSection({
-  life,
-  hideDetailLists = false,
-}: {
-  life?: PublicProfileLife
-  hideDetailLists?: boolean
-}) {
+export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playingId, setPlayingId] = useState<string | null>(null)
   const [playingTrack, setPlayingTrack] = useState<LifeMediaItem | null>(null)
@@ -560,80 +554,76 @@ export function PublicProfileLifeSection({
         onMusicToggle={handleMusicToggle}
       />
 
-      {!hideDetailLists && (
+      {(hasActivity || hasCulture || hasPlace) && <SectionDivider />}
+
+      {hasActivity && (
         <>
-          {(hasActivity || hasCulture || hasPlace) && <SectionDivider />}
-
-          {hasActivity && (
-            <>
-              <BlockHeader label="활동" />
-              {exercise.length > 0 && (
-                <div className="mb-4">
-                  <SubHeader label="운동" />
-                  <SquareScroll items={exercise} />
-                </div>
-              )}
-              {teams.length > 0 && (
-                <div>
-                  <SubHeader label="스포츠팀" />
-                  <SquareScroll items={teams} />
-                </div>
-              )}
-            </>
+          <BlockHeader label="활동" />
+          {exercise.length > 0 && (
+            <div className="mb-4">
+              <SubHeader label="운동" />
+              <SquareScroll items={exercise} />
+            </div>
           )}
-
-          {hasCulture && (
-            <>
-              <BlockHeader label="문화" />
-              {life.tastes.movies.length > 0 && (
-                <div className="mb-4">
-                  <SubHeader label="영화" />
-                  <PortraitScroll items={life.tastes.movies} />
-                </div>
-              )}
-              {life.tastes.music.length > 0 && (
-                <div className="mb-4">
-                  <SubHeader label="음악" />
-                  <MusicScroll items={life.tastes.music} playingId={playingId} isPlaying={isPlaying} onToggle={handleMusicToggle} />
-                </div>
-              )}
-              {life.tastes.books.length > 0 && (
-                <div className="mb-4">
-                  <SubHeader label="책" />
-                  <PortraitScroll items={life.tastes.books} />
-                </div>
-              )}
-              {(life.tastes.plays?.length ?? 0) > 0 && (
-                <div>
-                  <SubHeader label="뮤지컬 · 연극" />
-                  <PortraitScroll items={life.tastes.plays ?? []} />
-                </div>
-              )}
-            </>
+          {teams.length > 0 && (
+            <div>
+              <SubHeader label="스포츠팀" />
+              <SquareScroll items={teams} />
+            </div>
           )}
+        </>
+      )}
 
-          {hasPlace && (
-            <>
-              <BlockHeader label="장소" />
-              {life.tastes.restaurants.length > 0 && (
-                <div className="mb-4">
-                  <SubHeader label="맛집" />
-                  <PlaceScroll items={life.tastes.restaurants} />
-                </div>
-              )}
-              {life.tastes.cafes.length > 0 && (
-                <div className="mb-4">
-                  <SubHeader label="카페" />
-                  <PlaceScroll items={life.tastes.cafes} />
-                </div>
-              )}
-              {life.places.travelDestinations.length > 0 && (
-                <div>
-                  <SubHeader label="여행지" />
-                  <PlaceScroll items={life.places.travelDestinations} />
-                </div>
-              )}
-            </>
+      {hasCulture && (
+        <>
+          <BlockHeader label="문화" />
+          {life.tastes.movies.length > 0 && (
+            <div className="mb-4">
+              <SubHeader label="영화" />
+              <PortraitScroll items={life.tastes.movies} />
+            </div>
+          )}
+          {life.tastes.music.length > 0 && (
+            <div className="mb-4">
+              <SubHeader label="음악" />
+              <MusicScroll items={life.tastes.music} playingId={playingId} isPlaying={isPlaying} onToggle={handleMusicToggle} />
+            </div>
+          )}
+          {life.tastes.books.length > 0 && (
+            <div className="mb-4">
+              <SubHeader label="책" />
+              <PortraitScroll items={life.tastes.books} />
+            </div>
+          )}
+          {(life.tastes.plays?.length ?? 0) > 0 && (
+            <div>
+              <SubHeader label="뮤지컬 · 연극" />
+              <PortraitScroll items={life.tastes.plays ?? []} />
+            </div>
+          )}
+        </>
+      )}
+
+      {hasPlace && (
+        <>
+          <BlockHeader label="장소" />
+          {life.tastes.restaurants.length > 0 && (
+            <div className="mb-4">
+              <SubHeader label="맛집" />
+              <PlaceScroll items={life.tastes.restaurants} />
+            </div>
+          )}
+          {life.tastes.cafes.length > 0 && (
+            <div className="mb-4">
+              <SubHeader label="카페" />
+              <PlaceScroll items={life.tastes.cafes} />
+            </div>
+          )}
+          {life.places.travelDestinations.length > 0 && (
+            <div>
+              <SubHeader label="여행지" />
+              <PlaceScroll items={life.places.travelDestinations} />
+            </div>
           )}
         </>
       )}

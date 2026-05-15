@@ -174,34 +174,26 @@ function VibeBoard({
 }) {
   if (items.length === 0) return null
 
-  const left = items.filter((_, i) => i % 2 === 0)
-  const right = items.filter((_, i) => i % 2 === 1)
+  const col0 = items.filter((_, i) => i % 3 === 0)
+  const col1 = items.filter((_, i) => i % 3 === 1)
+  const col2 = items.filter((_, i) => i % 3 === 2)
 
   return (
     <div className="px-5 pt-4 pb-2">
-      <div className="flex gap-2.5">
-        <div className="flex flex-1 flex-col gap-2.5">
-          {left.map((item) => (
-            <VibeCard
-              key={getItemId(item) + item.category}
-              item={item}
-              playingId={playingId}
-              isPlaying={isPlaying}
-              onMusicToggle={onMusicToggle}
-            />
-          ))}
-        </div>
-        <div className="flex flex-1 flex-col gap-2.5">
-          {right.map((item) => (
-            <VibeCard
-              key={getItemId(item) + item.category}
-              item={item}
-              playingId={playingId}
-              isPlaying={isPlaying}
-              onMusicToggle={onMusicToggle}
-            />
-          ))}
-        </div>
+      <div className="flex gap-2">
+        {[col0, col1, col2].map((col, ci) => (
+          <div key={ci} className="flex flex-1 flex-col gap-2">
+            {col.map((item) => (
+              <VibeCard
+                key={getItemId(item) + item.category}
+                item={item}
+                playingId={playingId}
+                isPlaying={isPlaying}
+                onMusicToggle={onMusicToggle}
+              />
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   )

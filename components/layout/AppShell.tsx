@@ -9,7 +9,7 @@ interface AppShellProps {
 
 export default function AppShell({ children }: AppShellProps) {
   return (
-    <div className="min-h-dvh bg-[var(--color-bg-page)]">
+    <div className="min-h-dvh overflow-x-hidden bg-[var(--color-bg-page)]">
       <div className="mx-auto w-full max-w-[430px] px-3 sm:px-5">
         <div className="relative flex min-h-dvh w-full flex-col bg-[var(--color-bg-page)]">
           <ToastSingleton>

@@ -17,11 +17,10 @@ type VibeItem = LifeMediaItem & {
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function buildVibeItems(life: PublicProfileLife): VibeItem[] {
-  const result: VibeItem[] = []
-
+  const petItems: VibeItem[] = []
   const pet = life.daily.pet
   if (pet && pet !== '없음') {
-    result.push({
+    petItems.push({
       label: life.daily.petName ?? pet,
       sublabel: life.daily.petName ? pet : undefined,
       posterUrl: life.daily.petImage,
@@ -43,15 +42,18 @@ function buildVibeItems(life: PublicProfileLife): VibeItem[] {
     [life.places.travelDestinations, '여행지', 'place', false],
   ]
 
+  const rest: VibeItem[] = []
   const maxLen = Math.max(...sources.map(([arr]) => arr.length), 0)
-
   for (let i = 0; i < maxLen; i++) {
     for (const [arr, category, aspectType, isMusic] of sources) {
-      if (arr[i]) result.push({ ...arr[i], category, aspectType, isMusic })
+      if (arr[i]) rest.push({ ...arr[i], category, aspectType, isMusic })
     }
   }
 
-  return result
+  // 이미지 있는 항목 우선
+  rest.sort((a, b) => (b.posterUrl ? 1 : 0) - (a.posterUrl ? 1 : 0))
+
+  return [...petItems, ...rest].slice(0, 5)
 }
 
 function getItemId(item: LifeMediaItem) {

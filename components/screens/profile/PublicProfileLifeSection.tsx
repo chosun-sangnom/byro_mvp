@@ -81,13 +81,13 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 function VibeCard({
   item,
-  isBig = false,
+  aspectClass,
   playingId,
   isPlaying,
   onMusicToggle,
 }: {
   item: VibeItem
-  isBig?: boolean
+  aspectClass: string
   playingId: string | null
   isPlaying: boolean
   onMusicToggle: (item: LifeMediaItem) => void
@@ -95,7 +95,6 @@ function VibeCard({
   const id = getItemId(item)
   const active = item.isMusic && playingId === id
   const color = CATEGORY_COLORS[item.category] ?? 'var(--color-accent-dark)'
-  const aspectClass = isBig ? 'aspect-[4/3]' : ASPECT_CLASS[item.aspectType]
 
   const inner = (
     <div className={`relative w-full overflow-hidden rounded-2xl ${aspectClass}`}>
@@ -178,6 +177,37 @@ function VibeCard({
   return <div>{inner}</div>
 }
 
+type CardSlot = { item: VibeItem; colSpan: 1 | 2; aspectClass: string }
+
+function buildCardSlots(items: VibeItem[]): CardSlot[] {
+  const slots: CardSlot[] = []
+  const GROUP = 5
+
+  for (let g = 0; g < items.length; g += GROUP) {
+    const group = items.slice(g, g + GROUP)
+    const isOdd = Math.floor(g / GROUP) % 2 === 1
+
+    if (group.length >= 2) {
+      const [first, second, ...rest] = group
+      // 4:3 큰 카드 + 2:3 세로 카드는 3열 그리드에서 높이가 수학적으로 동일
+      if (isOdd) {
+        slots.push({ item: second, colSpan: 1, aspectClass: 'aspect-[2/3]' })
+        slots.push({ item: first,  colSpan: 2, aspectClass: 'aspect-[4/3]' })
+      } else {
+        slots.push({ item: first,  colSpan: 2, aspectClass: 'aspect-[4/3]' })
+        slots.push({ item: second, colSpan: 1, aspectClass: 'aspect-[2/3]' })
+      }
+      for (const item of rest) {
+        slots.push({ item, colSpan: 1, aspectClass: 'aspect-square' })
+      }
+    } else {
+      slots.push({ item: group[0], colSpan: 2, aspectClass: 'aspect-[4/3]' })
+    }
+  }
+
+  return slots
+}
+
 function VibeBoard({
   items,
   playingId,
@@ -191,23 +221,22 @@ function VibeBoard({
 }) {
   if (items.length === 0) return null
 
+  const slots = buildCardSlots(items)
+
   return (
     <div className="px-5 pt-4 pb-2">
       <div className="grid grid-cols-3 gap-2">
-        {items.map((item, i) => {
-          const isBig = i % 5 === 0
-          return (
-            <div key={getItemId(item) + item.category} className={isBig ? 'col-span-2' : 'col-span-1'}>
-              <VibeCard
-                item={item}
-                isBig={isBig}
-                playingId={playingId}
-                isPlaying={isPlaying}
-                onMusicToggle={onMusicToggle}
-              />
-            </div>
-          )
-        })}
+        {slots.map(({ item, colSpan, aspectClass }) => (
+          <div key={getItemId(item) + item.category} className={colSpan === 2 ? 'col-span-2' : 'col-span-1'}>
+            <VibeCard
+              item={item}
+              aspectClass={aspectClass}
+              playingId={playingId}
+              isPlaying={isPlaying}
+              onMusicToggle={onMusicToggle}
+            />
+          </div>
+        ))}
       </div>
     </div>
   )

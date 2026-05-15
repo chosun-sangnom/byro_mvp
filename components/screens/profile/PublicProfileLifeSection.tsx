@@ -177,9 +177,10 @@ function VibeBoard({
 
   const [a, b, c, d, e, f, g] = items
 
-  // 3×3 그리드에 aspect-ratio 1:1 + gridTemplateRows repeat(3,1fr) 적용 시
-  // 전체 콜라주가 정방형이 됨
-  // 배치: [A row-span-2][B col-span-2] / [C][D] / [E][F][G]
+  // 3×3 정방형 그리드, 두 tall 카드를 엇갈리게 배치해 불규칙한 크기감 연출
+  // [A tall] [B] [C]
+  // [      ] [D] [E tall]
+  // [F    ] [G] [      ]
   return (
     <div className="px-4 pt-4 pb-2">
       <div
@@ -187,10 +188,10 @@ function VibeBoard({
         style={{ aspectRatio: '1/1', gridTemplateRows: 'repeat(3, 1fr)' }}
       >
         {a && <div className="row-span-2"><VibeCard item={a} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
-        {b && <div className="col-span-2"><VibeCard item={b} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
+        {b && <div><VibeCard item={b} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
         {c && <div><VibeCard item={c} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
         {d && <div><VibeCard item={d} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
-        {e && <div><VibeCard item={e} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
+        {e && <div className="row-span-2"><VibeCard item={e} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
         {f && <div><VibeCard item={f} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
         {g && <div><VibeCard item={g} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
       </div>

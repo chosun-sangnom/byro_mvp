@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
 import { PublicProfileShell } from '@/components/screens/profile/PublicProfileShell'
@@ -36,13 +36,16 @@ type Screen =
 // ─────────────────────────────────────────────────────────────────────────────
 export default function MyByro() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const store = useByroStore()
 
   useEffect(() => {
     if (!store.isLoggedIn) router.replace('/onboarding')
   }, [store.isLoggedIn, router])
 
-  const [screen, setScreen] = useState<Screen>('preview')
+  const [screen, setScreen] = useState<Screen>(
+    searchParams.get('edit') === 'true' ? 'manage' : 'preview'
+  )
   const [activeTab, setActiveTab] = useState<PublicProfileTabId>('who')
 
   if (!store.isLoggedIn) return null

@@ -1,13 +1,12 @@
 'use client'
 
-import { ChevronRight } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { AnimatedSection, SectionTitle } from '@/components/screens/profile/PublicProfileSections'
 
 interface SnsItem {
   key: string
   icon: React.ReactNode
   title: string
-  subtitle: string
   href: string
 }
 
@@ -30,7 +29,6 @@ export function ProfileSnsSection({
         <img src="/images/Instagram.svg" alt="Instagram" className="h-[18px] w-[18px]" />
       ),
       title: 'Instagram',
-      subtitle: `@${instagram.username}`,
       href: instagram.profileUrl,
     },
     linkedinConnected && {
@@ -40,7 +38,6 @@ export function ProfileSnsSection({
         <img src="/images/linkedin.png" alt="LinkedIn" className="h-[18px] w-[18px]" />
       ),
       title: 'LinkedIn',
-      subtitle: linkedin.profileUrl.replace(/^https?:\/\/(www\.)?/, ''),
       href: linkedin.profileUrl,
     },
   ].filter(Boolean) as SnsItem[]
@@ -62,11 +59,8 @@ export function ProfileSnsSection({
             <span className="flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center">
               {item.icon}
             </span>
-            <div className="min-w-0 flex-1">
-              <p className="text-[14px] font-semibold text-[var(--color-text-primary)]">{item.title}</p>
-              <p className="mt-0.5 truncate text-[12px] text-[var(--color-accent-dark)]">{item.subtitle}</p>
-            </div>
-            <ChevronRight size={14} className="flex-shrink-0 text-[var(--color-text-tertiary)] opacity-40" />
+            <p className="flex-1 text-[14px] font-semibold text-[var(--color-text-primary)]">{item.title}</p>
+            <ArrowUpRight size={15} className="flex-shrink-0 text-[var(--color-text-tertiary)] opacity-40" />
           </a>
         ))}
       </div>

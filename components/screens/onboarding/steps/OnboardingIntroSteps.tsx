@@ -133,6 +133,8 @@ export function Step4Profile() {
   const [avatarImage, setAvatarImage] = useState('')
   const [mbti, setMbti] = useState('')
   const [bio, setBio] = useState('')
+  const [birthDate, setBirthDate] = useState('')
+  const [showAge, setShowAge] = useState(true)
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -153,6 +155,7 @@ export function Step4Profile() {
     if (avatarImage) store.updateUserInfo({ avatarImage, profileImages: [avatarImage] })
     if (bio.trim()) store.updateUserInfo({ bio: bio.trim() })
     if (mbti.length === 4) store.updateUserWhoIAm({ ...SAMPLE_PROFILE.whoIAm, mbti })
+    if (birthDate) store.updateUserSajuProfile({ ...SAMPLE_PROFILE.sajuProfile as import('@/types').SajuProfileInput, birthDate, showAge })
     store.goToStep('complete')
   }
 
@@ -229,7 +232,7 @@ export function Step4Profile() {
       </div>
 
       {/* 자기소개 */}
-      <div className="mb-6">
+      <div className="mb-5">
         <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">자기소개</label>
         <TextArea
           value={bio}
@@ -237,6 +240,29 @@ export function Step4Profile() {
           placeholder="예: 창업 3년차. 사람을 만나고 연결하는 걸 좋아합니다."
           rows={3}
           maxLength={200}
+        />
+      </div>
+
+      {/* 생년월일 */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-1">
+          <label className="text-xs text-[var(--color-text-tertiary)]">생년월일</label>
+          <button
+            type="button"
+            onClick={() => setShowAge((prev) => !prev)}
+            className="flex items-center gap-1.5"
+          >
+            <div className={`relative w-7 h-4 rounded-full transition-colors ${showAge ? 'bg-[var(--color-accent-dark)]' : 'bg-[var(--color-border-default)]'}`}>
+              <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white shadow transition-transform ${showAge ? 'translate-x-3.5' : 'translate-x-0.5'}`} />
+            </div>
+            <span className="text-[11px] text-[var(--color-text-tertiary)]">나이 공개</span>
+          </button>
+        </div>
+        <input
+          type="date"
+          value={birthDate}
+          onChange={(e) => setBirthDate(e.target.value)}
+          className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
         />
       </div>
 

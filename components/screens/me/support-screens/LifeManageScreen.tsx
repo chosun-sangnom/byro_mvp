@@ -234,11 +234,12 @@ function PlaceView({
       onBack={() => onSave({})}
       onSave={() => onSave({ restaurants, cafes })}
     >
-      <PlacePicker
-        restaurants={restaurants}
-        cafes={cafes}
-        onChange={(r, c) => { setRestaurants(r); setCafes(c) }}
-      />
+      <FieldBlock label="맛집">
+        <PlacePicker type="restaurant" selected={restaurants} onChange={setRestaurants} />
+      </FieldBlock>
+      <FieldBlock label="카페">
+        <PlacePicker type="cafe" selected={cafes} onChange={setCafes} />
+      </FieldBlock>
     </SubScreen>
   )
 }

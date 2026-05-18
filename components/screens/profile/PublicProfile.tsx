@@ -156,7 +156,9 @@ export default function PublicProfile({
     setExpDoneModal(true)
   }
 
-  const alreadySubmitted = store.expSubmittedProfiles.includes(profile.linkId)
+  const ONE_DAY_MS = 24 * 60 * 60 * 1000
+  const submittedAt = store.expSubmittedAt[profile.linkId]
+  const alreadySubmitted = !!submittedAt && (Date.now() - submittedAt < ONE_DAY_MS)
   const publicProfileUrl = `https://byro.io/@${profile.linkId}`
 
   const handleCopyProfileLink = async () => {
@@ -292,7 +294,7 @@ export default function PublicProfile({
           onRequestFeedback={() => showToast('피드백 요청을 보냈어요!')}
           onLeaveExperience={() => {
             if (alreadySubmitted) {
-              showToast('이미 경험을 남겼어요')
+              showToast('오늘 이미 경험을 남겼어요. 내일 다시 남길 수 있어요')
               return
             }
             setExpSheetOpen(true)

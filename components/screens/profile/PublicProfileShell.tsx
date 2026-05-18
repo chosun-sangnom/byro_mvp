@@ -96,7 +96,9 @@ export function PublicProfileShell({
   const [expDoneModal, setExpDoneModal] = useState(false)
   const [feedbackRequestOpen, setFeedbackRequestOpen] = useState(false)
   const [feedbackMessage, setFeedbackMessage] = useState('')
-  const alreadySubmitted = store.expSubmittedProfiles.includes(profile.linkId)
+  const ONE_DAY_MS = 24 * 60 * 60 * 1000
+  const submittedAt = store.expSubmittedAt[profile.linkId]
+  const alreadySubmitted = !!submittedAt && (Date.now() - submittedAt < ONE_DAY_MS)
   const [moodDraft, setMoodDraft] = useState(profile.headerMeta?.mood ?? '')
   const [availabilityDraft, setAvailabilityDraft] = useState(profile.headerMeta?.availability ?? '')
   const bioRef = useRef<HTMLParagraphElement | null>(null)
@@ -259,7 +261,7 @@ export function PublicProfileShell({
             </button>
             <button
               onClick={() => {
-                if (alreadySubmitted) { showToast('이미 경험을 남겼어요'); return }
+                if (alreadySubmitted) { showToast('오늘 이미 경험을 남겼어요. 내일 다시 남길 수 있어요'); return }
                 setExpSheetOpen(true)
               }}
               className="flex-1 rounded-full py-3 text-[13px] font-semibold whitespace-nowrap"

@@ -51,7 +51,7 @@ interface ByroStore {
   activeArchiveTab: 'connected' | 'recent' | 'requests'
   experienceKeywords: string[]
   experienceMessage: string
-  expSubmittedProfiles: string[]
+  expSubmittedAt: Record<string, number>
   deletedGuestbookIds: string[]
 
   // 연결
@@ -167,7 +167,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   activeArchiveTab: 'connected',
   experienceKeywords: [],
   experienceMessage: '',
-  expSubmittedProfiles: [],
+  expSubmittedAt: {},
   deletedGuestbookIds: [],
 
   // 연결
@@ -385,7 +385,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       primaryHighlightOverrides: {},
       bio: '',
       bioMode: null,
-      expSubmittedProfiles: [],
+      expSubmittedAt: {},
       sentRequestLinkIds: [],
       connectionRequests: SAMPLE_PROFILE.connectionRequests as ConnectionRequest[],
       connectedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
@@ -434,7 +434,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
 
   markExpSubmitted(profileId) {
     set((state) => ({
-      expSubmittedProfiles: [...state.expSubmittedProfiles, profileId],
+      expSubmittedAt: { ...state.expSubmittedAt, [profileId]: Date.now() },
     }))
   },
 
@@ -541,7 +541,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       submittedExperiences: {},
       kemiComputedProfiles: [],
       deletedGuestbookIds: [],
-      expSubmittedProfiles: [],
+      expSubmittedAt: {},
     })
   },
 
@@ -560,7 +560,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   },
 }), {
   name: 'byro-store',
-  version: 11,
+  version: 12,
   migrate: (persistedState: unknown) => {
     const state = persistedState as ByroStore | undefined
     if (!state) return persistedState
@@ -599,7 +599,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     activeArchiveTab: state.activeArchiveTab,
     experienceKeywords: state.experienceKeywords,
     experienceMessage: state.experienceMessage,
-    expSubmittedProfiles: state.expSubmittedProfiles,
+    expSubmittedAt: state.expSubmittedAt,
     deletedGuestbookIds: state.deletedGuestbookIds,
     tabVisibility: state.tabVisibility,
     sentRequestLinkIds: state.sentRequestLinkIds,

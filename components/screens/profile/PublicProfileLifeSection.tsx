@@ -53,7 +53,7 @@ function buildVibeItems(life: PublicProfileLife): VibeItem[] {
   // 이미지 있는 항목 우선
   rest.sort((a, b) => (b.posterUrl ? 1 : 0) - (a.posterUrl ? 1 : 0))
 
-  return [...petItems, ...rest].slice(0, 7)
+  return [...petItems, ...rest].slice(0, 6)
 }
 
 function getItemId(item: LifeMediaItem) {
@@ -175,25 +175,54 @@ function VibeBoard({
 }) {
   if (items.length === 0) return null
 
-  const [a, b, c, d, e, f, g] = items
+  const [a, b, c, d, e, f] = items
 
-  // 3×3 정방형 그리드, 두 tall 카드를 엇갈리게 배치해 불규칙한 크기감 연출
-  // [A tall] [B] [C]
-  // [      ] [D] [E tall]
-  // [F    ] [G] [      ]
+  // 전체 정방형, 내부 정방형 0개
+  // cols: 3fr 2fr 2fr / rows: 2fr 3fr 2fr → 7fr×7fr
+  //
+  // [A: 3:5 세로          ] [B: 4:2 가로       ]
+  // [                    ] [C: 2:3] [D: 2:3   ]
+  // [F: 3:2 가로          ] [E: 4:2 가로       ]
   return (
     <div className="px-4 pt-4 pb-2">
       <div
-        className="grid w-full grid-cols-3 gap-1.5"
-        style={{ aspectRatio: '1/1', gridTemplateRows: 'repeat(3, 1fr)' }}
+        className="grid w-full gap-1.5"
+        style={{
+          aspectRatio: '1/1',
+          gridTemplateColumns: '3fr 2fr 2fr',
+          gridTemplateRows: '2fr 3fr 2fr',
+        }}
       >
-        {a && <div className="row-span-2"><VibeCard item={a} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
-        {b && <div><VibeCard item={b} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
-        {c && <div><VibeCard item={c} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
-        {d && <div><VibeCard item={d} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
-        {e && <div className="row-span-2"><VibeCard item={e} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
-        {f && <div><VibeCard item={f} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
-        {g && <div><VibeCard item={g} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} /></div>}
+        {a && (
+          <div style={{ gridColumn: '1', gridRow: '1 / 3' }}>
+            <VibeCard item={a} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} />
+          </div>
+        )}
+        {b && (
+          <div style={{ gridColumn: '2 / 4', gridRow: '1' }}>
+            <VibeCard item={b} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} />
+          </div>
+        )}
+        {c && (
+          <div style={{ gridColumn: '2', gridRow: '2' }}>
+            <VibeCard item={c} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} />
+          </div>
+        )}
+        {d && (
+          <div style={{ gridColumn: '3', gridRow: '2' }}>
+            <VibeCard item={d} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} />
+          </div>
+        )}
+        {e && (
+          <div style={{ gridColumn: '2 / 4', gridRow: '3' }}>
+            <VibeCard item={e} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} />
+          </div>
+        )}
+        {f && (
+          <div style={{ gridColumn: '1', gridRow: '3' }}>
+            <VibeCard item={f} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} />
+          </div>
+        )}
       </div>
     </div>
   )

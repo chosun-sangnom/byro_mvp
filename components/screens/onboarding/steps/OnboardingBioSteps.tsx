@@ -47,8 +47,8 @@ export function Step9Complete() {
       </div>
 
       <div className="w-full space-y-3">
-        <Button onClick={() => router.push('/me?edit=true')}>프로필 꾸미러 가기</Button>
-        <Button variant="outline" onClick={() => router.push('/me')}>나중에 채울게요</Button>
+        <Button onClick={() => router.replace('/me?edit=true')}>프로필 꾸미러 가기</Button>
+        <Button variant="outline" onClick={() => router.replace('/me')}>나중에 채울게요</Button>
       </div>
     </div>
   )

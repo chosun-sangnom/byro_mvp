@@ -160,7 +160,7 @@ export function Step4Profile() {
     if (avatarImage) store.updateUserInfo({ avatarImage, profileImages: [avatarImage] })
     if (bio.trim()) store.updateUserInfo({ bio: bio.trim() })
     if (mbti.length === 4) store.updateUserWhoIAm({ ...SAMPLE_PROFILE.whoIAm, mbti })
-    if (birthDate) store.updateUserInfo({ birthDate, showAge })
+    if (birthDate) store.updateUserInfo({ birthDate, showAge, birthTime: '', birthPlace: '', calendarType: 'solar' })
     store.goToStep('complete')
   }
 

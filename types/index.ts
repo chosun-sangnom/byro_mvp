@@ -260,6 +260,9 @@ export interface PublicProfile {
   headerMeta?: ProfileHeaderMeta
   whoIAm?: PublicProfileWhoIAm
   birthDate?: string
+  birthTime?: string
+  birthPlace?: string
+  calendarType?: 'solar' | 'lunar'
   showAge?: boolean
   life?: PublicProfileLife
   avatarColor?: string
@@ -311,6 +314,9 @@ export interface UserState {
   profileImages?: string[]
   whoIAm?: PublicProfileWhoIAm
   birthDate?: string
+  birthTime?: string
+  birthPlace?: string
+  calendarType?: 'solar' | 'lunar'
   showAge?: boolean
   life?: PublicProfileLife
   contactChannels?: ContactChannel[]

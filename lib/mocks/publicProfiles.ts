@@ -30,6 +30,9 @@ export const SAMPLE_PROFILE = {
     religion: '무교',
   },
   birthDate: '1992-06-14',
+  birthTime: '08:30',
+  birthPlace: '서울',
+  calendarType: 'solar' as const,
   showAge: true,
   life: {
     daily: {
@@ -266,6 +269,9 @@ export const MK_PROFILE = {
     religion: '무교',
   },
   birthDate: '1988-11-03',
+  birthTime: '22:15',
+  birthPlace: '서울',
+  calendarType: 'solar' as const,
   showAge: true,
   life: {
     daily: {
@@ -476,6 +482,9 @@ export const JIMIN_PROFILE = {
     religion: '기독교',
   },
   birthDate: '1995-03-27',
+  birthTime: '19:20',
+  birthPlace: '부산',
+  calendarType: 'solar' as const,
   showAge: true,
   life: {
     daily: {

@@ -17,7 +17,7 @@ import {
 } from '@/lib/imageCropUtils'
 
 interface BasicInfoEditScreenProps {
-  user: Pick<UserState, 'name' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'profileImages' | 'headerMeta' | 'birthDate' | 'showAge' | 'whoIAm' | 'life'>
+  user: Pick<UserState, 'name' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'profileImages' | 'headerMeta' | 'birthDate' | 'birthTime' | 'birthPlace' | 'calendarType' | 'showAge' | 'whoIAm' | 'life'>
   onBack: () => void
 }
 
@@ -92,6 +92,9 @@ export function BasicInfoEditScreen({
   const initialWhoIAm: PublicProfileWhoIAm = user.whoIAm ?? SAMPLE_PROFILE.whoIAm
   const [mbti, setMbti] = useState(initialWhoIAm.mbti)
   const [birthDate, setBirthDate] = useState(user.birthDate ?? SAMPLE_PROFILE.birthDate ?? '')
+  const [birthTime, setBirthTime] = useState(user.birthTime ?? SAMPLE_PROFILE.birthTime ?? '')
+  const [birthPlace, setBirthPlace] = useState(user.birthPlace ?? SAMPLE_PROFILE.birthPlace ?? '')
+  const [calendarType, setCalendarType] = useState<'solar' | 'lunar'>(user.calendarType ?? SAMPLE_PROFILE.calendarType ?? 'solar')
   const [showAge, setShowAge] = useState(user.showAge ?? SAMPLE_PROFILE.showAge ?? true)
   const [profileImages, setProfileImages] = useState(() => normalizeProfileImages(user.profileImages, user.avatarImage))
   const [cropSource, setCropSource] = useState('')
@@ -127,7 +130,7 @@ export function BasicInfoEditScreen({
         availability: user.headerMeta?.availability ?? SAMPLE_PROFILE.headerMeta.availability,
       },
     })
-    store.updateUserInfo({ birthDate, showAge })
+    store.updateUserInfo({ birthDate, birthTime, birthPlace, calendarType, showAge })
     store.updateUserWhoIAm({
       ...initialWhoIAm,
       mbti,
@@ -370,6 +373,59 @@ export function BasicInfoEditScreen({
                 />
               </div>
 
+              <div>
+                <label className="text-xs text-[var(--color-text-tertiary)] mb-2 block">생시</label>
+                <select
+                  value={birthTime}
+                  onChange={(e) => setBirthTime(e.target.value)}
+                  className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none appearance-none"
+                >
+                  <option value="">모름</option>
+                  <option value="23:00">23:00 ~ 01:00</option>
+                  <option value="01:00">01:00 ~ 03:00</option>
+                  <option value="03:00">03:00 ~ 05:00</option>
+                  <option value="05:00">05:00 ~ 07:00</option>
+                  <option value="07:00">07:00 ~ 09:00</option>
+                  <option value="09:00">09:00 ~ 11:00</option>
+                  <option value="11:00">11:00 ~ 13:00</option>
+                  <option value="13:00">13:00 ~ 15:00</option>
+                  <option value="15:00">15:00 ~ 17:00</option>
+                  <option value="17:00">17:00 ~ 19:00</option>
+                  <option value="19:00">19:00 ~ 21:00</option>
+                  <option value="21:00">21:00 ~ 23:00</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-2 block">양력 / 음력</label>
+              <div className="flex gap-2">
+                {(['solar', 'lunar'] as const).map((type) => (
+                  <button
+                    key={type}
+                    type="button"
+                    onClick={() => setCalendarType(type)}
+                    className="rounded-full border px-3 py-1.5 text-xs font-semibold"
+                    style={{
+                      borderColor: calendarType === type ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
+                      background: calendarType === type ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
+                      color: calendarType === type ? '#ffffff' : 'var(--color-text-secondary)',
+                    }}
+                  >
+                    {type === 'solar' ? '양력' : '음력'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">출생지</label>
+              <input
+                value={birthPlace}
+                onChange={(event) => setBirthPlace(event.target.value)}
+                placeholder="예: 서울, 부산, 대전"
+                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
+              />
             </div>
 
             <div>

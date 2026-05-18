@@ -6,6 +6,7 @@ import { Button, NavBar, TextArea, showToast } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
 import type { LifeMediaItem, PublicProfileLife } from '@/types'
+import { ExercisePicker } from './ExercisePicker'
 import { SportsTeamPicker } from './SportsTeamPicker'
 import { MusicSearchPicker } from './MusicSearchPicker'
 import { MediaSearchPicker } from './MediaSearchPicker'
@@ -247,7 +248,7 @@ function ActivityView({
       onSave={() => onSave({ ...life.daily, exercise }, teams)}
     >
       <FieldBlock label="즐기는 운동">
-        <ChipInput items={exercise} onChange={setExercise} placeholder="예: 러닝, 골프, 테니스..." />
+        <ExercisePicker selected={exercise} onChange={setExercise} />
       </FieldBlock>
 
       <FieldBlock label="응원하는 스포츠팀">

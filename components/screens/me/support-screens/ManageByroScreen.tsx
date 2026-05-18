@@ -84,7 +84,7 @@ export function ManageByroScreen({
   ).length
 
   const completionChecks = [
-    { label: '기본정보', done: Boolean(user.headline?.trim() && whoIAm.mbti) },
+    { label: '기본정보', done: Boolean(whoIAm.mbti) },
     { label: '하이라이트', done: allHighlights.length > 0 },
     { label: '라이프', done: activityCount + cultureCount + placeCount > 0 },
     { label: 'SNS', done: connectedSnsCount > 0 },
@@ -111,7 +111,7 @@ export function ManageByroScreen({
     },
     {
       title: '라이프',
-      hint: '반려동물 · 운동 · 음식 · 카페 · 여행지 · 문화',
+      hint: '반려동물 · 운동 · 플레이스 · 여행지 · 문화',
       nudge: '취향이 겹치면 어색한 첫 대화가 자연스러워져요',
       meta: activityCount + cultureCount + placeCount > 0
         ? `활동 ${activityCount} · 문화 ${cultureCount} · 장소 ${placeCount}`

@@ -11,6 +11,8 @@ import type {
   PublicProfileLife,
   PublicProfileWhoIAm,
   SajuProfileInput,
+  TabVisibility,
+  TabVisibilityLevel,
 } from '@/types'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
@@ -40,6 +42,7 @@ interface ByroStore {
   selectedBioMethod: 'ai' | 'manual' | null  // Step7 선택 결과
 
   // 앱
+  tabVisibility: TabVisibility
   bookmarkedProfiles: string[]
   hlOpenStates: Record<string, boolean>
   primaryHighlightOverrides: Record<string, string>
@@ -88,6 +91,7 @@ interface ByroStore {
   updateUserLife(life: PublicProfileLife): void
   updateUserSajuProfile(sajuProfile: SajuProfileInput): void
   deleteGuestbookEntry(id: string): void
+  updateTabVisibility(tab: keyof TabVisibility, level: TabVisibilityLevel): void
 }
 
 const normalizeSampleUser = (user: UserState | null): UserState | null => {
@@ -133,6 +137,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   selectedBioMethod: null,
 
   // 앱
+  tabVisibility: { who: 'public', life: 'public', reputation: 'public' } as TabVisibility,
   bookmarkedProfiles: [],
   hlOpenStates: {},
   primaryHighlightOverrides: {},
@@ -429,9 +434,15 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       deletedGuestbookIds: [...state.deletedGuestbookIds, id],
     }))
   },
+
+  updateTabVisibility(tab, level) {
+    set((state) => ({
+      tabVisibility: { ...state.tabVisibility, [tab]: level },
+    }))
+  },
 }), {
   name: 'byro-store',
-  version: 3,
+  version: 4,
   migrate: (persistedState: unknown) => {
     const state = persistedState as ByroStore | undefined
     if (!state) return persistedState
@@ -472,5 +483,6 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     experienceMessage: state.experienceMessage,
     expSubmittedProfiles: state.expSubmittedProfiles,
     deletedGuestbookIds: state.deletedGuestbookIds,
+    tabVisibility: state.tabVisibility,
   }),
 }))

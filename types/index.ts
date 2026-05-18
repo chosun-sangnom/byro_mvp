@@ -304,6 +304,14 @@ export interface SajuProfileInput {
   showAge?: boolean
 }
 
+export type TabVisibilityLevel = 'public' | 'connected' | 'private'
+
+export interface TabVisibility {
+  who: TabVisibilityLevel
+  life: TabVisibilityLevel
+  reputation: TabVisibilityLevel
+}
+
 export interface UserState {
   name: string
   linkId: string
@@ -319,4 +327,5 @@ export interface UserState {
   life?: PublicProfileLife
   sajuProfile?: SajuProfileInput
   contactChannels?: ContactChannel[]
+  tabVisibility?: TabVisibility
 }

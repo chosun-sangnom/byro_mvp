@@ -84,6 +84,8 @@ export default function MyByro() {
         onEditSNS={() => setScreen('editSNS')}
         onEditContact={() => setScreen('editContact')}
         user={user}
+        tabVisibility={store.tabVisibility ?? { who: 'public', life: 'public', reputation: 'public' }}
+        onUpdateTabVisibility={store.updateTabVisibility}
       />
     )
   }

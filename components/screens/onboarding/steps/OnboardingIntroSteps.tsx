@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, type ChangeEvent } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { Camera } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { Button, CheckRow, InfoBox, TextArea, showToast } from '@/components/ui'
@@ -59,6 +59,112 @@ export function Step1Login() {
         <Button variant="google" disabled={!canProceed} onClick={handleSocial}>G  구글로 시작하기</Button>
         <Button variant="naver" disabled={!canProceed} onClick={handleSocial}>N  네이버로 시작하기</Button>
       </div>
+    </div>
+  )
+}
+
+export function Step2Verify() {
+  const store = useByroStore()
+  const [phone, setPhone] = useState('')
+  const [code, setCode] = useState('')
+  const [phase, setPhase] = useState<'phone' | 'code'>('phone')
+  const [sending, setSending] = useState(false)
+  const [timer, setTimer] = useState(0)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  useEffect(() => {
+    return () => { if (timerRef.current) clearInterval(timerRef.current) }
+  }, [])
+
+  const formatPhone = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 11)
+    if (digits.length <= 3) return digits
+    if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`
+    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`
+  }
+
+  const phoneDigits = phone.replace(/\D/g, '')
+  const canSend = phoneDigits.length === 11 && phase === 'phone'
+  const canVerify = code.length === 6
+
+  const handleSend = () => {
+    if (!canSend) return
+    setSending(true)
+    setTimeout(() => {
+      setSending(false)
+      setPhase('code')
+      setTimer(180)
+      showToast('인증번호를 발송했어요')
+      timerRef.current = setInterval(() => {
+        setTimer((prev) => {
+          if (prev <= 1) { clearInterval(timerRef.current!); return 0 }
+          return prev - 1
+        })
+      }, 1000)
+    }, 1000)
+  }
+
+  const handleVerify = () => {
+    if (!canVerify) return
+    store.nextStep()
+  }
+
+  const formatTimer = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
+
+  return (
+    <div className="flex flex-col h-full overflow-y-auto px-5 py-4">
+      <StepIntro
+        eyebrow="Verification"
+        title={'본인 확인이\n필요해요'}
+        description={'휴대폰 번호로 본인을 인증해주세요.'}
+      />
+
+      <div className="space-y-4">
+        <div>
+          <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">휴대폰 번호</label>
+          <div className="flex gap-2">
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => { if (phase === 'phone') setPhone(formatPhone(e.target.value)) }}
+              placeholder="010-0000-0000"
+              disabled={phase === 'code'}
+              className="flex-1 border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none disabled:opacity-50"
+            />
+            <Button
+              size="sm"
+              variant={phase === 'code' ? 'outline' : 'primary'}
+              onClick={phase === 'code' ? () => { setPhase('phone'); setCode(''); setTimer(0) } : handleSend}
+            >
+              {sending ? '발송 중...' : phase === 'code' ? '재입력' : '인증번호 받기'}
+            </Button>
+          </div>
+        </div>
+
+        {phase === 'code' && (
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs text-[var(--color-text-tertiary)]">인증번호</label>
+              {timer > 0 && <span className="text-xs font-semibold text-[var(--color-state-danger-text)]">{formatTimer(timer)}</span>}
+            </div>
+            <input
+              type="number"
+              inputMode="numeric"
+              value={code}
+              onChange={(e) => setCode(e.target.value.slice(0, 6))}
+              placeholder="6자리 입력"
+              className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
+            />
+            <p className="mt-1.5 text-[11px] text-[var(--color-text-tertiary)]">테스트 환경에서는 아무 6자리나 입력하세요</p>
+          </div>
+        )}
+      </div>
+
+      <StepFooter
+        canNext={phase === 'code' ? canVerify : false}
+        onNext={handleVerify}
+        onPrev={() => store.prevStep()}
+      />
     </div>
   )
 }

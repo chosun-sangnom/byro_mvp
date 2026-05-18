@@ -3,13 +3,14 @@
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
-import { getProfileAvatar } from '@/lib/mocks/publicProfiles'
+
+
 import type { Highlight } from '@/types'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
 import {
-  ProfileFeedbackSection,
   ProfileRememberSection,
   ProfileReputationSummarySection,
+  ProfileExperienceSection,
 } from '@/components/screens/profile/PublicProfileSections'
 import { ProfileSnsSection } from '@/components/screens/profile/PublicProfileSnsSection'
 import { ProfileHighlightsSection } from '@/components/screens/profile/PublicProfileHighlightsSection'
@@ -162,7 +163,9 @@ export function PublicProfileReputationTabPage({
   username: string
 }) {
   const router = useRouter()
-  const { profile, keywordCounts, totalKeywordCount, featuredGuestbook } = usePublicProfileTabData(username)
+  const { store, profile, keywordCounts, totalKeywordCount } = usePublicProfileTabData(username)
+  const submittedExps = store.submittedExperiences[profile.linkId] ?? []
+  const allExperiences = [...submittedExps, ...(profile.experiences ?? [])]
 
   return (
     <div className="pb-6">
@@ -174,12 +177,9 @@ export function PublicProfileReputationTabPage({
         keywordCounts={keywordCounts}
         totalKeywordCount={totalKeywordCount}
       />
-      <ProfileFeedbackSection
-        profile={profile}
-        featuredGuestbook={featuredGuestbook}
-        getProfileAvatar={getProfileAvatar}
-        onGuestbookEntryClick={(linkId) => router.push(`/${linkId}`)}
-        onOpenGuestbook={() => router.push(`/${profile.linkId}/feedback`)}
+      <ProfileExperienceSection
+        experiences={allExperiences}
+        onViewAll={() => router.push(`/${profile.linkId}/feedback`)}
       />
     </div>
   )

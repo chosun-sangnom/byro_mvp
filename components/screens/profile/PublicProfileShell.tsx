@@ -359,7 +359,6 @@ export function PublicProfileShell({
       <ExperienceBottomSheet
         open={expSheetOpen}
         profileName={profile.name}
-        currentUserName={store.user?.name}
         isLoggedIn={store.isLoggedIn}
         experienceKeywordGroups={REPUTATION_KEYWORD_GROUPS}
         selectedKeywords={store.experienceKeywords}
@@ -372,8 +371,14 @@ export function PublicProfileShell({
           store.setExperienceKeyword(keyword)
         }}
         onMessageChange={store.setExperienceMessage}
-        onSubmit={() => {
+        onSubmit={(isAnonymous) => {
           if (store.experienceKeywords.length === 0) { showToast('키워드를 하나 이상 선택해주세요'); return }
+          store.submitExperience(profile.linkId, {
+            authorName: isAnonymous ? null : (store.user?.name ?? null),
+            isAnonymous: isAnonymous || !store.isLoggedIn,
+            keywords: store.experienceKeywords,
+            message: store.experienceMessage,
+          })
           store.markExpSubmitted(profile.linkId)
           store.clearExperience()
           setExpSheetOpen(false)

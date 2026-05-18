@@ -2,7 +2,8 @@
 
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
-import { getPublicProfileByUsername, getProfileAvatar } from '@/lib/mocks/publicProfiles'
+import { getPublicProfileByUsername } from '@/lib/mocks/publicProfiles'
+import type { Experience, PublicProfile } from '@/types'
 
 export default function FeedbackScreen({ username }: { username: string }) {
   const router = useRouter()
@@ -12,6 +13,9 @@ export default function FeedbackScreen({ username }: { username: string }) {
   const profile = isOwnProfile && store.user
     ? { ...baseProfile, name: store.user.name, linkId: store.user.linkId }
     : baseProfile
+
+  const submittedExps = store.submittedExperiences[profile.linkId] ?? []
+  const allExperiences: Experience[] = [...submittedExps, ...((profile as PublicProfile).experiences ?? [])]
 
   return (
     <div className="flex h-full flex-col" style={{ backgroundColor: 'var(--color-bg-page)' }}>
@@ -25,51 +29,49 @@ export default function FeedbackScreen({ username }: { username: string }) {
       >
         <button onClick={() => router.back()} className="mr-3 text-xl text-[var(--color-text-secondary)]">‹</button>
         <div>
-          <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Feedback</div>
-          <div className="text-[14px] font-bold text-[var(--color-text-strong)]">{profile.name}님의 피드백</div>
+          <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Experience</div>
+          <div className="text-[14px] font-bold text-[var(--color-text-strong)]">{profile.name}님의 경험</div>
         </div>
         <div className="ml-auto rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
-          {profile.guestbook.length}개
+          {allExperiences.length}개
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {profile.guestbook.length === 0 ? (
+        {allExperiences.length === 0 ? (
           <div className="flex h-full items-center justify-center">
-            <p className="text-[13px] text-[var(--color-text-tertiary)]">아직 피드백이 없어요</p>
+            <p className="text-[13px] text-[var(--color-text-tertiary)]">아직 남겨진 경험이 없어요</p>
           </div>
         ) : (
           <div className="divide-y divide-[var(--color-border-soft)] px-5">
-            {profile.guestbook.map((entry) => (
-              <button
-                key={entry.id}
-                onClick={() => router.push(`/${entry.linkId}`)}
-                className="flex w-full gap-3 py-4 text-left"
-              >
-                {getProfileAvatar(entry.linkId) ? (
-                  <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-[var(--color-bg-soft)]">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={getProfileAvatar(entry.linkId)}
-                      alt={`${entry.authorName} 프로필 사진`}
-                      className="h-full w-full object-cover"
-                    />
+            {allExperiences.map((exp) => (
+              <div key={exp.id} className="py-4">
+                <div className="mb-2 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-muted)] text-[12px] font-bold text-[var(--color-text-secondary)]">
+                      {exp.isAnonymous ? '익' : (exp.authorName?.charAt(0) ?? '?')}
+                    </div>
+                    <span className="text-[14px] font-semibold text-[var(--color-text-primary)]">
+                      {exp.isAnonymous ? '익명' : (exp.authorName ?? '익명')}
+                    </span>
                   </div>
-                ) : (
-                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-sm font-bold text-[var(--color-text-secondary)]">
-                    {entry.authorName.charAt(0)}
-                  </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="text-[13px] font-semibold text-[var(--color-text-primary)]">{entry.authorName}</div>
-                    <div className="text-[11px] text-[var(--color-text-tertiary)]">{entry.date}</div>
-                  </div>
-                  <div className="mt-1.5 text-[13px] leading-relaxed text-[var(--color-text-secondary)]">
-                    {entry.message}
-                  </div>
+                  <span className="text-[11px] text-[var(--color-text-tertiary)]">{exp.date}</span>
                 </div>
-              </button>
+                <div className="mb-2.5 flex flex-wrap gap-1.5">
+                  {exp.keywords.map((kw) => (
+                    <span
+                      key={kw}
+                      className="rounded-full px-2.5 py-1 text-[11px] font-semibold"
+                      style={{ backgroundColor: 'var(--color-accent-bg)', color: 'var(--color-accent-dark)' }}
+                    >
+                      {kw}
+                    </span>
+                  ))}
+                </div>
+                {exp.message && (
+                  <p className="text-[13px] leading-relaxed text-[var(--color-text-secondary)]">{exp.message}</p>
+                )}
+              </div>
             ))}
           </div>
         )}

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { Award, Lightbulb } from 'lucide-react'
 import type { ReputationKeywordGroup } from '@/lib/mocks/reputationKeywords'
 import { Button, BottomSheet, Chip, Modal, TextArea } from '@/components/ui'
@@ -7,7 +8,6 @@ import { Button, BottomSheet, Chip, Modal, TextArea } from '@/components/ui'
 export function ExperienceBottomSheet({
   open,
   profileName,
-  currentUserName,
   isLoggedIn,
   experienceKeywordGroups,
   selectedKeywords,
@@ -20,24 +20,42 @@ export function ExperienceBottomSheet({
 }: {
   open: boolean
   profileName: string
-  currentUserName?: string
   isLoggedIn: boolean
   experienceKeywordGroups: ReputationKeywordGroup[]
   selectedKeywords: string[]
   experienceMessage: string
   onToggleKeyword: (keyword: string) => void
   onMessageChange: (value: string) => void
-  onSubmit: () => void
+  onSubmit: (isAnonymous: boolean) => void
   onLogin: () => void
   onClose: () => void
 }) {
+  const [isAnonymous, setIsAnonymous] = useState(false)
+
   return (
     <BottomSheet open={open} onClose={onClose}>
       <div className="px-5 pb-6">
         <div className="mb-1 text-[15px] font-bold text-[var(--color-text-strong)]">{profileName}에게 경험 남기기</div>
-        <div className="mb-5 text-[12px] text-[var(--color-text-tertiary)]">
-          {isLoggedIn ? `${currentUserName ?? '나'}으로 남겨져요` : '익명 사용자로 남겨져요'}
-        </div>
+
+        {isLoggedIn ? (
+          <button
+            onClick={() => setIsAnonymous((v) => !v)}
+            className="mb-5 flex items-center gap-1.5 text-[12px] text-[var(--color-text-tertiary)]"
+          >
+            <span
+              className={[
+                'inline-block h-3.5 w-3.5 rounded-sm border transition-colors',
+                isAnonymous
+                  ? 'border-[var(--color-accent-dark)] bg-[var(--color-accent-dark)]'
+                  : 'border-[var(--color-border-default)] bg-transparent',
+              ].join(' ')}
+            />
+            익명으로 남기기
+          </button>
+        ) : (
+          <div className="mb-5 text-[12px] text-[var(--color-text-tertiary)]">익명으로 남겨져요</div>
+        )}
+
         <div className="mb-4 space-y-4">
           {experienceKeywordGroups.map((group) => (
             <div key={group.category}>
@@ -65,7 +83,7 @@ export function ExperienceBottomSheet({
           dark
         />
         <div className="mt-4 space-y-2">
-          <Button onClick={onSubmit}>경험 남기기</Button>
+          <Button onClick={() => onSubmit(isAnonymous)}>경험 남기기</Button>
           {!isLoggedIn && (
             <>
               <div className="flex items-center gap-2 py-1">

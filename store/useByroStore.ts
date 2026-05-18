@@ -15,6 +15,7 @@ import type {
   TabVisibilityLevel,
   ConnectionRequest,
   SavedProfile,
+  Experience,
 } from '@/types'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
@@ -57,6 +58,9 @@ interface ByroStore {
   sentRequestLinkIds: string[]
   connectionRequests: ConnectionRequest[]
   connectedProfiles: SavedProfile[]
+
+  // 경험
+  submittedExperiences: Record<string, Experience[]>
 
   // Actions
   nextStep(): void
@@ -101,6 +105,7 @@ interface ByroStore {
   cancelConnectionRequest(linkId: string): void
   acceptConnectionRequest(id: string): void
   rejectConnectionRequest(id: string): void
+  submitExperience(profileLinkId: string, exp: Omit<Experience, 'id' | 'date'>): void
 }
 
 const normalizeSampleUser = (user: UserState | null): UserState | null => {
@@ -161,6 +166,9 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   sentRequestLinkIds: [],
   connectionRequests: SAMPLE_PROFILE.connectionRequests as ConnectionRequest[],
   connectedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
+
+  // 경험
+  submittedExperiences: {},
 
   // Actions
   nextStep() {
@@ -364,6 +372,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       sentRequestLinkIds: [],
       connectionRequests: SAMPLE_PROFILE.connectionRequests as ConnectionRequest[],
       connectedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
+      submittedExperiences: {},
     })
   },
 
@@ -489,9 +498,23 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       connectionRequests: state.connectionRequests.filter((r) => r.id !== id),
     }))
   },
+
+  submitExperience(profileLinkId, exp) {
+    const newExp: Experience = {
+      ...exp,
+      id: uuidv4(),
+      date: '방금',
+    }
+    set((state) => ({
+      submittedExperiences: {
+        ...state.submittedExperiences,
+        [profileLinkId]: [newExp, ...(state.submittedExperiences[profileLinkId] ?? [])],
+      },
+    }))
+  },
 }), {
   name: 'byro-store',
-  version: 8,
+  version: 9,
   migrate: (persistedState: unknown) => {
     const state = persistedState as ByroStore | undefined
     if (!state) return persistedState
@@ -536,5 +559,6 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     sentRequestLinkIds: state.sentRequestLinkIds,
     connectionRequests: state.connectionRequests,
     connectedProfiles: state.connectedProfiles,
+    submittedExperiences: state.submittedExperiences,
   }),
 }))

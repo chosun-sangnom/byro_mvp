@@ -62,6 +62,9 @@ interface ByroStore {
   // 경험
   submittedExperiences: Record<string, Experience[]>
 
+  // 케미
+  kemiComputedProfiles: string[]
+
   // Actions
   nextStep(): void
   prevStep(): void
@@ -106,6 +109,8 @@ interface ByroStore {
   acceptConnectionRequest(id: string): void
   rejectConnectionRequest(id: string): void
   submitExperience(profileLinkId: string, exp: Omit<Experience, 'id' | 'date'>): void
+  markKemiComputed(linkId: string): void
+  invalidateKemiCache(): void
 }
 
 const normalizeSampleUser = (user: UserState | null): UserState | null => {
@@ -169,6 +174,9 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
 
   // 경험
   submittedExperiences: {},
+
+  // 케미
+  kemiComputedProfiles: [],
 
   // Actions
   nextStep() {
@@ -440,12 +448,14 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   updateUserWhoIAm(whoIAm) {
     set((state) => ({
       user: state.user ? { ...state.user, whoIAm } : null,
+      kemiComputedProfiles: [],
     }))
   },
 
   updateUserLife(life) {
     set((state) => ({
       user: state.user ? { ...state.user, life } : null,
+      kemiComputedProfiles: [],
     }))
   },
 
@@ -499,6 +509,18 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     }))
   },
 
+  markKemiComputed(linkId) {
+    set((state) => ({
+      kemiComputedProfiles: state.kemiComputedProfiles.includes(linkId)
+        ? state.kemiComputedProfiles
+        : [...state.kemiComputedProfiles, linkId],
+    }))
+  },
+
+  invalidateKemiCache() {
+    set({ kemiComputedProfiles: [] })
+  },
+
   submitExperience(profileLinkId, exp) {
     const newExp: Experience = {
       ...exp,
@@ -514,7 +536,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   },
 }), {
   name: 'byro-store',
-  version: 9,
+  version: 10,
   migrate: (persistedState: unknown) => {
     const state = persistedState as ByroStore | undefined
     if (!state) return persistedState
@@ -560,5 +582,6 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     connectionRequests: state.connectionRequests,
     connectedProfiles: state.connectedProfiles,
     submittedExperiences: state.submittedExperiences,
+    kemiComputedProfiles: state.kemiComputedProfiles,
   }),
 }))

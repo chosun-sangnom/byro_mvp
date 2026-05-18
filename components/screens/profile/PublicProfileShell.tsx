@@ -69,6 +69,21 @@ export function PublicProfileShell({
   })()
   const receivedRequestId = store.connectionRequests.find((r) => r.linkId === profile.linkId)?.id
 
+  // 케미 로딩 트리거: 비로그인이거나 오너이면 케미 없음
+  const kemiAlreadyComputed = store.kemiComputedProfiles.includes(profile.linkId)
+  const shouldComputeKemi = store.isLoggedIn && !isOwnerMode && !!profile.kemi
+  const [kemiLoading, setKemiLoading] = useState(shouldComputeKemi && !kemiAlreadyComputed)
+
+  useEffect(() => {
+    if (!shouldComputeKemi || kemiAlreadyComputed) return
+    const timer = setTimeout(() => {
+      store.markKemiComputed(profile.linkId)
+      setKemiLoading(false)
+    }, 1500)
+    return () => clearTimeout(timer)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile.linkId])
+
   const [bioExpanded, setBioExpanded] = useState(false)
   const [bioOverflowing, setBioOverflowing] = useState(false)
   const [moodSheetOpen, setMoodSheetOpen] = useState(false)
@@ -216,6 +231,7 @@ export function PublicProfileShell({
           <PublicProfileKemiZone
             kemi={profile.kemi}
             isLoggedIn={store.isLoggedIn}
+            isLoading={kemiLoading}
             onCompatibilityOpen={profile.whoIAm ? () => setCompatibilityOpen(true) : undefined}
           />
         )}

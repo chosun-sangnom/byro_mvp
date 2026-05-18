@@ -34,13 +34,56 @@ import {
 export function PublicProfileKemiZone({
   kemi,
   isLoggedIn,
+  isLoading,
   onCompatibilityOpen,
 }: {
   kemi?: KemiData
   isLoggedIn: boolean
+  isLoading?: boolean
   onCompatibilityOpen?: () => void
 }) {
-  if (!kemi) return null
+  if (!kemi && !isLoading) return null
+
+  if (isLoading) {
+    return (
+      <div className="px-5 pb-3">
+        <div
+          className="rounded-[20px] px-4 py-4"
+          style={{
+            border: '1px solid var(--color-accent-border-soft)',
+            background: 'linear-gradient(135deg, var(--color-accent-bg-subtle) 0%, transparent 100%)',
+          }}
+        >
+          <div className="mb-3 flex items-center gap-1.5">
+            <Sparkles size={12} style={{ color: 'var(--color-accent-dark)' }} className="animate-pulse" />
+            <span
+              className="text-[11px] font-bold uppercase tracking-[0.08em] animate-pulse"
+              style={{ color: 'var(--color-accent-dark)' }}
+            >
+              케미 분석 중...
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-1.5 mb-3">
+            {[64, 80, 52].map((w) => (
+              <span
+                key={w}
+                className="animate-pulse rounded-full h-7"
+                style={{
+                  width: w,
+                  backgroundColor: 'var(--color-accent-bg)',
+                  border: '1px solid var(--color-accent-border-soft)',
+                }}
+              />
+            ))}
+          </div>
+          <div className="space-y-2">
+            <div className="animate-pulse h-3 rounded-full bg-[var(--color-bg-muted)] w-full" />
+            <div className="animate-pulse h-3 rounded-full bg-[var(--color-bg-muted)] w-4/5" />
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="px-5 pb-3">
@@ -58,7 +101,7 @@ export function PublicProfileKemiZone({
             className="text-[11px] font-bold uppercase tracking-[0.08em]"
             style={{ color: 'var(--color-accent-dark)' }}
           >
-            {kemi.matchCount}가지 케미
+            {kemi!.matchCount}가지 케미
           </span>
         </div>
 
@@ -66,7 +109,7 @@ export function PublicProfileKemiZone({
           <>
             {/* Match chips with Kemi Glow */}
             <div className="flex flex-wrap gap-1.5">
-              {kemi.matchItems.map((item) => (
+              {kemi!.matchItems.map((item) => (
                 <span
                   key={item.label}
                   className="chip-metric"
@@ -83,7 +126,7 @@ export function PublicProfileKemiZone({
             {/* AI copy — conversation starter */}
             {/* TODO(AI): Stream this from LLM; for now static mock text */}
             <p className="mt-3 text-[13px] leading-[1.65] text-[var(--color-text-secondary)]">
-              {kemi.aiCopy}
+              {kemi!.aiCopy}
             </p>
 
             <div className="mt-5 border-t border-[var(--color-accent-border-soft)] pt-4">

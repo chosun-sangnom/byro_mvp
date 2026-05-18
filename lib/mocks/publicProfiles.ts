@@ -105,6 +105,8 @@ export const SAMPLE_PROFILE = {
   ] as ContactChannel[],
   instagramConnected: true,
   linkedinConnected: true,
+  youtubeConnected: true,
+  tiktokConnected: true,
   instagram: {
     username: INSTAGRAM_PROFILE.username,
     profileUrl: INSTAGRAM_PROFILE.profileUrl,
@@ -115,6 +117,14 @@ export const SAMPLE_PROFILE = {
     profileUrl: LINKEDIN_PROFILE.profileUrl,
     aiSummary: LINKEDIN_PROFILE.aiSummary,
     previewImage: '/images/linkedsample.png',
+  },
+  youtube: {
+    channelName: '강민준',
+    channelUrl: 'https://www.youtube.com/@gangminjun',
+  },
+  tiktok: {
+    username: 'gangminjun',
+    profileUrl: 'https://www.tiktok.com/@gangminjun',
   },
   careerHighlight: { avgYears: 4.2, vsIndustryPercent: 128 },
   corporateHighlight: {

@@ -5,7 +5,7 @@ import { Camera } from 'lucide-react'
 import { Button, NavBar, showToast, TextArea } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
-import type { PublicProfileWhoIAm, SajuProfileInput, UserState } from '@/types'
+import type { PublicProfileWhoIAm, UserState } from '@/types'
 import {
   DEFAULT_CROP_FRAME,
   clampCropFrameRect,
@@ -17,7 +17,7 @@ import {
 } from '@/lib/imageCropUtils'
 
 interface BasicInfoEditScreenProps {
-  user: Pick<UserState, 'name' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'profileImages' | 'headerMeta' | 'sajuProfile' | 'whoIAm' | 'life'>
+  user: Pick<UserState, 'name' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'profileImages' | 'headerMeta' | 'birthDate' | 'showAge' | 'whoIAm' | 'life'>
   onBack: () => void
 }
 
@@ -90,13 +90,9 @@ export function BasicInfoEditScreen({
   const store = useByroStore()
   const [bio, setBio] = useState(user.bio)
   const initialWhoIAm: PublicProfileWhoIAm = user.whoIAm ?? SAMPLE_PROFILE.whoIAm
-  const initialSajuProfile: SajuProfileInput = user.sajuProfile ?? (SAMPLE_PROFILE.sajuProfile as SajuProfileInput)
   const [mbti, setMbti] = useState(initialWhoIAm.mbti)
-  const [birthDate, setBirthDate] = useState(initialSajuProfile.birthDate)
-  const [birthTime, setBirthTime] = useState(initialSajuProfile.birthTime)
-  const [birthPlace, setBirthPlace] = useState(initialSajuProfile.birthPlace)
-  const [calendarType, setCalendarType] = useState<SajuProfileInput['calendarType']>(initialSajuProfile.calendarType)
-  const [showAge, setShowAge] = useState(initialSajuProfile.showAge ?? true)
+  const [birthDate, setBirthDate] = useState(user.birthDate ?? SAMPLE_PROFILE.birthDate ?? '')
+  const [showAge, setShowAge] = useState(user.showAge ?? SAMPLE_PROFILE.showAge ?? true)
   const [profileImages, setProfileImages] = useState(() => normalizeProfileImages(user.profileImages, user.avatarImage))
   const [cropSource, setCropSource] = useState('')
   const [cropOpen, setCropOpen] = useState(false)
@@ -131,15 +127,7 @@ export function BasicInfoEditScreen({
         availability: user.headerMeta?.availability ?? SAMPLE_PROFILE.headerMeta.availability,
       },
     })
-    store.updateUserSajuProfile({
-      ...initialSajuProfile,
-      birthDate,
-      birthTime,
-      birthPlace,
-      calendarType,
-      isBirthTimeUnknown: !birthTime,
-      showAge,
-    })
+    store.updateUserInfo({ birthDate, showAge })
     store.updateUserWhoIAm({
       ...initialWhoIAm,
       mbti,
@@ -382,68 +370,6 @@ export function BasicInfoEditScreen({
                 />
               </div>
 
-              <div>
-                <label className="text-xs text-[var(--color-text-tertiary)] mb-2 block">생시</label>
-                <select
-                  value={birthTime}
-                  onChange={(e) => setBirthTime(e.target.value)}
-                  className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none appearance-none"
-                >
-                  <option value="">모름</option>
-                  <option value="23:00">23:00 ~ 01:00</option>
-                  <option value="01:00">01:00 ~ 03:00</option>
-                  <option value="03:00">03:00 ~ 05:00</option>
-                  <option value="05:00">05:00 ~ 07:00</option>
-                  <option value="07:00">07:00 ~ 09:00</option>
-                  <option value="09:00">09:00 ~ 11:00</option>
-                  <option value="11:00">11:00 ~ 13:00</option>
-                  <option value="13:00">13:00 ~ 15:00</option>
-                  <option value="15:00">15:00 ~ 17:00</option>
-                  <option value="17:00">17:00 ~ 19:00</option>
-                  <option value="19:00">19:00 ~ 21:00</option>
-                  <option value="21:00">21:00 ~ 23:00</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="text-xs text-[var(--color-text-tertiary)] mb-2 block">양력 / 음력</label>
-              <div className="flex gap-2">
-                {[
-                  { id: 'solar', label: '양력' },
-                  { id: 'lunar', label: '음력' },
-                ].map((option) => {
-                  const selected = option.id === calendarType
-                  return (
-                    <button
-                      key={option.id}
-                      type="button"
-                      onClick={() => setCalendarType(option.id as SajuProfileInput['calendarType'])}
-                      className="rounded-full border px-3 py-1.5 text-xs font-semibold"
-                      style={{
-                        borderColor: selected ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
-                        background: selected ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
-                        color: selected ? '#ffffff' : 'var(--color-text-secondary)',
-                      }}
-                    >
-                      {option.label}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-
-            <div>
-              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">출생지</label>
-              <input
-                value={birthPlace}
-                onChange={(event) => setBirthPlace(event.target.value)}
-                placeholder="예: 서울, 부산, 대전"
-                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-              />
-              <div className="mt-1 text-[11px] text-[var(--color-text-tertiary)]">
-                생년월일 아래에 생시와 출생지를 함께 입력하면 사주 해석 정확도를 높일 수 있어요.
-              </div>
             </div>
 
             <div>

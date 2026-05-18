@@ -118,7 +118,8 @@ function buildEditableOwnerProfile(
     avatarImage: user.avatarImage || baseProfile.avatarImage,
     profileImages: user.profileImages ?? baseProfile.profileImages,
     whoIAm: user.whoIAm ?? baseProfile.whoIAm,
-    sajuProfile: user.sajuProfile ?? baseProfile.sajuProfile,
+    birthDate: user.birthDate ?? baseProfile.birthDate,
+    showAge: user.showAge ?? baseProfile.showAge,
     life: user.life ?? baseProfile.life,
     contactChannels: user.contactChannels ?? baseProfile.contactChannels,
   }
@@ -146,7 +147,7 @@ export function getNormalizedPublicProfile({
   return {
     ...rawProfile,
     manualHighlights,
-    age: deriveAgeFromBirthDate(rawProfile.sajuProfile?.birthDate),
+    age: deriveAgeFromBirthDate(rawProfile.birthDate),
     instagram: {
       ...(instagram ?? {}),
       username: instagram?.username ?? PUBLIC_PROFILE_FALLBACKS.instagram.username,

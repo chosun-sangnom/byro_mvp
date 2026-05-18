@@ -209,6 +209,8 @@ export function ProfileHeroCard({
     title?: string
     linkId?: string
     age?: number
+    birthDate?: string
+    showAge?: boolean
     headline?: string
     bio: string
     avatarColor?: string
@@ -217,10 +219,6 @@ export function ProfileHeroCard({
     headerMeta?: {
       mood?: string
       availability?: string
-    }
-    sajuProfile?: {
-      showAge?: boolean
-      birthDate?: string
     }
   }
   heroTheme: HeroTheme
@@ -234,7 +232,7 @@ export function ProfileHeroCard({
   onEditPung?: () => void
   onOpenGallery?: () => void
 }) {
-  const showAge = typeof profile.age === 'number' && profile.sajuProfile?.showAge !== false
+  const showAge = typeof profile.age === 'number' && profile.showAge !== false
   const mood = profile.headerMeta?.mood
   const pung = profile.headerMeta?.availability
 
@@ -294,9 +292,9 @@ export function ProfileHeroCard({
           {showAge && (
             <div className="mt-0.5 text-[13px] font-semibold text-white/50">
               {profile.age}세
-              {profile.sajuProfile?.birthDate && (
+              {profile.birthDate && (
                 <span className="ml-1 font-normal">
-                  ({profile.sajuProfile.birthDate.replace(/-/g, '.')})
+                  ({profile.birthDate.replace(/-/g, '.')})
                 </span>
               )}
             </div>

@@ -141,7 +141,6 @@ export interface ProfileHeaderMeta {
 export interface PublicProfileWhoIAm {
   mbti: string
   bloodType: string
-  sajuType: string
   aiStyleSummary: string[]
   relationshipStatus: string
   children: string
@@ -260,7 +259,8 @@ export interface PublicProfile {
   bio: string
   headerMeta?: ProfileHeaderMeta
   whoIAm?: PublicProfileWhoIAm
-  sajuProfile?: SajuProfileInput
+  birthDate?: string
+  showAge?: boolean
   life?: PublicProfileLife
   avatarColor?: string
   avatarImage?: string
@@ -290,15 +290,6 @@ export interface PublicProfile {
   kemi?: KemiData
 }
 
-export interface SajuProfileInput {
-  birthDate: string
-  birthTime: string
-  birthPlace: string
-  calendarType: 'solar' | 'lunar'
-  isBirthTimeUnknown?: boolean
-  showAge?: boolean
-}
-
 export type TabVisibilityLevel = 'public' | 'connected' | 'private'
 
 export interface TabVisibility {
@@ -319,8 +310,9 @@ export interface UserState {
   avatarImage?: string
   profileImages?: string[]
   whoIAm?: PublicProfileWhoIAm
+  birthDate?: string
+  showAge?: boolean
   life?: PublicProfileLife
-  sajuProfile?: SajuProfileInput
   contactChannels?: ContactChannel[]
   tabVisibility?: TabVisibility
 }

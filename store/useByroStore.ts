@@ -10,7 +10,6 @@ import type {
   ContactChannel,
   PublicProfileLife,
   PublicProfileWhoIAm,
-  SajuProfileInput,
   TabVisibility,
   TabVisibilityLevel,
   ConnectionRequest,
@@ -102,7 +101,6 @@ interface ByroStore {
   updateUserContactChannels(channels: ContactChannel[]): void
   updateUserWhoIAm(whoIAm: PublicProfileWhoIAm): void
   updateUserLife(life: PublicProfileLife): void
-  updateUserSajuProfile(sajuProfile: SajuProfileInput): void
   deleteGuestbookEntry(id: string): void
   updateTabVisibility(tab: keyof TabVisibility, level: TabVisibilityLevel): void
   sendConnectionRequest(linkId: string, name: string, title: string, message: string): void
@@ -134,8 +132,6 @@ const normalizeSampleUser = (user: UserState | null): UserState | null => {
       : user.bio,
   }
 }
-
-const sampleSajuProfile = SAMPLE_PROFILE.sajuProfile as SajuProfileInput
 
 export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   // 인증
@@ -331,7 +327,8 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
         profileImages: SAMPLE_PROFILE.profileImages,
         whoIAm: SAMPLE_PROFILE.whoIAm,
         life: SAMPLE_PROFILE.life,
-        sajuProfile: sampleSajuProfile,
+        birthDate: SAMPLE_PROFILE.birthDate,
+        showAge: SAMPLE_PROFILE.showAge,
         contactChannels: onboardingContactChannels,
       },
       highlights: highlightsInitialized ? highlights : SAMPLE_PROFILE.manualHighlights as Highlight[],
@@ -359,7 +356,8 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
         profileImages: SAMPLE_PROFILE.profileImages,
         whoIAm: SAMPLE_PROFILE.whoIAm,
         life: SAMPLE_PROFILE.life,
-        sajuProfile: sampleSajuProfile,
+        birthDate: SAMPLE_PROFILE.birthDate,
+        showAge: SAMPLE_PROFILE.showAge,
         contactChannels: SAMPLE_PROFILE.contactChannels,
       },
       highlights: alreadyInitialized ? get().highlights : SAMPLE_PROFILE.manualHighlights as Highlight[],
@@ -465,12 +463,6 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     set((state) => ({
       user: state.user ? { ...state.user, life } : null,
       kemiComputedProfiles: [],
-    }))
-  },
-
-  updateUserSajuProfile(sajuProfile) {
-    set((state) => ({
-      user: state.user ? { ...state.user, sajuProfile } : null,
     }))
   },
 

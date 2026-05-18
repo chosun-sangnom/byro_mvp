@@ -24,19 +24,13 @@ export const SAMPLE_PROFILE = {
   whoIAm: {
     mbti: 'ENTJ',
     bloodType: 'A형',
-    sajuType: '경금',
     aiStyleSummary: ['신뢰감 있는 인상', '차분한 리더형 무드', '깔끔한 프로페셔널 스타일'],
     relationshipStatus: '좋은 대화에 열려 있음',
     children: '자녀 없음',
     religion: '무교',
   },
-  sajuProfile: {
-    birthDate: '1992-06-14',
-    birthTime: '08:30',
-    birthPlace: '서울',
-    calendarType: 'solar',
-    isBirthTimeUnknown: false,
-  },
+  birthDate: '1992-06-14',
+  showAge: true,
   life: {
     daily: {
       exercise: [
@@ -266,19 +260,13 @@ export const MK_PROFILE = {
   whoIAm: {
     mbti: 'ENTP',
     bloodType: 'B형',
-    sajuType: '임수',
     aiStyleSummary: ['카리스마 있는 인상', '깊은 눈빛의 사색형', '내추럴한 블랙 스타일'],
     relationshipStatus: '자연스러운 연결 선호',
     children: '자녀 없음',
     religion: '무교',
   },
-  sajuProfile: {
-    birthDate: '1988-11-03',
-    birthTime: '22:15',
-    birthPlace: '서울',
-    calendarType: 'solar',
-    isBirthTimeUnknown: false,
-  },
+  birthDate: '1988-11-03',
+  showAge: true,
   life: {
     daily: {
       exercise: [
@@ -482,19 +470,13 @@ export const JIMIN_PROFILE = {
   whoIAm: {
     mbti: 'ENFP',
     bloodType: 'O형',
-    sajuType: '정화',
     aiStyleSummary: ['밝은 첫인상', '부드러운 페미닌 무드', '감각적인 블랙 자켓 스타일'],
     relationshipStatus: '설레는 대화 환영',
     children: '자녀 없음',
     religion: '기독교',
   },
-  sajuProfile: {
-    birthDate: '1995-03-27',
-    birthTime: '19:20',
-    birthPlace: '부산',
-    calendarType: 'solar',
-    isBirthTimeUnknown: false,
-  },
+  birthDate: '1995-03-27',
+  showAge: true,
   life: {
     daily: {
       exercise: [

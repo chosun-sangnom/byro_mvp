@@ -116,6 +116,29 @@ function PreviewReputation() {
   )
 }
 
+function PreviewSNS() {
+  const rows = [
+    { icon: '▶', iconColor: '#FF0000', title: 'YouTube', sub: '구독자 기반 콘텐츠 연결', connected: false },
+    { icon: 'in', iconColor: '#0A66C2', title: 'LinkedIn', sub: 'linkedin.com/in/myongkoo', connected: true },
+    { icon: '📷', iconColor: '#E1306C', title: 'Instagram', sub: '@myongkoo', connected: true },
+    { icon: 'T', iconColor: '#000', title: 'TikTok', sub: '준비 중', connected: false },
+  ]
+  return (
+    <div className="rounded-[18px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 divide-y divide-[var(--color-border-soft)]">
+      {rows.map((row) => (
+        <div key={row.title} className="flex items-center gap-3 py-3">
+          <span className="text-[13px] font-black w-[18px] text-center flex-shrink-0" style={{ color: row.iconColor }}>{row.icon}</span>
+          <div className="flex-1 min-w-0">
+            <div className="text-[13px] font-semibold text-[var(--color-text-primary)]">{row.title}</div>
+            <div className={`text-[11px] truncate ${row.connected ? 'text-[var(--color-accent-dark)]' : 'text-[var(--color-text-tertiary)]'}`}>{row.sub}</div>
+          </div>
+          {row.connected && <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-state-success-text)] flex-shrink-0" />}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 function PreviewContact() {
   return (
     <div className="space-y-2">
@@ -166,6 +189,12 @@ const GUIDE_SLIDES: GuideSlide[] = [
     title: '평판',
     tags: ['경험 키워드', '방명록'],
     value: '다른 사람이 남긴 키워드가 나를 증명해줘요',
+  },
+  {
+    Preview: PreviewSNS,
+    title: 'SNS',
+    tags: ['인스타그램', '링크드인', '유튜브', '틱톡'],
+    value: '인스타·링크드인 연동으로 나다움이 더 드러나요',
   },
   {
     Preview: PreviewContact,

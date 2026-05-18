@@ -28,6 +28,7 @@ function usePublicProfileTabData(username: string) {
   const profile = getNormalizedPublicProfile({
     username,
     user: store.user,
+    ownerHighlights: store.highlights,
   })
   const corporateHighlight = profile.corporateHighlight
   const airlineHighlight = profile.airlineHighlight

@@ -6,6 +6,7 @@ import type {
   CorporateHighlight,
   GuestbookEntry,
   HeroTheme,
+  Highlight,
   InstagramProfile,
   LinkedInProfile,
   PublicProfile,
@@ -126,18 +127,25 @@ function buildEditableOwnerProfile(
 export function getNormalizedPublicProfile({
   username,
   user,
+  ownerHighlights,
 }: {
   username: string
   user?: UserState | null
+  ownerHighlights?: Highlight[]
 }): NormalizedPublicProfile {
   // TODO(real API): Replace this mock selector with a public-profile detail query keyed by `username`.
   const baseProfile = getPublicProfileByUsername(username) as PublicProfile
   const rawProfile = buildEditableOwnerProfile(username, baseProfile, user)
   const instagram = rawProfile.instagram
   const linkedin = rawProfile.linkedin
+  const isOwner = !!user && user.linkId === username
+  const manualHighlights = isOwner && ownerHighlights && ownerHighlights.length > 0
+    ? ownerHighlights
+    : rawProfile.manualHighlights
 
   return {
     ...rawProfile,
+    manualHighlights,
     age: deriveAgeFromBirthDate(rawProfile.sajuProfile?.birthDate),
     instagram: {
       ...(instagram ?? {}),

@@ -54,7 +54,7 @@ export function PublicProfileShell({
 }) {
   const router = useRouter()
   const store = useByroStore()
-  const profile = getNormalizedPublicProfile({ username, user: store.user })
+  const profile = getNormalizedPublicProfile({ username, user: store.user, ownerHighlights: store.highlights })
 
   // owner mode: 로그인 상태이고 현재 보는 프로필이 본인인 경우
   const isOwnerMode = store.isLoggedIn && store.user?.linkId === username

@@ -61,6 +61,7 @@ interface ByroStore {
 
   // 경험
   submittedExperiences: Record<string, Experience[]>
+  highlightsInitialized: boolean
 
   // 케미
   kemiComputedProfiles: string[]
@@ -176,6 +177,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
 
   // 경험
   submittedExperiences: {},
+  highlightsInitialized: false,
 
   // 케미
   kemiComputedProfiles: [],
@@ -312,6 +314,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     const {
       linkId, bio, instagramConnected, linkedinConnected,
       onboardingContactChannels, highlights, onboardingTitle, onboardingSchool,
+      highlightsInitialized,
     } = get()
     set({
       isLoggedIn: true,
@@ -331,14 +334,16 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
         sajuProfile: sampleSajuProfile,
         contactChannels: onboardingContactChannels,
       },
+      highlights: highlightsInitialized ? highlights : SAMPLE_PROFILE.manualHighlights as Highlight[],
+      highlightsInitialized: true,
       step: 'login',
     })
     void instagramConnected
     void linkedinConnected
-    void highlights
   },
 
   login() {
+    const alreadyInitialized = get().highlightsInitialized
     set({
       isLoggedIn: true,
       user: {
@@ -357,6 +362,8 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
         sajuProfile: sampleSajuProfile,
         contactChannels: SAMPLE_PROFILE.contactChannels,
       },
+      highlights: alreadyInitialized ? get().highlights : SAMPLE_PROFILE.manualHighlights as Highlight[],
+      highlightsInitialized: true,
     })
   },
 
@@ -526,6 +533,8 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   // [임시] 목업 데이터로 초기화 — CRUD 연동 전 디자인 검토용. 실제 API 연동 후 제거 예정.
   resetToMockDefaults() {
     set({
+      highlights: SAMPLE_PROFILE.manualHighlights as Highlight[],
+      highlightsInitialized: true,
       connectionRequests: SAMPLE_PROFILE.connectionRequests as ConnectionRequest[],
       connectedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
       sentRequestLinkIds: [],
@@ -551,7 +560,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   },
 }), {
   name: 'byro-store',
-  version: 10,
+  version: 11,
   migrate: (persistedState: unknown) => {
     const state = persistedState as ByroStore | undefined
     if (!state) return persistedState
@@ -597,6 +606,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     connectionRequests: state.connectionRequests,
     connectedProfiles: state.connectedProfiles,
     submittedExperiences: state.submittedExperiences,
+    highlightsInitialized: state.highlightsInitialized,
     kemiComputedProfiles: state.kemiComputedProfiles,
   }),
 }))

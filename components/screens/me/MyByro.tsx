@@ -52,9 +52,11 @@ export default function MyByro() {
 
   if (!store.isLoggedIn) return null
   const user = store.user!
-  const profile = getNormalizedPublicProfile({ username: user.linkId, user })
+  const profile = getNormalizedPublicProfile({ username: user.linkId, user, ownerHighlights: store.highlights })
 
-  const allHighlights = [...profile.manualHighlights, ...store.highlights]
+  const allHighlights = store.highlightsInitialized
+    ? store.highlights
+    : [...profile.manualHighlights, ...store.highlights]
   // ── 화면 분기 ──────────────────────────────────────────────
   if (screen === 'preview') {
     return (

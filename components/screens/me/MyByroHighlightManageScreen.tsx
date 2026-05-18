@@ -59,8 +59,11 @@ export function HighlightManageScreen({
   const educationNeedsMajor = hlSchoolType !== '고등학교'
   const currentYear = new Date().getFullYear()
   const yearOptions = Array.from({ length: currentYear - 1979 }, (_, index) => String(currentYear - index))
-  const allManualHighlights = [...SAMPLE_PROFILE.manualHighlights, ...store.highlights]
-  const editableHighlightIds = new Set(store.highlights.map((highlight) => highlight.id))
+  // store.highlightsInitialized 이후 store.highlights가 단일 진실의 원천 (CRUD 가능)
+  const allManualHighlights = store.highlightsInitialized
+    ? store.highlights
+    : [...SAMPLE_PROFILE.manualHighlights, ...store.highlights]
+  const editableHighlightIds = new Set(allManualHighlights.map((h) => h.id))
   const selectedCategoryHighlights = selectedCat
     ? sortHighlightsByPrimary(
         allManualHighlights.filter((item) => item.categoryId === selectedCat.id),

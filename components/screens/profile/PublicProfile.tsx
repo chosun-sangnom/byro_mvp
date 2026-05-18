@@ -40,6 +40,7 @@ export default function PublicProfile({
   const profile = getNormalizedPublicProfile({
     username,
     user: store.user,
+    ownerHighlights: store.highlights,
   })
   const {
     heroTheme,

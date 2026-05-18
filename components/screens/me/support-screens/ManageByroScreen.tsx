@@ -39,6 +39,7 @@ const TAB_LABELS: Array<{ id: keyof TabVisibility; label: string }> = [
 interface EditRow {
   title: string
   hint: string
+  nudge: string
   meta?: string
   onClick: () => void
 }
@@ -103,18 +104,21 @@ export function ManageByroScreen({
     {
       title: '기본정보',
       hint: '프로필사진 · MBTI · 자기소개',
+      nudge: '사진과 MBTI가 있으면 첫인상이 훨씬 기억에 남아요',
       meta: [user.headline?.trim(), whoIAm.mbti, petLabel].filter(Boolean).join(' · ') || undefined,
       onClick: onEditBasic,
     },
     {
       title: '하이라이트',
       hint: '경력 · 학력 · 수상 · 자격증 등',
+      nudge: '경력과 학력을 채우면 만나기 전부터 신뢰가 생겨요',
       meta: allHighlights.length > 0 ? `${allHighlights.length}개 항목` : undefined,
       onClick: onEditHighlight,
     },
     {
       title: '라이프',
       hint: '반려동물 · 운동 · 음식 · 카페 · 여행지 · 문화',
+      nudge: '취향이 겹치면 어색한 첫 대화가 자연스러워져요',
       meta: activityCount + cultureCount + placeCount > 0
         ? `활동 ${activityCount} · 문화 ${cultureCount} · 장소 ${placeCount}`
         : undefined,
@@ -123,24 +127,28 @@ export function ManageByroScreen({
     {
       title: '네트워크',
       hint: '리멤버 명함 기반 자동 집계',
+      nudge: '공통 인맥이 보이면 연결 고리가 생겨요',
       meta: `${profile.rememberHighlight.total}명 리멤버`,
       onClick: onEditNetwork,
     },
     {
       title: '평판',
       hint: '경험 키워드 · 방명록',
+      nudge: '다른 사람이 남긴 키워드가 나를 증명해줘요',
       meta: totalReputationCount > 0 ? `누적 ${totalReputationCount}회 · 상위 ${visibleReputationCount}개 키워드` : undefined,
       onClick: onEditReputation,
     },
     {
       title: 'SNS',
       hint: '유튜브 · 틱톡 · 인스타 · 링크드인',
+      nudge: '인스타·링크드인 연동으로 나다움이 더 드러나요',
       meta: connectedSnsCount > 0 ? `${connectedSnsCount}개 연동` : undefined,
       onClick: onEditSNS,
     },
     {
       title: '연락수단',
       hint: '전화 · 이메일 · 카카오 · 링크',
+      nudge: '연락 수단이 없으면 만남으로 이어지기 어려워요',
       meta: activeContactCount > 0 ? `${activeContactCount}개 연결` : undefined,
       onClick: onEditContact,
     },
@@ -188,8 +196,10 @@ export function ManageByroScreen({
               <div className="min-w-0 flex-1">
                 <p className="text-[15px] font-semibold text-[var(--color-text-primary)]">{row.title}</p>
                 <p className="mt-0.5 truncate text-[11px] text-[var(--color-text-tertiary)]">{row.hint}</p>
-                {row.meta && (
+                {row.meta ? (
                   <p className="mt-0.5 truncate text-[11px] font-medium text-[var(--color-accent-dark)]">{row.meta}</p>
+                ) : (
+                  <p className="mt-1 truncate text-[11px] text-[var(--color-text-secondary)]">💡 {row.nudge}</p>
                 )}
               </div>
               <ChevronRight size={14} className="ml-3 flex-shrink-0 text-[var(--color-text-tertiary)] opacity-30" />

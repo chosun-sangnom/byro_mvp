@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { useRef, useState, type ChangeEvent } from 'react'
 import { Camera } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { Button, CheckRow, InfoBox, TextArea, showToast } from '@/components/ui'
@@ -9,14 +9,6 @@ import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
 export function Step1Login() {
   const store = useByroStore()
-  const { agreedTerms, agreedPrivacy, agreedMarketing } = store
-  const allChecked = agreedTerms && agreedPrivacy && agreedMarketing
-  const canProceed = agreedTerms && agreedPrivacy
-
-  const handleSocial = () => {
-    if (!canProceed) return
-    store.nextStep()
-  }
 
   return (
     <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
@@ -29,142 +21,49 @@ export function Step1Login() {
           만난 사람에게 바로 공유할 수 있어요.
         </div>
       </div>
-
-      <div className="surface-card-soft rounded-[24px] p-4 mb-4">
-        <div className="pb-3 mb-3 border-b" style={{ borderColor: 'var(--color-border-default)' }}>
-          <CheckRow label="전체 동의" checked={allChecked} onToggle={store.toggleAllAgreed} />
-        </div>
-        <CheckRow
-          label="[필수] 서비스 이용약관"
-          checked={agreedTerms}
-          onToggle={() => store.setAgreedTerms(!agreedTerms)}
-          onDetail={() => {}}
-        />
-        <CheckRow
-          label="[필수] 개인정보 처리방침"
-          checked={agreedPrivacy}
-          onToggle={() => store.setAgreedPrivacy(!agreedPrivacy)}
-          onDetail={() => {}}
-        />
-        <CheckRow
-          label="[선택] 마케팅 정보 수신 동의"
-          checked={agreedMarketing}
-          onToggle={() => store.setAgreedMarketing(!agreedMarketing)}
-          onDetail={() => {}}
-        />
-      </div>
-
       <div className="space-y-3">
-        <Button variant="kakao" disabled={!canProceed} onClick={handleSocial}>카카오로 시작하기</Button>
-        <Button variant="google" disabled={!canProceed} onClick={handleSocial}>G  구글로 시작하기</Button>
-        <Button variant="naver" disabled={!canProceed} onClick={handleSocial}>N  네이버로 시작하기</Button>
+        <Button variant="kakao" onClick={() => store.nextStep()}>카카오로 시작하기</Button>
+        <Button variant="google" onClick={() => store.nextStep()}>G  구글로 시작하기</Button>
+        <Button variant="naver" onClick={() => store.nextStep()}>N  네이버로 시작하기</Button>
       </div>
+      <p className="micro-text text-center mt-6">
+        시작하면 이용약관 및 개인정보 처리방침에 동의하게 됩니다
+      </p>
     </div>
   )
 }
 
 export function Step2Verify() {
   const store = useByroStore()
-  const [phone, setPhone] = useState('')
-  const [code, setCode] = useState('')
-  const [phase, setPhase] = useState<'phone' | 'code'>('phone')
-  const [sending, setSending] = useState(false)
-  const [timer, setTimer] = useState(0)
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  useEffect(() => {
-    return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [])
-
-  const formatPhone = (value: string) => {
-    const digits = value.replace(/\D/g, '').slice(0, 11)
-    if (digits.length <= 3) return digits
-    if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`
-    return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`
-  }
-
-  const phoneDigits = phone.replace(/\D/g, '')
-  const canSend = phoneDigits.length === 11 && phase === 'phone'
-  const canVerify = code.length === 6
-
-  const handleSend = () => {
-    if (!canSend) return
-    setSending(true)
-    setTimeout(() => {
-      setSending(false)
-      setPhase('code')
-      setTimer(180)
-      showToast('인증번호를 발송했어요')
-      timerRef.current = setInterval(() => {
-        setTimer((prev) => {
-          if (prev <= 1) { clearInterval(timerRef.current!); return 0 }
-          return prev - 1
-        })
-      }, 1000)
-    }, 1000)
-  }
+  const { agreedTerms, agreedPrivacy, agreedMarketing } = store
+  const allChecked = agreedTerms && agreedPrivacy && agreedMarketing
+  const canProceed = agreedTerms && agreedPrivacy
 
   const handleVerify = () => {
-    if (!canVerify) return
+    if (!canProceed) return
     store.nextStep()
   }
-
-  const formatTimer = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
 
   return (
     <div className="flex flex-col h-full overflow-y-auto px-5 py-4">
       <StepIntro
         eyebrow="Verification"
         title={'본인 확인이\n필요해요'}
-        description={'휴대폰 번호로 본인을 인증해주세요.'}
+        description={'인증한 이름은 프로필에 실명으로 표시돼요.\n인증 후에는 바꾸기 어려워요.'}
       />
-
-      <div className="space-y-4">
-        <div>
-          <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">휴대폰 번호</label>
-          <div className="flex gap-2">
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => { if (phase === 'phone') setPhone(formatPhone(e.target.value)) }}
-              placeholder="010-0000-0000"
-              disabled={phase === 'code'}
-              className="flex-1 border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none disabled:opacity-50"
-            />
-            <Button
-              size="sm"
-              variant={phase === 'code' ? 'outline' : 'primary'}
-              onClick={phase === 'code' ? () => { setPhase('phone'); setCode(''); setTimer(0) } : handleSend}
-            >
-              {sending ? '발송 중...' : phase === 'code' ? '재입력' : '인증번호 받기'}
-            </Button>
-          </div>
+      <div className="surface-card-soft rounded-[24px] p-4 mb-4">
+        <div className="pb-3 mb-3 border-b" style={{ borderColor: 'var(--color-border-default)' }}>
+          <CheckRow label="전체 동의" checked={allChecked} onToggle={store.toggleAllAgreed} />
         </div>
-
-        {phase === 'code' && (
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="text-xs text-[var(--color-text-tertiary)]">인증번호</label>
-              {timer > 0 && <span className="text-xs font-semibold text-[var(--color-state-danger-text)]">{formatTimer(timer)}</span>}
-            </div>
-            <input
-              type="number"
-              inputMode="numeric"
-              value={code}
-              onChange={(e) => setCode(e.target.value.slice(0, 6))}
-              placeholder="6자리 입력"
-              className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-            />
-            <p className="mt-1.5 text-[11px] text-[var(--color-text-tertiary)]">테스트 환경에서는 아무 6자리나 입력하세요</p>
-          </div>
-        )}
+        <CheckRow label="[필수] 서비스 이용약관" checked={agreedTerms} onToggle={() => store.setAgreedTerms(!agreedTerms)} onDetail={() => {}} />
+        <CheckRow label="[필수] 개인정보 처리방침" checked={agreedPrivacy} onToggle={() => store.setAgreedPrivacy(!agreedPrivacy)} onDetail={() => {}} />
+        <CheckRow label="[선택] 마케팅 정보 수신 동의" checked={agreedMarketing} onToggle={() => store.setAgreedMarketing(!agreedMarketing)} onDetail={() => {}} />
       </div>
-
-      <StepFooter
-        canNext={phase === 'code' ? canVerify : false}
-        onNext={handleVerify}
-        onPrev={() => store.prevStep()}
-      />
+      <div className="space-y-3">
+        <Button variant="outline" disabled={!canProceed} onClick={handleVerify}>SMS로 인증하기</Button>
+        <Button variant="kakao" disabled={!canProceed} onClick={handleVerify}>카카오로 인증하기</Button>
+      </div>
+      <StepFooter canNext={canProceed} onNext={handleVerify} onPrev={() => store.prevStep()} />
     </div>
   )
 }

@@ -69,63 +69,6 @@ function FieldBlock({ label, children }: { label: string; children: ReactNode })
   )
 }
 
-// 칩 입력: 타이핑 → 추가 버튼 or Enter → 칩으로 표시
-function ChipInput({
-  items,
-  onChange,
-  placeholder,
-}: {
-  items: LifeMediaItem[]
-  onChange: (items: LifeMediaItem[]) => void
-  placeholder: string
-}) {
-  const [input, setInput] = useState('')
-
-  const add = () => {
-    const label = input.trim()
-    if (!label || items.some((i) => i.label === label)) return
-    onChange([...items, { label }])
-    setInput('')
-  }
-
-  return (
-    <div>
-      {items.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-3">
-          {items.map((item) => (
-            <span
-              key={item.label}
-              className="flex items-center gap-1.5 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--color-text-primary)]"
-            >
-              {item.label}
-              <button onClick={() => onChange(items.filter((i) => i.label !== item.label))}>
-                <X size={10} strokeWidth={2.5} className="text-[var(--color-text-tertiary)]" />
-              </button>
-            </span>
-          ))}
-        </div>
-      )}
-      <div className="flex gap-2">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add() } }}
-          placeholder={placeholder}
-          className="flex-1 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-2.5 text-sm outline-none placeholder:text-[var(--color-text-tertiary)]"
-        />
-        <button
-          onClick={add}
-          disabled={!input.trim()}
-          className="flex-shrink-0 rounded-xl px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-40"
-          style={{ background: 'var(--color-accent-dark)' }}
-        >
-          추가
-        </button>
-      </div>
-    </div>
-  )
-}
-
 // ─── Sub-screens ──────────────────────────────────────────────────────────────
 
 function PetView({

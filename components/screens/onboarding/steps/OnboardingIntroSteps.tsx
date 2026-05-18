@@ -2,13 +2,17 @@
 
 import { useState } from 'react'
 import { useByroStore } from '@/store/useByroStore'
-import { Button, InfoBox } from '@/components/ui'
+import { Button, CheckRow, InfoBox } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
 
 export function Step1Login() {
   const store = useByroStore()
+  const { agreedTerms, agreedPrivacy, agreedMarketing } = store
+  const allChecked = agreedTerms && agreedPrivacy && agreedMarketing
+  const canProceed = agreedTerms && agreedPrivacy
 
   const handleSocial = () => {
+    if (!canProceed) return
     store.nextStep()
   }
 
@@ -23,18 +27,36 @@ export function Step1Login() {
           만난 사람에게 바로 공유할 수 있어요.
         </div>
       </div>
-      <div className="space-y-3">
-        <Button variant="kakao" onClick={handleSocial}>카카오로 시작하기</Button>
-        <Button variant="google" onClick={handleSocial}>G  구글로 시작하기</Button>
-        <Button variant="naver" onClick={handleSocial}>N  네이버로 시작하기</Button>
+
+      <div className="surface-card-soft rounded-[24px] p-4 mb-4">
+        <div className="pb-3 mb-3 border-b" style={{ borderColor: 'var(--color-border-default)' }}>
+          <CheckRow label="전체 동의" checked={allChecked} onToggle={store.toggleAllAgreed} />
+        </div>
+        <CheckRow
+          label="[필수] 서비스 이용약관"
+          checked={agreedTerms}
+          onToggle={() => store.setAgreedTerms(!agreedTerms)}
+          onDetail={() => {}}
+        />
+        <CheckRow
+          label="[필수] 개인정보 처리방침"
+          checked={agreedPrivacy}
+          onToggle={() => store.setAgreedPrivacy(!agreedPrivacy)}
+          onDetail={() => {}}
+        />
+        <CheckRow
+          label="[선택] 마케팅 정보 수신 동의"
+          checked={agreedMarketing}
+          onToggle={() => store.setAgreedMarketing(!agreedMarketing)}
+          onDetail={() => {}}
+        />
       </div>
-      <p className="micro-text text-center mt-6 leading-relaxed">
-        시작하면{' '}
-        <span className="underline underline-offset-2">이용약관</span>
-        {' '}및{' '}
-        <span className="underline underline-offset-2">개인정보처리방침</span>
-        에 동의한 것으로 간주됩니다
-      </p>
+
+      <div className="space-y-3">
+        <Button variant="kakao" disabled={!canProceed} onClick={handleSocial}>카카오로 시작하기</Button>
+        <Button variant="google" disabled={!canProceed} onClick={handleSocial}>G  구글로 시작하기</Button>
+        <Button variant="naver" disabled={!canProceed} onClick={handleSocial}>N  네이버로 시작하기</Button>
+      </div>
     </div>
   )
 }

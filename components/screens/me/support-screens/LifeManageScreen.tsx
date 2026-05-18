@@ -6,6 +6,7 @@ import { Button, InfoBox, NavBar, TextArea, showToast } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
 import type { LifeMediaItem, PublicProfileLife } from '@/types'
+import { SportsTeamPicker } from './SportsTeamPicker'
 
 const PET_OPTIONS = ['없음', '강아지', '고양이', '기타']
 
@@ -42,7 +43,7 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
   const [petImage, setPetImage] = useState(initialLife.daily.petImage ?? '')
   const petFileInputRef = useRef<HTMLInputElement>(null)
   const [exercise, setExercise] = useState(formatMedia(initialLife.daily.exercise))
-  const [teams, setTeams] = useState(formatMedia(initialLife.tastes.teams ?? []))
+  const [teams, setTeams] = useState<LifeMediaItem[]>(initialLife.tastes.teams ?? [])
   const [movies, setMovies] = useState(formatMedia(initialLife.tastes.movies))
   const [music, setMusic] = useState(formatMedia(initialLife.tastes.music))
   const [books, setBooks] = useState(formatMedia(initialLife.tastes.books))
@@ -71,7 +72,7 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
         music: parseMedia(music, initialLife.tastes.music),
         books: parseMedia(books, initialLife.tastes.books),
         plays: parseMedia(plays, initialLife.tastes.plays ?? []),
-        teams: parseMedia(teams, initialLife.tastes.teams ?? []),
+        teams,
         restaurants: parseMedia(restaurants, initialLife.tastes.restaurants),
         cafes: parseMedia(cafes, initialLife.tastes.cafes),
       },
@@ -149,7 +150,9 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
 
         <Section title="활동">
           <TextAreaField label="좋아하는 운동" value={exercise} onChange={setExercise} placeholder={'러닝\n골프'} />
-          <TextAreaField label="응원하는 스포츠팀" value={teams} onChange={setTeams} placeholder={'LG 트윈스 | KBO\n토트넘 홋스퍼 | EPL\nT1 | e스포츠'} />
+          <InputField label="응원하는 스포츠팀">
+            <SportsTeamPicker selected={teams} onChange={setTeams} />
+          </InputField>
           <InputField label="반려동물">
             <div className="space-y-3">
               <div className="flex flex-wrap gap-2">

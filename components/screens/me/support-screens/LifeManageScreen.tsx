@@ -7,6 +7,7 @@ import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
 import type { LifeMediaItem, PublicProfileLife } from '@/types'
 import { SportsTeamPicker } from './SportsTeamPicker'
+import { MusicSearchPicker } from './MusicSearchPicker'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -263,7 +264,7 @@ function CultureView({
   onSave: (tastes: Partial<PublicProfileLife['tastes']>) => void
 }) {
   const [movies, setMovies] = useState(formatMedia(life.tastes.movies))
-  const [music, setMusic] = useState(formatMedia(life.tastes.music))
+  const [music, setMusic] = useState<LifeMediaItem[]>(life.tastes.music)
   const [books, setBooks] = useState(formatMedia(life.tastes.books))
   const [plays, setPlays] = useState(formatMedia(life.tastes.plays ?? []))
 
@@ -273,7 +274,7 @@ function CultureView({
       onBack={() => onSave({})}
       onSave={() => onSave({
         movies: parseMedia(movies, life.tastes.movies),
-        music: parseMedia(music, life.tastes.music),
+        music,
         books: parseMedia(books, life.tastes.books),
         plays: parseMedia(plays, life.tastes.plays ?? []),
       })}
@@ -282,7 +283,7 @@ function CultureView({
         <TextArea value={movies} onChange={setMovies} placeholder={'머니볼\n소셜 네트워크'} rows={3} maxLength={400} />
       </FieldBlock>
       <FieldBlock label="음악">
-        <TextArea value={music} onChange={setMusic} placeholder={'Tomboy | 혁오\nEverything | 검정치마'} rows={3} maxLength={400} />
+        <MusicSearchPicker selected={music} onChange={setMusic} />
       </FieldBlock>
       <FieldBlock label="책">
         <TextArea value={books} onChange={setBooks} placeholder={'린 스타트업\n제로 투 원'} rows={3} maxLength={400} />

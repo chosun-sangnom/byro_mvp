@@ -91,6 +91,7 @@ export default function MyByro() {
         user={user}
         tabVisibility={store.tabVisibility ?? { who: 'public', life: 'public', reputation: 'public' }}
         onEditVisibility={() => setScreen('editVisibility')}
+        onResetMockData={() => store.resetToMockDefaults()}
       />
     )
   }

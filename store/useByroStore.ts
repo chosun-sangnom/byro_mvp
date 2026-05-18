@@ -111,6 +111,8 @@ interface ByroStore {
   submitExperience(profileLinkId: string, exp: Omit<Experience, 'id' | 'date'>): void
   markKemiComputed(linkId: string): void
   invalidateKemiCache(): void
+  // [임시] 목업 데이터로 초기화 — CRUD 연동 전 디자인 검토용. 실제 API 연동 후 제거 예정.
+  resetToMockDefaults(): void
 }
 
 const normalizeSampleUser = (user: UserState | null): UserState | null => {
@@ -519,6 +521,19 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
 
   invalidateKemiCache() {
     set({ kemiComputedProfiles: [] })
+  },
+
+  // [임시] 목업 데이터로 초기화 — CRUD 연동 전 디자인 검토용. 실제 API 연동 후 제거 예정.
+  resetToMockDefaults() {
+    set({
+      connectionRequests: SAMPLE_PROFILE.connectionRequests as ConnectionRequest[],
+      connectedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
+      sentRequestLinkIds: [],
+      submittedExperiences: {},
+      kemiComputedProfiles: [],
+      deletedGuestbookIds: [],
+      expSubmittedProfiles: [],
+    })
   },
 
   submitExperience(profileLinkId, exp) {

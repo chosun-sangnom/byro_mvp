@@ -22,6 +22,8 @@ interface ManageByroScreenProps {
   user: UserState
   tabVisibility: TabVisibility
   onEditVisibility: () => void
+  // [임시] 목업 초기화 — CRUD 연동 전 디자인 검토용. 실제 API 연동 후 제거 예정.
+  onResetMockData: () => void
 }
 
 const VISIBILITY_LABEL: Record<TabVisibilityLevel, string> = {
@@ -55,6 +57,7 @@ export function ManageByroScreen({
   user,
   tabVisibility,
   onEditVisibility,
+  onResetMockData,
 }: ManageByroScreenProps) {
   const whoIAm = (profile.whoIAm ?? user.whoIAm) as PublicProfileWhoIAm
   const life = (profile.life ?? user.life) as PublicProfileLife
@@ -202,7 +205,7 @@ export function ManageByroScreen({
         </div>
 
         {/* 공개 설정 */}
-        <div className="mx-5 mt-4 mb-8 overflow-hidden rounded-2xl border border-[var(--color-border-soft)]">
+        <div className="mx-5 mt-4 overflow-hidden rounded-2xl border border-[var(--color-border-soft)]">
           <button
             onClick={onEditVisibility}
             className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors active:bg-white/[0.03]"
@@ -214,6 +217,17 @@ export function ManageByroScreen({
               </p>
             </div>
             <ChevronRight size={14} className="ml-3 flex-shrink-0 text-[var(--color-text-tertiary)] opacity-30" />
+          </button>
+        </div>
+
+        {/* [임시] 목업 초기화 버튼 — CRUD 연동 전 디자인 검토용. 실제 API 연동 후 제거 예정. */}
+        <div className="mx-5 mt-6 mb-8">
+          <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)] opacity-50">DEV ONLY</p>
+          <button
+            onClick={onResetMockData}
+            className="w-full rounded-2xl border border-dashed border-[var(--color-border-soft)] py-3.5 text-[13px] font-semibold text-[var(--color-text-tertiary)] opacity-60 active:opacity-40"
+          >
+            목업 데이터로 초기화
           </button>
         </div>
       </div>

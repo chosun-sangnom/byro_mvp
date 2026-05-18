@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, type ChangeEvent, type ReactNode } from 'react'
-import { Camera, ChevronRight, X } from 'lucide-react'
+import { Camera, ChevronRight } from 'lucide-react'
 import { Button, NavBar, showToast } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
@@ -11,6 +11,7 @@ import { SportsTeamPicker } from './SportsTeamPicker'
 import { MusicSearchPicker } from './MusicSearchPicker'
 import { MediaSearchPicker } from './MediaSearchPicker'
 import { PlacePicker } from './PlacePicker'
+import { TravelPicker } from './TravelPicker'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -250,67 +251,14 @@ function TravelView({
   onSave: (destinations: LifeMediaItem[]) => void
 }) {
   const [destinations, setDestinations] = useState<LifeMediaItem[]>(life.places.travelDestinations)
-  const fileInputRefs = useRef<(HTMLInputElement | null)[]>([])
-
-  const handlePhotoChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    if (!file.type.startsWith('image/')) { showToast('이미지 파일만 업로드할 수 있어요'); return }
-    const reader = new FileReader()
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        setDestinations((prev) => prev.map((d, i) => i === index ? { ...d, posterUrl: reader.result as string } : d))
-      }
-    }
-    reader.readAsDataURL(file)
-    e.target.value = ''
-  }
 
   return (
     <SubScreen
       title="여행"
       onBack={() => onSave(life.places.travelDestinations)}
-      onSave={() => onSave(destinations.filter((d) => d.label.trim()))}
+      onSave={() => onSave(destinations)}
     >
-      <div className="space-y-2">
-        {destinations.map((dest, i) => (
-          <div key={i} className="flex items-center gap-2">
-            <button
-              onClick={() => fileInputRefs.current[i]?.click()}
-              className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-muted)] flex items-center justify-center"
-            >
-              {dest.posterUrl
-                // eslint-disable-next-line @next/next/no-img-element
-                ? <img src={dest.posterUrl} alt={dest.label} className="h-full w-full object-cover" />
-                : <Camera size={16} className="text-[var(--color-text-tertiary)]" />
-              }
-            </button>
-            <input
-              ref={(el) => { fileInputRefs.current[i] = el }}
-              type="file" accept="image/*" className="sr-only"
-              onChange={(e) => handlePhotoChange(i, e)}
-            />
-            <input
-              value={dest.label}
-              onChange={(e) => setDestinations((prev) => prev.map((d, j) => j === i ? { ...d, label: e.target.value } : d))}
-              placeholder="예: 도쿄"
-              className="flex-1 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-3 py-2.5 text-sm outline-none placeholder:text-[var(--color-text-tertiary)]"
-            />
-            <button
-              onClick={() => setDestinations((prev) => prev.filter((_, j) => j !== i))}
-              className="h-8 w-8 flex-shrink-0 flex items-center justify-center rounded-lg bg-[var(--color-bg-muted)] text-[var(--color-text-tertiary)]"
-            >
-              <X size={14} />
-            </button>
-          </div>
-        ))}
-        <button
-          onClick={() => setDestinations((prev) => [...prev, { label: '' }])}
-          className="w-full rounded-xl border border-dashed border-[var(--color-border-default)] py-3 text-sm text-[var(--color-text-tertiary)]"
-        >
-          + 여행지 추가
-        </button>
-      </div>
+      <TravelPicker selected={destinations} onChange={setDestinations} />
     </SubScreen>
   )
 }

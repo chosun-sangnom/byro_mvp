@@ -100,8 +100,8 @@ export function RememberNetworkGraph({
           )
         })}
 
-        <circle cx="100" cy="84" r="26" fill="#1DC8A0" />
-        <circle cx="100" cy="84" r="29" fill="none" stroke="#0FA87F" strokeWidth="2" />
+        <circle cx="100" cy="84" r="26" fill="#2563EB" />
+        <circle cx="100" cy="84" r="29" fill="none" stroke="#1D4ED8" strokeWidth="2" />
         <text x="100" y="80" textAnchor="middle" fontSize="9" fontWeight="700" fill="#FFFFFF">나</text>
         <text x="100" y="92" textAnchor="middle" fontSize="7" fontWeight="600" fill="rgba(255,255,255,0.7)">Byro</text>
       </svg>

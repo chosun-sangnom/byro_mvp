@@ -110,7 +110,7 @@ export const comparisons: Array<{
   {
     icon: Sparkles,
     name: 'Byro',
-    color: 'from-[#3DD6B2] to-[#1DC8A0]',
+    color: 'from-[#3B82F6] to-[#2563EB]',
     isHighlight: true,
     description: '커리어 + 라이프스타일 + 검증된 평판',
     highlight: '만나는 순간 공통점이 보이고, 대화의 재료가 생긴다',

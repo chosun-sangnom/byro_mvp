@@ -533,15 +533,29 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   // [임시] 목업 데이터로 초기화 — CRUD 연동 전 디자인 검토용. 실제 API 연동 후 제거 예정.
   resetToMockDefaults() {
     set({
+      // 하이라이트
       highlights: SAMPLE_PROFILE.manualHighlights as Highlight[],
       highlightsInitialized: true,
+      primaryHighlightOverrides: {},
+      // 연결
       connectionRequests: SAMPLE_PROFILE.connectionRequests as ConnectionRequest[],
       connectedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
       sentRequestLinkIds: [],
+      // 경험/피드백
       submittedExperiences: {},
-      kemiComputedProfiles: [],
-      deletedGuestbookIds: [],
       expSubmittedAt: {},
+      deletedGuestbookIds: [],
+      // 케미
+      kemiComputedProfiles: [],
+      // UI 상태
+      bookmarkedProfiles: [],
+      hlOpenStates: {},
+      snsOpenStates: {},
+      activeArchiveTab: 'connected' as const,
+      experienceKeywords: [],
+      experienceMessage: '',
+      // 탭 공개 설정
+      tabVisibility: { who: 'public', life: 'public', reputation: 'public' } as TabVisibility,
     })
   },
 

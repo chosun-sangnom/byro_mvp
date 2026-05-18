@@ -6,7 +6,7 @@ import type { TabVisibility, TabVisibilityLevel } from '@/types'
 
 const VISIBILITY_OPTIONS: Array<{ value: TabVisibilityLevel; label: string; desc: string }> = [
   { value: 'public',    label: '전체공개', desc: '누구나 볼 수 있어요'         },
-  { value: 'connected', label: '연결됨만', desc: '연결된 사람만 볼 수 있어요'  },
+  { value: 'connected', label: '연결된 사람만', desc: '연결된 사람만 볼 수 있어요'  },
   { value: 'private',   label: '비공개',   desc: '나만 볼 수 있어요'           },
 ]
 

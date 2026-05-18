@@ -116,6 +116,37 @@ function PreviewReputation() {
   )
 }
 
+function PreviewConnect() {
+  return (
+    <div className="space-y-2">
+      <div className="rounded-[18px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-3">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-full bg-[var(--color-bg-muted)] flex items-center justify-center text-[13px] font-bold text-[var(--color-text-secondary)] flex-shrink-0">김</div>
+          <div className="flex-1 min-w-0">
+            <div className="text-[13px] font-semibold text-[var(--color-text-primary)]">김철수</div>
+            <div className="text-[11px] text-[var(--color-text-tertiary)]">B2B Sales · 5년차</div>
+          </div>
+          <div className="rounded-full px-2.5 py-1 text-[10px] font-bold bg-[var(--color-bg-muted)] text-[var(--color-text-tertiary)]">연결 안 됨</div>
+        </div>
+        <div className="flex gap-2">
+          <button className="flex-1 rounded-full border border-[var(--color-border-default)] py-2 text-[12px] font-semibold text-[var(--color-text-secondary)]">평판 요청</button>
+          <button className="flex-1 rounded-full py-2 text-[12px] font-semibold text-white bg-[var(--color-accent-dark)]">연결하기</button>
+        </div>
+      </div>
+      <div className="rounded-[14px] border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-4 py-3">
+        <div className="flex items-center gap-3 mb-1.5">
+          <div className="w-7 h-7 rounded-full bg-[var(--color-accent-dark)] flex items-center justify-center text-[11px] font-bold text-white flex-shrink-0">이</div>
+          <div className="flex-1 min-w-0">
+            <div className="text-[12px] font-semibold text-[var(--color-text-primary)]">이지현</div>
+          </div>
+          <div className="rounded-full px-2 py-0.5 text-[10px] font-bold text-[var(--color-accent-dark)]" style={{ background: 'color-mix(in srgb, var(--color-accent-dark) 12%, transparent)' }}>연결됨</div>
+        </div>
+        <p className="text-[11px] text-[var(--color-text-tertiary)] leading-relaxed">연결된 친구는 비공개로 설정한 탭도 볼 수 있어요</p>
+      </div>
+    </div>
+  )
+}
+
 function PreviewSNS() {
   const rows = [
     { icon: '▶', iconColor: '#FF0000', title: 'YouTube', sub: '구독자 기반 콘텐츠 연결', connected: false },
@@ -189,6 +220,12 @@ const GUIDE_SLIDES: GuideSlide[] = [
     title: '평판',
     tags: ['경험 키워드', '방명록'],
     value: '다른 사람이 남긴 키워드가 나를 증명해줘요',
+  },
+  {
+    Preview: PreviewConnect,
+    title: '연결',
+    tags: ['평판 요청', '친구 연결', '비공개 공유'],
+    value: '연결된 사람에게 더 많은 나를 보여줄 수 있어요',
   },
   {
     Preview: PreviewSNS,

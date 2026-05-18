@@ -335,6 +335,16 @@ export const MK_PROFILE = {
   ] as ContactChannel[],
   instagramConnected: true,
   linkedinConnected: true,
+  youtubeConnected: true,
+  tiktokConnected: true,
+  youtube: {
+    channelName: '강민준',
+    channelUrl: 'https://www.youtube.com/@epicmkk',
+  },
+  tiktok: {
+    username: 'epicmkk',
+    profileUrl: 'https://www.tiktok.com/@epicmkk',
+  },
   instagram: {
     username: 'epicmkk',
     profileUrl: 'https://www.instagram.com/epicmkk/',

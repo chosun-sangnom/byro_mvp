@@ -13,13 +13,21 @@ interface SnsItem {
 export function ProfileSnsSection({
   instagramConnected,
   linkedinConnected,
+  youtubeConnected,
+  tiktokConnected,
   instagram,
   linkedin,
+  youtube,
+  tiktok,
 }: {
   instagramConnected: boolean
   linkedinConnected: boolean
+  youtubeConnected?: boolean
+  tiktokConnected?: boolean
   instagram: { username: string; profileUrl: string }
   linkedin: { profileUrl: string }
+  youtube?: { channelName: string; channelUrl: string }
+  tiktok?: { username: string; profileUrl: string }
 }) {
   const items: SnsItem[] = [
     instagramConnected && {
@@ -39,6 +47,18 @@ export function ProfileSnsSection({
       ),
       title: 'LinkedIn',
       href: linkedin.profileUrl,
+    },
+    youtubeConnected && youtube && {
+      key: 'youtube',
+      icon: <YoutubeIcon />,
+      title: 'YouTube',
+      href: youtube.channelUrl,
+    },
+    tiktokConnected && tiktok && {
+      key: 'tiktok',
+      icon: <TiktokIcon />,
+      title: 'TikTok',
+      href: tiktok.profileUrl,
     },
   ].filter(Boolean) as SnsItem[]
 
@@ -65,5 +85,23 @@ export function ProfileSnsSection({
         ))}
       </div>
     </AnimatedSection>
+  )
+}
+
+function YoutubeIcon() {
+  return (
+    <svg viewBox="0 0 18 18" width={18} height={18} xmlns="http://www.w3.org/2000/svg">
+      <rect width="18" height="18" rx="4" fill="#FF0000" />
+      <polygon points="7,5.5 7,12.5 13,9" fill="white" />
+    </svg>
+  )
+}
+
+function TiktokIcon() {
+  return (
+    <svg viewBox="0 0 18 18" width={18} height={18} xmlns="http://www.w3.org/2000/svg">
+      <rect width="18" height="18" rx="4" fill="#111111" />
+      <text x="9" y="13" textAnchor="middle" fontSize="9" fontWeight="bold" fill="white" fontFamily="sans-serif">TT</text>
+    </svg>
   )
 }

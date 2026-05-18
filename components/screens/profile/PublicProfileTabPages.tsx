@@ -136,8 +136,12 @@ export function PublicProfileWhoTabPage({
       <ProfileSnsSection
         instagramConnected={profile.instagramConnected}
         linkedinConnected={profile.linkedinConnected}
+        youtubeConnected={profile.youtubeConnected}
+        tiktokConnected={profile.tiktokConnected}
         instagram={profile.instagram}
         linkedin={profile.linkedin}
+        youtube={profile.youtube}
+        tiktok={profile.tiktok}
       />
     </>
   )

@@ -267,8 +267,12 @@ export interface PublicProfile {
   profileImages?: string[]
   instagramConnected: boolean
   linkedinConnected: boolean
+  youtubeConnected?: boolean
+  tiktokConnected?: boolean
   instagram?: InstagramProfile
   linkedin?: LinkedInProfile
+  youtube?: { channelName: string; channelUrl: string }
+  tiktok?: { username: string; profileUrl: string }
   careerHighlight: CareerHighlight
   rememberHighlight: RememberHighlight
   heroTheme?: HeroTheme

@@ -16,7 +16,7 @@ import type {
 } from '@/types'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
-const STEP_ORDER: OnboardingStep[] = ['login', 'linkid', 'complete']
+const STEP_ORDER: OnboardingStep[] = ['login', 'linkid', 'profile', 'complete']
 
 interface ByroStore {
   // 인증
@@ -440,12 +440,12 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   },
 }), {
   name: 'byro-store',
-  version: 5,
+  version: 6,
   migrate: (persistedState: unknown) => {
     const state = persistedState as ByroStore | undefined
     if (!state) return persistedState
     const persistedStep = state.step as string
-    const validSteps: OnboardingStep[] = ['login', 'linkid', 'complete']
+    const validSteps: OnboardingStep[] = ['login', 'linkid', 'profile', 'complete']
     const migratedStep: OnboardingStep = validSteps.includes(persistedStep as OnboardingStep)
       ? (persistedStep as OnboardingStep)
       : 'login'

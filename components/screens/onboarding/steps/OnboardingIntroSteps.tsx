@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState, type ChangeEvent } from 'react'
+import { Camera } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
-import { Button, CheckRow, InfoBox } from '@/components/ui'
+import { Button, CheckRow, InfoBox, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
+import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
 export function Step1Login() {
   const store = useByroStore()
@@ -111,8 +113,139 @@ export function Step3LinkId() {
 
       <StepFooter
         canNext={status === 'valid'}
-        onNext={() => { store.completeOnboarding(); store.goToStep('complete') }}
+        onNext={() => store.nextStep()}
         onPrev={() => store.prevStep()}
+      />
+    </div>
+  )
+}
+
+const MBTI_DIMS = [
+  { options: ['E', 'I'] as const, labels: ['외향', '내향'] },
+  { options: ['N', 'S'] as const, labels: ['직관', '감각'] },
+  { options: ['T', 'F'] as const, labels: ['사고', '감정'] },
+  { options: ['J', 'P'] as const, labels: ['판단', '인식'] },
+]
+
+export function Step4Profile() {
+  const store = useByroStore()
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [avatarImage, setAvatarImage] = useState('')
+  const [mbti, setMbti] = useState('')
+  const [bio, setBio] = useState('')
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      showToast('이미지 파일만 업로드할 수 있어요')
+      event.target.value = ''
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => setAvatarImage(reader.result as string)
+    reader.readAsDataURL(file)
+    event.target.value = ''
+  }
+
+  const handleNext = () => {
+    store.completeOnboarding()
+    if (avatarImage) store.updateUserInfo({ avatarImage, profileImages: [avatarImage] })
+    if (bio.trim()) store.updateUserInfo({ bio: bio.trim() })
+    if (mbti.length === 4) store.updateUserWhoIAm({ ...SAMPLE_PROFILE.whoIAm, mbti })
+    store.goToStep('complete')
+  }
+
+  return (
+    <div className="flex flex-col h-full overflow-y-auto px-5 py-4">
+      <StepIntro
+        eyebrow="Profile"
+        title={'프로필을\n채워볼까요?'}
+        description={'나중에 편집에서 언제든 바꿀 수 있어요.'}
+      />
+
+      {/* 프로필 사진 */}
+      <input ref={fileInputRef} type="file" accept="image/*" className="sr-only" onChange={handleFileChange} />
+      <div className="mb-6 flex flex-col items-center">
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          className="relative h-24 w-24 overflow-hidden rounded-full border-2 border-dashed border-[var(--color-border-default)] bg-[var(--color-bg-soft)] transition-opacity active:opacity-70"
+        >
+          {avatarImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={avatarImage} alt="프로필" className="h-full w-full object-cover" />
+          ) : (
+            <div className="flex h-full w-full flex-col items-center justify-center gap-1 text-[var(--color-text-tertiary)]">
+              <Camera size={22} />
+              <span className="text-[10px] font-semibold">사진 추가</span>
+            </div>
+          )}
+        </button>
+        {avatarImage && (
+          <button onClick={() => fileInputRef.current?.click()} className="mt-2 text-xs font-semibold text-[var(--color-accent-dark)]">
+            변경하기
+          </button>
+        )}
+      </div>
+
+      {/* MBTI */}
+      <div className="mb-5">
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-xs text-[var(--color-text-tertiary)]">MBTI</label>
+          {mbti && <span className="text-sm font-bold text-[var(--color-text-primary)]">{mbti}</span>}
+        </div>
+        <div className="space-y-2">
+          {MBTI_DIMS.map((dim, dimIndex) => {
+            const selectedLetter = mbti[dimIndex] ?? ''
+            return (
+              <div key={dimIndex} className="flex overflow-hidden rounded-xl border border-[var(--color-border-default)]">
+                {dim.options.map((letter, optIndex) => {
+                  const isSelected = selectedLetter === letter
+                  return (
+                    <button
+                      key={letter}
+                      type="button"
+                      onClick={() => {
+                        const parts = (mbti || '    ').split('')
+                        parts[dimIndex] = letter
+                        setMbti(parts.join('').trimEnd())
+                      }}
+                      className="flex-1 py-2.5 px-4 text-left transition-colors"
+                      style={{
+                        background: isSelected ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
+                        borderRight: optIndex === 0 ? '1px solid var(--color-border-default)' : undefined,
+                      }}
+                    >
+                      <span className={`text-[13px] font-black ${isSelected ? 'text-white' : 'text-[var(--color-text-secondary)]'}`}>{letter}</span>
+                      <span className={`ml-1.5 text-[11px] ${isSelected ? 'text-white/80' : 'text-[var(--color-text-tertiary)]'}`}>{dim.labels[optIndex]}</span>
+                    </button>
+                  )
+                })}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* 자기소개 */}
+      <div className="mb-6">
+        <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">자기소개</label>
+        <TextArea
+          value={bio}
+          onChange={setBio}
+          placeholder="예: 창업 3년차. 사람을 만나고 연결하는 걸 좋아합니다."
+          rows={3}
+          maxLength={200}
+        />
+      </div>
+
+      <StepFooter
+        canNext
+        onNext={handleNext}
+        onPrev={() => store.prevStep()}
+        onSkip={handleNext}
+        skipLabel="건너뛰기"
       />
     </div>
   )

@@ -12,7 +12,7 @@ import { SportsTeamPicker } from './SportsTeamPicker'
 
 type LifeView = 'hub' | 'pet' | 'activity' | 'culture' | 'food' | 'travel'
 
-const PET_OPTIONS = ['없음', '강아지', '고양이', '기타']
+const PET_OPTIONS = ['없음', '강아지', '고양이', '소형 포유류', '조류', '파충류', '어류', '기타']
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -159,8 +159,21 @@ function PetView({
       })}
     >
       <FieldBlock label="종류">
+        {/* 없음 — 단독 행 */}
+        <button
+          onClick={() => setPet('없음')}
+          className="mb-3 w-full rounded-xl border px-4 py-2.5 text-sm font-semibold transition-colors"
+          style={{
+            borderColor: pet === '없음' ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
+            background: pet === '없음' ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
+            color: pet === '없음' ? '#fff' : 'var(--color-text-secondary)',
+          }}
+        >
+          없음
+        </button>
+        {/* 반려동물 카테고리 */}
         <div className="flex flex-wrap gap-2">
-          {PET_OPTIONS.map((option) => {
+          {PET_OPTIONS.filter((o) => o !== '없음').map((option) => {
             const selected = option === pet
             return (
               <button

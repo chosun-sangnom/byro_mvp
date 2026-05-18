@@ -341,7 +341,7 @@ export function PublicProfileShell({
         profileName={profile.name}
         isLoggedIn={store.isLoggedIn}
         onRequestExperience={() => { setExpDoneModal(false); setFeedbackRequestOpen(true) }}
-        onCreateByro={() => { setExpDoneModal(false); router.push('/onboarding') }}
+        onCreateByro={() => { setExpDoneModal(false); router.push('/signup') }}
         onLogin={() => { setExpDoneModal(false); store.login() }}
         onClose={() => setExpDoneModal(false)}
       />

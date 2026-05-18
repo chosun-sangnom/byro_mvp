@@ -40,7 +40,7 @@ export default function MyByro() {
   const store = useByroStore()
 
   useEffect(() => {
-    if (!store.isLoggedIn) router.replace('/onboarding')
+    if (!store.isLoggedIn) router.replace('/signup')
   }, [store.isLoggedIn, router])
 
   const [screen, setScreen] = useState<Screen>(

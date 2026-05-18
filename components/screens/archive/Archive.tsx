@@ -14,7 +14,7 @@ export default function Archive() {
 
   useEffect(() => {
     if (!store.isLoggedIn) {
-      router.replace('/onboarding')
+      router.replace('/signup')
     }
   }, [store.isLoggedIn, router])
 

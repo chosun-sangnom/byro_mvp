@@ -353,7 +353,7 @@ export default function PublicProfile({
         }}
         onCreateByro={() => {
           setExpDoneModal(false)
-          router.push('/onboarding')
+          router.push('/signup')
         }}
         onLogin={() => {
           setExpDoneModal(false)

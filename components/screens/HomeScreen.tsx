@@ -23,7 +23,7 @@ export default function HomeScreen() {
       router.push('/me')
       return
     }
-    router.push('/onboarding')
+    router.push('/signup')
   }
 
   const handleSecondary = () => {

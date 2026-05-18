@@ -8,6 +8,7 @@ import { useByroStore } from '@/store/useByroStore'
 import type { LifeMediaItem, PublicProfileLife } from '@/types'
 import { SportsTeamPicker } from './SportsTeamPicker'
 import { MusicSearchPicker } from './MusicSearchPicker'
+import { MediaSearchPicker } from './MediaSearchPicker'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -263,33 +264,28 @@ function CultureView({
   life: PublicProfileLife
   onSave: (tastes: Partial<PublicProfileLife['tastes']>) => void
 }) {
-  const [movies, setMovies] = useState(formatMedia(life.tastes.movies))
+  const [movies, setMovies] = useState<LifeMediaItem[]>(life.tastes.movies)
   const [music, setMusic] = useState<LifeMediaItem[]>(life.tastes.music)
-  const [books, setBooks] = useState(formatMedia(life.tastes.books))
-  const [plays, setPlays] = useState(formatMedia(life.tastes.plays ?? []))
+  const [books, setBooks] = useState<LifeMediaItem[]>(life.tastes.books)
+  const [plays, setPlays] = useState<LifeMediaItem[]>(life.tastes.plays ?? [])
 
   return (
     <SubScreen
       title="문화"
       onBack={() => onSave({})}
-      onSave={() => onSave({
-        movies: parseMedia(movies, life.tastes.movies),
-        music,
-        books: parseMedia(books, life.tastes.books),
-        plays: parseMedia(plays, life.tastes.plays ?? []),
-      })}
+      onSave={() => onSave({ movies, music, books, plays })}
     >
       <FieldBlock label="영화">
-        <TextArea value={movies} onChange={setMovies} placeholder={'머니볼\n소셜 네트워크'} rows={3} maxLength={400} />
+        <MediaSearchPicker type="movie" selected={movies} onChange={setMovies} />
       </FieldBlock>
       <FieldBlock label="음악">
         <MusicSearchPicker selected={music} onChange={setMusic} />
       </FieldBlock>
       <FieldBlock label="책">
-        <TextArea value={books} onChange={setBooks} placeholder={'린 스타트업\n제로 투 원'} rows={3} maxLength={400} />
+        <MediaSearchPicker type="book" selected={books} onChange={setBooks} />
       </FieldBlock>
       <FieldBlock label="공연 · 연극">
-        <TextArea value={plays} onChange={setPlays} placeholder={'렛미플라이\n레드북'} rows={2} maxLength={200} />
+        <MediaSearchPicker type="play" selected={plays} onChange={setPlays} />
       </FieldBlock>
     </SubScreen>
   )

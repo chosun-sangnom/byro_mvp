@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import { NavBar } from '@/components/ui'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import type { Highlight, PublicProfile, PublicProfileLife, PublicProfileWhoIAm, TabVisibility, TabVisibilityLevel, UserState } from '@/types'
@@ -21,20 +21,14 @@ interface ManageByroScreenProps {
   onEditContact: () => void
   user: UserState
   tabVisibility: TabVisibility
-  onUpdateTabVisibility: (tab: keyof TabVisibility, level: TabVisibilityLevel) => void
+  onEditVisibility: () => void
 }
 
-const VISIBILITY_OPTIONS: Array<{ value: TabVisibilityLevel; label: string }> = [
-  { value: 'public', label: '전체공개' },
-  { value: 'connected', label: '연결됨만' },
-  { value: 'private', label: '비공개' },
-]
-
-const TAB_LABELS: Array<{ id: keyof TabVisibility; label: string; desc: string }> = [
-  { id: 'who',        label: '나',     desc: '하이라이트 · 자기소개' },
-  { id: 'life',       label: '라이프', desc: '취향 · 장소 · 활동'   },
-  { id: 'reputation', label: '관계',   desc: '평판 · 방명록'        },
-]
+const VISIBILITY_LABEL: Record<TabVisibilityLevel, string> = {
+  public: '전체공개',
+  connected: '연결됨만',
+  private: '비공개',
+}
 
 interface EditRow {
   title: string
@@ -60,7 +54,7 @@ export function ManageByroScreen({
   onEditContact,
   user,
   tabVisibility,
-  onUpdateTabVisibility,
+  onEditVisibility,
 }: ManageByroScreenProps) {
   const whoIAm = (profile.whoIAm ?? user.whoIAm) as PublicProfileWhoIAm
   const life = (profile.life ?? user.life) as PublicProfileLife
@@ -208,43 +202,19 @@ export function ManageByroScreen({
         </div>
 
         {/* 공개 설정 */}
-        <div className="mx-5 mt-5 mb-8">
-          <p className="mb-3 text-[13px] font-black uppercase tracking-[0.1em] text-[var(--color-text-primary)]">공개 설정</p>
-          <div className="overflow-hidden rounded-2xl border border-[var(--color-border-soft)]">
-            <div className="flex items-center border-b border-[var(--color-border-soft)] px-5 py-3.5">
-              <div>
-                <p className="text-[14px] font-semibold text-[var(--color-text-primary)]">프로필 카드</p>
-                <p className="text-[11px] text-[var(--color-text-tertiary)]">이름 · 직함 · 사진</p>
-              </div>
-              <p className="ml-auto text-[11px] font-semibold text-[var(--color-accent-dark)]">항상 전체공개</p>
+        <div className="mx-5 mt-4 mb-8 overflow-hidden rounded-2xl border border-[var(--color-border-soft)]">
+          <button
+            onClick={onEditVisibility}
+            className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors active:bg-white/[0.03]"
+          >
+            <div className="min-w-0 flex-1">
+              <p className="text-[15px] font-semibold text-[var(--color-text-primary)]">공개 설정</p>
+              <p className="mt-0.5 text-[11px] font-medium text-[var(--color-accent-dark)]">
+                나 {VISIBILITY_LABEL[tabVisibility.who]} · 라이프 {VISIBILITY_LABEL[tabVisibility.life]} · 관계 {VISIBILITY_LABEL[tabVisibility.reputation]}
+              </p>
             </div>
-            {TAB_LABELS.map(({ id, label, desc }, i) => (
-              <div
-                key={id}
-                className={[
-                  'flex items-center gap-3 px-5 py-3.5',
-                  i < TAB_LABELS.length - 1 ? 'border-b border-[var(--color-border-soft)]' : '',
-                ].join(' ')}
-              >
-                <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-semibold text-[var(--color-text-primary)]">{label}</p>
-                  <p className="text-[11px] text-[var(--color-text-tertiary)]">{desc}</p>
-                </div>
-                <div className="relative flex-shrink-0">
-                  <select
-                    value={tabVisibility[id]}
-                    onChange={(e) => onUpdateTabVisibility(id, e.target.value as TabVisibilityLevel)}
-                    className="appearance-none cursor-pointer rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] py-1.5 pl-3 pr-7 text-[12px] font-semibold text-[var(--color-text-primary)] outline-none"
-                  >
-                    {VISIBILITY_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
-                    ))}
-                  </select>
-                  <ChevronDown size={11} className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]" />
-                </div>
-              </div>
-            ))}
-          </div>
+            <ChevronRight size={14} className="ml-3 flex-shrink-0 text-[var(--color-text-tertiary)] opacity-30" />
+          </button>
         </div>
       </div>
     </div>

@@ -20,6 +20,7 @@ import {
   RememberNetworkManageScreen,
   ReputationManageScreen,
   SNSManageScreen,
+  VisibilitySettingScreen,
 } from '@/components/screens/me/MyByroSupportScreens'
 
 type Screen =
@@ -32,6 +33,7 @@ type Screen =
   | 'editReputation'
   | 'editSNS'
   | 'editContact'
+  | 'editVisibility'
 
 // ─────────────────────────────────────────────────────────────────────────────
 export default function MyByro() {
@@ -88,7 +90,7 @@ export default function MyByro() {
         onEditContact={() => setScreen('editContact')}
         user={user}
         tabVisibility={store.tabVisibility ?? { who: 'public', life: 'public', reputation: 'public' }}
-        onUpdateTabVisibility={store.updateTabVisibility}
+        onEditVisibility={() => setScreen('editVisibility')}
       />
     )
   }
@@ -129,6 +131,16 @@ export default function MyByro() {
 
   if (screen === 'editContact') {
     return <ContactManageScreen onBack={() => setScreen('manage')} />
+  }
+
+  if (screen === 'editVisibility') {
+    return (
+      <VisibilitySettingScreen
+        tabVisibility={store.tabVisibility ?? { who: 'public', life: 'public', reputation: 'public' }}
+        onUpdate={store.updateTabVisibility}
+        onBack={() => setScreen('manage')}
+      />
+    )
   }
 
   return null

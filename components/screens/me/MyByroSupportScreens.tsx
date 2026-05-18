@@ -6,3 +6,4 @@ export { ContactManageScreen } from '@/components/screens/me/support-screens/Con
 export { ReputationManageScreen } from '@/components/screens/me/support-screens/ReputationManageScreen'
 export { LifeManageScreen } from '@/components/screens/me/support-screens/LifeManageScreen'
 export { RememberNetworkManageScreen } from '@/components/screens/me/support-screens/RememberNetworkManageScreen'
+export { VisibilitySettingScreen } from '@/components/screens/me/support-screens/VisibilitySettingScreen'

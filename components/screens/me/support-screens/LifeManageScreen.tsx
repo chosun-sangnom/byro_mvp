@@ -2,7 +2,7 @@
 
 import { useRef, useState, type ChangeEvent, type ReactNode } from 'react'
 import { Camera, ChevronRight, X } from 'lucide-react'
-import { Button, NavBar, TextArea, showToast } from '@/components/ui'
+import { Button, NavBar, showToast } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
 import type { LifeMediaItem, PublicProfileLife } from '@/types'
@@ -10,31 +10,13 @@ import { ExercisePicker } from './ExercisePicker'
 import { SportsTeamPicker } from './SportsTeamPicker'
 import { MusicSearchPicker } from './MusicSearchPicker'
 import { MediaSearchPicker } from './MediaSearchPicker'
+import { PlacePicker } from './PlacePicker'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type LifeView = 'hub' | 'pet' | 'activity' | 'culture' | 'food' | 'travel'
+type LifeView = 'hub' | 'pet' | 'activity' | 'culture' | 'place' | 'travel'
 
 const PET_OPTIONS = ['없음', '강아지', '고양이', '소형 포유류', '조류', '파충류', '어류', '기타']
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-function formatMedia(items: LifeMediaItem[]) {
-  return items.map((i) => (i.sublabel ? `${i.label} | ${i.sublabel}` : i.label)).join('\n')
-}
-
-function parseMedia(value: string, previous: LifeMediaItem[]): LifeMediaItem[] {
-  return value
-    .split('\n')
-    .map((l) => l.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const [labelPart, ...rest] = line.split('|')
-      const label = labelPart.trim()
-      const sublabel = rest.join('|').trim() || undefined
-      return { label, sublabel, posterUrl: previous.find((i) => i.label === label)?.posterUrl }
-    })
-}
 
 // ─── Shared sub-components ────────────────────────────────────────────────────
 
@@ -235,31 +217,27 @@ function CultureView({
   )
 }
 
-function FoodView({
+function PlaceView({
   life,
   onSave,
 }: {
   life: PublicProfileLife
   onSave: (tastes: Partial<PublicProfileLife['tastes']>) => void
 }) {
-  const [restaurants, setRestaurants] = useState(formatMedia(life.tastes.restaurants))
-  const [cafes, setCafes] = useState(formatMedia(life.tastes.cafes))
+  const [restaurants, setRestaurants] = useState<LifeMediaItem[]>(life.tastes.restaurants)
+  const [cafes, setCafes] = useState<LifeMediaItem[]>(life.tastes.cafes)
 
   return (
     <SubScreen
-      title="음식 · 카페"
+      title="플레이스"
       onBack={() => onSave({})}
-      onSave={() => onSave({
-        restaurants: parseMedia(restaurants, life.tastes.restaurants),
-        cafes: parseMedia(cafes, life.tastes.cafes),
-      })}
+      onSave={() => onSave({ restaurants, cafes })}
     >
-      <FieldBlock label="맛집">
-        <TextArea value={restaurants} onChange={setRestaurants} placeholder={'성수 우육미엔 | 성수동\n압구정 뜸들이다 | 압구정'} rows={4} maxLength={400} />
-      </FieldBlock>
-      <FieldBlock label="카페">
-        <TextArea value={cafes} onChange={setCafes} placeholder={'센터커피 | 성수동\n프릳츠 원서점 | 서촌'} rows={4} maxLength={400} />
-      </FieldBlock>
+      <PlacePicker
+        restaurants={restaurants}
+        cafes={cafes}
+        onChange={(r, c) => { setRestaurants(r); setCafes(c) }}
+      />
     </SubScreen>
   )
 }
@@ -381,9 +359,9 @@ function LifeHub({
       nudge: '영화·음악·책 취향은 가장 좋은 대화 소재예요',
     },
     {
-      view: 'food',
-      emoji: '🍜',
-      title: '음식 · 카페',
+      view: 'place',
+      emoji: '📍',
+      title: '플레이스',
       meta: foodCount > 0 ? `맛집 ${life.tastes.restaurants.length} · 카페 ${life.tastes.cafes.length}` : null,
       nudge: '좋아하는 동네 맛집을 공유해보세요',
     },
@@ -463,7 +441,7 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
   if (view === 'pet')      return <PetView      life={life} onSave={updateDaily} />
   if (view === 'activity') return <ActivityView life={life} onSave={updateActivityTeams} />
   if (view === 'culture')  return <CultureView  life={life} onSave={updateTastes} />
-  if (view === 'food')     return <FoodView     life={life} onSave={updateTastes} />
+  if (view === 'place')    return <PlaceView    life={life} onSave={updateTastes} />
   if (view === 'travel')   return <TravelView   life={life} onSave={updateTravel} />
 
   return <LifeHub life={life} onNavigate={setView} onBack={saveAndBack} />

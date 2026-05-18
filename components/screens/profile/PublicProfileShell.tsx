@@ -59,6 +59,16 @@ export function PublicProfileShell({
   // owner mode: 로그인 상태이고 현재 보는 프로필이 본인인 경우
   const isOwnerMode = store.isLoggedIn && store.user?.linkId === username
 
+  // 연결 관계 상태
+  const connectionStatus = (() => {
+    if (store.connectedProfiles.some((p) => p.linkId === profile.linkId)) return 'connected' as const
+    const receivedRequest = store.connectionRequests.find((r) => r.linkId === profile.linkId)
+    if (receivedRequest) return 'received' as const
+    if (store.sentRequestLinkIds.includes(profile.linkId)) return 'sent' as const
+    return 'none' as const
+  })()
+  const receivedRequestId = store.connectionRequests.find((r) => r.linkId === profile.linkId)?.id
+
   const [bioExpanded, setBioExpanded] = useState(false)
   const [bioOverflowing, setBioOverflowing] = useState(false)
   const [moodSheetOpen, setMoodSheetOpen] = useState(false)
@@ -66,6 +76,7 @@ export function PublicProfileShell({
   const [compatibilityOpen, setCompatibilityOpen] = useState(false)
   const [connectionRequestOpen, setConnectionRequestOpen] = useState(false)
   const [connectionMessage, setConnectionMessage] = useState('')
+  const [cancelRequestOpen, setCancelRequestOpen] = useState(false)
   const [expSheetOpen, setExpSheetOpen] = useState(false)
   const [expDoneModal, setExpDoneModal] = useState(false)
   const [feedbackRequestOpen, setFeedbackRequestOpen] = useState(false)
@@ -245,7 +256,7 @@ export function PublicProfileShell({
           </div>
         )}
 
-        {/* 메인 CTA — owner: 편집 + 연결 관리 / visitor: 연결 요청 */}
+        {/* 메인 CTA — owner: 편집 + 연결 관리 / visitor: 연결 상태별 버튼 */}
         {isOwnerMode ? (
           <div className="mb-4 flex gap-3">
             <button
@@ -260,6 +271,42 @@ export function PublicProfileShell({
               className="flex flex-1 items-center justify-center rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)] whitespace-nowrap"
             >
               연결 관리
+            </button>
+          </div>
+        ) : connectionStatus === 'connected' ? (
+          <button
+            disabled
+            className="mb-4 w-full rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-tertiary)] whitespace-nowrap"
+          >
+            연결됨 ✓
+          </button>
+        ) : connectionStatus === 'sent' ? (
+          <button
+            onClick={() => setCancelRequestOpen(true)}
+            className="mb-4 w-full rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-tertiary)] whitespace-nowrap"
+          >
+            요청 중
+          </button>
+        ) : connectionStatus === 'received' ? (
+          <div className="mb-4 flex gap-2">
+            <button
+              onClick={() => {
+                if (receivedRequestId) store.acceptConnectionRequest(receivedRequestId)
+                showToast(`${profile.name}님과 연결됐어요!`)
+              }}
+              className="flex-1 rounded-full py-3 text-[13px] font-semibold text-white whitespace-nowrap"
+              style={{ backgroundColor: 'var(--color-accent-dark)' }}
+            >
+              수락하기
+            </button>
+            <button
+              onClick={() => {
+                if (receivedRequestId) store.rejectConnectionRequest(receivedRequestId)
+                showToast('연결 요청을 거절했어요')
+              }}
+              className="flex-1 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-secondary)] whitespace-nowrap"
+            >
+              거절
             </button>
           </div>
         ) : (
@@ -409,6 +456,7 @@ export function PublicProfileShell({
             </div>
             <button
               onClick={() => {
+                store.sendConnectionRequest(profile.linkId, profile.name, profile.title, connectionMessage)
                 setConnectionRequestOpen(false)
                 setConnectionMessage('')
                 showToast('연결 요청을 보냈어요')
@@ -418,6 +466,38 @@ export function PublicProfileShell({
             >
               요청 보내기
             </button>
+          </div>
+        </BottomSheet>
+      )}
+
+      {!isOwnerMode && (
+        <BottomSheet open={cancelRequestOpen} onClose={() => setCancelRequestOpen(false)}>
+          <div className="px-5 pb-6">
+            <div className="mb-1 text-[18px] font-black text-[var(--color-text-strong)]">
+              연결 요청 취소
+            </div>
+            <p className="mb-6 text-[13px] leading-[1.65] text-[var(--color-text-secondary)]">
+              {profile.name}님께 보낸 연결 요청을 취소할까요?
+            </p>
+            <div className="space-y-2">
+              <button
+                onClick={() => {
+                  store.cancelConnectionRequest(profile.linkId)
+                  setCancelRequestOpen(false)
+                  showToast('연결 요청을 취소했어요')
+                }}
+                className="w-full rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3.5 text-[14px] font-semibold text-[var(--color-text-secondary)] whitespace-nowrap"
+              >
+                요청 취소
+              </button>
+              <button
+                onClick={() => setCancelRequestOpen(false)}
+                className="w-full rounded-full py-3.5 text-[14px] font-semibold whitespace-nowrap"
+                style={{ color: 'var(--color-accent-dark)' }}
+              >
+                닫기
+              </button>
+            </div>
           </div>
         </BottomSheet>
       )}

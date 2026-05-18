@@ -13,6 +13,8 @@ import type {
   SajuProfileInput,
   TabVisibility,
   TabVisibilityLevel,
+  ConnectionRequest,
+  SavedProfile,
 } from '@/types'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
@@ -50,6 +52,11 @@ interface ByroStore {
   experienceMessage: string
   expSubmittedProfiles: string[]
   deletedGuestbookIds: string[]
+
+  // 연결
+  sentRequestLinkIds: string[]
+  connectionRequests: ConnectionRequest[]
+  connectedProfiles: SavedProfile[]
 
   // Actions
   nextStep(): void
@@ -90,6 +97,10 @@ interface ByroStore {
   updateUserSajuProfile(sajuProfile: SajuProfileInput): void
   deleteGuestbookEntry(id: string): void
   updateTabVisibility(tab: keyof TabVisibility, level: TabVisibilityLevel): void
+  sendConnectionRequest(linkId: string, name: string, title: string, message: string): void
+  cancelConnectionRequest(linkId: string): void
+  acceptConnectionRequest(id: string): void
+  rejectConnectionRequest(id: string): void
 }
 
 const normalizeSampleUser = (user: UserState | null): UserState | null => {
@@ -145,6 +156,11 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   experienceMessage: '',
   expSubmittedProfiles: [],
   deletedGuestbookIds: [],
+
+  // 연결
+  sentRequestLinkIds: [],
+  connectionRequests: SAMPLE_PROFILE.connectionRequests as ConnectionRequest[],
+  connectedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
 
   // Actions
   nextStep() {
@@ -345,6 +361,9 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       bio: '',
       bioMode: null,
       expSubmittedProfiles: [],
+      sentRequestLinkIds: [],
+      connectionRequests: SAMPLE_PROFILE.connectionRequests as ConnectionRequest[],
+      connectedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
     })
   },
 
@@ -438,9 +457,41 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       tabVisibility: { ...state.tabVisibility, [tab]: level },
     }))
   },
+
+  sendConnectionRequest(linkId, _name, _title, _message) {
+    set((state) => ({
+      sentRequestLinkIds: state.sentRequestLinkIds.includes(linkId)
+        ? state.sentRequestLinkIds
+        : [...state.sentRequestLinkIds, linkId],
+    }))
+  },
+
+  cancelConnectionRequest(linkId) {
+    set((state) => ({
+      sentRequestLinkIds: state.sentRequestLinkIds.filter((id) => id !== linkId),
+    }))
+  },
+
+  acceptConnectionRequest(id) {
+    const request = get().connectionRequests.find((r) => r.id === id)
+    if (!request) return
+    set((state) => ({
+      connectionRequests: state.connectionRequests.filter((r) => r.id !== id),
+      connectedProfiles: [
+        ...state.connectedProfiles,
+        { id: request.id, linkId: request.linkId, name: request.name, title: request.title, memo: '', savedAt: '방금' },
+      ],
+    }))
+  },
+
+  rejectConnectionRequest(id) {
+    set((state) => ({
+      connectionRequests: state.connectionRequests.filter((r) => r.id !== id),
+    }))
+  },
 }), {
   name: 'byro-store',
-  version: 7,
+  version: 8,
   migrate: (persistedState: unknown) => {
     const state = persistedState as ByroStore | undefined
     if (!state) return persistedState
@@ -482,5 +533,8 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     expSubmittedProfiles: state.expSubmittedProfiles,
     deletedGuestbookIds: state.deletedGuestbookIds,
     tabVisibility: state.tabVisibility,
+    sentRequestLinkIds: state.sentRequestLinkIds,
+    connectionRequests: state.connectionRequests,
+    connectedProfiles: state.connectedProfiles,
   }),
 }))

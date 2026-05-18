@@ -21,12 +21,14 @@ export default function Archive() {
   if (!store.isLoggedIn) return null
 
   const { activeArchiveTab, setActiveArchiveTab } = store
-  const { savedProfiles, recentProfiles, receivedRequests, connectionRequests } = SAMPLE_PROFILE
+  const { recentProfiles, receivedRequests } = SAMPLE_PROFILE
+  const connectedProfiles = store.connectedProfiles
+  const connectionRequests = store.connectionRequests
 
   const totalRequests = receivedRequests.length + connectionRequests.length
 
   const tabs = [
-    { key: 'connected' as const, label: `연결된 사람 ${savedProfiles.length}` },
+    { key: 'connected' as const, label: `연결된 사람 ${connectedProfiles.length}` },
     { key: 'recent' as const, label: '최근 본' },
     { key: 'requests' as const, label: totalRequests > 0 ? `받은 요청 ${totalRequests}` : '받은 요청' },
   ]
@@ -64,7 +66,7 @@ export default function Archive() {
         {/* 연결된 사람 탭 */}
         {activeArchiveTab === 'connected' && (
           <div className="px-5 py-2">
-            {savedProfiles.map((p) => (
+            {connectedProfiles.map((p) => (
               <button
                 key={p.id}
                 onClick={() => router.push(`/${p.linkId}`)}
@@ -178,14 +180,20 @@ export default function Archive() {
                     )}
                     <div className="flex gap-2">
                       <button
-                        onClick={() => showToast('연결 요청을 수락했어요')}
+                        onClick={() => {
+                          store.acceptConnectionRequest(r.id)
+                          showToast(`${r.name}님과 연결됐어요!`)
+                        }}
                         className="flex-1 text-white text-xs font-bold py-2 rounded-xl"
                         style={{ backgroundColor: 'var(--color-accent-dark)' }}
                       >
                         수락
                       </button>
                       <button
-                        onClick={() => showToast('연결 요청을 거절했어요')}
+                        onClick={() => {
+                          store.rejectConnectionRequest(r.id)
+                          showToast('연결 요청을 거절했어요')
+                        }}
                         className="flex-1 border text-xs font-bold py-2 rounded-xl text-[var(--color-text-secondary)]"
                         style={{ borderColor: 'var(--color-border-default)' }}
                       >

@@ -404,7 +404,7 @@ export function Step9Complete() {
           )}
           <div className="flex gap-3">
             <Button variant="outline" onClick={goPrev}>이전</Button>
-            <Button onClick={() => router.replace('/me?edit=true')}>내 바이로 채우러 가기</Button>
+            <Button onClick={() => router.replace('/me?edit=true')}>완료</Button>
           </div>
           <Button variant="outline" onClick={() => router.replace(`/${linkId}`)}>나중에 할게요</Button>
         </div>

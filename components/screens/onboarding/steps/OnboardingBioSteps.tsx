@@ -194,6 +194,8 @@ interface GuideSlide {
   title: string
   tags: string[]
   value: string
+  ctaLabel?: string
+  ctaRoute?: string
 }
 
 const GUIDE_SLIDES: GuideSlide[] = [
@@ -202,12 +204,16 @@ const GUIDE_SLIDES: GuideSlide[] = [
     title: '하이라이트',
     tags: ['경력', '학력', '수상', '자격증'],
     value: '만나기 전부터 신뢰가 생겨요',
+    ctaLabel: '하이라이트 채우러 가기',
+    ctaRoute: '/me?section=highlight',
   },
   {
     Preview: PreviewLife,
     title: '라이프',
     tags: ['취향', '운동', '여행지', '음식'],
     value: '취향이 겹치면 첫 대화가 자연스러워져요',
+    ctaLabel: '라이프 채우러 가기',
+    ctaRoute: '/me?section=life',
   },
   {
     Preview: PreviewNetwork,
@@ -232,12 +238,16 @@ const GUIDE_SLIDES: GuideSlide[] = [
     title: 'SNS',
     tags: ['인스타그램', '링크드인', '유튜브', '틱톡'],
     value: '인스타·링크드인 연동으로 나다움이 더 드러나요',
+    ctaLabel: 'SNS 연동하러 가기',
+    ctaRoute: '/me?section=sns',
   },
   {
     Preview: PreviewContact,
     title: '연락수단',
     tags: ['전화', '이메일', '카카오'],
     value: '연락 수단이 없으면 만남으로 이어지기 어려워요',
+    ctaLabel: '연락처 추가하러 가기',
+    ctaRoute: '/me?section=contact',
   },
 ]
 
@@ -369,11 +379,23 @@ export function Step9Complete() {
           <Button variant="outline" onClick={goNext}>내 바이로 채우러 가기</Button>
         </div>
       ) : isLastSlide ? (
-        <Button onClick={() => router.replace(`/${linkId}`)}>내 프로필 보기</Button>
+        <div className="space-y-2.5">
+          {guide?.ctaRoute && (
+            <Button onClick={() => router.replace(guide.ctaRoute!)}>{guide.ctaLabel}</Button>
+          )}
+          <Button variant={guide?.ctaRoute ? 'outline' : undefined} onClick={() => router.replace(`/${linkId}`)}>
+            내 프로필 보기
+          </Button>
+        </div>
       ) : (
-        <div className="flex gap-3">
-          <Button variant="outline" onClick={goPrev}>이전</Button>
-          <Button onClick={goNext}>다음</Button>
+        <div className="space-y-2.5">
+          {guide?.ctaRoute && (
+            <Button onClick={() => router.replace(guide.ctaRoute!)}>{guide.ctaLabel}</Button>
+          )}
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={goPrev}>이전</Button>
+            <Button onClick={goNext}>다음</Button>
+          </div>
         </div>
       )}
     </div>

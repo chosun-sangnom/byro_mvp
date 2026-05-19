@@ -45,7 +45,12 @@ export default function MyByro() {
     if (!store.isLoggedIn) router.replace('/signup')
   }, [store.isLoggedIn, router])
 
+  const sectionParam = searchParams.get('section')
   const [screen, setScreen] = useState<Screen>(
+    sectionParam === 'highlight' ? 'editHighlight' :
+    sectionParam === 'life'      ? 'editLife'      :
+    sectionParam === 'sns'       ? 'editSNS'       :
+    sectionParam === 'contact'   ? 'editContact'   :
     searchParams.get('edit') === 'true' ? 'manage' : 'preview'
   )
   const [activeTab, setActiveTab] = useState<PublicProfileTabId>('who')

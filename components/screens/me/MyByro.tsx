@@ -40,6 +40,14 @@ export default function MyByro() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const store = useByroStore()
+  const returnTo = searchParams.get('returnTo')
+  const handleBackToManage = () => {
+    if (returnTo) {
+      router.replace(returnTo)
+      return
+    }
+    setScreen('manage')
+  }
 
   useEffect(() => {
     if (!store.isLoggedIn) router.replace('/signup')
@@ -104,18 +112,18 @@ export default function MyByro() {
   }
 
   if (screen === 'editBasic') {
-    return <BasicInfoEditScreen user={user} onBack={() => setScreen('manage')} />
+    return <BasicInfoEditScreen user={user} onBack={handleBackToManage} />
   }
 
   if (screen === 'editLife') {
-    return <LifeManageScreen onBack={() => setScreen('manage')} />
+    return <LifeManageScreen onBack={handleBackToManage} />
   }
 
   if (screen === 'editNetwork') {
     return (
       <RememberNetworkManageScreen
         userLinkId={user.linkId}
-        onBack={() => setScreen('manage')}
+        onBack={handleBackToManage}
       />
     )
   }
@@ -124,21 +132,21 @@ export default function MyByro() {
     return (
       <HighlightManageScreen
         userLinkId={user.linkId}
-        onBack={() => setScreen('manage')}
+        onBack={handleBackToManage}
       />
     )
   }
 
   if (screen === 'editSNS') {
-    return <SNSManageScreen onBack={() => setScreen('manage')} />
+    return <SNSManageScreen onBack={handleBackToManage} />
   }
 
   if (screen === 'editReputation') {
-    return <ReputationManageScreen onBack={() => setScreen('manage')} />
+    return <ReputationManageScreen onBack={handleBackToManage} />
   }
 
   if (screen === 'editContact') {
-    return <ContactManageScreen onBack={() => setScreen('manage')} />
+    return <ContactManageScreen onBack={handleBackToManage} />
   }
 
   if (screen === 'editVisibility') {

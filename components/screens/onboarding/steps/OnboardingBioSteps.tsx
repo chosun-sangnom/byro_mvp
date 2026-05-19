@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { BadgeCheck, CheckCircle2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { Button, showToast } from '@/components/ui'
@@ -295,8 +295,10 @@ const TOTAL = GUIDE_SLIDES.length + 1
 export function Step9Complete() {
   const store = useByroStore()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const linkId = store.user?.linkId || store.linkId || 'myongkoo'
-  const [slide, setSlide] = useState(0)
+  const initialGuide = Number(searchParams.get('guide') ?? '0')
+  const [slide, setSlide] = useState(Number.isFinite(initialGuide) ? Math.min(Math.max(initialGuide, 0), TOTAL - 1) : 0)
   const [showIntroText, setShowIntroText] = useState(false)
   const [showIntroPreview, setShowIntroPreview] = useState(false)
 
@@ -305,6 +307,13 @@ export function Step9Complete() {
       store.completeOnboarding()
     }
   }, [store])
+
+  useEffect(() => {
+    const guideParam = Number(searchParams.get('guide') ?? '0')
+    if (!Number.isFinite(guideParam)) return
+    const nextSlide = Math.min(Math.max(guideParam, 0), TOTAL - 1)
+    setSlide(nextSlide)
+  }, [searchParams])
 
   useEffect(() => {
     if (slide !== 0) return
@@ -325,6 +334,10 @@ export function Step9Complete() {
 
   const goNext = () => { if (slide < TOTAL - 1) setSlide(slide + 1) }
   const goPrev = () => { if (slide > 0) setSlide(slide - 1) }
+  const getGuideReturnRoute = () => {
+    if (slide >= TOTAL - 1) return '/me?edit=true'
+    return `/signup?guide=${slide + 1}`
+  }
 
   const isLastSlide = slide === TOTAL - 1
   const guide = slide > 0 ? GUIDE_SLIDES[slide - 1] : null
@@ -339,7 +352,7 @@ export function Step9Complete() {
         </div>
 
         <h2 className="text-[22px] font-black text-[var(--color-text-strong)] leading-snug mb-1">
-          프로필이 만들어졌어요
+          프로필이 만들어졌어요!
         </h2>
         {slide === 0 ? (
           <>
@@ -393,7 +406,9 @@ export function Step9Complete() {
       ) : isLastSlide ? (
         <div className="space-y-2.5">
           {guide?.ctaRoute && (
-            <Button onClick={() => router.replace(guide.ctaRoute!)}>{guide.ctaLabel}</Button>
+            <Button onClick={() => router.replace(`${guide.ctaRoute!}&returnTo=${encodeURIComponent(getGuideReturnRoute())}`)}>
+              {guide.ctaLabel}
+            </Button>
           )}
           <div className="flex gap-3">
             <Button variant="outline" onClick={goPrev}>이전</Button>
@@ -404,7 +419,9 @@ export function Step9Complete() {
       ) : (
         <div className="space-y-2.5">
           {guide?.ctaRoute && (
-            <Button onClick={() => router.replace(guide.ctaRoute!)}>{guide.ctaLabel}</Button>
+            <Button onClick={() => router.replace(`${guide.ctaRoute!}&returnTo=${encodeURIComponent(getGuideReturnRoute())}`)}>
+              {guide.ctaLabel}
+            </Button>
           )}
           <div className="flex gap-3">
             <Button variant="outline" onClick={goPrev}>이전</Button>

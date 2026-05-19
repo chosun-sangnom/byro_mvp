@@ -248,7 +248,7 @@ const TOTAL = GUIDE_SLIDES.length + 1
 export function Step9Complete() {
   const store = useByroStore()
   const router = useRouter()
-  const linkId = store.linkId || 'myongkoo'
+  const linkId = store.user?.linkId || store.linkId || 'myongkoo'
   const [slide, setSlide] = useState(0)
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
 
@@ -278,6 +278,13 @@ export function Step9Complete() {
   const isLastSlide = slide === TOTAL - 1
   const guide = slide > 0 ? GUIDE_SLIDES[slide - 1] : null
 
+  const ctaButtons = (
+    <div className="space-y-3">
+      <Button onClick={() => router.replace(`/${linkId}`)}>내 프로필 보기</Button>
+      <Button variant="outline" onClick={() => router.replace('/me?edit=true')}>프로필 더 꾸미기</Button>
+    </div>
+  )
+
   return (
     <div
       className="flex flex-col h-full px-5 py-6 select-none"
@@ -292,7 +299,7 @@ export function Step9Complete() {
           </div>
           <h2 className="text-2xl font-black mb-2 text-[var(--color-text-strong)]">바이로 준비 완료!</h2>
           <p className="text-sm text-[var(--color-text-secondary)] mb-6">링크로 바로 공유할 수 있어요.</p>
-          <div className="w-full flex items-center bg-[var(--color-bg-muted)] border border-[var(--color-border-soft)] rounded-xl px-4 py-3">
+          <div className="w-full flex items-center bg-[var(--color-bg-muted)] border border-[var(--color-border-soft)] rounded-xl px-4 py-3 mb-2">
             <span className="flex-1 text-sm text-[var(--color-text-primary)] text-left">byro.io/@{linkId}</span>
             <button onClick={handleCopy} className="text-xs font-bold text-[var(--color-accent-dark)] ml-3 flex-shrink-0">복사</button>
           </div>
@@ -302,12 +309,9 @@ export function Step9Complete() {
       {/* Guide slides */}
       {guide && (
         <div className="flex-1 flex flex-col justify-between overflow-hidden">
-          {/* Section preview */}
           <div className="pointer-events-none mb-5">
             <guide.Preview />
           </div>
-
-          {/* Text info */}
           <div className="text-center">
             <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] mb-1">{slide} / {GUIDE_SLIDES.length}</p>
             <h2 className="text-xl font-black mb-1.5 text-[var(--color-text-strong)]">{guide.title}</h2>
@@ -339,13 +343,18 @@ export function Step9Complete() {
       </div>
 
       {/* Bottom buttons */}
-      {isLastSlide ? (
-        <div className="space-y-3">
-          <Button onClick={() => router.replace('/me?edit=true')}>프로필 꾸미러 가기</Button>
-          <Button variant="outline" onClick={() => router.replace('/me')}>나중에 채울게요</Button>
-        </div>
-      ) : slide === 0 ? (
-        <Button onClick={goNext}>프로필 소개 보기</Button>
+      {slide === 0 ? (
+        <>
+          {ctaButtons}
+          <button
+            onClick={goNext}
+            className="mt-3 text-xs font-semibold text-[var(--color-text-tertiary)] text-center w-full"
+          >
+            바이로 기능 살펴보기 →
+          </button>
+        </>
+      ) : isLastSlide ? (
+        ctaButtons
       ) : (
         <div className="flex gap-3">
           <Button variant="outline" onClick={goPrev}>이전</Button>

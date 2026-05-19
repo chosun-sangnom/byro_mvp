@@ -124,9 +124,7 @@ export function BasicInfoEditScreen({
       bio,
       avatarImage: profileImages[0] || '',
       profileImages: profileImages.filter(Boolean),
-      headerMeta: {
-        residence: user.headerMeta?.residence ?? SAMPLE_PROFILE.headerMeta.residence,
-      },
+      headerMeta: {},
     })
     store.updateUserInfo({ birthDate, birthTime, birthPlace, calendarType, showAge })
     store.updateUserWhoIAm({

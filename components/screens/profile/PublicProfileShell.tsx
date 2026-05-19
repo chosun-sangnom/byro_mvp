@@ -17,8 +17,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { Pencil, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
-import { Button, BottomSheet, TextArea, showToast } from '@/components/ui'
-import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
+import { BottomSheet, TextArea, showToast } from '@/components/ui'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
 import { ContactActionButton } from '@/components/screens/profile/PublicProfileSections'
 import { ProfileHeroSection } from '@/components/screens/profile/PublicProfileHeroSection'
@@ -164,7 +163,6 @@ export function PublicProfileShell({
             bioOverflowing={bioOverflowing}
             bioRef={bioRef}
             onToggleBio={() => setBioExpanded((prev) => !prev)}
-            isOwnerMode={isOwnerMode}
           />
         </div>
 

@@ -22,7 +22,6 @@ export function ProfileHeroSection({
   bioOverflowing,
   bioRef,
   onToggleBio,
-  isOwnerMode,
 }: {
   profile: {
     name: string
@@ -40,7 +39,6 @@ export function ProfileHeroSection({
   bioOverflowing: boolean
   bioRef: RefObject<HTMLParagraphElement>
   onToggleBio: () => void
-  isOwnerMode?: boolean
 }) {
   const galleryImages = normalizeProfileImages(profile.profileImages, profile.avatarImage)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
@@ -70,7 +68,6 @@ export function ProfileHeroSection({
         bioOverflowing={bioOverflowing}
         bioRef={bioRef}
         onToggleBio={onToggleBio}
-        isOwnerMode={isOwnerMode}
         onOpenGallery={() => {
           setActiveImageIndex(0)
           setGalleryOpen(true)
@@ -189,7 +186,6 @@ export function ProfileHeroCard({
   bioExpanded,
   bioOverflowing,
   onToggleBio,
-  isOwnerMode = false,
   onOpenGallery,
 }: {
   profile: {
@@ -211,7 +207,6 @@ export function ProfileHeroCard({
   bioExpanded?: boolean
   bioOverflowing?: boolean
   onToggleBio?: () => void
-  isOwnerMode?: boolean
   onOpenGallery?: () => void
 }) {
   const showAge = typeof profile.age === 'number' && profile.showAge !== false

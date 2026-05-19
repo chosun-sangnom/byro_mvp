@@ -16,9 +16,7 @@ export const SAMPLE_PROFILE = {
   headline: '커뮤니티 기반 성장을 설계하는 B2B SaaS 빌더',
   school: 'KAIST 경영학과 졸업',
   bio: 'B2B SaaS 분야에서 5년간 Product Owner로 활동해 온 강민준입니다. 파트너십을 통해 성장을 만들어가는 것을 즐깁니다.',
-  headerMeta: {
-    residence: '성수동',
-  },
+  headerMeta: {},
   whoIAm: {
     mbti: 'ENTJ',
     bloodType: 'A형',
@@ -253,9 +251,7 @@ export const MK_PROFILE = {
   headline: 'Entrepreneur, Writer, Connector',
   school: '',
   bio: 'Entrepreneur, Writer, Connector. Byth에서 Byro 만들고 운영하고 있어요.',
-  headerMeta: {
-    residence: '한남동',
-  },
+  headerMeta: {},
   whoIAm: {
     mbti: 'ENTP',
     bloodType: 'B형',
@@ -464,9 +460,7 @@ export const JIMIN_PROFILE = {
   headline: '브랜드와 사람을 연결하는 스타트업 마케터',
   school: '연세대학교 경영학 학사',
   bio: '스타트업 생태계에서 브랜드와 사람을 연결하는 마케터입니다. 브랜드의 방향성과 사람들의 경험이 자연스럽게 이어지도록 설계하는 일을 좋아하고, 성장 전략과 커뮤니티 빌딩에도 꾸준히 관심을 두고 있습니다.',
-  headerMeta: {
-    residence: '한남동',
-  },
+  headerMeta: {},
   whoIAm: {
     mbti: 'ENFP',
     bloodType: 'O형',

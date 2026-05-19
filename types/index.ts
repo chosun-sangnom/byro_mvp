@@ -133,7 +133,7 @@ export interface HeroTheme {
 }
 
 export interface ProfileHeaderMeta {
-  residence: string
+  residence?: string
 }
 
 export interface PublicProfileWhoIAm {

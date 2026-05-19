@@ -94,9 +94,9 @@
 | 테이블 | 읽기 | 쓰기 |
 |--------|------|------|
 | users | 전체 공개 | 본인만 |
-| highlights | 전체 공개 | 본인만 |
+| highlights | tab_visibility.who 설정 따름 (public/connected/private) | 본인만 |
 | connections | 당사자만 | 요청자 생성, 당사자 수정 |
-| experiences | 전체 공개 | 로그인 유저는 항상 / 비회원은 reputation이 public인 프로필만 |
+| experiences | tab_visibility.reputation 설정 따름 (public/connected/private) | 로그인 유저는 항상 / 비회원은 reputation=public인 프로필만 |
 
 ---
 

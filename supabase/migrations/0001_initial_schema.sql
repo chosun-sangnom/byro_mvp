@@ -130,9 +130,31 @@ create policy "users can update own profile"
 create policy "users can insert own profile"
   on public.users for insert with check (auth.uid() = id);
 
--- highlights: 누구나 조회, 본인만 수정
-create policy "highlights are viewable"
-  on public.highlights for select using (true);
+-- highlights: tab_visibility.who 설정에 따라 조회 제한, 본인만 수정
+-- public → 누구나 / connected → 연결된 유저만 / private → 본인만
+create policy "highlights are viewable by allowed users"
+  on public.highlights for select using (
+    exists (
+      select 1 from public.users u where u.id = user_id and (
+        -- 본인
+        u.id = auth.uid()
+        -- 전체 공개
+        or (u.tab_visibility->>'who') = 'public'
+        -- 친구 공개: 연결된 유저
+        or (
+          (u.tab_visibility->>'who') = 'connected'
+          and exists (
+            select 1 from public.connections c
+            where c.status = 'accepted'
+              and (
+                (c.from_user_id = auth.uid() and c.to_user_id = u.id)
+                or (c.to_user_id = auth.uid() and c.from_user_id = u.id)
+              )
+          )
+        )
+      )
+    )
+  );
 
 create policy "users manage own highlights"
   on public.highlights for all using (auth.uid() = user_id);
@@ -152,10 +174,32 @@ create policy "users can update own connections"
 create policy "users can delete own requests"
   on public.connections for delete using (auth.uid() = from_user_id);
 
--- experiences: 누구나 조회
--- 로그인 유저는 항상 제출 가능, 비회원은 reputation이 public인 프로필에만 제출 가능
-create policy "experiences are viewable"
-  on public.experiences for select using (true);
+-- experiences: tab_visibility.reputation 설정에 따라 조회 제한
+-- public → 누구나 / connected → 연결된 유저만 / private → 본인만
+-- 제출: 로그인 유저는 항상 가능, 비회원은 reputation이 public인 프로필에만
+create policy "experiences are viewable by allowed users"
+  on public.experiences for select using (
+    exists (
+      select 1 from public.users u where u.link_id = target_link_id and (
+        -- 본인
+        u.id = auth.uid()
+        -- 전체 공개
+        or (u.tab_visibility->>'reputation') = 'public'
+        -- 친구 공개: 연결된 유저
+        or (
+          (u.tab_visibility->>'reputation') = 'connected'
+          and exists (
+            select 1 from public.connections c
+            where c.status = 'accepted'
+              and (
+                (c.from_user_id = auth.uid() and c.to_user_id = u.id)
+                or (c.to_user_id = auth.uid() and c.from_user_id = u.id)
+              )
+          )
+        )
+      )
+    )
+  );
 
 create policy "anyone can submit experience"
   on public.experiences for insert with check (

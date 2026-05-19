@@ -1,8 +1,7 @@
 'use client'
 
-import { useRef, useState, type ChangeEvent } from 'react'
-import { Camera, X } from 'lucide-react'
-import { showToast } from '@/components/ui'
+import { useState } from 'react'
+import { X } from 'lucide-react'
 import type { LifeMediaItem } from '@/types'
 
 type TravelRegion = 'all' | 'korea' | 'asia' | 'europe' | 'americas' | 'oceania'
@@ -105,8 +104,6 @@ export function TravelPicker({
 }) {
   const [activeRegion, setActiveRegion] = useState<TravelRegion>('all')
   const [customInput, setCustomInput] = useState('')
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const [uploadingLabel, setUploadingLabel] = useState<string | null>(null)
 
   const filtered = activeRegion === 'all'
     ? CITY_DB
@@ -129,71 +126,27 @@ export function TravelPicker({
     setCustomInput('')
   }
 
-  const handlePhotoClick = (label: string) => {
-    setUploadingLabel(label)
-    fileInputRef.current?.click()
-  }
-
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file || !uploadingLabel) return
-    if (!file.type.startsWith('image/')) {
-      showToast('이미지 파일만 업로드할 수 있어요')
-      e.target.value = ''
-      return
-    }
-    const reader = new FileReader()
-    reader.onload = () => {
-      if (typeof reader.result === 'string') {
-        onChange(selected.map((s) =>
-          s.label === uploadingLabel ? { ...s, posterUrl: reader.result as string } : s
-        ))
-      }
-    }
-    reader.readAsDataURL(file)
-    e.target.value = ''
-    setUploadingLabel(null)
-  }
-
   return (
     <div>
       {/* 헬퍼텍스트 */}
       <p className="text-[12px] text-[var(--color-text-tertiary)] mb-4">
-        내가 다녀온 여행지를 추가해요. 여행지 사진이 있으면 함께 올려보세요.
+        내가 다녀온 여행지를 추가해요.
       </p>
-
-      <input ref={fileInputRef} type="file" accept="image/*" className="sr-only" onChange={handleFileChange} />
 
       {/* 선택된 여행지 */}
       {selected.length > 0 && (
         <div className="flex flex-wrap gap-2 mb-4">
           {selected.map((item) => (
-            <div
+            <span
               key={item.label}
-              className="flex items-center gap-1.5 rounded-full pr-2 pl-1 py-1 text-xs font-semibold"
-              style={{ background: 'var(--color-accent-dark)', color: '#fff' }}
+              className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-white"
+              style={{ background: 'var(--color-accent-dark)' }}
             >
-              {/* 사진 썸네일 or 카메라 버튼 */}
-              <button
-                type="button"
-                onClick={() => handlePhotoClick(item.label)}
-                className="flex-shrink-0 w-6 h-6 rounded-full overflow-hidden flex items-center justify-center"
-                style={{ background: 'rgba(255,255,255,0.2)' }}
-              >
-                {item.posterUrl
-                  // eslint-disable-next-line @next/next/no-img-element
-                  ? <img src={item.posterUrl} alt={item.label} className="w-full h-full object-cover" />
-                  : <Camera size={11} strokeWidth={2} />
-                }
-              </button>
-              <span>{item.label}</span>
-              <button
-                type="button"
-                onClick={() => onChange(selected.filter((s) => s.label !== item.label))}
-              >
+              {item.label}
+              <button type="button" onClick={() => onChange(selected.filter((s) => s.label !== item.label))}>
                 <X size={10} strokeWidth={2.5} />
               </button>
-            </div>
+            </span>
           ))}
         </div>
       )}

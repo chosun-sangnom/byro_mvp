@@ -83,16 +83,6 @@ create table public.experiences (
   created_at      timestamptz not null default now()
 );
 
--- ─── bookmarks ───────────────────────────────────────────────────────────────
-create table public.bookmarks (
-  id              uuid primary key default gen_random_uuid(),
-  user_id         uuid not null references public.users(id) on delete cascade,
-  saved_link_id   text not null,
-  memo            text not null default '',
-  created_at      timestamptz not null default now(),
-  unique (user_id, saved_link_id)
-);
-
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Indexes
 -- ─────────────────────────────────────────────────────────────────────────────
@@ -101,7 +91,6 @@ create index on public.connections (from_user_id);
 create index on public.connections (to_user_id);
 create index on public.experiences (target_link_id);
 create index on public.experiences (author_user_id);
-create index on public.bookmarks (user_id);
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- updated_at auto-update trigger
@@ -130,7 +119,6 @@ alter table public.users          enable row level security;
 alter table public.highlights     enable row level security;
 alter table public.connections    enable row level security;
 alter table public.experiences    enable row level security;
-alter table public.bookmarks      enable row level security;
 
 -- users: 누구나 공개 프로필 조회 가능, 본인만 수정
 create policy "public profiles are viewable"
@@ -171,6 +159,3 @@ create policy "experiences are viewable"
 create policy "anyone can submit experience"
   on public.experiences for insert with check (true);
 
--- bookmarks: 본인만
-create policy "users manage own bookmarks"
-  on public.bookmarks for all using (auth.uid() = user_id);

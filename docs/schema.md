@@ -89,18 +89,6 @@
 | `message` | text | |
 | `created_at` | timestamptz | 24h rate limit 체크에 활용 |
 
-#### `bookmarks`
-
-사용자가 저장한 프로필 목록.
-
-| 컬럼 | 타입 | 설명 |
-|------|------|------|
-| `id` | uuid PK | |
-| `user_id` | uuid FK → users | |
-| `saved_link_id` | text | 저장된 프로필의 link_id |
-| `memo` | text | |
-| UNIQUE | (user_id, saved_link_id) | |
-
 ### RLS 정책 요약
 
 | 테이블 | 읽기 | 쓰기 |
@@ -109,7 +97,6 @@
 | highlights | 전체 공개 | 본인만 |
 | connections | 당사자만 | 요청자 생성, 당사자 수정 |
 | experiences | 전체 공개 | 누구나 (비회원 포함) |
-| bookmarks | 본인만 | 본인만 |
 
 ---
 
@@ -202,4 +189,3 @@ interface PublicProfileWhoIAm {
 | `useByroStore.ts` | `submitExperience()` | `supabase.from('experiences').insert()` |
 | `useByroStore.ts` | `sendConnectionRequest()` 등 | `supabase.from('connections').insert()` |
 | `useByroStore.ts` | `highlights` CRUD | `supabase.from('highlights')` |
-| `useByroStore.ts` | `bookmarks` | `supabase.from('bookmarks')` |

@@ -134,8 +134,6 @@ export interface HeroTheme {
 
 export interface ProfileHeaderMeta {
   residence: string
-  mood: string
-  availability: string
 }
 
 export interface PublicProfileWhoIAm {

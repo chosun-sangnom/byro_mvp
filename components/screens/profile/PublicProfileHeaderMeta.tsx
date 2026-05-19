@@ -11,8 +11,6 @@ export function PublicProfileHeaderMeta({
 
   const items = [
     { label: '거주', value: meta.residence },
-    { label: '기분', value: meta.mood },
-    { label: '펑', value: meta.availability },
   ].filter((item) => item.value)
 
   if (items.length === 0) return null

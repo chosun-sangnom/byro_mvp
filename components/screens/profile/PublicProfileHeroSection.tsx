@@ -23,8 +23,6 @@ export function ProfileHeroSection({
   bioRef,
   onToggleBio,
   isOwnerMode,
-  onEditMood,
-  onEditPung,
 }: {
   profile: {
     name: string
@@ -36,10 +34,6 @@ export function ProfileHeroSection({
     avatarColor?: string
     avatarImage?: string
     profileImages?: string[]
-    headerMeta?: {
-      mood?: string
-      availability?: string
-    }
   }
   heroTheme: HeroTheme
   bioExpanded: boolean
@@ -47,8 +41,6 @@ export function ProfileHeroSection({
   bioRef: RefObject<HTMLParagraphElement>
   onToggleBio: () => void
   isOwnerMode?: boolean
-  onEditMood?: () => void
-  onEditPung?: () => void
 }) {
   const galleryImages = normalizeProfileImages(profile.profileImages, profile.avatarImage)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
@@ -79,8 +71,6 @@ export function ProfileHeroSection({
         bioRef={bioRef}
         onToggleBio={onToggleBio}
         isOwnerMode={isOwnerMode}
-        onEditMood={onEditMood}
-        onEditPung={onEditPung}
         onOpenGallery={() => {
           setActiveImageIndex(0)
           setGalleryOpen(true)
@@ -200,8 +190,6 @@ export function ProfileHeroCard({
   bioOverflowing,
   onToggleBio,
   isOwnerMode = false,
-  onEditMood,
-  onEditPung,
   onOpenGallery,
 }: {
   profile: {
@@ -216,10 +204,6 @@ export function ProfileHeroCard({
     avatarColor?: string
     avatarImage?: string
     profileImages?: string[]
-    headerMeta?: {
-      mood?: string
-      availability?: string
-    }
   }
   heroTheme: HeroTheme
   activeImage?: string
@@ -228,16 +212,9 @@ export function ProfileHeroCard({
   bioOverflowing?: boolean
   onToggleBio?: () => void
   isOwnerMode?: boolean
-  onEditMood?: () => void
-  onEditPung?: () => void
   onOpenGallery?: () => void
 }) {
   const showAge = typeof profile.age === 'number' && profile.showAge !== false
-  const mood = profile.headerMeta?.mood
-  const pung = profile.headerMeta?.availability
-
-  const MoodPill = onEditMood ? 'button' : 'span'
-  const PungPill = onEditPung ? 'button' : 'span'
 
   return (
     <div className="hero-card border border-[var(--color-border-default)] bg-[var(--color-glass-strong)] p-[8px] backdrop-blur-sm">
@@ -300,18 +277,6 @@ export function ProfileHeroCard({
             </div>
           )}
 
-          {(mood || isOwnerMode) && (
-            <div className="mt-2.5">
-              <MoodPill
-                {...(onEditMood ? { type: 'button' as const, onClick: onEditMood } : {})}
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/14 bg-white/10 px-3 py-1 text-[12px] font-semibold text-white/85 backdrop-blur-sm"
-              >
-                <span className="text-white/42">✦</span>
-                <span>{mood || '오늘의 기분 선택'}</span>
-              </MoodPill>
-            </div>
-          )}
-
           <div className="mt-2.5 max-w-[318px] rounded-[18px] border border-white/12 bg-white/10 px-4 py-3 text-[15px] leading-[1.52] text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[8px]">
             <p ref={bioRef} className={bioExpanded ? undefined : 'line-clamp-2'}>
               {profile.bio}
@@ -327,18 +292,6 @@ export function ProfileHeroCard({
               </button>
             )}
           </div>
-
-          {(pung || isOwnerMode) && (
-            <div className="mt-2">
-              <PungPill
-                {...(onEditPung ? { type: 'button' as const, onClick: onEditPung } : {})}
-                className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-accent-border)] bg-[var(--color-accent-bg)] px-3 py-1 text-[12px] font-semibold text-[var(--color-text-primary)]"
-              >
-                <span>💬</span>
-                <span>{pung || '펑 열기'}</span>
-              </PungPill>
-            </div>
-          )}
 
           <div className="mt-2.5 text-[11px] font-semibold text-white/38">
             @{profile.linkId}

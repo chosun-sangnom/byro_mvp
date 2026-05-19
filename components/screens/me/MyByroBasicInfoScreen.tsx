@@ -126,8 +126,6 @@ export function BasicInfoEditScreen({
       profileImages: profileImages.filter(Boolean),
       headerMeta: {
         residence: user.headerMeta?.residence ?? SAMPLE_PROFILE.headerMeta.residence,
-        mood: user.headerMeta?.mood ?? SAMPLE_PROFILE.headerMeta.mood,
-        availability: user.headerMeta?.availability ?? SAMPLE_PROFILE.headerMeta.availability,
       },
     })
     store.updateUserInfo({ birthDate, birthTime, birthPlace, calendarType, showAge })

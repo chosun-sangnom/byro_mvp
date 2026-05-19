@@ -18,8 +18,6 @@ export const SAMPLE_PROFILE = {
   bio: 'B2B SaaS 분야에서 5년간 Product Owner로 활동해 온 강민준입니다. 파트너십을 통해 성장을 만들어가는 것을 즐깁니다.',
   headerMeta: {
     residence: '성수동',
-    mood: '집중 모드',
-    availability: '오늘 저녁 커피챗 가능',
   },
   whoIAm: {
     mbti: 'ENTJ',
@@ -257,8 +255,6 @@ export const MK_PROFILE = {
   bio: 'Entrepreneur, Writer, Connector. Byth에서 Byro 만들고 운영하고 있어요.',
   headerMeta: {
     residence: '한남동',
-    mood: '사색 모드',
-    availability: '늦은 밤 산책 환영',
   },
   whoIAm: {
     mbti: 'ENTP',
@@ -470,8 +466,6 @@ export const JIMIN_PROFILE = {
   bio: '스타트업 생태계에서 브랜드와 사람을 연결하는 마케터입니다. 브랜드의 방향성과 사람들의 경험이 자연스럽게 이어지도록 설계하는 일을 좋아하고, 성장 전략과 커뮤니티 빌딩에도 꾸준히 관심을 두고 있습니다.',
   headerMeta: {
     residence: '한남동',
-    mood: '산책 가고 싶은 날',
-    availability: '오늘의 펑 열려 있음',
   },
   whoIAm: {
     mbti: 'ENFP',

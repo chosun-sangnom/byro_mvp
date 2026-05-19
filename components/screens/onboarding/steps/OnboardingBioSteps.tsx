@@ -330,7 +330,7 @@ export function Step9Complete() {
             프로필이 만들어졌어요
           </h2>
           <p className="text-[19px] font-black leading-snug mb-3" style={{ color: 'var(--color-accent-dark)' }}>
-            이제 신뢰도를 높여보세요
+            이제 Byro를 채워보세요
           </p>
 
           {/* 서브카피 */}
@@ -417,8 +417,8 @@ export function Step9Complete() {
       {/* Bottom buttons */}
       {slide === 0 ? (
         <div className="space-y-2.5 pt-4">
-          <Button onClick={() => router.replace(`/${linkId}`)}>내 프로필 보기</Button>
-          <Button variant="outline" onClick={goNext}>내 바이로 채우러 가기</Button>
+          <Button onClick={goNext}>내 바이로 채우러 가기</Button>
+          <Button variant="outline" onClick={() => router.replace(`/${linkId}`)}>나중에 할게요</Button>
         </div>
       ) : isLastSlide ? (
         <div className="space-y-2.5">
@@ -426,7 +426,7 @@ export function Step9Complete() {
             <Button onClick={() => router.replace(guide.ctaRoute!)}>{guide.ctaLabel}</Button>
           )}
           <Button variant={guide?.ctaRoute ? 'outline' : undefined} onClick={() => router.replace(`/${linkId}`)}>
-            내 프로필 보기
+            나중에 할게요
           </Button>
         </div>
       ) : (

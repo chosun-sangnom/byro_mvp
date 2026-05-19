@@ -43,7 +43,6 @@ interface ByroStore {
 
   // 앱
   tabVisibility: TabVisibility
-  bookmarkedProfiles: string[]
   hlOpenStates: Record<string, boolean>
   primaryHighlightOverrides: Record<string, string>
   snsOpenStates: Record<string, boolean>
@@ -89,7 +88,6 @@ interface ByroStore {
   completeOnboarding(): void
   login(): void
   logout(): void
-  toggleBookmark(id: string): void
   toggleHlOpen(id: string): void
   toggleSnsOpen(id: string): void
   setExperienceKeyword(kw: string): void
@@ -156,7 +154,6 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
 
   // 앱
   tabVisibility: { who: 'public', life: 'public', reputation: 'public' } as TabVisibility,
-  bookmarkedProfiles: [],
   hlOpenStates: {},
   primaryHighlightOverrides: {},
   snsOpenStates: {},
@@ -397,14 +394,6 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     })
   },
 
-  toggleBookmark(id) {
-    set((state) => ({
-      bookmarkedProfiles: state.bookmarkedProfiles.includes(id)
-        ? state.bookmarkedProfiles.filter((b) => b !== id)
-        : [...state.bookmarkedProfiles, id],
-    }))
-  },
-
   toggleHlOpen(id) {
     set((state) => ({
       hlOpenStates: { ...state.hlOpenStates, [id]: !state.hlOpenStates[id] },
@@ -546,7 +535,6 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       // 케미
       kemiComputedProfiles: [],
       // UI 상태
-      bookmarkedProfiles: [],
       hlOpenStates: {},
       snsOpenStates: {},
       activeArchiveTab: 'connected' as const,
@@ -604,7 +592,6 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     bio: state.bio,
     bioMode: state.bioMode,
     selectedBioMethod: state.selectedBioMethod,
-    bookmarkedProfiles: state.bookmarkedProfiles,
     hlOpenStates: state.hlOpenStates,
     primaryHighlightOverrides: state.primaryHighlightOverrides,
     snsOpenStates: state.snsOpenStates,

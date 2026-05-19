@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Bookmark, Copy, Share2 } from 'lucide-react'
+import { Copy, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { showToast } from '@/components/ui'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
@@ -16,7 +16,6 @@ import { ProfileHighlightsSection } from '@/components/screens/profile/PublicPro
 import {
   ExperienceBottomSheet,
   ExperienceDoneModal,
-  SaveProfileMemoSheet,
 } from '@/components/screens/profile/PublicProfileOverlays'
 
 interface PublicProfileProps {
@@ -55,9 +54,6 @@ export default function PublicProfile({
 
   const [expSheetOpen, setExpSheetOpen] = useState(false)
   const [expDoneModal, setExpDoneModal] = useState(false)
-  const [bookmarked, setBookmarked] = useState(false)
-  const [memoSheetOpen, setMemoSheetOpen] = useState(false)
-  const [memoText, setMemoText] = useState('')
   const [bioExpanded, setBioExpanded] = useState(false)
   const [bioOverflowing, setBioOverflowing] = useState(false)
   const bioRef = useRef<HTMLParagraphElement | null>(null)
@@ -203,24 +199,6 @@ export default function PublicProfile({
         </div>
         {!isOwnerMode ? (
           <div className="flex items-center gap-3">
-            {store.isLoggedIn && (
-              <button
-                onClick={() => {
-                  if (bookmarked) {
-                    setBookmarked(false)
-                    showToast('저장 취소됐어요')
-                  } else {
-                    setMemoSheetOpen(true)
-                  }
-                }}
-                className={[
-                  'icon-button',
-                  bookmarked ? 'bg-[var(--color-accent-dark)] border-[var(--color-accent-dark)]' : '',
-                ].join(' ')}
-              >
-                <Bookmark size={14} color={bookmarked ? 'var(--color-text-strong)' : 'var(--color-text-tertiary)'} />
-              </button>
-            )}
             <button
               onClick={() => showToast('공유 링크를 준비 중이에요')}
               className="icon-button"
@@ -336,19 +314,6 @@ export default function PublicProfile({
           store.login()
         }}
         onClose={() => setExpSheetOpen(false)}
-      />
-
-      <SaveProfileMemoSheet
-        open={memoSheetOpen}
-        profileName={profile.name}
-        memoText={memoText}
-        onMemoChange={setMemoText}
-        onSave={() => {
-          setBookmarked(true)
-          setMemoSheetOpen(false)
-          showToast('프로필을 저장했어요!')
-        }}
-        onClose={() => setMemoSheetOpen(false)}
       />
 
       <ExperienceDoneModal

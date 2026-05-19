@@ -100,43 +100,6 @@ export function ExperienceBottomSheet({
   )
 }
 
-export function SaveProfileMemoSheet({
-  open,
-  profileName,
-  memoText,
-  onMemoChange,
-  onSave,
-  onClose,
-}: {
-  open: boolean
-  profileName: string
-  memoText: string
-  onMemoChange: (value: string) => void
-  onSave: () => void
-  onClose: () => void
-}) {
-  return (
-    <BottomSheet open={open} onClose={onClose}>
-      <div className="px-5 pb-6">
-        <div className="mb-1 text-[15px] font-bold text-[var(--color-text-strong)]">프로필 저장</div>
-        <div className="mb-5 text-[12px] text-[var(--color-text-tertiary)]">{profileName}</div>
-        <div className="mb-1.5 text-[12px] text-[var(--color-text-tertiary)]">메모 (선택)</div>
-        <TextArea
-          value={memoText}
-          onChange={onMemoChange}
-          placeholder="어디서 만났는지, 어떤 분인지 메모해두세요"
-          maxLength={80}
-          rows={3}
-          dark
-        />
-        <div className="mt-4 space-y-2">
-          <Button onClick={onSave}>저장하기</Button>
-          <Button variant="ghost" onClick={onClose}>취소</Button>
-        </div>
-      </div>
-    </BottomSheet>
-  )
-}
 
 export function ExperienceDoneModal({
   open,

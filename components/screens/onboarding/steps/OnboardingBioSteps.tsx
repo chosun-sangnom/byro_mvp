@@ -118,28 +118,7 @@ const GUIDE_SLIDES: GuideSlide[] = [
   },
 ]
 
-const TOTAL = GUIDE_SLIDES.length + 1
-
-const BYRO_SECTIONS = [
-  {
-    emoji: '🙂',
-    title: '나',
-    description: 'MBTI, 반려동물, 하이라이트처럼 첫인상을 만드는 정보를 채워요.',
-    chips: ['첫인상', '성향', '하이라이트'],
-  },
-  {
-    emoji: '🌿',
-    title: '라이프',
-    description: '활동, 문화, 장소를 채우면 공통점과 스몰토크 소재가 생겨요.',
-    chips: ['활동', '문화', '장소'],
-  },
-  {
-    emoji: '🤝',
-    title: '관계',
-    description: '네트워크, 평판, SNS를 연결하면 신뢰를 더 쉽게 쌓을 수 있어요.',
-    chips: ['네트워크', '평판', 'SNS'],
-  },
-] as const
+const TOTAL = GUIDE_SLIDES.length
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
@@ -163,100 +142,56 @@ export function Step9Complete() {
   const goNext = () => { if (slide < TOTAL - 1) setSlide(slide + 1) }
   const goPrev = () => { if (slide > 0) setSlide(slide - 1) }
 
+  const isFirstSlide = slide === 0
   const isLastSlide = slide === TOTAL - 1
-  const guide = slide > 0 ? GUIDE_SLIDES[slide - 1] : null
+  const guide = GUIDE_SLIDES[slide]
 
   return (
     <div className="flex flex-col h-full px-5 py-6">
-      {/* Slide 0: Complete */}
-      {slide === 0 && (
-        <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto">
+        <div className="flex items-center bg-[var(--color-bg-muted)] border border-[var(--color-border-soft)] rounded-xl px-4 py-2.5 mb-5">
+          <CheckCircle2 size={14} className="text-[var(--color-state-success-text)] mr-2 flex-shrink-0" />
+          <span className="flex-1 text-sm text-[var(--color-text-primary)]">byro.io/@{linkId}</span>
+          <button onClick={handleCopy} className="text-xs font-bold text-[var(--color-accent-dark)] ml-3 flex-shrink-0">복사</button>
+        </div>
 
-          {/* 링크 */}
-          <div className="flex items-center bg-[var(--color-bg-muted)] border border-[var(--color-border-soft)] rounded-xl px-4 py-2.5 mb-5">
-            <CheckCircle2 size={14} className="text-[var(--color-state-success-text)] mr-2 flex-shrink-0" />
-            <span className="flex-1 text-sm text-[var(--color-text-primary)]">byro.io/@{linkId}</span>
-            <button onClick={handleCopy} className="text-xs font-bold text-[var(--color-accent-dark)] ml-3 flex-shrink-0">복사</button>
-          </div>
+        <h2 className="text-[22px] font-black text-[var(--color-text-strong)] leading-snug mb-1">
+          프로필이 만들어졌어요
+        </h2>
+        <p className="text-[19px] font-black leading-snug mb-3" style={{ color: 'var(--color-accent-dark)' }}>
+          이제 Byro를 채워보세요
+        </p>
 
-          {/* 헤드라인 */}
-          <h2 className="text-[22px] font-black text-[var(--color-text-strong)] leading-snug mb-1">
-            프로필이 만들어졌어요
-          </h2>
-          <p className="text-[19px] font-black leading-snug mb-3" style={{ color: 'var(--color-accent-dark)' }}>
-            이제 Byro를 채워보세요
+        <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed mb-5">
+          `나`, `라이프`, `관계` 세 가지 탭을 채우면
+          <br />
+          만난 사람이 더 쉽게 기억하고 대화를 시작할 수 있어요.
+        </p>
+
+        <div className="pointer-events-none mb-5">
+          <guide.Preview />
+        </div>
+
+        <div className="text-center">
+          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] mb-1">
+            {slide + 1} / {GUIDE_SLIDES.length}
           </p>
-
-          {/* 서브카피 */}
-          <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed mb-5">
-            Byro는 `나`, `라이프`, `관계` 세 가지로 사람을 설명해요.
-            <br />
-            하나씩 채우면 만난 사람이 더 쉽게 기억하고 대화를 시작할 수 있어요.
-          </p>
-
-          <div className="rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-4 py-3 mb-4">
-            <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] mb-1.5">
-              채우게 될 섹션
-            </div>
-            <p className="text-[12px] leading-relaxed text-[var(--color-text-secondary)]">
-              원하는 순서로 채워도 되고, 중간에 나갔다가 다시 이어서 완성할 수 있어요.
-            </p>
-          </div>
-
-          <div className="space-y-2">
-            {BYRO_SECTIONS.map((section) => (
-              <div
-                key={section.title}
-                className="rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-bg-muted)] px-4 py-3"
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <span className="text-[18px] leading-none flex-shrink-0">{section.emoji}</span>
-                  <div className="text-[15px] font-black text-[var(--color-text-strong)]">{section.title}</div>
-                </div>
-                <p className="text-[12px] leading-relaxed text-[var(--color-text-secondary)] mb-3">
-                  {section.description}
-                </p>
-                <div className="flex flex-wrap gap-1.5">
-                  {section.chips.map((chip) => (
-                    <span
-                      key={chip}
-                      className="rounded-full bg-[var(--color-bg-surface)] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-secondary)]"
-                    >
-                      {chip}
-                    </span>
-                  ))}
-                </div>
-              </div>
+          <h2 className="text-xl font-black mb-1.5 text-[var(--color-text-strong)]">{guide.title}</h2>
+          <p className="text-sm font-semibold text-[var(--color-accent-dark)] mb-4">{guide.value}</p>
+          <div className="flex flex-wrap justify-center gap-1.5">
+            {guide.tags.map((tag) => (
+              <span key={tag} className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[var(--color-bg-muted)] text-[var(--color-text-secondary)]">
+                {tag}
+              </span>
             ))}
           </div>
         </div>
-      )}
-
-      {/* Guide slides */}
-      {guide && (
-        <div className="flex-1 flex flex-col justify-between overflow-hidden">
-          <div className="pointer-events-none mb-5">
-            <guide.Preview />
-          </div>
-          <div className="text-center">
-            <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] mb-1">{slide} / {GUIDE_SLIDES.length}</p>
-            <h2 className="text-xl font-black mb-1.5 text-[var(--color-text-strong)]">{guide.title}</h2>
-            <p className="text-sm font-semibold text-[var(--color-accent-dark)] mb-4">{guide.value}</p>
-            <div className="flex flex-wrap justify-center gap-1.5">
-              {guide.tags.map((tag) => (
-                <span key={tag} className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[var(--color-bg-muted)] text-[var(--color-text-secondary)]">
-                  {tag}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
 
       {/* Bottom buttons */}
-      {slide === 0 ? (
+      {isFirstSlide ? (
         <div className="space-y-2.5 pt-4">
-          <Button onClick={goNext}>내 바이로 채우러 가기</Button>
+          <Button onClick={goNext}>다음</Button>
           <Button variant="outline" onClick={() => router.replace(`/${linkId}`)}>나중에 할게요</Button>
         </div>
       ) : isLastSlide ? (

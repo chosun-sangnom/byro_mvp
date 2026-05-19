@@ -16,11 +16,74 @@ type VibeItem = LifeMediaItem & {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-function buildVibeItems(life: PublicProfileLife): VibeItem[] {
-  const petItems: VibeItem[] = []
+type GridSlot = { col: string; row: string }
+type LayoutPattern = {
+  columns: string
+  rows: string
+  slots: [GridSlot, GridSlot, GridSlot, GridSlot, GridSlot, GridSlot]
+}
+
+const LAYOUTS: LayoutPattern[] = [
+  {
+    // 좌측 tall
+    columns: '3fr 2fr 2fr',
+    rows: '2fr 3fr 2fr',
+    slots: [
+      { col: '1', row: '1 / 3' },
+      { col: '2 / 4', row: '1' },
+      { col: '2', row: '2' },
+      { col: '3', row: '2' },
+      { col: '2 / 4', row: '3' },
+      { col: '1', row: '3' },
+    ],
+  },
+  {
+    // 우측 tall
+    columns: '2fr 2fr 3fr',
+    rows: '2fr 3fr 2fr',
+    slots: [
+      { col: '3', row: '1 / 3' },
+      { col: '1 / 3', row: '1' },
+      { col: '1', row: '2' },
+      { col: '2', row: '2' },
+      { col: '1 / 3', row: '3' },
+      { col: '3', row: '3' },
+    ],
+  },
+  {
+    // 상단 파노라마
+    columns: '1fr 1fr 1fr',
+    rows: '4fr 3fr 3fr',
+    slots: [
+      { col: '1 / 4', row: '1' },
+      { col: '1', row: '2' },
+      { col: '2', row: '2' },
+      { col: '3', row: '2' },
+      { col: '1 / 3', row: '3' },
+      { col: '3', row: '3' },
+    ],
+  },
+  {
+    // 좌측 하단 tall
+    columns: '3fr 2fr 2fr',
+    rows: '2fr 2fr 3fr',
+    slots: [
+      { col: '1', row: '2 / 4' },
+      { col: '1', row: '1' },
+      { col: '2 / 4', row: '1' },
+      { col: '2', row: '2' },
+      { col: '3', row: '2' },
+      { col: '2 / 4', row: '3' },
+    ],
+  },
+]
+
+function buildVibeItemsRandom(life: PublicProfileLife): VibeItem[] {
+  const candidates: VibeItem[] = []
+
   const pet = life.daily.pet
   if (pet && pet !== '없음') {
-    petItems.push({
+    candidates.push({
       label: life.daily.petName ?? pet,
       sublabel: life.daily.petName ? pet : undefined,
       posterUrl: life.daily.petImage,
@@ -42,18 +105,22 @@ function buildVibeItems(life: PublicProfileLife): VibeItem[] {
     [life.places.travelDestinations, '여행지', 'place', false],
   ]
 
-  const rest: VibeItem[] = []
-  const maxLen = Math.max(...sources.map(([arr]) => arr.length), 0)
-  for (let i = 0; i < maxLen; i++) {
-    for (const [arr, category, aspectType, isMusic] of sources) {
-      if (arr[i]) rest.push({ ...arr[i], category, aspectType, isMusic })
-    }
+  // 카테고리당 1개 랜덤 뽑기 (이미지 있는 것 우선)
+  for (const [arr, category, aspectType, isMusic] of sources) {
+    if (!arr.length) continue
+    const withImage = arr.filter((item) => item.posterUrl)
+    const pool = withImage.length > 0 ? withImage : arr
+    const picked = pool[Math.floor(Math.random() * pool.length)]
+    candidates.push({ ...picked, category, aspectType, isMusic })
   }
 
-  // 이미지 있는 항목 우선
-  rest.sort((a, b) => (b.posterUrl ? 1 : 0) - (a.posterUrl ? 1 : 0))
+  // Fisher-Yates 셔플
+  for (let i = candidates.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[candidates[i], candidates[j]] = [candidates[j], candidates[i]]
+  }
 
-  return [...petItems, ...rest].slice(0, 6)
+  return candidates.slice(0, 6)
 }
 
 function getItemId(item: LifeMediaItem) {
@@ -164,65 +231,34 @@ function VibeCard({
 
 function VibeBoard({
   items,
+  layout,
   playingId,
   isPlaying,
   onMusicToggle,
 }: {
   items: VibeItem[]
+  layout: LayoutPattern
   playingId: string | null
   isPlaying: boolean
   onMusicToggle: (item: LifeMediaItem) => void
 }) {
   if (items.length === 0) return null
 
-  const [a, b, c, d, e, f] = items
-
-  // 전체 정방형, 내부 정방형 0개
-  // cols: 3fr 2fr 2fr / rows: 2fr 3fr 2fr → 7fr×7fr
-  //
-  // [A: 3:5 세로          ] [B: 4:2 가로       ]
-  // [                    ] [C: 2:3] [D: 2:3   ]
-  // [F: 3:2 가로          ] [E: 4:2 가로       ]
   return (
     <div className="px-4 pt-4 pb-2">
       <div
         className="grid w-full gap-1.5"
         style={{
           aspectRatio: '1/1',
-          gridTemplateColumns: '3fr 2fr 2fr',
-          gridTemplateRows: '2fr 3fr 2fr',
+          gridTemplateColumns: layout.columns,
+          gridTemplateRows: layout.rows,
         }}
       >
-        {a && (
-          <div style={{ gridColumn: '1', gridRow: '1 / 3' }}>
-            <VibeCard item={a} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} />
+        {items.map((item, i) => (
+          <div key={i} style={{ gridColumn: layout.slots[i].col, gridRow: layout.slots[i].row }}>
+            <VibeCard item={item} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} />
           </div>
-        )}
-        {b && (
-          <div style={{ gridColumn: '2 / 4', gridRow: '1' }}>
-            <VibeCard item={b} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} />
-          </div>
-        )}
-        {c && (
-          <div style={{ gridColumn: '2', gridRow: '2' }}>
-            <VibeCard item={c} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} />
-          </div>
-        )}
-        {d && (
-          <div style={{ gridColumn: '3', gridRow: '2' }}>
-            <VibeCard item={d} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} />
-          </div>
-        )}
-        {e && (
-          <div style={{ gridColumn: '2 / 4', gridRow: '3' }}>
-            <VibeCard item={e} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} />
-          </div>
-        )}
-        {f && (
-          <div style={{ gridColumn: '1', gridRow: '3' }}>
-            <VibeCard item={f} playingId={playingId} isPlaying={isPlaying} onMusicToggle={onMusicToggle} />
-          </div>
-        )}
+        ))}
       </div>
     </div>
   )
@@ -484,6 +520,11 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
   const [isPlaying, setIsPlaying] = useState(false)
   const [progress, setProgress] = useState(0)
 
+  const [{ vibeItems, vibeLayout }] = useState(() => ({
+    vibeItems: life ? buildVibeItemsRandom(life) : [],
+    vibeLayout: LAYOUTS[Math.floor(Math.random() * LAYOUTS.length)],
+  }))
+
   if (!life) return null
 
   const exercise = life.daily.exercise ?? []
@@ -496,8 +537,6 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
     (life.tastes.plays?.length ?? 0) > 0
   const placeItems = [...life.tastes.restaurants, ...life.tastes.cafes]
   const hasPlace = placeItems.length > 0 || life.places.travelDestinations.length > 0
-
-  const vibeItems = buildVibeItems(life)
 
   const handleMusicToggle = (item: LifeMediaItem) => {
     const id = getItemId(item)
@@ -540,6 +579,7 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
 
       <VibeBoard
         items={vibeItems}
+        layout={vibeLayout}
         playingId={playingId}
         isPlaying={isPlaying}
         onMusicToggle={handleMusicToggle}

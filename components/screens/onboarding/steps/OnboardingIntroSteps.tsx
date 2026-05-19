@@ -33,18 +33,108 @@ export function Step1Login() {
   )
 }
 
+type VerifyTab = 'kakao' | 'sms'
+
+function VerifySection({ onVerified }: { onVerified: () => void }) {
+  const [tab, setTab] = useState<VerifyTab>('kakao')
+  const [phone, setPhone] = useState('')
+  const [code, setCode] = useState('')
+  const [smsSent, setSmsSent] = useState(false)
+
+  return (
+    <div className="surface-card-soft rounded-[20px] overflow-hidden mb-4">
+      <div className="px-4 pt-4 pb-3">
+        <p className="text-[13px] font-bold text-[var(--color-text-strong)] mb-0.5">실명 인증하기 (선택)</p>
+        <p className="text-[11px] text-[var(--color-text-tertiary)]">인증 완료 시 프로필에 인증 뱃지가 붙어요</p>
+      </div>
+
+      {/* 탭 */}
+      <div className="flex border-b mx-4" style={{ borderColor: 'var(--color-border-default)' }}>
+        {(['kakao', 'sms'] as VerifyTab[]).map((t) => (
+          <button
+            key={t}
+            type="button"
+            onClick={() => setTab(t)}
+            className="flex-1 py-2 text-[12px] font-bold transition-colors"
+            style={{
+              color: tab === t ? 'var(--color-accent-dark)' : 'var(--color-text-tertiary)',
+              borderBottom: tab === t ? '2px solid var(--color-accent-dark)' : '2px solid transparent',
+              marginBottom: -1,
+            }}
+          >
+            {t === 'kakao' ? '카카오 인증' : 'SMS 인증'}
+          </button>
+        ))}
+      </div>
+
+      <div className="px-4 py-4">
+        {tab === 'kakao' ? (
+          /* [임시] 카카오 본인인증 API 미연동 */
+          <Button variant="kakao" onClick={onVerified}>카카오로 본인인증하기</Button>
+        ) : (
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="휴대폰 번호 입력"
+                disabled={smsSent}
+                className="flex-1 border border-[var(--color-border-default)] rounded-xl px-3 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none disabled:opacity-50"
+              />
+              {/* [임시] SMS 발송 API 미연동 */}
+              <button
+                type="button"
+                disabled={phone.length < 10 || smsSent}
+                onClick={() => setSmsSent(true)}
+                className="flex-shrink-0 rounded-xl px-3 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
+                style={{ backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
+              >
+                {smsSent ? '발송됨' : '인증번호 발송'}
+              </button>
+            </div>
+            {smsSent && (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder="인증번호 6자리"
+                  maxLength={6}
+                  className="flex-1 border border-[var(--color-border-default)] rounded-xl px-3 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
+                />
+                {/* [임시] 인증번호 확인 API 미연동 */}
+                <button
+                  type="button"
+                  disabled={code.length < 6}
+                  onClick={onVerified}
+                  className="flex-shrink-0 rounded-xl px-4 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
+                  style={{ backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
+                >
+                  확인
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export function Step2BasicInfo() {
   const store = useByroStore()
+  const [name, setName] = useState(store.onboardingName)
   const [nickname, setNickname] = useState(store.onboardingNickname)
   const [birthDate, setBirthDate] = useState(store.onboardingBirthDate)
   const [showAge, setShowAge] = useState(store.onboardingShowAge)
   const [isVerified, setIsVerified] = useState(store.isVerified)
 
-  const canProceed = nickname.trim().length > 0
+  const canProceed = name.trim().length > 0
 
   const handleNext = () => {
     if (!canProceed) return
-    store.setOnboardingNameAndBirth({ nickname: nickname.trim(), birthDate, showAge })
+    store.setOnboardingNameAndBirth({ name: name.trim(), nickname: nickname.trim(), birthDate, showAge })
     if (isVerified) store.setVerified(true)
     store.nextStep()
   }
@@ -53,13 +143,26 @@ export function Step2BasicInfo() {
     <div className="flex flex-col h-full overflow-y-auto px-5 py-4">
       <StepIntro
         eyebrow="Profile"
-        title={'어떻게\n불러드릴까요?'}
-        description={'별명은 프로필에 표시돼요.\n기본정보 편집에서 언제든 바꿀 수 있어요.'}
+        title={'이름을\n알려주세요'}
+        description={'나중에 기본정보 편집에서 바꿀 수 있어요.'}
       />
 
-      {/* 별명 */}
+      {/* 이름 (필수) */}
+      <div className="mb-4">
+        <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">이름 *</label>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="실명을 입력해주세요"
+          maxLength={20}
+          className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
+        />
+      </div>
+
+      {/* 별명 (선택) */}
       <div className="mb-5">
-        <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">별명 *</label>
+        <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">별명 (선택)</label>
         <input
           type="text"
           value={nickname}
@@ -68,10 +171,15 @@ export function Step2BasicInfo() {
           maxLength={30}
           className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
         />
+        {nickname.trim().length > 0 && (
+          <p className="mt-1.5 text-[11px] text-[var(--color-text-tertiary)]">
+            별명을 입력하면 프로필에 별명으로 표시돼요
+          </p>
+        )}
       </div>
 
       {/* 생년월일 */}
-      <div className="mb-6">
+      <div className="mb-5">
         <div className="flex items-center justify-between mb-1">
           <label className="text-xs text-[var(--color-text-tertiary)]">생년월일 (선택)</label>
           <button
@@ -93,25 +201,18 @@ export function Step2BasicInfo() {
         />
       </div>
 
-      {/* 본인인증 (선택) */}
-      <div className="surface-card-soft rounded-[20px] p-4 mb-4">
-        {isVerified ? (
-          <div className="flex items-center gap-3">
-            <CheckCircle2 size={22} className="text-[var(--color-state-success-text)] flex-shrink-0" />
-            <div>
-              <p className="text-[13px] font-bold text-[var(--color-text-strong)]">본인인증 완료</p>
-              <p className="text-[11px] text-[var(--color-text-tertiary)]">프로필에 인증 뱃지가 표시돼요</p>
-            </div>
+      {/* 본인인증 */}
+      {isVerified ? (
+        <div className="surface-card-soft rounded-[20px] p-4 mb-4 flex items-center gap-3">
+          <CheckCircle2 size={22} className="text-[var(--color-state-success-text)] flex-shrink-0" />
+          <div>
+            <p className="text-[13px] font-bold text-[var(--color-text-strong)]">본인인증 완료</p>
+            <p className="text-[11px] text-[var(--color-text-tertiary)]">프로필에 인증 뱃지가 표시돼요</p>
           </div>
-        ) : (
-          <>
-            <p className="text-[13px] font-bold text-[var(--color-text-strong)] mb-0.5">실명 인증하기 (선택)</p>
-            <p className="text-[11px] text-[var(--color-text-tertiary)] mb-3">인증 완료 시 프로필에 인증 뱃지가 붙어요</p>
-            {/* [임시] 본인인증 API 미연동 — 클릭 시 인증 완료 목업 */}
-            <Button variant="outline" onClick={() => setIsVerified(true)}>본인인증하기</Button>
-          </>
-        )}
-      </div>
+        </div>
+      ) : (
+        <VerifySection onVerified={() => setIsVerified(true)} />
+      )}
 
       <StepFooter canNext={canProceed} onNext={handleNext} onPrev={() => store.prevStep()} />
     </div>

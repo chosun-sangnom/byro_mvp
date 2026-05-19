@@ -30,6 +30,7 @@ interface ByroStore {
   agreedTerms: boolean
   agreedPrivacy: boolean
   agreedMarketing: boolean
+  onboardingName: string
   onboardingNickname: string
   onboardingBirthDate: string
   onboardingShowAge: boolean
@@ -77,7 +78,7 @@ interface ByroStore {
   setAgreedMarketing(v: boolean): void
   toggleAllAgreed(): void
   setOnboardingBasicInfo(info: { title?: string; school?: string }): void
-  setOnboardingNameAndBirth(info: { nickname: string; birthDate: string; showAge: boolean }): void
+  setOnboardingNameAndBirth(info: { name: string; nickname: string; birthDate: string; showAge: boolean }): void
   setVerified(v: boolean): void
   setLinkId(id: string): void
   connectInstagram(): void
@@ -147,6 +148,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   agreedTerms: false,
   agreedPrivacy: false,
   agreedMarketing: false,
+  onboardingName: '',
   onboardingNickname: '',
   onboardingBirthDate: '',
   onboardingShowAge: true,
@@ -235,8 +237,8 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     }))
   },
 
-  setOnboardingNameAndBirth({ nickname, birthDate, showAge }) {
-    set({ onboardingNickname: nickname, onboardingBirthDate: birthDate, onboardingShowAge: showAge })
+  setOnboardingNameAndBirth({ name, nickname, birthDate, showAge }) {
+    set({ onboardingName: name, onboardingNickname: nickname, onboardingBirthDate: birthDate, onboardingShowAge: showAge })
   },
 
   setVerified(v) {
@@ -325,12 +327,12 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     const {
       linkId, bio, instagramConnected, linkedinConnected,
       onboardingContactChannels, highlights, onboardingTitle, onboardingSchool,
-      highlightsInitialized, onboardingNickname, onboardingBirthDate, onboardingShowAge, isVerified,
+      highlightsInitialized, onboardingName, onboardingNickname, onboardingBirthDate, onboardingShowAge, isVerified,
     } = get()
     set({
       isLoggedIn: true,
       user: {
-        name: onboardingNickname || SAMPLE_PROFILE.name,
+        name: onboardingNickname || onboardingName || SAMPLE_PROFILE.name,
         linkId: linkId || SAMPLE_PROFILE.linkId,
         title: onboardingTitle.trim() || SAMPLE_PROFILE.title,
         headline: SAMPLE_PROFILE.headline,
@@ -592,6 +594,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       ...state,
       user: normalizeSampleUser(state.user),
       step: migratedStep,
+      onboardingName: (state as ByroStore & { onboardingName?: string }).onboardingName ?? '',
       onboardingNickname: (state as ByroStore & { onboardingNickname?: string }).onboardingNickname ?? '',
       onboardingBirthDate: (state as ByroStore & { onboardingBirthDate?: string }).onboardingBirthDate ?? '',
       onboardingShowAge: (state as ByroStore & { onboardingShowAge?: boolean }).onboardingShowAge ?? true,
@@ -605,6 +608,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     agreedTerms: state.agreedTerms,
     agreedPrivacy: state.agreedPrivacy,
     agreedMarketing: state.agreedMarketing,
+    onboardingName: state.onboardingName,
     onboardingNickname: state.onboardingNickname,
     onboardingBirthDate: state.onboardingBirthDate,
     onboardingShowAge: state.onboardingShowAge,

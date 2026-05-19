@@ -579,7 +579,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   },
 }), {
   name: 'byro-store',
-  version: 12,
+  version: 13,
   migrate: (persistedState: unknown) => {
     const state = persistedState as ByroStore | undefined
     if (!state) return persistedState
@@ -592,6 +592,10 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       ...state,
       user: normalizeSampleUser(state.user),
       step: migratedStep,
+      onboardingNickname: (state as ByroStore & { onboardingNickname?: string }).onboardingNickname ?? '',
+      onboardingBirthDate: (state as ByroStore & { onboardingBirthDate?: string }).onboardingBirthDate ?? '',
+      onboardingShowAge: (state as ByroStore & { onboardingShowAge?: boolean }).onboardingShowAge ?? true,
+      isVerified: (state as ByroStore & { isVerified?: boolean }).isVerified ?? false,
     }
   },
   partialize: (state) => ({
@@ -601,6 +605,10 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     agreedTerms: state.agreedTerms,
     agreedPrivacy: state.agreedPrivacy,
     agreedMarketing: state.agreedMarketing,
+    onboardingNickname: state.onboardingNickname,
+    onboardingBirthDate: state.onboardingBirthDate,
+    onboardingShowAge: state.onboardingShowAge,
+    isVerified: state.isVerified,
     onboardingTitle: state.onboardingTitle,
     onboardingSchool: state.onboardingSchool,
     linkId: state.linkId,

@@ -278,13 +278,6 @@ export function Step9Complete() {
   const isLastSlide = slide === TOTAL - 1
   const guide = slide > 0 ? GUIDE_SLIDES[slide - 1] : null
 
-  const ctaButtons = (
-    <div className="space-y-3">
-      <Button onClick={() => router.replace(`/${linkId}`)}>내 프로필 보기</Button>
-      <Button variant="outline" onClick={() => router.replace('/me?edit=true')}>프로필 더 꾸미기</Button>
-    </div>
-  )
-
   return (
     <div
       className="flex flex-col h-full px-5 py-6 select-none"
@@ -344,17 +337,15 @@ export function Step9Complete() {
 
       {/* Bottom buttons */}
       {slide === 0 ? (
-        <>
-          {ctaButtons}
-          <button
-            onClick={goNext}
-            className="mt-3 text-xs font-semibold text-[var(--color-text-tertiary)] text-center w-full"
-          >
-            바이로 기능 살펴보기 →
-          </button>
-        </>
+        <div className="space-y-3">
+          <p className="text-center text-[12px] text-[var(--color-text-tertiary)] leading-relaxed">
+            내 바이로를 더 채울수록<br />꽉꽉 담은 프로필이 돼요
+          </p>
+          <Button onClick={() => router.replace(`/${linkId}`)}>내 프로필 보기</Button>
+          <Button variant="outline" onClick={goNext}>내 바이로 채우러 가기</Button>
+        </div>
       ) : isLastSlide ? (
-        ctaButtons
+        <Button onClick={() => router.replace(`/${linkId}`)}>내 프로필 보기</Button>
       ) : (
         <div className="flex gap-3">
           <Button variant="outline" onClick={goPrev}>이전</Button>

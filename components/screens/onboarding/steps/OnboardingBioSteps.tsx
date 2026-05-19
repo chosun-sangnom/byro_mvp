@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { BadgeCheck, CheckCircle2 } from 'lucide-react'
+import { BadgeCheck } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
-import { Button, showToast } from '@/components/ui'
+import { Button } from '@/components/ui'
 
 // ─── Mini preview components ──────────────────────────────────────────────────
 
@@ -327,11 +327,6 @@ export function Step9Complete() {
     }
   }, [slide])
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(`byro.io/@${linkId}`).catch(() => {})
-    showToast('링크가 복사됐어요!')
-  }
-
   const goNext = () => { if (slide < TOTAL - 1) setSlide(slide + 1) }
   const goPrev = () => { if (slide > 0) setSlide(slide - 1) }
   const getGuideReturnRoute = () => {
@@ -343,26 +338,20 @@ export function Step9Complete() {
   const guide = slide > 0 ? GUIDE_SLIDES[slide - 1] : null
 
   return (
-    <div className="flex flex-col h-full px-5 py-6">
+    <div className="flex flex-col h-full px-5 py-7">
       <div className="flex-1 overflow-y-auto">
-        <div className="flex items-center bg-[var(--color-bg-muted)] border border-[var(--color-border-soft)] rounded-xl px-4 py-2.5 mb-5">
-          <CheckCircle2 size={14} className="text-[var(--color-state-success-text)] mr-2 flex-shrink-0" />
-          <span className="flex-1 text-sm text-[var(--color-text-primary)]">byro.io/@{linkId}</span>
-          <button onClick={handleCopy} className="text-xs font-bold text-[var(--color-accent-dark)] ml-3 flex-shrink-0">복사</button>
-        </div>
-
-        <h2 className="text-[22px] font-black text-[var(--color-text-strong)] leading-snug mb-1">
-          프로필이 만들어졌어요!
-        </h2>
         {slide === 0 ? (
-          <>
+          <div className="pt-5">
             <div className={`transition-all duration-500 ${showIntroText ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
-              <p className="text-[21px] font-black leading-snug mb-3" style={{ color: 'var(--color-accent-dark)' }}>
+              <p className="text-[26px] font-black leading-[1.18] text-[var(--color-text-strong)] mb-3">
+                프로필이 만들어졌어요!
+              </p>
+              <p className="text-[22px] font-black leading-[1.22] mb-3" style={{ color: 'var(--color-accent-dark)' }}>
                 이제 자유롭게 나를 표현하는
                 <br />
                 Byro를 만들어보세요!
               </p>
-              <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed mb-5">
+              <p className="text-[14px] text-[var(--color-text-secondary)] leading-relaxed mb-8">
                 어떤 사람인지, 어떤 취향을 가졌는지, 어떤 관계를 맺고 있는지
                 <br />
                 Byro 안에서 한눈에 보여줄 수 있어요.
@@ -372,20 +361,23 @@ export function Step9Complete() {
             <div className={`transition-all duration-500 ${showIntroPreview ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'}`}>
               <PreviewByroIntro />
             </div>
-          </>
+          </div>
         ) : guide ? (
-          <>
+          <div className="pt-2">
+            <div className="mb-5">
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] mb-2">
+                {slide} / {GUIDE_SLIDES.length}
+              </p>
+              <h2 className="text-[28px] font-black leading-[1.15] text-[var(--color-text-strong)] mb-2">{guide.title}</h2>
+              <p className="text-[15px] font-semibold text-[var(--color-accent-dark)] leading-snug">{guide.value}</p>
+            </div>
+
             <div className="pointer-events-none mb-5">
               <guide.Preview />
             </div>
 
-            <div className="text-center">
-              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] mb-1">
-                {slide} / {GUIDE_SLIDES.length}
-              </p>
-              <h2 className="text-xl font-black mb-1.5 text-[var(--color-text-strong)]">{guide.title}</h2>
-              <p className="text-sm font-semibold text-[var(--color-accent-dark)] mb-4">{guide.value}</p>
-              <div className="flex flex-wrap justify-center gap-1.5">
+            <div>
+              <div className="flex flex-wrap gap-1.5">
                 {guide.tags.map((tag) => (
                   <span key={tag} className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[var(--color-bg-muted)] text-[var(--color-text-secondary)]">
                     {tag}
@@ -393,18 +385,18 @@ export function Step9Complete() {
                 ))}
               </div>
             </div>
-          </>
+          </div>
         ) : null}
       </div>
 
       {/* Bottom buttons */}
       {slide === 0 ? (
-        <div className="space-y-2.5 pt-4">
+        <div className="space-y-3 pt-6">
           <Button onClick={goNext}>자세히보기</Button>
           <Button variant="outline" onClick={() => router.replace(`/${linkId}`)}>나중에 할게요</Button>
         </div>
       ) : isLastSlide ? (
-        <div className="space-y-2.5">
+        <div className="space-y-3 pt-5">
           {guide?.ctaRoute && (
             <Button onClick={() => router.replace(`${guide.ctaRoute!}&returnTo=${encodeURIComponent(getGuideReturnRoute())}`)}>
               {guide.ctaLabel}
@@ -417,7 +409,7 @@ export function Step9Complete() {
           <Button variant="outline" onClick={() => router.replace(`/${linkId}`)}>나중에 할게요</Button>
         </div>
       ) : (
-        <div className="space-y-2.5">
+        <div className="space-y-3 pt-5">
           {guide?.ctaRoute && (
             <Button onClick={() => router.replace(`${guide.ctaRoute!}&returnTo=${encodeURIComponent(getGuideReturnRoute())}`)}>
               {guide.ctaLabel}

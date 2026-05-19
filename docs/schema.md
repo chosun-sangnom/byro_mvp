@@ -96,7 +96,7 @@
 | users | 전체 공개 | 본인만 |
 | highlights | 전체 공개 | 본인만 |
 | connections | 당사자만 | 요청자 생성, 당사자 수정 |
-| experiences | 전체 공개 | 누구나 (비회원 포함) |
+| experiences | 전체 공개 | 로그인 유저는 항상 / 비회원은 reputation이 public인 프로필만 |
 
 ---
 

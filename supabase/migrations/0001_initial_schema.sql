@@ -152,10 +152,18 @@ create policy "users can update own connections"
 create policy "users can delete own requests"
   on public.connections for delete using (auth.uid() = from_user_id);
 
--- experiences: 누구나 조회, 로그인 유저 또는 비회원 생성
+-- experiences: 누구나 조회
+-- 로그인 유저는 항상 제출 가능, 비회원은 reputation이 public인 프로필에만 제출 가능
 create policy "experiences are viewable"
   on public.experiences for select using (true);
 
 create policy "anyone can submit experience"
-  on public.experiences for insert with check (true);
+  on public.experiences for insert with check (
+    auth.uid() is not null
+    or exists (
+      select 1 from public.users u
+      where u.link_id = target_link_id
+        and (u.tab_visibility->>'reputation') = 'public'
+    )
+  );
 

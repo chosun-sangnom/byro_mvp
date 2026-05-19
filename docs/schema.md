@@ -9,7 +9,7 @@
 
 #### `users`
 
-프로필의 핵심 데이터. `id`는 Supabase Auth의 `auth.uid()`와 동일.
+기본 공개 정보. 항상 전체 공개.
 
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
@@ -29,8 +29,6 @@
 | `avatar_url` | text | |
 | `profile_images` | jsonb | string[] |
 | `header_meta` | jsonb | `{ residence, mood, availability }` |
-| `who_i_am` | jsonb | `PublicProfileWhoIAm` |
-| `life` | jsonb | `PublicProfileLife` |
 | `contact_channels` | jsonb | `ContactChannel[]` |
 | `tab_visibility` | jsonb | `{ who, life, reputation }` |
 | `instagram_connected` | boolean | |
@@ -42,6 +40,32 @@
 | `youtube` | jsonb | `{ channelName, channelUrl }` |
 | `tiktok` | jsonb | `{ username, profileUrl }` |
 | `created_at` | timestamptz | |
+| `updated_at` | timestamptz | auto-update trigger |
+
+#### `user_who_i_am`
+
+나 탭 데이터. `tab_visibility.who` 설정에 따라 공개 범위 제한. 케미 매칭에 활용.
+
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| `user_id` | uuid PK → users | |
+| `mbti` | text | |
+| `blood_type` | text | |
+| `relationship_status` | text | |
+| `children` | text | |
+| `religion` | text | |
+| `updated_at` | timestamptz | auto-update trigger |
+
+#### `user_life`
+
+라이프 탭 데이터. `tab_visibility.life` 설정에 따라 공개 범위 제한.
+
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| `user_id` | uuid PK → users | |
+| `daily` | jsonb | `{ exercise[], pets[], diet }` |
+| `tastes` | jsonb | `{ movies[], music[], books[], cafes[], restaurants[], sports[] }` |
+| `places` | jsonb | `{ neighborhoods[], travelDestinations[] }` |
 | `updated_at` | timestamptz | auto-update trigger |
 
 #### `highlights`
@@ -94,9 +118,11 @@
 | 테이블 | 읽기 | 쓰기 |
 |--------|------|------|
 | users | 전체 공개 | 본인만 |
-| highlights | tab_visibility.who 설정 따름 (public/connected/private) | 본인만 |
+| user_who_i_am | tab_visibility.who 따름 | 본인만 |
+| user_life | tab_visibility.life 따름 | 본인만 |
+| highlights | tab_visibility.who 따름 | 본인만 |
 | connections | 당사자만 | 요청자 생성, 당사자 수정 |
-| experiences | tab_visibility.reputation 설정 따름 (public/connected/private) | 로그인 유저는 항상 / 비회원은 reputation=public인 프로필만 |
+| experiences | tab_visibility.reputation 따름 | 로그인 유저는 항상 / 비회원은 reputation=public인 프로필만 |
 
 ---
 

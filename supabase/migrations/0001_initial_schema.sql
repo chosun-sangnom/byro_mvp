@@ -6,7 +6,7 @@
 create extension if not exists "pgcrypto";
 
 -- ─── users ───────────────────────────────────────────────────────────────────
--- One row per registered user. Linked to Supabase Auth via id = auth.uid().
+-- 기본 공개 정보. id = auth.uid(). 항상 전체 공개.
 create table public.users (
   id              uuid primary key references auth.users(id) on delete cascade,
   link_id         text not null unique,                -- @username (byro.io/@link_id)
@@ -24,8 +24,6 @@ create table public.users (
   avatar_url      text,
   profile_images  jsonb not null default '[]',        -- string[]
   header_meta     jsonb not null default '{}',        -- { residence, mood, availability }
-  who_i_am        jsonb not null default '{}',        -- { mbti, bloodType, aiStyleSummary, ... }
-  life            jsonb not null default '{}',        -- { daily, tastes, places }
   contact_channels jsonb not null default '[]',       -- ContactChannel[]
   tab_visibility  jsonb not null default '{"who":"public","life":"public","reputation":"public"}',
   -- SNS
@@ -33,7 +31,7 @@ create table public.users (
   linkedin_connected   boolean not null default false,
   youtube_connected    boolean not null default false,
   tiktok_connected     boolean not null default false,
-  instagram       jsonb,                              -- { username, profileUrl, aiSummary, posts }
+  instagram       jsonb,                              -- { username, profileUrl, posts }
   linkedin        jsonb,                              -- { profileUrl, ... }
   youtube         jsonb,                              -- { channelName, channelUrl }
   tiktok          jsonb,                              -- { username, profileUrl }
@@ -42,7 +40,31 @@ create table public.users (
   updated_at      timestamptz not null default now()
 );
 
+-- ─── user_who_i_am ───────────────────────────────────────────────────────────
+-- 나 탭 데이터. tab_visibility.who 설정에 따라 공개 범위 제한.
+-- 케미 매칭에 활용되므로 개별 컬럼으로 분리.
+create table public.user_who_i_am (
+  user_id              uuid primary key references public.users(id) on delete cascade,
+  mbti                 text,
+  blood_type           text,
+  relationship_status  text,
+  children             text,
+  religion             text,
+  updated_at           timestamptz not null default now()
+);
+
+-- ─── user_life ───────────────────────────────────────────────────────────────
+-- 라이프 탭 데이터. tab_visibility.life 설정에 따라 공개 범위 제한.
+create table public.user_life (
+  user_id   uuid primary key references public.users(id) on delete cascade,
+  daily     jsonb not null default '{}',   -- { exercise[], pets[], diet }
+  tastes    jsonb not null default '{}',   -- { movies[], music[], books[], cafes[], restaurants[], sports[] }
+  places    jsonb not null default '{}',   -- { neighborhoods[], travelDestinations[] }
+  updated_at timestamptz not null default now()
+);
+
 -- ─── highlights ──────────────────────────────────────────────────────────────
+-- 나 탭에 표시. tab_visibility.who 설정에 따라 공개 범위 제한.
 create table public.highlights (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid not null references public.users(id) on delete cascade,
@@ -71,7 +93,7 @@ create table public.connections (
 );
 
 -- ─── experiences ─────────────────────────────────────────────────────────────
--- 경험 남기기. target_link_id는 text — 비회원 프로필에도 남길 수 있게.
+-- 관계 탭. target_link_id는 text — 비회원 프로필에도 남길 수 있게.
 create table public.experiences (
   id              uuid primary key default gen_random_uuid(),
   target_link_id  text not null,
@@ -106,6 +128,12 @@ $$;
 create trigger set_updated_at before update on public.users
   for each row execute function public.set_updated_at();
 
+create trigger set_updated_at before update on public.user_who_i_am
+  for each row execute function public.set_updated_at();
+
+create trigger set_updated_at before update on public.user_life
+  for each row execute function public.set_updated_at();
+
 create trigger set_updated_at before update on public.highlights
   for each row execute function public.set_updated_at();
 
@@ -116,11 +144,16 @@ create trigger set_updated_at before update on public.connections
 -- Row Level Security
 -- ─────────────────────────────────────────────────────────────────────────────
 alter table public.users          enable row level security;
+alter table public.user_who_i_am  enable row level security;
+alter table public.user_life      enable row level security;
 alter table public.highlights     enable row level security;
 alter table public.connections    enable row level security;
 alter table public.experiences    enable row level security;
 
--- users: 누구나 공개 프로필 조회 가능, 본인만 수정
+-- ─── 공통 visibility 체크 패턴 ─────────────────────────────────────────────
+-- public → 누구나 / connected → 연결된 유저만 / private → 본인만
+
+-- users: 기본 정보는 항상 전체 공개
 create policy "public profiles are viewable"
   on public.users for select using (true);
 
@@ -130,17 +163,63 @@ create policy "users can update own profile"
 create policy "users can insert own profile"
   on public.users for insert with check (auth.uid() = id);
 
--- highlights: tab_visibility.who 설정에 따라 조회 제한, 본인만 수정
--- public → 누구나 / connected → 연결된 유저만 / private → 본인만
-create policy "highlights are viewable by allowed users"
+-- user_who_i_am: tab_visibility.who 기준
+create policy "who_i_am viewable by allowed users"
+  on public.user_who_i_am for select using (
+    exists (
+      select 1 from public.users u where u.id = user_id and (
+        u.id = auth.uid()
+        or (u.tab_visibility->>'who') = 'public'
+        or (
+          (u.tab_visibility->>'who') = 'connected'
+          and exists (
+            select 1 from public.connections c
+            where c.status = 'accepted'
+              and (
+                (c.from_user_id = auth.uid() and c.to_user_id = u.id)
+                or (c.to_user_id = auth.uid() and c.from_user_id = u.id)
+              )
+          )
+        )
+      )
+    )
+  );
+
+create policy "users manage own who_i_am"
+  on public.user_who_i_am for all using (auth.uid() = user_id);
+
+-- user_life: tab_visibility.life 기준
+create policy "life viewable by allowed users"
+  on public.user_life for select using (
+    exists (
+      select 1 from public.users u where u.id = user_id and (
+        u.id = auth.uid()
+        or (u.tab_visibility->>'life') = 'public'
+        or (
+          (u.tab_visibility->>'life') = 'connected'
+          and exists (
+            select 1 from public.connections c
+            where c.status = 'accepted'
+              and (
+                (c.from_user_id = auth.uid() and c.to_user_id = u.id)
+                or (c.to_user_id = auth.uid() and c.from_user_id = u.id)
+              )
+          )
+        )
+      )
+    )
+  );
+
+create policy "users manage own life"
+  on public.user_life for all using (auth.uid() = user_id);
+
+-- highlights: tab_visibility.who 기준
+create policy "highlights viewable by allowed users"
   on public.highlights for select using (
     exists (
       select 1 from public.users u where u.id = user_id and (
-        -- 본인
         u.id = auth.uid()
-        -- 전체 공개
         or (u.tab_visibility->>'who') = 'public'
-        -- 친구 공개: 연결된 유저
         or (
           (u.tab_visibility->>'who') = 'connected'
           and exists (
@@ -174,18 +253,14 @@ create policy "users can update own connections"
 create policy "users can delete own requests"
   on public.connections for delete using (auth.uid() = from_user_id);
 
--- experiences: tab_visibility.reputation 설정에 따라 조회 제한
--- public → 누구나 / connected → 연결된 유저만 / private → 본인만
--- 제출: 로그인 유저는 항상 가능, 비회원은 reputation이 public인 프로필에만
-create policy "experiences are viewable by allowed users"
+-- experiences: tab_visibility.reputation 기준
+-- 제출: 로그인 유저는 항상 가능, 비회원은 reputation=public인 프로필만
+create policy "experiences viewable by allowed users"
   on public.experiences for select using (
     exists (
       select 1 from public.users u where u.link_id = target_link_id and (
-        -- 본인
         u.id = auth.uid()
-        -- 전체 공개
         or (u.tab_visibility->>'reputation') = 'public'
-        -- 친구 공개: 연결된 유저
         or (
           (u.tab_visibility->>'reputation') = 'connected'
           and exists (
@@ -210,4 +285,3 @@ create policy "anyone can submit experience"
         and (u.tab_visibility->>'reputation') = 'public'
     )
   );
-

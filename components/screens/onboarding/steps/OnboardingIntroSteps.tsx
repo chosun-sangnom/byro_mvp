@@ -1,9 +1,9 @@
 'use client'
 
 import { useRef, useState, type ChangeEvent } from 'react'
-import { Camera } from 'lucide-react'
+import { Camera, CheckCircle2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
-import { Button, CheckRow, InfoBox, TextArea, showToast } from '@/components/ui'
+import { Button, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
@@ -33,97 +33,91 @@ export function Step1Login() {
   )
 }
 
-export function Step2Verify() {
+export function Step2BasicInfo() {
   const store = useByroStore()
-  const { agreedTerms, agreedPrivacy, agreedMarketing } = store
-  const allChecked = agreedTerms && agreedPrivacy && agreedMarketing
-  const canProceed = agreedTerms && agreedPrivacy
+  const [nickname, setNickname] = useState(store.onboardingNickname)
+  const [birthDate, setBirthDate] = useState(store.onboardingBirthDate)
+  const [showAge, setShowAge] = useState(store.onboardingShowAge)
+  const [isVerified, setIsVerified] = useState(store.isVerified)
 
-  const handleVerify = () => {
+  const canProceed = nickname.trim().length > 0
+
+  const handleNext = () => {
     if (!canProceed) return
+    store.setOnboardingNameAndBirth({ nickname: nickname.trim(), birthDate, showAge })
+    if (isVerified) store.setVerified(true)
     store.nextStep()
   }
 
   return (
     <div className="flex flex-col h-full overflow-y-auto px-5 py-4">
       <StepIntro
-        eyebrow="Verification"
-        title={'본인 확인이\n필요해요'}
-        description={'인증한 이름은 프로필에 실명으로 표시돼요.\n인증 후에는 바꾸기 어려워요.'}
+        eyebrow="Profile"
+        title={'어떻게\n불러드릴까요?'}
+        description={'별명은 프로필에 표시돼요.\n기본정보 편집에서 언제든 바꿀 수 있어요.'}
       />
-      <div className="surface-card-soft rounded-[24px] p-4 mb-4">
-        <div className="pb-3 mb-3 border-b" style={{ borderColor: 'var(--color-border-default)' }}>
-          <CheckRow label="전체 동의" checked={allChecked} onToggle={store.toggleAllAgreed} />
+
+      {/* 별명 */}
+      <div className="mb-5">
+        <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">별명 *</label>
+        <input
+          type="text"
+          value={nickname}
+          onChange={(e) => setNickname(e.target.value)}
+          placeholder="예: 명구, Alex, 크리에이터K"
+          maxLength={30}
+          className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
+        />
+      </div>
+
+      {/* 생년월일 */}
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-1">
+          <label className="text-xs text-[var(--color-text-tertiary)]">생년월일 (선택)</label>
+          <button
+            type="button"
+            onClick={() => setShowAge((prev) => !prev)}
+            className="flex items-center gap-1.5"
+          >
+            <div className={`relative w-7 h-4 rounded-full transition-colors ${showAge ? 'bg-[var(--color-accent-dark)]' : 'bg-[var(--color-border-default)]'}`}>
+              <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white shadow transition-transform ${showAge ? 'translate-x-3.5' : 'translate-x-0.5'}`} />
+            </div>
+            <span className="text-[11px] text-[var(--color-text-tertiary)]">나이 공개</span>
+          </button>
         </div>
-        <CheckRow label="[필수] 서비스 이용약관" checked={agreedTerms} onToggle={() => store.setAgreedTerms(!agreedTerms)} onDetail={() => {}} />
-        <CheckRow label="[필수] 개인정보 처리방침" checked={agreedPrivacy} onToggle={() => store.setAgreedPrivacy(!agreedPrivacy)} onDetail={() => {}} />
-        <CheckRow label="[선택] 마케팅 정보 수신 동의" checked={agreedMarketing} onToggle={() => store.setAgreedMarketing(!agreedMarketing)} onDetail={() => {}} />
+        <input
+          type="date"
+          value={birthDate}
+          onChange={(e) => setBirthDate(e.target.value)}
+          className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
+        />
       </div>
-      <div className="space-y-3">
-        <Button variant="outline" disabled={!canProceed} onClick={handleVerify}>SMS로 인증하기</Button>
-        <Button variant="kakao" disabled={!canProceed} onClick={handleVerify}>카카오로 인증하기</Button>
+
+      {/* 본인인증 (선택) */}
+      <div className="surface-card-soft rounded-[20px] p-4 mb-4">
+        {isVerified ? (
+          <div className="flex items-center gap-3">
+            <CheckCircle2 size={22} className="text-[var(--color-state-success-text)] flex-shrink-0" />
+            <div>
+              <p className="text-[13px] font-bold text-[var(--color-text-strong)]">본인인증 완료</p>
+              <p className="text-[11px] text-[var(--color-text-tertiary)]">프로필에 인증 뱃지가 표시돼요</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            <p className="text-[13px] font-bold text-[var(--color-text-strong)] mb-0.5">실명 인증하기 (선택)</p>
+            <p className="text-[11px] text-[var(--color-text-tertiary)] mb-3">인증 완료 시 프로필에 인증 뱃지가 붙어요</p>
+            {/* [임시] 본인인증 API 미연동 — 클릭 시 인증 완료 목업 */}
+            <Button variant="outline" onClick={() => setIsVerified(true)}>본인인증하기</Button>
+          </>
+        )}
       </div>
-      <StepFooter canNext={canProceed} onNext={handleVerify} onPrev={() => store.prevStep()} />
+
+      <StepFooter canNext={canProceed} onNext={handleNext} onPrev={() => store.prevStep()} />
     </div>
   )
 }
 
-export function Step3LinkId() {
-  const store = useByroStore()
-  const [input, setInput] = useState(store.linkId)
-  const [status, setStatus] = useState<'idle' | 'valid' | 'error'>('idle')
-
-  const LINK_REGEX = /^[a-z0-9_]{2,20}$/
-
-  const handleChange = (value: string) => {
-    setInput(value)
-    store.setLinkId(value)
-    if (value.length === 0) setStatus('idle')
-    else if (LINK_REGEX.test(value)) setStatus('valid')
-    else setStatus('error')
-  }
-
-  return (
-    <div className="flex flex-col h-full overflow-y-auto px-5 py-4">
-      <StepIntro
-        eyebrow="Link"
-        title={'나만의 Byro 링크를\n만들어보세요'}
-        description={'한 번 정하면 바꾸기 어려워요.\n공유하기 쉬운 이름을 추천해요.'}
-      />
-      <InfoBox variant="warn">
-        지금은 무료로 만들 수 있어요.
-        <br />
-        정식 출시 후에는 유료로 전환될 수 있어요.
-      </InfoBox>
-
-      <label className="text-xs font-bold text-[var(--color-text-secondary)] uppercase tracking-wide mb-1">Byro 링크 ID</label>
-      <input
-        value={input}
-        onChange={(event) => handleChange(event.target.value)}
-        placeholder="예: myongkoo"
-        className={[
-          'w-full border rounded-xl px-4 py-3 text-sm outline-none mb-1',
-          status === 'valid' ? 'border-[var(--color-state-success-text)]' : status === 'error' ? 'border-[var(--color-state-danger-text)]' : 'border-[var(--color-border-default)]',
-        ].join(' ')}
-      />
-      {status === 'valid' && <p className="text-xs text-[var(--color-state-success-text)] mb-3">사용할 수 있는 ID예요</p>}
-      {status === 'error' && <p className="text-xs text-[var(--color-state-danger-text)] mb-3">영문 소문자, 숫자, 밑줄(_)만 가능 · 2~20자</p>}
-      <p className="meta-text mb-6">· 영문 소문자, 숫자, 밑줄(_) &nbsp;· 2~20자 이내</p>
-      {input && status !== 'error' && (
-        <div className="surface-card-soft rounded-2xl px-4 py-3 mb-5">
-          <div className="micro-text mb-1">미리보기</div>
-          <div className="text-sm font-semibold text-[var(--color-text-strong)]">byro.io/@{input}</div>
-        </div>
-      )}
-
-      <StepFooter
-        canNext={status === 'valid'}
-        onNext={() => store.nextStep()}
-        onPrev={() => store.prevStep()}
-      />
-    </div>
-  )
-}
 
 const MBTI_DIMS = [
   { options: ['E', 'I'] as const, labels: ['외향', '내향'] },
@@ -138,8 +132,6 @@ export function Step4Profile() {
   const [avatarImage, setAvatarImage] = useState('')
   const [mbti, setMbti] = useState('')
   const [bio, setBio] = useState('')
-  const [birthDate, setBirthDate] = useState('')
-  const [showAge, setShowAge] = useState(true)
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -160,7 +152,6 @@ export function Step4Profile() {
     if (avatarImage) store.updateUserInfo({ avatarImage, profileImages: [avatarImage] })
     if (bio.trim()) store.updateUserInfo({ bio: bio.trim() })
     if (mbti.length === 4) store.updateUserWhoIAm({ ...SAMPLE_PROFILE.whoIAm, mbti })
-    if (birthDate) store.updateUserInfo({ birthDate, showAge, birthTime: '', birthPlace: '', calendarType: 'solar' })
     store.goToStep('complete')
   }
 
@@ -245,29 +236,6 @@ export function Step4Profile() {
           placeholder="예: 창업 3년차. 사람을 만나고 연결하는 걸 좋아합니다."
           rows={3}
           maxLength={200}
-        />
-      </div>
-
-      {/* 생년월일 */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-1">
-          <label className="text-xs text-[var(--color-text-tertiary)]">생년월일</label>
-          <button
-            type="button"
-            onClick={() => setShowAge((prev) => !prev)}
-            className="flex items-center gap-1.5"
-          >
-            <div className={`relative w-7 h-4 rounded-full transition-colors ${showAge ? 'bg-[var(--color-accent-dark)]' : 'bg-[var(--color-border-default)]'}`}>
-              <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white shadow transition-transform ${showAge ? 'translate-x-3.5' : 'translate-x-0.5'}`} />
-            </div>
-            <span className="text-[11px] text-[var(--color-text-tertiary)]">나이 공개</span>
-          </button>
-        </div>
-        <input
-          type="date"
-          value={birthDate}
-          onChange={(e) => setBirthDate(e.target.value)}
-          className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
         />
       </div>
 

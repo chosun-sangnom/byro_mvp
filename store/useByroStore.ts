@@ -18,7 +18,7 @@ import type {
 } from '@/types'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
-const STEP_ORDER: OnboardingStep[] = ['login', 'verify', 'linkid', 'profile', 'complete']
+const STEP_ORDER: OnboardingStep[] = ['login', 'basicinfo', 'profile', 'complete']
 
 interface ByroStore {
   // 인증
@@ -30,6 +30,10 @@ interface ByroStore {
   agreedTerms: boolean
   agreedPrivacy: boolean
   agreedMarketing: boolean
+  onboardingNickname: string
+  onboardingBirthDate: string
+  onboardingShowAge: boolean
+  isVerified: boolean
   onboardingTitle: string
   onboardingSchool: string
   linkId: string
@@ -73,6 +77,8 @@ interface ByroStore {
   setAgreedMarketing(v: boolean): void
   toggleAllAgreed(): void
   setOnboardingBasicInfo(info: { title?: string; school?: string }): void
+  setOnboardingNameAndBirth(info: { nickname: string; birthDate: string; showAge: boolean }): void
+  setVerified(v: boolean): void
   setLinkId(id: string): void
   connectInstagram(): void
   disconnectInstagram(): void
@@ -141,6 +147,10 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   agreedTerms: false,
   agreedPrivacy: false,
   agreedMarketing: false,
+  onboardingNickname: '',
+  onboardingBirthDate: '',
+  onboardingShowAge: true,
+  isVerified: false,
   onboardingTitle: SAMPLE_PROFILE.title,
   onboardingSchool: SAMPLE_PROFILE.school,
   linkId: '',
@@ -225,6 +235,14 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     }))
   },
 
+  setOnboardingNameAndBirth({ nickname, birthDate, showAge }) {
+    set({ onboardingNickname: nickname, onboardingBirthDate: birthDate, onboardingShowAge: showAge })
+  },
+
+  setVerified(v) {
+    set({ isVerified: v })
+  },
+
   setLinkId(id) {
     set({ linkId: id })
   },
@@ -307,12 +325,12 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     const {
       linkId, bio, instagramConnected, linkedinConnected,
       onboardingContactChannels, highlights, onboardingTitle, onboardingSchool,
-      highlightsInitialized,
+      highlightsInitialized, onboardingNickname, onboardingBirthDate, onboardingShowAge, isVerified,
     } = get()
     set({
       isLoggedIn: true,
       user: {
-        name: SAMPLE_PROFILE.name,
+        name: onboardingNickname || SAMPLE_PROFILE.name,
         linkId: linkId || SAMPLE_PROFILE.linkId,
         title: onboardingTitle.trim() || SAMPLE_PROFILE.title,
         headline: SAMPLE_PROFILE.headline,
@@ -324,11 +342,12 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
         profileImages: SAMPLE_PROFILE.profileImages,
         whoIAm: SAMPLE_PROFILE.whoIAm,
         life: SAMPLE_PROFILE.life,
-        birthDate: SAMPLE_PROFILE.birthDate,
+        birthDate: onboardingBirthDate || SAMPLE_PROFILE.birthDate,
         birthTime: SAMPLE_PROFILE.birthTime,
         birthPlace: SAMPLE_PROFILE.birthPlace,
         calendarType: SAMPLE_PROFILE.calendarType,
-        showAge: SAMPLE_PROFILE.showAge,
+        showAge: onboardingBirthDate ? onboardingShowAge : SAMPLE_PROFILE.showAge,
+        isVerified,
         contactChannels: onboardingContactChannels,
       },
       highlights: highlightsInitialized ? highlights : SAMPLE_PROFILE.manualHighlights as Highlight[],
@@ -565,7 +584,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     const state = persistedState as ByroStore | undefined
     if (!state) return persistedState
     const persistedStep = state.step as string
-    const validSteps: OnboardingStep[] = ['login', 'verify', 'linkid', 'profile', 'complete']
+    const validSteps: OnboardingStep[] = ['login', 'basicinfo', 'profile', 'complete']
     const migratedStep: OnboardingStep = validSteps.includes(persistedStep as OnboardingStep)
       ? (persistedStep as OnboardingStep)
       : 'login'

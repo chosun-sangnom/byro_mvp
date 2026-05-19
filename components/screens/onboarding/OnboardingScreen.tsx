@@ -5,21 +5,19 @@ import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
 import { Button, Modal, NavBar, StepBar } from '@/components/ui'
 import type { OnboardingStep } from '@/types'
-import { Step1Login, Step2Verify, Step3LinkId, Step4Profile } from '@/components/screens/onboarding/steps/OnboardingIntroSteps'
+import { Step1Login, Step2BasicInfo, Step4Profile } from '@/components/screens/onboarding/steps/OnboardingIntroSteps'
 import { Step9Complete } from '@/components/screens/onboarding/steps/OnboardingBioSteps'
 
 const STEP_NUMS: Record<OnboardingStep, number> = {
   login: 0,
-  verify: 1,
-  linkid: 2,
-  profile: 3,
-  complete: 4,
+  basicinfo: 1,
+  profile: 2,
+  complete: 3,
 }
 
 const STEP_COMPONENTS: Record<OnboardingStep, () => JSX.Element> = {
   login: Step1Login,
-  verify: Step2Verify,
-  linkid: Step3LinkId,
+  basicinfo: Step2BasicInfo,
   profile: Step4Profile,
   complete: Step9Complete,
 }
@@ -31,7 +29,7 @@ export default function OnboardingScreen() {
 
   const stepNum = STEP_NUMS[store.step]
   const CurrentStep = STEP_COMPONENTS[store.step]
-  const hasBack = stepNum >= 1 && stepNum <= 3
+  const hasBack = stepNum >= 1 && stepNum <= 2
 
   const handleClose = () => setShowExitModal(true)
   const handleExitConfirm = () => {
@@ -43,11 +41,11 @@ export default function OnboardingScreen() {
     <div className="flex flex-col h-full">
       <NavBar
         onBack={hasBack ? () => store.prevStep() : undefined}
-        onClose={stepNum < 4 ? handleClose : undefined}
+        onClose={stepNum < 3 ? handleClose : undefined}
       />
 
-      {stepNum >= 1 && stepNum <= 3 && (
-        <StepBar current={stepNum} total={3} />
+      {stepNum >= 1 && stepNum <= 2 && (
+        <StepBar current={stepNum} total={2} />
       )}
 
       <div className="flex-1 overflow-hidden">

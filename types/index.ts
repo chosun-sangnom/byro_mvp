@@ -32,7 +32,7 @@ export type HighlightCategoryId =
   | 'volunteer'
   | 'other'
 
-export type OnboardingStep = 'login' | 'verify' | 'linkid' | 'profile' | 'complete'
+export type OnboardingStep = 'login' | 'basicinfo' | 'profile' | 'complete'
 
 export interface Highlight {
   id: string
@@ -321,4 +321,5 @@ export interface UserState {
   life?: PublicProfileLife
   contactChannels?: ContactChannel[]
   tabVisibility?: TabVisibility
+  isVerified?: boolean
 }

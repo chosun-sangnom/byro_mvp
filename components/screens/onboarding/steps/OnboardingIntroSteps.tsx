@@ -196,11 +196,9 @@ export function Step2BasicInfo() {
           maxLength={30}
           className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
         />
-        {nickname.trim().length > 0 && (
-          <p className="mt-1.5 text-[11px] text-[var(--color-text-tertiary)]">
-            별명을 입력하면 프로필에 별명으로 표시돼요
-          </p>
-        )}
+        <p className="mt-1.5 text-[11px] text-[var(--color-text-tertiary)]">
+          별명 설정 시 프로필에 별명으로 노출돼요
+        </p>
       </div>
 
       {/* 생년월일 */}

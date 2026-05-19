@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { BadgeCheck, CheckCircle2, Mail, MessageCircle, Phone } from 'lucide-react'
+import { BadgeCheck, CheckCircle2, ChevronRight, Mail, MessageCircle, Phone } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { Button, showToast } from '@/components/ui'
 
@@ -253,6 +253,13 @@ const GUIDE_SLIDES: GuideSlide[] = [
 
 const TOTAL = GUIDE_SLIDES.length + 1
 
+const RECOMMENDED_ACTIONS = [
+  { emoji: '💼', label: '하이라이트 추가하기', route: '/me?section=highlight' },
+  { emoji: '📱', label: 'SNS 연결하기',        route: '/me?section=sns' },
+  { emoji: '✍️', label: '자기소개 보강하기',   route: '/me?edit=true' },
+  { emoji: '📞', label: '연락 수단 설정하기',  route: '/me?section=contact' },
+] as const
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function Step9Complete() {
@@ -260,6 +267,19 @@ export function Step9Complete() {
   const router = useRouter()
   const linkId = store.user?.linkId || store.linkId || 'myongkoo'
   const [slide, setSlide] = useState(0)
+
+  // [임시] 프로필 완성도 계산 — 실제 API 연동 후 서버 계산으로 대체 예정
+  const completionPct = (() => {
+    const u = store.user
+    let pct = 15 // 이름 항상 있음
+    if (u?.bio?.trim()) pct += 15
+    if (u?.avatarImage) pct += 15
+    if (u?.birthDate) pct += 10
+    if (store.highlights.length > 0) pct += 20
+    if (store.instagramConnected || store.linkedinConnected) pct += 10
+    if (u?.contactChannels && u.contactChannels.length > 0) pct += 15
+    return Math.min(pct, 100)
+  })()
   const [touchStartX, setTouchStartX] = useState<number | null>(null)
 
   useEffect(() => {
@@ -296,39 +316,61 @@ export function Step9Complete() {
     >
       {/* Slide 0: Complete */}
       {slide === 0 && (
-        <div className="flex-1 flex flex-col justify-center">
-          <div className="text-center mb-5">
-            <div className="mb-3 text-[var(--color-state-success-text)] flex justify-center">
-              <CheckCircle2 size={40} />
-            </div>
-            <h2 className="text-2xl font-black mb-1 text-[var(--color-text-strong)]">바이로 준비 완료!</h2>
-            <p className="text-sm text-[var(--color-text-secondary)]">링크로 바로 공유할 수 있어요.</p>
-          </div>
+        <div className="flex-1 overflow-y-auto">
 
-          <div className="w-full flex items-center bg-[var(--color-bg-muted)] border border-[var(--color-border-soft)] rounded-xl px-4 py-3 mb-5">
+          {/* 링크 */}
+          <div className="flex items-center bg-[var(--color-bg-muted)] border border-[var(--color-border-soft)] rounded-xl px-4 py-2.5 mb-5">
+            <CheckCircle2 size={14} className="text-[var(--color-state-success-text)] mr-2 flex-shrink-0" />
             <span className="flex-1 text-sm text-[var(--color-text-primary)]">byro.io/@{linkId}</span>
             <button onClick={handleCopy} className="text-xs font-bold text-[var(--color-accent-dark)] ml-3 flex-shrink-0">복사</button>
           </div>
 
-          <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)] mb-2.5 px-1">
-            이걸 채우면 더 풍성해져요
+          {/* 헤드라인 */}
+          <h2 className="text-[22px] font-black text-[var(--color-text-strong)] leading-snug mb-1">
+            프로필이 만들어졌어요
+          </h2>
+          <p className="text-[19px] font-black leading-snug mb-3" style={{ color: 'var(--color-accent-dark)' }}>
+            이제 신뢰도를 높여보세요
+          </p>
+
+          {/* 서브카피 */}
+          <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed mb-5">
+            몇 가지 정보만 더 추가하면, 만난 사람들이 더 쉽게 기억하고 신뢰할 수 있어요.
+          </p>
+
+          {/* 완성도 */}
+          <div className="rounded-2xl p-4 mb-4" style={{ backgroundColor: 'var(--color-bg-muted)' }}>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[12px] font-bold text-[var(--color-text-secondary)]">현재 프로필 완성도</span>
+              <span className="text-[14px] font-black" style={{ color: 'var(--color-accent-dark)' }}>{completionPct}%</span>
+            </div>
+            <div className="w-full h-1.5 rounded-full mb-2" style={{ backgroundColor: 'var(--color-border-default)' }}>
+              <div
+                className="h-full rounded-full transition-all duration-700"
+                style={{ width: `${completionPct}%`, backgroundColor: 'var(--color-accent-dark)' }}
+              />
+            </div>
+            <p className="text-[11px] text-[var(--color-text-tertiary)]">
+              인증 1개만 추가해도 신뢰도가 크게 올라가요
+            </p>
+          </div>
+
+          {/* 추천 액션 */}
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] mb-2">
+            추천 액션
           </p>
           <div className="space-y-2">
-            {[
-              { emoji: '💼', label: '하이라이트', desc: '커리어 · 학력 · 성과' },
-              { emoji: '🎬', label: '라이프',    desc: '취향 · 음악 · 여행지' },
-              { emoji: '⭐', label: '평판',      desc: '함께한 경험 모으기' },
-              { emoji: '📱', label: '연락처',    desc: 'SNS · 카카오 · 링크드인' },
-            ].map((item) => (
-              <div
-                key={item.label}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
+            {RECOMMENDED_ACTIONS.map((action) => (
+              <button
+                key={action.label}
+                onClick={() => router.replace(action.route)}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left"
                 style={{ backgroundColor: 'var(--color-bg-muted)' }}
               >
-                <span className="text-[18px] leading-none">{item.emoji}</span>
-                <span className="text-[13px] font-bold text-[var(--color-text-strong)]">{item.label}</span>
-                <span className="text-[11px] text-[var(--color-text-tertiary)] ml-auto">{item.desc}</span>
-              </div>
+                <span className="text-[17px] leading-none flex-shrink-0">{action.emoji}</span>
+                <span className="flex-1 text-[13px] font-semibold text-[var(--color-text-strong)]">{action.label}</span>
+                <ChevronRight size={15} className="flex-shrink-0 text-[var(--color-text-tertiary)]" />
+              </button>
             ))}
           </div>
         </div>

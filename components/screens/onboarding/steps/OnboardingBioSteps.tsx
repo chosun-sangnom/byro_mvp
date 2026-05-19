@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { BadgeCheck, CheckCircle2, Mail, MessageCircle, Phone } from 'lucide-react'
+import { BadgeCheck, CheckCircle2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { Button, showToast } from '@/components/ui'
 
@@ -57,65 +57,6 @@ function PreviewLife() {
   )
 }
 
-function PreviewNetwork() {
-  const industries = [
-    { name: 'IT/스타트업', pct: 58 },
-    { name: '금융', pct: 22 },
-    { name: '컨설팅', pct: 13 },
-    { name: '제조', pct: 7 },
-  ]
-  return (
-    <div className="rounded-[18px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-4">
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Remember</div>
-          <div className="text-[17px] font-black tracking-tight text-[var(--color-text-strong)]">명함 기반 네트워크</div>
-        </div>
-        <div className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">총 247명</div>
-      </div>
-      <div className="space-y-2">
-        {industries.map(({ name, pct }) => (
-          <div key={name} className="flex items-center gap-2">
-            <span className="w-16 flex-shrink-0 text-[11px] text-[var(--color-text-tertiary)]">{name}</span>
-            <div className="flex-1 h-1.5 rounded-full bg-[var(--color-bg-muted)]">
-              <div className="h-full rounded-full bg-[var(--color-accent-dark)] opacity-60" style={{ width: `${pct}%` }} />
-            </div>
-            <span className="w-6 text-right text-[10px] font-semibold text-[var(--color-text-tertiary)]">{pct}%</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function PreviewReputation() {
-  const keywords = [
-    { kw: '실행력', cnt: 12 },
-    { kw: '신뢰감', cnt: 9 },
-    { kw: '창의적', cnt: 7 },
-    { kw: '꼼꼼함', cnt: 6 },
-    { kw: '리더십', cnt: 4 },
-  ]
-  return (
-    <div className="rounded-[18px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-4">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Reputation</div>
-          <div className="text-[17px] font-black tracking-tight text-[var(--color-text-strong)]">누적 평판</div>
-        </div>
-        <div className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">총 38</div>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {keywords.map(({ kw, cnt }) => (
-          <span key={kw} className="chip-metric">
-            {kw} <span className="font-black text-[var(--color-text-strong)]">{cnt}</span>
-          </span>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 function PreviewConnect() {
   return (
     <div className="space-y-2">
@@ -147,46 +88,6 @@ function PreviewConnect() {
   )
 }
 
-function PreviewSNS() {
-  const rows = [
-    { icon: '▶', iconColor: '#FF0000', title: 'YouTube', sub: '구독자 기반 콘텐츠 연결', connected: false },
-    { icon: 'in', iconColor: '#0A66C2', title: 'LinkedIn', sub: 'linkedin.com/in/myongkoo', connected: true },
-    { icon: '📷', iconColor: '#E1306C', title: 'Instagram', sub: '@myongkoo', connected: true },
-    { icon: 'T', iconColor: '#000', title: 'TikTok', sub: '준비 중', connected: false },
-  ]
-  return (
-    <div className="rounded-[18px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 divide-y divide-[var(--color-border-soft)]">
-      {rows.map((row) => (
-        <div key={row.title} className="flex items-center gap-3 py-3">
-          <span className="text-[13px] font-black w-[18px] text-center flex-shrink-0" style={{ color: row.iconColor }}>{row.icon}</span>
-          <div className="flex-1 min-w-0">
-            <div className="text-[13px] font-semibold text-[var(--color-text-primary)]">{row.title}</div>
-            <div className={`text-[11px] truncate ${row.connected ? 'text-[var(--color-accent-dark)]' : 'text-[var(--color-text-tertiary)]'}`}>{row.sub}</div>
-          </div>
-          {row.connected && <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-state-success-text)] flex-shrink-0" />}
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function PreviewContact() {
-  return (
-    <div className="space-y-2">
-      {[
-        { Icon: Phone, label: '010-1234-5678' },
-        { Icon: MessageCircle, label: 'kakao_myongkoo' },
-        { Icon: Mail, label: 'hello@byro.io' },
-      ].map(({ Icon, label }) => (
-        <div key={label} className="flex items-center gap-3 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-3">
-          <Icon size={15} className="flex-shrink-0 text-[var(--color-text-secondary)]" />
-          <span className="text-[13px] font-semibold text-[var(--color-text-primary)]">{label}</span>
-        </div>
-      ))}
-    </div>
-  )
-}
-
 // ─── Slide data ───────────────────────────────────────────────────────────────
 
 interface GuideSlide {
@@ -194,60 +95,26 @@ interface GuideSlide {
   title: string
   tags: string[]
   value: string
-  ctaLabel?: string
-  ctaRoute?: string
 }
 
 const GUIDE_SLIDES: GuideSlide[] = [
   {
     Preview: PreviewHighlight,
-    title: '하이라이트',
-    tags: ['경력', '학력', '수상', '자격증'],
-    value: '만나기 전부터 신뢰가 생겨요',
-    ctaLabel: '하이라이트 채우러 가기',
-    ctaRoute: '/me?section=highlight',
+    title: '나',
+    tags: ['MBTI', '반려동물', '하이라이트'],
+    value: '어떤 사람인지 빠르게 보여주는 탭이에요',
   },
   {
     Preview: PreviewLife,
     title: '라이프',
-    tags: ['취향', '운동', '여행지', '음식'],
-    value: '취향이 겹치면 첫 대화가 자연스러워져요',
-    ctaLabel: '라이프 채우러 가기',
-    ctaRoute: '/me?section=life',
-  },
-  {
-    Preview: PreviewNetwork,
-    title: '네트워크',
-    tags: ['리멤버 명함', '공통 인맥'],
-    value: '공통 인맥이 보이면 연결 고리가 생겨요',
-  },
-  {
-    Preview: PreviewReputation,
-    title: '평판',
-    tags: ['경험 키워드', '방명록'],
-    value: '다른 사람이 남긴 키워드가 나를 증명해줘요',
+    tags: ['활동', '문화', '장소'],
+    value: '공통점과 스몰토크 소재를 만드는 탭이에요',
   },
   {
     Preview: PreviewConnect,
-    title: '연결',
-    tags: ['평판 요청', '친구 연결', '비공개 공유'],
-    value: '연결된 사람에게 더 많은 나를 보여줄 수 있어요',
-  },
-  {
-    Preview: PreviewSNS,
-    title: 'SNS',
-    tags: ['인스타그램', '링크드인', '유튜브', '틱톡'],
-    value: '인스타·링크드인 연동으로 나다움이 더 드러나요',
-    ctaLabel: 'SNS 연동하러 가기',
-    ctaRoute: '/me?section=sns',
-  },
-  {
-    Preview: PreviewContact,
-    title: '연락수단',
-    tags: ['전화', '이메일', '카카오'],
-    value: '연락 수단이 없으면 만남으로 이어지기 어려워요',
-    ctaLabel: '연락처 추가하러 가기',
-    ctaRoute: '/me?section=contact',
+    title: '관계',
+    tags: ['네트워크', '평판', 'SNS'],
+    value: '신뢰와 연결을 더하는 탭이에요',
   },
 ]
 
@@ -281,7 +148,6 @@ export function Step9Complete() {
   const router = useRouter()
   const linkId = store.user?.linkId || store.linkId || 'myongkoo'
   const [slide, setSlide] = useState(0)
-  const [touchStartX, setTouchStartX] = useState<number | null>(null)
 
   useEffect(() => {
     if (!store.isLoggedIn) {
@@ -297,24 +163,11 @@ export function Step9Complete() {
   const goNext = () => { if (slide < TOTAL - 1) setSlide(slide + 1) }
   const goPrev = () => { if (slide > 0) setSlide(slide - 1) }
 
-  const handleTouchStart = (e: React.TouchEvent) => setTouchStartX(e.touches[0].clientX)
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX === null) return
-    const diff = touchStartX - e.changedTouches[0].clientX
-    if (diff > 50) goNext()
-    else if (diff < -50) goPrev()
-    setTouchStartX(null)
-  }
-
   const isLastSlide = slide === TOTAL - 1
   const guide = slide > 0 ? GUIDE_SLIDES[slide - 1] : null
 
   return (
-    <div
-      className="flex flex-col h-full px-5 py-6 select-none"
-      onTouchStart={handleTouchStart}
-      onTouchEnd={handleTouchEnd}
-    >
+    <div className="flex flex-col h-full px-5 py-6">
       {/* Slide 0: Complete */}
       {slide === 0 && (
         <div className="flex-1 overflow-y-auto">
@@ -400,23 +253,6 @@ export function Step9Complete() {
         </div>
       )}
 
-      {/* Dot indicators — slide 0에서는 숨김 */}
-      {slide > 0 && (
-        <div className="flex justify-center gap-1.5 py-4">
-          {Array.from({ length: TOTAL }).map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setSlide(i)}
-              className={`rounded-full transition-all duration-200 ${
-                i === slide
-                  ? 'w-5 h-1.5 bg-[var(--color-accent-dark)]'
-                  : 'w-1.5 h-1.5 bg-[var(--color-border-default)]'
-              }`}
-            />
-          ))}
-        </div>
-      )}
-
       {/* Bottom buttons */}
       {slide === 0 ? (
         <div className="space-y-2.5 pt-4">
@@ -425,22 +261,16 @@ export function Step9Complete() {
         </div>
       ) : isLastSlide ? (
         <div className="space-y-2.5">
-          {guide?.ctaRoute && (
-            <Button onClick={() => router.replace(guide.ctaRoute!)}>{guide.ctaLabel}</Button>
-          )}
-          <Button variant={guide?.ctaRoute ? 'outline' : undefined} onClick={() => router.replace(`/${linkId}`)}>
-            나중에 할게요
-          </Button>
-        </div>
-      ) : (
-        <div className="space-y-2.5">
-          {guide?.ctaRoute && (
-            <Button onClick={() => router.replace(guide.ctaRoute!)}>{guide.ctaLabel}</Button>
-          )}
           <div className="flex gap-3">
             <Button variant="outline" onClick={goPrev}>이전</Button>
-            <Button onClick={goNext}>다음</Button>
+            <Button onClick={() => router.replace('/me?edit=true')}>내 바이로 채우러 가기</Button>
           </div>
+          <Button variant="outline" onClick={() => router.replace(`/${linkId}`)}>나중에 할게요</Button>
+        </div>
+      ) : (
+        <div className="flex gap-3">
+          <Button variant="outline" onClick={goPrev}>이전</Button>
+          <Button onClick={goNext}>다음</Button>
         </div>
       )}
     </div>

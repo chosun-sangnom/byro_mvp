@@ -132,9 +132,6 @@ export interface HeroTheme {
   avatar: string
 }
 
-export interface ProfileHeaderMeta {
-  residence?: string
-}
 
 export interface PublicProfileWhoIAm {
   mbti: string
@@ -255,7 +252,6 @@ export interface PublicProfile {
   headline?: string
   school: string
   bio: string
-  headerMeta?: ProfileHeaderMeta
   whoIAm?: PublicProfileWhoIAm
   birthDate?: string
   birthTime?: string
@@ -306,7 +302,6 @@ export interface UserState {
   headline?: string
   school: string
   bio: string
-  headerMeta?: ProfileHeaderMeta
   avatarColor?: string
   avatarImage?: string
   profileImages?: string[]

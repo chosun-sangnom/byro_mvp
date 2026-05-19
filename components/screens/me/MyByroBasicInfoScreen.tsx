@@ -17,7 +17,7 @@ import {
 } from '@/lib/imageCropUtils'
 
 interface BasicInfoEditScreenProps {
-  user: Pick<UserState, 'name' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'profileImages' | 'headerMeta' | 'birthDate' | 'birthTime' | 'birthPlace' | 'calendarType' | 'showAge' | 'whoIAm' | 'life'>
+  user: Pick<UserState, 'name' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'profileImages' | 'birthDate' | 'birthTime' | 'birthPlace' | 'calendarType' | 'showAge' | 'whoIAm' | 'life'>
   onBack: () => void
 }
 
@@ -124,7 +124,6 @@ export function BasicInfoEditScreen({
       bio,
       avatarImage: profileImages[0] || '',
       profileImages: profileImages.filter(Boolean),
-      headerMeta: {},
     })
     store.updateUserInfo({ birthDate, birthTime, birthPlace, calendarType, showAge })
     store.updateUserWhoIAm({

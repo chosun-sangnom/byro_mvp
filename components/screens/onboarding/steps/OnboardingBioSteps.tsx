@@ -330,7 +330,7 @@ export function Step9Complete() {
   const goNext = () => { if (slide < TOTAL - 1) setSlide(slide + 1) }
   const goPrev = () => { if (slide > 0) setSlide(slide - 1) }
   const getGuideReturnRoute = () => {
-    if (slide >= TOTAL - 1) return '/me?edit=true'
+    if (slide >= TOTAL - 1) return `/${linkId}`
     return `/signup?guide=${slide + 1}`
   }
 
@@ -404,9 +404,8 @@ export function Step9Complete() {
           )}
           <div className="flex gap-3">
             <Button variant="outline" onClick={goPrev}>이전</Button>
-            <Button onClick={() => router.replace('/me?edit=true')}>완료</Button>
+            <Button onClick={() => router.replace(`/${linkId}`)}>완료</Button>
           </div>
-          <Button variant="outline" onClick={() => router.replace(`/${linkId}`)}>나중에 할게요</Button>
         </div>
       ) : (
         <div className="space-y-3 pt-5">

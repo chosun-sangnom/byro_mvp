@@ -117,6 +117,8 @@ interface ByroStore {
   invalidateKemiCache(): void
   // [임시] 목업 데이터로 초기화 — CRUD 연동 전 디자인 검토용. 실제 API 연동 후 제거 예정.
   resetToMockDefaults(): void
+  // [임시] 전체 초기화 — 로그인·인증·온보딩 포함 완전 리셋. 실제 API 연동 후 제거 예정.
+  resetAll(): void
 }
 
 const normalizeSampleUser = (user: UserState | null): UserState | null => {
@@ -562,6 +564,48 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       experienceKeywords: [],
       experienceMessage: '',
       // 탭 공개 설정
+      tabVisibility: { who: 'public', life: 'public', reputation: 'public' } as TabVisibility,
+    })
+  },
+
+  // [임시] 전체 초기화 — 로그인·인증·온보딩 포함 완전 리셋. 실제 API 연동 후 제거 예정.
+  resetAll() {
+    set({
+      isLoggedIn: false,
+      user: null,
+      step: 'login',
+      agreedTerms: false,
+      agreedPrivacy: false,
+      agreedMarketing: false,
+      onboardingName: '',
+      onboardingNickname: '',
+      onboardingBirthDate: '',
+      onboardingShowAge: true,
+      isVerified: false,
+      onboardingTitle: SAMPLE_PROFILE.title,
+      onboardingSchool: SAMPLE_PROFILE.school,
+      linkId: '',
+      instagramConnected: false,
+      linkedinConnected: false,
+      onboardingContactChannels: SAMPLE_PROFILE.contactChannels,
+      highlights: [],
+      highlightsInitialized: false,
+      primaryHighlightOverrides: {},
+      bio: '',
+      bioMode: null,
+      selectedBioMethod: null,
+      expSubmittedAt: {},
+      deletedGuestbookIds: [],
+      sentRequestLinkIds: [],
+      connectionRequests: SAMPLE_PROFILE.connectionRequests as ConnectionRequest[],
+      connectedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
+      submittedExperiences: {},
+      kemiComputedProfiles: [],
+      hlOpenStates: {},
+      snsOpenStates: {},
+      activeArchiveTab: 'connected' as const,
+      experienceKeywords: [],
+      experienceMessage: '',
       tabVisibility: { who: 'public', life: 'public', reputation: 'public' } as TabVisibility,
     })
   },

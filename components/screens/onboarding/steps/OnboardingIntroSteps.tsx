@@ -3,7 +3,7 @@
 import { useRef, useState, type ChangeEvent } from 'react'
 import { Camera, CheckCircle2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
-import { Button, TextArea, showToast } from '@/components/ui'
+import { Button, Modal, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
@@ -35,21 +35,24 @@ export function Step1Login() {
 
 type VerifyTab = 'kakao' | 'sms'
 
-function VerifySection({ onVerified }: { onVerified: () => void }) {
+function VerifyModal({ open, onClose, onVerified }: { open: boolean; onClose: () => void; onVerified: () => void }) {
   const [tab, setTab] = useState<VerifyTab>('kakao')
   const [phone, setPhone] = useState('')
   const [code, setCode] = useState('')
   const [smsSent, setSmsSent] = useState(false)
 
+  const handleVerified = () => {
+    onVerified()
+    onClose()
+  }
+
   return (
-    <div className="surface-card-soft rounded-[20px] overflow-hidden mb-4">
-      <div className="px-4 pt-4 pb-3">
-        <p className="text-[13px] font-bold text-[var(--color-text-strong)] mb-0.5">실명 인증하기 (선택)</p>
-        <p className="text-[11px] text-[var(--color-text-tertiary)]">인증 완료 시 프로필에 인증 뱃지가 붙어요</p>
-      </div>
+    <Modal open={open} onClose={onClose}>
+      <p className="text-[15px] font-black text-[var(--color-text-strong)] mb-1">본인인증</p>
+      <p className="text-[11px] text-[var(--color-text-tertiary)] mb-4">인증 완료 시 프로필에 인증 뱃지가 붙어요</p>
 
       {/* 탭 */}
-      <div className="flex border-b mx-4" style={{ borderColor: 'var(--color-border-default)' }}>
+      <div className="flex border-b -mx-1 mb-4" style={{ borderColor: 'var(--color-border-default)' }}>
         {(['kakao', 'sms'] as VerifyTab[]).map((t) => (
           <button
             key={t}
@@ -67,58 +70,56 @@ function VerifySection({ onVerified }: { onVerified: () => void }) {
         ))}
       </div>
 
-      <div className="px-4 py-4">
-        {tab === 'kakao' ? (
-          /* [임시] 카카오 본인인증 API 미연동 */
-          <Button variant="kakao" onClick={onVerified}>카카오로 본인인증하기</Button>
-        ) : (
-          <div className="space-y-2">
+      {tab === 'kakao' ? (
+        /* [임시] 카카오 본인인증 API 미연동 */
+        <Button variant="kakao" onClick={handleVerified}>카카오로 본인인증하기</Button>
+      ) : (
+        <div className="space-y-2">
+          <div className="flex gap-2">
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="휴대폰 번호"
+              disabled={smsSent}
+              className="flex-1 border border-[var(--color-border-default)] rounded-xl px-3 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none disabled:opacity-50"
+            />
+            {/* [임시] SMS 발송 API 미연동 */}
+            <button
+              type="button"
+              disabled={phone.length < 10 || smsSent}
+              onClick={() => setSmsSent(true)}
+              className="flex-shrink-0 rounded-xl px-3 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
+              style={{ backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
+            >
+              {smsSent ? '발송됨' : '발송'}
+            </button>
+          </div>
+          {smsSent && (
             <div className="flex gap-2">
               <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="휴대폰 번호 입력"
-                disabled={smsSent}
-                className="flex-1 border border-[var(--color-border-default)] rounded-xl px-3 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none disabled:opacity-50"
+                type="text"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder="인증번호 6자리"
+                maxLength={6}
+                className="flex-1 border border-[var(--color-border-default)] rounded-xl px-3 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
               />
-              {/* [임시] SMS 발송 API 미연동 */}
+              {/* [임시] 인증번호 확인 API 미연동 */}
               <button
                 type="button"
-                disabled={phone.length < 10 || smsSent}
-                onClick={() => setSmsSent(true)}
-                className="flex-shrink-0 rounded-xl px-3 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
+                disabled={code.length < 6}
+                onClick={handleVerified}
+                className="flex-shrink-0 rounded-xl px-4 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
                 style={{ backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
               >
-                {smsSent ? '발송됨' : '인증번호 발송'}
+                확인
               </button>
             </div>
-            {smsSent && (
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  placeholder="인증번호 6자리"
-                  maxLength={6}
-                  className="flex-1 border border-[var(--color-border-default)] rounded-xl px-3 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
-                />
-                {/* [임시] 인증번호 확인 API 미연동 */}
-                <button
-                  type="button"
-                  disabled={code.length < 6}
-                  onClick={onVerified}
-                  className="flex-shrink-0 rounded-xl px-4 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
-                  style={{ backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
-                >
-                  확인
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </div>
+          )}
+        </div>
+      )}
+    </Modal>
   )
 }
 
@@ -129,6 +130,7 @@ export function Step2BasicInfo() {
   const [birthDate, setBirthDate] = useState(store.onboardingBirthDate)
   const [showAge, setShowAge] = useState(store.onboardingShowAge)
   const [isVerified, setIsVerified] = useState(store.isVerified)
+  const [verifyOpen, setVerifyOpen] = useState(false)
 
   const canProceed = name.trim().length > 0
 
@@ -147,18 +149,41 @@ export function Step2BasicInfo() {
         description={'나중에 기본정보 편집에서 바꿀 수 있어요.'}
       />
 
-      {/* 이름 (필수) */}
+      {/* 이름 (필수) + 본인인증 버튼 */}
       <div className="mb-4">
         <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">이름 *</label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="실명을 입력해주세요"
-          maxLength={20}
-          className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
-        />
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="실명을 입력해주세요"
+            maxLength={20}
+            className="flex-1 border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
+          />
+          {isVerified ? (
+            <div className="flex items-center gap-1 px-3 rounded-xl text-[11px] font-bold flex-shrink-0"
+              style={{ color: 'var(--color-state-success-text)', backgroundColor: 'var(--color-state-success-bg)' }}>
+              <CheckCircle2 size={13} />
+              인증완료
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setVerifyOpen(true)}
+              className="flex-shrink-0 rounded-xl px-3 py-2.5 text-[12px] font-bold border border-[var(--color-border-default)] text-[var(--color-text-secondary)] bg-[var(--color-bg-soft)] whitespace-nowrap"
+            >
+              본인인증
+            </button>
+          )}
+        </div>
       </div>
+
+      <VerifyModal
+        open={verifyOpen}
+        onClose={() => setVerifyOpen(false)}
+        onVerified={() => setIsVerified(true)}
+      />
 
       {/* 별명 (선택) */}
       <div className="mb-5">
@@ -200,19 +225,6 @@ export function Step2BasicInfo() {
           className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
         />
       </div>
-
-      {/* 본인인증 */}
-      {isVerified ? (
-        <div className="surface-card-soft rounded-[20px] p-4 mb-4 flex items-center gap-3">
-          <CheckCircle2 size={22} className="text-[var(--color-state-success-text)] flex-shrink-0" />
-          <div>
-            <p className="text-[13px] font-bold text-[var(--color-text-strong)]">본인인증 완료</p>
-            <p className="text-[11px] text-[var(--color-text-tertiary)]">프로필에 인증 뱃지가 표시돼요</p>
-          </div>
-        </div>
-      ) : (
-        <VerifySection onVerified={() => setIsVerified(true)} />
-      )}
 
       <StepFooter canNext={canProceed} onNext={handleNext} onPrev={() => store.prevStep()} />
     </div>

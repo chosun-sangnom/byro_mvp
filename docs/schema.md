@@ -5,11 +5,13 @@
 마이그레이션 파일: `supabase/migrations/0001_initial_schema.sql`
 프로젝트: `ymkhswpdsylnrdchytja` (Supabase, Oceania-Sydney 리전)
 
-### 테이블 구조
+---
+
+### 공통 (항상 전체 공개)
 
 #### `users`
 
-기본 공개 정보. 항상 전체 공개.
+기본 공개 정보. RLS 없이 항상 전체 공개.
 
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
@@ -31,20 +33,16 @@
 | `header_meta` | jsonb | `{ residence, mood, availability }` |
 | `contact_channels` | jsonb | `ContactChannel[]` |
 | `tab_visibility` | jsonb | `{ who, life, reputation }` |
-| `instagram_connected` | boolean | |
-| `linkedin_connected` | boolean | |
-| `youtube_connected` | boolean | |
-| `tiktok_connected` | boolean | |
-| `instagram` | jsonb | `InstagramProfile` |
-| `linkedin` | jsonb | `LinkedInProfile` |
-| `youtube` | jsonb | `{ channelName, channelUrl }` |
-| `tiktok` | jsonb | `{ username, profileUrl }` |
 | `created_at` | timestamptz | |
 | `updated_at` | timestamptz | auto-update trigger |
 
+---
+
+### 나(Who) 탭 — `tab_visibility.who` 기준
+
 #### `user_who_i_am`
 
-나 탭 데이터. `tab_visibility.who` 설정에 따라 공개 범위 제한. 케미 매칭에 활용.
+MBTI 등 나 자신 정보. 케미 매칭에 활용.
 
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
@@ -52,38 +50,9 @@
 | `mbti` | text | |
 | `updated_at` | timestamptz | auto-update trigger |
 
-#### `user_life`
-
-라이프 탭 데이터. `tab_visibility.life` 설정에 따라 공개 범위 제한.
-
-| 컬럼 | 타입 | 설명 |
-|------|------|------|
-| `user_id` | uuid PK → users | |
-| `daily` | jsonb | `{ exercise[], pets[], diet }` |
-| `tastes` | jsonb | `{ movies[], music[], books[], cafes[], restaurants[], sports[] }` |
-| `places` | jsonb | `{ neighborhoods[], travelDestinations[] }` |
-| `updated_at` | timestamptz | auto-update trigger |
-
-#### `user_sns`
-
-SNS 연동 데이터. `tab_visibility.who` 설정에 따라 공개 범위 제한.
-
-| 컬럼 | 타입 | 설명 |
-|------|------|------|
-| `user_id` | uuid PK → users | |
-| `instagram_connected` | boolean | |
-| `linkedin_connected` | boolean | |
-| `youtube_connected` | boolean | |
-| `tiktok_connected` | boolean | |
-| `instagram` | jsonb | `{ username, profileUrl, posts }` |
-| `linkedin` | jsonb | `{ profileUrl, ... }` |
-| `youtube` | jsonb | `{ channelName, channelUrl }` |
-| `tiktok` | jsonb | `{ username, profileUrl }` |
-| `updated_at` | timestamptz | auto-update trigger |
-
 #### `highlights`
 
-사용자의 수동 하이라이트 목록. 카테고리별로 is_primary로 대표 지정.
+수동 하이라이트 목록. 카테고리별로 `is_primary`로 대표 지정.
 
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
@@ -98,18 +67,42 @@ SNS 연동 데이터. `tab_visibility.who` 설정에 따라 공개 범위 제한
 | `sort_order` | integer | |
 | `is_primary` | boolean | 카테고리 내 대표 여부 |
 
-#### `connections`
+#### `user_sns`
 
-두 사용자 간 연결 요청 및 상태.
+SNS 연동 데이터.
 
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
-| `id` | uuid PK | |
-| `from_user_id` | uuid FK → users | 요청 보낸 사람 |
-| `to_user_id` | uuid FK → users | 요청 받은 사람 |
-| `status` | text | `'pending' \| 'accepted' \| 'rejected'` |
-| `message` | text | 연결 요청 메시지 |
-| UNIQUE | (from_user_id, to_user_id) | 중복 요청 방지 |
+| `user_id` | uuid PK → users | |
+| `instagram_connected` | boolean | |
+| `linkedin_connected` | boolean | |
+| `youtube_connected` | boolean | |
+| `tiktok_connected` | boolean | |
+| `instagram` | jsonb | `{ username, profileUrl, posts }` |
+| `linkedin` | jsonb | `{ profileUrl, ... }` |
+| `youtube` | jsonb | `{ channelName, channelUrl }` |
+| `tiktok` | jsonb | `{ username, profileUrl }` |
+| `updated_at` | timestamptz | auto-update trigger |
+
+---
+
+### 라이프(Life) 탭 — `tab_visibility.life` 기준
+
+#### `user_life`
+
+일상/취향/장소 데이터.
+
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| `user_id` | uuid PK → users | |
+| `daily` | jsonb | `{ exercise[], pets[], diet }` |
+| `tastes` | jsonb | `{ movies[], music[], books[], cafes[], restaurants[], sports[] }` |
+| `places` | jsonb | `{ neighborhoods[], travelDestinations[] }` |
+| `updated_at` | timestamptz | auto-update trigger |
+
+---
+
+### 평판(Reputation) 탭 — `tab_visibility.reputation` 기준
 
 #### `experiences`
 
@@ -126,17 +119,36 @@ SNS 연동 데이터. `tab_visibility.who` 설정에 따라 공개 범위 제한
 | `message` | text | |
 | `created_at` | timestamptz | 24h rate limit 체크에 활용 |
 
+---
+
+### 연결 (시스템)
+
+#### `connections`
+
+두 사용자 간 연결 요청 및 상태. 당사자만 조회 가능.
+
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| `id` | uuid PK | |
+| `from_user_id` | uuid FK → users | 요청 보낸 사람 |
+| `to_user_id` | uuid FK → users | 요청 받은 사람 |
+| `status` | text | `'pending' \| 'accepted' \| 'rejected'` |
+| `message` | text | 연결 요청 메시지 |
+| UNIQUE | (from_user_id, to_user_id) | 중복 요청 방지 |
+
+---
+
 ### RLS 정책 요약
 
 | 테이블 | 읽기 | 쓰기 |
 |--------|------|------|
 | users | 전체 공개 | 본인만 |
 | user_who_i_am | tab_visibility.who 따름 | 본인만 |
-| user_life | tab_visibility.life 따름 | 본인만 |
-| user_sns | tab_visibility.who 따름 | 본인만 |
 | highlights | tab_visibility.who 따름 | 본인만 |
-| connections | 당사자만 | 요청자 생성, 당사자 수정 |
+| user_sns | tab_visibility.who 따름 | 본인만 |
+| user_life | tab_visibility.life 따름 | 본인만 |
 | experiences | tab_visibility.reputation 따름 | 로그인 유저는 항상 / 비회원은 reputation=public인 프로필만 |
+| connections | 당사자만 | 요청자 생성, 당사자 수정 |
 
 ---
 
@@ -159,10 +171,10 @@ interface PublicProfile {
   whoIAm?: PublicProfileWhoIAm
   life?: PublicProfileLife
   manualHighlights: Highlight[]
-  // ... 카리어/법인/항공/리멤버 하이라이트
-  // ... 경험/방명록/평판키워드
+  // ... 커리어/법인/항공/리멤버 하이라이트
+  // ... 경험/평판키워드
   // ... SNS 연동
-  // ... 연결/저장 목록
+  // ... 연결 목록
 }
 
 // 로그인 사용자 편집 상태
@@ -202,8 +214,7 @@ interface ConnectionRequest {
 }
 
 interface PublicProfileWhoIAm {
-  mbti: string; bloodType: string; aiStyleSummary: string[]
-  relationshipStatus: string; children: string; religion: string
+  mbti: string
 }
 ```
 

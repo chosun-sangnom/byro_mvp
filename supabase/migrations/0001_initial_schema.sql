@@ -26,15 +26,6 @@ create table public.users (
   header_meta     jsonb not null default '{}',        -- { residence, mood, availability }
   contact_channels jsonb not null default '[]',       -- ContactChannel[]
   tab_visibility  jsonb not null default '{"who":"public","life":"public","reputation":"public"}',
-  -- SNS
-  instagram_connected  boolean not null default false,
-  linkedin_connected   boolean not null default false,
-  youtube_connected    boolean not null default false,
-  tiktok_connected     boolean not null default false,
-  instagram       jsonb,                              -- { username, profileUrl, posts }
-  linkedin        jsonb,                              -- { profileUrl, ... }
-  youtube         jsonb,                              -- { channelName, channelUrl }
-  tiktok          jsonb,                              -- { username, profileUrl }
   --
   created_at      timestamptz not null default now(),
   updated_at      timestamptz not null default now()
@@ -44,13 +35,9 @@ create table public.users (
 -- 나 탭 데이터. tab_visibility.who 설정에 따라 공개 범위 제한.
 -- 케미 매칭에 활용되므로 개별 컬럼으로 분리.
 create table public.user_who_i_am (
-  user_id              uuid primary key references public.users(id) on delete cascade,
-  mbti                 text,
-  blood_type           text,
-  relationship_status  text,
-  children             text,
-  religion             text,
-  updated_at           timestamptz not null default now()
+  user_id   uuid primary key references public.users(id) on delete cascade,
+  mbti      text,
+  updated_at timestamptz not null default now()
 );
 
 -- ─── user_life ───────────────────────────────────────────────────────────────
@@ -61,6 +48,21 @@ create table public.user_life (
   tastes    jsonb not null default '{}',   -- { movies[], music[], books[], cafes[], restaurants[], sports[] }
   places    jsonb not null default '{}',   -- { neighborhoods[], travelDestinations[] }
   updated_at timestamptz not null default now()
+);
+
+-- ─── user_sns ────────────────────────────────────────────────────────────────
+-- SNS 연동 데이터. tab_visibility.who 설정에 따라 공개 범위 제한.
+create table public.user_sns (
+  user_id              uuid primary key references public.users(id) on delete cascade,
+  instagram_connected  boolean not null default false,
+  linkedin_connected   boolean not null default false,
+  youtube_connected    boolean not null default false,
+  tiktok_connected     boolean not null default false,
+  instagram            jsonb,   -- { username, profileUrl, posts }
+  linkedin             jsonb,   -- { profileUrl, ... }
+  youtube              jsonb,   -- { channelName, channelUrl }
+  tiktok               jsonb,   -- { username, profileUrl }
+  updated_at           timestamptz not null default now()
 );
 
 -- ─── highlights ──────────────────────────────────────────────────────────────
@@ -134,6 +136,9 @@ create trigger set_updated_at before update on public.user_who_i_am
 create trigger set_updated_at before update on public.user_life
   for each row execute function public.set_updated_at();
 
+create trigger set_updated_at before update on public.user_sns
+  for each row execute function public.set_updated_at();
+
 create trigger set_updated_at before update on public.highlights
   for each row execute function public.set_updated_at();
 
@@ -146,6 +151,7 @@ create trigger set_updated_at before update on public.connections
 alter table public.users          enable row level security;
 alter table public.user_who_i_am  enable row level security;
 alter table public.user_life      enable row level security;
+alter table public.user_sns       enable row level security;
 alter table public.highlights     enable row level security;
 alter table public.connections    enable row level security;
 alter table public.experiences    enable row level security;
@@ -212,6 +218,31 @@ create policy "life viewable by allowed users"
 
 create policy "users manage own life"
   on public.user_life for all using (auth.uid() = user_id);
+
+-- user_sns: tab_visibility.who 기준
+create policy "sns viewable by allowed users"
+  on public.user_sns for select using (
+    exists (
+      select 1 from public.users u where u.id = user_id and (
+        u.id = auth.uid()
+        or (u.tab_visibility->>'who') = 'public'
+        or (
+          (u.tab_visibility->>'who') = 'connected'
+          and exists (
+            select 1 from public.connections c
+            where c.status = 'accepted'
+              and (
+                (c.from_user_id = auth.uid() and c.to_user_id = u.id)
+                or (c.to_user_id = auth.uid() and c.from_user_id = u.id)
+              )
+          )
+        )
+      )
+    )
+  );
+
+create policy "users manage own sns"
+  on public.user_sns for all using (auth.uid() = user_id);
 
 -- highlights: tab_visibility.who 기준
 create policy "highlights viewable by allowed users"

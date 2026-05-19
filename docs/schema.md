@@ -50,10 +50,6 @@
 |------|------|------|
 | `user_id` | uuid PK → users | |
 | `mbti` | text | |
-| `blood_type` | text | |
-| `relationship_status` | text | |
-| `children` | text | |
-| `religion` | text | |
 | `updated_at` | timestamptz | auto-update trigger |
 
 #### `user_life`
@@ -66,6 +62,23 @@
 | `daily` | jsonb | `{ exercise[], pets[], diet }` |
 | `tastes` | jsonb | `{ movies[], music[], books[], cafes[], restaurants[], sports[] }` |
 | `places` | jsonb | `{ neighborhoods[], travelDestinations[] }` |
+| `updated_at` | timestamptz | auto-update trigger |
+
+#### `user_sns`
+
+SNS 연동 데이터. `tab_visibility.who` 설정에 따라 공개 범위 제한.
+
+| 컬럼 | 타입 | 설명 |
+|------|------|------|
+| `user_id` | uuid PK → users | |
+| `instagram_connected` | boolean | |
+| `linkedin_connected` | boolean | |
+| `youtube_connected` | boolean | |
+| `tiktok_connected` | boolean | |
+| `instagram` | jsonb | `{ username, profileUrl, posts }` |
+| `linkedin` | jsonb | `{ profileUrl, ... }` |
+| `youtube` | jsonb | `{ channelName, channelUrl }` |
+| `tiktok` | jsonb | `{ username, profileUrl }` |
 | `updated_at` | timestamptz | auto-update trigger |
 
 #### `highlights`
@@ -120,6 +133,7 @@
 | users | 전체 공개 | 본인만 |
 | user_who_i_am | tab_visibility.who 따름 | 본인만 |
 | user_life | tab_visibility.life 따름 | 본인만 |
+| user_sns | tab_visibility.who 따름 | 본인만 |
 | highlights | tab_visibility.who 따름 | 본인만 |
 | connections | 당사자만 | 요청자 생성, 당사자 수정 |
 | experiences | tab_visibility.reputation 따름 | 로그인 유저는 항상 / 비회원은 reputation=public인 프로필만 |

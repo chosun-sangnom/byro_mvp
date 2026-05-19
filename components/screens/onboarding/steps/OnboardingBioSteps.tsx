@@ -286,15 +286,40 @@ export function Step9Complete() {
     >
       {/* Slide 0: Complete */}
       {slide === 0 && (
-        <div className="flex-1 flex flex-col justify-center items-center text-center">
-          <div className="mb-4 text-[var(--color-state-success-text)]">
-            <CheckCircle2 size={44} />
+        <div className="flex-1 flex flex-col justify-center">
+          <div className="text-center mb-5">
+            <div className="mb-3 text-[var(--color-state-success-text)] flex justify-center">
+              <CheckCircle2 size={40} />
+            </div>
+            <h2 className="text-2xl font-black mb-1 text-[var(--color-text-strong)]">바이로 준비 완료!</h2>
+            <p className="text-sm text-[var(--color-text-secondary)]">링크로 바로 공유할 수 있어요.</p>
           </div>
-          <h2 className="text-2xl font-black mb-2 text-[var(--color-text-strong)]">바이로 준비 완료!</h2>
-          <p className="text-sm text-[var(--color-text-secondary)] mb-6">링크로 바로 공유할 수 있어요.</p>
-          <div className="w-full flex items-center bg-[var(--color-bg-muted)] border border-[var(--color-border-soft)] rounded-xl px-4 py-3 mb-2">
-            <span className="flex-1 text-sm text-[var(--color-text-primary)] text-left">byro.io/@{linkId}</span>
+
+          <div className="w-full flex items-center bg-[var(--color-bg-muted)] border border-[var(--color-border-soft)] rounded-xl px-4 py-3 mb-5">
+            <span className="flex-1 text-sm text-[var(--color-text-primary)]">byro.io/@{linkId}</span>
             <button onClick={handleCopy} className="text-xs font-bold text-[var(--color-accent-dark)] ml-3 flex-shrink-0">복사</button>
+          </div>
+
+          <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)] mb-2.5 px-1">
+            이걸 채우면 더 풍성해져요
+          </p>
+          <div className="space-y-2">
+            {[
+              { emoji: '💼', label: '하이라이트', desc: '커리어 · 학력 · 성과' },
+              { emoji: '🎬', label: '라이프',    desc: '취향 · 음악 · 여행지' },
+              { emoji: '⭐', label: '평판',      desc: '함께한 경험 모으기' },
+              { emoji: '📱', label: '연락처',    desc: 'SNS · 카카오 · 링크드인' },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
+                style={{ backgroundColor: 'var(--color-bg-muted)' }}
+              >
+                <span className="text-[18px] leading-none">{item.emoji}</span>
+                <span className="text-[13px] font-bold text-[var(--color-text-strong)]">{item.label}</span>
+                <span className="text-[11px] text-[var(--color-text-tertiary)] ml-auto">{item.desc}</span>
+              </div>
+            ))}
           </div>
         </div>
       )}
@@ -320,27 +345,26 @@ export function Step9Complete() {
         </div>
       )}
 
-      {/* Dot indicators */}
-      <div className="flex justify-center gap-1.5 py-5">
-        {Array.from({ length: TOTAL }).map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setSlide(i)}
-            className={`rounded-full transition-all duration-200 ${
-              i === slide
-                ? 'w-5 h-1.5 bg-[var(--color-accent-dark)]'
-                : 'w-1.5 h-1.5 bg-[var(--color-border-default)]'
-            }`}
-          />
-        ))}
-      </div>
+      {/* Dot indicators — slide 0에서는 숨김 */}
+      {slide > 0 && (
+        <div className="flex justify-center gap-1.5 py-4">
+          {Array.from({ length: TOTAL }).map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setSlide(i)}
+              className={`rounded-full transition-all duration-200 ${
+                i === slide
+                  ? 'w-5 h-1.5 bg-[var(--color-accent-dark)]'
+                  : 'w-1.5 h-1.5 bg-[var(--color-border-default)]'
+              }`}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Bottom buttons */}
       {slide === 0 ? (
-        <div className="space-y-3">
-          <p className="text-center text-[12px] text-[var(--color-text-tertiary)] leading-relaxed">
-            내 바이로를 더 채울수록<br />꽉꽉 담은 프로필이 돼요
-          </p>
+        <div className="space-y-2.5 pt-4">
           <Button onClick={() => router.replace(`/${linkId}`)}>내 프로필 보기</Button>
           <Button variant="outline" onClick={goNext}>내 바이로 채우러 가기</Button>
         </div>

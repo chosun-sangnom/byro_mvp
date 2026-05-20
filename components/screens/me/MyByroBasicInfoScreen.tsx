@@ -17,7 +17,7 @@ import {
 } from '@/lib/imageCropUtils'
 
 interface BasicInfoEditScreenProps {
-  user: Pick<UserState, 'name' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'profileImages' | 'birthDate' | 'birthTime' | 'birthPlace' | 'calendarType' | 'showAge' | 'whoIAm' | 'life'>
+  user: Pick<UserState, 'name' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'profileImages' | 'birthDate' | 'birthTime' | 'calendarType' | 'showAge' | 'whoIAm' | 'life'>
   onBack: () => void
 }
 
@@ -93,7 +93,6 @@ export function BasicInfoEditScreen({
   const [mbti, setMbti] = useState(initialWhoIAm.mbti)
   const [birthDate, setBirthDate] = useState(user.birthDate ?? SAMPLE_PROFILE.birthDate ?? '')
   const [birthTime, setBirthTime] = useState(user.birthTime ?? SAMPLE_PROFILE.birthTime ?? '')
-  const [birthPlace, setBirthPlace] = useState(user.birthPlace ?? SAMPLE_PROFILE.birthPlace ?? '')
   const [calendarType, setCalendarType] = useState<'solar' | 'lunar'>(user.calendarType ?? SAMPLE_PROFILE.calendarType ?? 'solar')
   const [showAge, setShowAge] = useState(user.showAge ?? SAMPLE_PROFILE.showAge ?? true)
   const [profileImages, setProfileImages] = useState(() => normalizeProfileImages(user.profileImages, user.avatarImage))
@@ -125,7 +124,7 @@ export function BasicInfoEditScreen({
       avatarImage: profileImages[0] || '',
       profileImages: profileImages.filter(Boolean),
     })
-    store.updateUserInfo({ birthDate, birthTime, birthPlace, calendarType, showAge })
+    store.updateUserInfo({ birthDate, birthTime, calendarType, showAge })
     store.updateUserWhoIAm({
       ...initialWhoIAm,
       mbti,
@@ -411,16 +410,6 @@ export function BasicInfoEditScreen({
                   </button>
                 ))}
               </div>
-            </div>
-
-            <div>
-              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">출생지</label>
-              <input
-                value={birthPlace}
-                onChange={(event) => setBirthPlace(event.target.value)}
-                placeholder="예: 서울, 부산, 대전"
-                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
-              />
             </div>
 
             <div>

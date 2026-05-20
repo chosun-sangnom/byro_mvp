@@ -135,11 +135,6 @@ export interface HeroTheme {
 
 export interface PublicProfileWhoIAm {
   mbti: string
-  bloodType: string
-  aiStyleSummary: string[]
-  relationshipStatus: string
-  children: string
-  religion: string
 }
 
 export interface LifeMediaItem {
@@ -175,16 +170,11 @@ export interface PublicProfileLife {
     music: LifeMediaItem[]
     books: LifeMediaItem[]
     plays?: LifeMediaItem[]
-    games: string[]
-    sports: string[]
     teams?: LifeMediaItem[]
-    celebrities: string[]
-    diet: string
     restaurants: LifeMediaItem[]
     cafes: LifeMediaItem[]
   }
   places: {
-    neighborhoods: string[]
     travelDestinations: LifeMediaItem[]
   }
 }
@@ -255,7 +245,6 @@ export interface PublicProfile {
   whoIAm?: PublicProfileWhoIAm
   birthDate?: string
   birthTime?: string
-  birthPlace?: string
   calendarType?: 'solar' | 'lunar'
   showAge?: boolean
   life?: PublicProfileLife
@@ -308,7 +297,6 @@ export interface UserState {
   whoIAm?: PublicProfileWhoIAm
   birthDate?: string
   birthTime?: string
-  birthPlace?: string
   calendarType?: 'solar' | 'lunar'
   showAge?: boolean
   life?: PublicProfileLife

@@ -23,7 +23,6 @@ export function getTasteHook(life?: PublicProfileLife) {
     ?? life?.tastes.music[0]?.label
     ?? life?.tastes.movies[0]?.label
     ?? life?.tastes.books[0]?.label
-    ?? life?.tastes.sports[0]
     ?? life?.daily.exercise[0]?.label
     ?? null
   )
@@ -32,7 +31,6 @@ export function getTasteHook(life?: PublicProfileLife) {
 export function getSignalChips(whoIAm: PublicProfileWhoIAm, life?: PublicProfileLife) {
   return [
     whoIAm.mbti,
-    life?.places.neighborhoods[0],
     life?.daily.exercise[0]?.label,
     life?.tastes.music[0]?.label,
     life?.tastes.cafes[0]?.label,
@@ -44,7 +42,6 @@ export function getLifestyleSignals(life?: PublicProfileLife) {
     activity:
       life?.daily.exercise[0]?.label
       ?? life?.tastes.teams?.[0]?.label
-      ?? life?.tastes.sports[0]
       ?? null,
     culture:
       life?.tastes.movies[0]?.label
@@ -55,10 +52,9 @@ export function getLifestyleSignals(life?: PublicProfileLife) {
     place:
       life?.tastes.cafes[0]?.label
       ?? life?.tastes.restaurants[0]?.label
-      ?? life?.places.neighborhoods[0]
       ?? life?.places.travelDestinations[0]?.label
       ?? null,
-    neighborhood: life?.places.neighborhoods[0] ?? null,
+    neighborhood: null,
     exercise: life?.daily.exercise[0]?.label ?? null,
     tasteHook: getTasteHook(life),
   }

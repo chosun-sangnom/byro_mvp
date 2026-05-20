@@ -18,15 +18,9 @@ export const SAMPLE_PROFILE = {
   bio: 'B2B SaaS 분야에서 5년간 Product Owner로 활동해 온 강민준입니다. 파트너십을 통해 성장을 만들어가는 것을 즐깁니다.',
   whoIAm: {
     mbti: 'ENTJ',
-    bloodType: 'A형',
-    aiStyleSummary: ['신뢰감 있는 인상', '차분한 리더형 무드', '깔끔한 프로페셔널 스타일'],
-    relationshipStatus: '좋은 대화에 열려 있음',
-    children: '자녀 없음',
-    religion: '무교',
   },
   birthDate: '1992-06-14',
   birthTime: '08:30',
-  birthPlace: '서울',
   calendarType: 'solar' as const,
   showAge: true,
   life: {
@@ -62,10 +56,6 @@ export const SAMPLE_PROFILE = {
       teams: [
         { label: 'LG 트윈스', sublabel: 'KBO', posterUrl: 'https://picsum.photos/seed/lgtwins_gmj/80/80' },
       ],
-      games: ['EA SPORTS FC'],
-      sports: ['축구', '골프'],
-      celebrities: ['유재석', '아이유'],
-      diet: '일반식',
       // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
       restaurants: [
         { label: '성수 우육미엔', sublabel: '성수동', posterUrl: 'https://picsum.photos/seed/seongsu_uuk/148/96' },
@@ -78,7 +68,6 @@ export const SAMPLE_PROFILE = {
       ],
     },
     places: {
-      neighborhoods: ['성수동', '한남동', '서촌'],
       travelDestinations: [
         { label: '도쿄', posterUrl: 'https://picsum.photos/seed/tokyo_gmj/148/96' },
         { label: '교토', posterUrl: 'https://picsum.photos/seed/kyoto_gmj/148/96' },
@@ -252,15 +241,9 @@ export const MK_PROFILE = {
   bio: 'Entrepreneur, Writer, Connector. Byth에서 Byro 만들고 운영하고 있어요.',
   whoIAm: {
     mbti: 'ENTP',
-    bloodType: 'B형',
-    aiStyleSummary: ['카리스마 있는 인상', '깊은 눈빛의 사색형', '내추럴한 블랙 스타일'],
-    relationshipStatus: '자연스러운 연결 선호',
-    children: '자녀 없음',
-    religion: '무교',
   },
   birthDate: '1988-11-03',
   birthTime: '22:15',
-  birthPlace: '서울',
   calendarType: 'solar' as const,
   showAge: true,
   life: {
@@ -296,10 +279,6 @@ export const MK_PROFILE = {
       teams: [
         { label: '토트넘 홋스퍼', sublabel: 'EPL', posterUrl: 'https://picsum.photos/seed/tottenham_mk/80/80' },
       ],
-      games: ['문명', 'FC'],
-      sports: ['골프', '축구'],
-      celebrities: ['손흥민', '전도연'],
-      diet: '일반식',
       restaurants: [
         { label: '몽탄', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/mongtan_mk/148/96' },
         { label: '금돼지식당', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/goldpig_mk/148/96' },
@@ -310,7 +289,6 @@ export const MK_PROFILE = {
       ],
     },
     places: {
-      neighborhoods: ['한남동', '압구정', '성수동'],
       travelDestinations: [
         { label: '뉴욕', posterUrl: 'https://picsum.photos/seed/newyork_mk/148/96' },
         { label: '런던', posterUrl: 'https://picsum.photos/seed/london_mk/148/96' },
@@ -460,15 +438,9 @@ export const JIMIN_PROFILE = {
   bio: '스타트업 생태계에서 브랜드와 사람을 연결하는 마케터입니다. 브랜드의 방향성과 사람들의 경험이 자연스럽게 이어지도록 설계하는 일을 좋아하고, 성장 전략과 커뮤니티 빌딩에도 꾸준히 관심을 두고 있습니다.',
   whoIAm: {
     mbti: 'ENFP',
-    bloodType: 'O형',
-    aiStyleSummary: ['밝은 첫인상', '부드러운 페미닌 무드', '감각적인 블랙 자켓 스타일'],
-    relationshipStatus: '설레는 대화 환영',
-    children: '자녀 없음',
-    religion: '기독교',
   },
   birthDate: '1995-03-27',
   birthTime: '19:20',
-  birthPlace: '부산',
   calendarType: 'solar' as const,
   showAge: true,
   life: {
@@ -502,10 +474,6 @@ export const JIMIN_PROFILE = {
       teams: [
         { label: '두산 베어스', sublabel: 'KBO', posterUrl: 'https://picsum.photos/seed/doosan_jm/80/80' },
       ],
-      games: ['심즈'],
-      sports: ['테니스', '야구'],
-      celebrities: ['아이유', '한소희'],
-      diet: '일반식',
       restaurants: [
         { label: '진작다이닝', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/jinjak_jm/148/96' },
         { label: '을지다락', sublabel: '을지로', posterUrl: 'https://picsum.photos/seed/euljiloft_jm/148/96' },
@@ -516,7 +484,6 @@ export const JIMIN_PROFILE = {
       ],
     },
     places: {
-      neighborhoods: ['한남동', '연남동', '서촌'],
       travelDestinations: [
         { label: '오사카', posterUrl: 'https://picsum.photos/seed/osaka_jm/148/96' },
         { label: '런던', posterUrl: 'https://picsum.photos/seed/london_jm/148/96' },

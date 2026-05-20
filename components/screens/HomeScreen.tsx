@@ -1,7 +1,6 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { ComparisonSection } from '@/components/screens/home/sections/ComparisonSection'
 import { HeroSection } from '@/components/screens/home/sections/HeroSection'
 import { HighlightSection } from '@/components/screens/home/sections/HighlightSection'
 import { ProblemSection } from '@/components/screens/home/sections/ProblemSection'
@@ -51,7 +50,6 @@ export default function HomeScreen() {
       <ProblemSection />
       <SolutionSection />
       <HighlightSection />
-      <ComparisonSection />
       <ProductPreviewSection />
       <ReputationSection />
       <TargetUserSection />

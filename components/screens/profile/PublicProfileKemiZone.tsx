@@ -140,7 +140,7 @@ export function PublicProfileKemiZone({
                 </span>
               </div>
               <p className="mb-3 text-[12px] leading-[1.65] text-[var(--color-text-secondary)]">
-                MBTI · 사주 · 라이프스타일을 조합해 이성 · 비즈니스 · 친구 관점에서 두 사람의 관계 흐름을 깊이 있게 해석해요.
+                두 사람이 나눈 경험과 공통점을 바탕으로 나와의 관계 흐름을 분석해줘요.
               </p>
               <button
                 type="button"

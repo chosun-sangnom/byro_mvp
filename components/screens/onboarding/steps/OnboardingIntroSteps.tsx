@@ -23,8 +23,8 @@ export function Step1Login() {
       </div>
       <div className="space-y-3">
         <Button variant="kakao" onClick={() => store.nextStep()}>카카오로 시작하기</Button>
-        <Button variant="google" onClick={() => store.nextStep()}>G  구글로 시작하기</Button>
         <Button variant="naver" onClick={() => store.nextStep()}>N  네이버로 시작하기</Button>
+        <Button variant="google" onClick={() => store.nextStep()}>G  구글로 시작하기</Button>
       </div>
       <p className="micro-text text-center mt-6">
         시작하면 이용약관 및 개인정보 처리방침에 동의하게 됩니다

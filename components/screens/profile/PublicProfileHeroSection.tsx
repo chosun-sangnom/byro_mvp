@@ -78,12 +78,12 @@ export function ProfileHeroSection({
         <div className="mt-3 grid grid-cols-3 gap-2 px-1">
           {[1, 2, 3].map((index) => {
             const image = galleryImages[index]
+            if (!image) return null
             return (
               <button
                 key={index}
                 type="button"
                 onClick={() => {
-                  if (!image) return
                   setActiveImageIndex(index)
                   setGalleryOpen(true)
                 }}
@@ -94,14 +94,8 @@ export function ProfileHeroSection({
                     : 'border-[var(--color-border-default)]',
                 ].join(' ')}
               >
-                {image ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={image} alt={`${profile.name} 서브 사진 ${index}`} className="h-full w-full object-cover" />
-                ) : (
-                  <div className="flex h-full items-center justify-center text-[11px] font-semibold text-[var(--color-text-tertiary)]">
-                    비어 있음
-                  </div>
-                )}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={image} alt={`${profile.name} 서브 사진 ${index}`} className="h-full w-full object-cover" />
               </button>
             )
           })}

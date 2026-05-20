@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, type ChangeEvent, type PointerEvent } from 'react'
-import { Camera } from 'lucide-react'
+import { Camera, Info } from 'lucide-react'
 import { Button, NavBar, showToast, TextArea } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
@@ -308,7 +308,17 @@ export function BasicInfoEditScreen({
 
             <div>
               <div className="flex items-center justify-between mb-3">
-                <label className="text-xs text-[var(--color-text-tertiary)]">MBTI</label>
+                <div className="flex items-center gap-1">
+                  <label className="text-xs text-[var(--color-text-tertiary)]">MBTI</label>
+                  <div className="group relative">
+                    <Info size={12} className="text-[var(--color-text-tertiary)] opacity-50 cursor-default" />
+                    <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 rounded-xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-3 py-2 text-[11px] leading-relaxed text-[var(--color-text-secondary)] shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                      Myers-Briggs 성격 유형 검사.<br />
+                      E/I · N/S · T/F · J/P 4가지 기준으로 16가지 성격 유형을 분류해요.
+                      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[var(--color-border-soft)]" />
+                    </div>
+                  </div>
+                </div>
                 <span className="text-sm font-bold text-[var(--color-text-primary)]">{mbti || '—'}</span>
               </div>
               <div className="space-y-2">

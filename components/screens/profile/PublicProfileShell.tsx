@@ -126,7 +126,7 @@ export function PublicProfileShell({
             Public Profile
           </div>
           <div className="truncate text-xs text-[var(--color-text-secondary)]">
-            byro.io/@{profile.linkId}
+            byro.io/{profile.linkId}
           </div>
         </div>
 

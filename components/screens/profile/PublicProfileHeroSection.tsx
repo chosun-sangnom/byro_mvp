@@ -283,7 +283,7 @@ export function ProfileHeroCard({
           </div>
 
           <div className="mt-2.5 text-[11px] font-semibold text-white/38">
-            @{profile.linkId}
+            byro.io/{profile.linkId}
           </div>
         </div>
       </div>

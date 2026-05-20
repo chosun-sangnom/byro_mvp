@@ -155,7 +155,7 @@ export default function PublicProfile({
   const ONE_DAY_MS = 24 * 60 * 60 * 1000
   const submittedAt = store.expSubmittedAt[profile.linkId]
   const alreadySubmitted = !!submittedAt && (Date.now() - submittedAt < ONE_DAY_MS)
-  const publicProfileUrl = `https://byro.io/@${profile.linkId}`
+  const publicProfileUrl = `https://byro.io/${profile.linkId}`
 
   const handleCopyProfileLink = async () => {
     try {
@@ -195,7 +195,7 @@ export default function PublicProfile({
         <button onClick={() => router.back()} className="text-sm text-[var(--color-text-secondary)] mr-2">‹</button>
         <div className="flex-1 min-w-0">
           <div className="text-[11px] text-[var(--color-text-tertiary)] uppercase tracking-[0.18em]">{isOwnerMode ? 'My Byro' : 'Public Profile'}</div>
-          <div className="text-xs text-[var(--color-text-secondary)] truncate">byro.io/@{profile.linkId}</div>
+          <div className="text-xs text-[var(--color-text-secondary)] truncate">byro.io/{profile.linkId}</div>
         </div>
         {!isOwnerMode ? (
           <div className="flex items-center gap-3">

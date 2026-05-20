@@ -20,19 +20,19 @@ export const problems: Array<{
   description: string
 }> = [
   {
-    icon: MessageCircle,
-    title: '스몰토크가 생각보다 어렵습니다',
-    description: '처음 만난 사람과 대화를 이어가는 건 쉽지 않다. 어색한 침묵, 형식적인 질문들.',
-  },
-  {
     icon: CreditCard,
-    title: '명함엔 이름과 직함뿐입니다',
-    description: '명함엔 연락처만, SNS엔 콘텐츠만 있다. 그 사람 자체를 알 수 있는 정보가 없다.',
+    title: '명함엔 이름과 직함 뿐이에요.',
+    description: '연락처와 회사명은 있어도, 그 사람이 어떤 사람인지는 알 수가 없다. 명함만으론 대화가 시작되지 않는다.',
   },
   {
     icon: Search,
-    title: '공통점을 찾기까지 시간이 걸립니다',
-    description: '사실 겹치는 게 있어도 대화하기 전엔 알 수 없다. 공통점을 발견하기까지 한참이 걸린다.',
+    title: '믿을만한 사람인지 모르겠어요.',
+    description: '처음 만난 자리에선 검증할 방법이 없다. 이력도, 평판도, 어떤 일을 해온 사람인지도 보이지 않는다.',
+  },
+  {
+    icon: MessageCircle,
+    title: '공통점을 찾기가 어려워요.',
+    description: '같은 취향, 비슷한 경험이 있어도 대화 전엔 알 수 없다. 공통점을 찾기까지 너무 오래 걸린다.',
   },
 ]
 

@@ -43,18 +43,18 @@ export const solutionSteps: Array<{
 }> = [
   {
     icon: User,
-    title: '나를 설명하는 정보를 한 프로필에',
-    description: '커리어, 라이프스타일, 검증된 하이라이트, 평판 키워드까지. 흩어져 있던 정보를 하나의 링크로.',
+    title: '나를 입체적으로 보여주는 한 페이지',
+    description: '커리어부터 취향, 검증된 경험까지. 여기저기 흩어진 나를 하나의 링크로 정리한다.',
   },
   {
     icon: Sparkles,
-    title: 'Kemi Glow — 공통점이 즉시 보인다',
-    description: '상대방의 Byro를 열면, 나와 겹치는 항목이 시각적으로 강조된다. 같은 대학, 같은 동네, 같은 MBTI를 한눈에.',
+    title: '상대방과 겹치는 것이 바로 드러난다',
+    description: '상대의 Byro를 열면 공통점이 자동으로 표시된다. 같은 업계, 같은 취향, 같은 MBTI — 대화 소재가 먼저 보인다.',
   },
   {
     icon: MessageCircle,
-    title: 'Kemi Report — 맥락 기반 해석을 제공한다',
-    description: '단순 공통점 나열이 아니라, 전체 맥락을 묶어 해석해준다. 미팅 전에 리포트를 보고 들어가면 첫 마디부터 다르다.',
+    title: '경험이 쌓이면 신뢰가 생긴다',
+    description: '함께 일한 사람, 대화를 나눈 사람이 남긴 평판 키워드가 프로필에 쌓인다. 말이 아닌 기록으로 증명한다.',
   },
 ]
 

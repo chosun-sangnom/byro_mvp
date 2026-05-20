@@ -16,7 +16,7 @@ export function ReputationSection() {
         >
           만남이 쌓일수록
           <br />
-          프로필이 두꺼워집니다
+          프로필이 단단해져요
         </motion.h2>
 
         <motion.p

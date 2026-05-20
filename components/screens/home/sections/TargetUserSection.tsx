@@ -26,7 +26,7 @@ export function TargetUserSection() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-sm text-[var(--color-text-secondary)] text-center mb-12"
         >
-          첫 만남이 결과로 이어지는 사람에게 특히 잘 맞습니다
+          오프라인 만남이 자산인 당신에게
         </motion.p>
 
         <div className="grid grid-cols-2 gap-3">

@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, type ChangeEvent, type PointerEvent } from 'react'
-import { Camera, Info } from 'lucide-react'
+import { Camera, Copy, Check, Info } from 'lucide-react'
 import { Button, NavBar, showToast, TextArea } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
@@ -91,6 +91,8 @@ export function BasicInfoEditScreen({
   const [bio, setBio] = useState(user.bio)
   const initialWhoIAm: PublicProfileWhoIAm = user.whoIAm ?? SAMPLE_PROFILE.whoIAm
   const [mbti, setMbti] = useState(initialWhoIAm.mbti)
+  const [personality, setPersonality] = useState(initialWhoIAm.personality ?? '')
+  const [promptCopied, setPromptCopied] = useState(false)
   const [birthDate, setBirthDate] = useState(user.birthDate ?? SAMPLE_PROFILE.birthDate ?? '')
   const [birthTime, setBirthTime] = useState(user.birthTime ?? SAMPLE_PROFILE.birthTime ?? '')
   const [calendarType, setCalendarType] = useState<'solar' | 'lunar'>(user.calendarType ?? SAMPLE_PROFILE.calendarType ?? 'solar')
@@ -128,6 +130,7 @@ export function BasicInfoEditScreen({
     store.updateUserWhoIAm({
       ...initialWhoIAm,
       mbti,
+      personality: personality.trim() || undefined,
     })
     showToast('저장됐어요!')
     onBack()
@@ -352,6 +355,49 @@ export function BasicInfoEditScreen({
                   )
                 })}
               </div>
+            </div>
+
+            {/* 성향 섹션 */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="text-xs text-[var(--color-text-tertiary)]">성향</label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const life = user.life
+                    const music = life?.tastes.music[0]
+                    const exercise = life?.daily.exercise[0]
+                    const cafe = life?.tastes.cafes[0]
+
+                    const lines = ['내 성향을 2-3문장으로 솔직하게 표현해줘. 관계 맺는 방식, 에너지 쓰는 방향, 일하는 스타일 중 하나 이상 포함해줘. 딱딱하지 않게 자연스러운 말투로.', '', '참고 정보:']
+                    if (mbti) lines.push(`- MBTI: ${mbti}`)
+                    if (exercise) lines.push(`- 즐겨 하는 것: ${exercise.label}`)
+                    if (music) lines.push(`- 자주 듣는 음악: ${music.sublabel ?? music.label}`)
+                    if (cafe) lines.push(`- 자주 찾는 곳: ${cafe.label}`)
+
+                    navigator.clipboard.writeText(lines.join('\n')).then(() => {
+                      setPromptCopied(true)
+                      showToast('프롬프트가 복사됐어요. ChatGPT나 Claude에 붙여넣기 해보세요.')
+                      setTimeout(() => setPromptCopied(false), 2000)
+                    })
+                  }}
+                  className="flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all"
+                  style={{
+                    background: promptCopied ? 'var(--color-state-success-bg)' : 'var(--color-accent-bg-subtle)',
+                    color: promptCopied ? 'var(--color-state-success-text)' : 'var(--color-accent-dark)',
+                    border: `1px solid ${promptCopied ? 'var(--color-state-success-border)' : 'var(--color-accent-border-soft)'}`,
+                  }}
+                >
+                  {promptCopied ? <Check size={11} /> : <Copy size={11} />}
+                  {promptCopied ? '복사됨' : 'AI 프롬프트 복사'}
+                </button>
+              </div>
+              <TextArea
+                value={personality}
+                onChange={setPersonality}
+                placeholder={'느슨하게 관계를 맺으며 천천히 신뢰를 쌓는 편이에요. (직접 입력하거나 AI 프롬프트로 채워보세요)'}
+                rows={3}
+              />
             </div>
 
             <div className="grid grid-cols-[1.2fr_0.8fr] gap-3">

@@ -135,6 +135,7 @@ export interface HeroTheme {
 
 export interface PublicProfileWhoIAm {
   mbti: string
+  personality?: string
 }
 
 export interface LifeMediaItem {

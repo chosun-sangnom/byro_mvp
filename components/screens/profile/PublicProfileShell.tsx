@@ -310,6 +310,7 @@ export function PublicProfileShell({
           profileName={profile.name}
           whoIAm={profile.whoIAm}
           life={profile.life}
+          kemi={profile.kemi}
         />
       )}
 

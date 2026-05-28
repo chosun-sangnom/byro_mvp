@@ -187,6 +187,10 @@ export const SAMPLE_PROFILE = {
     ],
     // TODO(AI): Replace with LLM-generated conversation starter based on full profile match context
     aiCopy: '아이유를 좋아하고 한남동과 서촌을 자주 찾는 분이에요. 동네 얘기나 좋아하는 음악으로 먼저 말 걸어보세요.',
+    // [임시] 목업 기본값
+    completenessPercent: 80,
+    lockedBlocks: [5],
+    missingTasteCount: 1,
   },
   experiences: [
     { id: 'e1', authorName: '김지수', isAnonymous: false, keywords: ['전문성이 느껴져요', '대화하면 생각이 넓어져요'], message: '대화하면 생각이 넓어지고 일도 깔끔하게 풀어가는 분이에요.', date: '2일 전' },
@@ -405,6 +409,10 @@ export const MK_PROFILE = {
     ],
     // TODO(AI): Replace with LLM-generated conversation starter based on full profile match context
     aiCopy: '골프와 축구를 즐기고 성수동을 자주 찾는 분이에요. FC 얘기나 성수 맛집으로 바로 들어가도 어색하지 않아요.',
+    // [임시] 강명구: 전체 블록 오픈 목업
+    completenessPercent: 100,
+    lockedBlocks: [],
+    missingTasteCount: 0,
   },
   reputationKeywords: [
     { keyword: '어려울 때 생각나는 사람이에요', count: 9 },
@@ -572,6 +580,10 @@ export const JIMIN_PROFILE = {
     ],
     // TODO(AI): Replace with LLM-generated conversation starter based on full profile match context
     aiCopy: '아이유를 좋아하고 한남동을 자주 찾는 분이에요. 같은 동네 카페 얘기로 자연스럽게 시작해보세요.',
+    // [임시] 이지민: 3~5번 블록 잠금 목업 (취향 데이터 부족 시나리오)
+    completenessPercent: 40,
+    lockedBlocks: [3, 4, 5],
+    missingTasteCount: 3,
   },
   reputationKeywords: [
     { keyword: '전문성이 느껴져요', count: 5 },

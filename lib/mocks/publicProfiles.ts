@@ -127,6 +127,16 @@ export const SAMPLE_PROFILE = {
       { name: 'IT', ratio: 22 },
       { name: '투자', ratio: 16 },
     ],
+    insight: {
+      recentMeetings: 34,
+      recentMonths: 3,
+      topIndustryName: '스타트업',
+      topIndustryPercent: 38,
+      growthIndustryName: 'IT·개발',
+      growthFrom: 14,
+      growthTo: 22,
+      growthPeriodLabel: '최근 6개월',
+    },
   },
   airlineHighlight: {
     tierSummary: '대한항공 모닝캄 · 아시아나 다이아몬드',
@@ -362,6 +372,16 @@ export const MK_PROFILE = {
       { name: '컨설팅/법률', ratio: 6, count: 102 },
       { name: '교육/연구', ratio: 5, count: 88 },
     ],
+    insight: {
+      recentMeetings: 58,
+      recentMonths: 3,
+      topIndustryName: '금융·투자',
+      topIndustryPercent: 29,
+      growthIndustryName: 'VC·심사역',
+      growthFrom: 9,
+      growthTo: 27,
+      growthPeriodLabel: '최근 6개월',
+    },
   },
   manualHighlights: [
     {
@@ -549,6 +569,16 @@ export const JIMIN_PROFILE = {
       { name: 'IT', ratio: 22 },
       { name: '투자', ratio: 16 },
     ],
+    insight: {
+      recentMeetings: 21,
+      recentMonths: 3,
+      topIndustryName: '마케팅',
+      topIndustryPercent: 24,
+      growthIndustryName: '스타트업',
+      growthFrom: 18,
+      growthTo: 38,
+      growthPeriodLabel: '최근 6개월',
+    },
   },
   manualHighlights: [
     {

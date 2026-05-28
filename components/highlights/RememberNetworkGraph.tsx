@@ -1,5 +1,10 @@
 'use client'
 
+import { useState } from 'react'
+import { ChevronRight } from 'lucide-react'
+import { NetworkInsightSheet } from '@/components/highlights/NetworkInsightSheet'
+import type { RememberInsight } from '@/types'
+
 type IndustryNode = {
   name: string
   ratio: number
@@ -27,10 +32,13 @@ const NODE_POSITIONS = [
 export function RememberNetworkGraph({
   total,
   industries,
+  insight,
 }: {
   total: number
   industries: IndustryNode[]
+  insight?: RememberInsight
 }) {
+  const [insightOpen, setInsightOpen] = useState(false)
   return (
     <div className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4">
       <div className="mb-4">
@@ -107,9 +115,28 @@ export function RememberNetworkGraph({
       </svg>
 
       <div className="mt-4 flex items-center justify-between border-t border-[var(--color-border-soft)] pt-3">
-        <div className="text-[11px] text-[var(--color-text-tertiary)]">리멤버 명함 기준</div>
-        <div className="text-[11px] font-semibold text-[var(--color-text-secondary)]">총 {total}명</div>
+        <div className="text-[11px] text-[var(--color-text-tertiary)]">리멤버 명함 기준 · 총 {total}명</div>
+        {insight && total >= 10 ? (
+          <button
+            type="button"
+            onClick={() => setInsightOpen(true)}
+            className="flex items-center gap-0.5 text-[11px] font-bold"
+            style={{ color: 'var(--color-accent-dark)' }}
+          >
+            인사이트 보기
+            <ChevronRight size={12} />
+          </button>
+        ) : null}
       </div>
+
+      {insight && (
+        <NetworkInsightSheet
+          open={insightOpen}
+          onClose={() => setInsightOpen(false)}
+          total={total}
+          insight={insight}
+        />
+      )}
     </div>
   )
 }

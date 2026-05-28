@@ -192,11 +192,24 @@ export interface CareerHighlight {
 export interface RememberIndustry {
   name: string
   ratio: number
+  count?: number
+}
+
+export interface RememberInsight {
+  recentMeetings: number
+  recentMonths: number
+  topIndustryName: string
+  topIndustryPercent: number
+  growthIndustryName: string
+  growthFrom: number
+  growthTo: number
+  growthPeriodLabel: string
 }
 
 export interface RememberHighlight {
   total: number
   industries: RememberIndustry[]
+  insight?: RememberInsight
 }
 
 export interface CorporateCompany {

@@ -1,5 +1,4 @@
-import { useRef } from 'react'
-import { BadgeCheck, ChevronRight, ScanLine } from 'lucide-react'
+import { BadgeCheck, ChevronRight, Sparkles } from 'lucide-react'
 import { NavBar } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import type { HighlightIconId } from '@/types'
@@ -11,9 +10,8 @@ interface HighlightManageListViewProps {
   onOpenCategory: (category: HighlightManageCategory) => void
   onOpenCertification: (categoryId: string) => void
   onOpenPicker: () => void
-  // [임시] OCR 기능 — ANTHROPIC_API_KEY 설정 후 동작
-  onFileSelected: (file: File) => void
-  ocrLoading: boolean
+  // [임시] LLM 클립보드 브릿지 — 경력/학력 자동 입력
+  onLlmImport: () => void
 }
 
 export function HighlightManageListView({
@@ -22,11 +20,8 @@ export function HighlightManageListView({
   onOpenCategory,
   onOpenCertification,
   onOpenPicker,
-  onFileSelected,
-  ocrLoading,
+  onLlmImport,
 }: HighlightManageListViewProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null)
-
   return (
     <div className="flex flex-col h-full">
       <NavBar title="하이라이트 관리" onBack={onBack} />
@@ -38,31 +33,19 @@ export function HighlightManageListView({
             카테고리별로 항목을 정리하고, 메인으로 보여줄 내용을 선택하세요.
           </div>
 
-          {/* [임시] OCR 자동 입력 — ANTHROPIC_API_KEY 설정 후 동작 */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0]
-              if (file) onFileSelected(file)
-              e.target.value = ''
-            }}
-          />
+          {/* [임시] LLM 자동 입력 버튼 */}
           <button
             type="button"
-            onClick={() => fileInputRef.current?.click()}
-            disabled={ocrLoading}
-            className="mt-4 flex w-full items-center justify-center gap-2 rounded-[16px] py-3 text-[13px] font-semibold transition-opacity disabled:opacity-50"
+            onClick={onLlmImport}
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-[16px] py-3 text-[13px] font-semibold"
             style={{
               background: 'var(--color-accent-bg-subtle)',
               border: '1px solid var(--color-accent-border-soft)',
               color: 'var(--color-accent-dark)',
             }}
           >
-            <ScanLine size={15} />
-            {ocrLoading ? '스크린샷 분석 중...' : '링크드인 · 리멤버 스크린샷으로 자동 입력'}
+            <Sparkles size={14} />
+            AI로 경력 · 학력 자동 채우기
           </button>
         </div>
 

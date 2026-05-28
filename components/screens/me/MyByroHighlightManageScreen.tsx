@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { showToast } from '@/components/ui'
 import { useByroStore } from '@/store/useByroStore'
-import type { Highlight, HighlightIconId, OcrResult } from '@/types'
+import type { Highlight, HighlightIconId } from '@/types'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { getGroupedHighlightPreview, sortHighlightsByPrimary } from '@/lib/highlightMeta'
@@ -12,7 +12,7 @@ import { HighlightManageCertificationView } from '@/components/screens/me/highli
 import { HighlightManageFormView } from '@/components/screens/me/highlight-manage/HighlightManageFormView'
 import { HighlightManageListView } from '@/components/screens/me/highlight-manage/HighlightManageListView'
 import { HighlightManagePickerView } from '@/components/screens/me/highlight-manage/HighlightManagePickerView'
-import { OcrPreviewSheet } from '@/components/screens/me/highlight-manage/OcrPreviewSheet'
+import { HighlightLlmImportSheet } from '@/components/screens/me/highlight-manage/HighlightLlmImportSheet'
 import {
   CERTIFICATION_ITEMS,
   type CertificationItem,
@@ -52,27 +52,8 @@ export function HighlightManageScreen({
   const [yearPickerTarget, setYearPickerTarget] = useState<YearPickerTarget | null>(null)
   const [selectedCert, setSelectedCert] = useState<CertificationItem | null>(null)
 
-  // [임시] OCR 상태 — ANTHROPIC_API_KEY 설정 후 실제 동작
-  const [ocrLoading, setOcrLoading] = useState(false)
-  const [ocrResult, setOcrResult] = useState<OcrResult | null>(null)
-  const [ocrSheetOpen, setOcrSheetOpen] = useState(false)
-
-  const handleFileSelected = async (file: File) => {
-    setOcrLoading(true)
-    try {
-      const formData = new FormData()
-      formData.append('image', file)
-      const res = await fetch('/api/ocr', { method: 'POST', body: formData })
-      if (!res.ok) throw new Error('OCR 요청 실패')
-      const result = await res.json() as OcrResult
-      setOcrResult(result)
-      setOcrSheetOpen(true)
-    } catch {
-      showToast('스크린샷 분석에 실패했어요. 다시 시도해주세요.')
-    } finally {
-      setOcrLoading(false)
-    }
-  }
+  // [임시] LLM 임포트 시트 상태
+  const [llmImportOpen, setLlmImportOpen] = useState(false)
 
   const isCareerRole = selectedCat?.id === 'career-role'
   const isEducationHistory = selectedCat?.id === 'education-history'
@@ -394,14 +375,12 @@ export function HighlightManageScreen({
           resetAll()
           setMode('picker')
         }}
-        onFileSelected={handleFileSelected}
-        ocrLoading={ocrLoading}
+        onLlmImport={() => setLlmImportOpen(true)}
       />
-      {/* [임시] OCR 결과 프리뷰 시트 */}
-      <OcrPreviewSheet
-        open={ocrSheetOpen}
-        onClose={() => setOcrSheetOpen(false)}
-        result={ocrResult}
+      {/* [임시] LLM 클립보드 브릿지 임포트 시트 */}
+      <HighlightLlmImportSheet
+        open={llmImportOpen}
+        onClose={() => setLlmImportOpen(false)}
       />
     </>
   )

@@ -13,6 +13,7 @@ interface ManageByroScreenProps {
   onLogout: () => void
   onBack: () => void
   onEditBasic: () => void
+  onEditWhoIAm: () => void
   onEditHighlight: () => void
   onEditLife: () => void
   onEditNetwork: () => void
@@ -48,6 +49,7 @@ export function ManageByroScreen({
   onLogout,
   onBack,
   onEditBasic,
+  onEditWhoIAm,
   onEditHighlight,
   onEditLife,
   onEditNetwork,
@@ -89,6 +91,7 @@ export function ManageByroScreen({
   const completionChecks = [
     { label: '기본정보', done: Boolean(whoIAm.mbti) },
     { label: '하이라이트', done: allHighlights.length > 0 },
+
     { label: '라이프', done: activityCount + cultureCount + placeCount > 0 },
     { label: 'SNS', done: connectedSnsCount > 0 },
     { label: '연락수단', done: activeContactCount > 0 },
@@ -99,11 +102,18 @@ export function ManageByroScreen({
 
   const rows: EditRow[] = [
     {
-      title: '기본정보',
-      hint: '프로필사진 · MBTI · 자기소개',
-      nudge: '사진과 MBTI가 있으면 첫인상이 훨씬 기억에 남아요',
-      meta: [user.headline?.trim(), whoIAm.mbti, petLabel].filter(Boolean).join(' · ') || undefined,
+      title: '프로필카드 편집',
+      hint: '프로필사진 · 자기소개 · 생년월일',
+      nudge: '얼굴 사진과 자기소개가 있으면 첫인상이 훨씬 기억에 남아요',
+      meta: user.headline?.trim() || undefined,
       onClick: onEditBasic,
+    },
+    {
+      title: '기본정보',
+      hint: 'MBTI · 성향',
+      nudge: 'MBTI와 성향이 있으면 케미 리포트가 더 정확해져요',
+      meta: [whoIAm.mbti, whoIAm.personality ? '성향 있음' : undefined].filter(Boolean).join(' · ') || undefined,
+      onClick: onEditWhoIAm,
     },
     {
       title: '하이라이트',

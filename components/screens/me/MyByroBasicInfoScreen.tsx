@@ -6,6 +6,131 @@ import { Button, NavBar, showToast, TextArea } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
 import type { PublicProfileWhoIAm, UserState } from '@/types'
+
+// ── WhoIAmEditScreen (기본정보: MBTI + 성향) ──────────────────────────────────
+export function WhoIAmEditScreen({
+  user,
+  onBack,
+}: {
+  user: Pick<UserState, 'whoIAm' | 'life'>
+  onBack: () => void
+}) {
+  const store = useByroStore()
+  const initialWhoIAm: PublicProfileWhoIAm = user.whoIAm ?? SAMPLE_PROFILE.whoIAm
+  const [mbti, setMbti] = useState(initialWhoIAm.mbti)
+  const [personality, setPersonality] = useState(initialWhoIAm.personality ?? '')
+  const [promptCopied, setPromptCopied] = useState(false)
+
+  const handleSave = () => {
+    store.updateUserWhoIAm({ ...initialWhoIAm, mbti, personality: personality.trim() || undefined })
+    showToast('저장됐어요!')
+    onBack()
+  }
+
+  return (
+    <div className="flex flex-col h-full">
+      <NavBar title="기본정보" onBack={onBack} />
+      <div className="flex-1 overflow-y-auto">
+        <div className="px-5 py-5 space-y-5">
+
+          {/* MBTI */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-1">
+                <label className="text-xs text-[var(--color-text-tertiary)]">MBTI</label>
+                <div className="group relative">
+                  <Info size={12} className="text-[var(--color-text-tertiary)] opacity-50 cursor-default" />
+                  <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 rounded-xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-3 py-2 text-[11px] leading-relaxed text-[var(--color-text-secondary)] shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                    Myers-Briggs 성격 유형 검사.<br />
+                    E/I · N/S · T/F · J/P 4가지 기준으로 16가지 성격 유형을 분류해요.
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[var(--color-border-soft)]" />
+                  </div>
+                </div>
+              </div>
+              <span className="text-sm font-bold text-[var(--color-text-primary)]">{mbti || '—'}</span>
+            </div>
+            <div className="space-y-2">
+              {MBTI_DIMS.map((dim, dimIndex) => {
+                const selectedLetter = mbti?.[dimIndex] ?? ''
+                return (
+                  <div key={dimIndex} className="flex rounded-xl overflow-hidden border border-[var(--color-border-default)]">
+                    {dim.options.map((letter, optIndex) => {
+                      const isSelected = selectedLetter === letter
+                      return (
+                        <button
+                          key={letter}
+                          type="button"
+                          onClick={() => {
+                            const parts = (mbti || '????').split('')
+                            parts[dimIndex] = letter
+                            setMbti(parts.join(''))
+                          }}
+                          className="flex-1 py-2.5 text-left px-4 transition-colors"
+                          style={{
+                            background: isSelected ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
+                            borderRight: optIndex === 0 ? '1px solid var(--color-border-default)' : undefined,
+                          }}
+                        >
+                          <span className={`text-[13px] font-black ${isSelected ? 'text-white' : 'text-[var(--color-text-secondary)]'}`}>{letter}</span>
+                          <span className={`ml-1.5 text-[11px] ${isSelected ? 'text-white/80' : 'text-[var(--color-text-tertiary)]'}`}>{dim.labels[optIndex]}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* 성향 */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs text-[var(--color-text-tertiary)]">성향</label>
+              <button
+                type="button"
+                onClick={() => {
+                  const life = user.life
+                  const music = life?.tastes.music[0]
+                  const exercise = life?.daily.exercise[0]
+                  const cafe = life?.tastes.cafes[0]
+                  const lines = ['내 성향을 2-3문장으로 솔직하게 표현해줘. 관계 맺는 방식, 에너지 쓰는 방향, 일하는 스타일 중 하나 이상 포함해줘. 딱딱하지 않게 자연스러운 말투로.', '', '참고 정보:']
+                  if (mbti) lines.push(`- MBTI: ${mbti}`)
+                  if (exercise) lines.push(`- 즐겨 하는 것: ${exercise.label}`)
+                  if (music) lines.push(`- 자주 듣는 음악: ${music.sublabel ?? music.label}`)
+                  if (cafe) lines.push(`- 자주 찾는 곳: ${cafe.label}`)
+                  navigator.clipboard.writeText(lines.join('\n')).then(() => {
+                    setPromptCopied(true)
+                    showToast('프롬프트가 복사됐어요. ChatGPT나 Claude에 붙여넣기 해보세요.')
+                    setTimeout(() => setPromptCopied(false), 2000)
+                  })
+                }}
+                className="flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all"
+                style={{
+                  background: promptCopied ? 'var(--color-state-success-bg)' : 'var(--color-accent-bg-subtle)',
+                  color: promptCopied ? 'var(--color-state-success-text)' : 'var(--color-accent-dark)',
+                  border: `1px solid ${promptCopied ? 'var(--color-state-success-border)' : 'var(--color-accent-border-soft)'}`,
+                }}
+              >
+                {promptCopied ? <Check size={11} /> : <Copy size={11} />}
+                {promptCopied ? '복사됨' : 'AI 프롬프트 복사'}
+              </button>
+            </div>
+            <TextArea
+              value={personality}
+              onChange={setPersonality}
+              placeholder="느슨하게 관계를 맺으며 천천히 신뢰를 쌓는 편이에요. (직접 입력하거나 AI 프롬프트로 채워보세요)"
+              rows={3}
+            />
+          </div>
+
+        </div>
+      </div>
+      <div className="px-5 pb-6">
+        <Button onClick={handleSave}>저장</Button>
+      </div>
+    </div>
+  )
+}
 import {
   DEFAULT_CROP_FRAME,
   clampCropFrameRect,
@@ -17,7 +142,7 @@ import {
 } from '@/lib/imageCropUtils'
 
 interface BasicInfoEditScreenProps {
-  user: Pick<UserState, 'name' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'profileImages' | 'birthDate' | 'birthTime' | 'calendarType' | 'showAge' | 'whoIAm' | 'life'>
+  user: Pick<UserState, 'name' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'profileImages' | 'birthDate' | 'birthTime' | 'calendarType' | 'showAge'>
   onBack: () => void
 }
 
@@ -89,10 +214,6 @@ export function BasicInfoEditScreen({
 }: BasicInfoEditScreenProps) {
   const store = useByroStore()
   const [bio, setBio] = useState(user.bio)
-  const initialWhoIAm: PublicProfileWhoIAm = user.whoIAm ?? SAMPLE_PROFILE.whoIAm
-  const [mbti, setMbti] = useState(initialWhoIAm.mbti)
-  const [personality, setPersonality] = useState(initialWhoIAm.personality ?? '')
-  const [promptCopied, setPromptCopied] = useState(false)
   const [birthDate, setBirthDate] = useState(user.birthDate ?? SAMPLE_PROFILE.birthDate ?? '')
   const [birthTime, setBirthTime] = useState(user.birthTime ?? SAMPLE_PROFILE.birthTime ?? '')
   const [calendarType, setCalendarType] = useState<'solar' | 'lunar'>(user.calendarType ?? SAMPLE_PROFILE.calendarType ?? 'solar')
@@ -127,11 +248,6 @@ export function BasicInfoEditScreen({
       profileImages: profileImages.filter(Boolean),
     })
     store.updateUserInfo({ birthDate, birthTime, calendarType, showAge })
-    store.updateUserWhoIAm({
-      ...initialWhoIAm,
-      mbti,
-      personality: personality.trim() || undefined,
-    })
     showToast('저장됐어요!')
     onBack()
   }
@@ -251,7 +367,7 @@ export function BasicInfoEditScreen({
 
   return (
     <div className="flex flex-col h-full">
-      <NavBar title="기본정보 편집" onBack={onBack} />
+      <NavBar title="프로필카드 편집" onBack={onBack} />
 
       <div className="flex-1 overflow-y-auto">
         <div className="px-5 py-5">
@@ -306,97 +422,6 @@ export function BasicInfoEditScreen({
                 disabled
                 placeholder="변경 불가"
                 className="w-full border border-[var(--color-border-soft)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-surface)] text-[var(--color-text-tertiary)]"
-              />
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-1">
-                  <label className="text-xs text-[var(--color-text-tertiary)]">MBTI</label>
-                  <div className="group relative">
-                    <Info size={12} className="text-[var(--color-text-tertiary)] opacity-50 cursor-default" />
-                    <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 rounded-xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-3 py-2 text-[11px] leading-relaxed text-[var(--color-text-secondary)] shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                      Myers-Briggs 성격 유형 검사.<br />
-                      E/I · N/S · T/F · J/P 4가지 기준으로 16가지 성격 유형을 분류해요.
-                      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[var(--color-border-soft)]" />
-                    </div>
-                  </div>
-                </div>
-                <span className="text-sm font-bold text-[var(--color-text-primary)]">{mbti || '—'}</span>
-              </div>
-              <div className="space-y-2">
-                {MBTI_DIMS.map((dim, dimIndex) => {
-                  const selectedLetter = mbti?.[dimIndex] ?? ''
-                  return (
-                    <div key={dimIndex} className="flex rounded-xl overflow-hidden border border-[var(--color-border-default)]">
-                      {dim.options.map((letter, optIndex) => {
-                        const isSelected = selectedLetter === letter
-                        return (
-                          <button
-                            key={letter}
-                            type="button"
-                            onClick={() => {
-                              const parts = (mbti || '????').split('')
-                              parts[dimIndex] = letter
-                              setMbti(parts.join(''))
-                            }}
-                            className="flex-1 py-2.5 text-left px-4 transition-colors"
-                            style={{
-                              background: isSelected ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
-                              borderRight: optIndex === 0 ? '1px solid var(--color-border-default)' : undefined,
-                            }}
-                          >
-                            <span className={`text-[13px] font-black ${isSelected ? 'text-white' : 'text-[var(--color-text-secondary)]'}`}>{letter}</span>
-                            <span className={`ml-1.5 text-[11px] ${isSelected ? 'text-white/80' : 'text-[var(--color-text-tertiary)]'}`}>{dim.labels[optIndex]}</span>
-                          </button>
-                        )
-                      })}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-
-            {/* 성향 섹션 */}
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-xs text-[var(--color-text-tertiary)]">성향</label>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const life = user.life
-                    const music = life?.tastes.music[0]
-                    const exercise = life?.daily.exercise[0]
-                    const cafe = life?.tastes.cafes[0]
-
-                    const lines = ['내 성향을 2-3문장으로 솔직하게 표현해줘. 관계 맺는 방식, 에너지 쓰는 방향, 일하는 스타일 중 하나 이상 포함해줘. 딱딱하지 않게 자연스러운 말투로.', '', '참고 정보:']
-                    if (mbti) lines.push(`- MBTI: ${mbti}`)
-                    if (exercise) lines.push(`- 즐겨 하는 것: ${exercise.label}`)
-                    if (music) lines.push(`- 자주 듣는 음악: ${music.sublabel ?? music.label}`)
-                    if (cafe) lines.push(`- 자주 찾는 곳: ${cafe.label}`)
-
-                    navigator.clipboard.writeText(lines.join('\n')).then(() => {
-                      setPromptCopied(true)
-                      showToast('프롬프트가 복사됐어요. ChatGPT나 Claude에 붙여넣기 해보세요.')
-                      setTimeout(() => setPromptCopied(false), 2000)
-                    })
-                  }}
-                  className="flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all"
-                  style={{
-                    background: promptCopied ? 'var(--color-state-success-bg)' : 'var(--color-accent-bg-subtle)',
-                    color: promptCopied ? 'var(--color-state-success-text)' : 'var(--color-accent-dark)',
-                    border: `1px solid ${promptCopied ? 'var(--color-state-success-border)' : 'var(--color-accent-border-soft)'}`,
-                  }}
-                >
-                  {promptCopied ? <Check size={11} /> : <Copy size={11} />}
-                  {promptCopied ? '복사됨' : 'AI 프롬프트 복사'}
-                </button>
-              </div>
-              <TextArea
-                value={personality}
-                onChange={setPersonality}
-                placeholder={'느슨하게 관계를 맺으며 천천히 신뢰를 쌓는 편이에요. (직접 입력하거나 AI 프롬프트로 채워보세요)'}
-                rows={3}
               />
             </div>
 

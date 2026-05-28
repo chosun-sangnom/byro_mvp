@@ -308,3 +308,28 @@ export interface UserState {
   tabVisibility?: TabVisibility
   isVerified?: boolean
 }
+
+// ── OCR 결과 타입 ──────────────────────────────────────────────────────────────
+export type OcrCareer = {
+  company: string
+  role: string
+  startYear: string
+  endYear: string
+  status: '재직 중' | '종료'
+}
+
+export type OcrEducation = {
+  school: string
+  major: string
+  degree: string
+  schoolType: '대학교' | '대학원' | '고등학교' | '기타'
+  status: '졸업' | '재학' | '중퇴'
+  startYear: string
+  endYear: string
+}
+
+export type OcrResult = {
+  source: 'linkedin' | 'remember' | 'unknown'
+  careers: OcrCareer[]
+  educations: OcrEducation[]
+}

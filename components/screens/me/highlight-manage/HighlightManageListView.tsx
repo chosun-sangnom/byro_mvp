@@ -10,7 +10,7 @@ interface HighlightManageListViewProps {
   onOpenCategory: (category: HighlightManageCategory) => void
   onOpenCertification: (categoryId: string) => void
   onOpenPicker: () => void
-  // [임시] LLM 클립보드 브릿지 — 경력/학력 자동 입력
+  // [임시] OCR 클립보드 브릿지 — 스크린샷으로 경력/학력 자동 입력
   onLlmImport: () => void
 }
 
@@ -33,7 +33,7 @@ export function HighlightManageListView({
             카테고리별로 항목을 정리하고, 메인으로 보여줄 내용을 선택하세요.
           </div>
 
-          {/* [임시] LLM 자동 입력 버튼 */}
+          {/* [임시] OCR 자동 입력 버튼 */}
           <button
             type="button"
             onClick={onLlmImport}
@@ -45,7 +45,7 @@ export function HighlightManageListView({
             }}
           >
             <Sparkles size={14} />
-            AI로 경력 · 학력 자동 채우기
+            스크린샷으로 경력 · 학력 자동 채우기
           </button>
         </div>
 

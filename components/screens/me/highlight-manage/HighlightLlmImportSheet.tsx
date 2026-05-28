@@ -1,7 +1,7 @@
 'use client'
 
-// [임시] LLM 클립보드 브릿지 — API 없음
-// 앱이 프롬프트를 생성 → 유저가 ChatGPT/Claude에 붙여넣기 → 응답을 다시 붙여넣기 → 슬롯 자동 채움
+// [임시] OCR 클립보드 브릿지 — API 없음
+// 앱이 OCR 프롬프트 생성 → 유저가 스크린샷 첨부 후 ChatGPT/Claude에 붙여넣기 → JSON 응답을 다시 붙여넣기 → 슬롯 자동 채움
 
 import { useEffect, useRef, useState } from 'react'
 import { CheckCircle, Circle, Briefcase, BookOpen, Copy, Check } from 'lucide-react'
@@ -9,12 +9,9 @@ import { BottomSheet, showToast } from '@/components/ui'
 import type { OcrCareer, OcrEducation, OcrResult } from '@/types'
 import { useByroStore } from '@/store/useByroStore'
 
-const PROMPT_TEMPLATE = `내 경력과 학력 정보를 아래 JSON 형식으로 정리해줘. 모르는 값은 빈 문자열로 채워줘. JSON만 응답해줘.
+const PROMPT_TEMPLATE = `첨부한 스크린샷에서 경력과 학력 정보를 아래 JSON 형식으로 추출해줘. 스크린샷에 보이는 내용만 추출하고, 모르는 값은 빈 문자열로. JSON만 응답해줘.
 
-{"careers":[{"company":"회사명","role":"직함","startYear":"YYYY","endYear":"YYYY또는빈값","status":"재직 중 또는 종료"}],"educations":[{"school":"학교명","major":"전공","degree":"학사 또는 석사 또는 박사 또는 빈값","schoolType":"대학교 또는 대학원 또는 고등학교 또는 기타","status":"졸업 또는 재학 또는 중퇴","startYear":"YYYY","endYear":"YYYY또는빈값"}]}
-
-내 정보:
-`
+{"careers":[{"company":"회사명","role":"직함","startYear":"YYYY","endYear":"YYYY또는빈값","status":"재직 중 또는 종료"}],"educations":[{"school":"학교명","major":"전공","degree":"학사 또는 석사 또는 박사 또는 빈값","schoolType":"대학교 또는 대학원 또는 고등학교 또는 기타","status":"졸업 또는 재학 또는 중퇴","startYear":"YYYY","endYear":"YYYY또는빈값"}]}`
 
 type Step = 'input' | 'preview'
 
@@ -139,20 +136,20 @@ export function HighlightLlmImportSheet({
           <>
             <div className="mb-4">
               <p className="text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color: 'var(--color-text-tertiary)' }}>
-                LLM으로 자동 입력
+                스크린샷 OCR
               </p>
               <h3 className="mt-1.5 text-[22px] font-black leading-[1.2]" style={{ color: 'var(--color-text-primary)' }}>
                 경력 · 학력 자동 채우기
               </h3>
               <p className="mt-1.5 text-[13px] leading-[1.6]" style={{ color: 'var(--color-text-secondary)' }}>
-                아래 프롬프트를 ChatGPT나 Claude에 복사하고, 내 정보를 입력한 뒤 응답을 붙여넣으세요.
+                링크드인 · 리멤버 프로필 스크린샷을 찍고, 아래 프롬프트와 함께 ChatGPT나 Claude에 이미지를 첨부해서 보내세요.
               </p>
             </div>
 
             {/* ① 프롬프트 복사 */}
             <div className="mb-4 rounded-[18px] p-4" style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-default)' }}>
               <div className="mb-2 flex items-center justify-between">
-                <span className="text-[12px] font-bold" style={{ color: 'var(--color-text-secondary)' }}>① 프롬프트 복사</span>
+                <span className="text-[12px] font-bold" style={{ color: 'var(--color-text-secondary)' }}>① OCR 프롬프트 복사</span>
                 <button
                   type="button"
                   onClick={handleCopyPrompt}
@@ -171,19 +168,17 @@ export function HighlightLlmImportSheet({
                 {PROMPT_TEMPLATE.split('\n')[0]}
                 <br />
                 {'{ "careers": [...], "educations": [...] }'}
-                <br />
-                {'내 정보: ___'}
               </p>
             </div>
 
             {/* ② 답변 붙여넣기 */}
             <div className="mb-4 rounded-[18px] p-4" style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-default)' }}>
-              <p className="mb-2 text-[12px] font-bold" style={{ color: 'var(--color-text-secondary)' }}>② LLM 응답 붙여넣기</p>
+              <p className="mb-2 text-[12px] font-bold" style={{ color: 'var(--color-text-secondary)' }}>② 스크린샷 첨부 후 응답 붙여넣기</p>
               <textarea
                 ref={textareaRef}
                 value={pasteValue}
                 onChange={(e) => { setPasteValue(e.target.value); setParseError('') }}
-                placeholder={'ChatGPT / Claude 응답을 여기에 붙여넣으세요'}
+                placeholder={'이미지 첨부 후 ChatGPT / Claude JSON 응답을 여기에 붙여넣으세요'}
                 rows={5}
                 className="w-full resize-none rounded-[12px] px-3 py-3 text-[13px] leading-[1.6] outline-none"
                 style={{

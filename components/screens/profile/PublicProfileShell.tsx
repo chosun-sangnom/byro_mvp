@@ -19,6 +19,7 @@ import { Pencil, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { BottomSheet, TextArea, showToast } from '@/components/ui'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
+import { generatePersona } from '@/lib/personaGen'
 import { ContactActionButton } from '@/components/screens/profile/PublicProfileSections'
 import { ProfileHeroSection } from '@/components/screens/profile/PublicProfileHeroSection'
 import { PublicProfileTabBar, type PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
@@ -49,6 +50,9 @@ export function PublicProfileShell({
 
   // owner mode: 로그인 상태이고 현재 보는 프로필이 본인인 경우
   const isOwnerMode = store.isLoggedIn && store.user?.linkId === username
+
+  // [임시] 오너 모드에서만 페르소나 생성 (목업 데이터 기반)
+  const persona = isOwnerMode ? generatePersona(profile) : null
 
   // 연결 관계 상태
   const connectionStatus = (() => {
@@ -163,6 +167,8 @@ export function PublicProfileShell({
             bioOverflowing={bioOverflowing}
             bioRef={bioRef}
             onToggleBio={() => setBioExpanded((prev) => !prev)}
+            personaText={persona?.text}
+            personaReasons={persona?.reasons}
           />
         </div>
 

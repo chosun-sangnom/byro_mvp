@@ -2,7 +2,9 @@
 
 import { useEffect, useState, type RefObject } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronDown, ChevronUp, X } from 'lucide-react'
+import { ChevronDown, ChevronUp, Sparkles, X } from 'lucide-react'
+import { BottomSheet } from '@/components/ui'
+import type { PersonaReason } from '@/lib/personaGen'
 
 type HeroTheme = {
   cover: string
@@ -22,6 +24,8 @@ export function ProfileHeroSection({
   bioOverflowing,
   bioRef,
   onToggleBio,
+  personaText,
+  personaReasons,
 }: {
   profile: {
     name: string
@@ -39,6 +43,8 @@ export function ProfileHeroSection({
   bioOverflowing: boolean
   bioRef: RefObject<HTMLParagraphElement>
   onToggleBio: () => void
+  personaText?: string
+  personaReasons?: PersonaReason[]
 }) {
   const galleryImages = normalizeProfileImages(profile.profileImages, profile.avatarImage)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
@@ -72,6 +78,8 @@ export function ProfileHeroSection({
           setActiveImageIndex(0)
           setGalleryOpen(true)
         }}
+        personaText={personaText}
+        personaReasons={personaReasons}
       />
 
       {galleryImages.length > 1 && (
@@ -181,6 +189,8 @@ export function ProfileHeroCard({
   bioOverflowing,
   onToggleBio,
   onOpenGallery,
+  personaText,
+  personaReasons,
 }: {
   profile: {
     name: string
@@ -202,7 +212,10 @@ export function ProfileHeroCard({
   bioOverflowing?: boolean
   onToggleBio?: () => void
   onOpenGallery?: () => void
+  personaText?: string
+  personaReasons?: PersonaReason[]
 }) {
+  const [personaSheetOpen, setPersonaSheetOpen] = useState(false)
   const showAge = typeof profile.age === 'number' && profile.showAge !== false
 
   return (
@@ -255,6 +268,31 @@ export function ProfileHeroCard({
             </div>
           </div>
 
+          {personaText && (
+            <>
+              <button
+                type="button"
+                onClick={personaReasons ? () => setPersonaSheetOpen(true) : undefined}
+                className="mt-2 flex items-center gap-1.5 rounded-full border border-white/14 bg-black/28 px-3 py-1.5 backdrop-blur-sm"
+              >
+                <Sparkles size={11} className="text-white/60 shrink-0" />
+                <span className="text-[12px] font-medium italic text-white/80">{personaText}</span>
+                {personaReasons && (
+                  <span className="ml-1 rounded-full bg-white/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white/50">AI</span>
+                )}
+              </button>
+
+              {personaReasons && (
+                <PersonaReasonSheet
+                  open={personaSheetOpen}
+                  onClose={() => setPersonaSheetOpen(false)}
+                  personaText={personaText}
+                  reasons={personaReasons}
+                />
+              )}
+            </>
+          )}
+
           {showAge && (
             <div className="mt-0.5 text-[13px] font-semibold text-white/50">
               {profile.age}세
@@ -288,5 +326,55 @@ export function ProfileHeroCard({
         </div>
       </div>
     </div>
+  )
+}
+
+function PersonaReasonSheet({
+  open,
+  onClose,
+  personaText,
+  reasons,
+}: {
+  open: boolean
+  onClose: () => void
+  personaText: string
+  reasons: PersonaReason[]
+}) {
+  return (
+    <BottomSheet open={open} onClose={onClose}>
+      <div className="px-5 pb-6">
+        <div className="mb-5">
+          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color: 'var(--color-text-tertiary)' }}>
+            <Sparkles size={13} />
+            <span>AI 페르소나</span>
+            <span className="rounded-full px-2 py-0.5 text-[10px]" style={{ background: 'var(--color-bg-muted)', color: 'var(--color-text-tertiary)' }}>
+              매주 업데이트됨
+            </span>
+          </div>
+          <h3 className="mt-3 text-[22px] font-black leading-[1.2]" style={{ color: 'var(--color-text-primary)' }}>
+            {personaText}
+          </h3>
+          <p className="mt-2 text-[13px] leading-[1.6]" style={{ color: 'var(--color-text-secondary)' }}>
+            평판 키워드와 라이프스타일 데이터를 바탕으로 자동 생성된 문장이에요.
+          </p>
+        </div>
+
+        <div className="space-y-2.5">
+          <p className="text-[11px] font-bold uppercase tracking-[0.1em]" style={{ color: 'var(--color-text-tertiary)' }}>
+            생성 근거
+          </p>
+          {reasons.map((reason) => (
+            <div
+              key={reason.category}
+              className="flex items-center justify-between rounded-[16px] px-4 py-3"
+              style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-default)' }}
+            >
+              <span className="text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>{reason.category}</span>
+              <span className="text-[13px] font-semibold" style={{ color: 'var(--color-text-primary)' }}>{reason.value}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </BottomSheet>
   )
 }

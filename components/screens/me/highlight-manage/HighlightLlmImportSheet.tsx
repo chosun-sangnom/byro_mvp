@@ -184,7 +184,7 @@ export function HighlightLlmImportSheet({
             <div className="mb-4 rounded-[16px] px-4 py-3.5" style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-soft)' }}>
               <p className="text-[12px] leading-[1.7]" style={{ color: 'var(--color-text-secondary)' }}>
                 이 이미지를 <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>ChatGPT나 Claude에 첨부</span>하고
-                "경력과 학력 정보를 JSON으로 추출해줘"라고 요청한 뒤, 응답을 아래에 붙여넣으세요.
+                &ldquo;경력과 학력 정보를 JSON으로 추출해줘&rdquo;라고 요청한 뒤, 응답을 아래에 붙여넣으세요.
               </p>
             </div>
 

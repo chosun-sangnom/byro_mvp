@@ -63,9 +63,6 @@ export function ManageByroScreen({
 }: ManageByroScreenProps) {
   const whoIAm = (profile.whoIAm ?? user.whoIAm) as PublicProfileWhoIAm
   const life = (profile.life ?? user.life) as PublicProfileLife
-  const petLabel = life.daily.petName
-    ? `${life.daily.pet} · ${life.daily.petName}`
-    : life.daily.pet
   const activityCount = life.daily.exercise.length + (life.tastes.teams?.length ?? 0)
   const cultureCount =
     life.tastes.movies.length +

@@ -1,7 +1,8 @@
 'use client'
 
-import { Lock, MessageCircle, Sparkles, Star, Users, Handshake } from 'lucide-react'
-import { BottomSheet } from '@/components/ui'
+import { useRef, useState } from 'react'
+import { Lock, MessageCircle, Share2, Sparkles, Star, Users, Handshake } from 'lucide-react'
+import { BottomSheet, showToast } from '@/components/ui'
 import type { KemiData, PublicProfileLife, PublicProfileWhoIAm } from '@/types'
 import {
   getLifestyleSignals,
@@ -68,6 +69,93 @@ const BLOCK_META = [
   { index: 5, label: '연결가치', Icon: Star },
 ]
 
+// [임시] 폴라로이드 카드 — html2canvas 캡처용. CSS 변수 미사용(캡처 시 미지원), 오프스크린 렌더링
+function PolaroidCard({
+  cardRef,
+  profileName,
+  matchItems,
+  summary,
+}: {
+  cardRef: React.RefObject<HTMLDivElement>
+  profileName: string
+  matchItems: { label: string; category: string }[]
+  summary: string
+}) {
+  const previewSummary = summary.length > 110 ? summary.slice(0, 110) + '…' : summary
+
+  return (
+    <div
+      ref={cardRef}
+      style={{
+        position: 'fixed',
+        left: '-9999px',
+        top: 0,
+        width: '320px',
+        background: '#FFFFFF',
+        borderRadius: '20px',
+        padding: '28px 24px 22px',
+        fontFamily: "'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif",
+      }}
+    >
+      {/* 상단 브랜딩 */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '18px' }}>
+        <div style={{
+          width: '20px', height: '20px',
+          background: '#2563EB', borderRadius: '6px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <span style={{ color: '#fff', fontSize: '10px', fontWeight: 900, lineHeight: 1 }}>B</span>
+        </div>
+        <span style={{ fontSize: '12px', fontWeight: 700, color: '#636366', letterSpacing: '0.04em' }}>byro</span>
+        <span style={{ marginLeft: 'auto', fontSize: '11px', color: '#98989D' }}>케미 리포트</span>
+      </div>
+
+      {/* 제목 */}
+      <p style={{ fontSize: '21px', fontWeight: 900, color: '#1C1C1E', lineHeight: 1.3, marginBottom: '16px' }}>
+        {profileName}님과<br />이런 공통점이 있어요 ✨
+      </p>
+
+      {/* 공통점 칩 */}
+      {matchItems.length > 0 && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px', marginBottom: '14px' }}>
+          {matchItems.slice(0, 6).map((item) => (
+            <span key={item.label} style={{
+              background: '#EFF6FF',
+              color: '#2563EB',
+              border: '1px solid rgba(37,99,235,0.20)',
+              borderRadius: '9999px',
+              padding: '4px 11px',
+              fontSize: '12px',
+              fontWeight: 600,
+            }}>
+              {item.label}
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* 요약 */}
+      <p style={{ fontSize: '12px', color: '#636366', lineHeight: 1.7, marginBottom: '20px' }}>
+        {previewSummary}
+      </p>
+
+      {/* 하단 */}
+      <div style={{
+        borderTop: '1px solid #EEEEF0',
+        paddingTop: '14px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      }}>
+        <span style={{ fontSize: '11px', color: '#98989D' }}>byro.app에서 나도 확인하기</span>
+        <div style={{ background: '#EFF6FF', borderRadius: '8px', padding: '4px 9px' }}>
+          <span style={{ fontSize: '11px', fontWeight: 700, color: '#2563EB' }}>→</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function PublicProfileCompatibilitySheet({
   open,
   onClose,
@@ -83,11 +171,60 @@ export function PublicProfileCompatibilitySheet({
   life?: PublicProfileLife
   kemi?: KemiData
 }) {
+  const polaroidRef = useRef<HTMLDivElement>(null)
+  const [sharing, setSharing] = useState(false)
+
   const report = buildCompatibilityReport(profileName, whoIAm, life)
   const lockedBlocks = kemi?.lockedBlocks ?? []
   const completenessPercent = kemi?.completenessPercent ?? 100
   const missingTasteCount = kemi?.missingTasteCount ?? 0
   const matchItems = kemi?.matchItems ?? []
+
+  // [임시] 폴라로이드 이미지 캡처 후 공유 (html2canvas + Web Share API)
+  const handleShare = async () => {
+    if (!polaroidRef.current || sharing) return
+    setSharing(true)
+    try {
+      const html2canvas = (await import('html2canvas')).default
+      const canvas = await html2canvas(polaroidRef.current, {
+        scale: 2,
+        backgroundColor: '#FFFFFF',
+        useCORS: true,
+        logging: false,
+      })
+      await new Promise<void>((resolve, reject) => {
+        canvas.toBlob(async (blob) => {
+          if (!blob) { reject(new Error('캡처 실패')); return }
+          const file = new File([blob], `byro-kemi-${profileName}.png`, { type: 'image/png' })
+          try {
+            if (navigator.canShare?.({ files: [file] })) {
+              await navigator.share({
+                files: [file],
+                title: `${profileName}님과의 케미 리포트`,
+                text: `byro에서 ${profileName}님과의 공통점을 발견했어요!`,
+              })
+            } else {
+              // 공유 미지원 환경 → 이미지 다운로드
+              const url = URL.createObjectURL(blob)
+              const a = document.createElement('a')
+              a.href = url
+              a.download = `byro-kemi-${profileName}.png`
+              a.click()
+              URL.revokeObjectURL(url)
+              showToast('이미지가 저장됐어요')
+            }
+            resolve()
+          } catch {
+            resolve() // 사용자가 공유 취소한 경우
+          }
+        }, 'image/png')
+      })
+    } catch {
+      showToast('공유에 실패했어요')
+    } finally {
+      setSharing(false)
+    }
+  }
 
   const blocks = [
     {
@@ -104,6 +241,21 @@ export function PublicProfileCompatibilitySheet({
               ))}
             </div>
           )}
+          {/* [임시] 공통점 폴라로이드 바이럴 공유 버튼 */}
+          <button
+            type="button"
+            onClick={handleShare}
+            disabled={sharing}
+            className="mt-3 flex w-full items-center justify-center gap-2 rounded-[14px] py-2.5 text-[13px] font-semibold transition-opacity active:opacity-70 disabled:opacity-50"
+            style={{
+              background: 'var(--color-accent-bg-subtle)',
+              border: '1px solid var(--color-accent-border-soft)',
+              color: 'var(--color-accent-dark)',
+            }}
+          >
+            <Share2 size={14} />
+            {sharing ? '이미지 생성 중…' : '공통점 공유하기'}
+          </button>
         </>
       ),
     },
@@ -210,6 +362,14 @@ export function PublicProfileCompatibilitySheet({
             )
           })}
         </div>
+
+        {/* [임시] 폴라로이드 캡처용 오프스크린 카드 */}
+        <PolaroidCard
+          cardRef={polaroidRef}
+          profileName={profileName}
+          matchItems={matchItems}
+          summary={report.summary}
+        />
       </div>
     </BottomSheet>
   )

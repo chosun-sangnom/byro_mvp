@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Download, Lock, MessageCircle, Share2, Sparkles, Star, Users, Handshake } from 'lucide-react'
 import { BottomSheet, showToast } from '@/components/ui'
 import { useByroStore } from '@/store/useByroStore'
@@ -423,6 +423,23 @@ export function PublicProfileCompatibilitySheet({
 
   const polaroidRef = useRef<HTMLDivElement>(null)
   const [sharing, setSharing] = useState(false)
+  const [cardGenerating, setCardGenerating] = useState(false)
+  const [cardGenerated, setCardGenerated] = useState(false)
+
+  useEffect(() => {
+    if (!open) {
+      setCardGenerating(false)
+      setCardGenerated(false)
+    }
+  }, [open])
+
+  const handleGenerateCard = () => {
+    setCardGenerating(true)
+    setTimeout(() => {
+      setCardGenerating(false)
+      setCardGenerated(true)
+    }, 1600)
+  }
 
   const report = buildCompatibilityReport(profileName, whoIAm, life)
   const lockedBlocks = kemi?.lockedBlocks ?? []
@@ -483,36 +500,86 @@ export function PublicProfileCompatibilitySheet({
       index: 1,
       content: (
         <>
-          {/* 폴라로이드 미리보기 카드 */}
-          <PolaroidPreviewCard
-            viewerName={viewerName}
-            viewerAvatar={viewerAvatar}
-            profileName={profileName}
-            profileAvatar={profileAvatar}
-            chemistryScore={chemistryScore}
-            matchItems={matchItems}
-          />
-
-          {/* 공유 버튼 */}
-          <button
-            type="button"
-            onClick={handleShare}
-            disabled={sharing}
-            className="mt-3 flex w-full items-center justify-center gap-2 rounded-[14px] py-2.5 text-[13px] font-semibold transition-opacity active:opacity-70 disabled:opacity-50"
-            style={{
-              background: 'var(--color-accent-bg-subtle)',
-              border: '1px solid var(--color-accent-border-soft)',
-              color: 'var(--color-accent-dark)',
-            }}
-          >
-            {sharing ? <Download size={14} /> : <Share2 size={14} />}
-            {sharing ? '이미지 생성 중…' : '이미지로 저장하기'}
-          </button>
-
           {/* 요약 텍스트 */}
-          <p className="mt-3 text-[13px] leading-[1.7]" style={{ color: 'var(--color-text-secondary)' }}>
+          <p className="mb-3 text-[13px] leading-[1.7]" style={{ color: 'var(--color-text-secondary)' }}>
             {report.summary}
           </p>
+
+          {/* 공통점 태그 */}
+          {matchItems.length > 0 && (
+            <div className="mb-3 flex flex-wrap gap-1.5">
+              {matchItems.map((item) => (
+                <span key={item.label} className="chip-metric">{item.label}</span>
+              ))}
+            </div>
+          )}
+
+          {/* 케미카드 만들기 버튼 */}
+          {!cardGenerated && !cardGenerating && (
+            <button
+              type="button"
+              onClick={handleGenerateCard}
+              className="flex w-full items-center justify-center gap-2 rounded-[14px] py-3 text-[13px] font-bold transition-opacity active:opacity-70"
+              style={{
+                background: 'linear-gradient(135deg, #1D4ED8, #7C3AED)',
+                color: '#fff',
+              }}
+            >
+              <Sparkles size={14} />
+              케미카드 만들기
+            </button>
+          )}
+
+          {/* 생성 중 */}
+          {cardGenerating && (
+            <div
+              className="flex w-full items-center justify-center gap-2.5 rounded-[14px] py-3"
+              style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-default)' }}
+            >
+              <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-[var(--color-accent-dark)] border-t-transparent" />
+              <span className="text-[13px] font-semibold" style={{ color: 'var(--color-text-secondary)' }}>케미카드 생성 중…</span>
+            </div>
+          )}
+
+          {/* 생성된 카드 */}
+          {cardGenerated && (
+            <>
+              <PolaroidPreviewCard
+                viewerName={viewerName}
+                viewerAvatar={viewerAvatar}
+                profileName={profileName}
+                profileAvatar={profileAvatar}
+                chemistryScore={chemistryScore}
+                matchItems={matchItems}
+              />
+              <div className="mt-3 flex gap-2">
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  disabled={sharing}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-[14px] py-2.5 text-[13px] font-semibold transition-opacity active:opacity-70 disabled:opacity-50"
+                  style={{
+                    background: 'var(--color-accent-bg-subtle)',
+                    border: '1px solid var(--color-accent-border-soft)',
+                    color: 'var(--color-accent-dark)',
+                  }}
+                >
+                  <Download size={13} />
+                  {sharing ? '저장 중…' : '저장'}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleShare}
+                  disabled={sharing}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-[14px] py-2.5 text-[13px] font-semibold text-white transition-opacity active:opacity-70 disabled:opacity-50"
+                  style={{ background: 'linear-gradient(135deg, #1D4ED8, #7C3AED)' }}
+                >
+                  <Share2 size={13} />
+                  {sharing ? '공유 중…' : '공유'}
+                </button>
+              </div>
+            </>
+          )}
         </>
       ),
     },

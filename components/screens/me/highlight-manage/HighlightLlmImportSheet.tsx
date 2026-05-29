@@ -1,19 +1,32 @@
 'use client'
 
-// [임시] OCR 클립보드 브릿지 — API 없음
-// 유저가 스크린샷을 앱에서 선택 → ChatGPT/Claude에 이미지 첨부 후 경력/학력 JSON 요청 → 응답 붙여넣기 → 슬롯 자동 채움
+// [임시] OCR 목업 — 실제 구현 시 이미지를 Byro OCR 모델에 전달하고 JSON 슬롯필링 결과를 받아야 함
 
 import { useEffect, useRef, useState } from 'react'
-import { CheckCircle, Circle, Briefcase, BookOpen, ImagePlus } from 'lucide-react'
+import { CheckCircle, Circle, Briefcase, BookOpen, ImagePlus, ScanLine } from 'lucide-react'
 import { BottomSheet, showToast } from '@/components/ui'
-import type { OcrCareer, OcrEducation, OcrResult } from '@/types'
+import type { OcrCareer, OcrEducation } from '@/types'
 import { useByroStore } from '@/store/useByroStore'
 
-type Step = 'upload' | 'paste' | 'preview'
+type Step = 'upload' | 'analyzing' | 'preview'
 
 type CareerItem = { type: 'career'; data: OcrCareer; selected: boolean }
 type EducationItem = { type: 'education'; data: OcrEducation; selected: boolean }
 type PreviewItem = CareerItem | EducationItem
+
+// [임시] OCR 결과 목업 — 실제 구현 시 서버 OCR API 응답으로 교체
+const MOCK_OCR_RESULT: PreviewItem[] = [
+  {
+    type: 'career',
+    selected: true,
+    data: { company: '(인식된 회사명)', role: '(인식된 직함)', startYear: '2022', endYear: '', status: '재직 중' },
+  },
+  {
+    type: 'education',
+    selected: true,
+    data: { school: '(인식된 학교명)', major: '(인식된 전공)', degree: '학사', schoolType: '대학교', status: '졸업', startYear: '2016', endYear: '2022' },
+  },
+]
 
 export function HighlightLlmImportSheet({
   open,
@@ -25,8 +38,6 @@ export function HighlightLlmImportSheet({
   const store = useByroStore()
   const [step, setStep] = useState<Step>('upload')
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  const [pasteValue, setPasteValue] = useState('')
-  const [parseError, setParseError] = useState('')
   const [items, setItems] = useState<PreviewItem[]>([])
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -34,8 +45,6 @@ export function HighlightLlmImportSheet({
     if (!open) {
       setStep('upload')
       setImagePreview(null)
-      setPasteValue('')
-      setParseError('')
       setItems([])
     }
   }, [open])
@@ -46,34 +55,15 @@ export function HighlightLlmImportSheet({
     const reader = new FileReader()
     reader.onload = () => {
       setImagePreview(reader.result as string)
-      setStep('paste')
+      setStep('analyzing')
+      // [임시] 실제 OCR 모델 호출 대신 1.5초 딜레이 후 목업 결과 표시
+      setTimeout(() => {
+        setItems(MOCK_OCR_RESULT)
+        setStep('preview')
+      }, 1500)
     }
     reader.readAsDataURL(file)
     e.target.value = ''
-  }
-
-  const handleParse = () => {
-    setParseError('')
-    const jsonMatch = pasteValue.match(/\{[\s\S]*\}/)
-    if (!jsonMatch) {
-      setParseError('JSON 형식을 찾지 못했어요. LLM 응답 전체를 그대로 붙여넣어 주세요.')
-      return
-    }
-    try {
-      const result = JSON.parse(jsonMatch[0]) as OcrResult
-      const parsed: PreviewItem[] = [
-        ...(result.careers ?? []).map((c): CareerItem => ({ type: 'career', data: c, selected: true })),
-        ...(result.educations ?? []).map((e): EducationItem => ({ type: 'education', data: e, selected: true })),
-      ]
-      if (parsed.length === 0) {
-        setParseError('경력이나 학력 정보를 찾지 못했어요. 다시 시도해보세요.')
-        return
-      }
-      setItems(parsed)
-      setStep('preview')
-    } catch {
-      setParseError('JSON 파싱에 실패했어요. LLM 응답을 그대로 붙여넣어 주세요.')
-    }
   }
 
   const handleToggle = (index: number) => {
@@ -126,9 +116,9 @@ export function HighlightLlmImportSheet({
           경력 · 학력 자동 채우기
         </h3>
 
+        {/* 업로드 */}
         {step === 'upload' && (
           <>
-            {/* 이미지 업로드 영역 */}
             <input ref={fileInputRef} type="file" accept="image/*" className="sr-only" onChange={handleFileChange} />
             <button
               type="button"
@@ -144,86 +134,62 @@ export function HighlightLlmImportSheet({
               </div>
               <div className="text-center">
                 <p className="text-[14px] font-bold" style={{ color: 'var(--color-text-primary)' }}>스크린샷 선택</p>
-                <p className="mt-1 text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>링크드인 · 리멤버 프로필 화면</p>
+                <p className="mt-1 text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>링크드인 · 리멤버 · 명함</p>
               </div>
             </button>
 
-            {/* 헬퍼 텍스트 */}
+            {/* 헬퍼텍스트 */}
             <div className="mt-4 rounded-[16px] px-4 py-3.5" style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-soft)' }}>
-              <p className="text-[12px] leading-[1.7]" style={{ color: 'var(--color-text-secondary)' }}>
-                스크린샷을 선택한 후 <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>ChatGPT나 Claude에 이미지를 첨부</span>해서
-                경력/학력 정보를 JSON으로 추출해달라고 하세요. 응답을 붙여넣으면 자동으로 입력돼요.
-              </p>
+              <p className="mb-1.5 text-[12px] font-bold" style={{ color: 'var(--color-text-primary)' }}>잘 찍힌 스크린샷이 정확도를 높여요</p>
+              <ul className="space-y-1">
+                {[
+                  '이름, 직함, 회사명이 화면에 모두 보이도록 캡처해주세요',
+                  '경력 기간(입사·퇴사 연도)이 포함된 화면이면 더 좋아요',
+                  '학력 정보도 함께 있으면 한 번에 입력할 수 있어요',
+                ].map((tip) => (
+                  <li key={tip} className="flex items-start gap-1.5 text-[12px] leading-[1.6]" style={{ color: 'var(--color-text-secondary)' }}>
+                    <span className="mt-[3px] shrink-0 text-[10px]" style={{ color: 'var(--color-accent-dark)' }}>•</span>
+                    {tip}
+                  </li>
+                ))}
+              </ul>
             </div>
           </>
         )}
 
-        {step === 'paste' && (
-          <>
-            {/* 선택된 이미지 썸네일 */}
-            {imagePreview && (
-              <div className="mb-4 flex items-center gap-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={imagePreview} alt="선택된 스크린샷" className="h-14 w-10 rounded-lg object-cover" style={{ border: '1px solid var(--color-border-default)' }} />
-                <div>
-                  <p className="text-[13px] font-semibold" style={{ color: 'var(--color-text-primary)' }}>스크린샷 선택됨</p>
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="text-[12px]"
-                    style={{ color: 'var(--color-accent-dark)' }}
-                  >
-                    다시 선택
-                  </button>
-                </div>
-              </div>
-            )}
-            <input ref={fileInputRef} type="file" accept="image/*" className="sr-only" onChange={handleFileChange} />
-
-            {/* 헬퍼 텍스트 */}
-            <div className="mb-4 rounded-[16px] px-4 py-3.5" style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-soft)' }}>
-              <p className="text-[12px] leading-[1.7]" style={{ color: 'var(--color-text-secondary)' }}>
-                이 이미지를 <span className="font-semibold" style={{ color: 'var(--color-text-primary)' }}>ChatGPT나 Claude에 첨부</span>하고
-                &ldquo;경력과 학력 정보를 JSON으로 추출해줘&rdquo;라고 요청한 뒤, 응답을 아래에 붙여넣으세요.
-              </p>
-            </div>
-
-            {/* 응답 붙여넣기 */}
-            <textarea
-              value={pasteValue}
-              onChange={(e) => { setPasteValue(e.target.value); setParseError('') }}
-              placeholder="LLM 응답을 여기에 붙여넣으세요"
-              rows={5}
-              className="mb-3 w-full resize-none rounded-[16px] px-4 py-3 text-[13px] leading-[1.6] outline-none"
-              style={{
-                background: 'var(--color-bg-soft)',
-                border: '1px solid var(--color-border-default)',
-                color: 'var(--color-text-primary)',
-              }}
-            />
-            {parseError && (
-              <p className="mb-3 text-[12px]" style={{ color: 'var(--color-state-danger-text)' }}>{parseError}</p>
-            )}
-            <button
-              type="button"
-              onClick={handleParse}
-              disabled={!pasteValue.trim()}
-              className="w-full rounded-full py-3.5 text-[14px] font-bold text-white transition-opacity disabled:opacity-40"
-              style={{ background: 'linear-gradient(135deg, var(--color-accent-light), var(--color-accent-dark))' }}
+        {/* 분석 중 */}
+        {step === 'analyzing' && (
+          <div className="flex flex-col items-center justify-center py-16 gap-4">
+            <div
+              className="flex h-14 w-14 items-center justify-center rounded-full"
+              style={{ background: 'var(--color-accent-bg)', color: 'var(--color-accent-dark)' }}
             >
-              하이라이트 항목 추출하기
-            </button>
-          </>
+              <ScanLine size={26} className="animate-pulse" />
+            </div>
+            <div className="text-center">
+              <p className="text-[15px] font-bold" style={{ color: 'var(--color-text-primary)' }}>분석 중이에요</p>
+              <p className="mt-1 text-[13px]" style={{ color: 'var(--color-text-tertiary)' }}>이름 · 경력 · 학력을 인식하고 있어요</p>
+            </div>
+          </div>
         )}
 
+        {/* 결과 선택 */}
         {step === 'preview' && (
           <>
-            <div className="mb-4">
-              <button type="button" onClick={() => setStep('paste')} className="mb-3 text-[12px] font-semibold" style={{ color: 'var(--color-text-tertiary)' }}>
-                ← 다시 붙여넣기
-              </button>
-              <h3 className="text-[20px] font-black" style={{ color: 'var(--color-text-primary)' }}>추가할 항목을 선택하세요</h3>
+            <div className="mb-4 flex items-center gap-3">
+              {imagePreview && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={imagePreview} alt="분석된 스크린샷" className="h-14 w-10 rounded-lg object-cover" style={{ border: '1px solid var(--color-border-default)' }} />
+              )}
+              <div>
+                <p className="text-[14px] font-bold" style={{ color: 'var(--color-text-primary)' }}>분석 완료</p>
+                <button type="button" onClick={() => { setStep('upload'); setImagePreview(null) }} className="text-[12px]" style={{ color: 'var(--color-accent-dark)' }}>
+                  다른 스크린샷 선택
+                </button>
+              </div>
             </div>
+            <input ref={fileInputRef} type="file" accept="image/*" className="sr-only" onChange={handleFileChange} />
+
             <div className="mb-5 space-y-3">
               {items.map((item, index) => {
                 const isCareer = item.type === 'career'
@@ -261,6 +227,7 @@ export function HighlightLlmImportSheet({
                 )
               })}
             </div>
+
             <button
               type="button"
               onClick={handleSave}

@@ -125,6 +125,7 @@ export function PublicProfileWhoTabPage({
     <>
       <PublicProfileWhoIAmSection
         whoIAm={profile.whoIAm}
+        bio={profile.bio}
       />
       <ProfileHighlightsSection
         profile={profile}

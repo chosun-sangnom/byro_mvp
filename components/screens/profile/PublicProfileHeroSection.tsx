@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState, type RefObject } from 'react'
+import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronDown, ChevronUp, Sparkles, X } from 'lucide-react'
+import { Sparkles, X } from 'lucide-react'
 import type { PersonaReason } from '@/lib/personaGen'
 
 type HeroTheme = {
@@ -19,10 +19,6 @@ function normalizeProfileImages(images?: string[], avatarImage?: string) {
 export function ProfileHeroSection({
   profile,
   heroTheme,
-  bioExpanded,
-  bioOverflowing,
-  bioRef,
-  onToggleBio,
   personaText,
   personaReasons,
   personaImage,
@@ -33,16 +29,11 @@ export function ProfileHeroSection({
     linkId?: string
     headline?: string
     age?: number
-    bio: string
     avatarColor?: string
     avatarImage?: string
     profileImages?: string[]
   }
   heroTheme: HeroTheme
-  bioExpanded: boolean
-  bioOverflowing: boolean
-  bioRef: RefObject<HTMLParagraphElement>
-  onToggleBio: () => void
   personaText?: string
   personaReasons?: PersonaReason[]
   personaImage?: string
@@ -71,10 +62,6 @@ export function ProfileHeroSection({
         profile={profile}
         heroTheme={heroTheme}
         activeImage={mainImage}
-        bioExpanded={bioExpanded}
-        bioOverflowing={bioOverflowing}
-        bioRef={bioRef}
-        onToggleBio={onToggleBio}
         onOpenGallery={() => {
           setActiveImageIndex(0)
           setGalleryOpen(true)
@@ -186,10 +173,6 @@ export function ProfileHeroCard({
   profile,
   heroTheme,
   activeImage,
-  bioRef,
-  bioExpanded,
-  bioOverflowing,
-  onToggleBio,
   onOpenGallery,
   personaText,
   personaReasons,
@@ -203,17 +186,12 @@ export function ProfileHeroCard({
     birthDate?: string
     showAge?: boolean
     headline?: string
-    bio: string
     avatarColor?: string
     avatarImage?: string
     profileImages?: string[]
   }
   heroTheme: HeroTheme
   activeImage?: string
-  bioRef: RefObject<HTMLParagraphElement>
-  bioExpanded?: boolean
-  bioOverflowing?: boolean
-  onToggleBio?: () => void
   onOpenGallery?: () => void
   personaText?: string
   personaReasons?: PersonaReason[]
@@ -341,23 +319,6 @@ export function ProfileHeroCard({
             </div>
           </div>
 
-          {personaText && (
-            <>
-              <button
-                type="button"
-                onClick={personaReasons ? () => setPersonaSheetOpen(true) : undefined}
-                className="mt-2 flex items-center gap-1.5 rounded-full border border-white/14 bg-black/28 px-3 py-1.5 backdrop-blur-sm"
-              >
-                <Sparkles size={11} className="text-white/60 shrink-0" />
-                <span className="text-[12px] font-medium italic text-white/80">{personaText}</span>
-                {personaReasons && (
-                  <span className="ml-1 rounded-full bg-white/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white/50">AI</span>
-                )}
-              </button>
-
-              </>
-          )}
-
           {showAge && (
             <div className="mt-0.5 text-[13px] font-semibold text-white/50">
               {profile.age}세
@@ -369,21 +330,19 @@ export function ProfileHeroCard({
             </div>
           )}
 
-          <div className="mt-2.5 max-w-[318px] rounded-[18px] border border-white/12 bg-white/10 px-4 py-3 text-[15px] leading-[1.52] text-white/92 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur-[8px]">
-            <p ref={bioRef} className={bioExpanded ? undefined : 'line-clamp-2'}>
-              {profile.bio}
-            </p>
-            {(bioOverflowing || bioExpanded) && onToggleBio && (
-              <button
-                type="button"
-                onClick={onToggleBio}
-                className="mt-1.5 flex items-center gap-0.5 text-[12px] font-semibold text-white/55"
-              >
-                {bioExpanded ? '접기' : '더보기'}
-                {bioExpanded ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
-              </button>
-            )}
-          </div>
+          {personaText && (
+            <button
+              type="button"
+              onClick={personaReasons ? () => setPersonaSheetOpen(true) : undefined}
+              className="mt-2 flex items-center gap-1.5 rounded-full border border-white/14 bg-black/28 px-3 py-1.5 backdrop-blur-sm"
+            >
+              <Sparkles size={11} className="text-white/60 shrink-0" />
+              <span className="text-[12px] font-medium italic text-white/80">{personaText}</span>
+              {personaReasons && (
+                <span className="ml-1 rounded-full bg-white/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white/50">AI</span>
+              )}
+            </button>
+          )}
 
           <div className="mt-2.5 text-[11px] font-semibold text-white/38">
             byro.io/{profile.linkId}

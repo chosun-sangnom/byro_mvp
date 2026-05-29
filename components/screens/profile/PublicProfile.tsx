@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Copy, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
@@ -54,9 +54,6 @@ export default function PublicProfile({
 
   const [expSheetOpen, setExpSheetOpen] = useState(false)
   const [expDoneModal, setExpDoneModal] = useState(false)
-  const [bioExpanded, setBioExpanded] = useState(false)
-  const [bioOverflowing, setBioOverflowing] = useState(false)
-  const bioRef = useRef<HTMLParagraphElement | null>(null)
   const verifiedHighlights: Highlight[] = [
     ...(showCareerHighlight ? [{
       id: `verified-career-${username}`,
@@ -117,23 +114,6 @@ export default function PublicProfile({
       items: [...verifiedItems, ...manualGroups],
     }
   }).filter((group) => group.items.length > 0)
-
-  useEffect(() => {
-    setBioExpanded(false)
-  }, [profile.bio, username])
-
-  useEffect(() => {
-    const checkOverflow = () => {
-      const element = bioRef.current
-      if (!element) return
-      setBioOverflowing(element.scrollHeight - element.clientHeight > 2)
-    }
-
-    if (bioExpanded) return
-    checkOverflow()
-    window.addEventListener('resize', checkOverflow)
-    return () => window.removeEventListener('resize', checkOverflow)
-  }, [profile.bio, bioExpanded])
 
   const handleExpSubmit = (isAnonymous: boolean) => {
     if (store.experienceKeywords.length === 0) {
@@ -239,10 +219,6 @@ export default function PublicProfile({
         <ProfileHeroSection
           profile={profile}
           heroTheme={heroTheme}
-          bioExpanded={bioExpanded}
-          bioOverflowing={bioOverflowing}
-          bioRef={bioRef}
-          onToggleBio={() => setBioExpanded((prev) => !prev)}
         />
 
         {/* ─── SNS 섹션 ─────────────────────────────── */}

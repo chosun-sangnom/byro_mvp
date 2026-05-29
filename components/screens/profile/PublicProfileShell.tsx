@@ -13,7 +13,7 @@
  * TODO(auth): 실제 인증 연동 시 서버사이드 세션으로 owner 판별 교체
  */
 
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { Pencil, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
@@ -79,8 +79,6 @@ export function PublicProfileShell({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile.linkId])
 
-  const [bioExpanded, setBioExpanded] = useState(false)
-  const [bioOverflowing, setBioOverflowing] = useState(false)
   const [compatibilityOpen, setCompatibilityOpen] = useState(false)
   const [connectionRequestOpen, setConnectionRequestOpen] = useState(false)
   const [connectionMessage, setConnectionMessage] = useState('')
@@ -92,23 +90,6 @@ export function PublicProfileShell({
   const ONE_DAY_MS = 24 * 60 * 60 * 1000
   const submittedAt = store.expSubmittedAt[profile.linkId]
   const alreadySubmitted = !!submittedAt && (Date.now() - submittedAt < ONE_DAY_MS)
-  const bioRef = useRef<HTMLParagraphElement | null>(null)
-
-  useEffect(() => {
-    setBioExpanded(false)
-  }, [profile.bio, username])
-
-  useEffect(() => {
-    const checkOverflow = () => {
-      const element = bioRef.current
-      if (!element) return
-      setBioOverflowing(element.scrollHeight - element.clientHeight > 2)
-    }
-    if (bioExpanded) return
-    checkOverflow()
-    window.addEventListener('resize', checkOverflow)
-    return () => window.removeEventListener('resize', checkOverflow)
-  }, [profile.bio, bioExpanded])
 
   // 관계 탭에서만 "피드백 요청 / 경험 남기기" 버튼 표시 (visitor only)
   const showReputationActions = activeTab === 'reputation' && !isOwnerMode
@@ -163,10 +144,6 @@ export function PublicProfileShell({
           <ProfileHeroSection
             profile={profile}
             heroTheme={profile.heroTheme}
-            bioExpanded={bioExpanded}
-            bioOverflowing={bioOverflowing}
-            bioRef={bioRef}
-            onToggleBio={() => setBioExpanded((prev) => !prev)}
             personaText={persona?.text}
             personaReasons={persona?.reasons}
             personaImage={persona?.image}

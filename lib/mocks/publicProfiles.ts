@@ -202,7 +202,7 @@ export const SAMPLE_PROFILE = {
     // [임시] 목업 기본값
     completenessPercent: 80,
     lockedBlocks: [5],
-    missingTasteCount: 1,
+    missingItems: ['취향 1개'],
   },
   experiences: [
     { id: 'e1', authorName: '김지수', isAnonymous: false, keywords: ['전문성이 느껴져요', '대화하면 생각이 넓어져요'], message: '대화하면 생각이 넓어지고 일도 깔끔하게 풀어가는 분이에요.', date: '2일 전' },
@@ -434,7 +434,7 @@ export const MK_PROFILE = {
     // [임시] 강명구: 전체 블록 오픈 목업
     completenessPercent: 100,
     lockedBlocks: [],
-    missingTasteCount: 0,
+    missingItems: [],
   },
   reputationKeywords: [
     { keyword: '어려울 때 생각나는 사람이에요', count: 9 },
@@ -615,7 +615,7 @@ export const JIMIN_PROFILE = {
     // [임시] 이지민: 3~5번 블록 잠금 목업 (취향 데이터 부족 시나리오)
     completenessPercent: 40,
     lockedBlocks: [3, 4, 5],
-    missingTasteCount: 3,
+    missingItems: ['성향', '하이라이트', '취향 3개'],
   },
   reputationKeywords: [
     { keyword: '전문성이 느껴져요', count: 5 },

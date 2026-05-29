@@ -46,7 +46,11 @@ function buildCompatibilityReport(
   }
 }
 
-function LockedBlockOverlay({ missingTasteCount }: { missingTasteCount: number }) {
+function LockedBlockOverlay({ missingItems }: { missingItems: string[] }) {
+  const hint = missingItems.length > 0
+    ? missingItems.join(' · ') + ' 채우면 열려요'
+    : '프로필을 더 채우면 열려요'
+
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-[22px] backdrop-blur-[2px]">
       <div
@@ -55,8 +59,8 @@ function LockedBlockOverlay({ missingTasteCount }: { missingTasteCount: number }
       >
         <Lock size={14} style={{ color: 'var(--color-text-tertiary)' }} />
       </div>
-      <p className="text-center text-[12px] font-semibold" style={{ color: 'var(--color-text-secondary)' }}>
-        취향 {missingTasteCount}개 더 채우면 열려요
+      <p className="text-center text-[12px] font-semibold px-6" style={{ color: 'var(--color-text-secondary)' }}>
+        {hint}
       </p>
     </div>
   )
@@ -444,7 +448,7 @@ export function PublicProfileCompatibilitySheet({
   const report = buildCompatibilityReport(profileName, whoIAm, life)
   const lockedBlocks = kemi?.lockedBlocks ?? []
   const completenessPercent = kemi?.completenessPercent ?? 100
-  const missingTasteCount = kemi?.missingTasteCount ?? 0
+  const missingItems = kemi?.missingItems ?? []
   const matchItems = kemi?.matchItems ?? []
 
   // 케미 점수: matchItems 수 기반 목업 계산
@@ -632,15 +636,17 @@ export function PublicProfileCompatibilitySheet({
           </h3>
         </div>
 
-        {/* 정확도 프로그레스바 */}
-        <div className="mb-5 rounded-[16px] px-4 py-3" style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-default)' }}>
+        {/* 분석 완성도 */}
+        <div className="mb-5 rounded-[16px] px-4 py-3.5" style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-default)' }}>
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-[12px] font-semibold" style={{ color: 'var(--color-text-secondary)' }}>
-              케미 분석됨
+            <span className="text-[13px] font-bold" style={{ color: 'var(--color-text-primary)' }}>
+              {completenessPercent}% 분석됐어요
             </span>
-            <span className="text-[13px] font-black" style={{ color: 'var(--color-accent-dark)' }}>
-              {completenessPercent}%
-            </span>
+            {completenessPercent < 100 && (
+              <span className="text-[11px]" style={{ color: 'var(--color-text-tertiary)' }}>
+                더 채울수록 더 정확해져요
+              </span>
+            )}
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full" style={{ background: 'var(--color-border-default)' }}>
             <div
@@ -651,10 +657,18 @@ export function PublicProfileCompatibilitySheet({
               }}
             />
           </div>
-          {lockedBlocks.length > 0 && (
-            <p className="mt-2 text-[11px]" style={{ color: 'var(--color-text-tertiary)' }}>
-              취향 {missingTasteCount}개를 더 채우면 전체 리포트가 열려요
-            </p>
+          {missingItems.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {missingItems.map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+                  style={{ background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)' }}
+                >
+                  + {item}
+                </span>
+              ))}
+            </div>
           )}
         </div>
 
@@ -681,7 +695,7 @@ export function PublicProfileCompatibilitySheet({
                 <div style={isLocked ? { filter: 'blur(4px)', userSelect: 'none', pointerEvents: 'none' } : {}}>
                   {content}
                 </div>
-                {isLocked && <LockedBlockOverlay missingTasteCount={missingTasteCount} />}
+                {isLocked && <LockedBlockOverlay missingItems={missingItems} />}
               </div>
             )
           })}

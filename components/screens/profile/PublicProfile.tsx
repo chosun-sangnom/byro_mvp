@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Copy, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'

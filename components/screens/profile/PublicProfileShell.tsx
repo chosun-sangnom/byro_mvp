@@ -169,6 +169,7 @@ export function PublicProfileShell({
             onToggleBio={() => setBioExpanded((prev) => !prev)}
             personaText={persona?.text}
             personaReasons={persona?.reasons}
+            personaImage={persona?.image}
           />
         </div>
 

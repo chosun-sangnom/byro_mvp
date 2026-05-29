@@ -11,6 +11,8 @@ export type PersonaReason = {
 export type PersonaResult = {
   text: string
   reasons: PersonaReason[]
+  // [임시] AI 이미지 생성 모델 연동 전 placeholder. 실제 구현 시 LLM 페르소나 텍스트 → 이미지 생성 API 호출
+  image?: string
 }
 
 export function generatePersona(profile: PublicProfile): PersonaResult {
@@ -35,7 +37,11 @@ export function generatePersona(profile: PublicProfile): PersonaResult {
 
   const text = buildSentence({ music, exercise, cafe, book, topKeyword, titleShort })
 
-  return { text, reasons }
+  // [임시] 페르소나 키워드 기반 일관된 시드로 목업 이미지 생성
+  const seed = [exercise?.label, music?.label, cafe?.label, titleShort].filter(Boolean).join('-') || profile.linkId
+  const image = `https://picsum.photos/seed/${encodeURIComponent(seed)}/640/360`
+
+  return { text, reasons, image }
 }
 
 function extractTitleCore(title: string): string {

@@ -25,6 +25,7 @@ export function ProfileHeroSection({
   onToggleBio,
   personaText,
   personaReasons,
+  personaImage,
 }: {
   profile: {
     name: string
@@ -44,6 +45,7 @@ export function ProfileHeroSection({
   onToggleBio: () => void
   personaText?: string
   personaReasons?: PersonaReason[]
+  personaImage?: string
 }) {
   const galleryImages = normalizeProfileImages(profile.profileImages, profile.avatarImage)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
@@ -79,6 +81,7 @@ export function ProfileHeroSection({
         }}
         personaText={personaText}
         personaReasons={personaReasons}
+        personaImage={personaImage}
       />
 
       {galleryImages.length > 1 && (
@@ -190,6 +193,7 @@ export function ProfileHeroCard({
   onOpenGallery,
   personaText,
   personaReasons,
+  personaImage,
 }: {
   profile: {
     name: string
@@ -213,6 +217,7 @@ export function ProfileHeroCard({
   onOpenGallery?: () => void
   personaText?: string
   personaReasons?: PersonaReason[]
+  personaImage?: string
 }) {
   const [personaSheetOpen, setPersonaSheetOpen] = useState(false)
   const showAge = typeof profile.age === 'number' && profile.showAge !== false
@@ -241,7 +246,24 @@ export function ProfileHeroCard({
                 <X size={16} />
               </button>
 
-              <div className="flex flex-1 flex-col justify-center overflow-y-auto px-6 py-10">
+              {/* [임시] AI 이미지 생성 모델 연동 전 placeholder 이미지 */}
+              {personaImage && (
+                <div className="relative h-[180px] w-full shrink-0 overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={personaImage}
+                    alt="AI 페르소나 이미지"
+                    className="h-full w-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/60" />
+                  <div className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-black/40 px-2 py-1 backdrop-blur-sm">
+                    <Sparkles size={9} className="text-white/60" />
+                    <span className="text-[9px] font-semibold uppercase tracking-wider text-white/60">AI generated</span>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex flex-1 flex-col overflow-y-auto px-6 py-5">
                 <div className="mb-5">
                   <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white/40">
                     <Sparkles size={11} />

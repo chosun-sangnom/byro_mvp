@@ -137,6 +137,8 @@ const normalizeSampleUser = (user: UserState | null): UserState | null => {
     bio: user.bio === 'B2B SaaS 분야에서 5년간 Product Owner로 활동해 온 강명구입니다. 파트너십을 통해 성장을 만들어가는 것을 즐깁니다.'
       ? SAMPLE_PROFILE.bio
       : user.bio,
+    whoIAm: SAMPLE_PROFILE.whoIAm,
+    life: SAMPLE_PROFILE.life,
   }
 }
 

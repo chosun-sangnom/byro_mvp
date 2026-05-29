@@ -146,9 +146,11 @@ export function ProfileFeedbackSection({
 export function ProfileRememberSection({
   total,
   industries,
+  insight,
 }: {
   total: number
   industries: Array<{ name: string; ratio: number }>
+  insight?: import('@/types').RememberInsight
 }) {
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.02}>
@@ -163,7 +165,7 @@ export function ProfileRememberSection({
             총 {total}명
           </div>
         </div>
-        <RememberNetworkGraph total={total} industries={industries} />
+        <RememberNetworkGraph total={total} industries={industries} insight={insight} />
       </div>
     </AnimatedSection>
   )

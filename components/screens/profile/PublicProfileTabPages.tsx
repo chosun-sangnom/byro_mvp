@@ -173,6 +173,7 @@ export function PublicProfileReputationTabPage({
       <ProfileRememberSection
         total={profile.rememberHighlight.total}
         industries={profile.rememberHighlight.industries}
+        insight={profile.rememberHighlight.insight}
       />
       <ProfileReputationSummarySection
         keywordCounts={keywordCounts}

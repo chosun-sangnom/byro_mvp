@@ -1,7 +1,8 @@
 'use client'
 
 import { useRef, useState, type ChangeEvent, type PointerEvent } from 'react'
-import { Camera, Copy, Check, Info } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Camera, Copy, Check, Info, HelpCircle } from 'lucide-react'
 import { Button, NavBar, showToast, TextArea } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
@@ -20,6 +21,7 @@ export function WhoIAmEditScreen({
   const [mbti, setMbti] = useState(initialWhoIAm.mbti)
   const [personality, setPersonality] = useState(initialWhoIAm.personality ?? '')
   const [promptCopied, setPromptCopied] = useState(false)
+  const [promptHelpOpen, setPromptHelpOpen] = useState(false)
 
   const handleSave = () => {
     store.updateUserWhoIAm({ ...initialWhoIAm, mbti, personality: personality.trim() || undefined })
@@ -84,52 +86,81 @@ export function WhoIAmEditScreen({
 
           {/* 성향 */}
           <div>
-            {/* 헬퍼텍스트 */}
-            <div
-              className="mb-4 rounded-[16px] px-4 py-3.5"
-              style={{ background: 'var(--color-accent-bg-subtle)', border: '1px solid var(--color-accent-border-soft)' }}
-            >
-              <p className="mb-1 text-[12px] font-bold" style={{ color: 'var(--color-accent-dark)' }}>
-                AI가 나보다 내 성향을 더 잘 알 수도 있어요
-              </p>
-              <p className="text-[12px] leading-[1.7]" style={{ color: 'var(--color-text-secondary)' }}>
-                평소 AI를 자주 쓴다면, 대화 기록 속에 이미 내 패턴이 담겨 있어요.
-                아래 프롬프트를 복사해서 ChatGPT나 Claude에 붙여넣고,
-                결과물을 그대로 가져오세요.
-              </p>
-            </div>
-
             <div className="flex items-center justify-between mb-2">
               <label className="text-xs text-[var(--color-text-tertiary)]">성향</label>
-              <button
-                type="button"
-                onClick={() => {
-                  const life = user.life
-                  const music = life?.tastes.music[0]
-                  const exercise = life?.daily.exercise[0]
-                  const cafe = life?.tastes.cafes[0]
-                  const lines = ['내 성향을 2-3문장으로 솔직하게 표현해줘. 관계 맺는 방식, 에너지 쓰는 방향, 일하는 스타일 중 하나 이상 포함해줘. 딱딱하지 않게 자연스러운 말투로.', '', '참고 정보:']
-                  if (mbti) lines.push(`- MBTI: ${mbti}`)
-                  if (exercise) lines.push(`- 즐겨 하는 것: ${exercise.label}`)
-                  if (music) lines.push(`- 자주 듣는 음악: ${music.sublabel ?? music.label}`)
-                  if (cafe) lines.push(`- 자주 찾는 곳: ${cafe.label}`)
-                  navigator.clipboard.writeText(lines.join('\n')).then(() => {
-                    setPromptCopied(true)
-                    showToast('프롬프트가 복사됐어요. ChatGPT나 Claude에 붙여넣기 해보세요.')
-                    setTimeout(() => setPromptCopied(false), 2000)
-                  })
-                }}
-                className="flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all"
-                style={{
-                  background: promptCopied ? 'var(--color-state-success-bg)' : 'var(--color-accent-bg-subtle)',
-                  color: promptCopied ? 'var(--color-state-success-text)' : 'var(--color-accent-dark)',
-                  border: `1px solid ${promptCopied ? 'var(--color-state-success-border)' : 'var(--color-accent-border-soft)'}`,
-                }}
-              >
-                {promptCopied ? <Check size={11} /> : <Copy size={11} />}
-                {promptCopied ? '복사됨' : 'AI 프롬프트 복사'}
-              </button>
+              <div className="flex items-center gap-1.5">
+                {/* 도움말 버튼 */}
+                <button
+                  type="button"
+                  onClick={() => setPromptHelpOpen((v) => !v)}
+                  className="flex h-6 w-6 items-center justify-center rounded-full transition-colors"
+                  style={{
+                    background: promptHelpOpen ? 'var(--color-accent-bg-subtle)' : 'transparent',
+                    color: promptHelpOpen ? 'var(--color-accent-dark)' : 'var(--color-text-tertiary)',
+                  }}
+                >
+                  <HelpCircle size={14} />
+                </button>
+                {/* AI 프롬프트 복사 버튼 */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const life = user.life
+                    const music = life?.tastes.music[0]
+                    const exercise = life?.daily.exercise[0]
+                    const cafe = life?.tastes.cafes[0]
+                    const lines = ['내 성향을 2-3문장으로 솔직하게 표현해줘. 관계 맺는 방식, 에너지 쓰는 방향, 일하는 스타일 중 하나 이상 포함해줘. 딱딱하지 않게 자연스러운 말투로.', '', '참고 정보:']
+                    if (mbti) lines.push(`- MBTI: ${mbti}`)
+                    if (exercise) lines.push(`- 즐겨 하는 것: ${exercise.label}`)
+                    if (music) lines.push(`- 자주 듣는 음악: ${music.sublabel ?? music.label}`)
+                    if (cafe) lines.push(`- 자주 찾는 곳: ${cafe.label}`)
+                    navigator.clipboard.writeText(lines.join('\n')).then(() => {
+                      setPromptCopied(true)
+                      showToast('프롬프트가 복사됐어요. ChatGPT나 Claude에 붙여넣기 해보세요.')
+                      setTimeout(() => setPromptCopied(false), 2000)
+                    })
+                  }}
+                  className="flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all"
+                  style={{
+                    background: promptCopied ? 'var(--color-state-success-bg)' : 'var(--color-accent-bg-subtle)',
+                    color: promptCopied ? 'var(--color-state-success-text)' : 'var(--color-accent-dark)',
+                    border: `1px solid ${promptCopied ? 'var(--color-state-success-border)' : 'var(--color-accent-border-soft)'}`,
+                  }}
+                >
+                  {promptCopied ? <Check size={11} /> : <Copy size={11} />}
+                  {promptCopied ? '복사됨' : 'AI 프롬프트 복사'}
+                </button>
+              </div>
             </div>
+
+            {/* 도움말 카드 (토글) */}
+            <AnimatePresence>
+              {promptHelpOpen && (
+                <motion.div
+                  key="prompt-help"
+                  initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                  animate={{ opacity: 1, height: 'auto', marginBottom: 12 }}
+                  exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                  transition={{ duration: 0.2, ease: 'easeInOut' }}
+                  className="overflow-hidden"
+                >
+                  <div
+                    className="rounded-[16px] px-4 py-3.5"
+                    style={{ background: 'var(--color-accent-bg-subtle)', border: '1px solid var(--color-accent-border-soft)' }}
+                  >
+                    <p className="mb-1 text-[12px] font-bold" style={{ color: 'var(--color-accent-dark)' }}>
+                      AI가 나보다 내 성향을 더 잘 알 수도 있어요
+                    </p>
+                    <p className="text-[12px] leading-[1.7]" style={{ color: 'var(--color-text-secondary)' }}>
+                      평소 AI를 자주 쓴다면, 대화 기록 속에 이미 내 패턴이 담겨 있어요.
+                      위 버튼을 눌러 프롬프트를 복사한 뒤 ChatGPT나 Claude에 붙여넣고,
+                      결과물을 아래에 그대로 붙여넣으세요.
+                    </p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             <TextArea
               value={personality}
               onChange={setPersonality}

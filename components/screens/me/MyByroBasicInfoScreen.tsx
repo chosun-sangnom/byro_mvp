@@ -84,6 +84,21 @@ export function WhoIAmEditScreen({
 
           {/* 성향 */}
           <div>
+            {/* 헬퍼텍스트 */}
+            <div
+              className="mb-4 rounded-[16px] px-4 py-3.5"
+              style={{ background: 'var(--color-accent-bg-subtle)', border: '1px solid var(--color-accent-border-soft)' }}
+            >
+              <p className="mb-1 text-[12px] font-bold" style={{ color: 'var(--color-accent-dark)' }}>
+                AI가 나보다 내 성향을 더 잘 알 수도 있어요
+              </p>
+              <p className="text-[12px] leading-[1.7]" style={{ color: 'var(--color-text-secondary)' }}>
+                평소 AI를 자주 쓴다면, 대화 기록 속에 이미 내 패턴이 담겨 있어요.
+                아래 프롬프트를 복사해서 ChatGPT나 Claude에 붙여넣고,
+                결과물을 그대로 가져오세요.
+              </p>
+            </div>
+
             <div className="flex items-center justify-between mb-2">
               <label className="text-xs text-[var(--color-text-tertiary)]">성향</label>
               <button

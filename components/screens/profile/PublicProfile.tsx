@@ -1,22 +1,16 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Copy, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { showToast } from '@/components/ui'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
-import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import type { Highlight } from '@/types'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
 import { ProfileConnectSection } from '@/components/screens/profile/PublicProfileSections'
 import { ProfileHeroSection } from '@/components/screens/profile/PublicProfileHeroSection'
 import { ProfileSnsSection } from '@/components/screens/profile/PublicProfileSnsSection'
 import { ProfileHighlightsSection } from '@/components/screens/profile/PublicProfileHighlightsSection'
-import {
-  ExperienceBottomSheet,
-  ExperienceDoneModal,
-} from '@/components/screens/profile/PublicProfileOverlays'
 
 interface PublicProfileProps {
   username: string
@@ -52,8 +46,6 @@ export default function PublicProfile({
   const showCareerHighlight = username !== 'mk'
   const showAirlineHighlight = !['jiminlee', 'mk'].includes(username)
 
-  const [expSheetOpen, setExpSheetOpen] = useState(false)
-  const [expDoneModal, setExpDoneModal] = useState(false)
   const verifiedHighlights: Highlight[] = [
     ...(showCareerHighlight ? [{
       id: `verified-career-${username}`,
@@ -115,26 +107,6 @@ export default function PublicProfile({
     }
   }).filter((group) => group.items.length > 0)
 
-  const handleExpSubmit = (isAnonymous: boolean) => {
-    if (store.experienceKeywords.length === 0) {
-      showToast('키워드를 하나 이상 선택해주세요')
-      return
-    }
-    store.submitExperience(profile.linkId, {
-      authorName: isAnonymous ? null : (store.user?.name ?? null),
-      isAnonymous: isAnonymous || !store.isLoggedIn,
-      keywords: store.experienceKeywords,
-      message: store.experienceMessage,
-    })
-    store.markExpSubmitted(profile.linkId)
-    store.clearExperience()
-    setExpSheetOpen(false)
-    setExpDoneModal(true)
-  }
-
-  const ONE_DAY_MS = 24 * 60 * 60 * 1000
-  const submittedAt = store.expSubmittedAt[profile.linkId]
-  const alreadySubmitted = !!submittedAt && (Date.now() - submittedAt < ONE_DAY_MS)
   const publicProfileUrl = `https://byro.io/${profile.linkId}`
 
   const handleCopyProfileLink = async () => {
@@ -243,16 +215,8 @@ export default function PublicProfile({
 
         <ProfileConnectSection
           isOwnerMode={isOwnerMode}
-          alreadySubmitted={alreadySubmitted}
           contactChannels={contactChannels}
           onRequestFeedback={() => showToast('피드백 요청을 보냈어요!')}
-          onLeaveExperience={() => {
-            if (alreadySubmitted) {
-              showToast('오늘 이미 경험을 남겼어요. 내일 다시 남길 수 있어요')
-              return
-            }
-            setExpSheetOpen(true)
-          }}
           onChannelClick={(channel) => {
             if (!channel.enabled) {
               showToast(isOwnerMode ? 'Byro 편집에서 연동을 활성화해 주세요' : '비활성화된 연락 수단이에요')
@@ -269,47 +233,6 @@ export default function PublicProfile({
         <div className="h-24" />
       </div>
 
-      <ExperienceBottomSheet
-        open={expSheetOpen}
-        profileName={profile.name}
-        isLoggedIn={store.isLoggedIn}
-        experienceKeywordGroups={REPUTATION_KEYWORD_GROUPS}
-        selectedKeywords={store.experienceKeywords}
-        experienceMessage={store.experienceMessage}
-        onToggleKeyword={(keyword) => {
-          if (!store.experienceKeywords.includes(keyword) && store.experienceKeywords.length >= 3) {
-            showToast('키워드는 최대 3개까지 선택할 수 있어요')
-            return
-          }
-          store.setExperienceKeyword(keyword)
-        }}
-        onMessageChange={store.setExperienceMessage}
-        onSubmit={handleExpSubmit}
-        onLogin={() => {
-          setExpSheetOpen(false)
-          store.login()
-        }}
-        onClose={() => setExpSheetOpen(false)}
-      />
-
-      <ExperienceDoneModal
-        open={expDoneModal}
-        profileName={profile.name}
-        isLoggedIn={store.isLoggedIn}
-        onRequestExperience={() => {
-          setExpDoneModal(false)
-          showToast(`${profile.name} 님에게 경험 요청을 보냈어요!`)
-        }}
-        onCreateByro={() => {
-          setExpDoneModal(false)
-          router.push('/signup')
-        }}
-        onLogin={() => {
-          setExpDoneModal(false)
-          store.login()
-        }}
-        onClose={() => setExpDoneModal(false)}
-      />
     </div>
   )
 }

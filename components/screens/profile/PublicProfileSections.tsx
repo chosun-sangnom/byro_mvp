@@ -174,42 +174,27 @@ export function ProfileRememberSection({
 
 export function ProfileConnectSection({
   isOwnerMode,
-  alreadySubmitted,
   contactChannels,
   onRequestFeedback,
-  onLeaveExperience,
   onChannelClick,
 }: {
   isOwnerMode: boolean
-  alreadySubmitted: boolean
   contactChannels: ContactChannel[]
   onRequestFeedback: () => void
-  onLeaveExperience: () => void
   onChannelClick: (channel: ContactChannel) => void
 }) {
   return (
     <AnimatedSection className="px-5 pt-6 pb-8" delay={0.1}>
       <SectionTitle title="Connect" />
       {!isOwnerMode && (
-        <div className="mb-6 flex gap-2">
+        <div className="mb-6">
           <motion.button
             onClick={onRequestFeedback}
             whileTap={{ scale: 0.96 }}
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-            className="flex-1 rounded-full border border-[var(--color-border-default)] py-2.5 text-[13px] font-semibold text-[var(--color-text-secondary)]"
+            className="w-full rounded-full border border-[var(--color-border-default)] py-2.5 text-[13px] font-semibold text-[var(--color-text-secondary)]"
           >
             피드백 요청
-          </motion.button>
-          <motion.button
-            onClick={onLeaveExperience}
-            whileTap={{ scale: 0.96 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-            className="flex-1 rounded-full py-2.5 text-[13px] font-semibold"
-            style={alreadySubmitted
-              ? { border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)' }
-              : { backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
-          >
-            {alreadySubmitted ? '경험 남겼어요 ✓' : '경험 남겨요'}
           </motion.button>
         </div>
       )}

@@ -152,6 +152,11 @@ export interface KemiMatchItem {
   category: 'taste' | 'place' | 'lifestyle' | 'identity'
 }
 
+export interface KemiLockedBlock {
+  index: number          // 블록 인덱스 (1~5)
+  missingItems: string[] // 이 블록을 열기 위해 필요한 항목들
+}
+
 export interface KemiData {
   matchCount: number
   matchItems: KemiMatchItem[]
@@ -159,8 +164,8 @@ export interface KemiData {
   aiCopy: string
   // [임시] 목업 전용. 실제 구현 시 viewer 프로필 완성도 기반으로 서버에서 계산
   completenessPercent: number
-  lockedBlocks: number[]   // 잠긴 블록 인덱스 (1~5)
-  // 잠금 해제에 필요한 항목들 (예: ['성향', '하이라이트 1개', '취향 2개'])
+  lockedBlocks: KemiLockedBlock[]  // 블록별 잠금 이유
+  // 완성도 바 하단 힌트용 전체 부족 항목 (lockedBlocks에서 파생 가능하지만 편의상 유지)
   missingItems: string[]
 }
 

@@ -450,6 +450,7 @@ export function PublicProfileCompatibilitySheet({
   const completenessPercent = kemi?.completenessPercent ?? 100
   const missingItems = kemi?.missingItems ?? []
   const matchItems = kemi?.matchItems ?? []
+  const lockedBlockMap = Object.fromEntries(lockedBlocks.map((b) => [b.index, b.missingItems]))
 
   // 케미 점수: matchItems 수 기반 목업 계산
   const chemistryScore = Math.min(52 + matchItems.length * 7 + Math.round(completenessPercent / 8), 98)
@@ -676,7 +677,8 @@ export function PublicProfileCompatibilitySheet({
         <div className="space-y-3">
           {blocks.map(({ index, content }) => {
             const meta = BLOCK_META[index - 1]
-            const isLocked = lockedBlocks.includes(index)
+            const blockMissing = lockedBlockMap[index]
+            const isLocked = blockMissing !== undefined
             const Icon = meta.Icon
 
             return (
@@ -695,7 +697,7 @@ export function PublicProfileCompatibilitySheet({
                 <div style={isLocked ? { filter: 'blur(4px)', userSelect: 'none', pointerEvents: 'none' } : {}}>
                   {content}
                 </div>
-                {isLocked && <LockedBlockOverlay missingItems={missingItems} />}
+                {isLocked && <LockedBlockOverlay missingItems={blockMissing} />}
               </div>
             )
           })}

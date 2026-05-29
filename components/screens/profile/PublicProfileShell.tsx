@@ -314,6 +314,7 @@ export function PublicProfileShell({
           open={compatibilityOpen}
           onClose={() => setCompatibilityOpen(false)}
           profileName={profile.name}
+          profileAvatar={profile.profileImages?.[0] ?? profile.avatarImage}
           whoIAm={profile.whoIAm}
           life={profile.life}
           kemi={profile.kemi}

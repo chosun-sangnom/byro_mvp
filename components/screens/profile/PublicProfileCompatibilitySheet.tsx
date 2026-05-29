@@ -1,8 +1,9 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import { Lock, MessageCircle, Share2, Sparkles, Star, Users, Handshake } from 'lucide-react'
+import { Download, Lock, MessageCircle, Share2, Sparkles, Star, Users, Handshake } from 'lucide-react'
 import { BottomSheet, showToast } from '@/components/ui'
+import { useByroStore } from '@/store/useByroStore'
 import type { KemiData, PublicProfileLife, PublicProfileWhoIAm } from '@/types'
 import {
   getLifestyleSignals,
@@ -69,19 +70,72 @@ const BLOCK_META = [
   { index: 5, label: '연결가치', Icon: Star },
 ]
 
-// [임시] 폴라로이드 카드 — html2canvas 캡처용. CSS 변수 미사용(캡처 시 미지원), 오프스크린 렌더링
+// ── 폴라로이드 카드 (인라인 표시 + html2canvas 캡처용) ─────────────────────────
+
+function AvatarCircle({
+  src,
+  name,
+  size,
+  fontSize,
+}: {
+  src?: string
+  name: string
+  size: number
+  fontSize: number
+}) {
+  if (src) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={src}
+        alt={name}
+        style={{
+          width: size, height: size,
+          borderRadius: '50%',
+          objectFit: 'cover',
+          border: '3px solid #FFFFFF',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.14)',
+          flexShrink: 0,
+        }}
+      />
+    )
+  }
+  return (
+    <div style={{
+      width: size, height: size,
+      borderRadius: '50%',
+      background: 'linear-gradient(135deg, #BFDBFE, #2563EB)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      border: '3px solid #FFFFFF',
+      boxShadow: '0 2px 10px rgba(0,0,0,0.14)',
+      flexShrink: 0,
+    }}>
+      <span style={{ fontSize, fontWeight: 900, color: '#fff', lineHeight: 1 }}>
+        {name.charAt(0)}
+      </span>
+    </div>
+  )
+}
+
+// [임시] 폴라로이드 카드 — html2canvas 캡처용. CSS 변수 미사용(캡처 시 미지원)
 function PolaroidCard({
   cardRef,
+  viewerName,
+  viewerAvatar,
   profileName,
+  profileAvatar,
+  chemistryScore,
   matchItems,
-  summary,
 }: {
   cardRef: React.RefObject<HTMLDivElement>
+  viewerName: string
+  viewerAvatar?: string
   profileName: string
+  profileAvatar?: string
+  chemistryScore: number
   matchItems: { label: string; category: string }[]
-  summary: string
 }) {
-  const previewSummary = summary.length > 110 ? summary.slice(0, 110) + '…' : summary
+  const filledDots = Math.round(chemistryScore / 10)
 
   return (
     <div
@@ -92,74 +146,265 @@ function PolaroidCard({
         top: 0,
         width: '320px',
         background: '#FFFFFF',
-        borderRadius: '20px',
-        padding: '28px 24px 22px',
+        borderRadius: '18px',
+        paddingBottom: '32px',
         fontFamily: "'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif",
+        boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+        overflow: 'hidden',
       }}
     >
-      {/* 상단 브랜딩 */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '18px' }}>
-        <div style={{
-          width: '20px', height: '20px',
-          background: '#2563EB', borderRadius: '6px',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <span style={{ color: '#fff', fontSize: '10px', fontWeight: 900, lineHeight: 1 }}>B</span>
+      {/* 상단 그라디언트 배너 */}
+      <div style={{
+        background: 'linear-gradient(135deg, #1D4ED8 0%, #7C3AED 100%)',
+        padding: '24px 24px 28px',
+      }}>
+        {/* 브랜딩 */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '20px' }}>
+          <div style={{
+            width: '20px', height: '20px',
+            background: 'rgba(255,255,255,0.25)',
+            borderRadius: '6px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <span style={{ color: '#fff', fontSize: '10px', fontWeight: 900, lineHeight: 1 }}>B</span>
+          </div>
+          <span style={{ fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.9)', letterSpacing: '0.06em' }}>byro</span>
+          <span style={{ marginLeft: 'auto', fontSize: '10px', color: 'rgba(255,255,255,0.55)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Kemi Report</span>
         </div>
-        <span style={{ fontSize: '12px', fontWeight: 700, color: '#636366', letterSpacing: '0.04em' }}>byro</span>
-        <span style={{ marginLeft: 'auto', fontSize: '11px', color: '#98989D' }}>케미 리포트</span>
+
+        {/* 양쪽 아바타 */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0px' }}>
+          <AvatarCircle src={viewerAvatar} name={viewerName} size={72} fontSize={26} />
+          {/* 스파크 배지 */}
+          <div style={{
+            width: '32px', height: '32px',
+            background: '#FFFFFF',
+            borderRadius: '50%',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 -8px',
+            zIndex: 1,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            flexShrink: 0,
+          }}>
+            <span style={{ fontSize: '14px', lineHeight: 1 }}>✦</span>
+          </div>
+          <AvatarCircle src={profileAvatar} name={profileName} size={72} fontSize={26} />
+        </div>
+
+        {/* 이름 */}
+        <p style={{
+          marginTop: '14px',
+          textAlign: 'center',
+          fontSize: '15px',
+          fontWeight: 800,
+          color: '#FFFFFF',
+          lineHeight: 1.3,
+        }}>
+          {viewerName} × {profileName}
+        </p>
       </div>
 
-      {/* 제목 */}
-      <p style={{ fontSize: '21px', fontWeight: 900, color: '#1C1C1E', lineHeight: 1.3, marginBottom: '16px' }}>
-        {profileName}님과<br />이런 공통점이 있어요 ✨
-      </p>
-
-      {/* 공통점 칩 */}
-      {matchItems.length > 0 && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px', marginBottom: '14px' }}>
-          {matchItems.slice(0, 6).map((item) => (
-            <span key={item.label} style={{
-              background: '#EFF6FF',
-              color: '#2563EB',
-              border: '1px solid rgba(37,99,235,0.20)',
-              borderRadius: '9999px',
-              padding: '4px 11px',
-              fontSize: '12px',
-              fontWeight: 600,
-            }}>
-              {item.label}
-            </span>
-          ))}
+      {/* 하단 흰색 영역 */}
+      <div style={{ padding: '20px 22px 0' }}>
+        {/* 케미 점수 */}
+        <div style={{ marginBottom: '16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#636366', letterSpacing: '0.06em', textTransform: 'uppercase' }}>케미 점수</span>
+            <span style={{ fontSize: '18px', fontWeight: 900, color: '#2563EB' }}>{chemistryScore}%</span>
+          </div>
+          {/* 도트 바 */}
+          <div style={{ display: 'flex', gap: '4px' }}>
+            {Array.from({ length: 10 }).map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  flex: 1, height: '6px', borderRadius: '3px',
+                  background: i < filledDots
+                    ? `linear-gradient(90deg, #2563EB ${(i / 10) * 100}%, #7C3AED 100%)`
+                    : '#E5E7EB',
+                }}
+              />
+            ))}
+          </div>
         </div>
-      )}
 
-      {/* 요약 */}
-      <p style={{ fontSize: '12px', color: '#636366', lineHeight: 1.7, marginBottom: '20px' }}>
-        {previewSummary}
-      </p>
+        {/* 공통점 태그 */}
+        {matchItems.length > 0 && (
+          <div>
+            <p style={{ fontSize: '11px', fontWeight: 700, color: '#636366', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '8px' }}>
+              공통점
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+              {matchItems.slice(0, 6).map((item) => (
+                <span key={item.label} style={{
+                  background: '#EFF6FF',
+                  color: '#2563EB',
+                  border: '1px solid rgba(37,99,235,0.18)',
+                  borderRadius: '9999px',
+                  padding: '4px 11px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                }}>
+                  {item.label}
+                </span>
+              ))}
+              {matchItems.length > 6 && (
+                <span style={{
+                  background: '#F3F4F6',
+                  color: '#6B7280',
+                  borderRadius: '9999px',
+                  padding: '4px 11px',
+                  fontSize: '12px',
+                  fontWeight: 600,
+                }}>
+                  +{matchItems.length - 6}
+                </span>
+              )}
+            </div>
+          </div>
+        )}
 
-      {/* 하단 */}
-      <div style={{
-        borderTop: '1px solid #EEEEF0',
-        paddingTop: '14px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-      }}>
-        <span style={{ fontSize: '11px', color: '#98989D' }}>byro.app에서 나도 확인하기</span>
-        <div style={{ background: '#EFF6FF', borderRadius: '8px', padding: '4px 9px' }}>
-          <span style={{ fontSize: '11px', fontWeight: 700, color: '#2563EB' }}>→</span>
+        {/* 구분선 + 하단 CTA */}
+        <div style={{
+          marginTop: '18px',
+          paddingTop: '14px',
+          borderTop: '1px solid #F0F0F2',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
+          <span style={{ fontSize: '11px', color: '#98989D' }}>byro.app에서 나도 확인하기</span>
+          <div style={{ background: '#EFF6FF', borderRadius: '8px', padding: '4px 10px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, color: '#2563EB' }}>→</span>
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
+// ── 화면에 보이는 폴라로이드 미리보기 카드 ────────────────────────────────────
+
+function PolaroidPreviewCard({
+  viewerName,
+  viewerAvatar,
+  profileName,
+  profileAvatar,
+  chemistryScore,
+  matchItems,
+}: {
+  viewerName: string
+  viewerAvatar?: string
+  profileName: string
+  profileAvatar?: string
+  chemistryScore: number
+  matchItems: { label: string; category: string }[]
+}) {
+  const filledDots = Math.round(chemistryScore / 10)
+
+  return (
+    <div
+      className="overflow-hidden rounded-[18px]"
+      style={{ border: '1px solid var(--color-border-default)', background: 'var(--color-bg-surface)', boxShadow: '0 4px 20px rgba(0,0,0,0.10)' }}
+    >
+      {/* 그라디언트 배너 */}
+      <div style={{ background: 'linear-gradient(135deg, #1D4ED8 0%, #7C3AED 100%)', padding: '20px 20px 24px' }}>
+        {/* 브랜딩 */}
+        <div className="mb-4 flex items-center gap-1.5">
+          <div className="flex h-5 w-5 items-center justify-center rounded-[5px] bg-white/25">
+            <span className="text-[10px] font-black leading-none text-white">B</span>
+          </div>
+          <span className="text-[12px] font-bold tracking-[0.06em] text-white/90">byro</span>
+          <span className="ml-auto text-[10px] uppercase tracking-[0.08em] text-white/50">Kemi Report</span>
+        </div>
+
+        {/* 양쪽 아바타 */}
+        <div className="flex items-center justify-center">
+          {/* 내 아바타 */}
+          <div className="relative">
+            {viewerAvatar ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={viewerAvatar} alt={viewerName} className="h-[68px] w-[68px] rounded-full object-cover" style={{ border: '3px solid #fff', boxShadow: '0 2px 10px rgba(0,0,0,0.14)' }} />
+            ) : (
+              <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full text-[24px] font-black text-white" style={{ background: 'linear-gradient(135deg, #93C5FD, #1D4ED8)', border: '3px solid #fff', boxShadow: '0 2px 10px rgba(0,0,0,0.14)' }}>
+                {viewerName.charAt(0)}
+              </div>
+            )}
+            <div className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px]" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}>나</div>
+          </div>
+
+          {/* 중앙 스파크 */}
+          <div className="z-10 mx-[-6px] flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-[14px]" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
+            ✦
+          </div>
+
+          {/* 상대 아바타 */}
+          <div className="relative">
+            {profileAvatar ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={profileAvatar} alt={profileName} className="h-[68px] w-[68px] rounded-full object-cover" style={{ border: '3px solid #fff', boxShadow: '0 2px 10px rgba(0,0,0,0.14)' }} />
+            ) : (
+              <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full text-[24px] font-black text-white" style={{ background: 'linear-gradient(135deg, #C4B5FD, #7C3AED)', border: '3px solid #fff', boxShadow: '0 2px 10px rgba(0,0,0,0.14)' }}>
+                {profileName.charAt(0)}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 이름 */}
+        <p className="mt-3 text-center text-[14px] font-black text-white">
+          {viewerName} × {profileName}
+        </p>
+      </div>
+
+      {/* 하단 흰색 영역 */}
+      <div className="px-5 py-4">
+        {/* 케미 점수 */}
+        <div className="mb-4">
+          <div className="mb-2 flex items-center justify-between">
+            <span className="text-[11px] font-bold uppercase tracking-[0.08em]" style={{ color: 'var(--color-text-tertiary)' }}>케미 점수</span>
+            <span className="text-[18px] font-black" style={{ color: 'var(--color-accent-dark)' }}>{chemistryScore}%</span>
+          </div>
+          <div className="flex gap-1">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <div
+                key={i}
+                className="h-1.5 flex-1 rounded-full transition-all"
+                style={{
+                  background: i < filledDots
+                    ? 'linear-gradient(90deg, #2563EB, #7C3AED)'
+                    : 'var(--color-border-default)',
+                }}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* 공통점 태그 */}
+        {matchItems.length > 0 && (
+          <div>
+            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.08em]" style={{ color: 'var(--color-text-tertiary)' }}>공통점</p>
+            <div className="flex flex-wrap gap-1.5">
+              {matchItems.slice(0, 6).map((item) => (
+                <span key={item.label} className="chip-metric">{item.label}</span>
+              ))}
+              {matchItems.length > 6 && (
+                <span className="chip-metric">+{matchItems.length - 6}</span>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+
 export function PublicProfileCompatibilitySheet({
   open,
   onClose,
   profileName,
+  profileAvatar,
   whoIAm,
   life,
   kemi,
@@ -167,10 +412,15 @@ export function PublicProfileCompatibilitySheet({
   open: boolean
   onClose: () => void
   profileName: string
+  profileAvatar?: string
   whoIAm: PublicProfileWhoIAm
   life?: PublicProfileLife
   kemi?: KemiData
 }) {
+  const store = useByroStore()
+  const viewerName = store.user?.name ?? '나'
+  const viewerAvatar = store.user?.profileImages?.[0] ?? store.user?.avatarImage
+
   const polaroidRef = useRef<HTMLDivElement>(null)
   const [sharing, setSharing] = useState(false)
 
@@ -179,6 +429,9 @@ export function PublicProfileCompatibilitySheet({
   const completenessPercent = kemi?.completenessPercent ?? 100
   const missingTasteCount = kemi?.missingTasteCount ?? 0
   const matchItems = kemi?.matchItems ?? []
+
+  // 케미 점수: matchItems 수 기반 목업 계산
+  const chemistryScore = Math.min(52 + matchItems.length * 7 + Math.round(completenessPercent / 8), 98)
 
   // [임시] 폴라로이드 이미지 캡처 후 공유 (html2canvas + Web Share API)
   const handleShare = async () => {
@@ -204,7 +457,6 @@ export function PublicProfileCompatibilitySheet({
                 text: `byro에서 ${profileName}님과의 공통점을 발견했어요!`,
               })
             } else {
-              // 공유 미지원 환경 → 이미지 다운로드
               const url = URL.createObjectURL(blob)
               const a = document.createElement('a')
               a.href = url
@@ -215,7 +467,7 @@ export function PublicProfileCompatibilitySheet({
             }
             resolve()
           } catch {
-            resolve() // 사용자가 공유 취소한 경우
+            resolve()
           }
         }, 'image/png')
       })
@@ -231,17 +483,17 @@ export function PublicProfileCompatibilitySheet({
       index: 1,
       content: (
         <>
-          <p className="text-[13px] leading-[1.7]" style={{ color: 'var(--color-text-secondary)' }}>
-            {report.summary}
-          </p>
-          {matchItems.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {matchItems.map((item) => (
-                <span key={item.label} className="chip-metric">{item.label}</span>
-              ))}
-            </div>
-          )}
-          {/* [임시] 공통점 폴라로이드 바이럴 공유 버튼 */}
+          {/* 폴라로이드 미리보기 카드 */}
+          <PolaroidPreviewCard
+            viewerName={viewerName}
+            viewerAvatar={viewerAvatar}
+            profileName={profileName}
+            profileAvatar={profileAvatar}
+            chemistryScore={chemistryScore}
+            matchItems={matchItems}
+          />
+
+          {/* 공유 버튼 */}
           <button
             type="button"
             onClick={handleShare}
@@ -253,9 +505,14 @@ export function PublicProfileCompatibilitySheet({
               color: 'var(--color-accent-dark)',
             }}
           >
-            <Share2 size={14} />
-            {sharing ? '이미지 생성 중…' : '공통점 공유하기'}
+            {sharing ? <Download size={14} /> : <Share2 size={14} />}
+            {sharing ? '이미지 생성 중…' : '이미지로 저장하기'}
           </button>
+
+          {/* 요약 텍스트 */}
+          <p className="mt-3 text-[13px] leading-[1.7]" style={{ color: 'var(--color-text-secondary)' }}>
+            {report.summary}
+          </p>
         </>
       ),
     },
@@ -366,9 +623,12 @@ export function PublicProfileCompatibilitySheet({
         {/* [임시] 폴라로이드 캡처용 오프스크린 카드 */}
         <PolaroidCard
           cardRef={polaroidRef}
+          viewerName={viewerName}
+          viewerAvatar={viewerAvatar}
           profileName={profileName}
+          profileAvatar={profileAvatar}
+          chemistryScore={chemistryScore}
           matchItems={matchItems}
-          summary={report.summary}
         />
       </div>
     </BottomSheet>

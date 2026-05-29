@@ -22,9 +22,7 @@ export const SAMPLE_PROFILE = {
   school: 'KAIST 경영학과 졸업',
   bio: 'B2B SaaS 분야에서 5년간 Product Owner로 활동해 온 강민준입니다. 파트너십을 통해 성장을 만들어가는 것을 즐깁니다.',
   whoIAm: {
-    mbti: 'ENTJ',
-    // [임시] 목업 성향 데이터
-    personality: '관계에서 처음엔 거리를 두지만 신뢰가 쌓이면 깊이 연결되는 편이에요. 일할 때는 방향이 먼저고, 실행은 빠르게 가는 스타일입니다.',
+    mbti: 'ENFP',
   },
   birthDate: '1992-06-14',
   birthTime: '08:30',
@@ -33,52 +31,53 @@ export const SAMPLE_PROFILE = {
   life: {
     daily: {
       exercise: [
-        { label: '러닝', posterUrl: 'https://picsum.photos/seed/running_gmj/80/80' },
-        { label: '골프', posterUrl: 'https://picsum.photos/seed/golf_gmj/80/80' },
+        { label: '필라테스', posterUrl: 'https://picsum.photos/seed/pilates_gmj/80/80' },
+        { label: '산책', posterUrl: 'https://picsum.photos/seed/walk_gmj/80/80' },
       ],
-      pet: '없음',
+      pet: '강아지',
+      petName: '두부',
     },
     tastes: {
       // TODO(real API): posterUrl from TMDB API — image.tmdb.org/t/p/w185/{poster_path}
       movies: [
-        { label: '머니볼', sublabel: '2011', posterUrl: 'https://picsum.photos/seed/moneyball/80/112' },
-        { label: '소셜 네트워크', sublabel: '2010', posterUrl: 'https://picsum.photos/seed/socialnetwork/80/112' },
-        { label: '나 홀로 집에 2', sublabel: '1992', posterUrl: 'https://picsum.photos/seed/homealone2/80/112' },
+        { label: '이터널 선샤인', sublabel: '2004', posterUrl: 'https://picsum.photos/seed/eternalsunshine_gmj/80/112' },
+        { label: '작은 아씨들', sublabel: '2019', posterUrl: 'https://picsum.photos/seed/littlewomen_gmj/80/112' },
+        { label: '비포 선셋', sublabel: '2004', posterUrl: 'https://picsum.photos/seed/beforesunset_gmj/80/112' },
       ],
       // TODO(real API): posterUrl from Spotify API — i.scdn.co album art URL
       music: [
-        { label: 'Tomboy', sublabel: '혁오', posterUrl: 'https://picsum.photos/seed/tomboy_hyukoh/80/80', previewUrl: 'https://p.scdn.co/mp3-preview/e195d59e5dc7869fa3657f58e35748c3e48b7e3f' },
-        { label: 'Everything', sublabel: '검정치마', posterUrl: 'https://picsum.photos/seed/blackskirts/80/80', previewUrl: 'https://p.scdn.co/mp3-preview/5b1b3a88c94516e3b1e25a0de7f0dd17e89c7c9f' },
-        { label: 'Replay', sublabel: '김동률', posterUrl: 'https://picsum.photos/seed/kimdongryul/80/80', previewUrl: 'https://p.scdn.co/mp3-preview/e30a8d1f9285c5e30a8d1f9285c5e300' },
+        { label: 'Square', sublabel: '백예린', posterUrl: 'https://picsum.photos/seed/square_gmj/80/80' },
+        { label: 'Ditto', sublabel: 'NewJeans', posterUrl: 'https://picsum.photos/seed/ditto_gmj/80/80' },
+        { label: 'Beautiful', sublabel: 'Crush', posterUrl: 'https://picsum.photos/seed/beautiful_gmj/80/80' },
       ],
       // TODO(real API): posterUrl from 알라딘 API — cover image URL
       books: [
-        { label: '린 스타트업', sublabel: '에릭 리스', posterUrl: 'https://picsum.photos/seed/leanstartup/80/112' },
-        { label: '제로 투 원', sublabel: '피터 틸', posterUrl: 'https://picsum.photos/seed/zerotone/80/112' },
-        { label: '좋은 전략 나쁜 전략', sublabel: '리처드 루멜트', posterUrl: 'https://picsum.photos/seed/goodstrategy/80/112' },
+        { label: '아무튼, 여름', sublabel: '위고', posterUrl: 'https://picsum.photos/seed/anyhow_gmj/80/112' },
+        { label: '보통의 언어들', sublabel: '김이나', posterUrl: 'https://picsum.photos/seed/ordinary_gmj/80/112' },
+        { label: '불편한 편의점', sublabel: '김호연', posterUrl: 'https://picsum.photos/seed/inconvenient_gmj/80/112' },
       ],
       plays: [
-        { label: '렛미플라이', sublabel: '뮤지컬', posterUrl: 'https://picsum.photos/seed/letmefly_gmj/80/112' },
+        { label: '레드북', sublabel: '연극', posterUrl: 'https://picsum.photos/seed/redbook_gmj/80/112' },
       ],
       teams: [
-        { label: 'LG 트윈스', sublabel: 'KBO', posterUrl: 'https://picsum.photos/seed/lgtwins_gmj/80/80' },
+        { label: '두산 베어스', sublabel: 'KBO', posterUrl: 'https://picsum.photos/seed/doosan_gmj/80/80' },
       ],
       // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
       restaurants: [
-        { label: '성수 우육미엔', sublabel: '성수동', posterUrl: 'https://picsum.photos/seed/seongsu_uuk/148/96' },
-        { label: '압구정 뜸들이다', sublabel: '압구정', posterUrl: 'https://picsum.photos/seed/apgujeong_ddeum/148/96' },
+        { label: '진작다이닝', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/jinjak_gmj/148/96' },
+        { label: '을지다락', sublabel: '을지로', posterUrl: 'https://picsum.photos/seed/euljiloft_gmj/148/96' },
       ],
       // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
       cafes: [
-        { label: '센터커피', sublabel: '성수동', posterUrl: 'https://picsum.photos/seed/centercoffee/148/96' },
-        { label: '프릳츠 원서점', sublabel: '서촌', posterUrl: 'https://picsum.photos/seed/fritz_wonseo/148/96' },
+        { label: '오츠커피', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/oatscoffee_gmj/148/96' },
+        { label: '레이어드', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/layered_gmj/148/96' },
       ],
     },
     places: {
       travelDestinations: [
-        { label: '도쿄', posterUrl: 'https://picsum.photos/seed/tokyo_gmj/148/96' },
-        { label: '교토', posterUrl: 'https://picsum.photos/seed/kyoto_gmj/148/96' },
-        { label: '샌프란시스코', posterUrl: 'https://picsum.photos/seed/sf_gmj/148/96' },
+        { label: '오사카', posterUrl: 'https://picsum.photos/seed/osaka_gmj/148/96' },
+        { label: '런던', posterUrl: 'https://picsum.photos/seed/london_gmj/148/96' },
+        { label: '제주', posterUrl: 'https://picsum.photos/seed/jeju_gmj/148/96' },
       ],
     },
   },
@@ -475,7 +474,9 @@ export const JIMIN_PROFILE = {
   school: '연세대학교 경영학 학사',
   bio: '스타트업 생태계에서 브랜드와 사람을 연결하는 마케터입니다. 브랜드의 방향성과 사람들의 경험이 자연스럽게 이어지도록 설계하는 일을 좋아하고, 성장 전략과 커뮤니티 빌딩에도 꾸준히 관심을 두고 있습니다.',
   whoIAm: {
-    mbti: 'ENFP',
+    mbti: 'ENTJ',
+    // [임시] 목업 성향 데이터
+    personality: '관계에서 처음엔 거리를 두지만 신뢰가 쌓이면 깊이 연결되는 편이에요. 일할 때는 방향이 먼저고, 실행은 빠르게 가는 스타일입니다.',
   },
   birthDate: '1995-03-27',
   birthTime: '19:20',
@@ -484,48 +485,52 @@ export const JIMIN_PROFILE = {
   life: {
     daily: {
       exercise: [
-        { label: '필라테스', posterUrl: 'https://picsum.photos/seed/pilates_jm/80/80' },
-        { label: '산책', posterUrl: 'https://picsum.photos/seed/walk_jm/80/80' },
+        { label: '러닝', posterUrl: 'https://picsum.photos/seed/running_jm/80/80' },
+        { label: '골프', posterUrl: 'https://picsum.photos/seed/golf_jm/80/80' },
       ],
-      pet: '강아지',
-      petName: '두부',
+      pet: '없음',
     },
     tastes: {
+      // TODO(real API): posterUrl from TMDB API — image.tmdb.org/t/p/w185/{poster_path}
       movies: [
-        { label: '이터널 선샤인', sublabel: '2004', posterUrl: 'https://picsum.photos/seed/eternalsunshine_jm/80/112' },
-        { label: '작은 아씨들', sublabel: '2019', posterUrl: 'https://picsum.photos/seed/littlewomen_jm/80/112' },
-        { label: '비포 선셋', sublabel: '2004', posterUrl: 'https://picsum.photos/seed/beforesunset_jm/80/112' },
+        { label: '머니볼', sublabel: '2011', posterUrl: 'https://picsum.photos/seed/moneyball_jm/80/112' },
+        { label: '소셜 네트워크', sublabel: '2010', posterUrl: 'https://picsum.photos/seed/socialnetwork_jm/80/112' },
+        { label: '나 홀로 집에 2', sublabel: '1992', posterUrl: 'https://picsum.photos/seed/homealone2_jm/80/112' },
       ],
+      // TODO(real API): posterUrl from Spotify API — i.scdn.co album art URL
       music: [
-        { label: 'Square', sublabel: '백예린', posterUrl: 'https://picsum.photos/seed/square_jm/80/80' },
-        { label: 'Ditto', sublabel: 'NewJeans', posterUrl: 'https://picsum.photos/seed/ditto_jm/80/80' },
-        { label: 'Beautiful', sublabel: 'Crush', posterUrl: 'https://picsum.photos/seed/beautiful_jm/80/80' },
+        { label: 'Tomboy', sublabel: '혁오', posterUrl: 'https://picsum.photos/seed/tomboy_jm/80/80' },
+        { label: 'Everything', sublabel: '검정치마', posterUrl: 'https://picsum.photos/seed/blackskirts_jm/80/80' },
+        { label: 'Replay', sublabel: '김동률', posterUrl: 'https://picsum.photos/seed/kimdongryul_jm/80/80' },
       ],
+      // TODO(real API): posterUrl from 알라딘 API — cover image URL
       books: [
-        { label: '아무튼, 여름', sublabel: '위고', posterUrl: 'https://picsum.photos/seed/anyhow_jm/80/112' },
-        { label: '보통의 언어들', sublabel: '김이나', posterUrl: 'https://picsum.photos/seed/ordinary_jm/80/112' },
-        { label: '불편한 편의점', sublabel: '김호연', posterUrl: 'https://picsum.photos/seed/inconvenient_jm/80/112' },
+        { label: '린 스타트업', sublabel: '에릭 리스', posterUrl: 'https://picsum.photos/seed/leanstartup_jm/80/112' },
+        { label: '제로 투 원', sublabel: '피터 틸', posterUrl: 'https://picsum.photos/seed/zerotone_jm/80/112' },
+        { label: '좋은 전략 나쁜 전략', sublabel: '리처드 루멜트', posterUrl: 'https://picsum.photos/seed/goodstrategy_jm/80/112' },
       ],
       plays: [
-        { label: '레드북', sublabel: '연극', posterUrl: 'https://picsum.photos/seed/redbook_jm/80/112' },
+        { label: '렛미플라이', sublabel: '뮤지컬', posterUrl: 'https://picsum.photos/seed/letmefly_jm/80/112' },
       ],
       teams: [
-        { label: '두산 베어스', sublabel: 'KBO', posterUrl: 'https://picsum.photos/seed/doosan_jm/80/80' },
+        { label: 'LG 트윈스', sublabel: 'KBO', posterUrl: 'https://picsum.photos/seed/lgtwins_jm/80/80' },
       ],
+      // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
       restaurants: [
-        { label: '진작다이닝', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/jinjak_jm/148/96' },
-        { label: '을지다락', sublabel: '을지로', posterUrl: 'https://picsum.photos/seed/euljiloft_jm/148/96' },
+        { label: '성수 우육미엔', sublabel: '성수동', posterUrl: 'https://picsum.photos/seed/seongsu_uuk_jm/148/96' },
+        { label: '압구정 뜸들이다', sublabel: '압구정', posterUrl: 'https://picsum.photos/seed/apgujeong_ddeum_jm/148/96' },
       ],
+      // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
       cafes: [
-        { label: '오츠커피', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/oatscoffee_jm/148/96' },
-        { label: '레이어드', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/layered_jm/148/96' },
+        { label: '센터커피', sublabel: '성수동', posterUrl: 'https://picsum.photos/seed/centercoffee_jm/148/96' },
+        { label: '프릳츠 원서점', sublabel: '서촌', posterUrl: 'https://picsum.photos/seed/fritz_wonseo_jm/148/96' },
       ],
     },
     places: {
       travelDestinations: [
-        { label: '오사카', posterUrl: 'https://picsum.photos/seed/osaka_jm/148/96' },
-        { label: '런던', posterUrl: 'https://picsum.photos/seed/london_jm/148/96' },
-        { label: '제주', posterUrl: 'https://picsum.photos/seed/jeju_jm/148/96' },
+        { label: '도쿄', posterUrl: 'https://picsum.photos/seed/tokyo_jm/148/96' },
+        { label: '교토', posterUrl: 'https://picsum.photos/seed/kyoto_jm/148/96' },
+        { label: '샌프란시스코', posterUrl: 'https://picsum.photos/seed/sf_jm/148/96' },
       ],
     },
   },

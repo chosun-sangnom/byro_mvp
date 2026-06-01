@@ -625,7 +625,10 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   },
 }), {
   name: 'byro-store',
-  version: 15,
+  version: 16,
+  onRehydrateStorage: () => (state) => {
+    if (state) state.user = normalizeSampleUser(state.user)
+  },
   migrate: (persistedState: unknown) => {
     const state = persistedState as ByroStore | undefined
     if (!state) return persistedState

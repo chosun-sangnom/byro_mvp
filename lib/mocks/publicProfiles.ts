@@ -21,6 +21,7 @@ export const SAMPLE_PROFILE = {
   bio: 'B2B SaaS 분야에서 5년간 Product Owner로 활동해 온 강민준입니다. 파트너십을 통해 성장을 만들어가는 것을 즐깁니다.',
   whoIAm: {
     mbti: 'ENFP',
+    personality: '관계에서 처음엔 거리를 두지만 신뢰가 쌓이면 깊이 연결되는 편이에요. 일할 때는 방향이 먼저고, 실행은 빠르게 가는 스타일입니다.',
   },
   birthDate: '1992-06-14',
   birthTime: '08:30',

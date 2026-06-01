@@ -32,52 +32,37 @@ export const SAMPLE_PROFILE = {
     daily: {
       exercise: [
         { label: '필라테스', posterUrl: 'https://picsum.photos/seed/pilates_gmj/80/80' },
-        { label: '산책', posterUrl: 'https://picsum.photos/seed/walk_gmj/80/80' },
       ],
-      pet: '강아지',
-      petName: '두부',
     },
     tastes: {
       // TODO(real API): posterUrl from TMDB API — image.tmdb.org/t/p/w185/{poster_path}
       movies: [
         { label: '이터널 선샤인', sublabel: '2004', posterUrl: 'https://picsum.photos/seed/eternalsunshine_gmj/80/112' },
         { label: '작은 아씨들', sublabel: '2019', posterUrl: 'https://picsum.photos/seed/littlewomen_gmj/80/112' },
-        { label: '비포 선셋', sublabel: '2004', posterUrl: 'https://picsum.photos/seed/beforesunset_gmj/80/112' },
       ],
       // TODO(real API): posterUrl from Spotify API — i.scdn.co album art URL
       music: [
         { label: 'Square', sublabel: '백예린', posterUrl: 'https://picsum.photos/seed/square_gmj/80/80' },
         { label: 'Ditto', sublabel: 'NewJeans', posterUrl: 'https://picsum.photos/seed/ditto_gmj/80/80' },
-        { label: 'Beautiful', sublabel: 'Crush', posterUrl: 'https://picsum.photos/seed/beautiful_gmj/80/80' },
       ],
       // TODO(real API): posterUrl from 알라딘 API — cover image URL
       books: [
         { label: '아무튼, 여름', sublabel: '위고', posterUrl: 'https://picsum.photos/seed/anyhow_gmj/80/112' },
         { label: '보통의 언어들', sublabel: '김이나', posterUrl: 'https://picsum.photos/seed/ordinary_gmj/80/112' },
-        { label: '불편한 편의점', sublabel: '김호연', posterUrl: 'https://picsum.photos/seed/inconvenient_gmj/80/112' },
-      ],
-      plays: [
-        { label: '레드북', sublabel: '연극', posterUrl: 'https://picsum.photos/seed/redbook_gmj/80/112' },
-      ],
-      teams: [
-        { label: '두산 베어스', sublabel: 'KBO', posterUrl: 'https://picsum.photos/seed/doosan_gmj/80/80' },
       ],
       // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
       restaurants: [
         { label: '진작다이닝', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/jinjak_gmj/148/96' },
-        { label: '을지다락', sublabel: '을지로', posterUrl: 'https://picsum.photos/seed/euljiloft_gmj/148/96' },
       ],
       // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
       cafes: [
         { label: '오츠커피', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/oatscoffee_gmj/148/96' },
-        { label: '레이어드', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/layered_gmj/148/96' },
       ],
     },
     places: {
       travelDestinations: [
         { label: '오사카', posterUrl: 'https://picsum.photos/seed/osaka_gmj/148/96' },
         { label: '런던', posterUrl: 'https://picsum.photos/seed/london_gmj/148/96' },
-        { label: '제주', posterUrl: 'https://picsum.photos/seed/jeju_gmj/148/96' },
       ],
     },
   },
@@ -92,8 +77,6 @@ export const SAMPLE_PROFILE = {
   ] as ContactChannel[],
   instagramConnected: true,
   linkedinConnected: true,
-  youtubeConnected: true,
-  tiktokConnected: true,
   instagram: {
     username: INSTAGRAM_PROFILE.username,
     profileUrl: INSTAGRAM_PROFILE.profileUrl,
@@ -104,14 +87,6 @@ export const SAMPLE_PROFILE = {
     profileUrl: LINKEDIN_PROFILE.profileUrl,
     aiSummary: LINKEDIN_PROFILE.aiSummary,
     previewImage: '/images/linkedsample.png',
-  },
-  youtube: {
-    channelName: '강민준',
-    channelUrl: 'https://www.youtube.com/@gangminjun',
-  },
-  tiktok: {
-    username: 'gangminjun',
-    profileUrl: 'https://www.tiktok.com/@gangminjun',
   },
   careerHighlight: { avgYears: 4.2, vsIndustryPercent: 128 },
   corporateHighlight: {

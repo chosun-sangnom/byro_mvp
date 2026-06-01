@@ -35,7 +35,7 @@ function usePublicProfileTabData(username: string) {
   const airlineHighlight = profile.airlineHighlight
   const airlineBadgeLabel = AIRLINE_BADGE_LABELS[airlineHighlight.badgeLevel as keyof typeof AIRLINE_BADGE_LABELS] ?? null
   const showCareerHighlight = username !== 'mk'
-  const showAirlineHighlight = !['jiminlee', 'mk'].includes(username)
+  const showAirlineHighlight = !['jiminlee', 'mk', 'gangminjun'].includes(username)
 
   const verifiedHighlights: Highlight[] = [
     ...(showCareerHighlight ? [{

@@ -44,7 +44,7 @@ export default function PublicProfile({
   const airlineBadgeLabel = AIRLINE_BADGE_LABELS[airlineHighlight.badgeLevel as keyof typeof AIRLINE_BADGE_LABELS] ?? null
   const topRememberIndustry = [...profile.rememberHighlight.industries].sort((a, b) => b.ratio - a.ratio)[0]
   const showCareerHighlight = username !== 'mk'
-  const showAirlineHighlight = !['jiminlee', 'mk'].includes(username)
+  const showAirlineHighlight = !['jiminlee', 'mk', 'gangminjun'].includes(username)
 
   const verifiedHighlights: Highlight[] = [
     ...(showCareerHighlight ? [{

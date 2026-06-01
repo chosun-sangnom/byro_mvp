@@ -11,12 +11,10 @@ export const SAMPLE_PROFILE = {
   name: '강민준',
   title: 'B2B SaaS Product Owner · 스타트업 공동창업자',
   avatarColor: '#DCC5B6',
-  // [임시] 스톡 사진 목업 — 실제 구현 시 Supabase Storage 업로드 이미지로 교체
-  avatarImage: 'https://randomuser.me/api/portraits/men/32.jpg',
+  avatarImage: '/images/mj1.jpg',
   profileImages: [
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=640&h=800&fit=crop&crop=face',
-    'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=640&h=800&fit=crop&crop=face',
-    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=640&h=800&fit=crop&crop=face',
+    '/images/mj1.jpg',
+    '/images/mj2.jpg',
   ],
   headline: '커뮤니티 기반 성장을 설계하는 B2B SaaS 빌더',
   school: 'KAIST 경영학과 졸업',

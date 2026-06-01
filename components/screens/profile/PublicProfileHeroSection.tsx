@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Sparkles, X } from 'lucide-react'
+import { BottomSheet } from '@/components/ui'
 import type { PersonaReason } from '@/lib/personaGen'
 
 type HeroTheme = {
@@ -204,36 +205,16 @@ export function ProfileHeroCard({
     <div className="hero-card border border-[var(--color-border-default)] bg-[var(--color-glass-strong)] p-[8px] backdrop-blur-sm">
       <div className="relative h-[452px] overflow-hidden rounded-[30px] bg-[#121212] text-white ring-1 ring-black/4">
 
-        {/* AI 페르소나 팝업 오버레이 */}
-        <AnimatePresence>
-          {personaSheetOpen && personaReasons && (
-            <motion.div
-              key="persona-overlay"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}
-              className="absolute inset-0 z-20 flex flex-col overflow-hidden rounded-[30px]"
-              style={{ background: 'rgba(0,0,0,0.82)', backdropFilter: 'blur(12px)' }}
-            >
-              <button
-                type="button"
-                onClick={() => setPersonaSheetOpen(false)}
-                className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white/70 transition-colors active:bg-white/20"
-              >
-                <X size={16} />
-              </button>
-
+        {/* AI 페르소나 바텀시트 */}
+        {personaReasons && (
+          <BottomSheet open={personaSheetOpen} onClose={() => setPersonaSheetOpen(false)}>
+            <div className="pb-8">
               {/* [임시] AI 이미지 생성 모델 연동 전 placeholder 이미지 */}
               {personaImage && (
-                <div className="relative h-[180px] w-full shrink-0 overflow-hidden">
+                <div className="relative h-[200px] w-full shrink-0 overflow-hidden rounded-t-[inherit]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={personaImage}
-                    alt="AI 페르소나 이미지"
-                    className="h-full w-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/60" />
+                  <img src={personaImage} alt="AI 페르소나 이미지" className="h-full w-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/40" />
                   <div className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-black/40 px-2 py-1 backdrop-blur-sm">
                     <Sparkles size={9} className="text-white/60" />
                     <span className="text-[9px] font-semibold uppercase tracking-wider text-white/60">AI generated</span>
@@ -241,36 +222,36 @@ export function ProfileHeroCard({
                 </div>
               )}
 
-              <div className="flex flex-1 flex-col overflow-y-auto px-6 py-5">
+              <div className="px-5 pt-5">
                 <div className="mb-5">
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white/40">
+                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: 'var(--color-text-tertiary)' }}>
                     <Sparkles size={11} />
                     <span>AI 페르소나</span>
-                    <span className="rounded-full bg-white/10 px-2 py-0.5 text-[9px]">매주 업데이트됨</span>
+                    <span className="rounded-full px-2 py-0.5 text-[9px]" style={{ background: 'var(--color-bg-soft)' }}>매주 업데이트됨</span>
                   </div>
-                  <p className="mt-3 text-[22px] font-black leading-[1.2] text-white">{personaText}</p>
-                  <p className="mt-2 text-[12px] leading-[1.65] text-white/50">
+                  <p className="mt-3 text-[22px] font-black leading-[1.2]" style={{ color: 'var(--color-text-primary)' }}>{personaText}</p>
+                  <p className="mt-2 text-[12px] leading-[1.65]" style={{ color: 'var(--color-text-tertiary)' }}>
                     평판 키워드와 라이프스타일 데이터를 바탕으로 자동 생성된 문장이에요.
                   </p>
                 </div>
 
                 <div className="space-y-2">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.12em] text-white/35">생성 근거</p>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: 'var(--color-text-tertiary)' }}>생성 근거</p>
                   {personaReasons.map((reason) => (
                     <div
                       key={reason.category}
                       className="flex items-center justify-between rounded-[14px] px-4 py-3"
-                      style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.10)' }}
+                      style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-soft)' }}
                     >
-                      <span className="text-[12px] text-white/50">{reason.category}</span>
-                      <span className="text-[13px] font-semibold text-white/90">{reason.value}</span>
+                      <span className="text-[12px]" style={{ color: 'var(--color-text-secondary)' }}>{reason.category}</span>
+                      <span className="text-[13px] font-semibold" style={{ color: 'var(--color-text-primary)' }}>{reason.value}</span>
                     </div>
                   ))}
                 </div>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+            </div>
+          </BottomSheet>
+        )}
 
         <div className="relative h-full">
           {activeImage ? (

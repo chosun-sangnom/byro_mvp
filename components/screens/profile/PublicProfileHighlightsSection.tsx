@@ -76,11 +76,13 @@ export function ProfileHighlightsSection({
                     onClick={() => onToggleHighlight(toggleKey)}
                     className="flex w-full items-center gap-3.5 py-3.5 text-left"
                   >
-                    <span className="flex h-[28px] w-[28px] flex-shrink-0 items-center justify-center rounded-full" style={{ background: 'var(--color-state-success-bg)', color: 'var(--color-state-success-text)' }}>
-                      <BadgeCheck size={18} />
+                    <span className="flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center text-[var(--color-text-secondary)]">
+                      <HighlightIcon id={hl.icon as HighlightIconId} size={16} />
                     </span>
                     <div className="min-w-0 flex-1">
-                      <div className="mb-0.5 text-[11px] text-[var(--color-text-tertiary)]">{hl.title}</div>
+                      <div className="mb-0.5 flex items-center gap-1">
+                        <span className="text-[11px] text-[var(--color-text-tertiary)]">{hl.title}</span>
+                      </div>
                       <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{hl.subtitle}</div>
                       {hl.categoryId === 'career-continuity' && (
                         <div className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">업계 평균 대비 +{profile.careerHighlight.vsIndustryPercent}%</div>
@@ -95,6 +97,9 @@ export function ProfileHighlightsSection({
                         <div className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">{airlineBadgeLabel}</div>
                       )}
                     </div>
+                    <span className="flex h-[28px] w-[28px] flex-shrink-0 items-center justify-center rounded-full" style={{ background: 'var(--color-state-success-bg)', color: 'var(--color-state-success-text)' }}>
+                      <BadgeCheck size={18} />
+                    </span>
                     {isOpen ? <ChevronUp size={14} color="var(--color-text-tertiary)" /> : <ChevronDown size={14} color="var(--color-text-tertiary)" />}
                   </button>
                   <AnimatePresence initial={false}>
@@ -106,7 +111,7 @@ export function ProfileHighlightsSection({
                         transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
                         className="overflow-hidden"
                       >
-                        <div className="pb-4 pl-[44px]">
+                        <div className="pb-4 pl-8">
                           {hl.categoryId === 'career-continuity' && (
                             <CareerContinuityChart
                               avgYears={profile.careerHighlight.avgYears}

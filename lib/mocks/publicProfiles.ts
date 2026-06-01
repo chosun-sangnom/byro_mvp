@@ -11,13 +11,18 @@ export const SAMPLE_PROFILE = {
   name: '강민준',
   title: 'B2B SaaS Product Owner · 스타트업 공동창업자',
   avatarColor: '#DCC5B6',
-  avatarImage: '',
-  profileImages: [],
+  // [임시] 스톡 사진 목업 — 실제 구현 시 Supabase Storage 업로드 이미지로 교체
+  avatarImage: 'https://randomuser.me/api/portraits/men/32.jpg',
+  profileImages: [
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=640&h=800&fit=crop&crop=face',
+    'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=640&h=800&fit=crop&crop=face',
+    'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=640&h=800&fit=crop&crop=face',
+  ],
   headline: '커뮤니티 기반 성장을 설계하는 B2B SaaS 빌더',
   school: 'KAIST 경영학과 졸업',
   bio: 'B2B SaaS 분야에서 5년간 Product Owner로 활동해 온 강민준입니다. 파트너십을 통해 성장을 만들어가는 것을 즐깁니다.',
   whoIAm: {
-    mbti: 'ENTJ',
+    mbti: 'ENFP',
   },
   birthDate: '1992-06-14',
   birthTime: '08:30',
@@ -26,52 +31,38 @@ export const SAMPLE_PROFILE = {
   life: {
     daily: {
       exercise: [
-        { label: '러닝', posterUrl: 'https://picsum.photos/seed/running_gmj/80/80' },
-        { label: '골프', posterUrl: 'https://picsum.photos/seed/golf_gmj/80/80' },
+        { label: '필라테스', posterUrl: 'https://picsum.photos/seed/pilates_gmj/80/80' },
       ],
-      pet: '없음',
     },
     tastes: {
       // TODO(real API): posterUrl from TMDB API — image.tmdb.org/t/p/w185/{poster_path}
       movies: [
-        { label: '머니볼', sublabel: '2011', posterUrl: 'https://picsum.photos/seed/moneyball/80/112' },
-        { label: '소셜 네트워크', sublabel: '2010', posterUrl: 'https://picsum.photos/seed/socialnetwork/80/112' },
-        { label: '나 홀로 집에 2', sublabel: '1992', posterUrl: 'https://picsum.photos/seed/homealone2/80/112' },
+        { label: '이터널 선샤인', sublabel: '2004', posterUrl: 'https://picsum.photos/seed/eternalsunshine_gmj/80/112' },
+        { label: '작은 아씨들', sublabel: '2019', posterUrl: 'https://picsum.photos/seed/littlewomen_gmj/80/112' },
       ],
       // TODO(real API): posterUrl from Spotify API — i.scdn.co album art URL
       music: [
-        { label: 'Tomboy', sublabel: '혁오', posterUrl: 'https://picsum.photos/seed/tomboy_hyukoh/80/80', previewUrl: 'https://p.scdn.co/mp3-preview/e195d59e5dc7869fa3657f58e35748c3e48b7e3f' },
-        { label: 'Everything', sublabel: '검정치마', posterUrl: 'https://picsum.photos/seed/blackskirts/80/80', previewUrl: 'https://p.scdn.co/mp3-preview/5b1b3a88c94516e3b1e25a0de7f0dd17e89c7c9f' },
-        { label: 'Replay', sublabel: '김동률', posterUrl: 'https://picsum.photos/seed/kimdongryul/80/80', previewUrl: 'https://p.scdn.co/mp3-preview/e30a8d1f9285c5e30a8d1f9285c5e300' },
+        { label: 'Square', sublabel: '백예린', posterUrl: 'https://picsum.photos/seed/square_gmj/80/80' },
+        { label: 'Ditto', sublabel: 'NewJeans', posterUrl: 'https://picsum.photos/seed/ditto_gmj/80/80' },
       ],
       // TODO(real API): posterUrl from 알라딘 API — cover image URL
       books: [
-        { label: '린 스타트업', sublabel: '에릭 리스', posterUrl: 'https://picsum.photos/seed/leanstartup/80/112' },
-        { label: '제로 투 원', sublabel: '피터 틸', posterUrl: 'https://picsum.photos/seed/zerotone/80/112' },
-        { label: '좋은 전략 나쁜 전략', sublabel: '리처드 루멜트', posterUrl: 'https://picsum.photos/seed/goodstrategy/80/112' },
-      ],
-      plays: [
-        { label: '렛미플라이', sublabel: '뮤지컬', posterUrl: 'https://picsum.photos/seed/letmefly_gmj/80/112' },
-      ],
-      teams: [
-        { label: 'LG 트윈스', sublabel: 'KBO', posterUrl: 'https://picsum.photos/seed/lgtwins_gmj/80/80' },
+        { label: '아무튼, 여름', sublabel: '위고', posterUrl: 'https://picsum.photos/seed/anyhow_gmj/80/112' },
+        { label: '보통의 언어들', sublabel: '김이나', posterUrl: 'https://picsum.photos/seed/ordinary_gmj/80/112' },
       ],
       // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
       restaurants: [
-        { label: '성수 우육미엔', sublabel: '성수동', posterUrl: 'https://picsum.photos/seed/seongsu_uuk/148/96' },
-        { label: '압구정 뜸들이다', sublabel: '압구정', posterUrl: 'https://picsum.photos/seed/apgujeong_ddeum/148/96' },
+        { label: '진작다이닝', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/jinjak_gmj/148/96' },
       ],
       // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
       cafes: [
-        { label: '센터커피', sublabel: '성수동', posterUrl: 'https://picsum.photos/seed/centercoffee/148/96' },
-        { label: '프릳츠 원서점', sublabel: '서촌', posterUrl: 'https://picsum.photos/seed/fritz_wonseo/148/96' },
+        { label: '오츠커피', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/oatscoffee_gmj/148/96' },
       ],
     },
     places: {
       travelDestinations: [
-        { label: '도쿄', posterUrl: 'https://picsum.photos/seed/tokyo_gmj/148/96' },
-        { label: '교토', posterUrl: 'https://picsum.photos/seed/kyoto_gmj/148/96' },
-        { label: '샌프란시스코', posterUrl: 'https://picsum.photos/seed/sf_gmj/148/96' },
+        { label: '오사카', posterUrl: 'https://picsum.photos/seed/osaka_gmj/148/96' },
+        { label: '런던', posterUrl: 'https://picsum.photos/seed/london_gmj/148/96' },
       ],
     },
   },
@@ -86,8 +77,6 @@ export const SAMPLE_PROFILE = {
   ] as ContactChannel[],
   instagramConnected: true,
   linkedinConnected: true,
-  youtubeConnected: true,
-  tiktokConnected: true,
   instagram: {
     username: INSTAGRAM_PROFILE.username,
     profileUrl: INSTAGRAM_PROFILE.profileUrl,
@@ -98,14 +87,6 @@ export const SAMPLE_PROFILE = {
     profileUrl: LINKEDIN_PROFILE.profileUrl,
     aiSummary: LINKEDIN_PROFILE.aiSummary,
     previewImage: '/images/linkedsample.png',
-  },
-  youtube: {
-    channelName: '강민준',
-    channelUrl: 'https://www.youtube.com/@gangminjun',
-  },
-  tiktok: {
-    username: 'gangminjun',
-    profileUrl: 'https://www.tiktok.com/@gangminjun',
   },
   careerHighlight: { avgYears: 4.2, vsIndustryPercent: 128 },
   corporateHighlight: {
@@ -125,6 +106,16 @@ export const SAMPLE_PROFILE = {
       { name: 'IT', ratio: 22 },
       { name: '투자', ratio: 16 },
     ],
+    insight: {
+      recentMeetings: 34,
+      recentMonths: 3,
+      topIndustryName: '스타트업',
+      topIndustryPercent: 38,
+      growthIndustryName: 'IT·개발',
+      growthFrom: 14,
+      growthTo: 22,
+      growthPeriodLabel: '최근 6개월',
+    },
   },
   airlineHighlight: {
     tierSummary: '대한항공 모닝캄 · 아시아나 다이아몬드',
@@ -165,16 +156,7 @@ export const SAMPLE_PROFILE = {
       year: '2020',
       metadata: { status: '졸업', role: '경영학과', degree: '학사', schoolType: '대학교' },
     },
-    { id: 'mh1', categoryId: 'talk', icon: 'mic', title: 'TEDx Seoul 2023', subtitle: '강연 / 연설 · 직접 입력', description: '신뢰 기반 네트워킹의 미래를 주제로 강연', year: '2023' },
-    { id: 'mh2', categoryId: 'collab', icon: 'handshake', title: '일본 파트너사 협업 프로젝트', subtitle: '협업 프로젝트 · 직접 입력', description: '6개월 간 일본 파트너사와 B2B 제품 공동 개발', year: '2022' },
-    { id: 'mh2-1', categoryId: 'education', icon: 'book-open', title: '스타트업 PM 부트캠프', subtitle: '강의 / 교육 · 직접 입력', description: '초기 PM을 위한 문제 정의와 실험 설계 세션을 진행했습니다.', year: '2024' },
     { id: 'mh3', categoryId: 'award', icon: 'trophy', title: 'K-Startup Excellence 2024', subtitle: '수상 / 표창 · 직접 입력', description: '초기 스타트업 성장 전략 부문 우수 사례로 선정', year: '2024', metadata: { issuer: 'K-Startup' } },
-    { id: 'mh4', categoryId: 'publish', icon: 'book-open', title: '작게 시작하는 B2B SaaS', subtitle: '출판 / 기고 · 직접 입력', description: '초기 B2B SaaS 팀이 첫 고객을 만나기까지의 실험 과정을 정리한 기고문입니다.', year: '2025', sourceLabel: 'Byro Journal', linkUrl: 'https://byro.io/articles/b2b-saas-start' },
-    { id: 'mh5', categoryId: 'article-interview', icon: 'file-text', title: '강민준 Product Owner, 작은 팀의 실행력에 대해 말하다', subtitle: '기사 / 인터뷰 · 직접 입력', description: '적은 리소스로도 제품 가설을 빠르게 검증하는 팀 운영 방식에 대한 인터뷰입니다.', year: '2024', sourceLabel: 'Startup Today', linkUrl: 'https://byro.io/articles/gangminjun-interview' },
-    { id: 'mh6', categoryId: 'patent', icon: 'book-open', title: '네트워크 신뢰도 기반 프로필 매칭 시스템', subtitle: '특허 / 연구 · 직접 입력', description: '', year: '2024', metadata: { registrationNumber: '10-2024-0012345' } },
-    { id: 'mh7', categoryId: 'license', icon: 'badge-check', title: 'GAIQ', subtitle: '자격증 / 수료 · 직접 입력', description: '', year: '2023', metadata: { issuer: 'Google', expiryYear: '2026' } },
-    { id: 'mh8', categoryId: 'volunteer', icon: 'globe', title: '청소년 창업 멘토링', subtitle: '봉사 / 사회공헌 · 직접 입력', description: '지역 청소년을 대상으로 문제 정의와 팀 프로젝트 멘토링을 진행했습니다.', year: '2023' },
-    { id: 'mh9', categoryId: 'other', icon: 'pencil', title: '로컬 커뮤니티 살롱 운영', subtitle: '기타 · 직접 입력', description: '제품, 커리어, 브랜딩을 주제로 소규모 오프라인 살롱을 운영하고 있습니다.', year: '2024' },
   ] as Highlight[],
   // TODO(real API): Replace with viewer-relative kemi payload from /profiles/:id/kemi?viewer_id=... endpoint
   kemi: {
@@ -187,6 +169,12 @@ export const SAMPLE_PROFILE = {
     ],
     // TODO(AI): Replace with LLM-generated conversation starter based on full profile match context
     aiCopy: '아이유를 좋아하고 한남동과 서촌을 자주 찾는 분이에요. 동네 얘기나 좋아하는 음악으로 먼저 말 걸어보세요.',
+    // [임시] 목업 기본값
+    completenessPercent: 80,
+    lockedBlocks: [
+      { index: 5, missingItems: ['취향 1개'] },
+    ],
+    missingItems: ['취향 1개'],
   },
   experiences: [
     { id: 'e1', authorName: '김지수', isAnonymous: false, keywords: ['전문성이 느껴져요', '대화하면 생각이 넓어져요'], message: '대화하면 생각이 넓어지고 일도 깔끔하게 풀어가는 분이에요.', date: '2일 전' },
@@ -356,6 +344,16 @@ export const MK_PROFILE = {
       { name: '컨설팅/법률', ratio: 6, count: 102 },
       { name: '교육/연구', ratio: 5, count: 88 },
     ],
+    insight: {
+      recentMeetings: 58,
+      recentMonths: 3,
+      topIndustryName: '금융·투자',
+      topIndustryPercent: 29,
+      growthIndustryName: 'VC·심사역',
+      growthFrom: 9,
+      growthTo: 27,
+      growthPeriodLabel: '최근 6개월',
+    },
   },
   manualHighlights: [
     {
@@ -405,6 +403,11 @@ export const MK_PROFILE = {
     ],
     // TODO(AI): Replace with LLM-generated conversation starter based on full profile match context
     aiCopy: '골프와 축구를 즐기고 성수동을 자주 찾는 분이에요. FC 얘기나 성수 맛집으로 바로 들어가도 어색하지 않아요.',
+    // [임시] 강명구: 전체 블록 오픈 목업
+    completenessPercent: 100,
+    lockedBlocks: [],
+    missingItems: [],
+
   },
   reputationKeywords: [
     { keyword: '어려울 때 생각나는 사람이에요', count: 9 },
@@ -437,7 +440,9 @@ export const JIMIN_PROFILE = {
   school: '연세대학교 경영학 학사',
   bio: '스타트업 생태계에서 브랜드와 사람을 연결하는 마케터입니다. 브랜드의 방향성과 사람들의 경험이 자연스럽게 이어지도록 설계하는 일을 좋아하고, 성장 전략과 커뮤니티 빌딩에도 꾸준히 관심을 두고 있습니다.',
   whoIAm: {
-    mbti: 'ENFP',
+    mbti: 'ENTJ',
+    // [임시] 목업 성향 데이터
+    personality: '관계에서 처음엔 거리를 두지만 신뢰가 쌓이면 깊이 연결되는 편이에요. 일할 때는 방향이 먼저고, 실행은 빠르게 가는 스타일입니다.',
   },
   birthDate: '1995-03-27',
   birthTime: '19:20',
@@ -446,48 +451,52 @@ export const JIMIN_PROFILE = {
   life: {
     daily: {
       exercise: [
-        { label: '필라테스', posterUrl: 'https://picsum.photos/seed/pilates_jm/80/80' },
-        { label: '산책', posterUrl: 'https://picsum.photos/seed/walk_jm/80/80' },
+        { label: '러닝', posterUrl: 'https://picsum.photos/seed/running_jm/80/80' },
+        { label: '골프', posterUrl: 'https://picsum.photos/seed/golf_jm/80/80' },
       ],
-      pet: '강아지',
-      petName: '두부',
+      pet: '없음',
     },
     tastes: {
+      // TODO(real API): posterUrl from TMDB API — image.tmdb.org/t/p/w185/{poster_path}
       movies: [
-        { label: '이터널 선샤인', sublabel: '2004', posterUrl: 'https://picsum.photos/seed/eternalsunshine_jm/80/112' },
-        { label: '작은 아씨들', sublabel: '2019', posterUrl: 'https://picsum.photos/seed/littlewomen_jm/80/112' },
-        { label: '비포 선셋', sublabel: '2004', posterUrl: 'https://picsum.photos/seed/beforesunset_jm/80/112' },
+        { label: '머니볼', sublabel: '2011', posterUrl: 'https://picsum.photos/seed/moneyball_jm/80/112' },
+        { label: '소셜 네트워크', sublabel: '2010', posterUrl: 'https://picsum.photos/seed/socialnetwork_jm/80/112' },
+        { label: '나 홀로 집에 2', sublabel: '1992', posterUrl: 'https://picsum.photos/seed/homealone2_jm/80/112' },
       ],
+      // TODO(real API): posterUrl from Spotify API — i.scdn.co album art URL
       music: [
-        { label: 'Square', sublabel: '백예린', posterUrl: 'https://picsum.photos/seed/square_jm/80/80' },
-        { label: 'Ditto', sublabel: 'NewJeans', posterUrl: 'https://picsum.photos/seed/ditto_jm/80/80' },
-        { label: 'Beautiful', sublabel: 'Crush', posterUrl: 'https://picsum.photos/seed/beautiful_jm/80/80' },
+        { label: 'Tomboy', sublabel: '혁오', posterUrl: 'https://picsum.photos/seed/tomboy_jm/80/80' },
+        { label: 'Everything', sublabel: '검정치마', posterUrl: 'https://picsum.photos/seed/blackskirts_jm/80/80' },
+        { label: 'Replay', sublabel: '김동률', posterUrl: 'https://picsum.photos/seed/kimdongryul_jm/80/80' },
       ],
+      // TODO(real API): posterUrl from 알라딘 API — cover image URL
       books: [
-        { label: '아무튼, 여름', sublabel: '위고', posterUrl: 'https://picsum.photos/seed/anyhow_jm/80/112' },
-        { label: '보통의 언어들', sublabel: '김이나', posterUrl: 'https://picsum.photos/seed/ordinary_jm/80/112' },
-        { label: '불편한 편의점', sublabel: '김호연', posterUrl: 'https://picsum.photos/seed/inconvenient_jm/80/112' },
+        { label: '린 스타트업', sublabel: '에릭 리스', posterUrl: 'https://picsum.photos/seed/leanstartup_jm/80/112' },
+        { label: '제로 투 원', sublabel: '피터 틸', posterUrl: 'https://picsum.photos/seed/zerotone_jm/80/112' },
+        { label: '좋은 전략 나쁜 전략', sublabel: '리처드 루멜트', posterUrl: 'https://picsum.photos/seed/goodstrategy_jm/80/112' },
       ],
       plays: [
-        { label: '레드북', sublabel: '연극', posterUrl: 'https://picsum.photos/seed/redbook_jm/80/112' },
+        { label: '렛미플라이', sublabel: '뮤지컬', posterUrl: 'https://picsum.photos/seed/letmefly_jm/80/112' },
       ],
       teams: [
-        { label: '두산 베어스', sublabel: 'KBO', posterUrl: 'https://picsum.photos/seed/doosan_jm/80/80' },
+        { label: 'LG 트윈스', sublabel: 'KBO', posterUrl: 'https://picsum.photos/seed/lgtwins_jm/80/80' },
       ],
+      // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
       restaurants: [
-        { label: '진작다이닝', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/jinjak_jm/148/96' },
-        { label: '을지다락', sublabel: '을지로', posterUrl: 'https://picsum.photos/seed/euljiloft_jm/148/96' },
+        { label: '성수 우육미엔', sublabel: '성수동', posterUrl: 'https://picsum.photos/seed/seongsu_uuk_jm/148/96' },
+        { label: '압구정 뜸들이다', sublabel: '압구정', posterUrl: 'https://picsum.photos/seed/apgujeong_ddeum_jm/148/96' },
       ],
+      // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
       cafes: [
-        { label: '오츠커피', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/oatscoffee_jm/148/96' },
-        { label: '레이어드', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/layered_jm/148/96' },
+        { label: '센터커피', sublabel: '성수동', posterUrl: 'https://picsum.photos/seed/centercoffee_jm/148/96' },
+        { label: '프릳츠 원서점', sublabel: '서촌', posterUrl: 'https://picsum.photos/seed/fritz_wonseo_jm/148/96' },
       ],
     },
     places: {
       travelDestinations: [
-        { label: '오사카', posterUrl: 'https://picsum.photos/seed/osaka_jm/148/96' },
-        { label: '런던', posterUrl: 'https://picsum.photos/seed/london_jm/148/96' },
-        { label: '제주', posterUrl: 'https://picsum.photos/seed/jeju_jm/148/96' },
+        { label: '도쿄', posterUrl: 'https://picsum.photos/seed/tokyo_jm/148/96' },
+        { label: '교토', posterUrl: 'https://picsum.photos/seed/kyoto_jm/148/96' },
+        { label: '샌프란시스코', posterUrl: 'https://picsum.photos/seed/sf_jm/148/96' },
       ],
     },
   },
@@ -539,6 +548,16 @@ export const JIMIN_PROFILE = {
       { name: 'IT', ratio: 22 },
       { name: '투자', ratio: 16 },
     ],
+    insight: {
+      recentMeetings: 21,
+      recentMonths: 3,
+      topIndustryName: '마케팅',
+      topIndustryPercent: 24,
+      growthIndustryName: '스타트업',
+      growthFrom: 18,
+      growthTo: 38,
+      growthPeriodLabel: '최근 6개월',
+    },
   },
   manualHighlights: [
     {
@@ -572,6 +591,14 @@ export const JIMIN_PROFILE = {
     ],
     // TODO(AI): Replace with LLM-generated conversation starter based on full profile match context
     aiCopy: '아이유를 좋아하고 한남동을 자주 찾는 분이에요. 같은 동네 카페 얘기로 자연스럽게 시작해보세요.',
+    // [임시] 이지민: 3~5번 블록 잠금 목업 (프로필 데이터 부족 시나리오)
+    completenessPercent: 40,
+    lockedBlocks: [
+      { index: 3, missingItems: ['취향 3개'] },
+      { index: 4, missingItems: ['하이라이트'] },
+      { index: 5, missingItems: ['성향', '취향 3개'] },
+    ],
+    missingItems: ['성향', '하이라이트', '취향 3개'],
   },
   reputationKeywords: [
     { keyword: '전문성이 느껴져요', count: 5 },

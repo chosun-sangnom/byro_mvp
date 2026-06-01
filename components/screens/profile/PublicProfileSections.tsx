@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronRight, Mail, MessageCircle, Phone } from 'lucide-react'
 import { RememberNetworkGraph } from '@/components/highlights/RememberNetworkGraph'
-import type { ContactChannel, Experience } from '@/types'
+import type { ContactChannel } from '@/types'
 
 const SECTION_EASE = [0.22, 1, 0.36, 1] as const
 
@@ -146,9 +146,11 @@ export function ProfileFeedbackSection({
 export function ProfileRememberSection({
   total,
   industries,
+  insight,
 }: {
   total: number
   industries: Array<{ name: string; ratio: number }>
+  insight?: import('@/types').RememberInsight
 }) {
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.02}>
@@ -163,7 +165,7 @@ export function ProfileRememberSection({
             총 {total}명
           </div>
         </div>
-        <RememberNetworkGraph total={total} industries={industries} />
+        <RememberNetworkGraph total={total} industries={industries} insight={insight} />
       </div>
     </AnimatedSection>
   )
@@ -172,42 +174,27 @@ export function ProfileRememberSection({
 
 export function ProfileConnectSection({
   isOwnerMode,
-  alreadySubmitted,
   contactChannels,
   onRequestFeedback,
-  onLeaveExperience,
   onChannelClick,
 }: {
   isOwnerMode: boolean
-  alreadySubmitted: boolean
   contactChannels: ContactChannel[]
   onRequestFeedback: () => void
-  onLeaveExperience: () => void
   onChannelClick: (channel: ContactChannel) => void
 }) {
   return (
     <AnimatedSection className="px-5 pt-6 pb-8" delay={0.1}>
       <SectionTitle title="Connect" />
       {!isOwnerMode && (
-        <div className="mb-6 flex gap-2">
+        <div className="mb-6">
           <motion.button
             onClick={onRequestFeedback}
             whileTap={{ scale: 0.96 }}
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-            className="flex-1 rounded-full border border-[var(--color-border-default)] py-2.5 text-[13px] font-semibold text-[var(--color-text-secondary)]"
+            className="w-full rounded-full border border-[var(--color-border-default)] py-2.5 text-[13px] font-semibold text-[var(--color-text-secondary)]"
           >
             피드백 요청
-          </motion.button>
-          <motion.button
-            onClick={onLeaveExperience}
-            whileTap={{ scale: 0.96 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-            className="flex-1 rounded-full py-2.5 text-[13px] font-semibold"
-            style={alreadySubmitted
-              ? { border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)' }
-              : { backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
-          >
-            {alreadySubmitted ? '경험 남겼어요 ✓' : '경험 남겨요'}
           </motion.button>
         </div>
       )}
@@ -269,82 +256,5 @@ export function ContactActionButton({
       </div>
       <span className="text-[12px] font-medium text-[var(--color-text-secondary)]">{channel.label}</span>
     </motion.button>
-  )
-}
-
-export function ProfileExperienceSection({
-  experiences,
-  onViewAll,
-}: {
-  experiences: Experience[]
-  onViewAll: () => void
-}) {
-  if (experiences.length === 0) return null
-
-  const preview = experiences.slice(0, 5)
-
-  return (
-    <AnimatedSection className="px-5 pt-6 pb-2" delay={0.08}>
-      <SectionTitle title="경험" />
-      <div className="rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] overflow-hidden">
-        <div className="flex items-center justify-between px-4 pt-4 pb-3">
-          <div>
-            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Experience</div>
-            <div className="mt-0.5 text-[18px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">함께한 사람들의 경험</div>
-          </div>
-          <div className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
-            {experiences.length}개
-          </div>
-        </div>
-
-        <div className="divide-y divide-[var(--color-border-soft)] px-4">
-          {preview.map((exp) => (
-            <ExperienceCard key={exp.id} experience={exp} />
-          ))}
-        </div>
-
-        <div className="px-4 pb-4 pt-3">
-          <button
-            onClick={onViewAll}
-            className="flex w-full items-center justify-between rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-left active:opacity-70"
-          >
-            <span className="text-[12px] font-semibold text-[var(--color-text-secondary)]">경험 전체보기</span>
-            <ChevronRight className="h-4 w-4 text-[var(--color-text-tertiary)]" />
-          </button>
-        </div>
-      </div>
-    </AnimatedSection>
-  )
-}
-
-function ExperienceCard({ experience }: { experience: Experience }) {
-  return (
-    <div className="py-3.5 first:pt-2 last:pb-2">
-      <div className="mb-2 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-muted)] text-[11px] font-bold text-[var(--color-text-secondary)]">
-            {experience.isAnonymous ? '익' : (experience.authorName?.charAt(0) ?? '?')}
-          </div>
-          <span className="text-[13px] font-semibold text-[var(--color-text-primary)]">
-            {experience.isAnonymous ? '익명' : (experience.authorName ?? '익명')}
-          </span>
-        </div>
-        <span className="text-[10px] text-[var(--color-text-tertiary)]">{experience.date}</span>
-      </div>
-      <div className="mb-2 flex flex-wrap gap-1.5">
-        {experience.keywords.map((kw) => (
-          <span
-            key={kw}
-            className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
-            style={{ backgroundColor: 'var(--color-accent-bg)', color: 'var(--color-accent-dark)' }}
-          >
-            {kw}
-          </span>
-        ))}
-      </div>
-      {experience.message && (
-        <p className="text-[13px] leading-relaxed text-[var(--color-text-secondary)]">{experience.message}</p>
-      )}
-    </div>
   )
 }

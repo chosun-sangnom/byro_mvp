@@ -13,19 +13,18 @@
  * TODO(auth): 실제 인증 연동 시 서버사이드 세션으로 owner 판별 교체
  */
 
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { Pencil, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { BottomSheet, TextArea, showToast } from '@/components/ui'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
+import { generatePersona } from '@/lib/personaGen'
 import { ContactActionButton } from '@/components/screens/profile/PublicProfileSections'
 import { ProfileHeroSection } from '@/components/screens/profile/PublicProfileHeroSection'
 import { PublicProfileTabBar, type PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
 import { PublicProfileKemiZone, PublicProfileOwnerMatchZone } from '@/components/screens/profile/PublicProfileKemiZone'
 import { PublicProfileCompatibilitySheet } from '@/components/screens/profile/PublicProfileCompatibilitySheet'
-import { ExperienceBottomSheet, ExperienceDoneModal } from '@/components/screens/profile/PublicProfileOverlays'
-import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 
 
 export function PublicProfileShell({
@@ -49,6 +48,9 @@ export function PublicProfileShell({
 
   // owner mode: 로그인 상태이고 현재 보는 프로필이 본인인 경우
   const isOwnerMode = store.isLoggedIn && store.user?.linkId === username
+
+  // [임시] 오너 모드에서만 페르소나 생성 (목업 데이터 기반)
+  const persona = isOwnerMode ? generatePersona(profile) : null
 
   // 연결 관계 상태
   const connectionStatus = (() => {
@@ -75,38 +77,14 @@ export function PublicProfileShell({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile.linkId])
 
-  const [bioExpanded, setBioExpanded] = useState(false)
-  const [bioOverflowing, setBioOverflowing] = useState(false)
   const [compatibilityOpen, setCompatibilityOpen] = useState(false)
   const [connectionRequestOpen, setConnectionRequestOpen] = useState(false)
   const [connectionMessage, setConnectionMessage] = useState('')
   const [cancelRequestOpen, setCancelRequestOpen] = useState(false)
-  const [expSheetOpen, setExpSheetOpen] = useState(false)
-  const [expDoneModal, setExpDoneModal] = useState(false)
   const [feedbackRequestOpen, setFeedbackRequestOpen] = useState(false)
   const [feedbackMessage, setFeedbackMessage] = useState('')
-  const ONE_DAY_MS = 24 * 60 * 60 * 1000
-  const submittedAt = store.expSubmittedAt[profile.linkId]
-  const alreadySubmitted = !!submittedAt && (Date.now() - submittedAt < ONE_DAY_MS)
-  const bioRef = useRef<HTMLParagraphElement | null>(null)
 
-  useEffect(() => {
-    setBioExpanded(false)
-  }, [profile.bio, username])
-
-  useEffect(() => {
-    const checkOverflow = () => {
-      const element = bioRef.current
-      if (!element) return
-      setBioOverflowing(element.scrollHeight - element.clientHeight > 2)
-    }
-    if (bioExpanded) return
-    checkOverflow()
-    window.addEventListener('resize', checkOverflow)
-    return () => window.removeEventListener('resize', checkOverflow)
-  }, [profile.bio, bioExpanded])
-
-  // 관계 탭에서만 "피드백 요청 / 경험 남기기" 버튼 표시 (visitor only)
+  // 관계 탭에서만 "피드백 요청" 버튼 표시 (visitor only)
   const showReputationActions = activeTab === 'reputation' && !isOwnerMode
 
   return (
@@ -159,10 +137,9 @@ export function PublicProfileShell({
           <ProfileHeroSection
             profile={profile}
             heroTheme={profile.heroTheme}
-            bioExpanded={bioExpanded}
-            bioOverflowing={bioOverflowing}
-            bioRef={bioRef}
-            onToggleBio={() => setBioExpanded((prev) => !prev)}
+            personaText={persona?.text}
+            personaReasons={persona?.reasons}
+            personaImage={persona?.image}
           />
         </div>
 
@@ -191,26 +168,12 @@ export function PublicProfileShell({
 
         {/* 평판 탭 visitor 전용 액션 — 방문자가 평판을 남길 수 있는 버튼 */}
         {showReputationActions && (
-          <div className="mb-4 flex gap-3">
-            <button
-              onClick={() => setFeedbackRequestOpen(true)}
-              className="flex-1 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)] whitespace-nowrap"
-            >
-              피드백 요청
-            </button>
-            <button
-              onClick={() => {
-                if (alreadySubmitted) { showToast('오늘 이미 경험을 남겼어요. 내일 다시 남길 수 있어요'); return }
-                setExpSheetOpen(true)
-              }}
-              className="flex-1 rounded-full py-3 text-[13px] font-semibold whitespace-nowrap"
-              style={alreadySubmitted
-                ? { border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)' }
-                : { background: 'linear-gradient(135deg,var(--color-accent-light) 0%,var(--color-accent-dark) 100%)', color: '#fff', boxShadow: '0 10px 24px var(--color-accent-glow)' }}
-            >
-              {alreadySubmitted ? '경험 남겼어요 ✓' : '+ 경험 남기기'}
-            </button>
-          </div>
+          <button
+            onClick={() => setFeedbackRequestOpen(true)}
+            className="mb-4 w-full rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)] whitespace-nowrap"
+          >
+            피드백 요청
+          </button>
         )}
 
         {/* 메인 CTA — owner: 편집 + 연결 관리 / visitor: 연결 상태별 버튼 */}
@@ -308,52 +271,12 @@ export function PublicProfileShell({
           open={compatibilityOpen}
           onClose={() => setCompatibilityOpen(false)}
           profileName={profile.name}
+          profileAvatar={profile.profileImages?.[0] ?? profile.avatarImage}
           whoIAm={profile.whoIAm}
           life={profile.life}
+          kemi={profile.kemi}
         />
       )}
-
-      <ExperienceBottomSheet
-        open={expSheetOpen}
-        profileName={profile.name}
-        isLoggedIn={store.isLoggedIn}
-        experienceKeywordGroups={REPUTATION_KEYWORD_GROUPS}
-        selectedKeywords={store.experienceKeywords}
-        experienceMessage={store.experienceMessage}
-        onToggleKeyword={(keyword) => {
-          if (!store.experienceKeywords.includes(keyword) && store.experienceKeywords.length >= 3) {
-            showToast('키워드는 최대 3개까지 선택할 수 있어요')
-            return
-          }
-          store.setExperienceKeyword(keyword)
-        }}
-        onMessageChange={store.setExperienceMessage}
-        onSubmit={(isAnonymous) => {
-          if (store.experienceKeywords.length === 0) { showToast('키워드를 하나 이상 선택해주세요'); return }
-          store.submitExperience(profile.linkId, {
-            authorName: isAnonymous ? null : (store.user?.name ?? null),
-            isAnonymous: isAnonymous || !store.isLoggedIn,
-            keywords: store.experienceKeywords,
-            message: store.experienceMessage,
-          })
-          store.markExpSubmitted(profile.linkId)
-          store.clearExperience()
-          setExpSheetOpen(false)
-          setExpDoneModal(true)
-        }}
-        onLogin={() => { setExpSheetOpen(false); store.login() }}
-        onClose={() => setExpSheetOpen(false)}
-      />
-
-      <ExperienceDoneModal
-        open={expDoneModal}
-        profileName={profile.name}
-        isLoggedIn={store.isLoggedIn}
-        onRequestExperience={() => { setExpDoneModal(false); setFeedbackRequestOpen(true) }}
-        onCreateByro={() => { setExpDoneModal(false); router.push('/signup') }}
-        onLogin={() => { setExpDoneModal(false); store.login() }}
-        onClose={() => setExpDoneModal(false)}
-      />
 
       {!isOwnerMode && (
         <BottomSheet open={feedbackRequestOpen} onClose={() => { setFeedbackRequestOpen(false); setFeedbackMessage('') }}>

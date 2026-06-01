@@ -135,6 +135,7 @@ export interface HeroTheme {
 
 export interface PublicProfileWhoIAm {
   mbti: string
+  personality?: string
 }
 
 export interface LifeMediaItem {
@@ -151,17 +152,27 @@ export interface KemiMatchItem {
   category: 'taste' | 'place' | 'lifestyle' | 'identity'
 }
 
+export interface KemiLockedBlock {
+  index: number          // 블록 인덱스 (1~5)
+  missingItems: string[] // 이 블록을 열기 위해 필요한 항목들
+}
+
 export interface KemiData {
   matchCount: number
   matchItems: KemiMatchItem[]
   // TODO(AI): Replace aiCopy with LLM-generated conversation starter based on full profile match context
   aiCopy: string
+  // [임시] 목업 전용. 실제 구현 시 viewer 프로필 완성도 기반으로 서버에서 계산
+  completenessPercent: number
+  lockedBlocks: KemiLockedBlock[]  // 블록별 잠금 이유
+  // 완성도 바 하단 힌트용 전체 부족 항목 (lockedBlocks에서 파생 가능하지만 편의상 유지)
+  missingItems: string[]
 }
 
 export interface PublicProfileLife {
   daily: {
     exercise: LifeMediaItem[]
-    pet: string
+    pet?: string
     petName?: string
     petImage?: string
   }
@@ -187,11 +198,24 @@ export interface CareerHighlight {
 export interface RememberIndustry {
   name: string
   ratio: number
+  count?: number
+}
+
+export interface RememberInsight {
+  recentMeetings: number
+  recentMonths: number
+  topIndustryName: string
+  topIndustryPercent: number
+  growthIndustryName: string
+  growthFrom: number
+  growthTo: number
+  growthPeriodLabel: string
 }
 
 export interface RememberHighlight {
   total: number
   industries: RememberIndustry[]
+  insight?: RememberInsight
 }
 
 export interface CorporateCompany {
@@ -303,4 +327,29 @@ export interface UserState {
   contactChannels?: ContactChannel[]
   tabVisibility?: TabVisibility
   isVerified?: boolean
+}
+
+// ── OCR 결과 타입 ──────────────────────────────────────────────────────────────
+export type OcrCareer = {
+  company: string
+  role: string
+  startYear: string
+  endYear: string
+  status: '재직 중' | '종료'
+}
+
+export type OcrEducation = {
+  school: string
+  major: string
+  degree: string
+  schoolType: '대학교' | '대학원' | '고등학교' | '기타'
+  status: '졸업' | '재학' | '중퇴'
+  startYear: string
+  endYear: string
+}
+
+export type OcrResult = {
+  source: 'linkedin' | 'remember' | 'unknown'
+  careers: OcrCareer[]
+  educations: OcrEducation[]
 }

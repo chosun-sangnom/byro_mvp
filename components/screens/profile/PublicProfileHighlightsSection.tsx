@@ -36,7 +36,7 @@ export function ProfileHighlightsSection({
 }: {
   profile: {
     careerHighlight: { avgYears: number; vsIndustryPercent: number }
-    rememberHighlight: { total: number; industries: { name: string; ratio: number }[] }
+    rememberHighlight: { total: number; industries: { name: string; ratio: number }[]; insight?: import('@/types').RememberInsight }
   }
   corporateHighlight: {
     companyCount: number
@@ -122,6 +122,7 @@ export function ProfileHighlightsSection({
                             <RememberNetworkGraph
                               total={profile.rememberHighlight.total}
                               industries={profile.rememberHighlight.industries}
+                              insight={profile.rememberHighlight.insight}
                             />
                           )}
                           {hl.categoryId === 'corporate-longevity' && (

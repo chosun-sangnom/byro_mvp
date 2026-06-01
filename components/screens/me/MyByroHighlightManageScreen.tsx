@@ -12,6 +12,7 @@ import { HighlightManageCertificationView } from '@/components/screens/me/highli
 import { HighlightManageFormView } from '@/components/screens/me/highlight-manage/HighlightManageFormView'
 import { HighlightManageListView } from '@/components/screens/me/highlight-manage/HighlightManageListView'
 import { HighlightManagePickerView } from '@/components/screens/me/highlight-manage/HighlightManagePickerView'
+import { HighlightLlmImportSheet } from '@/components/screens/me/highlight-manage/HighlightLlmImportSheet'
 import {
   CERTIFICATION_ITEMS,
   type CertificationItem,
@@ -50,6 +51,9 @@ export function HighlightManageScreen({
   const [hlDesc, setHlDesc] = useState('')
   const [yearPickerTarget, setYearPickerTarget] = useState<YearPickerTarget | null>(null)
   const [selectedCert, setSelectedCert] = useState<CertificationItem | null>(null)
+
+  // [임시] LLM 임포트 시트 상태
+  const [llmImportOpen, setLlmImportOpen] = useState(false)
 
   const isCareerRole = selectedCat?.id === 'career-role'
   const isEducationHistory = selectedCat?.id === 'education-history'
@@ -361,16 +365,24 @@ export function HighlightManageScreen({
   }
 
   return (
-    <HighlightManageListView
-      groupedCategoryCards={groupedCategoryCards}
-      onBack={onBack}
-      onOpenCategory={openCategory}
-      onOpenCertification={openCertification}
-      onOpenPicker={() => {
-        resetAll()
-        setMode('picker')
-      }}
-    />
+    <>
+      <HighlightManageListView
+        groupedCategoryCards={groupedCategoryCards}
+        onBack={onBack}
+        onOpenCategory={openCategory}
+        onOpenCertification={openCertification}
+        onOpenPicker={() => {
+          resetAll()
+          setMode('picker')
+        }}
+        onLlmImport={() => setLlmImportOpen(true)}
+      />
+      {/* [임시] LLM 클립보드 브릿지 임포트 시트 */}
+      <HighlightLlmImportSheet
+        open={llmImportOpen}
+        onClose={() => setLlmImportOpen(false)}
+      />
+    </>
   )
 }
 

@@ -8,10 +8,11 @@ import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
 import type { Highlight } from '@/types'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
 import {
+  ProfileFeedbackSection,
   ProfileRememberSection,
   ProfileReputationSummarySection,
-  ProfileExperienceSection,
 } from '@/components/screens/profile/PublicProfileSections'
+import { getPublicProfileByUsername } from '@/lib/mocks/publicProfiles'
 import { ProfileSnsSection } from '@/components/screens/profile/PublicProfileSnsSection'
 import { ProfileHighlightsSection } from '@/components/screens/profile/PublicProfileHighlightsSection'
 import { PublicProfileLifeSection } from '@/components/screens/profile/PublicProfileLifeSection'
@@ -123,6 +124,7 @@ export function PublicProfileWhoTabPage({
     <>
       <PublicProfileWhoIAmSection
         whoIAm={profile.whoIAm}
+        bio={profile.bio}
       />
       <ProfileHighlightsSection
         profile={profile}
@@ -164,23 +166,30 @@ export function PublicProfileReputationTabPage({
   username: string
 }) {
   const router = useRouter()
-  const { store, profile, keywordCounts, totalKeywordCount } = usePublicProfileTabData(username)
-  const submittedExps = store.submittedExperiences[profile.linkId] ?? []
-  const allExperiences = [...submittedExps, ...(profile.experiences ?? [])]
+  const { profile, keywordCounts, totalKeywordCount, featuredGuestbook } = usePublicProfileTabData(username)
+
+  const getProfileAvatar = (linkId: string) => {
+    const p = getPublicProfileByUsername(linkId)
+    return p?.profileImages?.[0] ?? p?.avatarImage ?? ''
+  }
 
   return (
     <div className="pb-6">
       <ProfileRememberSection
         total={profile.rememberHighlight.total}
         industries={profile.rememberHighlight.industries}
+        insight={profile.rememberHighlight.insight}
       />
       <ProfileReputationSummarySection
         keywordCounts={keywordCounts}
         totalKeywordCount={totalKeywordCount}
       />
-      <ProfileExperienceSection
-        experiences={allExperiences}
-        onViewAll={() => router.push(`/${profile.linkId}/feedback`)}
+      <ProfileFeedbackSection
+        profile={profile}
+        featuredGuestbook={featuredGuestbook}
+        getProfileAvatar={getProfileAvatar}
+        onGuestbookEntryClick={(linkId) => router.push(`/${linkId}`)}
+        onOpenGuestbook={() => router.push(`/${profile.linkId}/feedback`)}
       />
     </div>
   )

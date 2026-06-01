@@ -11,7 +11,7 @@ import {
   PublicProfileReputationTabPage,
   PublicProfileWhoTabPage,
 } from '@/components/screens/profile/PublicProfileTabPages'
-import { BasicInfoEditScreen } from '@/components/screens/me/MyByroBasicInfoScreen'
+import { BasicInfoEditScreen, WhoIAmEditScreen } from '@/components/screens/me/MyByroBasicInfoScreen'
 import { HighlightManageScreen } from '@/components/screens/me/MyByroHighlightManageScreen'
 import {
   ContactManageScreen,
@@ -27,6 +27,7 @@ type Screen =
   | 'preview'
   | 'manage'
   | 'editBasic'
+  | 'editWhoIAm'
   | 'editHighlight'
   | 'editLife'
   | 'editNetwork'
@@ -97,6 +98,7 @@ export default function MyByro() {
         onLogout={() => store.logout()}
         onBack={() => setScreen('preview')}
         onEditBasic={() => setScreen('editBasic')}
+        onEditWhoIAm={() => setScreen('editWhoIAm')}
         onEditHighlight={() => setScreen('editHighlight')}
         onEditLife={() => setScreen('editLife')}
         onEditNetwork={() => setScreen('editNetwork')}
@@ -115,6 +117,10 @@ export default function MyByro() {
     return <BasicInfoEditScreen user={user} onBack={handleBackToManage} />
   }
 
+  if (screen === 'editWhoIAm') {
+    return <WhoIAmEditScreen user={user} onBack={handleBackToManage} />
+  }
+
   if (screen === 'editLife') {
     return <LifeManageScreen onBack={handleBackToManage} />
   }
@@ -123,6 +129,7 @@ export default function MyByro() {
     return (
       <RememberNetworkManageScreen
         userLinkId={user.linkId}
+        rememberHighlight={profile.rememberHighlight}
         onBack={handleBackToManage}
       />
     )

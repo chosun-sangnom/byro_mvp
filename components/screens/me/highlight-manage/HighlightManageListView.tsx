@@ -1,4 +1,4 @@
-import { BadgeCheck, ChevronRight } from 'lucide-react'
+import { BadgeCheck, ChevronRight, Sparkles } from 'lucide-react'
 import { NavBar } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import type { HighlightIconId } from '@/types'
@@ -10,6 +10,8 @@ interface HighlightManageListViewProps {
   onOpenCategory: (category: HighlightManageCategory) => void
   onOpenCertification: (categoryId: string) => void
   onOpenPicker: () => void
+  // [임시] OCR 클립보드 브릿지 — 스크린샷으로 경력/학력 자동 입력
+  onLlmImport: () => void
 }
 
 export function HighlightManageListView({
@@ -18,6 +20,7 @@ export function HighlightManageListView({
   onOpenCategory,
   onOpenCertification,
   onOpenPicker,
+  onLlmImport,
 }: HighlightManageListViewProps) {
   return (
     <div className="flex flex-col h-full">
@@ -29,6 +32,21 @@ export function HighlightManageListView({
           <div className="mt-1 text-sm leading-6 text-[var(--color-text-secondary)]">
             카테고리별로 항목을 정리하고, 메인으로 보여줄 내용을 선택하세요.
           </div>
+
+          {/* [임시] OCR 자동 입력 버튼 */}
+          <button
+            type="button"
+            onClick={onLlmImport}
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-[16px] py-3 text-[13px] font-semibold"
+            style={{
+              background: 'var(--color-accent-bg-subtle)',
+              border: '1px solid var(--color-accent-border-soft)',
+              color: 'var(--color-accent-dark)',
+            }}
+          >
+            <Sparkles size={14} />
+            스크린샷으로 경력 · 학력 자동 채우기
+          </button>
         </div>
 
         <div className="space-y-6">

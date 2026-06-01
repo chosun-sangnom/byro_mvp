@@ -166,7 +166,7 @@ export function PublicProfileReputationTabPage({
   username: string
 }) {
   const router = useRouter()
-  const { store, profile, keywordCounts, totalKeywordCount, featuredGuestbook } = usePublicProfileTabData(username)
+  const { profile, keywordCounts, totalKeywordCount, featuredGuestbook } = usePublicProfileTabData(username)
 
   const getProfileAvatar = (linkId: string) => {
     const p = getPublicProfileByUsername(linkId)

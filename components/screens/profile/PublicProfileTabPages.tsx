@@ -11,7 +11,6 @@ import {
   ProfileFeedbackSection,
   ProfileRememberSection,
   ProfileReputationSummarySection,
-  ProfileExperienceSection,
 } from '@/components/screens/profile/PublicProfileSections'
 import { getPublicProfileByUsername } from '@/lib/mocks/publicProfiles'
 import { ProfileSnsSection } from '@/components/screens/profile/PublicProfileSnsSection'
@@ -168,8 +167,6 @@ export function PublicProfileReputationTabPage({
 }) {
   const router = useRouter()
   const { store, profile, keywordCounts, totalKeywordCount, featuredGuestbook } = usePublicProfileTabData(username)
-  const submittedExps = store.submittedExperiences[profile.linkId] ?? []
-  const allExperiences = [...submittedExps, ...(profile.experiences ?? [])]
 
   const getProfileAvatar = (linkId: string) => {
     const p = getPublicProfileByUsername(linkId)
@@ -193,10 +190,6 @@ export function PublicProfileReputationTabPage({
         getProfileAvatar={getProfileAvatar}
         onGuestbookEntryClick={(linkId) => router.push(`/${linkId}`)}
         onOpenGuestbook={() => router.push(`/${profile.linkId}/feedback`)}
-      />
-      <ProfileExperienceSection
-        experiences={allExperiences}
-        onViewAll={() => router.push(`/${profile.linkId}/feedback`)}
       />
     </div>
   )

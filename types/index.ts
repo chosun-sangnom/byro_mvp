@@ -172,7 +172,7 @@ export interface KemiData {
 export interface PublicProfileLife {
   daily: {
     exercise: LifeMediaItem[]
-    pet: string
+    pet?: string
     petName?: string
     petImage?: string
   }

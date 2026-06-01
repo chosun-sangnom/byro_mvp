@@ -641,13 +641,8 @@ export function PublicProfileCompatibilitySheet({
         <div className="mb-5 rounded-[16px] px-4 py-3.5" style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-default)' }}>
           <div className="mb-2 flex items-center justify-between">
             <span className="text-[13px] font-bold" style={{ color: 'var(--color-text-primary)' }}>
-              {completenessPercent}% 분석됐어요
+              케미가 {completenessPercent}%만 분석됐어요
             </span>
-            {completenessPercent < 100 && (
-              <span className="text-[11px]" style={{ color: 'var(--color-text-tertiary)' }}>
-                더 채울수록 더 정확해져요
-              </span>
-            )}
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full" style={{ background: 'var(--color-border-default)' }}>
             <div
@@ -659,17 +654,22 @@ export function PublicProfileCompatibilitySheet({
             />
           </div>
           {missingItems.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {missingItems.map((item) => (
-                <span
-                  key={item}
-                  className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
-                  style={{ background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)' }}
-                >
-                  + {item}
-                </span>
-              ))}
-            </div>
+            <>
+              <p className="mt-2.5 text-[11px] leading-relaxed" style={{ color: 'var(--color-text-tertiary)' }}>
+                아래 정보가 부족해서 일부 케미를 분석하지 못했어요. 채우면 더 정확한 결과를 볼 수 있어요.
+              </p>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {missingItems.map((item) => (
+                  <span
+                    key={item}
+                    className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+                    style={{ background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)' }}
+                  >
+                    + {item}
+                  </span>
+                ))}
+              </div>
+            </>
           )}
         </div>
 

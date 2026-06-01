@@ -112,7 +112,6 @@ export function ProfileHighlightsSection({
                           {hl.categoryId === 'career-continuity' && (
                             <CareerContinuityChart
                               avgYears={profile.careerHighlight.avgYears}
-                              vsIndustryPercent={profile.careerHighlight.vsIndustryPercent}
                             />
                           )}
                           {hl.categoryId === 'remember-network' && (

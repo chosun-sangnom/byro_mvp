@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import DevResetButton from "@/components/ui/DevResetButton";
 
 export const metadata: Metadata = {
   title: "Byro — Build Your Real Offline Identity",
@@ -15,6 +16,7 @@ export default function RootLayout({
     <html lang="ko">
       <body className="antialiased overflow-x-hidden">
         {children}
+        <DevResetButton />
       </body>
     </html>
   );

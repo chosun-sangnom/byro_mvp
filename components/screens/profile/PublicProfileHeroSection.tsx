@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Sparkles, X } from 'lucide-react'
 import { BottomSheet } from '@/components/ui'
@@ -199,14 +200,16 @@ export function ProfileHeroCard({
   personaImage?: string
 }) {
   const [personaSheetOpen, setPersonaSheetOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
   const showAge = typeof profile.age === 'number' && profile.showAge !== false
 
   return (
     <div className="hero-card border border-[var(--color-border-default)] bg-[var(--color-glass-strong)] p-[8px] backdrop-blur-sm">
       <div className="relative h-[452px] overflow-hidden rounded-[30px] bg-[#121212] text-white ring-1 ring-black/4">
 
-        {/* AI 페르소나 바텀시트 */}
-        {personaReasons && (
+        {/* AI 페르소나 바텀시트 — createPortal로 transform 컨텍스트 탈출 */}
+        {personaReasons && mounted && createPortal(
           <BottomSheet open={personaSheetOpen} onClose={() => setPersonaSheetOpen(false)}>
             <div className="pb-8">
               {/* [임시] AI 이미지 생성 모델 연동 전 placeholder 이미지 */}
@@ -250,7 +253,8 @@ export function ProfileHeroCard({
                 </div>
               </div>
             </div>
-          </BottomSheet>
+          </BottomSheet>,
+          document.body
         )}
 
         <div className="relative h-full">

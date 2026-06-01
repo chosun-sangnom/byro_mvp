@@ -84,9 +84,6 @@ export function ProfileHighlightsSection({
                         <span className="text-[11px] text-[var(--color-text-tertiary)]">{hl.title}</span>
                       </div>
                       <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{hl.subtitle}</div>
-                      {hl.categoryId === 'career-continuity' && (
-                        <div className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">업계 평균 대비 +{profile.careerHighlight.vsIndustryPercent}%</div>
-                      )}
                       {hl.categoryId === 'corporate-longevity' && (
                         <div className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">{corporateHighlight.companyCount}개 법인 · 폐업 이력 없음</div>
                       )}

@@ -89,12 +89,11 @@ export const SAMPLE_PROFILE = {
   },
   careerHighlight: { avgYears: 4.2, vsIndustryPercent: 128 },
   corporateHighlight: {
-    companyCount: 2,
-    averageOperatingYears: 5,
-    summary: '2개 법인 · 정상 운영 중',
+    companyCount: 1,
+    averageOperatingYears: 6,
+    summary: '1개 법인 · 정상 운영 중',
     companies: [
       { name: 'Byro Inc.', startYear: 2020, endYear: null, years: 6, status: '정상 운영' },
-      { name: 'MKG Studio', startYear: 2022, endYear: null, years: 4, status: '정상 운영' },
     ],
   },
   rememberHighlight: {

@@ -5,7 +5,7 @@ import Archive from '@/components/screens/archive/Archive'
 
 export default function ArchivePage() {
   return (
-    <AppShell>
+    <AppShell showHeader>
       <Archive />
     </AppShell>
   )

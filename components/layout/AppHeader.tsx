@@ -61,7 +61,7 @@ export default function AppHeader() {
 
       {/* 검색 모달 오버레이 */}
       {searchOpen && (
-        <div className="fixed inset-0 z-50 bg-[var(--color-bg-page)]">
+        <div className="absolute inset-0 z-50 bg-[var(--color-bg-page)]">
           <SearchScreen onClose={() => setSearchOpen(false)} />
         </div>
       )}

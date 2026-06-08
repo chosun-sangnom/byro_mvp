@@ -98,7 +98,7 @@ function NoResults({ query }: { query: string }) {
   return (
     <div className="flex flex-col items-center justify-center h-full pt-32 gap-2 px-6 text-center">
       <p className="text-[15px] font-semibold text-[var(--color-text-primary)]">
-        '{query}'에 대한 결과가 없어요
+        &apos;{query}&apos;에 대한 결과가 없어요
       </p>
       <p className="text-[13px] text-[var(--color-text-secondary)]">
         다른 이름이나 직함으로 검색해보세요

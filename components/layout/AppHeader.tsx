@@ -173,7 +173,7 @@ export default function AppHeader() {
                 {allNotifs.map((item) => (
                   <li key={item.id}>
                     <button
-                      onClick={() => { setMode('default'); item.type === 'connection' ? router.push('/archive') : router.push(`/${item.linkId}`) }}
+                      onClick={() => { setMode('default'); if (item.type === 'connection') router.push('/archive'); else router.push(`/${item.linkId}`) }}
                       className="w-full flex items-start gap-3 px-5 py-3.5 hover:bg-[var(--color-bg-soft)] transition-colors text-left"
                     >
                       <div className="w-8 h-8 rounded-full bg-[var(--color-accent-soft)] flex items-center justify-center text-[var(--color-accent-dark)] flex-shrink-0 mt-0.5">

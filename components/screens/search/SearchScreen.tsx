@@ -26,7 +26,11 @@ function matchesQuery(profile: SearchResult, q: string) {
   )
 }
 
-export default function SearchScreen() {
+interface SearchScreenProps {
+  onClose?: () => void
+}
+
+export default function SearchScreen({ onClose }: SearchScreenProps) {
   const router = useRouter()
   const [query, setQuery] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
@@ -34,6 +38,11 @@ export default function SearchScreen() {
   useEffect(() => {
     inputRef.current?.focus()
   }, [])
+
+  const handleClose = () => {
+    if (onClose) onClose()
+    else router.back()
+  }
 
   const results: SearchResult[] = query.trim()
     ? SEARCHABLE_PROFILES.filter((p) => matchesQuery(p, query.trim()))
@@ -44,7 +53,7 @@ export default function SearchScreen() {
       {/* 상단 검색 바 */}
       <div className="flex items-center gap-2 px-4 h-14 border-b border-[var(--color-border-soft)] flex-shrink-0">
         <button
-          onClick={() => router.back()}
+          onClick={handleClose}
           className="p-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
           aria-label="뒤로"
         >
@@ -69,7 +78,7 @@ export default function SearchScreen() {
         ) : results.length === 0 ? (
           <NoResults query={query} />
         ) : (
-          <ResultList results={results} onSelect={(id) => router.push(`/${id}`)} />
+          <ResultList results={results} onSelect={(id) => { onClose?.(); router.push(`/${id}`) }} />
         )}
       </div>
     </div>

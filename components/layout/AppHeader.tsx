@@ -5,13 +5,16 @@ import { Bell, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
 import SearchScreen from '@/components/screens/search/SearchScreen'
+import NotificationModal from '@/components/layout/NotificationModal'
 
 export default function AppHeader() {
   const router = useRouter()
-  const { user, isLoggedIn } = useByroStore()
+  const { user, isLoggedIn, connectionRequests } = useByroStore()
   const [searchOpen, setSearchOpen] = useState(false)
+  const [notiOpen, setNotiOpen] = useState(false)
 
   const initials = user?.name ? user.name.slice(0, 2) : 'BY'
+  const hasUnread = connectionRequests.length > 0
 
   return (
     <>
@@ -30,22 +33,37 @@ export default function AppHeader() {
           </button>
 
           <button
+            onClick={() => setNotiOpen(true)}
             className="relative p-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
             aria-label="알림"
           >
             <Bell size={20} />
-            {/* [임시] 알림 배지 — 실제 알림 연동 전 고정 표시 */}
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500" />
+            {hasUnread && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500" />
+            )}
           </button>
 
           {isLoggedIn ? (
             <button
               onClick={() => router.push('/me')}
-              className="ml-1 w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-bold transition-opacity hover:opacity-80"
-              style={{ backgroundColor: user?.avatarColor ?? 'var(--color-accent-dark)' }}
+              className="ml-1 w-8 h-8 rounded-full overflow-hidden flex-shrink-0 hover:opacity-80 transition-opacity"
               aria-label="내 바이로"
             >
-              {initials}
+              {user?.avatarImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={user.avatarImage}
+                  alt={user.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div
+                  className="w-full h-full flex items-center justify-center text-white text-[11px] font-bold"
+                  style={{ backgroundColor: user?.avatarColor ?? 'var(--color-accent-dark)' }}
+                >
+                  {initials}
+                </div>
+              )}
             </button>
           ) : (
             <button
@@ -59,11 +77,14 @@ export default function AppHeader() {
         </div>
       </header>
 
-      {/* 검색 모달 오버레이 */}
       {searchOpen && (
         <div className="absolute inset-0 z-50 bg-[var(--color-bg-page)]">
           <SearchScreen onClose={() => setSearchOpen(false)} />
         </div>
+      )}
+
+      {notiOpen && (
+        <NotificationModal onClose={() => setNotiOpen(false)} />
       )}
     </>
   )

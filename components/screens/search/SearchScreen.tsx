@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Search } from 'lucide-react'
 import { SAMPLE_PROFILE, MK_PROFILE, JIMIN_PROFILE } from '@/lib/mocks/publicProfiles'
@@ -49,7 +50,12 @@ export default function SearchScreen({ onClose }: SearchScreenProps) {
     : []
 
   return (
-    <div className="flex flex-col min-h-dvh bg-[var(--color-bg-page)]">
+    <motion.div
+      className="flex flex-col min-h-dvh bg-[var(--color-bg-page)]"
+      initial={{ opacity: 0, y: -12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+    >
       {/* 상단 검색 바 */}
       <div className="flex items-center gap-2 px-4 h-14 border-b border-[var(--color-border-soft)] flex-shrink-0">
         <button
@@ -73,15 +79,23 @@ export default function SearchScreen({ onClose }: SearchScreenProps) {
 
       {/* 본문 */}
       <div className="flex-1">
-        {query.trim() === '' ? (
-          <EmptyPrompt />
-        ) : results.length === 0 ? (
-          <NoResults query={query} />
-        ) : (
-          <ResultList results={results} onSelect={(id) => { onClose?.(); router.push(`/${id}`) }} />
-        )}
+        <AnimatePresence mode="wait">
+          {query.trim() === '' ? (
+            <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+              <EmptyPrompt />
+            </motion.div>
+          ) : results.length === 0 ? (
+            <motion.div key="no-results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+              <NoResults query={query} />
+            </motion.div>
+          ) : (
+            <motion.div key="results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
+              <ResultList results={results} onSelect={(id) => { onClose?.(); router.push(`/${id}`) }} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -125,8 +139,13 @@ function ResultList({
 }) {
   return (
     <ul className="py-2">
-      {results.map((p) => (
-        <li key={p.linkId}>
+      {results.map((p, i) => (
+        <motion.li
+          key={p.linkId}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.05, duration: 0.15 }}
+        >
           <button
             onClick={() => onSelect(p.linkId)}
             className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[var(--color-bg-soft)] transition-colors text-left"
@@ -151,7 +170,7 @@ function ResultList({
               </p>
             </div>
           </button>
-        </li>
+        </motion.li>
       ))}
     </ul>
   )

@@ -90,46 +90,48 @@ export function PublicProfileShell({
   return (
     <div className="flex h-full flex-col">
 
-      {/* ── 상단 Nav ── */}
-      <div className="flex h-12 flex-shrink-0 items-center border-b border-[var(--color-border-soft)] bg-[var(--color-glass-mid)] px-4 backdrop-blur-md">
-        <button
-          onClick={() => router.back()}
-          className="mr-2 text-sm text-[var(--color-text-secondary)]"
-        >
-          ‹
-        </button>
-
-        <div className="min-w-0 flex-1">
-          <div className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">
-            Public Profile
-          </div>
-          <div className="truncate text-xs text-[var(--color-text-secondary)]">
-            byro.io/{profile.linkId}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2.5">
-          {store.isLoggedIn ? (
-            <button
-              onClick={() => router.push('/me')}
-              className="inline-flex h-8 items-center gap-2 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] pl-1.5 pr-3 text-[11px] font-semibold text-[var(--color-text-primary)]"
-            >
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-accent-dark)] text-[10px] font-black text-white">
-                {store.user?.name?.charAt(0) ?? 'M'}
-              </span>
-              <span>{isOwnerMode ? '내 Byro' : '내 프로필'}</span>
-            </button>
-          ) : null}
-
-          {/* TODO(share): 실제 공유 링크 생성 연동 */}
+      {/* ── 상단 Nav (방문자 모드에서만 표시) ── */}
+      {!isOwnerMode && (
+        <div className="flex h-12 flex-shrink-0 items-center border-b border-[var(--color-border-soft)] bg-[var(--color-glass-mid)] px-4 backdrop-blur-md">
           <button
-            onClick={() => showToast('공유 링크를 준비 중이에요')}
-            className="icon-button"
+            onClick={() => router.back()}
+            className="mr-2 text-sm text-[var(--color-text-secondary)]"
           >
-            <Share2 size={14} color="var(--color-text-tertiary)" />
+            ‹
           </button>
+
+          <div className="min-w-0 flex-1">
+            <div className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">
+              Public Profile
+            </div>
+            <div className="truncate text-xs text-[var(--color-text-secondary)]">
+              byro.io/{profile.linkId}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            {store.isLoggedIn ? (
+              <button
+                onClick={() => router.push('/me')}
+                className="inline-flex h-8 items-center gap-2 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] pl-1.5 pr-3 text-[11px] font-semibold text-[var(--color-text-primary)]"
+              >
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-accent-dark)] text-[10px] font-black text-white">
+                  {store.user?.name?.charAt(0) ?? 'M'}
+                </span>
+                <span>내 프로필</span>
+              </button>
+            ) : null}
+
+            {/* TODO(share): 실제 공유 링크 생성 연동 */}
+            <button
+              onClick={() => showToast('공유 링크를 준비 중이에요')}
+              className="icon-button"
+            >
+              <Share2 size={14} color="var(--color-text-tertiary)" />
+            </button>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ── 고정 헤더 영역 ── */}
       <div className="flex-shrink-0">

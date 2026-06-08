@@ -15,7 +15,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
-import { Pencil, Share2 } from 'lucide-react'
+import { Pencil } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { BottomSheet, TextArea, showToast } from '@/components/ui'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'

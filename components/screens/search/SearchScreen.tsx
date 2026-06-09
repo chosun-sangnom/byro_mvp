@@ -4,14 +4,21 @@ import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Search } from 'lucide-react'
+import { showToast } from '@/components/ui'
 import { SAMPLE_PROFILE, MK_PROFILE, JIMIN_PROFILE } from '@/lib/mocks/publicProfiles'
-import { VIRTUAL_KIM_YOUNGSEOK } from '@/lib/mocks/virtualProfiles'
+import { ALL_VIRTUAL_PROFILES } from '@/lib/mocks/virtualProfiles'
 
 // [임시] 목업 검색 대상 — API 연동 후 서버 검색으로 교체
 const SEARCHABLE_PROFILES = [SAMPLE_PROFILE, MK_PROFILE, JIMIN_PROFILE]
 
+// [임시] 동명이인 시연용 가입자 김영석 — 클릭 시 프로필 페이지 없음
+const EXTRA_MOCK_MEMBERS: SearchResult[] = [
+  { linkId: 'kimyoungseok-bonanza-po', name: '김영석', title: 'Product Owner · 보난자팩토리', school: '', avatarColor: '#5B8FA8' },
+  { linkId: 'kimyoungseok-coinone', name: '김영석', title: '마케팅 팀장 · 코인원', school: '', avatarColor: '#7B6F9A' },
+]
+
 // [임시] 목업 가상 프로필 — 실제 구현 시 크롤링 결과로 교체
-const VIRTUAL_PROFILES = [VIRTUAL_KIM_YOUNGSEOK]
+const VIRTUAL_PROFILES = ALL_VIRTUAL_PROFILES
 
 type SearchResult = {
   linkId: string
@@ -68,9 +75,13 @@ export default function SearchScreen({ onClose }: SearchScreenProps) {
   }
 
   const q = query.trim()
-  const results: SearchResult[] = q
+  const baseResults: SearchResult[] = q
     ? SEARCHABLE_PROFILES.filter((p) => matchesQuery(p, q))
     : []
+  const extraResults: SearchResult[] = q
+    ? EXTRA_MOCK_MEMBERS.filter((p) => matchesQuery(p, q))
+    : []
+  const results = [...baseResults, ...extraResults]
   const virtualResults: VirtualSearchResult[] = q
     ? VIRTUAL_PROFILES.filter((p) => matchesVirtualQuery(p, q))
     : []
@@ -122,6 +133,7 @@ export default function SearchScreen({ onClose }: SearchScreenProps) {
                 <ResultList
                   results={results}
                   label={`바이로 회원 ${results.length}명`}
+                  extraLinkIds={new Set(EXTRA_MOCK_MEMBERS.map((p) => p.linkId))}
                   onSelect={(id) => { onClose?.(); router.push(`/${id}`) }}
                 />
               )}
@@ -184,10 +196,12 @@ function SectionHeader({ label }: { label: string }) {
 function ResultList({
   results,
   label,
+  extraLinkIds,
   onSelect,
 }: {
   results: SearchResult[]
   label?: string
+  extraLinkIds?: Set<string>
   onSelect: (linkId: string) => void
 }) {
   return (
@@ -202,7 +216,10 @@ function ResultList({
             transition={{ delay: i * 0.05, duration: 0.15 }}
           >
             <button
-              onClick={() => onSelect(p.linkId)}
+              onClick={() => {
+                if (extraLinkIds?.has(p.linkId)) { showToast('준비 중인 프로필이에요'); return }
+                onSelect(p.linkId)
+              }}
               className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[var(--color-bg-soft)] transition-colors text-left"
             >
               <div

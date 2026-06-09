@@ -78,7 +78,88 @@ export const VIRTUAL_KIM_YOUNGSEOK: VirtualProfile = {
   sourceLabel: '뉴스 · 인터뷰 기반 공개 정보',
 }
 
+export const VIRTUAL_KIM_YOUNGSEOK_VC: VirtualProfile = {
+  id: 'kim-youngseok-sparklabs',
+  name: '김영석',
+  title: 'VC 심사역 · 스파크랩',
+  tags: ['스타트업', '투자', 'VC'],
+  avatarInitials: '김영',
+  avatarColor: '#3D6B5E',
+  heroTheme: {
+    cover: 'from-[#1E4035] via-[#111F1A] to-[#0D0D0D]',
+    avatar: 'from-[#3D6B5E] to-[#1E4035]',
+  },
+  highlights: [
+    {
+      id: 'vkvc1',
+      icon: 'briefcase',
+      label: 'VC 심사역 · 스파크랩',
+      sublabel: '초기 스타트업 투자 심사',
+      year: '2021 - 현재',
+    },
+    {
+      id: 'vkvc2',
+      icon: 'briefcase',
+      label: '전) 카카오벤처스 투자팀',
+      sublabel: 'Series A · B 투자 심사',
+      year: '2018 - 2021',
+    },
+    {
+      id: 'vkvc3',
+      icon: 'book-open',
+      label: '서울대학교 경영학',
+      sublabel: '경영학과 학사',
+      year: '2016',
+    },
+  ],
+  kemiPreviewCount: 2,
+  sourceLabel: '뉴스 · LinkedIn 기반 공개 정보',
+}
+
+export const VIRTUAL_KIM_YOUNGSEOK_WRITER: VirtualProfile = {
+  id: 'kim-youngseok-writer',
+  name: '김영석',
+  title: '소설가 · 에세이스트',
+  tags: ['문학', '에세이', '창작'],
+  avatarInitials: '김영',
+  avatarColor: '#7A4A3A',
+  heroTheme: {
+    cover: 'from-[#4A2A1E] via-[#1A1210] to-[#0D0D0D]',
+    avatar: 'from-[#7A4A3A] to-[#4A2A1E]',
+  },
+  highlights: [
+    {
+      id: 'vkw1',
+      icon: 'book-open',
+      label: '장편소설 『우리가 헤어지는 계절』 출간',
+      sublabel: '민음사 · 2023 올해의 책 선정',
+      year: '2023',
+    },
+    {
+      id: 'vkw2',
+      icon: 'trophy',
+      label: '한국문학상 중편 부문 수상',
+      sublabel: '2022 한국문학상',
+      year: '2022',
+    },
+    {
+      id: 'vkw3',
+      icon: 'mic',
+      label: '서울국제도서전 초청 강연',
+      sublabel: '창작 프로세스와 문학의 사회적 역할',
+      year: '2023',
+    },
+  ],
+  kemiPreviewCount: 2,
+  sourceLabel: '출판사 · 문학상 공개 정보',
+}
+
+export const ALL_VIRTUAL_PROFILES = [
+  VIRTUAL_KIM_YOUNGSEOK,
+  VIRTUAL_KIM_YOUNGSEOK_VC,
+  VIRTUAL_KIM_YOUNGSEOK_WRITER,
+]
+
 export function getVirtualProfileById(id: string): VirtualProfile | null {
-  if (id === 'kim-youngseok-bonanza') return VIRTUAL_KIM_YOUNGSEOK
-  return null
+  return ALL_VIRTUAL_PROFILES.find((p) => p.id === id) ?? null
 }

@@ -287,9 +287,6 @@ export default function SearchScreen({ onClose }: SearchScreenProps) {
                           <div className="min-w-0 flex-1">
                             <p className="text-[14px] font-semibold text-[var(--color-text-primary)] truncate">{p.name}</p>
                             <p className="text-[12px] text-[var(--color-text-secondary)] truncate">{p.title}</p>
-                            <p className="text-[11px] mt-0.5" style={{ color: 'var(--color-accent-dark)' }}>
-                              내 프로필이에요 →
-                            </p>
                           </div>
                           <span
                             className="flex-shrink-0 self-start mt-1 rounded-full px-2 py-0.5 text-[10px] font-semibold"

@@ -5,9 +5,13 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Search } from 'lucide-react'
 import { SAMPLE_PROFILE, MK_PROFILE, JIMIN_PROFILE } from '@/lib/mocks/publicProfiles'
+import { VIRTUAL_KIM_YOUNGSEOK } from '@/lib/mocks/virtualProfiles'
 
 // [임시] 목업 검색 대상 — API 연동 후 서버 검색으로 교체
 const SEARCHABLE_PROFILES = [SAMPLE_PROFILE, MK_PROFILE, JIMIN_PROFILE]
+
+// [임시] 목업 가상 프로필 — 실제 구현 시 크롤링 결과로 교체
+const VIRTUAL_PROFILES = [VIRTUAL_KIM_YOUNGSEOK]
 
 type SearchResult = {
   linkId: string
@@ -18,12 +22,30 @@ type SearchResult = {
   avatarImage?: string
 }
 
+type VirtualSearchResult = {
+  id: string
+  name: string
+  title: string
+  tags: string[]
+  avatarInitials: string
+  avatarColor: string
+}
+
 function matchesQuery(profile: SearchResult, q: string) {
   const lower = q.toLowerCase()
   return (
     profile.name.toLowerCase().includes(lower) ||
     profile.title.toLowerCase().includes(lower) ||
     profile.school.toLowerCase().includes(lower)
+  )
+}
+
+function matchesVirtualQuery(profile: VirtualSearchResult, q: string) {
+  const lower = q.toLowerCase()
+  return (
+    profile.name.toLowerCase().includes(lower) ||
+    profile.title.toLowerCase().includes(lower) ||
+    profile.tags.some((t) => t.toLowerCase().includes(lower))
   )
 }
 
@@ -45,9 +67,15 @@ export default function SearchScreen({ onClose }: SearchScreenProps) {
     else router.back()
   }
 
-  const results: SearchResult[] = query.trim()
-    ? SEARCHABLE_PROFILES.filter((p) => matchesQuery(p, query.trim()))
+  const q = query.trim()
+  const results: SearchResult[] = q
+    ? SEARCHABLE_PROFILES.filter((p) => matchesQuery(p, q))
     : []
+  const virtualResults: VirtualSearchResult[] = q
+    ? VIRTUAL_PROFILES.filter((p) => matchesVirtualQuery(p, q))
+    : []
+
+  const hasAnyResults = results.length > 0 || virtualResults.length > 0
 
   return (
     <motion.div
@@ -80,17 +108,29 @@ export default function SearchScreen({ onClose }: SearchScreenProps) {
       {/* 본문 */}
       <div className="flex-1">
         <AnimatePresence mode="wait">
-          {query.trim() === '' ? (
+          {q === '' ? (
             <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
               <EmptyPrompt />
             </motion.div>
-          ) : results.length === 0 ? (
+          ) : !hasAnyResults ? (
             <motion.div key="no-results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
               <NoResults query={query} />
             </motion.div>
           ) : (
             <motion.div key="results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
-              <ResultList results={results} onSelect={(id) => { onClose?.(); router.push(`/${id}`) }} />
+              {results.length > 0 && (
+                <ResultList
+                  results={results}
+                  label={`바이로 회원 ${results.length}명`}
+                  onSelect={(id) => { onClose?.(); router.push(`/${id}`) }}
+                />
+              )}
+              {virtualResults.length > 0 && (
+                <VirtualResultList
+                  results={virtualResults}
+                  onSelect={(id) => { onClose?.(); router.push(`/virtual/${id}`) }}
+                />
+              )}
             </motion.div>
           )}
         </AnimatePresence>
@@ -130,48 +170,120 @@ function NoResults({ query }: { query: string }) {
   )
 }
 
+function SectionHeader({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-3 px-5 pt-4 pb-2">
+      <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)]">
+        {label}
+      </span>
+      <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
+    </div>
+  )
+}
+
 function ResultList({
   results,
+  label,
   onSelect,
 }: {
   results: SearchResult[]
+  label?: string
   onSelect: (linkId: string) => void
 }) {
   return (
-    <ul className="py-2">
-      {results.map((p, i) => (
-        <motion.li
-          key={p.linkId}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: i * 0.05, duration: 0.15 }}
-        >
-          <button
-            onClick={() => onSelect(p.linkId)}
-            className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[var(--color-bg-soft)] transition-colors text-left"
+    <div>
+      {label && <SectionHeader label={label} />}
+      <ul className="pb-2">
+        {results.map((p, i) => (
+          <motion.li
+            key={p.linkId}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05, duration: 0.15 }}
           >
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center text-white text-[12px] font-bold flex-shrink-0 overflow-hidden"
-              style={{ backgroundColor: p.avatarColor ?? 'var(--color-accent-dark)' }}
+            <button
+              onClick={() => onSelect(p.linkId)}
+              className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[var(--color-bg-soft)] transition-colors text-left"
             >
-              {p.avatarImage ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={p.avatarImage} alt={p.name} className="w-full h-full object-cover" />
-              ) : (
-                p.name.slice(0, 2)
-              )}
-            </div>
-            <div className="min-w-0">
-              <p className="text-[14px] font-semibold text-[var(--color-text-primary)] truncate">
-                {p.name}
-              </p>
-              <p className="text-[12px] text-[var(--color-text-secondary)] truncate">
-                {p.title}
-              </p>
-            </div>
-          </button>
-        </motion.li>
-      ))}
-    </ul>
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white text-[12px] font-bold flex-shrink-0 overflow-hidden"
+                style={{ backgroundColor: p.avatarColor ?? 'var(--color-accent-dark)' }}
+              >
+                {p.avatarImage ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={p.avatarImage} alt={p.name} className="w-full h-full object-cover" />
+                ) : (
+                  p.name.slice(0, 2)
+                )}
+              </div>
+              <div className="min-w-0">
+                <p className="text-[14px] font-semibold text-[var(--color-text-primary)] truncate">
+                  {p.name}
+                </p>
+                <p className="text-[12px] text-[var(--color-text-secondary)] truncate">
+                  {p.title}
+                </p>
+              </div>
+            </button>
+          </motion.li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function VirtualResultList({
+  results,
+  onSelect,
+}: {
+  results: VirtualSearchResult[]
+  onSelect: (id: string) => void
+}) {
+  return (
+    <div>
+      <SectionHeader label="공개 정보 기반" />
+      <ul className="pb-2">
+        {results.map((p, i) => (
+          <motion.li
+            key={p.id}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05, duration: 0.15 }}
+          >
+            <button
+              onClick={() => onSelect(p.id)}
+              className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[var(--color-bg-soft)] transition-colors text-left"
+            >
+              <div
+                className="w-10 h-10 rounded-full flex items-center justify-center text-white text-[12px] font-bold flex-shrink-0"
+                style={{ backgroundColor: p.avatarColor }}
+              >
+                {p.avatarInitials}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <p className="text-[14px] font-semibold text-[var(--color-text-primary)] truncate">
+                    {p.name}
+                  </p>
+                  <span
+                    className="flex-shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.08em]"
+                    style={{
+                      background: 'var(--color-bg-muted)',
+                      color: 'var(--color-text-tertiary)',
+                      border: '1px solid var(--color-border-soft)',
+                    }}
+                  >
+                    공개정보
+                  </span>
+                </div>
+                <p className="text-[12px] text-[var(--color-text-secondary)] truncate">
+                  {p.title}
+                </p>
+              </div>
+            </button>
+          </motion.li>
+        ))}
+      </ul>
+    </div>
   )
 }

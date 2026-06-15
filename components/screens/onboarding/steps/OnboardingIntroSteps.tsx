@@ -127,6 +127,7 @@ export function Step2BasicInfo() {
   const store = useByroStore()
   const [name, setName] = useState(store.onboardingName)
   const [nickname, setNickname] = useState(store.onboardingNickname)
+  const [useActivityName, setUseActivityName] = useState(!!store.onboardingNickname)
   const [birthDate, setBirthDate] = useState(store.onboardingBirthDate)
   const [showAge, setShowAge] = useState(store.onboardingShowAge)
   const [isVerified, setIsVerified] = useState(store.isVerified)
@@ -136,7 +137,7 @@ export function Step2BasicInfo() {
 
   const handleNext = () => {
     if (!canProceed) return
-    store.setOnboardingNameAndBirth({ name: name.trim(), nickname: nickname.trim(), birthDate, showAge })
+    store.setOnboardingNameAndBirth({ name: name.trim(), nickname: useActivityName ? nickname.trim() : '', birthDate, showAge })
     if (isVerified) store.setVerified(true)
     store.nextStep()
   }
@@ -185,19 +186,40 @@ export function Step2BasicInfo() {
         onVerified={() => setIsVerified(true)}
       />
 
-      {/* 별명 (선택) */}
+      {/* 활동명 (선택) */}
       <div className="mb-5">
-        <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">별명 (선택)</label>
-        <input
-          type="text"
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
-          placeholder="예: 명구, Alex, 크리에이터K"
-          maxLength={30}
-          className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
-        />
-        <p className="mt-1.5 text-[11px] text-[var(--color-text-tertiary)]">
-          별명 설정 시 프로필에 별명으로 노출돼요
+        <button
+          type="button"
+          onClick={() => {
+            setUseActivityName((prev) => !prev)
+            if (useActivityName) setNickname('')
+          }}
+          className="flex items-center gap-2 mb-3"
+        >
+          <div className={`w-4 h-4 rounded flex items-center justify-center border transition-colors flex-shrink-0 ${useActivityName ? 'border-[var(--color-accent-dark)] bg-[var(--color-accent-dark)]' : 'border-[var(--color-border-default)] bg-[var(--color-bg-soft)]'}`}>
+            {useActivityName && (
+              <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
+          </div>
+          <span className="text-[13px] font-medium text-[var(--color-text-primary)]">활동명 사용</span>
+        </button>
+
+        {useActivityName && (
+          <input
+            type="text"
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+            placeholder="예: 크리에이터K, Alex, 디에디트"
+            maxLength={30}
+            className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
+            autoFocus
+          />
+        )}
+
+        <p className="mt-2 text-[11px] text-[var(--color-text-tertiary)] leading-relaxed">
+          바이로는 실명 기반 서비스예요. 활동명은 유튜버·크리에이터 등 활동명으로 활동하시는 분들을 위한 선택 기능이에요. 활동명을 설정하면 실명 대신 활동명으로 프로필에 노출돼요.
         </p>
       </div>
 

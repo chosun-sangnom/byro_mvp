@@ -153,7 +153,7 @@ export default function AppHeader() {
                   마이페이지
                 </button>
                 <button
-                  onClick={() => { setProfileOpen(false); logout(); router.push('/') }}
+                  onClick={() => { setProfileOpen(false); logout() }}
                   className="flex-1 py-3 text-[13px] font-medium text-red-500 hover:bg-red-50 transition-colors"
                 >
                   로그아웃

@@ -18,7 +18,7 @@ import { useRouter } from 'next/navigation'
 import { Pencil } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { BottomSheet, TextArea, showToast } from '@/components/ui'
-import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
+import { getNormalizedPublicProfile, computeTabAccess } from '@/components/screens/profile/publicProfileData'
 import { generatePersona } from '@/lib/personaGen'
 import { ContactActionButton } from '@/components/screens/profile/PublicProfileSections'
 import { ProfileHeroSection } from '@/components/screens/profile/PublicProfileHeroSection'
@@ -44,7 +44,12 @@ export function PublicProfileShell({
 }) {
   const router = useRouter()
   const store = useByroStore()
-  const profile = getNormalizedPublicProfile({ username, user: store.user, ownerHighlights: store.highlights })
+  const profile = getNormalizedPublicProfile({
+    username,
+    user: store.user,
+    ownerHighlights: store.highlights,
+    ownerTabVisibility: store.tabVisibility,
+  })
 
   // owner mode: 로그인 상태이고 현재 보는 프로필이 본인인 경우
   const isOwnerMode = store.isLoggedIn && store.user?.linkId === username
@@ -52,15 +57,23 @@ export function PublicProfileShell({
   // [임시] 오너 모드에서만 페르소나 생성 (목업 데이터 기반)
   const persona = isOwnerMode ? generatePersona(profile) : null
 
+  const isConnected = store.connectedProfiles.some((p) => p.linkId === profile.linkId)
+  const tabAccessCtx = { isOwner: isOwnerMode, isLoggedIn: store.isLoggedIn, isConnected }
+
   // 연결 관계 상태
   const connectionStatus = (() => {
-    if (store.connectedProfiles.some((p) => p.linkId === profile.linkId)) return 'connected' as const
+    if (isConnected) return 'connected' as const
     const receivedRequest = store.connectionRequests.find((r) => r.linkId === profile.linkId)
     if (receivedRequest) return 'received' as const
     if (store.sentRequestLinkIds.includes(profile.linkId)) return 'sent' as const
     return 'none' as const
   })()
   const receivedRequestId = store.connectionRequests.find((r) => r.linkId === profile.linkId)?.id
+  const tabAccess = {
+    who: computeTabAccess(profile.tabVisibility, 'who', tabAccessCtx),
+    life: computeTabAccess(profile.tabVisibility, 'life', tabAccessCtx),
+    reputation: computeTabAccess(profile.tabVisibility, 'reputation', tabAccessCtx),
+  }
 
   // 케미 로딩 트리거: 비로그인이거나 오너이면 케미 없음
   const kemiAlreadyComputed = store.kemiComputedProfiles.includes(profile.linkId)
@@ -115,7 +128,7 @@ export function PublicProfileShell({
         )}
 
         {/* 나 / 라이프 / 관계 탭 */}
-        <PublicProfileTabBar activeTab={activeTab} onTabChange={onTabChange} />
+        <PublicProfileTabBar activeTab={activeTab} onTabChange={onTabChange} tabAccess={tabAccess} />
       </div>
 
       {/* ── 탭 콘텐츠 스크롤 영역 ── */}
@@ -189,6 +202,14 @@ export function PublicProfileShell({
               거절
             </button>
           </div>
+        ) : !store.isLoggedIn ? (
+          <button
+            onClick={() => router.push('/signup')}
+            className="mb-4 w-full rounded-full py-3 text-[13px] font-semibold text-white whitespace-nowrap"
+            style={{ backgroundColor: 'var(--color-accent-dark)' }}
+          >
+            로그인하고 연결하기
+          </button>
         ) : (
           <button
             onClick={() => setConnectionRequestOpen(true)}

@@ -298,6 +298,7 @@ export interface PublicProfile {
   reputationKeywords?: ReputationKeyword[]
   guestbook?: GuestbookEntry[]
   kemi?: KemiData
+  tabVisibility?: TabVisibility
 }
 
 export type TabVisibilityLevel = 'public' | 'connected' | 'private'

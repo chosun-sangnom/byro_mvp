@@ -11,8 +11,30 @@ import type {
   LinkedInProfile,
   PublicProfile,
   ReputationKeyword,
+  TabVisibility,
+  TabVisibilityLevel,
   UserState,
 } from '@/types'
+
+export type TabAccessLevel = 'visible' | 'login-required' | 'connect-required' | 'hidden'
+
+const DEFAULT_TAB_VISIBILITY: TabVisibility = { who: 'public', life: 'public', reputation: 'public' }
+
+export function computeTabAccess(
+  tabVisibility: TabVisibility,
+  tab: keyof TabVisibility,
+  { isOwner, isLoggedIn, isConnected }: { isOwner: boolean; isLoggedIn: boolean; isConnected: boolean },
+): TabAccessLevel {
+  if (isOwner) return 'visible'
+  const level: TabVisibilityLevel = tabVisibility[tab]
+  if (level === 'public') return 'visible'
+  if (level === 'private') return 'hidden'
+  if (!isLoggedIn) return 'login-required'
+  if (!isConnected) return 'connect-required'
+  return 'visible'
+}
+
+export { DEFAULT_TAB_VISIBILITY }
 
 type NormalizedLinkedInProfile = LinkedInProfile & {
   previewImage: string
@@ -27,6 +49,7 @@ type NormalizedPublicProfile = PublicProfile & {
   airlineHighlight: AirlineHighlight
   reputationKeywords: ReputationKeyword[]
   guestbook: GuestbookEntry[]
+  tabVisibility: TabVisibility
 }
 
 function deriveAgeFromBirthDate(birthDate?: string) {
@@ -129,10 +152,12 @@ export function getNormalizedPublicProfile({
   username,
   user,
   ownerHighlights,
+  ownerTabVisibility,
 }: {
   username: string
   user?: UserState | null
   ownerHighlights?: Highlight[]
+  ownerTabVisibility?: TabVisibility
 }): NormalizedPublicProfile {
   // TODO(real API): Replace this mock selector with a public-profile detail query keyed by `username`.
   const baseProfile = getPublicProfileByUsername(username) as PublicProfile
@@ -144,10 +169,15 @@ export function getNormalizedPublicProfile({
     ? ownerHighlights
     : rawProfile.manualHighlights
 
+  const tabVisibility = isOwner
+    ? (ownerTabVisibility ?? rawProfile.tabVisibility ?? DEFAULT_TAB_VISIBILITY)
+    : (rawProfile.tabVisibility ?? DEFAULT_TAB_VISIBILITY)
+
   return {
     ...rawProfile,
     manualHighlights,
     age: deriveAgeFromBirthDate(rawProfile.birthDate),
+    tabVisibility,
     instagram: {
       ...(instagram ?? {}),
       username: instagram?.username ?? PUBLIC_PROFILE_FALLBACKS.instagram.username,

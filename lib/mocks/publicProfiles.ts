@@ -210,6 +210,7 @@ export const SAMPLE_PROFILE = {
     { id: 'g3', linkId: 'kimdohyeon', authorName: '김도현', message: '대화가 구체적이고 믿음이 가는 분이었어요.', date: '2주 전' },
     { id: 'g4', linkId: 'chijiwon', authorName: '최지원', message: '비즈니스 관점이 선명해서 배우는 포인트가 많았습니다.', date: '3주 전' },
   ],
+  tabVisibility: { who: 'public', life: 'connected', reputation: 'public' },
 }
 
 export const MK_PROFILE = {
@@ -420,6 +421,7 @@ export const MK_PROFILE = {
     { id: 'mkg3', linkId: 'kimdohyeon', authorName: '김도현', message: '사람을 연결하는 방식이 자연스럽고 진정성이 느껴졌어요.', date: '1주 전' },
     { id: 'mkg4', linkId: 'chijiwon', authorName: '최지원', message: '비즈니스 맥락을 읽는 힘이 좋아서 대화가 늘 선명했습니다.', date: '2주 전' },
   ],
+  tabVisibility: { who: 'public', life: 'public', reputation: 'connected' },
 }
 
 export const JIMIN_PROFILE = {
@@ -610,6 +612,7 @@ export const JIMIN_PROFILE = {
     { id: 'jg3', linkId: 'chijiwon', authorName: '최지원', message: '사람을 편하게 연결하는 힘이 있어요.', date: '1주 전' },
     { id: 'jg4', linkId: 'kimdohyeon', authorName: '김도현', message: '마케팅 관점이 실무적이라 대화가 특히 좋았습니다.', date: '2주 전' },
   ],
+  tabVisibility: { who: 'public', life: 'public', reputation: 'public' },
 }
 
 // TODO(real API): Replace this mock selector with a profile lookup against the public profile endpoint.

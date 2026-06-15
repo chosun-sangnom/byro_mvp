@@ -1,12 +1,13 @@
 'use client'
 
+import { Lock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
 
 
 import type { Highlight } from '@/types'
-import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
+import { getNormalizedPublicProfile, computeTabAccess, type TabAccessLevel } from '@/components/screens/profile/publicProfileData'
 import {
   ProfileFeedbackSection,
   ProfileRememberSection,
@@ -26,11 +27,20 @@ const AIRLINE_BADGE_LABELS = {
 
 function usePublicProfileTabData(username: string) {
   const store = useByroStore()
+  const isOwnerMode = store.isLoggedIn && store.user?.linkId === username
+  const isConnected = store.connectedProfiles.some((p) => p.linkId === username)
   const profile = getNormalizedPublicProfile({
     username,
     user: store.user,
     ownerHighlights: store.highlights,
+    ownerTabVisibility: store.tabVisibility,
   })
+  const tabAccessCtx = { isOwner: isOwnerMode, isLoggedIn: store.isLoggedIn, isConnected }
+  const tabAccess = {
+    who: computeTabAccess(profile.tabVisibility, 'who', tabAccessCtx),
+    life: computeTabAccess(profile.tabVisibility, 'life', tabAccessCtx),
+    reputation: computeTabAccess(profile.tabVisibility, 'reputation', tabAccessCtx),
+  }
   const corporateHighlight = profile.corporateHighlight
   const airlineHighlight = profile.airlineHighlight
   const airlineBadgeLabel = AIRLINE_BADGE_LABELS[airlineHighlight.badgeLevel as keyof typeof AIRLINE_BADGE_LABELS] ?? null
@@ -110,7 +120,46 @@ function usePublicProfileTabData(username: string) {
     keywordCounts,
     totalKeywordCount,
     featuredGuestbook,
+    tabAccess,
   }
+}
+
+function LockedTabContent({
+  access,
+  onLogin,
+}: {
+  access: TabAccessLevel
+  onLogin: () => void
+}) {
+  return (
+    <div className="flex flex-col items-center justify-center py-20 px-8 text-center">
+      <div className="w-14 h-14 rounded-full bg-[var(--color-bg-soft)] flex items-center justify-center mb-4">
+        <Lock size={22} className="text-[var(--color-text-tertiary)]" />
+      </div>
+      {access === 'login-required' ? (
+        <>
+          <p className="text-[15px] font-bold text-[var(--color-text-primary)] mb-1.5">로그인이 필요해요</p>
+          <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed mb-5">
+            이 섹션은 로그인한 사용자만 볼 수 있어요.
+          </p>
+          <button
+            onClick={onLogin}
+            className="rounded-full px-6 py-2.5 text-[13px] font-semibold text-white"
+            style={{ backgroundColor: 'var(--color-accent-dark)' }}
+          >
+            로그인하기
+          </button>
+        </>
+      ) : (
+        <>
+          <p className="text-[15px] font-bold text-[var(--color-text-primary)] mb-1.5">연결된 사람만 볼 수 있어요</p>
+          <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed">
+            연결 요청을 수락하면 이 섹션을 확인할 수 있어요.
+          </p>
+        </>
+      )}
+    </div>
+  )
 }
 
 export function PublicProfileWhoTabPage({
@@ -118,7 +167,12 @@ export function PublicProfileWhoTabPage({
 }: {
   username: string
 }) {
-  const { store, profile, groupedHighlights, corporateHighlight, airlineHighlight, airlineBadgeLabel } = usePublicProfileTabData(username)
+  const router = useRouter()
+  const { store, profile, groupedHighlights, corporateHighlight, airlineHighlight, airlineBadgeLabel, tabAccess } = usePublicProfileTabData(username)
+
+  if (tabAccess.who !== 'visible') {
+    return <LockedTabContent access={tabAccess.who} onLogin={() => router.push('/signup')} />
+  }
 
   return (
     <>
@@ -156,7 +210,13 @@ export function PublicProfileLifeTabPage({
 }: {
   username: string
 }) {
-  const { profile } = usePublicProfileTabData(username)
+  const router = useRouter()
+  const { profile, tabAccess } = usePublicProfileTabData(username)
+
+  if (tabAccess.life !== 'visible') {
+    return <LockedTabContent access={tabAccess.life} onLogin={() => router.push('/signup')} />
+  }
+
   return <PublicProfileLifeSection life={profile.life} />
 }
 
@@ -166,7 +226,11 @@ export function PublicProfileReputationTabPage({
   username: string
 }) {
   const router = useRouter()
-  const { profile, keywordCounts, totalKeywordCount, featuredGuestbook } = usePublicProfileTabData(username)
+  const { profile, keywordCounts, totalKeywordCount, featuredGuestbook, tabAccess } = usePublicProfileTabData(username)
+
+  if (tabAccess.reputation !== 'visible') {
+    return <LockedTabContent access={tabAccess.reputation} onLogin={() => router.push('/signup')} />
+  }
 
   const getProfileAvatar = (linkId: string) => {
     const p = getPublicProfileByUsername(linkId)

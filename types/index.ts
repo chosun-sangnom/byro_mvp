@@ -315,6 +315,9 @@ export interface UserState {
   activityName?: string
   activityNameChangedAt?: string
   linkId: string
+  randomLinkId?: string
+  customLinkId?: string
+  isPaidUser?: boolean
   title: string
   headline?: string
   school: string

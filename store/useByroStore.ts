@@ -18,6 +18,11 @@ import type {
 } from '@/types'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
+function generateRandomLinkId(): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
+  return Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
+}
+
 const STEP_ORDER: OnboardingStep[] = ['login', 'basicinfo', 'profile', 'complete']
 
 interface ByroStore {
@@ -81,6 +86,7 @@ interface ByroStore {
   setOnboardingNameAndBirth(info: { name: string; nickname: string; birthDate: string; showAge: boolean }): void
   setVerified(v: boolean): void
   setLinkId(id: string): void
+  setCustomLinkId(customId: string | null): void
   connectInstagram(): void
   disconnectInstagram(): void
   connectLinkedIn(): void
@@ -255,6 +261,16 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     set({ linkId: id })
   },
 
+  setCustomLinkId(customId) {
+    const { user } = get()
+    if (!user) return
+    const randomLinkId = user.randomLinkId ?? user.linkId
+    const resolvedLinkId = customId ?? randomLinkId
+    set({
+      user: { ...user, customLinkId: customId ?? undefined, linkId: resolvedLinkId },
+    })
+  },
+
   connectInstagram() {
     set({ instagramConnected: true })
   },
@@ -342,6 +358,9 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
         realName: onboardingName || SAMPLE_PROFILE.name,
         activityName: onboardingNickname || undefined,
         activityNameChangedAt: onboardingNickname ? new Date().toISOString() : undefined,
+        randomLinkId: generateRandomLinkId(),
+        customLinkId: linkId || SAMPLE_PROFILE.linkId,
+        isPaidUser: true,
         linkId: linkId || SAMPLE_PROFILE.linkId,
         title: onboardingTitle.trim() || SAMPLE_PROFILE.title,
         headline: SAMPLE_PROFILE.headline,

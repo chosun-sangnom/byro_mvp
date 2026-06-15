@@ -25,8 +25,9 @@ const NOTIF_META = {
 
 export default function AppHeader() {
   const router = useRouter()
-  const { user, isLoggedIn, connectionRequests } = useByroStore()
+  const { user, isLoggedIn, connectionRequests, logout } = useByroStore()
   const [notiOpen, setNotiOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
 
   const initials = user?.name ? user.name.slice(0, 2) : 'BY'
   const hasUnread = connectionRequests.length > 0
@@ -40,7 +41,12 @@ export default function AppHeader() {
   return (
     <>
       <header className="flex items-center justify-between px-5 h-14 bg-[var(--color-bg-page)] border-b border-[var(--color-border-soft)] flex-shrink-0">
-        <span className="text-[18px] font-black tracking-tight text-[var(--color-text-strong)]">Byro</span>
+        <button
+          onClick={() => router.push('/')}
+          className="text-[18px] font-black tracking-tight text-[var(--color-text-strong)]"
+        >
+          Byro
+        </button>
 
         <div className="flex items-center gap-1">
           {/* 검색 — 페이지 이동 */}
@@ -70,9 +76,9 @@ export default function AppHeader() {
           {isLoggedIn ? (
             <motion.button
               whileTap={{ scale: 0.88 }}
-              onClick={() => router.push('/me')}
+              onClick={() => setProfileOpen((o) => !o)}
               className="ml-1 w-8 h-8 rounded-full overflow-hidden flex-shrink-0"
-              aria-label="내 바이로"
+              aria-label="프로필 메뉴"
             >
               {user?.avatarImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -98,6 +104,65 @@ export default function AppHeader() {
           )}
         </div>
       </header>
+
+      {/* 프로필 패널 */}
+      <AnimatePresence>
+        {profileOpen && (
+          <>
+            <motion.div
+              key="profile-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className="absolute inset-0 top-14 z-30"
+              onClick={() => setProfileOpen(false)}
+            />
+            <motion.div
+              key="profile-panel"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.18, ease: 'easeOut' }}
+              className="absolute right-0 top-14 z-40 w-56 bg-[var(--color-bg-page)] border border-[var(--color-border-soft)] rounded-xl shadow-xl mx-3 overflow-hidden"
+            >
+              {/* 프로필 정보 */}
+              <div className="flex flex-col items-center gap-2 px-5 pt-5 pb-4">
+                <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
+                  {user?.avatarImage ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={user.avatarImage} alt={user?.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div
+                      className="w-full h-full flex items-center justify-center text-white text-[18px] font-bold"
+                      style={{ backgroundColor: user?.avatarColor ?? 'var(--color-accent-dark)' }}
+                    >
+                      {initials}
+                    </div>
+                  )}
+                </div>
+                <span className="text-[15px] font-semibold text-[var(--color-text-primary)]">{user?.name}</span>
+              </div>
+
+              {/* 버튼 */}
+              <div className="flex border-t border-[var(--color-border-soft)]">
+                <button
+                  onClick={() => { setProfileOpen(false); router.push('/me') }}
+                  className="flex-1 py-3 text-[13px] font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-bg-soft)] transition-colors border-r border-[var(--color-border-soft)]"
+                >
+                  마이페이지
+                </button>
+                <button
+                  onClick={() => { setProfileOpen(false); logout(); router.push('/') }}
+                  className="flex-1 py-3 text-[13px] font-medium text-red-500 hover:bg-red-50 transition-colors"
+                >
+                  로그아웃
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* 알림 드롭다운 */}
       <AnimatePresence>

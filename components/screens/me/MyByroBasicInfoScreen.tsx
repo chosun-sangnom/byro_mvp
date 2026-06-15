@@ -268,7 +268,7 @@ import {
 } from '@/lib/imageCropUtils'
 
 interface BasicInfoEditScreenProps {
-  user: Pick<UserState, 'name' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'profileImages' | 'birthDate' | 'birthTime' | 'calendarType' | 'showAge'>
+  user: Pick<UserState, 'name' | 'realName' | 'activityName' | 'activityNameChangedAt' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'profileImages' | 'birthDate' | 'birthTime' | 'calendarType' | 'showAge'>
   onBack: () => void
 }
 
@@ -340,6 +340,16 @@ export function BasicInfoEditScreen({
 }: BasicInfoEditScreenProps) {
   const store = useByroStore()
   const [bio, setBio] = useState(user.bio)
+
+  const [useActivityName, setUseActivityName] = useState(!!user.activityName)
+  const [activityName, setActivityName] = useState(user.activityName ?? '')
+  const activityNameChangedAt = user.activityNameChangedAt ? new Date(user.activityNameChangedAt) : null
+  const daysSinceChange = activityNameChangedAt
+    ? Math.floor((Date.now() - activityNameChangedAt.getTime()) / (1000 * 60 * 60 * 24))
+    : null
+  const isActivityNameLocked = daysSinceChange !== null && daysSinceChange < 30
+  const activityNameDaysRemaining = isActivityNameLocked ? 30 - daysSinceChange! : 0
+
   const [birthDate, setBirthDate] = useState(user.birthDate ?? SAMPLE_PROFILE.birthDate ?? '')
   const [birthTime, setBirthTime] = useState(user.birthTime ?? SAMPLE_PROFILE.birthTime ?? '')
   const [calendarType, setCalendarType] = useState<'solar' | 'lunar'>(user.calendarType ?? SAMPLE_PROFILE.calendarType ?? 'solar')
@@ -367,11 +377,20 @@ export function BasicInfoEditScreen({
   const cropImageLayout = getCropImageLayout(cropNaturalSize.width, cropNaturalSize.height, cropStage)
 
   const handleSave = () => {
+    const newActivityName = useActivityName ? activityName.trim() : ''
+    const activityNameChanged = newActivityName !== (user.activityName ?? '')
+    const realName = user.realName ?? user.name
+
     store.updateUserInfo({
       headline: user.headline,
       bio,
       avatarImage: profileImages[0] || '',
       profileImages: profileImages.filter(Boolean),
+      name: newActivityName || realName,
+      activityName: newActivityName || undefined,
+      activityNameChangedAt: activityNameChanged && newActivityName
+        ? new Date().toISOString()
+        : user.activityNameChangedAt,
     })
     store.updateUserInfo({ birthDate, birthTime, calendarType, showAge })
     showToast('저장됐어요!')
@@ -544,11 +563,65 @@ export function BasicInfoEditScreen({
             <div>
               <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">이름</label>
               <input
-                value={user.name}
+                value={user.realName ?? user.name}
                 disabled
-                placeholder="변경 불가"
                 className="w-full border border-[var(--color-border-soft)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-surface)] text-[var(--color-text-tertiary)]"
               />
+            </div>
+
+            {/* 활동명 */}
+            <div>
+              <button
+                type="button"
+                onClick={() => {
+                  if (isActivityNameLocked) return
+                  setUseActivityName((prev) => !prev)
+                  if (useActivityName) setActivityName('')
+                }}
+                className="flex items-center gap-2 mb-2.5"
+              >
+                <div className={`w-4 h-4 rounded flex items-center justify-center border transition-colors flex-shrink-0 ${useActivityName ? 'border-[var(--color-accent-dark)] bg-[var(--color-accent-dark)]' : 'border-[var(--color-border-default)] bg-[var(--color-bg-soft)]'}`}>
+                  {useActivityName && (
+                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                      <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  )}
+                </div>
+                <span className="text-[13px] font-medium text-[var(--color-text-primary)]">활동명 사용</span>
+              </button>
+
+              {useActivityName && (
+                <div>
+                  <input
+                    type="text"
+                    value={activityName}
+                    onChange={(e) => setActivityName(e.target.value)}
+                    disabled={isActivityNameLocked}
+                    placeholder="예: 크리에이터K, Alex, 디에디트"
+                    maxLength={30}
+                    className={`w-full border rounded-xl px-4 py-2.5 text-sm outline-none transition-colors ${
+                      isActivityNameLocked
+                        ? 'border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] text-[var(--color-text-tertiary)]'
+                        : 'border-[var(--color-border-default)] bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] focus:border-[var(--color-accent-dark)]'
+                    }`}
+                  />
+                  {isActivityNameLocked ? (
+                    <p className="mt-1.5 text-[11px] text-[var(--color-state-warning-text)]">
+                      활동명은 변경 후 30일간 수정할 수 없어요. ({activityNameDaysRemaining}일 후 변경 가능)
+                    </p>
+                  ) : (
+                    <p className="mt-1.5 text-[11px] text-[var(--color-text-tertiary)]">
+                      변경 후 30일간 재변경이 불가해요.
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {!useActivityName && (
+                <p className="text-[11px] text-[var(--color-text-tertiary)] leading-relaxed">
+                  유튜버·크리에이터 등 활동명으로 활동하시는 분들을 위한 선택 기능이에요. 활동명을 설정하면 실명 대신 활동명으로 프로필에 노출돼요.
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-[1.2fr_0.8fr] gap-3">

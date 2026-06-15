@@ -311,6 +311,9 @@ export interface TabVisibility {
 
 export interface UserState {
   name: string
+  realName?: string
+  activityName?: string
+  activityNameChangedAt?: string
   linkId: string
   title: string
   headline?: string

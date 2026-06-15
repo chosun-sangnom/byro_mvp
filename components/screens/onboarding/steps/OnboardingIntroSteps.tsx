@@ -219,7 +219,7 @@ export function Step2BasicInfo() {
         )}
 
         <p className="mt-2 text-[11px] text-[var(--color-text-tertiary)] leading-relaxed">
-          바이로는 실명 기반 서비스예요. 활동명은 유튜버·크리에이터 등 활동명으로 활동하시는 분들을 위한 선택 기능이에요. 활동명을 설정하면 실명 대신 활동명으로 프로필에 노출돼요.
+          유튜버·크리에이터 등 활동명으로 활동하시는 분들을 위한 선택 기능이에요. 활동명을 설정하면 실명 대신 활동명으로 프로필에 노출돼요.
         </p>
       </div>
 

@@ -339,6 +339,9 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       isLoggedIn: true,
       user: {
         name: onboardingNickname || onboardingName || SAMPLE_PROFILE.name,
+        realName: onboardingName || SAMPLE_PROFILE.name,
+        activityName: onboardingNickname || undefined,
+        activityNameChangedAt: onboardingNickname ? new Date().toISOString() : undefined,
         linkId: linkId || SAMPLE_PROFILE.linkId,
         title: onboardingTitle.trim() || SAMPLE_PROFILE.title,
         headline: SAMPLE_PROFILE.headline,

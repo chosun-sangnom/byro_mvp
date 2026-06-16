@@ -94,7 +94,8 @@ export function PublicProfileShell({
   const [connectionRequestOpen, setConnectionRequestOpen] = useState(false)
   const [connectionMessage, setConnectionMessage] = useState('')
   const [cancelRequestOpen, setCancelRequestOpen] = useState(false)
-  const [disconnectOpen, setDisconnectOpen] = useState(false)
+  const [disconnectSheetOpen, setDisconnectSheetOpen] = useState(false)
+  const [disconnectConfirmOpen, setDisconnectConfirmOpen] = useState(false)
   const [feedbackRequestOpen, setFeedbackRequestOpen] = useState(false)
   const [feedbackMessage, setFeedbackMessage] = useState('')
 
@@ -169,7 +170,7 @@ export function PublicProfileShell({
           </div>
         ) : connectionStatus === 'connected' ? (
           <button
-            onClick={() => setDisconnectOpen(true)}
+            onClick={() => setDisconnectSheetOpen(true)}
             className="mb-4 w-full rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-tertiary)] whitespace-nowrap"
           >
             연결됨 ✓
@@ -248,9 +249,27 @@ export function PublicProfileShell({
         </div>
       </div>
 
+      {/* 연결됨 ✓ → 액션 시트 */}
+      {!isOwnerMode && (
+        <BottomSheet open={disconnectSheetOpen} onClose={() => setDisconnectSheetOpen(false)}>
+          <div className="px-5 pb-6">
+            <button
+              onClick={() => {
+                setDisconnectSheetOpen(false)
+                setDisconnectConfirmOpen(true)
+              }}
+              className="w-full rounded-xl border py-3 text-[14px] font-semibold text-left px-4"
+              style={{ borderColor: 'rgba(198,40,40,0.28)', color: 'var(--color-state-danger-text)' }}
+            >
+              연결 해제
+            </button>
+          </div>
+        </BottomSheet>
+      )}
+
       {/* 연결 해제 확인 모달 */}
       {!isOwnerMode && (
-        <Modal open={disconnectOpen} onClose={() => setDisconnectOpen(false)}>
+        <Modal open={disconnectConfirmOpen} onClose={() => setDisconnectConfirmOpen(false)}>
           <div className="text-center">
             <div className="text-base font-black mb-2">
               {profile.name}님과의 연결을 해제할까요?
@@ -261,7 +280,7 @@ export function PublicProfileShell({
             </p>
             <div className="flex gap-2">
               <button
-                onClick={() => setDisconnectOpen(false)}
+                onClick={() => setDisconnectConfirmOpen(false)}
                 className="flex-1 rounded-xl border py-2.5 text-[13px] font-semibold text-[var(--color-text-secondary)]"
                 style={{ borderColor: 'var(--color-border-default)' }}
               >
@@ -270,7 +289,7 @@ export function PublicProfileShell({
               <button
                 onClick={() => {
                   store.disconnectProfile(profile.linkId)
-                  setDisconnectOpen(false)
+                  setDisconnectConfirmOpen(false)
                   showToast(`${profile.name}님과 연결을 해제했어요`)
                 }}
                 className="flex-1 rounded-xl border py-2.5 text-[13px] font-semibold"

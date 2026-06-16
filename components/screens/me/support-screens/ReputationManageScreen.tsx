@@ -5,7 +5,6 @@ import { MoreHorizontal } from 'lucide-react'
 import { NavBar, ActionMenu, ActionMenuItem, showToast } from '@/components/ui'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mocks/publicProfiles'
-import type { GuestbookEntry } from '@/types'
 
 export function ReputationManageScreen({
   onBack,

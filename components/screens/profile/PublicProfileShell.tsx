@@ -115,6 +115,7 @@ export function PublicProfileShell({
             personaText={persona?.text}
             personaReasons={persona?.reasons}
             personaImage={persona?.image}
+            isOwner={isOwnerMode}
           />
         </div>
 

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Sparkles, X } from 'lucide-react'
-import { BottomSheet } from '@/components/ui'
+import { BottomSheet, showToast } from '@/components/ui'
 import type { PersonaReason } from '@/lib/personaGen'
 
 type HeroTheme = {
@@ -24,6 +24,7 @@ export function ProfileHeroSection({
   personaText,
   personaReasons,
   personaImage,
+  isOwner,
 }: {
   profile: {
     name: string
@@ -39,6 +40,7 @@ export function ProfileHeroSection({
   personaText?: string
   personaReasons?: PersonaReason[]
   personaImage?: string
+  isOwner?: boolean
 }) {
   const galleryImages = normalizeProfileImages(profile.profileImages, profile.avatarImage)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
@@ -71,6 +73,7 @@ export function ProfileHeroSection({
         personaText={personaText}
         personaReasons={personaReasons}
         personaImage={personaImage}
+        isOwner={isOwner}
       />
 
       {galleryImages.length > 1 && (
@@ -179,6 +182,7 @@ export function ProfileHeroCard({
   personaText,
   personaReasons,
   personaImage,
+  isOwner,
 }: {
   profile: {
     name: string
@@ -198,8 +202,10 @@ export function ProfileHeroCard({
   personaText?: string
   personaReasons?: PersonaReason[]
   personaImage?: string
+  isOwner?: boolean
 }) {
   const [personaSheetOpen, setPersonaSheetOpen] = useState(false)
+  const [moreSheetOpen, setMoreSheetOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
   const showAge = typeof profile.age === 'number' && profile.showAge !== false
@@ -207,6 +213,42 @@ export function ProfileHeroCard({
   return (
     <div className="hero-card border border-[var(--color-border-default)] bg-[var(--color-glass-strong)] p-[8px] backdrop-blur-sm">
       <div className="relative h-[452px] overflow-hidden rounded-[30px] bg-[#121212] text-white ring-1 ring-black/4">
+
+        {/* … 액션 시트 — createPortal로 transform 컨텍스트 탈출 */}
+        {!isOwner && mounted && createPortal(
+          <BottomSheet open={moreSheetOpen} onClose={() => setMoreSheetOpen(false)}>
+            <div className="px-5 pb-6 space-y-2">
+              <button
+                onClick={() => {
+                  const url = window.location.href
+                  if (navigator.share) {
+                    navigator.share({ title: `${profile.name}의 바이로`, url })
+                  } else {
+                    navigator.clipboard.writeText(url)
+                    showToast('링크를 복사했어요')
+                  }
+                  setMoreSheetOpen(false)
+                }}
+                className="w-full rounded-xl border px-4 py-3 text-[14px] font-semibold text-left"
+                style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-primary)' }}
+              >
+                공유하기
+              </button>
+              {/* [임시] 프로필 신고 API 미연동 */}
+              <button
+                onClick={() => {
+                  setMoreSheetOpen(false)
+                  showToast('신고가 접수됐어요')
+                }}
+                className="w-full rounded-xl border px-4 py-3 text-[14px] font-semibold text-left"
+                style={{ borderColor: 'rgba(198,40,40,0.28)', color: 'var(--color-state-danger-text)' }}
+              >
+                프로필 신고
+              </button>
+            </div>
+          </BottomSheet>,
+          document.body
+        )}
 
         {/* AI 페르소나 바텀시트 — createPortal로 transform 컨텍스트 탈출 */}
         {personaReasons && mounted && createPortal(
@@ -267,9 +309,15 @@ export function ProfileHeroCard({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={activeImage} alt={`${profile.name} 프로필 사진`} className="h-full w-full object-cover" />
               <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.10)_58%,rgba(0,0,0,0.74)_100%)]" />
-              <div className="absolute right-4 top-4 rounded-full border border-white/14 bg-black/38 px-3 py-1 text-[11px] font-semibold text-white/88 backdrop-blur-sm">
-                탭해서 크게 보기
-              </div>
+              {!isOwner ? (
+                <button
+                  type="button"
+                  onClick={(e) => { e.stopPropagation(); setMoreSheetOpen(true) }}
+                  className="absolute right-4 top-4 rounded-full border border-white/14 bg-black/38 px-3 py-1.5 text-[13px] font-bold text-white/88 backdrop-blur-sm leading-none"
+                >
+                  ···
+                </button>
+              ) : null}
             </button>
           ) : (
             <div className="relative h-full overflow-hidden">

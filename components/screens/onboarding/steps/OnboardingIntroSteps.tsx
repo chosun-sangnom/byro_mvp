@@ -7,8 +7,96 @@ import { Button, Modal, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
+type LoginView = 'oauth' | 'email'
+
+function isValidEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
 export function Step1Login() {
   const store = useByroStore()
+  const [view, setView] = useState<LoginView>('oauth')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [passwordConfirm, setPasswordConfirm] = useState('')
+
+  const passwordMismatch = passwordConfirm.length > 0 && password !== passwordConfirm
+  const canSubmit = isValidEmail(email) && password.length >= 8 && password === passwordConfirm
+
+  const handleEmailSignup = () => {
+    if (!canSubmit) return
+    // [임시] 바이로 이메일 회원가입 API 미연동
+    store.nextStep()
+  }
+
+  if (view === 'email') {
+    return (
+      <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+        <button
+          type="button"
+          onClick={() => setView('oauth')}
+          className="flex items-center gap-1 text-[13px] text-[var(--color-text-tertiary)] mb-6 -ml-0.5 self-start"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M10 3L5 8L10 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          다른 방법으로 가입
+        </button>
+
+        <div className="mb-6">
+          <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
+            이메일로<br />회원가입
+          </div>
+        </div>
+
+        <div className="space-y-3 mb-6">
+          <div>
+            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">이메일</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="example@email.com"
+              autoComplete="email"
+              className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">비밀번호</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="8자 이상 입력해주세요"
+              autoComplete="new-password"
+              className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">비밀번호 확인</label>
+            <input
+              type="password"
+              value={passwordConfirm}
+              onChange={(e) => setPasswordConfirm(e.target.value)}
+              placeholder="비밀번호를 다시 입력해주세요"
+              autoComplete="new-password"
+              className={`w-full border rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] ${
+                passwordMismatch ? 'border-[var(--color-state-danger-text)]' : 'border-[var(--color-border-default)]'
+              }`}
+            />
+            {passwordMismatch && (
+              <p className="mt-1 text-[11px] text-[var(--color-state-danger-text)]">비밀번호가 일치하지 않아요</p>
+            )}
+          </div>
+        </div>
+
+        <Button onClick={handleEmailSignup} disabled={!canSubmit}>가입하기</Button>
+        <p className="micro-text text-center mt-4">
+          시작하면 이용약관 및 개인정보 처리방침에 동의하게 됩니다
+        </p>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
@@ -26,6 +114,12 @@ export function Step1Login() {
         <Button variant="naver" onClick={() => store.nextStep()}>N  네이버로 시작하기</Button>
         <Button variant="google" onClick={() => store.nextStep()}>G  구글로 시작하기</Button>
       </div>
+      <div className="flex items-center gap-3 my-4">
+        <div className="flex-1 h-px bg-[var(--color-border-default)]" />
+        <span className="text-[11px] text-[var(--color-text-tertiary)]">또는</span>
+        <div className="flex-1 h-px bg-[var(--color-border-default)]" />
+      </div>
+      <Button variant="outline" onClick={() => setView('email')}>이메일로 회원가입</Button>
       <p className="micro-text text-center mt-6">
         시작하면 이용약관 및 개인정보 처리방침에 동의하게 됩니다
       </p>

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { ChevronRight, Lock } from 'lucide-react'
-import { NavBar, BottomSheet, showToast } from '@/components/ui'
+import { NavBar, BottomSheet, Modal, Button, showToast } from '@/components/ui'
 import { useByroStore } from '@/store/useByroStore'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import type { Highlight, PublicProfile, PublicProfileLife, PublicProfileWhoIAm, TabVisibility, TabVisibilityLevel, UserState } from '@/types'
@@ -13,6 +13,7 @@ interface ManageByroScreenProps {
   instagramConnected: boolean
   linkedinConnected: boolean
   onLogout: () => void
+  onWithdraw: () => void
   onBack: () => void
   onEditBasic: () => void
   onEditWhoIAm: () => void
@@ -51,6 +52,7 @@ export function ManageByroScreen({
   instagramConnected,
   linkedinConnected,
   onLogout,
+  onWithdraw,
   onBack,
   onEditBasic,
   onEditWhoIAm,
@@ -67,6 +69,7 @@ export function ManageByroScreen({
 }: ManageByroScreenProps) {
   const store = useByroStore()
   const [linkIdSheetOpen, setLinkIdSheetOpen] = useState(false)
+  const [withdrawOpen, setWithdrawOpen] = useState(false)
   const [customLinkInput, setCustomLinkInput] = useState(user.customLinkId ?? '')
   const isPaid = user.isPaidUser ?? false
   const randomLinkId = user.randomLinkId ?? user.linkId
@@ -327,8 +330,59 @@ export function ManageByroScreen({
           </div>
         </BottomSheet>
 
+        {/* 회원탈퇴 */}
+        <div className="mx-5 mt-6">
+          <button
+            onClick={() => setWithdrawOpen(true)}
+            className="w-full py-3 text-[13px] font-medium text-[var(--color-text-tertiary)] opacity-60 active:opacity-40"
+          >
+            회원탈퇴
+          </button>
+        </div>
+
+        {/* 탈퇴 확인 모달 */}
+        <Modal open={withdrawOpen} onClose={() => setWithdrawOpen(false)}>
+          <div className="text-center">
+            <div className="text-base font-black mb-1" style={{ color: 'var(--color-state-danger-text)' }}>
+              정말 탈퇴하시겠습니까?
+            </div>
+            <p className="text-[12px] text-[var(--color-text-tertiary)] mb-4 leading-relaxed">
+              탈퇴 즉시 아래 데이터가 <span className="font-bold text-[var(--color-text-secondary)]">영구 삭제</span>되며 복구할 수 없어요.
+            </p>
+            <ul className="text-left rounded-xl bg-[var(--color-bg-muted)] px-4 py-3 mb-4 space-y-1.5">
+              {[
+                '내 프로필 정보',
+                '연결 관계',
+                '내가 남긴 리뷰 · 방명록',
+                '받은 리뷰 · 방명록',
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2 text-[12px] text-[var(--color-text-secondary)]">
+                  <span className="mt-0.5 flex-shrink-0 text-[var(--color-state-danger-text)]">✕</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <p className="text-[11px] text-[var(--color-text-tertiary)] mb-5 leading-relaxed">
+              탈퇴 후 동일 전화번호로 재가입은 가능하지만,<br />이전 데이터는 복구되지 않습니다.
+            </p>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => setWithdrawOpen(false)}>취소</Button>
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => {
+                  setWithdrawOpen(false)
+                  onWithdraw()
+                }}
+              >
+                탈퇴하기
+              </Button>
+            </div>
+          </div>
+        </Modal>
+
         {/* [임시] 목업 초기화 버튼 — CRUD 연동 전 디자인 검토용. 실제 API 연동 후 제거 예정. */}
-        <div className="mx-5 mt-6 mb-8">
+        <div className="mx-5 mt-2 mb-8">
           <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)] opacity-50">DEV ONLY</p>
           <button
             onClick={onResetMockData}

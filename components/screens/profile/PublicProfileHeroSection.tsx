@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Sparkles, X } from 'lucide-react'
-import { BottomSheet, showToast } from '@/components/ui'
+import { ActionMenu, ActionMenuItem, BottomSheet, showToast } from '@/components/ui'
 import type { PersonaReason } from '@/lib/personaGen'
 
 type HeroTheme = {
@@ -214,41 +214,6 @@ export function ProfileHeroCard({
     <div className="hero-card border border-[var(--color-border-default)] bg-[var(--color-glass-strong)] p-[8px] backdrop-blur-sm">
       <div className="relative h-[452px] overflow-hidden rounded-[30px] bg-[#121212] text-white ring-1 ring-black/4">
 
-        {/* … 액션 시트 — createPortal로 transform 컨텍스트 탈출 */}
-        {!isOwner && mounted && createPortal(
-          <BottomSheet open={moreSheetOpen} onClose={() => setMoreSheetOpen(false)}>
-            <div className="px-5 pb-6 space-y-2">
-              <button
-                onClick={() => {
-                  const url = window.location.href
-                  if (navigator.share) {
-                    navigator.share({ title: `${profile.name}의 바이로`, url })
-                  } else {
-                    navigator.clipboard.writeText(url)
-                    showToast('링크를 복사했어요')
-                  }
-                  setMoreSheetOpen(false)
-                }}
-                className="w-full rounded-xl border px-4 py-3 text-[14px] font-semibold text-left"
-                style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-primary)' }}
-              >
-                공유하기
-              </button>
-              {/* [임시] 프로필 신고 API 미연동 */}
-              <button
-                onClick={() => {
-                  setMoreSheetOpen(false)
-                  showToast('신고가 접수됐어요')
-                }}
-                className="w-full rounded-xl border px-4 py-3 text-[14px] font-semibold text-left"
-                style={{ borderColor: 'rgba(198,40,40,0.28)', color: 'var(--color-state-danger-text)' }}
-              >
-                프로필 신고
-              </button>
-            </div>
-          </BottomSheet>,
-          document.body
-        )}
 
         {/* AI 페르소나 바텀시트 — createPortal로 transform 컨텍스트 탈출 */}
         {personaReasons && mounted && createPortal(
@@ -309,15 +274,38 @@ export function ProfileHeroCard({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={activeImage} alt={`${profile.name} 프로필 사진`} className="h-full w-full object-cover" />
               <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.10)_58%,rgba(0,0,0,0.74)_100%)]" />
-              {!isOwner ? (
-                <button
-                  type="button"
-                  onClick={(e) => { e.stopPropagation(); setMoreSheetOpen(true) }}
-                  className="absolute right-4 top-4 rounded-full border border-white/14 bg-black/38 px-3 py-1.5 text-[13px] font-bold text-white/88 backdrop-blur-sm leading-none"
-                >
-                  ···
-                </button>
-              ) : null}
+              {!isOwner && (
+                <div className="absolute right-4 top-4">
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); setMoreSheetOpen((v) => !v) }}
+                    className="rounded-full border border-white/14 bg-black/38 px-3 py-1.5 text-[13px] font-bold text-white/88 backdrop-blur-sm leading-none"
+                  >
+                    ···
+                  </button>
+                  <ActionMenu open={moreSheetOpen} onClose={() => setMoreSheetOpen(false)}>
+                    <ActionMenuItem
+                      label="공유하기"
+                      onClick={() => {
+                        const url = window.location.href
+                        if (navigator.share) {
+                          navigator.share({ title: `${profile.name}의 바이로`, url })
+                        } else {
+                          navigator.clipboard.writeText(url)
+                          showToast('링크를 복사했어요')
+                        }
+                        setMoreSheetOpen(false)
+                      }}
+                    />
+                    {/* [임시] 프로필 신고 API 미연동 */}
+                    <ActionMenuItem
+                      label="프로필 신고"
+                      danger
+                      onClick={() => { setMoreSheetOpen(false); showToast('신고가 접수됐어요') }}
+                    />
+                  </ActionMenu>
+                </div>
+              )}
             </button>
           ) : (
             <div className="relative h-full overflow-hidden">

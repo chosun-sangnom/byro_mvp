@@ -93,6 +93,67 @@ export function YearPickerSheet({
   )
 }
 
+// ─── ActionMenu ───────────────────────────────────────────────────────────────
+// … 버튼 근처에 뜨는 작은 플로팅 메뉴.
+// 부모에 `position: relative` 필요. align으로 좌/우 정렬 제어.
+
+interface ActionMenuProps {
+  open: boolean
+  onClose: () => void
+  children: ReactNode
+  align?: 'right' | 'left'
+}
+
+export function ActionMenu({ open, onClose, children, align = 'right' }: ActionMenuProps) {
+  return (
+    <AnimatePresence>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={onClose} />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92, y: -4 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.92, y: -4 }}
+            transition={{ duration: 0.15, ease: [0.4, 0, 0.2, 1] }}
+            className={`absolute z-50 top-full mt-1.5 min-w-[160px] overflow-hidden rounded-2xl border ${align === 'right' ? 'right-0' : 'left-0'}`}
+            style={{
+              backgroundColor: 'var(--color-bg-surface)',
+              borderColor: 'var(--color-border-default)',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.22)',
+              transformOrigin: align === 'right' ? 'top right' : 'top left',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {children}
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  )
+}
+
+interface ActionMenuItemProps {
+  label: string
+  onClick: () => void
+  danger?: boolean
+}
+
+export function ActionMenuItem({ label, onClick, danger }: ActionMenuItemProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-full px-4 py-3 text-[14px] font-semibold text-left transition-colors active:bg-[var(--color-bg-soft)] border-b last:border-b-0"
+      style={{
+        color: danger ? 'var(--color-state-danger-text)' : 'var(--color-text-primary)',
+        borderColor: 'var(--color-border-soft)',
+      }}
+    >
+      {label}
+    </button>
+  )
+}
+
 interface ModalProps {
   open: boolean
   onClose: () => void

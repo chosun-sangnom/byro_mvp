@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { MoreHorizontal, Search, X } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
-import { BottomSheet, Modal, showToast } from '@/components/ui'
+import { ActionMenu, ActionMenuItem, Modal, showToast } from '@/components/ui'
 import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mocks/publicProfiles'
 import type { SavedProfile } from '@/types'
 
@@ -17,7 +17,7 @@ export default function Archive() {
   const [activeRequestTab, setActiveRequestTab] = useState<'connection' | 'feedback'>('connection')
   const [searchQuery, setSearchQuery] = useState('')
   const [sort, setSort] = useState<SortKey>('name')
-  const [actionTarget, setActionTarget] = useState<SavedProfile | null>(null)
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [disconnectTarget, setDisconnectTarget] = useState<SavedProfile | null>(null)
 
   useEffect(() => {
@@ -141,12 +141,21 @@ export default function Archive() {
                       )}
                     </div>
                   </button>
-                  <button
-                    onClick={() => setActionTarget(p)}
-                    className="flex-shrink-0 rounded-full p-1.5 text-[var(--color-text-tertiary)] active:bg-[var(--color-bg-muted)] transition-colors"
-                  >
-                    <MoreHorizontal size={16} />
-                  </button>
+                  <div className="relative flex-shrink-0">
+                    <button
+                      onClick={() => setOpenMenuId(openMenuId === p.id ? null : p.id)}
+                      className="rounded-full p-1.5 text-[var(--color-text-tertiary)] active:bg-[var(--color-bg-muted)] transition-colors"
+                    >
+                      <MoreHorizontal size={16} />
+                    </button>
+                    <ActionMenu open={openMenuId === p.id} onClose={() => setOpenMenuId(null)}>
+                      <ActionMenuItem
+                        label="연결 해제"
+                        danger
+                        onClick={() => { setOpenMenuId(null); setDisconnectTarget(p) }}
+                      />
+                    </ActionMenu>
+                  </div>
                 </div>
               ))}
             </div>
@@ -308,31 +317,6 @@ export default function Archive() {
           </div>
         )}
       </div>
-
-      {/* … 액션 패널 */}
-      <BottomSheet open={!!actionTarget} onClose={() => setActionTarget(null)}>
-        <div className="px-5 pb-6">
-          <div className="flex items-center gap-3 mb-4">
-            <ProfileAvatar linkId={actionTarget?.linkId ?? ''} name={actionTarget?.name ?? ''} size={36} />
-            <div className="min-w-0">
-              <div className="text-sm font-bold truncate">{actionTarget?.name}</div>
-              {actionTarget?.title && (
-                <div className="meta-text truncate">{actionTarget.title}</div>
-              )}
-            </div>
-          </div>
-          <button
-            onClick={() => {
-              setDisconnectTarget(actionTarget)
-              setActionTarget(null)
-            }}
-            className="w-full rounded-xl border py-3 text-[14px] font-semibold text-left px-4"
-            style={{ borderColor: 'rgba(198,40,40,0.28)', color: 'var(--color-state-danger-text)' }}
-          >
-            연결 해제
-          </button>
-        </div>
-      </BottomSheet>
 
       {/* 연결 해제 확인 모달 */}
       <Modal open={!!disconnectTarget} onClose={() => setDisconnectTarget(null)}>

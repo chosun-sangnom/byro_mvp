@@ -17,7 +17,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { Pencil } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
-import { BottomSheet, TextArea, showToast } from '@/components/ui'
+import { BottomSheet, Modal, TextArea, showToast } from '@/components/ui'
 import { getNormalizedPublicProfile, computeTabAccess } from '@/components/screens/profile/publicProfileData'
 import { generatePersona } from '@/lib/personaGen'
 import { ContactActionButton } from '@/components/screens/profile/PublicProfileSections'
@@ -94,6 +94,7 @@ export function PublicProfileShell({
   const [connectionRequestOpen, setConnectionRequestOpen] = useState(false)
   const [connectionMessage, setConnectionMessage] = useState('')
   const [cancelRequestOpen, setCancelRequestOpen] = useState(false)
+  const [disconnectOpen, setDisconnectOpen] = useState(false)
   const [feedbackRequestOpen, setFeedbackRequestOpen] = useState(false)
   const [feedbackMessage, setFeedbackMessage] = useState('')
 
@@ -168,7 +169,7 @@ export function PublicProfileShell({
           </div>
         ) : connectionStatus === 'connected' ? (
           <button
-            disabled
+            onClick={() => setDisconnectOpen(true)}
             className="mb-4 w-full rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-tertiary)] whitespace-nowrap"
           >
             연결됨 ✓
@@ -246,6 +247,41 @@ export function PublicProfileShell({
           </div>
         </div>
       </div>
+
+      {/* 연결 해제 확인 모달 */}
+      {!isOwnerMode && (
+        <Modal open={disconnectOpen} onClose={() => setDisconnectOpen(false)}>
+          <div className="text-center">
+            <div className="text-base font-black mb-2">
+              {profile.name}님과의 연결을 해제할까요?
+            </div>
+            <p className="text-[12px] text-[var(--color-text-tertiary)] mb-5 leading-relaxed">
+              주고받은 피드백, 방명록 기록은 그대로 유지돼요.<br />
+              상대방에게 알림이 가지 않아요.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setDisconnectOpen(false)}
+                className="flex-1 rounded-xl border py-2.5 text-[13px] font-semibold text-[var(--color-text-secondary)]"
+                style={{ borderColor: 'var(--color-border-default)' }}
+              >
+                취소
+              </button>
+              <button
+                onClick={() => {
+                  store.disconnectProfile(profile.linkId)
+                  setDisconnectOpen(false)
+                  showToast(`${profile.name}님과 연결을 해제했어요`)
+                }}
+                className="flex-1 rounded-xl border py-2.5 text-[13px] font-semibold"
+                style={{ borderColor: 'rgba(198,40,40,0.28)', color: 'var(--color-state-danger-text)' }}
+              >
+                연결 해제
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
 
       {!isOwnerMode && profile.whoIAm && (
         <PublicProfileCompatibilitySheet

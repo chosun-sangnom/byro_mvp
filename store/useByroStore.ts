@@ -118,6 +118,7 @@ interface ByroStore {
   cancelConnectionRequest(linkId: string): void
   acceptConnectionRequest(id: string): void
   rejectConnectionRequest(id: string): void
+  disconnectProfile(linkId: string): void
   submitExperience(profileLinkId: string, exp: Omit<Experience, 'id' | 'date'>): void
   markKemiComputed(linkId: string): void
   invalidateKemiCache(): void
@@ -547,6 +548,12 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   rejectConnectionRequest(id) {
     set((state) => ({
       connectionRequests: state.connectionRequests.filter((r) => r.id !== id),
+    }))
+  },
+
+  disconnectProfile(linkId) {
+    set((state) => ({
+      connectedProfiles: state.connectedProfiles.filter((p) => p.linkId !== linkId),
     }))
   },
 

@@ -332,12 +332,7 @@ export function ManageByroScreen({
 
         {/* 회원탈퇴 */}
         <div className="mx-5 mt-6">
-          <button
-            onClick={() => setWithdrawOpen(true)}
-            className="w-full py-3 text-[13px] font-medium text-[var(--color-text-tertiary)] opacity-60 active:opacity-40"
-          >
-            회원탈퇴
-          </button>
+          <Button variant="danger" onClick={() => setWithdrawOpen(true)}>회원탈퇴</Button>
         </div>
 
         {/* 탈퇴 확인 모달 */}

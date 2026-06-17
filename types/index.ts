@@ -39,6 +39,7 @@ export interface Highlight {
   subtitle: string
   description: string
   year: string
+  verified?: boolean
   metadata?: Record<string, string | boolean>
   linkUrl?: string
   thumbnailUrl?: string

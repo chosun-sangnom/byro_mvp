@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { BadgeCheck, ChevronDown, ChevronUp } from 'lucide-react'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { AnimatedSection, SectionTitle } from '@/components/screens/profile/PublicProfileSections'
 import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
@@ -57,7 +57,12 @@ export function ProfileHighlightsSection({
                     <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={16} />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <div className="mb-0.5 text-[11px] text-[var(--color-text-tertiary)]">{category?.label ?? '직접 입력'}</div>
+                    <div className="mb-0.5 flex items-center gap-1 text-[11px] text-[var(--color-text-tertiary)]">
+                      <span>{category?.label ?? '직접 입력'}</span>
+                      {entry.items.some((h) => h.verified) && (
+                        <BadgeCheck size={11} className="text-[var(--color-accent)]" />
+                      )}
+                    </div>
                     <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{preview.title}</div>
                     {preview.meta && (
                       <div className="mt-0.5 text-[12px] text-[var(--color-text-tertiary)]">{preview.meta}</div>
@@ -80,7 +85,10 @@ export function ProfileHighlightsSection({
                             const metaParts = getHighlightMetaParts(hl)
                             return (
                               <div key={hl.id} className="py-3 first:pt-0 last:pb-0">
-                                <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{hl.title}</div>
+                                <div className="flex items-center gap-1.5">
+                                  <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{hl.title}</div>
+                                  {hl.verified && <BadgeCheck size={13} className="shrink-0 text-[var(--color-accent)]" />}
+                                </div>
                                 {metaParts.length > 0 && (
                                   <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
                                     {metaParts.map((part, partIndex) => (

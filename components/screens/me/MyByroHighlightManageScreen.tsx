@@ -11,6 +11,7 @@ import { HighlightManageCategoryView } from '@/components/screens/me/highlight-m
 import { HighlightManageFormView } from '@/components/screens/me/highlight-manage/HighlightManageFormView'
 import { HighlightManageListView } from '@/components/screens/me/highlight-manage/HighlightManageListView'
 import { HighlightManagePickerView } from '@/components/screens/me/highlight-manage/HighlightManagePickerView'
+import { HighlightManageVerifyView } from '@/components/screens/me/highlight-manage/HighlightManageVerifyView'
 import { HighlightLlmImportSheet } from '@/components/screens/me/highlight-manage/HighlightLlmImportSheet'
 import {
   type HighlightCategoryCardGroup,
@@ -233,6 +234,19 @@ export function HighlightManageScreen({
     showToast(editingHl ? '수정됐어요!' : '추가됐어요!')
   }
 
+  if (mode === 'verify' && selectedCat) {
+    return (
+      <HighlightManageVerifyView
+        selectedCat={selectedCat}
+        existingHighlights={selectedCategoryHighlights}
+        onBack={() => setMode('group')}
+        onImportCareers={(items) => items.forEach((item) => store.addHighlight(item))}
+        onVerifyHighlight={(id) => store.verifyHighlight(id)}
+        onAddHighlight={(item) => store.addHighlight(item)}
+      />
+    )
+  }
+
   if (mode === 'group' && selectedCat) {
     return (
       <HighlightManageCategoryView
@@ -257,6 +271,7 @@ export function HighlightManageScreen({
           resetFormFields()
           setMode('form')
         }}
+        onVerify={() => setMode('verify')}
       />
     )
   }

@@ -1,9 +1,7 @@
 import { getPublicProfileByUsername } from '@/lib/mocks/publicProfiles'
 import { INSTAGRAM_PROFILE, LINKEDIN_PROFILE } from '@/lib/mocks/socialProfiles'
 import type {
-  AirlineHighlight,
   ContactChannel,
-  CorporateHighlight,
   GuestbookEntry,
   HeroTheme,
   Highlight,
@@ -45,8 +43,6 @@ type NormalizedPublicProfile = PublicProfile & {
   linkedin: NormalizedLinkedInProfile
   heroTheme: HeroTheme
   contactChannels: ContactChannel[]
-  corporateHighlight: CorporateHighlight
-  airlineHighlight: AirlineHighlight
   reputationKeywords: ReputationKeyword[]
   guestbook: GuestbookEntry[]
   tabVisibility: TabVisibility
@@ -72,8 +68,6 @@ const PUBLIC_PROFILE_FALLBACKS: {
   linkedin: NormalizedLinkedInProfile
   heroTheme: HeroTheme
   contactChannels: ContactChannel[]
-  corporateHighlight: CorporateHighlight
-  airlineHighlight: AirlineHighlight
   reputationKeywords: ReputationKeyword[]
   guestbook: GuestbookEntry[]
 } = {
@@ -97,21 +91,6 @@ const PUBLIC_PROFILE_FALLBACKS: {
   },
   // TODO(real API): Replace with only the contact channels that are public in the user's visibility settings.
   contactChannels: [],
-  // TODO(real API): Replace with verified corporate registry aggregates for active companies and operating years.
-  corporateHighlight: {
-    companyCount: 1,
-    years: 4,
-    summary: '창업 4년차 · 정상 운영 중 · 폐업 이력 없음',
-    companies: [
-      { name: 'Byro Studio', startYear: 2022, endYear: null, years: 4, status: '정상 운영' },
-    ],
-  },
-  // TODO(real API): Replace with airline loyalty integrations or verified membership summaries.
-  airlineHighlight: {
-    tierSummary: '대한항공 모닝캄',
-    badgeLevel: 'business_traveler',
-    airlines: [{ name: '대한항공', tier: '모닝캄' }],
-  },
   // TODO(real API): Replace with aggregated reputation keyword counts returned by the public reputation summary API.
   reputationKeywords: [],
   // TODO(real API): Replace with the public guestbook feed for the profile owner.
@@ -193,8 +172,6 @@ export function getNormalizedPublicProfile({
     },
     heroTheme: rawProfile.heroTheme ?? PUBLIC_PROFILE_FALLBACKS.heroTheme,
     contactChannels: rawProfile.contactChannels ?? PUBLIC_PROFILE_FALLBACKS.contactChannels,
-    corporateHighlight: rawProfile.corporateHighlight ?? PUBLIC_PROFILE_FALLBACKS.corporateHighlight,
-    airlineHighlight: rawProfile.airlineHighlight ?? PUBLIC_PROFILE_FALLBACKS.airlineHighlight,
     reputationKeywords: rawProfile.reputationKeywords ?? PUBLIC_PROFILE_FALLBACKS.reputationKeywords,
     guestbook: rawProfile.guestbook ?? PUBLIC_PROFILE_FALLBACKS.guestbook,
   }

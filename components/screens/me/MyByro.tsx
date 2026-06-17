@@ -139,7 +139,6 @@ export default function MyByro() {
   if (screen === 'editHighlight') {
     return (
       <HighlightManageScreen
-        userLinkId={user.linkId}
         onBack={handleBackToManage}
       />
     )

@@ -17,9 +17,7 @@ export type HighlightGroupId = 'career' | 'achievement' | 'lifestyle'
 export type HighlightCategoryId =
   | 'career-role'
   | 'education-history'
-  | 'career-continuity'
   | 'remember-network'
-  | 'corporate-longevity'
   | 'talk'
   | 'collab'
   | 'publish'
@@ -28,7 +26,6 @@ export type HighlightCategoryId =
   | 'award'
   | 'patent'
   | 'license'
-  | 'airline-mileage'
   | 'volunteer'
   | 'other'
 
@@ -190,11 +187,6 @@ export interface PublicProfileLife {
   }
 }
 
-export interface CareerHighlight {
-  avgYears: number
-  vsIndustryPercent: number
-}
-
 export interface RememberIndustry {
   name: string
   ratio: number
@@ -216,33 +208,6 @@ export interface RememberHighlight {
   total: number
   industries: RememberIndustry[]
   insight?: RememberInsight
-}
-
-export interface CorporateCompany {
-  name: string
-  startYear: number
-  endYear: number | null
-  years: number
-  status: string
-}
-
-export interface CorporateHighlight {
-  companyCount: number
-  summary: string
-  companies: CorporateCompany[]
-  averageOperatingYears?: number
-  years?: number
-}
-
-export interface AirlineMembership {
-  name: string
-  tier: string
-}
-
-export interface AirlineHighlight {
-  tierSummary: string
-  badgeLevel: string
-  airlines: AirlineMembership[]
 }
 
 export interface ReputationKeyword {
@@ -283,12 +248,9 @@ export interface PublicProfile {
   linkedin?: LinkedInProfile
   youtube?: { channelName: string; channelUrl: string }
   tiktok?: { username: string; profileUrl: string }
-  careerHighlight: CareerHighlight
   rememberHighlight: RememberHighlight
   heroTheme?: HeroTheme
   contactChannels?: ContactChannel[]
-  corporateHighlight?: CorporateHighlight
-  airlineHighlight?: AirlineHighlight
   manualHighlights: Highlight[]
   experiences: Experience[]
   savedProfiles: SavedProfile[]

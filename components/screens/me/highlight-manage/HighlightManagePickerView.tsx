@@ -1,4 +1,3 @@
-import { BadgeCheck } from 'lucide-react'
 import { NavBar } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
@@ -8,13 +7,11 @@ import type { HighlightManageCategory } from './constants'
 interface HighlightManagePickerViewProps {
   onBack: () => void
   onOpenCategory: (category: HighlightManageCategory) => void
-  onOpenCertification: (categoryId: string) => void
 }
 
 export function HighlightManagePickerView({
   onBack,
   onOpenCategory,
-  onOpenCertification,
 }: HighlightManagePickerViewProps) {
   return (
     <div className="flex flex-col h-full">
@@ -34,20 +31,9 @@ export function HighlightManagePickerView({
                 {HIGHLIGHT_CATEGORIES.filter((cat) => cat.group === group.id).map((cat) => (
                   <button
                     key={cat.id}
-                    onClick={() => {
-                      if (cat.certificationOnly) {
-                        onOpenCertification(cat.id)
-                        return
-                      }
-                      onOpenCategory(cat)
-                    }}
+                    onClick={() => onOpenCategory(cat)}
                     className="settings-row-light relative overflow-visible px-3 py-4 text-center"
                   >
-                    {cat.certificationOnly && (
-                      <span className="absolute -right-2 -top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-bg-surface)] border border-[var(--color-border-default)] text-[var(--color-state-success-text)]">
-                        <BadgeCheck size={14} />
-                      </span>
-                    )}
                     <div className="mx-auto mb-2 flex items-center justify-center text-[var(--color-text-secondary)]">
                       <HighlightIcon id={cat.icon as HighlightIconId} size={16} />
                     </div>

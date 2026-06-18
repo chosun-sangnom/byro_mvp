@@ -139,7 +139,7 @@ export interface PublicProfileWhoIAm {
 export interface LifeMediaItem {
   label: string
   sublabel?: string
-  // TODO(real API): posterUrl from TMDB (movies/books), Spotify (music), Kakao Maps / Google Places (restaurants/cafes)
+  // TODO(real API): posterUrl from TMDB (movies), 알라딘 API (books, 무료 5000건/일), Spotify (music), Kakao Maps / Google Places (restaurants/cafes)
   posterUrl?: string
   // TODO(real API): Spotify 30s preview URL
   previewUrl?: string

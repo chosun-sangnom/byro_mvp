@@ -31,6 +31,67 @@ interface ExerciseItem {
   category: Exclude<ExerciseCategory, 'all'>
 }
 
+// ─── 운동별 기본 이미지 (Unsplash CDN) ───────────────────────────────────────
+// TODO(real API): 백엔드 연동 시 DB에서 이미지 URL 관리
+const BASE = 'https://images.unsplash.com/photo-'
+const Q = '?w=200&h=200&q=75&fit=crop&auto=format'
+
+// 카테고리 기본 이미지 (항목별 이미지 없을 때 fallback)
+const CATEGORY_IMAGES: Record<Exclude<ExerciseCategory, 'all'>, string> = {
+  run:     `${BASE}1571008887538-b36bb32f4571${Q}`,  // 러닝
+  ball:    `${BASE}1553778263-73a83bab9b0c${Q}`,      // 축구
+  fitness: `${BASE}1534438327276-14e5300c3a48${Q}`,   // 헬스장
+  martial: `${BASE}1544717305-2782549b5136${Q}`,      // 복싱
+  water:   `${BASE}1530549387789-4c1017266635${Q}`,   // 수영
+  outdoor: `${BASE}1551632811-561732d1e306${Q}`,      // 등산
+  other:   `${BASE}1546519638-68e109498ffc${Q}`,      // 농구장(일반)
+}
+
+// 항목별 특화 이미지
+const EXERCISE_IMAGES: Record<string, string> = {
+  '러닝':       `${BASE}1571008887538-b36bb32f4571${Q}`,
+  '조깅':       `${BASE}1571008887538-b36bb32f4571${Q}`,
+  '걷기':       `${BASE}1476480862126-209bfaa8edc8${Q}`,
+  '마라톤':     `${BASE}1513593771513-7b58b6c4af38${Q}`,
+  '트레일러닝': `${BASE}1455156218388-5e61287f7f6d${Q}`,
+  '축구':       `${BASE}1553778263-73a83bab9b0c${Q}`,
+  '농구':       `${BASE}1546519638-68e109498ffc${Q}`,
+  '야구':       `${BASE}1566577739112-5180d4bf9390${Q}`,
+  '테니스':     `${BASE}1554068865-24ceec41ef66${Q}`,
+  '골프':       `${BASE}1535131749006-b7f58c99034b${Q}`,
+  '배구':       `${BASE}1612872087720-bb876e2e67d1${Q}`,
+  '볼링':       `${BASE}1545809074-59472b3f5ecc${Q}`,
+  '헬스':       `${BASE}1534438327276-14e5300c3a48${Q}`,
+  '크로스핏':   `${BASE}1541534401786-2077eed87a74${Q}`,
+  '필라테스':   `${BASE}1518611012118-696072aa579a${Q}`,
+  '요가':       `${BASE}1544367567-0f2fcb009e0b${Q}`,
+  '실내사이클': `${BASE}1571019613454-1cb2f99b2d8b${Q}`,
+  '맨몸운동':   `${BASE}1543351611-58f69d7c1781${Q}`,
+  '복싱':       `${BASE}1544717305-2782549b5136${Q}`,
+  '태권도':     `${BASE}1555597673-b21d5c935865${Q}`,
+  '주짓수':     `${BASE}1533536347418-0614b89b0347${Q}`,
+  '검도':       `${BASE}1577563908411-5077b6dc7624${Q}`,
+  '수영':       `${BASE}1530549387789-4c1017266635${Q}`,
+  '서핑':       `${BASE}1505118380757-91f5f5632de0${Q}`,
+  '스쿠버다이빙': `${BASE}1583212292454-1d6aa0bde093${Q}`,
+  '카약':       `${BASE}1476611338391-6f395a0dd82e${Q}`,
+  '등산':       `${BASE}1551632811-561732d1e306${Q}`,
+  '클라이밍':   `${BASE}1522163182402-834f871fd851${Q}`,
+  '자전거':     `${BASE}1558618666-fcd25c85cd64${Q}`,
+  'MTB':        `${BASE}1544191696-102dbeb3b1cd${Q}`,
+  '캠핑':       `${BASE}1504280390367-361c6d9f38f4${Q}`,
+  '스키':       `${BASE}1551698618-1dfe5d97d256${Q}`,
+  '스노보드':   `${BASE}1565992441121-4367ef2f6826${Q}`,
+  '패러글라이딩': `${BASE}1506905925346-21bda4d32df4${Q}`,
+  '당구':       `${BASE}1587223962930-cb7f31384c19${Q}`,
+  '다트':       `${BASE}1509036236416-66d2c4b7e55f${Q}`,
+  '승마':       `${BASE}1553284965-83fd3e82fa5a${Q}`,
+  '댄스':       `${BASE}1504609813442-a8924e83f76e${Q}`,
+}
+
+const getExerciseImage = (name: string, category: Exclude<ExerciseCategory, 'all'>): string =>
+  EXERCISE_IMAGES[name] ?? CATEGORY_IMAGES[category]
+
 // TODO(backend): GET /api/exercise/items 호출로 교체
 const EXERCISE_DB: ExerciseItem[] = [
   { id: 'running',      name: '러닝',       category: 'run'     },
@@ -92,6 +153,45 @@ const EXERCISE_DB: ExerciseItem[] = [
 ]
 
 const MAX_ITEMS = 5
+
+function ExercisePhotoButton({
+  item,
+  defaultImageUrl,
+  onCameraClick,
+}: {
+  item: LifeMediaItem
+  defaultImageUrl: string
+  onCameraClick: () => void
+}) {
+  const [imgFailed, setImgFailed] = useState(false)
+  const displayUrl = item.posterUrl ?? (!imgFailed ? defaultImageUrl : undefined)
+  const isUserPhoto = !!item.posterUrl
+
+  return (
+    <button
+      onClick={onCameraClick}
+      className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-[var(--color-bg-muted)] flex items-center justify-center"
+    >
+      {displayUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={displayUrl}
+          alt={item.label}
+          className="h-full w-full object-cover"
+          onError={() => setImgFailed(true)}
+        />
+      ) : (
+        <Camera size={15} className="text-[var(--color-text-tertiary)]" />
+      )}
+      {/* 카메라 뱃지: 기본 이미지일 때만 표시 */}
+      {!isUserPhoto && displayUrl && (
+        <div className="absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-tl-md bg-black/50">
+          <Camera size={8} className="text-white" />
+        </div>
+      )}
+    </button>
+  )
+}
 
 export function ExercisePicker({
   selected,
@@ -172,11 +272,16 @@ export function ExercisePicker({
       {/* ── 선택된 운동 (카테고리별 그룹) ── */}
       {selected.length > 0 && (
         <div className="mb-4 space-y-4">
+          {/* 헬퍼 텍스트 */}
+          <p className="flex items-center gap-1.5 text-[11px] text-[var(--color-text-tertiary)]">
+            <Camera size={11} />
+            기본 이미지를 눌러 내 모습으로 바꿀 수 있어요
+          </p>
+
           {CATEGORY_ORDER.filter((cat) => grouped[cat]).map((cat) => {
             const { label, emoji } = getCategoryInfo(cat)
             return (
               <div key={cat}>
-                {/* 카테고리 헤더 */}
                 <div className="mb-2 flex items-center gap-1.5">
                   {emoji && <span className="text-[12px]">{emoji}</span>}
                   <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">
@@ -184,32 +289,31 @@ export function ExercisePicker({
                   </span>
                   <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
                 </div>
-                {/* 아이템 카드 */}
                 <div className="space-y-2">
-                  {grouped[cat].map((item) => (
-                    <div
-                      key={item.label}
-                      className="flex items-center gap-3 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-3 py-2"
-                    >
-                      {/* 사진 업로드 버튼 */}
-                      <button
-                        onClick={() => handleCameraClick(item.label)}
-                        className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-[var(--color-bg-muted)] flex items-center justify-center"
+                  {grouped[cat].map((item) => {
+                    const dbItem = EXERCISE_DB.find((e) => e.name === item.label)
+                    const defaultImg = dbItem
+                      ? getExerciseImage(item.label, dbItem.category)
+                      : CATEGORY_IMAGES['other']
+                    return (
+                      <div
+                        key={item.label}
+                        className="flex items-center gap-3 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-3 py-2"
                       >
-                        {item.posterUrl
-                          // eslint-disable-next-line @next/next/no-img-element
-                          ? <img src={item.posterUrl} alt={item.label} className="h-full w-full object-cover" />
-                          : <Camera size={15} className="text-[var(--color-text-tertiary)]" />
-                        }
-                      </button>
-                      <p className="flex-1 text-[13px] font-semibold text-[var(--color-text-primary)]">
-                        {item.label}
-                      </p>
-                      <button onClick={() => remove(item.label)} className="flex-shrink-0 p-1">
-                        <X size={14} className="text-[var(--color-text-tertiary)]" />
-                      </button>
-                    </div>
-                  ))}
+                        <ExercisePhotoButton
+                          item={item}
+                          defaultImageUrl={defaultImg}
+                          onCameraClick={() => handleCameraClick(item.label)}
+                        />
+                        <p className="flex-1 text-[13px] font-semibold text-[var(--color-text-primary)]">
+                          {item.label}
+                        </p>
+                        <button onClick={() => remove(item.label)} className="flex-shrink-0 p-1">
+                          <X size={14} className="text-[var(--color-text-tertiary)]" />
+                        </button>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             )
@@ -225,7 +329,6 @@ export function ExercisePicker({
 
       {!isAtLimit && (
         <>
-          {/* 카테고리 탭 */}
           <div className="flex gap-1.5 overflow-x-auto pb-2 mb-3 no-scrollbar">
             {CATEGORY_TABS.map((tab) => {
               const active = activeCategory === tab.id
@@ -245,7 +348,6 @@ export function ExercisePicker({
             })}
           </div>
 
-          {/* 종목 그리드 */}
           <div className="flex flex-wrap gap-2">
             {filtered.map((item) => {
               const isSelected = selectedNames.has(item.name)
@@ -266,7 +368,6 @@ export function ExercisePicker({
             })}
           </div>
 
-          {/* 직접 입력 */}
           <div className="flex gap-2 mt-4">
             <input
               value={customInput}

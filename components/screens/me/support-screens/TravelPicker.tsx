@@ -1,5 +1,10 @@
 'use client'
 
+// ─── 여행지 DB 가이드 (백엔드 구현 시 참고) ──────────────────────────────────
+// Table: city_items (id, name, region, sort_order)
+// GET /api/travel/cities  →  ISR revalidate:86400 권장
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { useRef, useState, type ChangeEvent } from 'react'
 import { Camera, X } from 'lucide-react'
 import { showToast } from '@/components/ui'
@@ -23,6 +28,100 @@ interface CityItem {
   name: string
   region: Exclude<TravelRegion, 'all'>
 }
+
+// ─── 도시별 기본 이미지 (Unsplash CDN) ───────────────────────────────────────
+// TODO(real API): 백엔드 연동 시 DB에서 이미지 URL 관리
+const BASE = 'https://images.unsplash.com/photo-'
+const Q = '?w=200&h=200&q=75&fit=crop&auto=format'
+
+const CITY_IMAGES: Record<string, string> = {
+  // 국내
+  '서울':       `${BASE}1517154421773-0529f29ea451${Q}`,
+  '부산':       `${BASE}1578662996442-48f60103fc96${Q}`,
+  '제주':       `${BASE}1600100397608-4e6c697e1d58${Q}`,
+  '경주':       `${BASE}1600100397608-4e6c697e1d58${Q}`, // 한국 일반
+  '강릉':       `${BASE}1504214208698-7d9b51b61be6${Q}`, // 동해 바다
+  '여수':       `${BASE}1524492412937-b28074a5d7da${Q}`, // 항구 야경
+  '전주':       `${BASE}1517154421773-0529f29ea451${Q}`, // 한국 일반
+  '속초':       `${BASE}1504214208698-7d9b51b61be6${Q}`, // 동해 바다
+  '통영':       `${BASE}1578662996442-48f60103fc96${Q}`, // 한국 항구
+  '거제':       `${BASE}1578662996442-48f60103fc96${Q}`, // 한국 섬
+
+  // 아시아 — 일본
+  '도쿄':       `${BASE}1540959733332-eab4deabeeaf${Q}`,
+  '오사카':     `${BASE}1589824823514-5b5d73b4eb24${Q}`,
+  '교토':       `${BASE}1493976040374-85c8e12f0c0e${Q}`,
+  '삿포로':     `${BASE}1584624491862-1f0de7eeee56${Q}`,
+  '후쿠오카':   `${BASE}1540959733332-eab4deabeeaf${Q}`, // 일본 일반
+  // 동남아
+  '방콕':       `${BASE}1563492065599-3520f775eeed${Q}`,
+  '발리':       `${BASE}1537996194471-e657df975ab4${Q}`,
+  '싱가포르':   `${BASE}1524492412937-b28074a5d7da${Q}`,
+  '홍콩':       `${BASE}1576788369575-4d2cd05e25b1${Q}`,
+  '타이페이':   `${BASE}1528360983277-13d401cdc186${Q}`,
+  '하노이':     `${BASE}1555921015-5532091f6026${Q}`,
+  '다낭':       `${BASE}1559592413-7cec4d0cae2b${Q}`,
+  '나트랑':     `${BASE}1505852679233-d9fd70aff56d${Q}`, // 해변
+  '세부':       `${BASE}1505852679233-d9fd70aff56d${Q}`, // 열대 해변
+  // 중국
+  '상하이':     `${BASE}1538428494232-9c0d8a3ab403${Q}`,
+  '베이징':     `${BASE}1508804185872-d7badad00f7d${Q}`,
+  '청두':       `${BASE}1538428494232-9c0d8a3ab403${Q}`, // 중국 일반
+  '마카오':     `${BASE}1576788369575-4d2cd05e25b1${Q}`, // 야경
+  // 중동
+  '두바이':     `${BASE}1512453979798-5ea266f8880c${Q}`,
+  '이스탄불':   `${BASE}1524231757912-21f4fe3a7200${Q}`,
+
+  // 유럽
+  '파리':       `${BASE}1549144511-f099e773c147${Q}`,
+  '런던':       `${BASE}1543832923-44667a44c804${Q}`,
+  '로마':       `${BASE}1552832230-c0197dd311b5${Q}`,
+  '바르셀로나': `${BASE}1539037116277-4db20889f2d4${Q}`,
+  '암스테르담': `${BASE}1534351590666-13e3e96b5702${Q}`,
+  '프라하':     `${BASE}1541849546-216549ae216d${Q}`,
+  '빈':         `${BASE}1516550893923-42d28e5677af${Q}`,
+  '취리히':     `${BASE}1506905925346-21bda4d32df4${Q}`, // 산 배경
+  '베네치아':   `${BASE}1534113414509-0eec2bfb493f${Q}`,
+  '피렌체':     `${BASE}1552832230-c0197dd311b5${Q}`,    // 이탈리아 일반
+  '마드리드':   `${BASE}1539037116277-4db20889f2d4${Q}`, // 스페인 일반
+  '리스본':     `${BASE}1555881400-74d7acaacd8b${Q}`,
+  '산토리니':   `${BASE}1570077188670-e3a8d69ac5ff${Q}`,
+  '코펜하겐':   `${BASE}1513622470522-26c3c8a854bc${Q}`,
+  '스톡홀름':   `${BASE}1508193638397-1c4234db14d8${Q}`,
+  '헬싱키':     `${BASE}1508193638397-1c4234db14d8${Q}`, // 북유럽 일반
+
+  // 미주
+  '뉴욕':       `${BASE}1496442226666-8d4d0e62e6e9${Q}`,
+  '로스앤젤레스': `${BASE}1534430480872-3498386e7856${Q}`,
+  '샌프란시스코': `${BASE}1501594907352-04cda38ebc29${Q}`,
+  '라스베이거스': `${BASE}1605833556294-ea5c7a74f57d${Q}`,
+  '하와이':     `${BASE}1505852679233-d9fd70aff56d${Q}`,
+  '시카고':     `${BASE}1494522855154-9297ac14b55f${Q}`,
+  '마이애미':   `${BASE}1533106497176-45ae19e68ba2${Q}`,
+  '밴쿠버':     `${BASE}1501016757720-5a7b9d6b4eb6${Q}`,
+  '토론토':     `${BASE}1517935706615-2717063c2225${Q}`,
+  '칸쿤':       `${BASE}1532592937548-c5d4f5c0f77b${Q}`,
+  '보스턴':     `${BASE}1494522855154-9297ac14b55f${Q}`, // 미국 도시 일반
+
+  // 오세아니아
+  '시드니':     `${BASE}1524820197278-540916411146${Q}`,
+  '멜버른':     `${BASE}1545044846-351ba102b6d5${Q}`,
+  '골드코스트': `${BASE}1505852679233-d9fd70aff56d${Q}`, // 해변
+  '오클랜드':   `${BASE}1524820197278-540916411146${Q}`, // 오세아니아 일반
+  '퀸스타운':   `${BASE}1506905925346-21bda4d32df4${Q}`, // 산악 경관
+}
+
+// 지역 기본 fallback (도시 이미지 없을 때)
+const REGION_IMAGES: Record<Exclude<TravelRegion, 'all'>, string> = {
+  korea:    `${BASE}1517154421773-0529f29ea451${Q}`,
+  asia:     `${BASE}1540959733332-eab4deabeeaf${Q}`,
+  europe:   `${BASE}1549144511-f099e773c147${Q}`,
+  americas: `${BASE}1496442226666-8d4d0e62e6e9${Q}`,
+  oceania:  `${BASE}1524820197278-540916411146${Q}`,
+}
+
+const getCityImage = (name: string, region: Exclude<TravelRegion, 'all'>): string =>
+  CITY_IMAGES[name] ?? REGION_IMAGES[region]
 
 const CITY_DB: CityItem[] = [
   { id: 'seoul',      name: '서울',       region: 'korea'    },
@@ -90,6 +189,45 @@ const CITY_DB: CityItem[] = [
 ]
 
 const MAX_ITEMS = 5
+
+function CityPhotoButton({
+  item,
+  defaultImageUrl,
+  onCameraClick,
+}: {
+  item: LifeMediaItem
+  defaultImageUrl: string
+  onCameraClick: () => void
+}) {
+  const [imgFailed, setImgFailed] = useState(false)
+  const displayUrl = item.posterUrl ?? (!imgFailed ? defaultImageUrl : undefined)
+  const isUserPhoto = !!item.posterUrl
+
+  return (
+    <button
+      onClick={onCameraClick}
+      className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-[var(--color-bg-muted)] flex items-center justify-center"
+    >
+      {displayUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={displayUrl}
+          alt={item.label}
+          className="h-full w-full object-cover"
+          onError={() => setImgFailed(true)}
+        />
+      ) : (
+        <Camera size={15} className="text-[var(--color-text-tertiary)]" />
+      )}
+      {/* 카메라 뱃지: 기본 이미지일 때만 표시 */}
+      {!isUserPhoto && displayUrl && (
+        <div className="absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-tl-md bg-black/50">
+          <Camera size={8} className="text-white" />
+        </div>
+      )}
+    </button>
+  )
+}
 
 export function TravelPicker({
   selected,
@@ -168,18 +306,19 @@ export function TravelPicker({
     <div>
       <input ref={fileInputRef} type="file" accept="image/*" className="sr-only" onChange={handleFileChange} />
 
-      <p className="text-[12px] text-[var(--color-text-tertiary)] mb-4">
-        내가 다녀온 여행지를 추가해요.
-      </p>
-
       {/* ── 선택된 여행지 (지역별 그룹) ── */}
       {selected.length > 0 && (
         <div className="mb-4 space-y-4">
+          {/* 헬퍼 텍스트 */}
+          <p className="flex items-center gap-1.5 text-[11px] text-[var(--color-text-tertiary)]">
+            <Camera size={11} />
+            기본 이미지를 눌러 내 여행 사진으로 바꿀 수 있어요
+          </p>
+
           {groupOrder.map((region) => {
             const { label, emoji } = getRegionInfo(region)
             return (
               <div key={region}>
-                {/* 지역 헤더 */}
                 <div className="mb-2 flex items-center gap-1.5">
                   {emoji && <span className="text-[12px]">{emoji}</span>}
                   <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">
@@ -187,32 +326,31 @@ export function TravelPicker({
                   </span>
                   <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
                 </div>
-                {/* 아이템 카드 */}
                 <div className="space-y-2">
-                  {grouped[region].map((item) => (
-                    <div
-                      key={item.label}
-                      className="flex items-center gap-3 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-3 py-2"
-                    >
-                      {/* 사진 업로드 버튼 */}
-                      <button
-                        onClick={() => handleCameraClick(item.label)}
-                        className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-[var(--color-bg-muted)] flex items-center justify-center"
+                  {grouped[region].map((item) => {
+                    const cityItem = CITY_DB.find((c) => c.name === item.label)
+                    const defaultImg = cityItem
+                      ? getCityImage(item.label, cityItem.region)
+                      : REGION_IMAGES['korea']
+                    return (
+                      <div
+                        key={item.label}
+                        className="flex items-center gap-3 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-3 py-2"
                       >
-                        {item.posterUrl
-                          // eslint-disable-next-line @next/next/no-img-element
-                          ? <img src={item.posterUrl} alt={item.label} className="h-full w-full object-cover" />
-                          : <Camera size={15} className="text-[var(--color-text-tertiary)]" />
-                        }
-                      </button>
-                      <p className="flex-1 text-[13px] font-semibold text-[var(--color-text-primary)]">
-                        {item.label}
-                      </p>
-                      <button onClick={() => remove(item.label)} className="flex-shrink-0 p-1">
-                        <X size={14} className="text-[var(--color-text-tertiary)]" />
-                      </button>
-                    </div>
-                  ))}
+                        <CityPhotoButton
+                          item={item}
+                          defaultImageUrl={defaultImg}
+                          onCameraClick={() => handleCameraClick(item.label)}
+                        />
+                        <p className="flex-1 text-[13px] font-semibold text-[var(--color-text-primary)]">
+                          {item.label}
+                        </p>
+                        <button onClick={() => remove(item.label)} className="flex-shrink-0 p-1">
+                          <X size={14} className="text-[var(--color-text-tertiary)]" />
+                        </button>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             )

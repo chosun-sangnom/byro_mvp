@@ -23,8 +23,6 @@ import type { AiSearchItem } from '@/app/api/ai-search/route'
 
 export type PlaceType = 'restaurant' | 'cafe'
 
-const limit = 5
-
 interface MockPlace {
   id: string
   name: string

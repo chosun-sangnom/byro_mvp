@@ -28,8 +28,6 @@ import type { AiSearchItem } from '@/app/api/ai-search/route'
 
 export type MediaType = 'movie' | 'book' | 'play'
 
-const limit = 5
-
 interface MockMediaItem {
   id: string
   title: string

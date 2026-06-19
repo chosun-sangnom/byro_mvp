@@ -26,8 +26,6 @@ import { Loader2, Music, PenLine, Search, Sparkles, X } from 'lucide-react'
 import type { LifeMediaItem } from '@/types'
 import type { AiSearchItem } from '@/app/api/ai-search/route'
 
-const limit = 5
-
 interface MockTrack {
   id: string
   title: string

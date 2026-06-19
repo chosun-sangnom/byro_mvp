@@ -26,7 +26,7 @@ import { Loader2, Music, PenLine, Search, Sparkles, X } from 'lucide-react'
 import type { LifeMediaItem } from '@/types'
 import type { AiSearchItem } from '@/app/api/ai-search/route'
 
-const MAX_ITEMS = 5
+const limit = 5
 
 interface MockTrack {
   id: string
@@ -92,10 +92,13 @@ function CheckCircle({ isSelected }: { isSelected: boolean }) {
 export function MusicSearchPicker({
   selected,
   onChange,
+  maxItems,
 }: {
   selected: LifeMediaItem[]
   onChange: (items: LifeMediaItem[]) => void
+  maxItems?: number
 }) {
+  const limit = maxItems ?? 5
   const [query, setQuery] = useState('')
   const [aiResults, setAiResults] = useState<AiSearchItem[]>([])
   const [aiLoading, setAiLoading] = useState(false)
@@ -132,7 +135,7 @@ export function MusicSearchPicker({
   }, [query, mockResults.length])
 
   const selectedIds = new Set(selected.map((s) => `${s.label}__${s.sublabel}`))
-  const isAtLimit = selected.length >= MAX_ITEMS
+  const isAtLimit = selected.length >= limit
 
   const toggleMock = (track: MockTrack) => {
     const key = `${track.title}__${track.artist}`
@@ -200,7 +203,7 @@ export function MusicSearchPicker({
 
       {isAtLimit && (
         <p className="mb-3 text-center text-[12px] text-[var(--color-text-tertiary)]">
-          최대 {MAX_ITEMS}개까지 추가할 수 있어요
+          최대 {limit}개까지 추가할 수 있어요
         </p>
       )}
 

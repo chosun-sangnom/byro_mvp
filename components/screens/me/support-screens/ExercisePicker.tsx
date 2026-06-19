@@ -152,8 +152,6 @@ const EXERCISE_DB: ExerciseItem[] = [
   { id: 'cheerleading', name: '치어리딩',   category: 'other'   },
 ]
 
-const MAX_ITEMS = 5
-
 function ExercisePhotoButton({
   item,
   defaultImageUrl,
@@ -196,17 +194,20 @@ function ExercisePhotoButton({
 export function ExercisePicker({
   selected,
   onChange,
+  maxItems,
 }: {
   selected: LifeMediaItem[]
   onChange: (items: LifeMediaItem[]) => void
+  maxItems?: number
 }) {
   const [activeCategory, setActiveCategory] = useState<ExerciseCategory>('all')
   const [customInput, setCustomInput] = useState('')
   const [editingLabel, setEditingLabel] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
+  const limit = maxItems ?? 5
   const selectedNames = new Set(selected.map((s) => s.label))
-  const isAtLimit = selected.length >= MAX_ITEMS
+  const isAtLimit = selected.length >= limit
 
   const filtered = activeCategory === 'all'
     ? EXERCISE_DB
@@ -323,7 +324,7 @@ export function ExercisePicker({
 
       {isAtLimit && (
         <p className="mb-3 text-center text-[12px] text-[var(--color-text-tertiary)]">
-          최대 {MAX_ITEMS}개까지 추가할 수 있어요
+          최대 {limit}개까지 추가할 수 있어요
         </p>
       )}
 

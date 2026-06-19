@@ -28,7 +28,7 @@ import type { AiSearchItem } from '@/app/api/ai-search/route'
 
 export type MediaType = 'movie' | 'book' | 'play'
 
-const MAX_ITEMS = 5
+const limit = 5
 
 interface MockMediaItem {
   id: string
@@ -132,11 +132,14 @@ export function MediaSearchPicker({
   type,
   selected,
   onChange,
+  maxItems,
 }: {
   type: MediaType
   selected: LifeMediaItem[]
   onChange: (items: LifeMediaItem[]) => void
+  maxItems?: number
 }) {
+  const limit = maxItems ?? 5
   const [query, setQuery] = useState('')
   const [aiResults, setAiResults] = useState<AiSearchItem[]>([])
   const [aiLoading, setAiLoading] = useState(false)
@@ -184,7 +187,7 @@ export function MediaSearchPicker({
     if (selectedKeys.has(item.title)) {
       onChange(selected.filter((s) => s.label !== item.title))
     } else {
-      if (selected.length >= MAX_ITEMS) return
+      if (selected.length >= limit) return
       onChange([...selected, { label: item.title, sublabel: item.subtitle }])
     }
   }
@@ -193,7 +196,7 @@ export function MediaSearchPicker({
     if (selectedKeys.has(item.title)) {
       onChange(selected.filter((s) => s.label !== item.title))
     } else {
-      if (selected.length >= MAX_ITEMS) return
+      if (selected.length >= limit) return
       onChange([...selected, {
         label: item.title,
         sublabel: item.subtitle,
@@ -205,7 +208,7 @@ export function MediaSearchPicker({
   const addCustom = () => {
     const title = customTitle.trim()
     if (!title || selectedKeys.has(title)) return
-    if (selected.length >= MAX_ITEMS) return
+    if (selected.length >= limit) return
     onChange([...selected, { label: title, sublabel: customSubtitle.trim() || undefined }])
     setCustomTitle('')
     setCustomSubtitle('')
@@ -216,7 +219,7 @@ export function MediaSearchPicker({
   const getPlaceholderColor = (label: string) =>
     MOCK_DATA[type].find((m) => m.title === label)?.placeholderColor ?? '#555'
 
-  const isAtLimit = selected.length >= MAX_ITEMS
+  const isAtLimit = selected.length >= limit
 
   return (
     <div>
@@ -250,7 +253,7 @@ export function MediaSearchPicker({
 
       {isAtLimit && (
         <p className="mb-3 text-center text-[12px] text-[var(--color-text-tertiary)]">
-          최대 {MAX_ITEMS}개까지 추가할 수 있어요
+          최대 {limit}개까지 추가할 수 있어요
         </p>
       )}
 

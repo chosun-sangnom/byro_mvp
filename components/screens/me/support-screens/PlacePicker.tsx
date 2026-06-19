@@ -23,7 +23,7 @@ import type { AiSearchItem } from '@/app/api/ai-search/route'
 
 export type PlaceType = 'restaurant' | 'cafe'
 
-const MAX_ITEMS = 5
+const limit = 5
 
 interface MockPlace {
   id: string
@@ -94,11 +94,14 @@ export function PlacePicker({
   type,
   selected,
   onChange,
+  maxItems,
 }: {
   type: PlaceType
   selected: LifeMediaItem[]
   onChange: (items: LifeMediaItem[]) => void
+  maxItems?: number
 }) {
+  const limit = maxItems ?? 5
   const [query, setQuery] = useState('')
   const [aiResults, setAiResults] = useState<AiSearchItem[]>([])
   const [aiLoading, setAiLoading] = useState(false)
@@ -108,7 +111,7 @@ export function PlacePicker({
 
   const cfg = TYPE_CONFIG[type]
   const selectedNames = new Set(selected.map((s) => s.label))
-  const isAtLimit = selected.length >= MAX_ITEMS
+  const isAtLimit = selected.length >= limit
 
   // TODO(real API): query 변경 시 debounce(300ms) 후 /api/places/search?q={query}&type={type} 호출로 교체
   const mockResults = query.trim()
@@ -188,7 +191,7 @@ export function PlacePicker({
 
       {isAtLimit && (
         <p className="mb-3 text-center text-[12px] text-[var(--color-text-tertiary)]">
-          최대 {MAX_ITEMS}개까지 추가할 수 있어요
+          최대 {limit}개까지 추가할 수 있어요
         </p>
       )}
 

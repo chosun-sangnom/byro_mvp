@@ -74,6 +74,9 @@ interface ByroStore {
   // 케미
   kemiComputedProfiles: string[]
 
+  // 플랜
+  isPro: boolean  // [임시] 실제 결제 연동 전까지 로컬 토글
+
   // Actions
   nextStep(): void
   prevStep(): void
@@ -123,6 +126,7 @@ interface ByroStore {
   submitExperience(profileLinkId: string, exp: Omit<Experience, 'id' | 'date'>): void
   markKemiComputed(linkId: string): void
   invalidateKemiCache(): void
+  setIsPro(v: boolean): void  // [임시] 실제 결제 연동 전까지 로컬 토글
   // [임시] 목업 데이터로 초기화 — CRUD 연동 전 디자인 검토용. 실제 API 연동 후 제거 예정.
   resetToMockDefaults(): void
   // [임시] 전체 초기화 — 로그인·인증·온보딩 포함 완전 리셋. 실제 API 연동 후 제거 예정.
@@ -200,6 +204,9 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
 
   // 케미
   kemiComputedProfiles: [],
+
+  // 플랜
+  isPro: false,
 
   // Actions
   nextStep() {
@@ -575,6 +582,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   invalidateKemiCache() {
     set({ kemiComputedProfiles: [] })
   },
+  setIsPro: (v) => set({ isPro: v }),
 
   // [임시] 목업 데이터로 초기화 — CRUD 연동 전 디자인 검토용. 실제 API 연동 후 제거 예정.
   resetToMockDefaults() {
@@ -661,7 +669,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   },
 }), {
   name: 'byro-store',
-  version: 15,
+  version: 16,
   migrate: (persistedState: unknown) => {
     const state = persistedState as ByroStore | undefined
     if (!state) return persistedState
@@ -679,6 +687,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       onboardingBirthDate: (state as ByroStore & { onboardingBirthDate?: string }).onboardingBirthDate ?? '',
       onboardingShowAge: (state as ByroStore & { onboardingShowAge?: boolean }).onboardingShowAge ?? true,
       isVerified: (state as ByroStore & { isVerified?: boolean }).isVerified ?? false,
+      isPro: (state as ByroStore & { isPro?: boolean }).isPro ?? false,
     }
   },
   partialize: (state) => ({
@@ -718,5 +727,6 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     submittedExperiences: state.submittedExperiences,
     highlightsInitialized: state.highlightsInitialized,
     kemiComputedProfiles: state.kemiComputedProfiles,
+    isPro: state.isPro,
   }),
 }))

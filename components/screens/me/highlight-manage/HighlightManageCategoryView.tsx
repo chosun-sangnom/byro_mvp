@@ -1,8 +1,11 @@
+import { BadgeCheck } from 'lucide-react'
 import { Button, NavBar, showToast } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { getHighlightMetaParts, isPrimaryHighlight } from '@/lib/highlightMeta'
 import type { Highlight, HighlightIconId } from '@/types'
 import type { HighlightManageCategory } from './constants'
+
+const VERIFIABLE_CATEGORIES = new Set(['career-role', 'education-history'])
 
 interface HighlightManageCategoryViewProps {
   selectedCat: HighlightManageCategory
@@ -14,6 +17,7 @@ interface HighlightManageCategoryViewProps {
   onEdit: (highlight: Highlight) => void
   onDelete: (highlight: Highlight) => void
   onAdd: () => void
+  onVerify?: () => void
 }
 
 export function HighlightManageCategoryView({
@@ -26,7 +30,10 @@ export function HighlightManageCategoryView({
   onEdit,
   onDelete,
   onAdd,
+  onVerify,
 }: HighlightManageCategoryViewProps) {
+  const isVerifiable = VERIFIABLE_CATEGORIES.has(selectedCat.id)
+
   return (
     <div className="flex flex-col h-full">
       <NavBar title={`${selectedCat.label} 관리`} onBack={onBack} />
@@ -37,11 +44,25 @@ export function HighlightManageCategoryView({
             <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
               <HighlightIcon id={selectedCat.icon as HighlightIconId} size={16} />
             </span>
-            <div>
+            <div className="flex-1 min-w-0">
               <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{selectedCat.label}</div>
               <div className="micro-text">여러 항목을 추가하고 메인으로 보여줄 항목을 선택할 수 있어요</div>
             </div>
           </div>
+          {isVerifiable && onVerify && (
+            <button
+              onClick={onVerify}
+              className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-[14px] py-2.5 text-[13px] font-semibold"
+              style={{
+                background: 'var(--color-accent-bg-subtle)',
+                border: '1px solid var(--color-accent-border-soft)',
+                color: 'var(--color-accent-dark)',
+              }}
+            >
+              <BadgeCheck size={14} />
+              {selectedCat.id === 'career-role' ? '건강보험공단으로 경력 인증' : '졸업증명서로 학력 인증'}
+            </button>
+          )}
         </div>
 
         {selectedCategoryHighlights.length > 0 ? (
@@ -54,7 +75,10 @@ export function HighlightManageCategoryView({
                 <div key={item.id} className="surface-card rounded-[24px] p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0 flex-1">
-                      <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{item.title}</div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{item.title}</div>
+                        {item.verified && <BadgeCheck size={14} className="shrink-0 text-[var(--color-accent)]" />}
+                      </div>
                       {metaParts.length > 0 && (
                         <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
                           {metaParts.map((part, partIndex) => (

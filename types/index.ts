@@ -17,9 +17,7 @@ export type HighlightGroupId = 'career' | 'achievement' | 'lifestyle'
 export type HighlightCategoryId =
   | 'career-role'
   | 'education-history'
-  | 'career-continuity'
   | 'remember-network'
-  | 'corporate-longevity'
   | 'talk'
   | 'collab'
   | 'publish'
@@ -28,7 +26,6 @@ export type HighlightCategoryId =
   | 'award'
   | 'patent'
   | 'license'
-  | 'airline-mileage'
   | 'volunteer'
   | 'other'
 
@@ -42,6 +39,7 @@ export interface Highlight {
   subtitle: string
   description: string
   year: string
+  verified?: boolean
   metadata?: Record<string, string | boolean>
   linkUrl?: string
   thumbnailUrl?: string
@@ -141,7 +139,7 @@ export interface PublicProfileWhoIAm {
 export interface LifeMediaItem {
   label: string
   sublabel?: string
-  // TODO(real API): posterUrl from TMDB (movies/books), Spotify (music), Kakao Maps / Google Places (restaurants/cafes)
+  // TODO(real API): posterUrl from TMDB (movies), 알라딘 API (books, 무료 5000건/일), Spotify (music), Kakao Maps / Google Places (restaurants/cafes)
   posterUrl?: string
   // TODO(real API): Spotify 30s preview URL
   previewUrl?: string
@@ -190,11 +188,6 @@ export interface PublicProfileLife {
   }
 }
 
-export interface CareerHighlight {
-  avgYears: number
-  vsIndustryPercent: number
-}
-
 export interface RememberIndustry {
   name: string
   ratio: number
@@ -216,33 +209,6 @@ export interface RememberHighlight {
   total: number
   industries: RememberIndustry[]
   insight?: RememberInsight
-}
-
-export interface CorporateCompany {
-  name: string
-  startYear: number
-  endYear: number | null
-  years: number
-  status: string
-}
-
-export interface CorporateHighlight {
-  companyCount: number
-  summary: string
-  companies: CorporateCompany[]
-  averageOperatingYears?: number
-  years?: number
-}
-
-export interface AirlineMembership {
-  name: string
-  tier: string
-}
-
-export interface AirlineHighlight {
-  tierSummary: string
-  badgeLevel: string
-  airlines: AirlineMembership[]
 }
 
 export interface ReputationKeyword {
@@ -283,12 +249,9 @@ export interface PublicProfile {
   linkedin?: LinkedInProfile
   youtube?: { channelName: string; channelUrl: string }
   tiktok?: { username: string; profileUrl: string }
-  careerHighlight: CareerHighlight
   rememberHighlight: RememberHighlight
   heroTheme?: HeroTheme
   contactChannels?: ContactChannel[]
-  corporateHighlight?: CorporateHighlight
-  airlineHighlight?: AirlineHighlight
   manualHighlights: Highlight[]
   experiences: Experience[]
   savedProfiles: SavedProfile[]
@@ -298,6 +261,7 @@ export interface PublicProfile {
   reputationKeywords?: ReputationKeyword[]
   guestbook?: GuestbookEntry[]
   kemi?: KemiData
+  tabVisibility?: TabVisibility
 }
 
 export type TabVisibilityLevel = 'public' | 'connected' | 'private'
@@ -310,7 +274,13 @@ export interface TabVisibility {
 
 export interface UserState {
   name: string
+  realName?: string
+  activityName?: string
+  activityNameChangedAt?: string
   linkId: string
+  randomLinkId?: string
+  customLinkId?: string
+  isPaidUser?: boolean
   title: string
   headline?: string
   school: string

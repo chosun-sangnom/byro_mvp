@@ -2,20 +2,14 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { BadgeCheck, ChevronDown, ChevronUp } from 'lucide-react'
-import { AirlineMileageSummary } from '@/components/highlights/AirlineMileageSummary'
-import { CareerContinuityChart } from '@/components/highlights/CareerContinuityChart'
-import { CorporateLongevityTimeline } from '@/components/highlights/CorporateLongevityTimeline'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
-import { RememberNetworkGraph } from '@/components/highlights/RememberNetworkGraph'
 import { AnimatedSection, SectionTitle } from '@/components/screens/profile/PublicProfileSections'
 import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
 import { getGroupedHighlightPreview, getHighlightDetailFootnote, getHighlightMetaParts } from '@/lib/highlightMeta'
 import type { Highlight, HighlightIconId } from '@/types'
 
 
-type HighlightGroupEntry =
-  | { kind: 'verified'; item: Highlight }
-  | { kind: 'manual-group'; categoryId: string; items: Highlight[] }
+type HighlightGroupEntry = { kind: 'manual-group'; categoryId: string; items: Highlight[] }
 
 type HighlightGroupSection = {
   id: string
@@ -24,30 +18,12 @@ type HighlightGroupSection = {
 }
 
 export function ProfileHighlightsSection({
-  profile,
-  corporateHighlight,
-  airlineHighlight,
-  airlineBadgeLabel,
   groupedHighlights,
   username,
   primaryHighlightOverrides,
   getHighlightOpen,
   onToggleHighlight,
 }: {
-  profile: {
-    careerHighlight: { avgYears: number; vsIndustryPercent: number }
-    rememberHighlight: { total: number; industries: { name: string; ratio: number }[]; insight?: import('@/types').RememberInsight }
-  }
-  corporateHighlight: {
-    companyCount: number
-    summary: string
-    companies: Array<{ name: string; startYear: number; endYear: number | null; years: number; status: string }>
-  }
-  airlineHighlight: {
-    tierSummary: string
-    airlines: Array<{ name: string; tier: string }>
-  }
-  airlineBadgeLabel: string | null
   groupedHighlights: HighlightGroupSection[]
   username: string
   primaryHighlightOverrides: Record<string, string>
@@ -66,82 +42,6 @@ export function ProfileHighlightsSection({
             </div>
             <div className="divide-y divide-[var(--color-border-soft)]">
               {group.items.map((entry) => {
-            if (entry.kind === 'verified') {
-              const hl = entry.item
-              const toggleKey = `${hl.id}_${username}`
-              const isOpen = getHighlightOpen(toggleKey)
-              return (
-                <div key={hl.id}>
-                  <button
-                    onClick={() => onToggleHighlight(toggleKey)}
-                    className="flex w-full items-center gap-3.5 py-3.5 text-left"
-                  >
-                    <span className="flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center text-[var(--color-text-secondary)]">
-                      <HighlightIcon id={hl.icon as HighlightIconId} size={16} />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <div className="mb-0.5 flex items-center gap-1">
-                        <span className="text-[11px] text-[var(--color-text-tertiary)]">{hl.title}</span>
-                      </div>
-                      <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{hl.subtitle}</div>
-                      {hl.categoryId === 'corporate-longevity' && (
-                        <div className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">{corporateHighlight.companyCount}개 법인 · 폐업 이력 없음</div>
-                      )}
-                      {hl.categoryId === 'remember-network' && (
-                        <div className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">총 {profile.rememberHighlight.total}명 네트워크</div>
-                      )}
-                      {hl.categoryId === 'airline-mileage' && airlineBadgeLabel && (
-                        <div className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">{airlineBadgeLabel}</div>
-                      )}
-                    </div>
-                    <span className="flex h-[28px] w-[28px] flex-shrink-0 items-center justify-center rounded-full" style={{ background: 'var(--color-state-success-bg)', color: 'var(--color-state-success-text)' }}>
-                      <BadgeCheck size={18} />
-                    </span>
-                    {isOpen ? <ChevronUp size={14} color="var(--color-text-tertiary)" /> : <ChevronDown size={14} color="var(--color-text-tertiary)" />}
-                  </button>
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
-                        className="overflow-hidden"
-                      >
-                        <div className="pb-4 pl-8">
-                          {hl.categoryId === 'career-continuity' && (
-                            <CareerContinuityChart
-                              avgYears={profile.careerHighlight.avgYears}
-                            />
-                          )}
-                          {hl.categoryId === 'remember-network' && (
-                            <RememberNetworkGraph
-                              total={profile.rememberHighlight.total}
-                              industries={profile.rememberHighlight.industries}
-                              insight={profile.rememberHighlight.insight}
-                            />
-                          )}
-                          {hl.categoryId === 'corporate-longevity' && (
-                            <CorporateLongevityTimeline
-                              summary={corporateHighlight.summary}
-                              companies={corporateHighlight.companies}
-                            />
-                          )}
-                          {hl.categoryId === 'airline-mileage' && (
-                            <AirlineMileageSummary
-                              badgeLabel={airlineBadgeLabel}
-                              tierSummary={airlineHighlight.tierSummary}
-                              airlines={airlineHighlight.airlines}
-                            />
-                          )}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              )
-            }
-
             const category = HIGHLIGHT_CATEGORIES.find((item) => item.id === entry.categoryId)
             const groupToggleKey = `group_${entry.categoryId}_${username}`
             const isGroupOpen = getHighlightOpen(groupToggleKey)
@@ -157,7 +57,12 @@ export function ProfileHighlightsSection({
                     <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={16} />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <div className="mb-0.5 text-[11px] text-[var(--color-text-tertiary)]">{category?.label ?? '직접 입력'}</div>
+                    <div className="mb-0.5 flex items-center gap-1 text-[11px] text-[var(--color-text-tertiary)]">
+                      <span>{category?.label ?? '직접 입력'}</span>
+                      {entry.items.some((h) => h.verified) && (
+                        <BadgeCheck size={11} className="text-[var(--color-accent)]" />
+                      )}
+                    </div>
                     <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{preview.title}</div>
                     {preview.meta && (
                       <div className="mt-0.5 text-[12px] text-[var(--color-text-tertiary)]">{preview.meta}</div>
@@ -180,7 +85,10 @@ export function ProfileHighlightsSection({
                             const metaParts = getHighlightMetaParts(hl)
                             return (
                               <div key={hl.id} className="py-3 first:pt-0 last:pb-0">
-                                <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{hl.title}</div>
+                                <div className="flex items-center gap-1.5">
+                                  <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{hl.title}</div>
+                                  {hl.verified && <BadgeCheck size={13} className="shrink-0 text-[var(--color-accent)]" />}
+                                </div>
                                 {metaParts.length > 0 && (
                                   <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">
                                     {metaParts.map((part, partIndex) => (

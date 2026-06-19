@@ -1,7 +1,9 @@
 'use client'
 
-import { ChevronRight } from 'lucide-react'
-import { NavBar } from '@/components/ui'
+import { useState } from 'react'
+import { ChevronRight, Lock } from 'lucide-react'
+import { NavBar, BottomSheet, Modal, Button, showToast } from '@/components/ui'
+import { useByroStore } from '@/store/useByroStore'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import type { Highlight, PublicProfile, PublicProfileLife, PublicProfileWhoIAm, TabVisibility, TabVisibilityLevel, UserState } from '@/types'
 
@@ -11,6 +13,7 @@ interface ManageByroScreenProps {
   instagramConnected: boolean
   linkedinConnected: boolean
   onLogout: () => void
+  onWithdraw: () => void
   onBack: () => void
   onEditBasic: () => void
   onEditWhoIAm: () => void
@@ -41,12 +44,15 @@ interface EditRow {
   onClick: () => void
 }
 
+const CUSTOM_LINK_ID_REGEX = /^[a-z0-9_]{2,20}$/
+
 export function ManageByroScreen({
   allHighlights,
   profile,
   instagramConnected,
   linkedinConnected,
   onLogout,
+  onWithdraw,
   onBack,
   onEditBasic,
   onEditWhoIAm,
@@ -61,6 +67,25 @@ export function ManageByroScreen({
   onEditVisibility,
   onResetMockData,
 }: ManageByroScreenProps) {
+  const store = useByroStore()
+  const [linkIdSheetOpen, setLinkIdSheetOpen] = useState(false)
+  const [withdrawOpen, setWithdrawOpen] = useState(false)
+  const [customLinkInput, setCustomLinkInput] = useState(user.customLinkId ?? '')
+  const isPaid = user.isPaidUser ?? false
+  const randomLinkId = user.randomLinkId ?? user.linkId
+  const currentLinkId = user.linkId
+
+  const handleSaveCustomLinkId = () => {
+    const trimmed = customLinkInput.trim().toLowerCase()
+    if (trimmed && !CUSTOM_LINK_ID_REGEX.test(trimmed)) {
+      showToast('영문 소문자·숫자·_만 사용할 수 있어요 (2~20자)')
+      return
+    }
+    store.setCustomLinkId(trimmed || null)
+    setLinkIdSheetOpen(false)
+    showToast(trimmed ? '링크가 변경됐어요!' : '기본 링크로 복원했어요')
+  }
+
   const whoIAm = (profile.whoIAm ?? user.whoIAm) as PublicProfileWhoIAm
   const life = (profile.life ?? user.life) as PublicProfileLife
   const activityCount = life.daily.exercise.length + (life.tastes.teams?.length ?? 0)
@@ -227,8 +252,132 @@ export function ManageByroScreen({
           </button>
         </div>
 
+        {/* 내 링크 */}
+        <div className="mx-5 mt-4 overflow-hidden rounded-2xl border border-[var(--color-border-soft)]">
+          <button
+            onClick={() => isPaid ? setLinkIdSheetOpen(true) : showToast('유료 플랜에서 사용할 수 있는 기능이에요')}
+            className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors active:bg-white/[0.03]"
+          >
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 mb-0.5">
+                <p className="text-[15px] font-semibold text-[var(--color-text-primary)]">내 링크</p>
+                {!isPaid && <Lock size={11} className="text-[var(--color-text-tertiary)]" />}
+                {isPaid && (
+                  <span className="rounded-full bg-[var(--color-accent-soft)] px-2 py-0.5 text-[10px] font-bold text-[var(--color-accent-dark)]">PRO</span>
+                )}
+              </div>
+              <p className="text-[11px] font-medium text-[var(--color-accent-dark)]">
+                byro.io/{currentLinkId}
+              </p>
+              {isPaid && user.customLinkId && (
+                <p className="mt-0.5 text-[10px] text-[var(--color-text-tertiary)]">
+                  기본 링크: byro.io/{randomLinkId}
+                </p>
+              )}
+              {!isPaid && (
+                <p className="mt-0.5 text-[11px] text-[var(--color-text-secondary)]">
+                  💡 유료 플랜으로 나만의 링크를 설정할 수 있어요
+                </p>
+              )}
+            </div>
+            <ChevronRight size={14} className="ml-3 flex-shrink-0 text-[var(--color-text-tertiary)] opacity-30" />
+          </button>
+        </div>
+
+        {/* 내 링크 편집 BottomSheet */}
+        <BottomSheet open={linkIdSheetOpen} onClose={() => setLinkIdSheetOpen(false)}>
+          <div className="px-5 pb-6">
+            <p className="text-[18px] font-black text-[var(--color-text-strong)] mb-1">내 링크 설정</p>
+            <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed mb-5">
+              나만의 링크를 설정하면 <span className="font-semibold">byro.io/내이름</span> 형태로 프로필을 공유할 수 있어요. 유료 이용 종료 시 기본 링크로 자동 복원돼요.
+            </p>
+
+            <p className="text-[11px] font-bold text-[var(--color-text-tertiary)] mb-1.5 uppercase tracking-[0.08em]">기본 링크 (변경 불가)</p>
+            <div className="flex items-center gap-1.5 mb-4 px-4 py-2.5 rounded-xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)]">
+              <span className="text-[13px] text-[var(--color-text-tertiary)]">byro.io/</span>
+              <span className="text-[13px] font-semibold text-[var(--color-text-tertiary)]">{randomLinkId}</span>
+            </div>
+
+            <p className="text-[11px] font-bold text-[var(--color-text-tertiary)] mb-1.5 uppercase tracking-[0.08em]">커스텀 링크</p>
+            <div className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] mb-1.5">
+              <span className="text-[13px] text-[var(--color-text-tertiary)] flex-shrink-0">byro.io/</span>
+              <input
+                type="text"
+                value={customLinkInput}
+                onChange={(e) => setCustomLinkInput(e.target.value.toLowerCase())}
+                placeholder="예: gangminjun"
+                maxLength={20}
+                className="flex-1 bg-transparent text-[13px] font-semibold text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)] placeholder:font-normal"
+              />
+            </div>
+            <p className="text-[11px] text-[var(--color-text-tertiary)] mb-5">영문 소문자·숫자·_만 사용, 2~20자</p>
+
+            <button
+              onClick={handleSaveCustomLinkId}
+              className="w-full rounded-full py-3.5 text-[14px] font-semibold text-white whitespace-nowrap"
+              style={{ backgroundColor: 'var(--color-accent-dark)' }}
+            >
+              저장
+            </button>
+            {user.customLinkId && (
+              <button
+                onClick={() => { store.setCustomLinkId(null); setCustomLinkInput(''); setLinkIdSheetOpen(false); showToast('기본 링크로 복원했어요') }}
+                className="w-full mt-2 py-3 text-[13px] font-medium text-[var(--color-text-tertiary)]"
+              >
+                기본 링크로 복원
+              </button>
+            )}
+          </div>
+        </BottomSheet>
+
+        {/* 회원탈퇴 */}
+        <div className="mx-5 mt-6">
+          <Button variant="danger" size="sm" onClick={() => setWithdrawOpen(true)} style={{ backgroundColor: 'transparent' }}>회원탈퇴</Button>
+        </div>
+
+        {/* 탈퇴 확인 모달 */}
+        <Modal open={withdrawOpen} onClose={() => setWithdrawOpen(false)}>
+          <div className="text-center">
+            <div className="text-base font-black mb-1" style={{ color: 'var(--color-state-danger-text)' }}>
+              정말 탈퇴하시겠습니까?
+            </div>
+            <p className="text-[12px] text-[var(--color-text-tertiary)] mb-4 leading-relaxed">
+              탈퇴 즉시 아래 데이터가 <span className="font-bold text-[var(--color-text-secondary)]">영구 삭제</span>되며 복구할 수 없어요.
+            </p>
+            <ul className="text-left rounded-xl bg-[var(--color-bg-muted)] px-4 py-3 mb-4 space-y-1.5">
+              {[
+                '내 프로필 정보',
+                '연결 관계',
+                '내가 남긴 리뷰 · 방명록',
+                '받은 리뷰 · 방명록',
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2 text-[12px] text-[var(--color-text-secondary)]">
+                  <span className="mt-0.5 flex-shrink-0 text-[var(--color-state-danger-text)]">✕</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <p className="text-[11px] text-[var(--color-text-tertiary)] mb-5 leading-relaxed">
+              탈퇴 후 동일 전화번호로 재가입은 가능하지만,<br />이전 데이터는 복구되지 않습니다.
+            </p>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => setWithdrawOpen(false)}>취소</Button>
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => {
+                  setWithdrawOpen(false)
+                  onWithdraw()
+                }}
+              >
+                탈퇴하기
+              </Button>
+            </div>
+          </div>
+        </Modal>
+
         {/* [임시] 목업 초기화 버튼 — CRUD 연동 전 디자인 검토용. 실제 API 연동 후 제거 예정. */}
-        <div className="mx-5 mt-6 mb-8">
+        <div className="mx-5 mt-2 mb-8">
           <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)] opacity-50">DEV ONLY</p>
           <button
             onClick={onResetMockData}

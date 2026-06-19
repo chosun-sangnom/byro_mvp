@@ -6,7 +6,7 @@ import MyByro from '@/components/screens/me/MyByro'
 
 export default function MePage() {
   return (
-    <AppShell>
+    <AppShell showHeader>
       <Suspense>
         <MyByro />
       </Suspense>

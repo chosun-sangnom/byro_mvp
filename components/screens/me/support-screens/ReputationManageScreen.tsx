@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Trash2 } from 'lucide-react'
-import { NavBar } from '@/components/ui'
+import { MoreHorizontal } from 'lucide-react'
+import { NavBar, ActionMenu, ActionMenuItem, showToast } from '@/components/ui'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mocks/publicProfiles'
 
@@ -21,6 +21,7 @@ export function ReputationManageScreen({
 
   const [deletedIds, setDeletedIds] = useState<string[]>([])
   const [expanded, setExpanded] = useState(false)
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null)
 
   const allEntries = SAMPLE_PROFILE.guestbook.filter((e) => !deletedIds.includes(e.id))
   const displayedEntries = expanded ? allEntries : allEntries.slice(0, 3)
@@ -114,13 +115,33 @@ export function ReputationManageScreen({
                           <div className="text-[12px] font-semibold text-[var(--color-text-primary)]">{entry.authorName}</div>
                           <div className="flex items-center gap-2">
                             <div className="text-[10px] text-[var(--color-text-tertiary)]">{entry.date}</div>
-                            <button
-                              onClick={() => setDeletedIds((prev) => [...prev, entry.id])}
-                              className="flex h-6 w-6 items-center justify-center rounded-full text-[var(--color-text-tertiary)] opacity-40 active:opacity-100 transition-opacity"
-                              aria-label="삭제"
-                            >
-                              <Trash2 size={13} />
-                            </button>
+                            <div className="relative">
+                              <button
+                                onClick={() => setOpenMenuId(openMenuId === entry.id ? null : entry.id)}
+                                className="flex h-6 w-6 items-center justify-center rounded-full text-[var(--color-text-tertiary)] opacity-40 active:opacity-100 transition-opacity"
+                                aria-label="더보기"
+                              >
+                                <MoreHorizontal size={13} />
+                              </button>
+                              <ActionMenu open={openMenuId === entry.id} onClose={() => setOpenMenuId(null)}>
+                                <ActionMenuItem
+                                  label="삭제하기"
+                                  danger
+                                  onClick={() => {
+                                    setDeletedIds((prev) => [...prev, entry.id])
+                                    setOpenMenuId(null)
+                                    showToast('피드백을 삭제했어요')
+                                  }}
+                                />
+                                <ActionMenuItem
+                                  label="신고하기"
+                                  onClick={() => {
+                                    setOpenMenuId(null)
+                                    showToast('신고가 접수됐어요')
+                                  }}
+                                />
+                              </ActionMenu>
+                            </div>
                           </div>
                         </div>
                         <div className="mt-1 text-[13px] leading-snug text-[var(--color-text-secondary)]">{entry.message}</div>
@@ -144,6 +165,7 @@ export function ReputationManageScreen({
 
         <div className="h-4" />
       </div>
+
     </div>
   )
 }

@@ -18,6 +18,11 @@ import type {
 } from '@/types'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
+function generateRandomLinkId(): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
+  return Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
+}
+
 const STEP_ORDER: OnboardingStep[] = ['login', 'basicinfo', 'profile', 'complete']
 
 interface ByroStore {
@@ -69,6 +74,9 @@ interface ByroStore {
   // 케미
   kemiComputedProfiles: string[]
 
+  // 플랜
+  isPro: boolean  // [임시] 실제 결제 연동 전까지 로컬 토글
+
   // Actions
   nextStep(): void
   prevStep(): void
@@ -81,6 +89,7 @@ interface ByroStore {
   setOnboardingNameAndBirth(info: { name: string; nickname: string; birthDate: string; showAge: boolean }): void
   setVerified(v: boolean): void
   setLinkId(id: string): void
+  setCustomLinkId(customId: string | null): void
   connectInstagram(): void
   disconnectInstagram(): void
   connectLinkedIn(): void
@@ -89,6 +98,7 @@ interface ByroStore {
   addHighlight(h: Omit<Highlight, 'id'>): void
   updateHighlight(id: string, h: Omit<Highlight, 'id'>): void
   removeHighlight(id: string): void
+  verifyHighlight(id: string): void
   setHighlightPrimary(categoryId: string, id: string): void
   setBio(bio: string, mode: 'ai' | 'manual'): void
   setSelectedBioMethod(method: 'ai' | 'manual'): void
@@ -112,9 +122,11 @@ interface ByroStore {
   cancelConnectionRequest(linkId: string): void
   acceptConnectionRequest(id: string): void
   rejectConnectionRequest(id: string): void
+  disconnectProfile(linkId: string): void
   submitExperience(profileLinkId: string, exp: Omit<Experience, 'id' | 'date'>): void
   markKemiComputed(linkId: string): void
   invalidateKemiCache(): void
+  setIsPro(v: boolean): void  // [임시] 실제 결제 연동 전까지 로컬 토글
   // [임시] 목업 데이터로 초기화 — CRUD 연동 전 디자인 검토용. 실제 API 연동 후 제거 예정.
   resetToMockDefaults(): void
   // [임시] 전체 초기화 — 로그인·인증·온보딩 포함 완전 리셋. 실제 API 연동 후 제거 예정.
@@ -193,6 +205,9 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   // 케미
   kemiComputedProfiles: [],
 
+  // 플랜
+  isPro: false,
+
   // Actions
   nextStep() {
     const current = get().step
@@ -255,6 +270,16 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     set({ linkId: id })
   },
 
+  setCustomLinkId(customId) {
+    const { user } = get()
+    if (!user) return
+    const randomLinkId = user.randomLinkId ?? user.linkId
+    const resolvedLinkId = customId ?? randomLinkId
+    set({
+      user: { ...user, customLinkId: customId ?? undefined, linkId: resolvedLinkId },
+    })
+  },
+
   connectInstagram() {
     set({ instagramConnected: true })
   },
@@ -290,6 +315,12 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   removeHighlight(id) {
     set((state) => ({
       highlights: state.highlights.filter((h) => h.id !== id),
+    }))
+  },
+
+  verifyHighlight(id) {
+    set((state) => ({
+      highlights: state.highlights.map((h) => (h.id === id ? { ...h, verified: true } : h)),
     }))
   },
 
@@ -339,6 +370,12 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       isLoggedIn: true,
       user: {
         name: onboardingNickname || onboardingName || SAMPLE_PROFILE.name,
+        realName: onboardingName || SAMPLE_PROFILE.name,
+        activityName: onboardingNickname || undefined,
+        activityNameChangedAt: onboardingNickname ? new Date().toISOString() : undefined,
+        randomLinkId: generateRandomLinkId(),
+        customLinkId: linkId || SAMPLE_PROFILE.linkId,
+        isPaidUser: true,
         linkId: linkId || SAMPLE_PROFILE.linkId,
         title: onboardingTitle.trim() || SAMPLE_PROFILE.title,
         headline: SAMPLE_PROFILE.headline,
@@ -528,6 +565,12 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     }))
   },
 
+  disconnectProfile(linkId) {
+    set((state) => ({
+      connectedProfiles: state.connectedProfiles.filter((p) => p.linkId !== linkId),
+    }))
+  },
+
   markKemiComputed(linkId) {
     set((state) => ({
       kemiComputedProfiles: state.kemiComputedProfiles.includes(linkId)
@@ -539,6 +582,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   invalidateKemiCache() {
     set({ kemiComputedProfiles: [] })
   },
+  setIsPro: (v) => set({ isPro: v }),
 
   // [임시] 목업 데이터로 초기화 — CRUD 연동 전 디자인 검토용. 실제 API 연동 후 제거 예정.
   resetToMockDefaults() {
@@ -625,7 +669,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   },
 }), {
   name: 'byro-store',
-  version: 15,
+  version: 16,
   migrate: (persistedState: unknown) => {
     const state = persistedState as ByroStore | undefined
     if (!state) return persistedState
@@ -643,6 +687,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       onboardingBirthDate: (state as ByroStore & { onboardingBirthDate?: string }).onboardingBirthDate ?? '',
       onboardingShowAge: (state as ByroStore & { onboardingShowAge?: boolean }).onboardingShowAge ?? true,
       isVerified: (state as ByroStore & { isVerified?: boolean }).isVerified ?? false,
+      isPro: (state as ByroStore & { isPro?: boolean }).isPro ?? false,
     }
   },
   partialize: (state) => ({
@@ -682,5 +727,6 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     submittedExperiences: state.submittedExperiences,
     highlightsInitialized: state.highlightsInitialized,
     kemiComputedProfiles: state.kemiComputedProfiles,
+    isPro: state.isPro,
   }),
 }))

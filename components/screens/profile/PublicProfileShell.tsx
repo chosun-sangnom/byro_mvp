@@ -15,10 +15,10 @@
 
 import { useEffect, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
-import { Pencil, Share2 } from 'lucide-react'
+import { Pencil } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
-import { BottomSheet, TextArea, showToast } from '@/components/ui'
-import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
+import { BottomSheet, Modal, TextArea, showToast } from '@/components/ui'
+import { getNormalizedPublicProfile, computeTabAccess } from '@/components/screens/profile/publicProfileData'
 import { generatePersona } from '@/lib/personaGen'
 import { ContactActionButton } from '@/components/screens/profile/PublicProfileSections'
 import { ProfileHeroSection } from '@/components/screens/profile/PublicProfileHeroSection'
@@ -44,7 +44,12 @@ export function PublicProfileShell({
 }) {
   const router = useRouter()
   const store = useByroStore()
-  const profile = getNormalizedPublicProfile({ username, user: store.user, ownerHighlights: store.highlights })
+  const profile = getNormalizedPublicProfile({
+    username,
+    user: store.user,
+    ownerHighlights: store.highlights,
+    ownerTabVisibility: store.tabVisibility,
+  })
 
   // owner mode: 로그인 상태이고 현재 보는 프로필이 본인인 경우
   const isOwnerMode = store.isLoggedIn && store.user?.linkId === username
@@ -52,15 +57,23 @@ export function PublicProfileShell({
   // [임시] 오너 모드에서만 페르소나 생성 (목업 데이터 기반)
   const persona = isOwnerMode ? generatePersona(profile) : null
 
+  const isConnected = store.connectedProfiles.some((p) => p.linkId === profile.linkId)
+  const tabAccessCtx = { isOwner: isOwnerMode, isLoggedIn: store.isLoggedIn, isConnected }
+
   // 연결 관계 상태
   const connectionStatus = (() => {
-    if (store.connectedProfiles.some((p) => p.linkId === profile.linkId)) return 'connected' as const
+    if (isConnected) return 'connected' as const
     const receivedRequest = store.connectionRequests.find((r) => r.linkId === profile.linkId)
     if (receivedRequest) return 'received' as const
     if (store.sentRequestLinkIds.includes(profile.linkId)) return 'sent' as const
     return 'none' as const
   })()
   const receivedRequestId = store.connectionRequests.find((r) => r.linkId === profile.linkId)?.id
+  const tabAccess = {
+    who: computeTabAccess(profile.tabVisibility, 'who', tabAccessCtx),
+    life: computeTabAccess(profile.tabVisibility, 'life', tabAccessCtx),
+    reputation: computeTabAccess(profile.tabVisibility, 'reputation', tabAccessCtx),
+  }
 
   // 케미 로딩 트리거: 비로그인이거나 오너이면 케미 없음
   const kemiAlreadyComputed = store.kemiComputedProfiles.includes(profile.linkId)
@@ -81,6 +94,8 @@ export function PublicProfileShell({
   const [connectionRequestOpen, setConnectionRequestOpen] = useState(false)
   const [connectionMessage, setConnectionMessage] = useState('')
   const [cancelRequestOpen, setCancelRequestOpen] = useState(false)
+  const [disconnectSheetOpen, setDisconnectSheetOpen] = useState(false)
+  const [disconnectConfirmOpen, setDisconnectConfirmOpen] = useState(false)
   const [feedbackRequestOpen, setFeedbackRequestOpen] = useState(false)
   const [feedbackMessage, setFeedbackMessage] = useState('')
 
@@ -90,46 +105,6 @@ export function PublicProfileShell({
   return (
     <div className="flex h-full flex-col">
 
-      {/* ── 상단 Nav ── */}
-      <div className="flex h-12 flex-shrink-0 items-center border-b border-[var(--color-border-soft)] bg-[var(--color-glass-mid)] px-4 backdrop-blur-md">
-        <button
-          onClick={() => router.back()}
-          className="mr-2 text-sm text-[var(--color-text-secondary)]"
-        >
-          ‹
-        </button>
-
-        <div className="min-w-0 flex-1">
-          <div className="text-[11px] uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">
-            Public Profile
-          </div>
-          <div className="truncate text-xs text-[var(--color-text-secondary)]">
-            byro.io/{profile.linkId}
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2.5">
-          {store.isLoggedIn ? (
-            <button
-              onClick={() => router.push('/me')}
-              className="inline-flex h-8 items-center gap-2 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] pl-1.5 pr-3 text-[11px] font-semibold text-[var(--color-text-primary)]"
-            >
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-accent-dark)] text-[10px] font-black text-white">
-                {store.user?.name?.charAt(0) ?? 'M'}
-              </span>
-              <span>{isOwnerMode ? '내 Byro' : '내 프로필'}</span>
-            </button>
-          ) : null}
-
-          {/* TODO(share): 실제 공유 링크 생성 연동 */}
-          <button
-            onClick={() => showToast('공유 링크를 준비 중이에요')}
-            className="icon-button"
-          >
-            <Share2 size={14} color="var(--color-text-tertiary)" />
-          </button>
-        </div>
-      </div>
 
       {/* ── 고정 헤더 영역 ── */}
       <div className="flex-shrink-0">
@@ -140,6 +115,7 @@ export function PublicProfileShell({
             personaText={persona?.text}
             personaReasons={persona?.reasons}
             personaImage={persona?.image}
+            isOwner={isOwnerMode}
           />
         </div>
 
@@ -155,7 +131,7 @@ export function PublicProfileShell({
         )}
 
         {/* 나 / 라이프 / 관계 탭 */}
-        <PublicProfileTabBar activeTab={activeTab} onTabChange={onTabChange} />
+        <PublicProfileTabBar activeTab={activeTab} onTabChange={onTabChange} tabAccess={tabAccess} />
       </div>
 
       {/* ── 탭 콘텐츠 스크롤 영역 ── */}
@@ -195,7 +171,7 @@ export function PublicProfileShell({
           </div>
         ) : connectionStatus === 'connected' ? (
           <button
-            disabled
+            onClick={() => setDisconnectSheetOpen(true)}
             className="mb-4 w-full rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-tertiary)] whitespace-nowrap"
           >
             연결됨 ✓
@@ -229,6 +205,14 @@ export function PublicProfileShell({
               거절
             </button>
           </div>
+        ) : !store.isLoggedIn ? (
+          <button
+            onClick={() => router.push('/signup')}
+            className="mb-4 w-full rounded-full py-3 text-[13px] font-semibold text-white whitespace-nowrap"
+            style={{ backgroundColor: 'var(--color-accent-dark)' }}
+          >
+            로그인하고 연결하기
+          </button>
         ) : (
           <button
             onClick={() => setConnectionRequestOpen(true)}
@@ -265,6 +249,59 @@ export function PublicProfileShell({
           </div>
         </div>
       </div>
+
+      {/* 연결됨 ✓ → 액션 시트 */}
+      {!isOwnerMode && (
+        <BottomSheet open={disconnectSheetOpen} onClose={() => setDisconnectSheetOpen(false)}>
+          <div className="px-5 pb-6">
+            <button
+              onClick={() => {
+                setDisconnectSheetOpen(false)
+                setDisconnectConfirmOpen(true)
+              }}
+              className="w-full rounded-xl border py-3 text-[14px] font-semibold text-left px-4"
+              style={{ borderColor: 'rgba(198,40,40,0.28)', color: 'var(--color-state-danger-text)' }}
+            >
+              연결 해제
+            </button>
+          </div>
+        </BottomSheet>
+      )}
+
+      {/* 연결 해제 확인 모달 */}
+      {!isOwnerMode && (
+        <Modal open={disconnectConfirmOpen} onClose={() => setDisconnectConfirmOpen(false)}>
+          <div className="text-center">
+            <div className="text-base font-black mb-2">
+              {profile.name}님과의 연결을 해제할까요?
+            </div>
+            <p className="text-[12px] text-[var(--color-text-tertiary)] mb-5 leading-relaxed">
+              주고받은 피드백, 방명록 기록은 그대로 유지돼요.<br />
+              상대방에게 알림이 가지 않아요.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setDisconnectConfirmOpen(false)}
+                className="flex-1 rounded-xl border py-2.5 text-[13px] font-semibold text-[var(--color-text-secondary)]"
+                style={{ borderColor: 'var(--color-border-default)' }}
+              >
+                취소
+              </button>
+              <button
+                onClick={() => {
+                  store.disconnectProfile(profile.linkId)
+                  setDisconnectConfirmOpen(false)
+                  showToast(`${profile.name}님과 연결을 해제했어요`)
+                }}
+                className="flex-1 rounded-xl border py-2.5 text-[13px] font-semibold"
+                style={{ borderColor: 'rgba(198,40,40,0.28)', color: 'var(--color-state-danger-text)' }}
+              >
+                연결 해제
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
 
       {!isOwnerMode && profile.whoIAm && (
         <PublicProfileCompatibilitySheet

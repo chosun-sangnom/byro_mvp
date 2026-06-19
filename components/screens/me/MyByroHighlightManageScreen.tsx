@@ -8,28 +8,23 @@ import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { getGroupedHighlightPreview, sortHighlightsByPrimary } from '@/lib/highlightMeta'
 import { HighlightManageCategoryView } from '@/components/screens/me/highlight-manage/HighlightManageCategoryView'
-import { HighlightManageCertificationView } from '@/components/screens/me/highlight-manage/HighlightManageCertificationView'
 import { HighlightManageFormView } from '@/components/screens/me/highlight-manage/HighlightManageFormView'
 import { HighlightManageListView } from '@/components/screens/me/highlight-manage/HighlightManageListView'
 import { HighlightManagePickerView } from '@/components/screens/me/highlight-manage/HighlightManagePickerView'
+import { HighlightManageVerifyView } from '@/components/screens/me/highlight-manage/HighlightManageVerifyView'
 import { HighlightLlmImportSheet } from '@/components/screens/me/highlight-manage/HighlightLlmImportSheet'
 import {
-  CERTIFICATION_ITEMS,
-  type CertificationItem,
   type HighlightCategoryCardGroup,
   type HighlightManageCategory,
   type HighlightManageMode,
-  VERIFIED_HIGHLIGHT_SUMMARIES,
   type YearPickerTarget,
 } from '@/components/screens/me/highlight-manage/constants'
 
 interface HighlightManageScreenProps {
-  userLinkId: string
   onBack: () => void
 }
 
 export function HighlightManageScreen({
-  userLinkId,
   onBack,
 }: HighlightManageScreenProps) {
   const store = useByroStore()
@@ -50,8 +45,6 @@ export function HighlightManageScreen({
   const [hlLinkUrl, setHlLinkUrl] = useState('')
   const [hlDesc, setHlDesc] = useState('')
   const [yearPickerTarget, setYearPickerTarget] = useState<YearPickerTarget | null>(null)
-  const [selectedCert, setSelectedCert] = useState<CertificationItem | null>(null)
-
   // [임시] LLM 임포트 시트 상태
   const [llmImportOpen, setLlmImportOpen] = useState(false)
 
@@ -108,19 +101,10 @@ export function HighlightManageScreen({
   const resetAll = () => {
     resetFormFields()
     setSelectedCat(null)
-    setSelectedCert(null)
-  }
-
-  const openCertification = (categoryId: string) => {
-    const certItem = CERTIFICATION_ITEMS.find((item) => item.categoryId === categoryId)
-    if (!certItem) return
-    setSelectedCert(certItem)
-    setMode('cert')
   }
 
   const openCategory = (category: HighlightManageCategory) => {
     setSelectedCat(category)
-    setSelectedCert(null)
     setMode('group')
   }
 
@@ -250,24 +234,15 @@ export function HighlightManageScreen({
     showToast(editingHl ? '수정됐어요!' : '추가됐어요!')
   }
 
-  if (mode === 'cert' && selectedCert) {
+  if (mode === 'verify' && selectedCat) {
     return (
-      <HighlightManageCertificationView
-        selectedCert={selectedCert}
-        userLinkId={userLinkId}
-        onBack={() => {
-          setSelectedCert(null)
-          setMode('picker')
-        }}
-        onCopyEmail={() => {
-          navigator.clipboard.writeText(`${userLinkId}@data.byro.io`).catch(() => {})
-          showToast('복사됐어요!')
-        }}
-        onConfirm={() => {
-          setSelectedCert(null)
-          setMode('list')
-          showToast('인증 메일 발송 후 반영을 기다려주세요')
-        }}
+      <HighlightManageVerifyView
+        selectedCat={selectedCat}
+        existingHighlights={selectedCategoryHighlights}
+        onBack={() => setMode('group')}
+        onImportCareers={(items) => items.forEach((item) => store.addHighlight(item))}
+        onVerifyHighlight={(id) => store.verifyHighlight(id)}
+        onAddHighlight={(item) => store.addHighlight(item)}
       />
     )
   }
@@ -296,6 +271,7 @@ export function HighlightManageScreen({
           resetFormFields()
           setMode('form')
         }}
+        onVerify={() => setMode('verify')}
       />
     )
   }
@@ -359,7 +335,6 @@ export function HighlightManageScreen({
       <HighlightManagePickerView
         onBack={() => setMode('list')}
         onOpenCategory={openCategory}
-        onOpenCertification={openCertification}
       />
     )
   }
@@ -370,7 +345,6 @@ export function HighlightManageScreen({
         groupedCategoryCards={groupedCategoryCards}
         onBack={onBack}
         onOpenCategory={openCategory}
-        onOpenCertification={openCertification}
         onOpenPicker={() => {
           resetAll()
           setMode('picker')
@@ -395,17 +369,6 @@ function buildGroupedCategoryCards(
     items: HIGHLIGHT_CATEGORIES
       .filter((category) => category.group === group.id)
       .map((category) => {
-        if (category.certificationOnly) {
-          const certItem = CERTIFICATION_ITEMS.find((item) => item.categoryId === category.id)
-          return {
-            kind: 'verified' as const,
-            category,
-            title: VERIFIED_HIGHLIGHT_SUMMARIES[category.id] ?? certItem?.summary ?? '',
-            meta: certItem?.automated ? '본인 확인 후 자동 연동' : '명함 파일 제출 후 확인',
-            countLabel: '인증 항목',
-          }
-        }
-
         const items = sortHighlightsByPrimary(
           allManualHighlights.filter((item) => item.categoryId === category.id),
           primaryHighlightOverrides[category.id],

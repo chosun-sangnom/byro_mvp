@@ -1,17 +1,8 @@
 'use client'
 
-/**
- * PublicProfileTabBar
- *
- * 공개 프로필 탭 네비게이션 (나 / 라이프 / 관계).
- * - owner / visitor 모두 동일한 탭 구조를 가짐
- * - 선택된 탭은 인디고 배경 + 스프링 애니메이션으로 표시
- * - 탭 상태는 부모(page.tsx)의 useState로 관리 — URL 변경 없음
- *
- * TODO(tabs): 탭 추가 시 TABS 배열에만 항목 추가하면 됨
- */
-
+import { Lock } from 'lucide-react'
 import { motion } from 'framer-motion'
+import type { TabAccessLevel } from '@/components/screens/profile/publicProfileData'
 
 export type PublicProfileTabId = 'who' | 'life' | 'reputation'
 
@@ -24,9 +15,11 @@ const TABS: Array<{ id: PublicProfileTabId; label: string }> = [
 export function PublicProfileTabBar({
   activeTab,
   onTabChange,
+  tabAccess,
 }: {
   activeTab: PublicProfileTabId
   onTabChange: (tab: PublicProfileTabId) => void
+  tabAccess?: Partial<Record<PublicProfileTabId, TabAccessLevel>>
 }) {
   return (
     <div className="px-5 pt-3 pb-3">
@@ -34,6 +27,10 @@ export function PublicProfileTabBar({
         <div className="grid grid-cols-3 gap-1">
           {TABS.map((tab) => {
             const selected = tab.id === activeTab
+            const access = tabAccess?.[tab.id] ?? 'visible'
+            const isLocked = access !== 'visible' && access !== 'hidden'
+            const isHidden = access === 'hidden'
+            if (isHidden) return null
             return (
               <button
                 key={tab.id}
@@ -48,8 +45,9 @@ export function PublicProfileTabBar({
                     transition={{ type: 'spring', stiffness: 420, damping: 34 }}
                   />
                 )}
-                <span className={`relative z-10 ${selected ? 'text-white' : 'text-[var(--color-text-secondary)]'}`}>
+                <span className={`relative z-10 flex items-center justify-center gap-1 ${selected ? 'text-white' : 'text-[var(--color-text-secondary)]'}`}>
                   {tab.label}
+                  {isLocked && <Lock size={10} className="opacity-60" />}
                 </span>
               </button>
             )

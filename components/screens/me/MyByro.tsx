@@ -96,6 +96,7 @@ export default function MyByro() {
         instagramConnected={store.instagramConnected}
         linkedinConnected={store.linkedinConnected}
         onLogout={() => store.logout()}
+        onWithdraw={() => store.resetAll()}
         onBack={() => setScreen('preview')}
         onEditBasic={() => setScreen('editBasic')}
         onEditWhoIAm={() => setScreen('editWhoIAm')}
@@ -138,7 +139,6 @@ export default function MyByro() {
   if (screen === 'editHighlight') {
     return (
       <HighlightManageScreen
-        userLinkId={user.linkId}
         onBack={handleBackToManage}
       />
     )

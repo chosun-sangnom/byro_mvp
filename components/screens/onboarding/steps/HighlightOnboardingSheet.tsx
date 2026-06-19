@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { BadgeCheck } from 'lucide-react'
 import { BottomSheet, Button, TextArea, YearPickerSheet, showToast } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { useByroStore } from '@/store/useByroStore'
@@ -9,12 +8,6 @@ import type { Highlight, HighlightIconId } from '@/types'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
 import { getHighlightMetaParts, isPrimaryHighlight, sortHighlightsByPrimary } from '@/lib/highlightMeta'
 
-const CERTIFICATION_HIGHLIGHTS = [
-  { categoryId: 'career-continuity', icon: 'briefcase', title: '커리어 지속성', automated: true },
-  { categoryId: 'corporate-longevity', icon: 'building2', title: '법인 영속성', automated: true },
-  { categoryId: 'remember-network', icon: 'users', title: '리멤버 직업 네트워크', automated: false, docLabel: '리멤버 명함 내보내기 파일' },
-  { categoryId: 'airline-mileage', icon: 'plane', title: '항공 마일리지', automated: true },
-] as const
 
 interface HighlightOnboardingSheetProps {
   open: boolean
@@ -23,8 +16,7 @@ interface HighlightOnboardingSheetProps {
 
 export function HighlightOnboardingSheet({ open, onClose }: HighlightOnboardingSheetProps) {
   const store = useByroStore()
-  const [sheetMode, setSheetMode] = useState<'picker' | 'group' | 'form' | 'cert'>('picker')
-  const [selectedCert, setSelectedCert] = useState<(typeof CERTIFICATION_HIGHLIGHTS)[number] | null>(null)
+  const [sheetMode, setSheetMode] = useState<'picker' | 'group' | 'form'>('picker')
   const [editingHighlightId, setEditingHighlightId] = useState<string | null>(null)
 
   const [selectedCat, setSelectedCat] = useState<typeof HIGHLIGHT_CATEGORIES[0] | null>(null)
@@ -228,34 +220,21 @@ export function HighlightOnboardingSheet({ open, onClose }: HighlightOnboardingS
                     <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
                   </div>
                   <div className="grid grid-cols-4 gap-3">
-                    {HIGHLIGHT_CATEGORIES.filter((category) => category.group === group.id).map((category) => {
-                      const certification = CERTIFICATION_HIGHLIGHTS.find((item) => item.categoryId === category.id)
-                      return (
-                        <button
-                          key={category.id}
-                          onClick={() => {
-                            if (category.certificationOnly && certification) {
-                              setSelectedCert(certification)
-                              setSheetMode('cert')
-                              return
-                            }
-                            setSelectedCat(category)
-                            setSheetMode('group')
-                          }}
-                          className="relative overflow-visible rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-3 py-4 text-center"
-                        >
-                          {category.certificationOnly && (
-                            <span className="absolute -right-2 -top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-bg-surface)] border border-[var(--color-border-default)] text-[var(--color-state-success-text)]">
-                              <BadgeCheck size={14} />
-                            </span>
-                          )}
-                          <div className="mx-auto mb-2 flex items-center justify-center text-[var(--color-text-secondary)]">
-                            <HighlightIcon id={category.icon as HighlightIconId} size={16} />
-                          </div>
-                          <div className="text-[12px] font-bold leading-[1.4] text-[var(--color-text-primary)] break-keep">{category.label}</div>
-                        </button>
-                      )
-                    })}
+                    {HIGHLIGHT_CATEGORIES.filter((category) => category.group === group.id).map((category) => (
+                      <button
+                        key={category.id}
+                        onClick={() => {
+                          setSelectedCat(category)
+                          setSheetMode('group')
+                        }}
+                        className="relative overflow-visible rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-3 py-4 text-center"
+                      >
+                        <div className="mx-auto mb-2 flex items-center justify-center text-[var(--color-text-secondary)]">
+                          <HighlightIcon id={category.icon as HighlightIconId} size={16} />
+                        </div>
+                        <div className="text-[12px] font-bold leading-[1.4] text-[var(--color-text-primary)] break-keep">{category.label}</div>
+                      </button>
+                    ))}
                   </div>
                 </div>
               ))}
@@ -573,63 +552,6 @@ export function HighlightOnboardingSheet({ open, onClose }: HighlightOnboardingS
           </div>
         )}
 
-        {sheetMode === 'cert' && selectedCert && (
-          <div className="px-5 pb-6">
-            <div className="flex items-center mb-4">
-              <button onClick={() => setSheetMode('picker')} className="text-xl text-[var(--color-text-secondary)] mr-3 leading-none">‹</button>
-              <div className="text-[18px] font-black text-[var(--color-text-strong)]">{selectedCert.title} 인증</div>
-            </div>
-
-            <div className="surface-card rounded-[28px] p-5">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-secondary)]">
-                <HighlightIcon id={selectedCert.icon as HighlightIconId} size={20} />
-              </div>
-              {selectedCert.automated ? (
-                <>
-                  <div className="mt-4 text-sm font-bold text-[var(--color-text-strong)]">진행 방식</div>
-                  <div className="mt-2 space-y-3 text-sm leading-6 text-[var(--color-text-secondary)]">
-                    <p>1. 본인확인을 진행하면 필요한 정보를 자동으로 불러와요.</p>
-                    <p>2. 확인이 끝나면 하이라이트에 바로 반영돼요.</p>
-                  </div>
-                  <div className="mt-5 rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4 text-sm leading-6 text-[var(--color-text-secondary)]">
-                    별도 파일을 보내지 않아도 돼요. 본인확인만 끝나면 자동으로 진행됩니다.
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="mt-4 text-sm font-bold text-[var(--color-text-strong)]">진행 방식</div>
-                  <div className="mt-2 space-y-3 text-sm leading-6 text-[var(--color-text-secondary)]">
-                    <p>1. 리멤버 앱에서 명함 내보내기 파일을 준비해주세요.</p>
-                    <p>2. 아래 이메일 주소로 파일을 보내주시면 확인 후 반영돼요.</p>
-                  </div>
-                  <div className="mt-5 rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4">
-                    <div className="micro-text mb-2">인증 이메일 주소</div>
-                    <div className="flex items-center gap-2">
-                      <div className="min-w-0 flex-1 truncate text-sm font-mono font-bold text-[var(--color-text-strong)]">
-                        gangjunmin@data.byro.io
-                      </div>
-                      <button
-                        onClick={() => {
-                          navigator.clipboard.writeText('gangjunmin@data.byro.io').catch(() => {})
-                          showToast('복사됐어요!')
-                        }}
-                        className="rounded-xl bg-[var(--color-accent-dark)] px-3 py-2 text-xs font-semibold text-white"
-                      >
-                        복사
-                      </button>
-                    </div>
-                    <div className="micro-text mt-3">{selectedCert.docLabel}</div>
-                  </div>
-                </>
-              )}
-
-              <div className="mt-4 flex gap-2">
-                <Button variant="outline" onClick={() => setSheetMode('picker')}>이전</Button>
-                <Button onClick={() => { onClose(); setSheetMode('picker'); setSelectedCert(null) }}>확인</Button>
-              </div>
-            </div>
-          </div>
-        )}
       </BottomSheet>
 
       <YearPickerSheet

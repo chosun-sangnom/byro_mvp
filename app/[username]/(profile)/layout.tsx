@@ -9,7 +9,7 @@ export default function PublicProfileLayout({
   children: ReactNode
 }) {
   return (
-    <AppShell>
+    <AppShell showHeader>
       {children}
     </AppShell>
   )

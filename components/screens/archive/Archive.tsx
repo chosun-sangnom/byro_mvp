@@ -2,15 +2,23 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { MoreHorizontal, Search, X } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
-import { showToast } from '@/components/ui'
+import { ActionMenu, ActionMenuItem, Modal, showToast } from '@/components/ui'
 import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mocks/publicProfiles'
+import type { SavedProfile } from '@/types'
+
+type SortKey = 'name' | 'recent'
 
 export default function Archive() {
   const router = useRouter()
   const store = useByroStore()
 
   const [activeRequestTab, setActiveRequestTab] = useState<'connection' | 'feedback'>('connection')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [sort, setSort] = useState<SortKey>('name')
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  const [disconnectTarget, setDisconnectTarget] = useState<SavedProfile | null>(null)
 
   useEffect(() => {
     if (!store.isLoggedIn) {
@@ -26,6 +34,17 @@ export default function Archive() {
   const connectionRequests = store.connectionRequests
 
   const totalRequests = receivedRequests.length + connectionRequests.length
+
+  // 정렬
+  const sorted: SavedProfile[] = sort === 'name'
+    ? [...connectedProfiles].sort((a, b) => a.name.localeCompare(b.name, 'ko'))
+    : [...connectedProfiles].reverse()
+
+  // 검색 — 이름(활동명) + 직함(title)
+  const q = searchQuery.trim().toLowerCase()
+  const filtered = q
+    ? sorted.filter((p) => p.name.toLowerCase().includes(q) || p.title.toLowerCase().includes(q))
+    : sorted
 
   const tabs = [
     { key: 'connected' as const, label: `연결된 사람 ${connectedProfiles.length}` },
@@ -65,29 +84,81 @@ export default function Archive() {
 
         {/* 연결된 사람 탭 */}
         {activeArchiveTab === 'connected' && (
-          <div className="px-5 py-2">
-            {connectedProfiles.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => router.push(`/${p.linkId}`)}
-                className="surface-card flex items-center gap-3 rounded-[22px] px-4 py-4 w-full text-left mb-3"
-              >
-                <ProfileAvatar linkId={p.linkId} name={p.name} size={40} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <div className="text-sm font-bold">{p.name}</div>
-                    <span className="text-[10px] font-semibold rounded-full px-2 py-0.5" style={{ color: 'var(--color-accent-dark)', background: 'var(--color-accent-bg)' }}>연결됨</span>
-                  </div>
-                  <div className="meta-text mt-0.5">{p.title}</div>
-                  {p.memo && (
-                    <div className="text-xs text-[var(--color-text-secondary)] rounded-full px-2.5 py-1 mt-2 inline-block bg-[var(--color-bg-muted)] border border-[var(--color-border-default)]">
-                      📝 {p.memo}
+          <div className="flex flex-col h-full">
+            {/* 검색바 + 정렬 */}
+            <div className="px-5 pb-3 space-y-2">
+              {/* 검색 */}
+              <div className="flex items-center gap-2 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-3 py-2.5">
+                <Search size={14} className="flex-shrink-0 text-[var(--color-text-tertiary)]" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="이름, 직함으로 검색"
+                  className="flex-1 bg-transparent text-[13px] text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)]"
+                />
+                {searchQuery && (
+                  <button onClick={() => setSearchQuery('')} className="flex-shrink-0">
+                    <X size={14} className="text-[var(--color-text-tertiary)]" />
+                  </button>
+                )}
+              </div>
+              {/* 정렬 */}
+              <div className="flex gap-1.5">
+                {(['name', 'recent'] as SortKey[]).map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => setSort(key)}
+                    className="rounded-full border px-3 py-1 text-[11px] font-semibold transition-colors"
+                    style={sort === key
+                      ? { backgroundColor: 'var(--color-accent-dark)', borderColor: 'var(--color-accent-dark)', color: '#fff' }
+                      : { backgroundColor: 'var(--color-bg-soft)', borderColor: 'var(--color-border-default)', color: 'var(--color-text-secondary)' }
+                    }
+                  >
+                    {key === 'name' ? '가나다순' : '최근 연결순'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 목록 */}
+            <div className="flex-1 overflow-y-auto px-5 pb-4">
+              {filtered.length === 0 ? (
+                <p className="micro-text text-center pt-10">
+                  {q ? '검색 결과가 없어요' : '연결된 사람이 없어요'}
+                </p>
+              ) : filtered.map((p) => (
+                <div key={p.id} className="surface-card flex items-center gap-3 rounded-[22px] px-4 py-4 w-full text-left mb-3">
+                  <button className="flex items-center gap-3 flex-1 min-w-0" onClick={() => router.push(`/${p.linkId}`)}>
+                    <ProfileAvatar linkId={p.linkId} name={p.name} size={40} />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <div className="text-sm font-bold truncate">{p.name}</div>
+                        <span className="flex-shrink-0 text-[10px] font-semibold rounded-full px-2 py-0.5" style={{ color: 'var(--color-accent-dark)', background: 'var(--color-accent-bg)' }}>연결됨</span>
+                      </div>
+                      {p.title && (
+                        <div className="meta-text mt-0.5 truncate">{p.title}</div>
+                      )}
                     </div>
-                  )}
+                  </button>
+                  <div className="relative flex-shrink-0">
+                    <button
+                      onClick={() => setOpenMenuId(openMenuId === p.id ? null : p.id)}
+                      className="rounded-full p-1.5 text-[var(--color-text-tertiary)] active:bg-[var(--color-bg-muted)] transition-colors"
+                    >
+                      <MoreHorizontal size={16} />
+                    </button>
+                    <ActionMenu open={openMenuId === p.id} onClose={() => setOpenMenuId(null)}>
+                      <ActionMenuItem
+                        label="연결 해제"
+                        danger
+                        onClick={() => { setOpenMenuId(null); setDisconnectTarget(p) }}
+                      />
+                    </ActionMenu>
+                  </div>
                 </div>
-                <div className="micro-text flex-shrink-0">{p.savedAt}</div>
-              </button>
-            ))}
+              ))}
+            </div>
           </div>
         )}
 
@@ -246,6 +317,40 @@ export default function Archive() {
           </div>
         )}
       </div>
+
+      {/* 연결 해제 확인 모달 */}
+      <Modal open={!!disconnectTarget} onClose={() => setDisconnectTarget(null)}>
+        <div className="text-center">
+          <div className="text-base font-black mb-2">
+            {disconnectTarget?.name}님과의 연결을 해제할까요?
+          </div>
+          <p className="text-[12px] text-[var(--color-text-tertiary)] mb-5 leading-relaxed">
+            주고받은 메시지, 피드백, 방명록 기록은 그대로 유지돼요.<br />
+            상대방에게 알림이 가지 않아요.
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setDisconnectTarget(null)}
+              className="flex-1 rounded-xl border py-2.5 text-[13px] font-semibold text-[var(--color-text-secondary)]"
+              style={{ borderColor: 'var(--color-border-default)' }}
+            >
+              취소
+            </button>
+            <button
+              onClick={() => {
+                if (!disconnectTarget) return
+                store.disconnectProfile(disconnectTarget.linkId)
+                setDisconnectTarget(null)
+                showToast(`${disconnectTarget.name}님과 연결을 해제했어요`)
+              }}
+              className="flex-1 rounded-xl border py-2.5 text-[13px] font-semibold"
+              style={{ borderColor: 'rgba(198,40,40,0.28)', color: 'var(--color-state-danger-text)' }}
+            >
+              연결 해제
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

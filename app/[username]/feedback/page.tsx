@@ -5,7 +5,7 @@ import FeedbackScreen from '@/components/screens/profile/FeedbackScreen'
 
 export default function FeedbackPage({ params }: { params: { username: string } }) {
   return (
-    <AppShell>
+    <AppShell showHeader>
       <FeedbackScreen username={params.username} />
     </AppShell>
   )

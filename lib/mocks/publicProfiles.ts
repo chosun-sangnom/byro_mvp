@@ -87,15 +87,6 @@ export const SAMPLE_PROFILE = {
     aiSummary: LINKEDIN_PROFILE.aiSummary,
     previewImage: '/images/linkedsample.png',
   },
-  careerHighlight: { avgYears: 4.2, vsIndustryPercent: 128 },
-  corporateHighlight: {
-    companyCount: 1,
-    averageOperatingYears: 6,
-    summary: '1개 법인 · 정상 운영 중',
-    companies: [
-      { name: 'Byro Inc.', startYear: 2020, endYear: null, years: 6, status: '정상 운영' },
-    ],
-  },
   rememberHighlight: {
     total: 247,
     industries: [
@@ -114,14 +105,6 @@ export const SAMPLE_PROFILE = {
       growthTo: 22,
       growthPeriodLabel: '최근 6개월',
     },
-  },
-  airlineHighlight: {
-    tierSummary: '대한항공 모닝캄 · 아시아나 다이아몬드',
-    badgeLevel: 'global_business',
-    airlines: [
-      { name: '대한항공', tier: '모닝캄' },
-      { name: '아시아나', tier: '다이아몬드' },
-    ],
   },
   manualHighlights: [
     {
@@ -210,6 +193,7 @@ export const SAMPLE_PROFILE = {
     { id: 'g3', linkId: 'kimdohyeon', authorName: '김도현', message: '대화가 구체적이고 믿음이 가는 분이었어요.', date: '2주 전' },
     { id: 'g4', linkId: 'chijiwon', authorName: '최지원', message: '비즈니스 관점이 선명해서 배우는 포인트가 많았습니다.', date: '3주 전' },
   ],
+  tabVisibility: { who: 'public', life: 'connected', reputation: 'public' },
 }
 
 export const MK_PROFILE = {
@@ -321,15 +305,6 @@ export const MK_PROFILE = {
     ],
   },
   linkedin: MK_LINKEDIN_PROFILE,
-  careerHighlight: { avgYears: 4.8, vsIndustryPercent: 146 },
-  corporateHighlight: {
-    companyCount: 1,
-    years: 2,
-    summary: '1개 법인 · 정상 운영 중',
-    companies: [
-      { name: 'Byth', startYear: 2025, endYear: null, years: 2, status: '정상 운영' },
-    ],
-  },
   rememberHighlight: {
     total: 1691,
     industries: [
@@ -420,6 +395,7 @@ export const MK_PROFILE = {
     { id: 'mkg3', linkId: 'kimdohyeon', authorName: '김도현', message: '사람을 연결하는 방식이 자연스럽고 진정성이 느껴졌어요.', date: '1주 전' },
     { id: 'mkg4', linkId: 'chijiwon', authorName: '최지원', message: '비즈니스 맥락을 읽는 힘이 좋아서 대화가 늘 선명했습니다.', date: '2주 전' },
   ],
+  tabVisibility: { who: 'public', life: 'public', reputation: 'connected' },
 }
 
 export const JIMIN_PROFILE = {
@@ -509,21 +485,6 @@ export const JIMIN_PROFILE = {
   ] as ContactChannel[],
   instagramConnected: true,
   linkedinConnected: false,
-  corporateHighlight: {
-    companyCount: 1,
-    years: 4,
-    summary: '1개 법인 · 정상 운영 중',
-    companies: [
-      { name: 'Jimin Brand Lab', startYear: 2022, endYear: null, years: 4, status: '정상 운영' },
-    ],
-  },
-  airlineHighlight: {
-    tierSummary: '대한항공 모닝캄',
-    badgeLevel: 'business_traveler',
-    airlines: [
-      { name: '대한항공', tier: '모닝캄' },
-    ],
-  },
   instagram: {
     username: 'jimin_lee',
     profileUrl: 'https://www.instagram.com/jimin_lee/',
@@ -537,7 +498,6 @@ export const JIMIN_PROFILE = {
       { id: '6', imageUrl: 'https://picsum.photos/seed/jimin_ig6/400/400', caption: '팀 점심 🍱', timestamp: '1달 전' },
     ],
   },
-  careerHighlight: { avgYears: 4.2, vsIndustryPercent: 128 },
   rememberHighlight: {
     total: 183,
     industries: [
@@ -610,6 +570,7 @@ export const JIMIN_PROFILE = {
     { id: 'jg3', linkId: 'chijiwon', authorName: '최지원', message: '사람을 편하게 연결하는 힘이 있어요.', date: '1주 전' },
     { id: 'jg4', linkId: 'kimdohyeon', authorName: '김도현', message: '마케팅 관점이 실무적이라 대화가 특히 좋았습니다.', date: '2주 전' },
   ],
+  tabVisibility: { who: 'public', life: 'public', reputation: 'public' },
 }
 
 // TODO(real API): Replace this mock selector with a profile lookup against the public profile endpoint.

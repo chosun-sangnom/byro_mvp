@@ -1,4 +1,4 @@
-import { BadgeCheck, ChevronRight, Sparkles } from 'lucide-react'
+import { ChevronRight, Sparkles } from 'lucide-react'
 import { NavBar } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import type { HighlightIconId } from '@/types'
@@ -8,7 +8,6 @@ interface HighlightManageListViewProps {
   groupedCategoryCards: HighlightCategoryCardGroup[]
   onBack: () => void
   onOpenCategory: (category: HighlightManageCategory) => void
-  onOpenCertification: (categoryId: string) => void
   onOpenPicker: () => void
   // [임시] OCR 클립보드 브릿지 — 스크린샷으로 경력/학력 자동 입력
   onLlmImport: () => void
@@ -18,7 +17,6 @@ export function HighlightManageListView({
   groupedCategoryCards,
   onBack,
   onOpenCategory,
-  onOpenCertification,
   onOpenPicker,
   onLlmImport,
 }: HighlightManageListViewProps) {
@@ -61,13 +59,7 @@ export function HighlightManageListView({
                   {group.items.map((entry) => (
                     <button
                       key={`${entry.category.id}-${group.id}`}
-                      onClick={() => {
-                        if (entry.kind === 'verified') {
-                          onOpenCertification(entry.category.id)
-                          return
-                        }
-                        onOpenCategory(entry.category)
-                      }}
+                      onClick={() => onOpenCategory(entry.category)}
                       className="settings-row-light flex w-full items-center gap-3 px-4 py-4 text-left"
                     >
                       <span className="flex h-11 w-8 shrink-0 items-center justify-center text-[var(--color-text-strong)]">
@@ -76,11 +68,6 @@ export function HighlightManageListView({
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <span className="text-[11px] font-semibold text-[var(--color-text-secondary)]">{entry.category.label}</span>
-                          {entry.kind === 'verified' && (
-                            <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[var(--color-bg-surface)] border border-[var(--color-border-default)] text-[var(--color-state-success-text)]">
-                              <BadgeCheck size={12} />
-                            </span>
-                          )}
                         </div>
                         <div className="mt-1 text-[15px] font-bold text-[var(--color-text-strong)]">
                           {entry.title}

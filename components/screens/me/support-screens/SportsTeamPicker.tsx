@@ -109,9 +109,11 @@ const STATIC_TEAMS: SportTeam[] = [
 export function SportsTeamPicker({
   selected,
   onChange,
+  maxItems,
 }: {
   selected: LifeMediaItem[]
   onChange: (teams: LifeMediaItem[]) => void
+  maxItems?: number
 }) {
   const [activeCategory, setActiveCategory] = useState<SportCategory>('all')
   const [query, setQuery] = useState('')
@@ -137,12 +139,15 @@ export function SportsTeamPicker({
     return matchCategory && matchQuery
   })
 
+  const limit = maxItems ?? 5
+  const isAtLimit = selected.length >= limit
   const selectedNames = new Set(selected.map((s) => s.label))
 
   const toggleTeam = (team: SportTeam) => {
     if (selectedNames.has(team.name)) {
       onChange(selected.filter((s) => s.label !== team.name))
     } else {
+      if (isAtLimit) return
       onChange([...selected, { label: team.name, sublabel: team.league }])
     }
   }
@@ -151,7 +156,7 @@ export function SportsTeamPicker({
 
   const addCustom = () => {
     const name = customInput.trim()
-    if (!name || selectedNames.has(name)) return
+    if (!name || selectedNames.has(name) || isAtLimit) return
     onChange([...selected, { label: name }])
     setCustomInput('')
   }

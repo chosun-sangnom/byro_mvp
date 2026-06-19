@@ -7,9 +7,194 @@ import { Button, Modal, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
+type LoginView = 'main' | 'oauth' | 'phone'
+type OAuthProvider = 'kakao' | 'naver' | 'google'
+type OAuthStep = 'pending' | 'done'
+
+interface OAuthMeta {
+  label: string
+  variant: 'kakao' | 'naver' | 'google'
+  prefix: string
+}
+
+const OAUTH_META: Record<OAuthProvider, OAuthMeta> = {
+  kakao: { label: '카카오', variant: 'kakao', prefix: '' },
+  naver: { label: '네이버', variant: 'naver', prefix: 'N  ' },
+  google: { label: '구글', variant: 'google', prefix: 'G  ' },
+}
+
+function formatPhone(value: string) {
+  const digits = value.replace(/\D/g, '').slice(0, 11)
+  if (digits.length <= 3) return digits
+  if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`
+  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`
+}
+
+function isValidPhone(phone: string) {
+  const digits = phone.replace(/\D/g, '')
+  return digits.length === 11 && digits.startsWith('010')
+}
+
+function isValidEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
+function BackButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex items-center gap-1 text-[13px] text-[var(--color-text-tertiary)] mb-6 -ml-0.5 self-start"
+    >
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M10 3L5 8L10 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+      다른 방법으로 가입
+    </button>
+  )
+}
+
 export function Step1Login() {
   const store = useByroStore()
+  const [view, setView] = useState<LoginView>('main')
+  const [oauthProvider, setOauthProvider] = useState<OAuthProvider | null>(null)
+  const [oauthStep, setOauthStep] = useState<OAuthStep>('pending')
 
+  // 전화번호 가입 폼
+  const [phone, setPhone] = useState('')
+  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('')
+
+  const passwordShort = password.length > 0 && password.length < 8
+  const emailInvalid = email.length > 0 && !isValidEmail(email)
+  const canPhoneSubmit = isValidPhone(phone) && password.length >= 8 && (email === '' || isValidEmail(email))
+
+  const handleOAuthSelect = (provider: OAuthProvider) => {
+    setOauthProvider(provider)
+    setOauthStep('pending')
+    setView('oauth')
+  }
+
+  const handleBack = () => {
+    setView('main')
+    setOauthProvider(null)
+    setOauthStep('pending')
+  }
+
+  // --- OAuth 뷰 ---
+  if (view === 'oauth' && oauthProvider) {
+    const meta = OAUTH_META[oauthProvider]
+
+    if (oauthStep === 'done') {
+      return (
+        <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+          <div className="flex-1 flex flex-col items-center justify-center text-center">
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mb-5"
+              style={{ backgroundColor: 'var(--color-state-success-bg)' }}>
+              <CheckCircle2 size={32} style={{ color: 'var(--color-state-success-text)' }} />
+            </div>
+            <div className="text-xl font-black text-[var(--color-text-strong)] mb-2">
+              {meta.label} 연결 완료
+            </div>
+            <p className="meta-text leading-relaxed">이제 프로필을 만들어볼게요.</p>
+          </div>
+          <Button onClick={() => store.nextStep()}>계속하기</Button>
+          <p className="micro-text text-center mt-4">
+            시작하면 이용약관 및 개인정보 처리방침에 동의하게 됩니다
+          </p>
+        </div>
+      )
+    }
+
+    return (
+      <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+        <BackButton onClick={handleBack} />
+        <div className="mb-8">
+          <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight mb-2">
+            {meta.label} 계정으로<br />시작하기
+          </div>
+          <p className="meta-text leading-relaxed">
+            {meta.label} 계정을 바이로에 연결합니다.<br />
+            아래 버튼을 누르면 {meta.label} 인증을 진행해요.
+          </p>
+        </div>
+        {/* [임시] 실제 OAuth 리다이렉트 미연동 — 버튼 클릭으로 연결 완료 시뮬레이션 */}
+        <Button variant={meta.variant} onClick={() => setOauthStep('done')}>
+          {meta.prefix}{meta.label}로 연결하기
+        </Button>
+      </div>
+    )
+  }
+
+  // --- 전화번호 뷰 ---
+  if (view === 'phone') {
+    return (
+      <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+        <BackButton onClick={handleBack} />
+        <div className="mb-6">
+          <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
+            전화번호로<br />회원가입
+          </div>
+        </div>
+        <div className="space-y-4 mb-6">
+          <div>
+            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">전화번호 *</label>
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(formatPhone(e.target.value))}
+              placeholder="010-0000-0000"
+              autoComplete="tel"
+              className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">비밀번호 *</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="8자 이상 입력해주세요"
+              autoComplete="new-password"
+              className={`w-full border rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] ${
+                passwordShort ? 'border-[var(--color-state-danger-text)]' : 'border-[var(--color-border-default)]'
+              }`}
+            />
+            {passwordShort && (
+              <p className="mt-1 text-[11px] text-[var(--color-state-danger-text)]">비밀번호는 8자 이상이어야 해요</p>
+            )}
+          </div>
+          <div>
+            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">
+              이메일 <span className="text-[10px]">(선택 · 전화번호 변경 시 계정 복구용)</span>
+            </label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="example@email.com"
+              autoComplete="email"
+              className={`w-full border rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] ${
+                emailInvalid ? 'border-[var(--color-state-danger-text)]' : 'border-[var(--color-border-default)]'
+              }`}
+            />
+            {emailInvalid && (
+              <p className="mt-1 text-[11px] text-[var(--color-state-danger-text)]">올바른 이메일 형식을 입력해주세요</p>
+            )}
+          </div>
+        </div>
+        {/* [임시] 바이로 전화번호 회원가입 API 미연동 */}
+        <Button onClick={() => { if (canPhoneSubmit) store.nextStep() }} disabled={!canPhoneSubmit}>
+          가입하기
+        </Button>
+        <p className="micro-text text-center mt-4">
+          시작하면 이용약관 및 개인정보 처리방침에 동의하게 됩니다
+        </p>
+      </div>
+    )
+  }
+
+  // --- 메인 뷰 ---
   return (
     <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
       <div className="surface-card rounded-[32px] px-5 py-6 text-center mb-5">
@@ -22,10 +207,16 @@ export function Step1Login() {
         </div>
       </div>
       <div className="space-y-3">
-        <Button variant="kakao" onClick={() => store.nextStep()}>카카오로 시작하기</Button>
-        <Button variant="naver" onClick={() => store.nextStep()}>N  네이버로 시작하기</Button>
-        <Button variant="google" onClick={() => store.nextStep()}>G  구글로 시작하기</Button>
+        <Button variant="kakao" onClick={() => handleOAuthSelect('kakao')}>카카오로 시작하기</Button>
+        <Button variant="naver" onClick={() => handleOAuthSelect('naver')}>N  네이버로 시작하기</Button>
+        <Button variant="google" onClick={() => handleOAuthSelect('google')}>G  구글로 시작하기</Button>
       </div>
+      <div className="flex items-center gap-3 my-4">
+        <div className="flex-1 h-px bg-[var(--color-border-default)]" />
+        <span className="text-[11px] text-[var(--color-text-tertiary)]">또는</span>
+        <div className="flex-1 h-px bg-[var(--color-border-default)]" />
+      </div>
+      <Button variant="outline" onClick={() => setView('phone')}>전화번호로 회원가입</Button>
       <p className="micro-text text-center mt-6">
         시작하면 이용약관 및 개인정보 처리방침에 동의하게 됩니다
       </p>
@@ -127,6 +318,7 @@ export function Step2BasicInfo() {
   const store = useByroStore()
   const [name, setName] = useState(store.onboardingName)
   const [nickname, setNickname] = useState(store.onboardingNickname)
+  const [useActivityName, setUseActivityName] = useState(!!store.onboardingNickname)
   const [birthDate, setBirthDate] = useState(store.onboardingBirthDate)
   const [showAge, setShowAge] = useState(store.onboardingShowAge)
   const [isVerified, setIsVerified] = useState(store.isVerified)
@@ -136,7 +328,7 @@ export function Step2BasicInfo() {
 
   const handleNext = () => {
     if (!canProceed) return
-    store.setOnboardingNameAndBirth({ name: name.trim(), nickname: nickname.trim(), birthDate, showAge })
+    store.setOnboardingNameAndBirth({ name: name.trim(), nickname: useActivityName ? nickname.trim() : '', birthDate, showAge })
     if (isVerified) store.setVerified(true)
     store.nextStep()
   }
@@ -185,19 +377,40 @@ export function Step2BasicInfo() {
         onVerified={() => setIsVerified(true)}
       />
 
-      {/* 별명 (선택) */}
+      {/* 활동명 (선택) */}
       <div className="mb-5">
-        <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">별명 (선택)</label>
-        <input
-          type="text"
-          value={nickname}
-          onChange={(e) => setNickname(e.target.value)}
-          placeholder="예: 명구, Alex, 크리에이터K"
-          maxLength={30}
-          className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
-        />
-        <p className="mt-1.5 text-[11px] text-[var(--color-text-tertiary)]">
-          별명 설정 시 프로필에 별명으로 노출돼요
+        <button
+          type="button"
+          onClick={() => {
+            setUseActivityName((prev) => !prev)
+            if (useActivityName) setNickname('')
+          }}
+          className="flex items-center gap-2 mb-3"
+        >
+          <div className={`w-4 h-4 rounded flex items-center justify-center border transition-colors flex-shrink-0 ${useActivityName ? 'border-[var(--color-accent-dark)] bg-[var(--color-accent-dark)]' : 'border-[var(--color-border-default)] bg-[var(--color-bg-soft)]'}`}>
+            {useActivityName && (
+              <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            )}
+          </div>
+          <span className="text-[13px] font-medium text-[var(--color-text-primary)]">활동명 사용</span>
+        </button>
+
+        {useActivityName && (
+          <input
+            type="text"
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+            placeholder="예: 크리에이터K, Alex, 디에디트"
+            maxLength={30}
+            className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
+            autoFocus
+          />
+        )}
+
+        <p className="mt-2 text-[11px] text-[var(--color-text-tertiary)] leading-relaxed">
+          유튜버·크리에이터 등 활동명으로 활동하시는 분들을 위한 선택 기능이에요. 활동명을 설정하면 실명 대신 활동명으로 프로필에 노출돼요.
         </p>
       </div>
 

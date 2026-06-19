@@ -188,8 +188,6 @@ const CITY_DB: CityItem[] = [
   { id: 'queenstown', name: '퀸스타운',   region: 'oceania'  },
 ]
 
-const MAX_ITEMS = 5
-
 function CityPhotoButton({
   item,
   defaultImageUrl,
@@ -232,9 +230,11 @@ function CityPhotoButton({
 export function TravelPicker({
   selected,
   onChange,
+  maxItems = 5,
 }: {
   selected: LifeMediaItem[]
   onChange: (items: LifeMediaItem[]) => void
+  maxItems?: number
 }) {
   const [activeRegion, setActiveRegion] = useState<TravelRegion>('all')
   const [customInput, setCustomInput] = useState('')
@@ -242,7 +242,7 @@ export function TravelPicker({
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const selectedNames = new Set(selected.map((s) => s.label))
-  const isAtLimit = selected.length >= MAX_ITEMS
+  const isAtLimit = selected.length >= maxItems
 
   const filtered = activeRegion === 'all'
     ? CITY_DB
@@ -360,7 +360,7 @@ export function TravelPicker({
 
       {isAtLimit && (
         <p className="mb-3 text-center text-[12px] text-[var(--color-text-tertiary)]">
-          최대 {MAX_ITEMS}개까지 추가할 수 있어요
+          최대 {maxItems}개까지 추가할 수 있어요
         </p>
       )}
 

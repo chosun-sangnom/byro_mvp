@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, type ChangeEvent, type ReactNode } from 'react'
-import { Camera, ChevronRight } from 'lucide-react'
+import { Camera, ChevronRight, Zap } from 'lucide-react'
 import { Button, NavBar, showToast } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
@@ -19,6 +19,87 @@ type LifeView = 'hub' | 'pet' | 'activity' | 'culture' | 'place' | 'travel'
 
 const PET_OPTIONS = ['없음', '강아지', '고양이', '소형 포유류', '조류', '파충류', '어류', '기타']
 
+const FREE_LIMIT = 5
+
+function countLifeItems(life: PublicProfileLife): number {
+  return (
+    life.daily.exercise.length +
+    (life.tastes.teams?.length ?? 0) +
+    life.tastes.movies.length +
+    life.tastes.music.length +
+    life.tastes.books.length +
+    (life.tastes.plays?.length ?? 0) +
+    life.tastes.restaurants.length +
+    life.tastes.cafes.length +
+    life.places.travelDestinations.length
+  )
+}
+
+// ─── Pro 업그레이드 모달 ───────────────────────────────────────────────────────
+
+function ProUpgradeModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-end">
+      <button className="absolute inset-0 bg-black/50" onClick={onClose} aria-label="닫기" />
+      <div className="relative w-full rounded-t-3xl bg-[var(--color-bg-surface)] px-6 pt-6 pb-10">
+        <div
+          className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl"
+          style={{ background: 'var(--color-accent-dark)' }}
+        >
+          <Zap size={22} className="text-white" />
+        </div>
+        <p className="mb-1 text-[18px] font-bold text-[var(--color-text-primary)]">Pro로 업그레이드</p>
+        <p className="mb-6 text-[14px] leading-relaxed text-[var(--color-text-secondary)]">
+          Pro 플랜으로 업그레이드하면 카테고리별 최대 5개씩,
+          제한 없이 라이프를 채울 수 있어요.
+        </p>
+        <Button onClick={onClose}>곧 출시 예정이에요</Button>
+        <button
+          onClick={onClose}
+          className="mt-3 w-full py-2 text-sm text-[var(--color-text-tertiary)]"
+        >
+          닫기
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ─── 슬롯 배너 ────────────────────────────────────────────────────────────────
+
+function SlotBadge({
+  remaining,
+  onUpgrade,
+}: {
+  remaining: number
+  onUpgrade: () => void
+}) {
+  return (
+    <div className="mx-5 mt-3 flex items-center justify-between rounded-xl border border-[var(--color-border-soft)] bg-[var(--color-bg-soft)] px-4 py-2.5">
+      {remaining > 0 ? (
+        <span className="text-[12px] font-semibold text-[var(--color-text-secondary)]">
+          슬롯 {remaining}개 남음
+          <span className="ml-1.5 font-normal text-[var(--color-text-tertiary)]">· Free 플랜</span>
+        </span>
+      ) : (
+        <>
+          <span className="text-[12px] font-semibold" style={{ color: 'var(--color-state-danger-text, #ef4444)' }}>
+            슬롯이 모두 찼어요
+          </span>
+          <button
+            onClick={onUpgrade}
+            className="flex items-center gap-1 text-[12px] font-bold"
+            style={{ color: 'var(--color-accent-dark)' }}
+          >
+            <Zap size={11} />
+            Pro 업그레이드
+          </button>
+        </>
+      )}
+    </div>
+  )
+}
+
 // ─── Shared sub-components ────────────────────────────────────────────────────
 
 function SubScreen({
@@ -26,15 +107,18 @@ function SubScreen({
   onBack,
   onSave,
   children,
+  slotBadge,
 }: {
   title: string
   onBack: () => void
   onSave: () => void
   children: ReactNode
+  slotBadge?: ReactNode
 }) {
   return (
     <div className="flex h-full flex-col">
       <NavBar title={title} onBack={onBack} />
+      {slotBadge}
       <div className="flex-1 overflow-y-auto px-5 py-4 space-y-6">{children}</div>
       <div className="border-t border-[var(--color-border-soft)] px-5 pb-5 pt-3">
         <Button onClick={onSave}>저장</Button>
@@ -147,25 +231,40 @@ function PetView({
 function ActivityView({
   life,
   onSave,
+  isPro,
+  freeSlots,
+  onUpgrade,
 }: {
   life: PublicProfileLife
   onSave: (daily: PublicProfileLife['daily'], teams: LifeMediaItem[]) => void
+  isPro: boolean
+  freeSlots: number
+  onUpgrade: () => void
 }) {
   const [exercise, setExercise] = useState<LifeMediaItem[]>(life.daily.exercise)
   const [teams, setTeams] = useState<LifeMediaItem[]>(life.tastes.teams ?? [])
+
+  const totalHere = exercise.length + teams.length
+  const exerciseMax = isPro ? 5 : Math.min(5, Math.max(0, freeSlots - (totalHere - exercise.length)))
+  const teamsMax = isPro ? 5 : Math.min(5, Math.max(0, freeSlots - (totalHere - teams.length)))
+  const freeRemaining = isPro ? undefined : Math.max(0, freeSlots - totalHere)
 
   return (
     <SubScreen
       title="활동"
       onBack={() => onSave(life.daily, life.tastes.teams ?? [])}
       onSave={() => onSave({ ...life.daily, exercise }, teams)}
+      slotBadge={freeRemaining !== undefined
+        ? <SlotBadge remaining={freeRemaining} onUpgrade={onUpgrade} />
+        : undefined
+      }
     >
       <FieldBlock label="즐기는 운동">
-        <ExercisePicker selected={exercise} onChange={setExercise} />
+        <ExercisePicker selected={exercise} onChange={setExercise} maxItems={exerciseMax} />
       </FieldBlock>
 
       <FieldBlock label="응원하는 스포츠팀">
-        <SportsTeamPicker selected={teams} onChange={setTeams} />
+        <SportsTeamPicker selected={teams} onChange={setTeams} maxItems={teamsMax} />
       </FieldBlock>
     </SubScreen>
   )
@@ -174,32 +273,49 @@ function ActivityView({
 function CultureView({
   life,
   onSave,
+  isPro,
+  freeSlots,
+  onUpgrade,
 }: {
   life: PublicProfileLife
   onSave: (tastes: Partial<PublicProfileLife['tastes']>) => void
+  isPro: boolean
+  freeSlots: number
+  onUpgrade: () => void
 }) {
   const [movies, setMovies] = useState<LifeMediaItem[]>(life.tastes.movies)
   const [music, setMusic] = useState<LifeMediaItem[]>(life.tastes.music)
   const [books, setBooks] = useState<LifeMediaItem[]>(life.tastes.books)
   const [plays, setPlays] = useState<LifeMediaItem[]>(life.tastes.plays ?? [])
 
+  const totalHere = movies.length + music.length + books.length + plays.length
+  const movieMax  = isPro ? 5 : Math.min(5, Math.max(0, freeSlots - (totalHere - movies.length)))
+  const musicMax  = isPro ? 5 : Math.min(5, Math.max(0, freeSlots - (totalHere - music.length)))
+  const bookMax   = isPro ? 5 : Math.min(5, Math.max(0, freeSlots - (totalHere - books.length)))
+  const playMax   = isPro ? 5 : Math.min(5, Math.max(0, freeSlots - (totalHere - plays.length)))
+  const freeRemaining = isPro ? undefined : Math.max(0, freeSlots - totalHere)
+
   return (
     <SubScreen
       title="문화"
       onBack={() => onSave({})}
       onSave={() => onSave({ movies, music, books, plays })}
+      slotBadge={freeRemaining !== undefined
+        ? <SlotBadge remaining={freeRemaining} onUpgrade={onUpgrade} />
+        : undefined
+      }
     >
       <FieldBlock label="영화">
-        <MediaSearchPicker type="movie" selected={movies} onChange={setMovies} />
+        <MediaSearchPicker type="movie" selected={movies} onChange={setMovies} maxItems={movieMax} />
       </FieldBlock>
       <FieldBlock label="음악">
-        <MusicSearchPicker selected={music} onChange={setMusic} />
+        <MusicSearchPicker selected={music} onChange={setMusic} maxItems={musicMax} />
       </FieldBlock>
       <FieldBlock label="책">
-        <MediaSearchPicker type="book" selected={books} onChange={setBooks} />
+        <MediaSearchPicker type="book" selected={books} onChange={setBooks} maxItems={bookMax} />
       </FieldBlock>
       <FieldBlock label="공연 · 연극">
-        <MediaSearchPicker type="play" selected={plays} onChange={setPlays} />
+        <MediaSearchPicker type="play" selected={plays} onChange={setPlays} maxItems={playMax} />
       </FieldBlock>
     </SubScreen>
   )
@@ -208,24 +324,39 @@ function CultureView({
 function PlaceView({
   life,
   onSave,
+  isPro,
+  freeSlots,
+  onUpgrade,
 }: {
   life: PublicProfileLife
   onSave: (tastes: Partial<PublicProfileLife['tastes']>) => void
+  isPro: boolean
+  freeSlots: number
+  onUpgrade: () => void
 }) {
   const [restaurants, setRestaurants] = useState<LifeMediaItem[]>(life.tastes.restaurants)
   const [cafes, setCafes] = useState<LifeMediaItem[]>(life.tastes.cafes)
+
+  const totalHere = restaurants.length + cafes.length
+  const restaurantMax = isPro ? 5 : Math.min(5, Math.max(0, freeSlots - (totalHere - restaurants.length)))
+  const cafeMax       = isPro ? 5 : Math.min(5, Math.max(0, freeSlots - (totalHere - cafes.length)))
+  const freeRemaining = isPro ? undefined : Math.max(0, freeSlots - totalHere)
 
   return (
     <SubScreen
       title="플레이스"
       onBack={() => onSave({})}
       onSave={() => onSave({ restaurants, cafes })}
+      slotBadge={freeRemaining !== undefined
+        ? <SlotBadge remaining={freeRemaining} onUpgrade={onUpgrade} />
+        : undefined
+      }
     >
       <FieldBlock label="맛집">
-        <PlacePicker type="restaurant" selected={restaurants} onChange={setRestaurants} />
+        <PlacePicker type="restaurant" selected={restaurants} onChange={setRestaurants} maxItems={restaurantMax} />
       </FieldBlock>
       <FieldBlock label="카페">
-        <PlacePicker type="cafe" selected={cafes} onChange={setCafes} />
+        <PlacePicker type="cafe" selected={cafes} onChange={setCafes} maxItems={cafeMax} />
       </FieldBlock>
     </SubScreen>
   )
@@ -234,19 +365,32 @@ function PlaceView({
 function TravelView({
   life,
   onSave,
+  isPro,
+  freeSlots,
+  onUpgrade,
 }: {
   life: PublicProfileLife
   onSave: (destinations: LifeMediaItem[]) => void
+  isPro: boolean
+  freeSlots: number
+  onUpgrade: () => void
 }) {
   const [destinations, setDestinations] = useState<LifeMediaItem[]>(life.places.travelDestinations)
+
+  const travelMax = isPro ? 5 : Math.min(5, freeSlots)
+  const freeRemaining = isPro ? undefined : Math.max(0, freeSlots - destinations.length)
 
   return (
     <SubScreen
       title="여행"
       onBack={() => onSave(life.places.travelDestinations)}
       onSave={() => onSave(destinations)}
+      slotBadge={freeRemaining !== undefined
+        ? <SlotBadge remaining={freeRemaining} onUpgrade={onUpgrade} />
+        : undefined
+      }
     >
-      <TravelPicker selected={destinations} onChange={setDestinations} />
+      <TravelPicker selected={destinations} onChange={setDestinations} maxItems={travelMax} />
     </SubScreen>
   )
 }
@@ -257,16 +401,23 @@ function LifeHub({
   life,
   onNavigate,
   onBack,
+  isPro,
+  onUpgrade,
 }: {
   life: PublicProfileLife
   onNavigate: (view: LifeView) => void
   onBack: () => void
+  isPro: boolean
+  onUpgrade: () => void
 }) {
   const exerciseCount = life.daily.exercise.length
   const teamsCount = life.tastes.teams?.length ?? 0
   const cultureCount = life.tastes.movies.length + life.tastes.music.length + life.tastes.books.length + (life.tastes.plays?.length ?? 0)
   const foodCount = life.tastes.restaurants.length + life.tastes.cafes.length
   const travelCount = life.places.travelDestinations.length
+
+  const totalCount = exerciseCount + teamsCount + cultureCount + foodCount + travelCount
+  const freeRemaining = Math.max(0, FREE_LIMIT - totalCount)
 
   const rows: Array<{ view: LifeView; emoji: string; title: string; meta: string | null; nudge: string }> = [
     {
@@ -313,6 +464,10 @@ function LifeHub({
   return (
     <div className="flex h-full flex-col">
       <NavBar title="라이프 편집" onBack={onBack} />
+
+      {/* Free 슬롯 배너 */}
+      {!isPro && <SlotBadge remaining={freeRemaining} onUpgrade={onUpgrade} />}
+
       <div className="flex-1 overflow-y-auto">
         <div className="mx-5 mt-4 overflow-hidden rounded-2xl border border-[var(--color-border-soft)]">
           {rows.map((row, i) => (
@@ -336,6 +491,24 @@ function LifeHub({
             </button>
           ))}
         </div>
+
+        {/* Free: Pro 플랜 비교 안내 */}
+        {!isPro && (
+          <div className="mx-5 mt-3 mb-4 flex items-center justify-between rounded-xl bg-[var(--color-bg-soft)] px-4 py-3">
+            <div>
+              <p className="text-[12px] font-semibold text-[var(--color-text-secondary)]">Free · 5개 슬롯</p>
+              <p className="text-[11px] text-[var(--color-text-tertiary)]">Pro는 카테고리별 최대 5개</p>
+            </div>
+            <button
+              onClick={onUpgrade}
+              className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-bold text-white"
+              style={{ background: 'var(--color-accent-dark)' }}
+            >
+              <Zap size={11} />
+              업그레이드
+            </button>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -345,8 +518,10 @@ function LifeHub({
 
 export function LifeManageScreen({ onBack }: { onBack: () => void }) {
   const store = useByroStore()
+  const isPro = store.isPro
   const [view, setView] = useState<LifeView>('hub')
   const [life, setLife] = useState<PublicProfileLife>(store.user?.life ?? SAMPLE_PROFILE.life)
+  const [showUpgrade, setShowUpgrade] = useState(false)
 
   const saveAndBack = () => {
     store.updateUserLife(life)
@@ -374,11 +549,35 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
     setView('hub')
   }
 
-  if (view === 'pet')      return <PetView      life={life} onSave={updateDaily} />
-  if (view === 'activity') return <ActivityView life={life} onSave={updateActivityTeams} />
-  if (view === 'culture')  return <CultureView  life={life} onSave={updateTastes} />
-  if (view === 'place')    return <PlaceView    life={life} onSave={updateTastes} />
-  if (view === 'travel')   return <TravelView   life={life} onSave={updateTravel} />
+  // Free 플랜: 각 서브뷰에 할당 가능한 최대 슬롯 수 계산 (다른 카테고리 항목 제외)
+  const total = countLifeItems(life)
+  const activityCount = life.daily.exercise.length + (life.tastes.teams?.length ?? 0)
+  const cultureCount  = life.tastes.movies.length + life.tastes.music.length + life.tastes.books.length + (life.tastes.plays?.length ?? 0)
+  const placeCount    = life.tastes.restaurants.length + life.tastes.cafes.length
+  const travelCount   = life.places.travelDestinations.length
 
-  return <LifeHub life={life} onNavigate={setView} onBack={saveAndBack} />
+  const activityFreeSlots = Math.max(0, FREE_LIMIT - (total - activityCount))
+  const cultureFreeSlots  = Math.max(0, FREE_LIMIT - (total - cultureCount))
+  const placeFreeSlots    = Math.max(0, FREE_LIMIT - (total - placeCount))
+  const travelFreeSlots   = Math.max(0, FREE_LIMIT - (total - travelCount))
+
+  const handleUpgrade = () => setShowUpgrade(true)
+
+  if (view === 'pet')
+    return <PetView life={life} onSave={updateDaily} />
+  if (view === 'activity')
+    return <ActivityView life={life} onSave={updateActivityTeams} isPro={isPro} freeSlots={activityFreeSlots} onUpgrade={handleUpgrade} />
+  if (view === 'culture')
+    return <CultureView life={life} onSave={updateTastes} isPro={isPro} freeSlots={cultureFreeSlots} onUpgrade={handleUpgrade} />
+  if (view === 'place')
+    return <PlaceView life={life} onSave={updateTastes} isPro={isPro} freeSlots={placeFreeSlots} onUpgrade={handleUpgrade} />
+  if (view === 'travel')
+    return <TravelView life={life} onSave={updateTravel} isPro={isPro} freeSlots={travelFreeSlots} onUpgrade={handleUpgrade} />
+
+  return (
+    <>
+      <LifeHub life={life} onNavigate={setView} onBack={saveAndBack} isPro={isPro} onUpgrade={handleUpgrade} />
+      {showUpgrade && <ProUpgradeModal onClose={() => setShowUpgrade(false)} />}
+    </>
+  )
 }

@@ -14,7 +14,7 @@
 
 ```
 /                          홈 (로그인/회원가입 진입)
-/signup                    온보딩 (5단계)
+/signup                    온보딩 (4단계)
 /me                        내 바이로
   ?edit=true               → 편집 모드(manage 화면)로 진입
 /[username]                공개 프로필
@@ -23,7 +23,7 @@
   /reputation              → 관계 탭
   /feedback                → 피드백 전체 보기
   /guestbook               → 방명록 전체 보기
-/archive                   연결 관리 (받은 요청 / 연결됨 / 최근 본)
+/archive                   아카이브 (저장됨 / 최근 본)
 ```
 
 ## 핵심 화면 컴포넌트
@@ -31,9 +31,9 @@
 | 컴포넌트 | 경로 | 역할 |
 |----------|------|------|
 | `PublicProfileShell` | `components/screens/profile/PublicProfileShell.tsx` | 공개 프로필 전체 레이아웃 (탭바 + CTA + 케미) |
-| `MyByro` | `components/screens/me/MyByro.tsx` | 내 바이로 10개 화면 분기 |
+| `MyByro` | `components/screens/me/MyByro.tsx` | 내 바이로 화면 분기 |
 | `OnboardingScreen` | `components/screens/onboarding/OnboardingScreen.tsx` | 온보딩 오케스트레이터 |
-| `Archive` | `components/screens/archive/Archive.tsx` | 연결 목록 + 요청 수락/거절 |
+| `Archive` | `components/screens/archive/Archive.tsx` | 아카이브 (저장됨 / 최근 본) |
 
 ## 공통 UI 컴포넌트 (`components/ui/`)
 
@@ -55,7 +55,7 @@ API 연동 전까지 모든 프로필 데이터는 `lib/mocks/publicProfiles.ts`
 | 목업 | linkId | 설명 |
 |------|--------|------|
 | `SAMPLE_PROFILE` | `gangminjun` | 로그인 시 사용되는 기본 사용자 |
-| `MK_PROFILE` | `mk` | 연결 요청 테스트용 서브 사용자 |
+| `MK_PROFILE` | `mk` | 서브 사용자 |
 | `JIMINLEE_PROFILE` | `jiminlee` | 추가 테스트용 사용자 |
 
 `getPublicProfileByUsername(username)` — username으로 목업 프로필 조회.

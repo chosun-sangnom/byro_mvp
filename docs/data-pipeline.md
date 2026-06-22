@@ -160,11 +160,12 @@ const keywordCounts = [...profile.reputationKeywords]
 ```typescript
 persist(store, {
   name: 'byro-store',
-  version: 12,
+  version: 16,
   migrate: (persistedState) => { /* 버전 마이그레이션 */ },
   partialize: (state) => ({
-    // 저장됨: 로그인 상태, 유저 정보, 하이라이트, 연결, 경험 등
+    // 저장됨: 로그인 상태, 유저 정보, 하이라이트, 경험 등
     // 저장 안 됨: kemiComputedProfiles (매 세션 재계산)
+    // 삭제됨: sentRequestLinkIds, connectionRequests, connectedProfiles (연결 기능 제거)
   }),
 })
 ```

@@ -18,16 +18,16 @@
 app/                  Next.js 라우트
 components/
   screens/
-    onboarding/       온보딩 5단계 플로우
+    onboarding/       온보딩 4단계 플로우
     profile/          공개 프로필 (PublicProfileShell 중심)
     me/               내 바이로 (MyByro 중심)
-    archive/          연결된 사람들
+    archive/          아카이브 (저장됨 / 최근 본)
   ui/                 공통 컴포넌트 (Button, BottomSheet, NavBar 등)
 lib/
   mocks/              목업 데이터 (SAMPLE_PROFILE 등)
   supabase/           Supabase 클라이언트 (미연동)
 store/
-  useByroStore.ts     Zustand 전역 상태 (version 12)
+  useByroStore.ts     Zustand 전역 상태 (version 16)
 types/index.ts        전체 TypeScript 타입 정의
 supabase/migrations/  DB 마이그레이션 SQL
 docs/                 기술 문서
@@ -39,3 +39,7 @@ docs/                 기술 문서
 - [상태 전이](docs/state-machines.md)
 - [데이터 파이프라인 & 공통점 감지](docs/data-pipeline.md)
 - [DB 스키마](docs/schema.md)
+- [공개 범위 정책](docs/policy-visibility.md)
+- [하이라이트 항목 설계](docs/policy-highlights.md)
+- [평판 리뷰 정책](docs/policy-reputation.md)
+- [알림 정책](docs/policy-notifications.md)

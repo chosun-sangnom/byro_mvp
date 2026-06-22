@@ -54,6 +54,8 @@ MBTI 등 나 자신 정보. 케미 매칭에 활용.
 
 수동 하이라이트 목록. 카테고리별로 `is_primary`로 대표 지정.
 
+**슬롯 정책**: Free 전체 3개 / Pro 100개
+
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
 | `id` | uuid PK | |
@@ -66,6 +68,9 @@ MBTI 등 나 자신 정보. 케미 매칭에 활용.
 | `year` | text | |
 | `sort_order` | integer | |
 | `is_primary` | boolean | 카테고리 내 대표 여부 |
+| `verified` | boolean | 인증 배지 여부 (경력·학력만 해당) |
+| `link_url` | text | 기사/인터뷰만 지원 |
+| `source_label` | text | 매체명 등 |
 
 #### `user_sns`
 
@@ -88,6 +93,8 @@ SNS 연동 데이터.
 
 ### 라이프(Life) 탭 — `tab_visibility.life` 기준
 
+**슬롯 정책**: Free 전체 5개 / Pro 카테고리별 최대 5개 (무제한)
+
 #### `user_life`
 
 일상/취향/장소 데이터.
@@ -95,9 +102,9 @@ SNS 연동 데이터.
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
 | `user_id` | uuid PK → users | |
-| `daily` | jsonb | `{ exercise[], pets[], diet }` |
-| `tastes` | jsonb | `{ movies[], music[], books[], cafes[], restaurants[], sports[] }` |
-| `places` | jsonb | `{ neighborhoods[], travelDestinations[] }` |
+| `daily` | jsonb | `{ exercise[], pet, petName }` |
+| `tastes` | jsonb | `{ movies[], music[], books[], cafes[], restaurants[], teams[] }` |
+| `places` | jsonb | `{ travelDestinations[] }` |
 | `updated_at` | timestamptz | auto-update trigger |
 
 ---
@@ -106,7 +113,11 @@ SNS 연동 데이터.
 
 #### `experiences`
 
-경험 남기기 데이터. 비회원도 제출 가능하므로 `target_link_id`는 text.
+경험 남기기 데이터.
+
+**작성 자격**:
+- 평판 탭이 `public`이면 로그인 유저 누구나 + 비로그인 유저(익명 처리)
+- 평판 탭이 `connected`이면 연결된 사람만 *(연결 기능 제거 후 정책 재확정 예정)*
 
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
@@ -117,24 +128,8 @@ SNS 연동 데이터.
 | `is_anonymous` | boolean | |
 | `keywords` | text[] | 최대 3개 |
 | `message` | text | |
+| `ip_address` | text | 익명 악용 방지용 저장 |
 | `created_at` | timestamptz | 24h rate limit 체크에 활용 |
-
----
-
-### 연결 (시스템)
-
-#### `connections`
-
-두 사용자 간 연결 요청 및 상태. 당사자만 조회 가능.
-
-| 컬럼 | 타입 | 설명 |
-|------|------|------|
-| `id` | uuid PK | |
-| `from_user_id` | uuid FK → users | 요청 보낸 사람 |
-| `to_user_id` | uuid FK → users | 요청 받은 사람 |
-| `status` | text | `'pending' \| 'accepted' \| 'rejected'` |
-| `message` | text | 연결 요청 메시지 |
-| UNIQUE | (from_user_id, to_user_id) | 중복 요청 방지 |
 
 ---
 
@@ -148,7 +143,6 @@ SNS 연동 데이터.
 | user_sns | tab_visibility.who 따름 | 본인만 |
 | user_life | tab_visibility.life 따름 | 본인만 |
 | experiences | tab_visibility.reputation 따름 | 로그인 유저는 항상 / 비회원은 reputation=public인 프로필만 |
-| connections | 당사자만 | 요청자 생성, 당사자 수정 |
 
 ---
 
@@ -165,35 +159,38 @@ interface PublicProfile {
   bio: string
   birthDate?: string
   birthTime?: string
-  birthPlace?: string
   calendarType?: 'solar' | 'lunar'
   showAge?: boolean
   whoIAm?: PublicProfileWhoIAm
   life?: PublicProfileLife
   manualHighlights: Highlight[]
-  // ... 커리어/법인/항공/리멤버 하이라이트
-  // ... 경험/평판키워드
-  // ... SNS 연동
-  // ... 연결 목록
+  experiences: Experience[]
+  reputationKeywords?: ReputationKeyword[]
+  guestbook?: GuestbookEntry[]
+  kemi?: KemiData
+  tabVisibility?: TabVisibility
+  // SNS
+  instagram?: InstagramProfile
+  linkedin?: LinkedInProfile
+  contactChannels?: ContactChannel[]
 }
 
 // 로그인 사용자 편집 상태
 interface UserState {
   name: string; linkId: string; title: string; school: string; bio: string
-  birthDate?: string; birthTime?: string; birthPlace?: string
+  birthDate?: string; birthTime?: string
   calendarType?: 'solar' | 'lunar'; showAge?: boolean
   whoIAm?: PublicProfileWhoIAm; life?: PublicProfileLife
   contactChannels?: ContactChannel[]
   tabVisibility?: TabVisibility
   avatarColor?: string; avatarImage?: string; profileImages?: string[]
-  headerMeta?: ProfileHeaderMeta
 }
 ```
 
 ### 중요 타입들
 
 ```typescript
-type OnboardingStep = 'login' | 'verify' | 'linkid' | 'profile' | 'complete'
+type OnboardingStep = 'login' | 'basicinfo' | 'profile' | 'complete'
 
 type TabVisibilityLevel = 'public' | 'connected' | 'private'
 interface TabVisibility { who: TabVisibilityLevel; life: TabVisibilityLevel; reputation: TabVisibilityLevel }
@@ -201,20 +198,12 @@ interface TabVisibility { who: TabVisibilityLevel; life: TabVisibilityLevel; rep
 interface Highlight {
   id: string; categoryId: HighlightCategoryId; icon: string
   title: string; subtitle: string; description: string; year: string
+  verified?: boolean; linkUrl?: string; sourceLabel?: string
 }
 
 interface Experience {
   id: string; authorName: string | null; isAnonymous: boolean
   keywords: string[]; message: string; date: string
-}
-
-interface ConnectionRequest {
-  id: string; linkId: string; name: string; title: string
-  message: string; requestedAt: string
-}
-
-interface PublicProfileWhoIAm {
-  mbti: string
 }
 ```
 
@@ -223,9 +212,23 @@ interface PublicProfileWhoIAm {
 **그룹** (`HighlightGroupId`): `'career' | 'achievement' | 'lifestyle'`
 
 **카테고리** (`HighlightCategoryId`):
-- career: `career-role`, `education-history`, `career-continuity`, `corporate-longevity`, `talk`, `collab`, `education`
+- career: `career-role`, `education-history`, `talk`, `collab`, `education`
 - achievement: `publish`, `article-interview`, `award`, `patent`, `license`
-- lifestyle: `airline-mileage`, `volunteer`, `other`
+- lifestyle: `volunteer`, `other`
+
+**제거된 카테고리** (MVP 범위 제외):
+- ~~`career-continuity`~~ (커리어 지속성)
+- ~~`corporate-longevity`~~ (법인 영속성)
+- ~~`airline-mileage`~~ (항공 마일리지)
+- ~~`remember-network`~~ → 관계 탭으로 이동
+
+### 인증 지원 카테고리
+
+| 카테고리 | 인증 방식 |
+|----------|----------|
+| `career-role` | 건강보험공단 API (카카오 본인인증 → 직장가입자 이력 조회) |
+| `education-history` | OCR (졸업증명서) 또는 학교 이메일 인증 |
+| 나머지 | 인증 없음, 수동 입력만 |
 
 ---
 
@@ -238,5 +241,4 @@ interface PublicProfileWhoIAm {
 | `publicProfileData.ts` | `getPublicProfileByUsername()` | `supabase.from('users').select()` |
 | `useByroStore.ts` | `login()`, `completeOnboarding()` | Supabase Auth |
 | `useByroStore.ts` | `submitExperience()` | `supabase.from('experiences').insert()` |
-| `useByroStore.ts` | `sendConnectionRequest()` 등 | `supabase.from('connections').insert()` |
 | `useByroStore.ts` | `highlights` CRUD | `supabase.from('highlights')` |

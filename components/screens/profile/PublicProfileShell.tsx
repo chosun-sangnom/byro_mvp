@@ -17,7 +17,7 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { Pencil } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
-import { BottomSheet, Modal, TextArea, showToast } from '@/components/ui'
+import { BottomSheet, TextArea, showToast } from '@/components/ui'
 import { getNormalizedPublicProfile, computeTabAccess } from '@/components/screens/profile/publicProfileData'
 import { generatePersona } from '@/lib/personaGen'
 import { ContactActionButton } from '@/components/screens/profile/PublicProfileSections'
@@ -81,8 +81,9 @@ export function PublicProfileShell({
   const [compatibilityOpen, setCompatibilityOpen] = useState(false)
   const [feedbackRequestOpen, setFeedbackRequestOpen] = useState(false)
   const [feedbackMessage, setFeedbackMessage] = useState('')
-  const [bookmarkModalOpen, setBookmarkModalOpen] = useState(false)
+  const [bookmarkSheetOpen, setBookmarkSheetOpen] = useState(false)
   const [bookmarkMemo, setBookmarkMemo] = useState('')
+  const [unsaveSheetOpen, setUnsaveSheetOpen] = useState(false)
 
   // 관계 탭에서만 "피드백 요청" 버튼 표시 (visitor only)
   const showReputationActions = activeTab === 'reputation' && !isOwnerMode
@@ -105,11 +106,10 @@ export function PublicProfileShell({
             onBookmarkClick={store.isLoggedIn && !isOwnerMode
               ? () => {
                   if (isSaved) {
-                    store.unsaveProfile(profile.linkId)
-                    showToast(`${profile.name}님을 저장 목록에서 삭제했어요`)
+                    setUnsaveSheetOpen(true)
                   } else {
                     setBookmarkMemo('')
-                    setBookmarkModalOpen(true)
+                    setBookmarkSheetOpen(true)
                   }
                 }
               : undefined
@@ -199,10 +199,10 @@ export function PublicProfileShell({
         </div>
       </div>
 
-      {/* 저장 모달 */}
+      {/* 저장 시트 */}
       {!isOwnerMode && (
-        <Modal open={bookmarkModalOpen} onClose={() => setBookmarkModalOpen(false)}>
-          <div>
+        <BottomSheet open={bookmarkSheetOpen} onClose={() => setBookmarkSheetOpen(false)}>
+          <div className="px-5 pb-6">
             <div className="mb-1 text-[18px] font-black text-[var(--color-text-strong)]">
               {profile.name}님 저장
             </div>
@@ -226,7 +226,7 @@ export function PublicProfileShell({
             <button
               onClick={() => {
                 store.saveProfile(profile.linkId, profile.name, profile.title, bookmarkMemo)
-                setBookmarkModalOpen(false)
+                setBookmarkSheetOpen(false)
                 showToast(`${profile.name}님을 저장했어요`)
               }}
               className="w-full rounded-full py-3.5 text-[14px] font-semibold text-white whitespace-nowrap"
@@ -235,7 +235,41 @@ export function PublicProfileShell({
               저장하기
             </button>
           </div>
-        </Modal>
+        </BottomSheet>
+      )}
+
+      {/* 저장 취소 확인 시트 */}
+      {!isOwnerMode && (
+        <BottomSheet open={unsaveSheetOpen} onClose={() => setUnsaveSheetOpen(false)}>
+          <div className="px-5 pb-6">
+            <div className="mb-1 text-[18px] font-black text-[var(--color-text-strong)]">
+              저장을 취소할까요?
+            </div>
+            <p className="mb-6 text-[13px] leading-[1.65] text-[var(--color-text-secondary)]">
+              {profile.name}님이 아카이브에서 삭제돼요.
+            </p>
+            <div className="space-y-2">
+              <button
+                onClick={() => {
+                  store.unsaveProfile(profile.linkId)
+                  setUnsaveSheetOpen(false)
+                  showToast(`${profile.name}님을 저장 목록에서 삭제했어요`)
+                }}
+                className="w-full rounded-full border py-3.5 text-[14px] font-semibold whitespace-nowrap"
+                style={{ borderColor: 'rgba(198,40,40,0.28)', color: 'var(--color-state-danger-text)' }}
+              >
+                저장 취소
+              </button>
+              <button
+                onClick={() => setUnsaveSheetOpen(false)}
+                className="w-full rounded-full py-3.5 text-[14px] font-semibold whitespace-nowrap"
+                style={{ color: 'var(--color-accent-dark)' }}
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        </BottomSheet>
       )}
 
       {!isOwnerMode && profile.whoIAm && (

@@ -45,6 +45,7 @@ export function HighlightManageScreen({
   const [hlLinkUrl, setHlLinkUrl] = useState('')
   const [hlDesc, setHlDesc] = useState('')
   const [yearPickerTarget, setYearPickerTarget] = useState<YearPickerTarget | null>(null)
+  const [verifyMethod, setVerifyMethod] = useState<'ocr' | 'email' | undefined>(undefined)
   // [임시] LLM 임포트 시트 상태
   const [llmImportOpen, setLlmImportOpen] = useState(false)
 
@@ -239,6 +240,7 @@ export function HighlightManageScreen({
       <HighlightManageVerifyView
         selectedCat={selectedCat}
         existingHighlights={selectedCategoryHighlights}
+        initialMethod={verifyMethod}
         onBack={() => setMode('group')}
         onImportCareers={(items) => items.forEach((item) => store.addHighlight(item))}
         onVerifyHighlight={(id) => store.verifyHighlight(id)}
@@ -271,7 +273,7 @@ export function HighlightManageScreen({
           resetFormFields()
           setMode('form')
         }}
-        onVerify={() => setMode('verify')}
+        onVerify={(method) => { setVerifyMethod(method); setMode('verify') }}
       />
     )
   }

@@ -30,6 +30,7 @@ const MOCK_EMAIL_CODE = '123456'
 interface VerifyViewProps {
   selectedCat: HighlightManageCategory
   existingHighlights: Highlight[]
+  initialMethod?: 'ocr' | 'email'
   onBack: () => void
   onImportCareers: (items: Array<Omit<Highlight, 'id'>>) => void
   onVerifyHighlight: (id: string) => void
@@ -212,9 +213,9 @@ type EducationStep =
   | 'email-input' | 'email-sending' | 'email-verify'
   | 'done'
 
-function EducationVerifyFlow({ selectedCat, existingHighlights, onBack, onVerifyHighlight, onAddHighlight }: VerifyViewProps) {
-  const [step, setStep] = useState<EducationStep>('method')
-  const [method, setMethod] = useState<EducationMethod>('ocr')
+function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, onBack, onVerifyHighlight, onAddHighlight }: VerifyViewProps) {
+  const [step, setStep] = useState<EducationStep>(initialMethod === 'email' ? 'email-input' : initialMethod === 'ocr' ? 'upload' : 'method')
+  const [method, setMethod] = useState<EducationMethod>(initialMethod ?? 'ocr')
   const [emailInput, setEmailInput] = useState('')
   const [codeInput, setCodeInput] = useState('')
   const [codeError, setCodeError] = useState(false)

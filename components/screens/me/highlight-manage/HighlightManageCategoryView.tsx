@@ -1,4 +1,4 @@
-import { BadgeCheck } from 'lucide-react'
+import { BadgeCheck, Mail, Upload } from 'lucide-react'
 import { Button, NavBar, showToast } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { getHighlightMetaParts, isPrimaryHighlight } from '@/lib/highlightMeta'
@@ -17,7 +17,7 @@ interface HighlightManageCategoryViewProps {
   onEdit: (highlight: Highlight) => void
   onDelete: (highlight: Highlight) => void
   onAdd: () => void
-  onVerify?: () => void
+  onVerify?: (method?: 'ocr' | 'email') => void
 }
 
 export function HighlightManageCategoryView({
@@ -49,19 +49,35 @@ export function HighlightManageCategoryView({
               <div className="micro-text">여러 항목을 추가하고 메인으로 보여줄 항목을 선택할 수 있어요</div>
             </div>
           </div>
-          {isVerifiable && onVerify && (
+          {isVerifiable && onVerify && selectedCat.id === 'career-role' && (
             <button
-              onClick={onVerify}
+              onClick={() => onVerify()}
               className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-[14px] py-2.5 text-[13px] font-semibold"
-              style={{
-                background: 'var(--color-accent-bg-subtle)',
-                border: '1px solid var(--color-accent-border-soft)',
-                color: 'var(--color-accent-dark)',
-              }}
+              style={{ background: 'var(--color-accent-bg-subtle)', border: '1px solid var(--color-accent-border-soft)', color: 'var(--color-accent-dark)' }}
             >
               <BadgeCheck size={14} />
-              {selectedCat.id === 'career-role' ? '건강보험공단으로 경력 인증' : '졸업증명서로 학력 인증'}
+              건강보험공단으로 경력 인증
             </button>
+          )}
+          {isVerifiable && onVerify && selectedCat.id === 'education-history' && (
+            <div className="mt-3 flex flex-col gap-2">
+              <button
+                onClick={() => onVerify('ocr')}
+                className="flex w-full items-center justify-center gap-1.5 rounded-[14px] py-2.5 text-[13px] font-semibold"
+                style={{ background: 'var(--color-accent-bg-subtle)', border: '1px solid var(--color-accent-border-soft)', color: 'var(--color-accent-dark)' }}
+              >
+                <Upload size={14} />
+                졸업증명서로 학력 확인
+              </button>
+              <button
+                onClick={() => onVerify('email')}
+                className="flex w-full items-center justify-center gap-1.5 rounded-[14px] py-2.5 text-[13px] font-semibold"
+                style={{ background: 'var(--color-accent-bg-subtle)', border: '1px solid var(--color-accent-border-soft)', color: 'var(--color-accent-dark)' }}
+              >
+                <Mail size={14} />
+                학교 이메일로 학력 확인
+              </button>
+            </div>
           )}
         </div>
 

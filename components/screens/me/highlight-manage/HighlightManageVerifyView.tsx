@@ -274,13 +274,13 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, onBack, onVerify
   if (step === 'method') {
     return (
       <div className="flex flex-col h-full">
-        <NavBar title="학력 인증" onBack={onBack} />
+        <NavBar title="학력 확인" onBack={onBack} />
         <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[var(--color-accent-bg-subtle)]">
               <BadgeCheck size={28} className="text-[var(--color-accent-dark)]" />
             </div>
-            <div className="text-[17px] font-bold text-[var(--color-text-strong)]">학력 인증 방법 선택</div>
+            <div className="text-[17px] font-bold text-[var(--color-text-strong)]">학력 확인 방법 선택</div>
             <p className="text-sm text-[var(--color-text-secondary)]">편한 방법으로 학력을 인증하세요.</p>
           </div>
 
@@ -328,7 +328,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, onBack, onVerify
   if (step === 'upload') {
     return (
       <div className="flex flex-col h-full">
-        <NavBar title="학력 인증 · 졸업증명서" onBack={() => setStep('method')} />
+        <NavBar title="학력 확인 · 졸업증명서" onBack={() => setStep('method')} />
         <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col items-center justify-center gap-6">
           <div className="flex flex-col items-center gap-3 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[var(--color-accent-bg-subtle)]">
@@ -369,7 +369,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, onBack, onVerify
   if (step === 'loading-ocr') {
     return (
       <div className="flex flex-col h-full">
-        <NavBar title="학력 인증 · 졸업증명서" onBack={() => setStep('method')} />
+        <NavBar title="학력 확인 · 졸업증명서" onBack={() => setStep('method')} />
         <div className="flex-1 flex flex-col items-center justify-center gap-4">
           <Loader2 size={36} className="animate-spin text-[var(--color-accent)]" />
           <p className="text-sm text-[var(--color-text-secondary)]">졸업증명서 OCR 파싱 중...</p>
@@ -383,7 +383,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, onBack, onVerify
   if (step === 'result') {
     return (
       <div className="flex flex-col h-full">
-        <NavBar title="학력 인증 · 졸업증명서" onBack={() => setStep('upload')} />
+        <NavBar title="학력 확인 · 졸업증명서" onBack={() => setStep('upload')} />
         <div className="flex-1 overflow-y-auto px-5 py-5">
           <p className="mb-4 text-[13px] text-[var(--color-text-secondary)]">
             졸업증명서에서 아래 정보를 확인했어요. 맞으면 인증을 완료하세요.
@@ -419,7 +419,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, onBack, onVerify
   if (step === 'email-input') {
     return (
       <div className="flex flex-col h-full">
-        <NavBar title="학력 인증 · 이메일" onBack={() => setStep('method')} />
+        <NavBar title="학력 확인 · 이메일" onBack={() => setStep('method')} />
         <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-6">
           <div className="flex flex-col items-center gap-3 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[var(--color-accent-bg-subtle)]">
@@ -432,7 +432,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, onBack, onVerify
           </div>
 
           <div className="w-full surface-card rounded-[22px] px-4 py-4 space-y-3">
-            {['학교 발급 이메일 주소 입력', '이메일로 6자리 인증코드 발송', '코드 입력 후 학력 인증 배지 부여'].map((label, i) => (
+            {['학교 발급 이메일 주소 입력', '이메일로 6자리 인증코드 발송', '코드 입력 후 학력 확인 배지 부여'].map((label, i) => (
               <div key={i} className="flex items-center gap-3 text-sm text-[var(--color-text-secondary)]">
                 <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-bg-subtle)] text-[10px] font-bold text-[var(--color-accent-dark)]">
                   {i + 1}
@@ -473,7 +473,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, onBack, onVerify
   if (step === 'email-sending') {
     return (
       <div className="flex flex-col h-full">
-        <NavBar title="학력 인증 · 이메일" onBack={() => setStep('email-input')} />
+        <NavBar title="학력 확인 · 이메일" onBack={() => setStep('email-input')} />
         <div className="flex-1 flex flex-col items-center justify-center gap-4">
           <Loader2 size={36} className="animate-spin text-[var(--color-accent)]" />
           <p className="text-sm text-[var(--color-text-secondary)]">인증코드 발송 중...</p>
@@ -487,7 +487,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, onBack, onVerify
   if (step === 'email-verify') {
     return (
       <div className="flex flex-col h-full">
-        <NavBar title="학력 인증 · 이메일" onBack={() => setStep('email-input')} />
+        <NavBar title="학력 확인 · 이메일" onBack={() => setStep('email-input')} />
         <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-6">
           <div className="flex flex-col items-center gap-3 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[var(--color-accent-bg-subtle)]">
@@ -546,13 +546,13 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, onBack, onVerify
 
   return (
     <div className="flex flex-col h-full">
-      <NavBar title="학력 인증" onBack={onBack} />
+      <NavBar title="학력 확인" onBack={onBack} />
       <div className="flex-1 flex flex-col items-center justify-center gap-4 px-5">
         <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[var(--color-state-success-bg)]">
           <BadgeCheck size={28} className="text-[var(--color-state-success-text)]" />
         </div>
         <div className="text-center">
-          <div className="text-[17px] font-bold text-[var(--color-text-strong)]">학력 인증 완료</div>
+          <div className="text-[17px] font-bold text-[var(--color-text-strong)]">학력 확인 완료</div>
           <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
             {method === 'email'
               ? `${emailInput} 이메일로 학력이 인증됐어요.`

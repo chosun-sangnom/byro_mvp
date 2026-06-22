@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { BadgeCheck, ChevronDown, ChevronUp } from 'lucide-react'
+import { BadgeCheck, ShieldCheck, ChevronDown, ChevronUp } from 'lucide-react'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { AnimatedSection, SectionTitle } from '@/components/screens/profile/PublicProfileSections'
 import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
@@ -60,7 +60,9 @@ export function ProfileHighlightsSection({
                     <div className="mb-0.5 flex items-center gap-1 text-[11px] text-[var(--color-text-tertiary)]">
                       <span>{category?.label ?? '직접 입력'}</span>
                       {entry.items.some((h) => h.verified) && (
-                        <BadgeCheck size={11} className="text-[var(--color-accent)]" />
+                        entry.categoryId === 'career-role'
+                          ? <ShieldCheck size={11} className="text-[var(--color-accent)]" />
+                          : <BadgeCheck size={11} className="text-[var(--color-accent)]" />
                       )}
                     </div>
                     <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{preview.title}</div>
@@ -87,7 +89,17 @@ export function ProfileHighlightsSection({
                               <div key={hl.id} className="py-3 first:pt-0 last:pb-0">
                                 <div className="flex items-center gap-1.5">
                                   <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{hl.title}</div>
-                                  {hl.verified && <BadgeCheck size={13} className="shrink-0 text-[var(--color-accent)]" />}
+                                  {hl.verified && (
+                                    <span className="flex items-center gap-0.5">
+                                      {hl.categoryId === 'career-role'
+                                        ? <ShieldCheck size={13} className="shrink-0 text-[var(--color-accent)]" />
+                                        : <BadgeCheck size={13} className="shrink-0 text-[var(--color-accent)]" />
+                                      }
+                                      <span className="text-[11px] font-semibold text-[var(--color-accent)]">
+                                        {hl.categoryId === 'career-role' ? '인증' : '확인'}
+                                      </span>
+                                    </span>
+                                  )}
                                 </div>
                                 {metaParts.length > 0 && (
                                   <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5">

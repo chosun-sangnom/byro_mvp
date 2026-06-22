@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Sparkles, X } from 'lucide-react'
+import { Bookmark, BookmarkCheck, Sparkles, X } from 'lucide-react'
 import { ActionMenu, ActionMenuItem, BottomSheet, showToast } from '@/components/ui'
 import type { PersonaReason } from '@/lib/personaGen'
 
@@ -25,6 +25,8 @@ export function ProfileHeroSection({
   personaReasons,
   personaImage,
   isOwner,
+  isBookmarked,
+  onBookmarkClick,
 }: {
   profile: {
     name: string
@@ -41,6 +43,8 @@ export function ProfileHeroSection({
   personaReasons?: PersonaReason[]
   personaImage?: string
   isOwner?: boolean
+  isBookmarked?: boolean
+  onBookmarkClick?: () => void
 }) {
   const galleryImages = normalizeProfileImages(profile.profileImages, profile.avatarImage)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
@@ -74,6 +78,8 @@ export function ProfileHeroSection({
         personaReasons={personaReasons}
         personaImage={personaImage}
         isOwner={isOwner}
+        isBookmarked={isBookmarked}
+        onBookmarkClick={onBookmarkClick}
       />
 
       {galleryImages.length > 1 && (
@@ -183,6 +189,8 @@ export function ProfileHeroCard({
   personaReasons,
   personaImage,
   isOwner,
+  isBookmarked,
+  onBookmarkClick,
 }: {
   profile: {
     name: string
@@ -203,6 +211,8 @@ export function ProfileHeroCard({
   personaReasons?: PersonaReason[]
   personaImage?: string
   isOwner?: boolean
+  isBookmarked?: boolean
+  onBookmarkClick?: () => void
 }) {
   const [personaSheetOpen, setPersonaSheetOpen] = useState(false)
   const [moreSheetOpen, setMoreSheetOpen] = useState(false)
@@ -275,36 +285,52 @@ export function ProfileHeroCard({
               <img src={activeImage} alt={`${profile.name} 프로필 사진`} className="h-full w-full object-cover" />
               <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.10)_58%,rgba(0,0,0,0.74)_100%)]" />
               {!isOwner && (
-                <div className="absolute right-4 top-4">
-                  <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); setMoreSheetOpen((v) => !v) }}
-                    className="rounded-full border border-white/14 bg-black/38 px-3 py-1.5 text-[13px] font-bold text-white/88 backdrop-blur-sm leading-none"
-                  >
-                    ···
-                  </button>
-                  <ActionMenu open={moreSheetOpen} onClose={() => setMoreSheetOpen(false)}>
-                    <ActionMenuItem
-                      label="공유하기"
-                      onClick={() => {
-                        const url = window.location.href
-                        if (navigator.share) {
-                          navigator.share({ title: `${profile.name}의 바이로`, url })
-                        } else {
-                          navigator.clipboard.writeText(url)
-                          showToast('링크를 복사했어요')
-                        }
-                        setMoreSheetOpen(false)
-                      }}
-                    />
-                    {/* [임시] 프로필 신고 API 미연동 */}
-                    <ActionMenuItem
-                      label="프로필 신고"
-                      danger
-                      onClick={() => { setMoreSheetOpen(false); showToast('신고가 접수됐어요') }}
-                    />
-                  </ActionMenu>
-                </div>
+                <>
+                  {/* 북마크 — 카드 상단 왼쪽 */}
+                  {onBookmarkClick && (
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); onBookmarkClick() }}
+                      className="absolute left-4 top-4 rounded-full border border-white/14 bg-black/38 p-2 backdrop-blur-sm"
+                    >
+                      {isBookmarked
+                        ? <BookmarkCheck size={18} className="text-white" />
+                        : <Bookmark size={18} className="text-white/88" />
+                      }
+                    </button>
+                  )}
+                  {/* 더보기 — 카드 상단 오른쪽 */}
+                  <div className="absolute right-4 top-4">
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); setMoreSheetOpen((v) => !v) }}
+                      className="rounded-full border border-white/14 bg-black/38 px-3 py-1.5 text-[13px] font-bold text-white/88 backdrop-blur-sm leading-none"
+                    >
+                      ···
+                    </button>
+                    <ActionMenu open={moreSheetOpen} onClose={() => setMoreSheetOpen(false)}>
+                      <ActionMenuItem
+                        label="공유하기"
+                        onClick={() => {
+                          const url = window.location.href
+                          if (navigator.share) {
+                            navigator.share({ title: `${profile.name}의 바이로`, url })
+                          } else {
+                            navigator.clipboard.writeText(url)
+                            showToast('링크를 복사했어요')
+                          }
+                          setMoreSheetOpen(false)
+                        }}
+                      />
+                      {/* [임시] 프로필 신고 API 미연동 */}
+                      <ActionMenuItem
+                        label="프로필 신고"
+                        danger
+                        onClick={() => { setMoreSheetOpen(false); showToast('신고가 접수됐어요') }}
+                      />
+                    </ActionMenu>
+                  </div>
+                </>
               )}
             </button>
           ) : (

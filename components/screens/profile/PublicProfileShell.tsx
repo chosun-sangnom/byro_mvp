@@ -15,7 +15,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
-import { Bookmark, BookmarkCheck, Pencil } from 'lucide-react'
+import { Pencil } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { BottomSheet, Modal, TextArea, showToast } from '@/components/ui'
 import { getNormalizedPublicProfile, computeTabAccess } from '@/components/screens/profile/publicProfileData'
@@ -101,6 +101,19 @@ export function PublicProfileShell({
             personaReasons={persona?.reasons}
             personaImage={persona?.image}
             isOwner={isOwnerMode}
+            isBookmarked={store.isLoggedIn && !isOwnerMode ? isSaved : undefined}
+            onBookmarkClick={store.isLoggedIn && !isOwnerMode
+              ? () => {
+                  if (isSaved) {
+                    store.unsaveProfile(profile.linkId)
+                    showToast(`${profile.name}님을 저장 목록에서 삭제했어요`)
+                  } else {
+                    setBookmarkMemo('')
+                    setBookmarkModalOpen(true)
+                  }
+                }
+              : undefined
+            }
           />
         </div>
 
@@ -156,26 +169,7 @@ export function PublicProfileShell({
           >
             로그인하고 저장하기
           </button>
-        ) : isSaved ? (
-          <button
-            onClick={() => {
-              store.unsaveProfile(profile.linkId)
-              showToast(`${profile.name}님을 저장 목록에서 삭제했어요`)
-            }}
-            className="mb-4 flex w-full items-center justify-center gap-2 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-secondary)] whitespace-nowrap"
-          >
-            <BookmarkCheck size={15} />
-            저장됨
-          </button>
-        ) : (
-          <button
-            onClick={() => { setBookmarkMemo(''); setBookmarkModalOpen(true) }}
-            className="mb-4 flex w-full items-center justify-center gap-2 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)] whitespace-nowrap"
-          >
-            <Bookmark size={15} />
-            저장하기
-          </button>
-        )}
+        ) : null}
 
         {/* 연락처 채널 */}
         {/* TODO(contact): 공개 여부 설정에 따라 채널 노출 제어 필요 */}

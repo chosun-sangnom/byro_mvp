@@ -49,10 +49,10 @@ export default function FeedbackScreen({ username }: { username: string }) {
                 <div className="mb-2 flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2">
                     <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-muted)] text-[12px] font-bold text-[var(--color-text-secondary)]">
-                      {exp.isAnonymous ? '익' : (exp.authorName?.charAt(0) ?? '?')}
+                      {exp.isAnonymous ? 'B' : (exp.authorName?.charAt(0) ?? '?')}
                     </div>
                     <span className="text-[14px] font-semibold text-[var(--color-text-primary)]">
-                      {exp.isAnonymous ? '익명' : (exp.authorName ?? '익명')}
+                      {exp.isAnonymous ? 'Byro사용자' : (exp.authorName ?? 'Byro사용자')}
                     </span>
                   </div>
                   <span className="text-[11px] text-[var(--color-text-tertiary)]">{exp.date}</span>

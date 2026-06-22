@@ -391,7 +391,7 @@ export const MK_PROFILE = {
     { id: 'mkg3', linkId: 'kimdohyeon', authorName: '김도현', message: '사람을 연결하는 방식이 자연스럽고 진정성이 느껴졌어요.', date: '1주 전' },
     { id: 'mkg4', linkId: 'chijiwon', authorName: '최지원', message: '비즈니스 맥락을 읽는 힘이 좋아서 대화가 늘 선명했습니다.', date: '2주 전' },
   ],
-  tabVisibility: { who: 'public', life: 'public', reputation: 'private' },
+  tabVisibility: { who: 'public', life: 'public', reputation: 'public' },
 }
 
 export const JIMIN_PROFILE = {

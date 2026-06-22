@@ -104,7 +104,6 @@ export function PublicProfileWhoTabPage({
 }: {
   username: string
 }) {
-  const router = useRouter()
   const { store, profile, groupedHighlights, tabAccess } = usePublicProfileTabData(username)
 
   if (tabAccess.who !== 'visible') {
@@ -143,7 +142,6 @@ export function PublicProfileLifeTabPage({
 }: {
   username: string
 }) {
-  const router = useRouter()
   const { profile, tabAccess } = usePublicProfileTabData(username)
 
   if (tabAccess.life !== 'visible') {

@@ -6,7 +6,7 @@ import { useByroStore } from '@/store/useByroStore'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
 
 
-import { getNormalizedPublicProfile, computeTabAccess, type TabAccessLevel } from '@/components/screens/profile/publicProfileData'
+import { getNormalizedPublicProfile, computeTabAccess } from '@/components/screens/profile/publicProfileData'
 import {
   ProfileFeedbackSection,
   ProfileRememberSection,
@@ -74,13 +74,7 @@ function usePublicProfileTabData(username: string) {
   }
 }
 
-function LockedTabContent({
-  access,
-  onLogin,
-}: {
-  access: TabAccessLevel
-  onLogin: () => void
-}) {
+function LockedTabContent({ onLogin }: { onLogin: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-20 px-8 text-center">
       <div className="w-14 h-14 rounded-full bg-[var(--color-bg-soft)] flex items-center justify-center mb-4">
@@ -110,7 +104,7 @@ export function PublicProfileWhoTabPage({
   const { store, profile, groupedHighlights, tabAccess } = usePublicProfileTabData(username)
 
   if (tabAccess.who !== 'visible') {
-    return <LockedTabContent access={tabAccess.who} onLogin={() => router.push('/signup')} />
+    return <LockedTabContent onLogin={() => router.push('/signup')} />
   }
 
   return (
@@ -149,7 +143,7 @@ export function PublicProfileLifeTabPage({
   const { profile, tabAccess } = usePublicProfileTabData(username)
 
   if (tabAccess.life !== 'visible') {
-    return <LockedTabContent access={tabAccess.life} onLogin={() => router.push('/signup')} />
+    return <LockedTabContent onLogin={() => router.push('/signup')} />
   }
 
   return <PublicProfileLifeSection life={profile.life} />
@@ -164,7 +158,7 @@ export function PublicProfileReputationTabPage({
   const { profile, keywordCounts, totalKeywordCount, featuredGuestbook, tabAccess } = usePublicProfileTabData(username)
 
   if (tabAccess.reputation !== 'visible') {
-    return <LockedTabContent access={tabAccess.reputation} onLogin={() => router.push('/signup')} />
+    return <LockedTabContent onLogin={() => router.push('/signup')} />
   }
 
   const getProfileAvatar = (linkId: string) => {

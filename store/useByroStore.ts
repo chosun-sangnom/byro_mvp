@@ -12,7 +12,6 @@ import type {
   PublicProfileWhoIAm,
   TabVisibility,
   TabVisibilityLevel,
-  ConnectionRequest,
   SavedProfile,
   Experience,
 } from '@/types'
@@ -56,16 +55,14 @@ interface ByroStore {
   hlOpenStates: Record<string, boolean>
   primaryHighlightOverrides: Record<string, string>
   snsOpenStates: Record<string, boolean>
-  activeArchiveTab: 'connected' | 'recent' | 'requests'
+  activeArchiveTab: 'saved' | 'recent'
   experienceKeywords: string[]
   experienceMessage: string
   expSubmittedAt: Record<string, number>
   deletedGuestbookIds: string[]
 
-  // 연결
-  sentRequestLinkIds: string[]
-  connectionRequests: ConnectionRequest[]
-  connectedProfiles: SavedProfile[]
+  // 아카이브
+  savedProfiles: SavedProfile[]
 
   // 경험
   submittedExperiences: Record<string, Experience[]>
@@ -111,18 +108,16 @@ interface ByroStore {
   setExperienceMessage(msg: string): void
   clearExperience(): void
   markExpSubmitted(profileId: string): void
-  setActiveArchiveTab(tab: 'connected' | 'recent' | 'requests'): void
+  setActiveArchiveTab(tab: 'saved' | 'recent'): void
   updateUserInfo(info: Partial<UserState>): void
   updateUserContactChannels(channels: ContactChannel[]): void
   updateUserWhoIAm(whoIAm: PublicProfileWhoIAm): void
   updateUserLife(life: PublicProfileLife): void
   deleteGuestbookEntry(id: string): void
   updateTabVisibility(tab: keyof TabVisibility, level: TabVisibilityLevel): void
-  sendConnectionRequest(linkId: string, name: string, title: string, message: string): void
-  cancelConnectionRequest(linkId: string): void
-  acceptConnectionRequest(id: string): void
-  rejectConnectionRequest(id: string): void
-  disconnectProfile(linkId: string): void
+  saveProfile(linkId: string, name: string, title: string, memo?: string): void
+  unsaveProfile(linkId: string): void
+  updateProfileMemo(linkId: string, memo: string): void
   submitExperience(profileLinkId: string, exp: Omit<Experience, 'id' | 'date'>): void
   markKemiComputed(linkId: string): void
   invalidateKemiCache(): void
@@ -187,16 +182,14 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   hlOpenStates: {},
   primaryHighlightOverrides: {},
   snsOpenStates: {},
-  activeArchiveTab: 'connected',
+  activeArchiveTab: 'saved' as const,
   experienceKeywords: [],
   experienceMessage: '',
   expSubmittedAt: {},
   deletedGuestbookIds: [],
 
-  // 연결
-  sentRequestLinkIds: [],
-  connectionRequests: SAMPLE_PROFILE.connectionRequests as ConnectionRequest[],
-  connectedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
+  // 아카이브
+  savedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
 
   // 경험
   submittedExperiences: {},
@@ -447,9 +440,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       bio: '',
       bioMode: null,
       expSubmittedAt: {},
-      sentRequestLinkIds: [],
-      connectionRequests: SAMPLE_PROFILE.connectionRequests as ConnectionRequest[],
-      connectedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
+      savedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
       submittedExperiences: {},
     })
   },
@@ -533,41 +524,28 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     }))
   },
 
-  sendConnectionRequest(linkId, _name, _title, _message) {
+  saveProfile(linkId, name, title, memo = '') {
+    set((state) => {
+      if (state.savedProfiles.some((p) => p.linkId === linkId)) return {}
+      const v4 = () => uuidv4()
+      return {
+        savedProfiles: [
+          { id: v4(), linkId, name, title, memo, savedAt: '방금' },
+          ...state.savedProfiles,
+        ],
+      }
+    })
+  },
+
+  unsaveProfile(linkId) {
     set((state) => ({
-      sentRequestLinkIds: state.sentRequestLinkIds.includes(linkId)
-        ? state.sentRequestLinkIds
-        : [...state.sentRequestLinkIds, linkId],
+      savedProfiles: state.savedProfiles.filter((p) => p.linkId !== linkId),
     }))
   },
 
-  cancelConnectionRequest(linkId) {
+  updateProfileMemo(linkId, memo) {
     set((state) => ({
-      sentRequestLinkIds: state.sentRequestLinkIds.filter((id) => id !== linkId),
-    }))
-  },
-
-  acceptConnectionRequest(id) {
-    const request = get().connectionRequests.find((r) => r.id === id)
-    if (!request) return
-    set((state) => ({
-      connectionRequests: state.connectionRequests.filter((r) => r.id !== id),
-      connectedProfiles: [
-        ...state.connectedProfiles,
-        { id: request.id, linkId: request.linkId, name: request.name, title: request.title, memo: '', savedAt: '방금' },
-      ],
-    }))
-  },
-
-  rejectConnectionRequest(id) {
-    set((state) => ({
-      connectionRequests: state.connectionRequests.filter((r) => r.id !== id),
-    }))
-  },
-
-  disconnectProfile(linkId) {
-    set((state) => ({
-      connectedProfiles: state.connectedProfiles.filter((p) => p.linkId !== linkId),
+      savedProfiles: state.savedProfiles.map((p) => p.linkId === linkId ? { ...p, memo } : p),
     }))
   },
 
@@ -591,10 +569,8 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       highlights: SAMPLE_PROFILE.manualHighlights as Highlight[],
       highlightsInitialized: true,
       primaryHighlightOverrides: {},
-      // 연결
-      connectionRequests: SAMPLE_PROFILE.connectionRequests as ConnectionRequest[],
-      connectedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
-      sentRequestLinkIds: [],
+      // 아카이브
+      savedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
       // 경험/피드백
       submittedExperiences: {},
       expSubmittedAt: {},
@@ -604,7 +580,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       // UI 상태
       hlOpenStates: {},
       snsOpenStates: {},
-      activeArchiveTab: 'connected' as const,
+      activeArchiveTab: 'saved' as const,
       experienceKeywords: [],
       experienceMessage: '',
       // 탭 공개 설정
@@ -640,14 +616,12 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       selectedBioMethod: null,
       expSubmittedAt: {},
       deletedGuestbookIds: [],
-      sentRequestLinkIds: [],
-      connectionRequests: SAMPLE_PROFILE.connectionRequests as ConnectionRequest[],
-      connectedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
+      savedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
       submittedExperiences: {},
       kemiComputedProfiles: [],
       hlOpenStates: {},
       snsOpenStates: {},
-      activeArchiveTab: 'connected' as const,
+      activeArchiveTab: 'saved' as const,
       experienceKeywords: [],
       experienceMessage: '',
       tabVisibility: { who: 'public', life: 'public', reputation: 'public' } as TabVisibility,
@@ -669,7 +643,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   },
 }), {
   name: 'byro-store',
-  version: 16,
+  version: 17,
   migrate: (persistedState: unknown) => {
     const state = persistedState as ByroStore | undefined
     if (!state) return persistedState
@@ -721,9 +695,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     expSubmittedAt: state.expSubmittedAt,
     deletedGuestbookIds: state.deletedGuestbookIds,
     tabVisibility: state.tabVisibility,
-    sentRequestLinkIds: state.sentRequestLinkIds,
-    connectionRequests: state.connectionRequests,
-    connectedProfiles: state.connectedProfiles,
+    savedProfiles: state.savedProfiles,
     submittedExperiences: state.submittedExperiences,
     highlightsInitialized: state.highlightsInitialized,
     kemiComputedProfiles: state.kemiComputedProfiles,

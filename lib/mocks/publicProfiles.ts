@@ -176,10 +176,6 @@ export const SAMPLE_PROFILE = {
     { id: 'r1', linkId: 'jiminlee', name: '이지민', message: '"같이 일해봤는데 꼭 남겨주세요 🙏"', requestedAt: '방금 전' },
     { id: 'r2', linkId: 'chijiwon', name: '최지원', message: null, requestedAt: '2일 전' },
   ],
-  connectionRequests: [
-    { id: 'c1', linkId: 'mk', name: '강명구', title: 'Byth CEO', message: '안녕하세요, 네트워크 연결 요청드립니다.', requestedAt: '3시간 전' },
-    { id: 'c2', linkId: 'kimdohyeon', name: '김도현', title: '독립 재무설계사', message: null, requestedAt: '1일 전' },
-  ],
   reputationKeywords: [
     { keyword: '전문성이 느껴져요', count: 8 },
     { keyword: '믿고 맡길 수 있어요', count: 6 },
@@ -193,7 +189,7 @@ export const SAMPLE_PROFILE = {
     { id: 'g3', linkId: 'kimdohyeon', authorName: '김도현', message: '대화가 구체적이고 믿음이 가는 분이었어요.', date: '2주 전' },
     { id: 'g4', linkId: 'chijiwon', authorName: '최지원', message: '비즈니스 관점이 선명해서 배우는 포인트가 많았습니다.', date: '3주 전' },
   ],
-  tabVisibility: { who: 'public', life: 'connected', reputation: 'public' },
+  tabVisibility: { who: 'public', life: 'private', reputation: 'public' },
 }
 
 export const MK_PROFILE = {
@@ -395,7 +391,7 @@ export const MK_PROFILE = {
     { id: 'mkg3', linkId: 'kimdohyeon', authorName: '김도현', message: '사람을 연결하는 방식이 자연스럽고 진정성이 느껴졌어요.', date: '1주 전' },
     { id: 'mkg4', linkId: 'chijiwon', authorName: '최지원', message: '비즈니스 맥락을 읽는 힘이 좋아서 대화가 늘 선명했습니다.', date: '2주 전' },
   ],
-  tabVisibility: { who: 'public', life: 'public', reputation: 'connected' },
+  tabVisibility: { who: 'public', life: 'public', reputation: 'private' },
 }
 
 export const JIMIN_PROFILE = {

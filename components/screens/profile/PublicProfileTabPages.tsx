@@ -21,14 +21,13 @@ import { PublicProfileWhoIAmSection } from '@/components/screens/profile/PublicP
 function usePublicProfileTabData(username: string) {
   const store = useByroStore()
   const isOwnerMode = store.isLoggedIn && store.user?.linkId === username
-  const isConnected = store.connectedProfiles.some((p) => p.linkId === username)
   const profile = getNormalizedPublicProfile({
     username,
     user: store.user,
     ownerHighlights: store.highlights,
     ownerTabVisibility: store.tabVisibility,
   })
-  const tabAccessCtx = { isOwner: isOwnerMode, isLoggedIn: store.isLoggedIn, isConnected }
+  const tabAccessCtx = { isOwner: isOwnerMode, isLoggedIn: store.isLoggedIn }
   const tabAccess = {
     who: computeTabAccess(profile.tabVisibility, 'who', tabAccessCtx),
     life: computeTabAccess(profile.tabVisibility, 'life', tabAccessCtx),
@@ -87,28 +86,17 @@ function LockedTabContent({
       <div className="w-14 h-14 rounded-full bg-[var(--color-bg-soft)] flex items-center justify-center mb-4">
         <Lock size={22} className="text-[var(--color-text-tertiary)]" />
       </div>
-      {access === 'login-required' ? (
-        <>
-          <p className="text-[15px] font-bold text-[var(--color-text-primary)] mb-1.5">로그인이 필요해요</p>
-          <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed mb-5">
-            이 섹션은 로그인한 사용자만 볼 수 있어요.
-          </p>
-          <button
-            onClick={onLogin}
-            className="rounded-full px-6 py-2.5 text-[13px] font-semibold text-white"
-            style={{ backgroundColor: 'var(--color-accent-dark)' }}
-          >
-            로그인하기
-          </button>
-        </>
-      ) : (
-        <>
-          <p className="text-[15px] font-bold text-[var(--color-text-primary)] mb-1.5">연결된 사람만 볼 수 있어요</p>
-          <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed">
-            연결 요청을 수락하면 이 섹션을 확인할 수 있어요.
-          </p>
-        </>
-      )}
+      <p className="text-[15px] font-bold text-[var(--color-text-primary)] mb-1.5">로그인이 필요해요</p>
+      <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed mb-5">
+        이 섹션은 로그인한 사용자만 볼 수 있어요.
+      </p>
+      <button
+        onClick={onLogin}
+        className="rounded-full px-6 py-2.5 text-[13px] font-semibold text-white"
+        style={{ backgroundColor: 'var(--color-accent-dark)' }}
+      >
+        로그인하기
+      </button>
     </div>
   )
 }

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bell, BookOpen, Search, Star, UserPlus, X } from 'lucide-react'
+import { Bell, BookOpen, Search, Star, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
@@ -18,25 +18,20 @@ const MOCK_NOTIFS = [
 ]
 
 const NOTIF_META = {
-  connection: { icon: <UserPlus size={14} />, label: '연결 요청', msg: (n: string) => `${n} 님이 연결 요청을 보냈어요` },
-  guestbook:  { icon: <BookOpen size={14} />,  label: '방명록',    msg: (n: string) => `${n} 님이 방명록을 남겼어요` },
-  feedback:   { icon: <Star size={14} />,       label: '피드백',    msg: (n: string) => `${n} 님이 피드백을 남겼어요` },
+  guestbook: { icon: <BookOpen size={14} />, label: '방명록', msg: (n: string) => `${n} 님이 방명록을 남겼어요` },
+  feedback:  { icon: <Star size={14} />,     label: '피드백', msg: (n: string) => `${n} 님이 피드백을 남겼어요` },
 }
 
 export default function AppHeader() {
   const router = useRouter()
-  const { user, isLoggedIn, connectionRequests, logout } = useByroStore()
+  const { user, isLoggedIn, logout } = useByroStore()
   const [notiOpen, setNotiOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
 
   const initials = user?.name ? user.name.slice(0, 2) : 'BY'
-  const hasUnread = connectionRequests.length > 0
+  const hasUnread = MOCK_NOTIFS.length > 0
 
-  const connectionNotifs = connectionRequests.map((r) => ({
-    id: `conn-${r.id}`, type: 'connection' as const,
-    name: r.name, linkId: r.linkId, body: r.message ?? '', date: r.requestedAt,
-  }))
-  const allNotifs = [...connectionNotifs, ...MOCK_NOTIFS]
+  const allNotifs = MOCK_NOTIFS
 
   return (
     <>
@@ -210,8 +205,7 @@ export default function AppHeader() {
                         <button
                           onClick={() => {
                             setNotiOpen(false)
-                            if (item.type === 'connection') router.push('/archive')
-                            else router.push(`/${item.linkId}`)
+                            router.push(`/${item.linkId}`)
                           }}
                           className="w-full flex items-start gap-3 px-5 py-3.5 hover:bg-[var(--color-bg-soft)] transition-colors text-left"
                         >

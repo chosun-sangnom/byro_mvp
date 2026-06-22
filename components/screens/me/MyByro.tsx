@@ -79,7 +79,6 @@ export default function MyByro() {
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onOwnerEdit={() => setScreen('manage')}
-        onOwnerManageConnections={() => router.push('/archive')}
       >
         {activeTab === 'who' && <PublicProfileWhoTabPage username={user.linkId} />}
         {activeTab === 'life' && <PublicProfileLifeTabPage username={user.linkId} />}

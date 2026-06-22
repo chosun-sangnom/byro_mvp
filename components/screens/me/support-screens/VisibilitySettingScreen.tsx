@@ -5,9 +5,8 @@ import { NavBar } from '@/components/ui'
 import type { TabVisibility, TabVisibilityLevel } from '@/types'
 
 const VISIBILITY_OPTIONS: Array<{ value: TabVisibilityLevel; label: string; desc: string }> = [
-  { value: 'public',    label: '전체공개', desc: '누구나 볼 수 있어요'         },
-  { value: 'connected', label: '연결된 사람만', desc: '연결된 사람만 볼 수 있어요'  },
-  { value: 'private',   label: '비공개',   desc: '나만 볼 수 있어요'           },
+  { value: 'public',  label: '전체공개', desc: '누구나 볼 수 있어요' },
+  { value: 'private', label: '비공개',   desc: '나만 볼 수 있어요'   },
 ]
 
 const SECTIONS: Array<{ id: keyof TabVisibility; label: string; desc: string }> = [
@@ -86,9 +85,6 @@ export function VisibilitySettingScreen({
               <span className="text-[12px] text-[var(--color-text-secondary)]">{opt.desc}</span>
             </div>
           ))}
-          <p className="pt-1 text-[11px] text-[var(--color-text-tertiary)]">
-            ※ 연결 — 서로 연결 요청을 수락한 사람이에요
-          </p>
         </div>
 
       </div>

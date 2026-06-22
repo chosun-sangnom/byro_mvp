@@ -14,22 +14,19 @@ import type {
   UserState,
 } from '@/types'
 
-export type TabAccessLevel = 'visible' | 'login-required' | 'connect-required' | 'hidden'
+export type TabAccessLevel = 'visible' | 'login-required' | 'hidden'
 
 const DEFAULT_TAB_VISIBILITY: TabVisibility = { who: 'public', life: 'public', reputation: 'public' }
 
 export function computeTabAccess(
   tabVisibility: TabVisibility,
   tab: keyof TabVisibility,
-  { isOwner, isLoggedIn, isConnected }: { isOwner: boolean; isLoggedIn: boolean; isConnected: boolean },
+  { isOwner }: { isOwner: boolean; isLoggedIn?: boolean },
 ): TabAccessLevel {
   if (isOwner) return 'visible'
   const level: TabVisibilityLevel = tabVisibility[tab]
   if (level === 'public') return 'visible'
-  if (level === 'private') return 'hidden'
-  if (!isLoggedIn) return 'login-required'
-  if (!isConnected) return 'connect-required'
-  return 'visible'
+  return 'hidden'
 }
 
 export { DEFAULT_TAB_VISIBILITY }

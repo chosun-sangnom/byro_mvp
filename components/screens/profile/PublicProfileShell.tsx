@@ -7,7 +7,7 @@
  * - 상단 nav: 뒤로가기 / URL / 액션 버튼
  * - 고정 헤더 영역: 히어로 카드 → 케미 존 → 탭바
  * - 스크롤 영역: 탭 콘텐츠 (children)
- * - 고정 푸터: 편집(owner) or 연결 요청(visitor) + 연락처
+ * - 고정 푸터: 편집(owner) or 저장 버튼(visitor) + 연락처
  *
  * owner 판별: store.user.linkId === username && isLoggedIn
  * TODO(auth): 실제 인증 연동 시 서버사이드 세션으로 owner 판별 교체
@@ -15,7 +15,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
-import { Pencil } from 'lucide-react'
+import { Bookmark, BookmarkCheck, Pencil } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { BottomSheet, Modal, TextArea, showToast } from '@/components/ui'
 import { getNormalizedPublicProfile, computeTabAccess } from '@/components/screens/profile/publicProfileData'
@@ -32,14 +32,12 @@ export function PublicProfileShell({
   activeTab,
   onTabChange,
   onOwnerEdit,
-  onOwnerManageConnections,
   children,
 }: {
   username: string
   activeTab: PublicProfileTabId
   onTabChange: (tab: PublicProfileTabId) => void
   onOwnerEdit?: () => void
-  onOwnerManageConnections?: () => void
   children: ReactNode
 }) {
   const router = useRouter()
@@ -51,24 +49,14 @@ export function PublicProfileShell({
     ownerTabVisibility: store.tabVisibility,
   })
 
-  // owner mode: 로그인 상태이고 현재 보는 프로필이 본인인 경우
   const isOwnerMode = store.isLoggedIn && store.user?.linkId === username
 
   // [임시] 오너 모드에서만 페르소나 생성 (목업 데이터 기반)
   const persona = isOwnerMode ? generatePersona(profile) : null
 
-  const isConnected = store.connectedProfiles.some((p) => p.linkId === profile.linkId)
-  const tabAccessCtx = { isOwner: isOwnerMode, isLoggedIn: store.isLoggedIn, isConnected }
+  const isSaved = store.savedProfiles.some((p) => p.linkId === profile.linkId)
+  const tabAccessCtx = { isOwner: isOwnerMode, isLoggedIn: store.isLoggedIn }
 
-  // 연결 관계 상태
-  const connectionStatus = (() => {
-    if (isConnected) return 'connected' as const
-    const receivedRequest = store.connectionRequests.find((r) => r.linkId === profile.linkId)
-    if (receivedRequest) return 'received' as const
-    if (store.sentRequestLinkIds.includes(profile.linkId)) return 'sent' as const
-    return 'none' as const
-  })()
-  const receivedRequestId = store.connectionRequests.find((r) => r.linkId === profile.linkId)?.id
   const tabAccess = {
     who: computeTabAccess(profile.tabVisibility, 'who', tabAccessCtx),
     life: computeTabAccess(profile.tabVisibility, 'life', tabAccessCtx),
@@ -91,13 +79,10 @@ export function PublicProfileShell({
   }, [profile.linkId])
 
   const [compatibilityOpen, setCompatibilityOpen] = useState(false)
-  const [connectionRequestOpen, setConnectionRequestOpen] = useState(false)
-  const [connectionMessage, setConnectionMessage] = useState('')
-  const [cancelRequestOpen, setCancelRequestOpen] = useState(false)
-  const [disconnectSheetOpen, setDisconnectSheetOpen] = useState(false)
-  const [disconnectConfirmOpen, setDisconnectConfirmOpen] = useState(false)
   const [feedbackRequestOpen, setFeedbackRequestOpen] = useState(false)
   const [feedbackMessage, setFeedbackMessage] = useState('')
+  const [bookmarkModalOpen, setBookmarkModalOpen] = useState(false)
+  const [bookmarkMemo, setBookmarkMemo] = useState('')
 
   // 관계 탭에서만 "피드백 요청" 버튼 표시 (visitor only)
   const showReputationActions = activeTab === 'reputation' && !isOwnerMode
@@ -142,7 +127,7 @@ export function PublicProfileShell({
       {/* ── 고정 푸터 ── */}
       <div className="flex-shrink-0 border-t border-[var(--color-border-soft)] bg-[var(--color-glass-strong)] px-5 pt-4 pb-[calc(env(safe-area-inset-bottom)+16px)] backdrop-blur-md">
 
-        {/* 평판 탭 visitor 전용 액션 — 방문자가 평판을 남길 수 있는 버튼 */}
+        {/* 평판 탭 visitor 전용 액션 */}
         {showReputationActions && (
           <button
             onClick={() => setFeedbackRequestOpen(true)}
@@ -152,57 +137,15 @@ export function PublicProfileShell({
           </button>
         )}
 
-        {/* 메인 CTA — owner: 편집 + 연결 관리 / visitor: 연결 상태별 버튼 */}
+        {/* 메인 CTA */}
         {isOwnerMode ? (
-          <div className="mb-4 flex gap-3">
+          <div className="mb-4">
             <button
               onClick={onOwnerEdit ?? (() => router.push('/me'))}
-              className="flex flex-1 items-center justify-center gap-2 rounded-full border border-[var(--color-accent-dark)] bg-[var(--color-accent-bg-subtle)] py-3 text-[13px] font-semibold text-[var(--color-accent-dark)] whitespace-nowrap"
+              className="flex w-full items-center justify-center gap-2 rounded-full border border-[var(--color-accent-dark)] bg-[var(--color-accent-bg-subtle)] py-3 text-[13px] font-semibold text-[var(--color-accent-dark)] whitespace-nowrap"
             >
               <Pencil size={14} />
               편집
-            </button>
-            <button
-              onClick={onOwnerManageConnections ?? (() => showToast('연결 관리를 준비 중이에요'))}
-              className="flex flex-1 items-center justify-center rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)] whitespace-nowrap"
-            >
-              연결 관리
-            </button>
-          </div>
-        ) : connectionStatus === 'connected' ? (
-          <button
-            onClick={() => setDisconnectSheetOpen(true)}
-            className="mb-4 w-full rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-tertiary)] whitespace-nowrap"
-          >
-            연결됨 ✓
-          </button>
-        ) : connectionStatus === 'sent' ? (
-          <button
-            onClick={() => setCancelRequestOpen(true)}
-            className="mb-4 w-full rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-tertiary)] whitespace-nowrap"
-          >
-            요청 중
-          </button>
-        ) : connectionStatus === 'received' ? (
-          <div className="mb-4 flex gap-2">
-            <button
-              onClick={() => {
-                if (receivedRequestId) store.acceptConnectionRequest(receivedRequestId)
-                showToast(`${profile.name}님과 연결됐어요!`)
-              }}
-              className="flex-1 rounded-full py-3 text-[13px] font-semibold text-white whitespace-nowrap"
-              style={{ backgroundColor: 'var(--color-accent-dark)' }}
-            >
-              수락하기
-            </button>
-            <button
-              onClick={() => {
-                if (receivedRequestId) store.rejectConnectionRequest(receivedRequestId)
-                showToast('연결 요청을 거절했어요')
-              }}
-              className="flex-1 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-secondary)] whitespace-nowrap"
-            >
-              거절
             </button>
           </div>
         ) : !store.isLoggedIn ? (
@@ -211,18 +154,30 @@ export function PublicProfileShell({
             className="mb-4 w-full rounded-full py-3 text-[13px] font-semibold text-white whitespace-nowrap"
             style={{ backgroundColor: 'var(--color-accent-dark)' }}
           >
-            로그인하고 연결하기
+            로그인하고 저장하기
+          </button>
+        ) : isSaved ? (
+          <button
+            onClick={() => {
+              store.unsaveProfile(profile.linkId)
+              showToast(`${profile.name}님을 저장 목록에서 삭제했어요`)
+            }}
+            className="mb-4 flex w-full items-center justify-center gap-2 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-secondary)] whitespace-nowrap"
+          >
+            <BookmarkCheck size={15} />
+            저장됨
           </button>
         ) : (
           <button
-            onClick={() => setConnectionRequestOpen(true)}
-            className="mb-4 w-full rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)] whitespace-nowrap"
+            onClick={() => { setBookmarkMemo(''); setBookmarkModalOpen(true) }}
+            className="mb-4 flex w-full items-center justify-center gap-2 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)] whitespace-nowrap"
           >
-            연결 요청
+            <Bookmark size={15} />
+            저장하기
           </button>
         )}
 
-        {/* 연락처 채널 — 전화 / 이메일 / 카카오 */}
+        {/* 연락처 채널 */}
         {/* TODO(contact): 공개 여부 설정에 따라 채널 노출 제어 필요 */}
         <div>
           <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">
@@ -250,55 +205,41 @@ export function PublicProfileShell({
         </div>
       </div>
 
-      {/* 연결됨 ✓ → 액션 시트 */}
+      {/* 저장 모달 */}
       {!isOwnerMode && (
-        <BottomSheet open={disconnectSheetOpen} onClose={() => setDisconnectSheetOpen(false)}>
-          <div className="px-5 pb-6">
+        <Modal open={bookmarkModalOpen} onClose={() => setBookmarkModalOpen(false)}>
+          <div>
+            <div className="mb-1 text-[18px] font-black text-[var(--color-text-strong)]">
+              {profile.name}님 저장
+            </div>
+            <p className="mb-5 text-[13px] leading-[1.65] text-[var(--color-text-secondary)]">
+              아카이브에 저장하고 메모를 남길 수 있어요.
+            </p>
+            <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-tertiary)]">
+              메모 <span className="font-normal normal-case tracking-normal">(선택)</span>
+            </label>
+            <TextArea
+              value={bookmarkMemo}
+              onChange={setBookmarkMemo}
+              placeholder="어디서 만났는지, 어떤 분인지 메모해두세요."
+              maxLength={100}
+              rows={3}
+              dark
+            />
+            <div className="mb-5 text-right text-[11px] text-[var(--color-text-tertiary)]">
+              {bookmarkMemo.length}/100
+            </div>
             <button
               onClick={() => {
-                setDisconnectSheetOpen(false)
-                setDisconnectConfirmOpen(true)
+                store.saveProfile(profile.linkId, profile.name, profile.title, bookmarkMemo)
+                setBookmarkModalOpen(false)
+                showToast(`${profile.name}님을 저장했어요`)
               }}
-              className="w-full rounded-xl border py-3 text-[14px] font-semibold text-left px-4"
-              style={{ borderColor: 'rgba(198,40,40,0.28)', color: 'var(--color-state-danger-text)' }}
+              className="w-full rounded-full py-3.5 text-[14px] font-semibold text-white whitespace-nowrap"
+              style={{ backgroundColor: 'var(--color-accent-dark)' }}
             >
-              연결 해제
+              저장하기
             </button>
-          </div>
-        </BottomSheet>
-      )}
-
-      {/* 연결 해제 확인 모달 */}
-      {!isOwnerMode && (
-        <Modal open={disconnectConfirmOpen} onClose={() => setDisconnectConfirmOpen(false)}>
-          <div className="text-center">
-            <div className="text-base font-black mb-2">
-              {profile.name}님과의 연결을 해제할까요?
-            </div>
-            <p className="text-[12px] text-[var(--color-text-tertiary)] mb-5 leading-relaxed">
-              주고받은 피드백, 방명록 기록은 그대로 유지돼요.<br />
-              상대방에게 알림이 가지 않아요.
-            </p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setDisconnectConfirmOpen(false)}
-                className="flex-1 rounded-xl border py-2.5 text-[13px] font-semibold text-[var(--color-text-secondary)]"
-                style={{ borderColor: 'var(--color-border-default)' }}
-              >
-                취소
-              </button>
-              <button
-                onClick={() => {
-                  store.disconnectProfile(profile.linkId)
-                  setDisconnectConfirmOpen(false)
-                  showToast(`${profile.name}님과 연결을 해제했어요`)
-                }}
-                className="flex-1 rounded-xl border py-2.5 text-[13px] font-semibold"
-                style={{ borderColor: 'rgba(198,40,40,0.28)', color: 'var(--color-state-danger-text)' }}
-              >
-                연결 해제
-              </button>
-            </div>
           </div>
         </Modal>
       )}
@@ -349,77 +290,6 @@ export function PublicProfileShell({
             >
               요청 보내기
             </button>
-          </div>
-        </BottomSheet>
-      )}
-
-      {!isOwnerMode && (
-        <BottomSheet open={connectionRequestOpen} onClose={() => { setConnectionRequestOpen(false); setConnectionMessage('') }}>
-          <div className="px-5 pb-6">
-            <div className="mb-1 text-[18px] font-black text-[var(--color-text-strong)]">
-              {profile.name}님께 연결 요청
-            </div>
-            <p className="mb-5 text-[13px] leading-[1.65] text-[var(--color-text-secondary)]">
-              요청이 수락되면 연결된 사람 목록에 추가돼요.
-            </p>
-            <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-tertiary)]">
-              한마디 <span className="font-normal normal-case tracking-normal text-[var(--color-text-tertiary)]">(선택)</span>
-            </label>
-            <textarea
-              value={connectionMessage}
-              onChange={(e) => setConnectionMessage(e.target.value)}
-              placeholder="연결을 원하는 이유나 간단한 인사를 남겨보세요."
-              maxLength={100}
-              rows={3}
-              className="mb-1 w-full resize-none rounded-[16px] border border-[var(--color-border-default)] bg-[var(--color-bg-muted)] px-4 py-3 text-[14px] text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)]"
-            />
-            <div className="mb-5 text-right text-[11px] text-[var(--color-text-tertiary)]">
-              {connectionMessage.length}/100
-            </div>
-            <button
-              onClick={() => {
-                store.sendConnectionRequest(profile.linkId, profile.name, profile.title, connectionMessage)
-                setConnectionRequestOpen(false)
-                setConnectionMessage('')
-                showToast('연결 요청을 보냈어요')
-              }}
-              className="w-full rounded-full py-3.5 text-[14px] font-semibold text-white whitespace-nowrap"
-              style={{ backgroundColor: 'var(--color-accent-dark)' }}
-            >
-              요청 보내기
-            </button>
-          </div>
-        </BottomSheet>
-      )}
-
-      {!isOwnerMode && (
-        <BottomSheet open={cancelRequestOpen} onClose={() => setCancelRequestOpen(false)}>
-          <div className="px-5 pb-6">
-            <div className="mb-1 text-[18px] font-black text-[var(--color-text-strong)]">
-              연결 요청 취소
-            </div>
-            <p className="mb-6 text-[13px] leading-[1.65] text-[var(--color-text-secondary)]">
-              {profile.name}님께 보낸 연결 요청을 취소할까요?
-            </p>
-            <div className="space-y-2">
-              <button
-                onClick={() => {
-                  store.cancelConnectionRequest(profile.linkId)
-                  setCancelRequestOpen(false)
-                  showToast('연결 요청을 취소했어요')
-                }}
-                className="w-full rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3.5 text-[14px] font-semibold text-[var(--color-text-secondary)] whitespace-nowrap"
-              >
-                요청 취소
-              </button>
-              <button
-                onClick={() => setCancelRequestOpen(false)}
-                className="w-full rounded-full py-3.5 text-[14px] font-semibold whitespace-nowrap"
-                style={{ color: 'var(--color-accent-dark)' }}
-              >
-                닫기
-              </button>
-            </div>
           </div>
         </BottomSheet>
       )}

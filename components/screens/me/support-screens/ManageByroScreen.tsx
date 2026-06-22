@@ -32,7 +32,6 @@ interface ManageByroScreenProps {
 
 const VISIBILITY_LABEL: Record<TabVisibilityLevel, string> = {
   public: '전체공개',
-  connected: '연결된 사람만',
   private: '비공개',
 }
 

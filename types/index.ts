@@ -17,7 +17,6 @@ export type HighlightGroupId = 'career' | 'achievement' | 'lifestyle'
 export type HighlightCategoryId =
   | 'career-role'
   | 'education-history'
-  | 'remember-network'
   | 'talk'
   | 'collab'
   | 'publish'
@@ -76,15 +75,6 @@ export interface ReceivedRequest {
   id: string
   linkId: string
   name: string
-  message: string | null
-  requestedAt: string
-}
-
-export interface ConnectionRequest {
-  id: string
-  linkId: string
-  name: string
-  title: string
   message: string | null
   requestedAt: string
 }
@@ -257,14 +247,13 @@ export interface PublicProfile {
   savedProfiles: SavedProfile[]
   recentProfiles: RecentProfile[]
   receivedRequests: ReceivedRequest[]
-  connectionRequests: ConnectionRequest[]
   reputationKeywords?: ReputationKeyword[]
   guestbook?: GuestbookEntry[]
   kemi?: KemiData
   tabVisibility?: TabVisibility
 }
 
-export type TabVisibilityLevel = 'public' | 'connected' | 'private'
+export type TabVisibilityLevel = 'public' | 'private'
 
 export interface TabVisibility {
   who: TabVisibilityLevel

@@ -28,9 +28,7 @@ export function PublicProfileTabBar({
           {TABS.map((tab) => {
             const selected = tab.id === activeTab
             const access = tabAccess?.[tab.id] ?? 'visible'
-            const isLocked = access !== 'visible' && access !== 'hidden'
-            const isHidden = access === 'hidden'
-            if (isHidden) return null
+            const isLocked = access === 'locked'
             return (
               <button
                 key={tab.id}

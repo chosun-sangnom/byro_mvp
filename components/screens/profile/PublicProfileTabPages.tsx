@@ -74,23 +74,27 @@ function usePublicProfileTabData(username: string) {
   }
 }
 
-function LockedTabContent({ onLogin }: { onLogin: () => void }) {
+function LockedTabContent() {
   return (
-    <div className="flex flex-col items-center justify-center py-20 px-8 text-center">
-      <div className="w-14 h-14 rounded-full bg-[var(--color-bg-soft)] flex items-center justify-center mb-4">
-        <Lock size={22} className="text-[var(--color-text-tertiary)]" />
+    <div className="relative overflow-hidden">
+      {/* 블러 배경 */}
+      <div className="px-5 py-6 space-y-3 select-none pointer-events-none" aria-hidden>
+        {[80, 60, 72, 48, 64].map((w, i) => (
+          <div key={i} className="h-4 rounded-full bg-[var(--color-bg-soft)]" style={{ width: `${w}%` }} />
+        ))}
       </div>
-      <p className="text-[15px] font-bold text-[var(--color-text-primary)] mb-1.5">로그인이 필요해요</p>
-      <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed mb-5">
-        이 섹션은 로그인한 사용자만 볼 수 있어요.
-      </p>
-      <button
-        onClick={onLogin}
-        className="rounded-full px-6 py-2.5 text-[13px] font-semibold text-white"
-        style={{ backgroundColor: 'var(--color-accent-dark)' }}
-      >
-        로그인하기
-      </button>
+      <div className="absolute inset-0 backdrop-blur-md bg-[var(--color-bg-page)]/60" />
+
+      {/* 잠금 안내 */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-8 text-center">
+        <div className="w-14 h-14 rounded-full bg-[var(--color-bg-soft)] border border-[var(--color-border-default)] flex items-center justify-center mb-4">
+          <Lock size={22} className="text-[var(--color-text-tertiary)]" />
+        </div>
+        <p className="text-[15px] font-bold text-[var(--color-text-primary)] mb-1.5">비공개 콘텐츠예요</p>
+        <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed">
+          프로필 주인이 이 섹션을 비공개로 설정했어요.
+        </p>
+      </div>
     </div>
   )
 }
@@ -104,7 +108,7 @@ export function PublicProfileWhoTabPage({
   const { store, profile, groupedHighlights, tabAccess } = usePublicProfileTabData(username)
 
   if (tabAccess.who !== 'visible') {
-    return <LockedTabContent onLogin={() => router.push('/signup')} />
+    return <LockedTabContent />
   }
 
   return (
@@ -143,7 +147,7 @@ export function PublicProfileLifeTabPage({
   const { profile, tabAccess } = usePublicProfileTabData(username)
 
   if (tabAccess.life !== 'visible') {
-    return <LockedTabContent onLogin={() => router.push('/signup')} />
+    return <LockedTabContent />
   }
 
   return <PublicProfileLifeSection life={profile.life} />
@@ -158,7 +162,7 @@ export function PublicProfileReputationTabPage({
   const { profile, keywordCounts, totalKeywordCount, featuredGuestbook, tabAccess } = usePublicProfileTabData(username)
 
   if (tabAccess.reputation !== 'visible') {
-    return <LockedTabContent onLogin={() => router.push('/signup')} />
+    return <LockedTabContent />
   }
 
   const getProfileAvatar = (linkId: string) => {

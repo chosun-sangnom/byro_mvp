@@ -30,38 +30,38 @@ export const SAMPLE_PROFILE = {
   life: {
     daily: {
       exercise: [
-        { label: '필라테스', posterUrl: 'https://picsum.photos/seed/pilates_gmj/80/80' },
+        { label: '필라테스', posterUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=80&h=80&q=75&fit=crop&auto=format' },
       ],
     },
     tastes: {
       // TODO(real API): posterUrl from TMDB API — image.tmdb.org/t/p/w185/{poster_path}
       movies: [
-        { label: '이터널 선샤인', sublabel: '2004', posterUrl: 'https://picsum.photos/seed/eternalsunshine_gmj/80/112' },
-        { label: '작은 아씨들', sublabel: '2019', posterUrl: 'https://picsum.photos/seed/littlewomen_gmj/80/112' },
+        { label: '이터널 선샤인', sublabel: '2004', posterUrl: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=80&h=112&q=75&fit=crop&auto=format' },
+        { label: '작은 아씨들', sublabel: '2019', posterUrl: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=80&h=112&q=75&fit=crop&auto=format' },
       ],
       // TODO(real API): posterUrl from Spotify API — i.scdn.co album art URL
       music: [
-        { label: 'Square', sublabel: '백예린', posterUrl: 'https://picsum.photos/seed/square_gmj/80/80' },
-        { label: 'Ditto', sublabel: 'NewJeans', posterUrl: 'https://picsum.photos/seed/ditto_gmj/80/80' },
+        { label: 'Square', sublabel: '백예린', posterUrl: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=80&h=80&q=75&fit=crop&auto=format' },
+        { label: 'Ditto', sublabel: 'NewJeans', posterUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=80&h=80&q=75&fit=crop&auto=format' },
       ],
       // TODO(real API): posterUrl from 알라딘 API — cover image URL
       books: [
-        { label: '아무튼, 여름', sublabel: '위고', posterUrl: 'https://picsum.photos/seed/anyhow_gmj/80/112' },
-        { label: '보통의 언어들', sublabel: '김이나', posterUrl: 'https://picsum.photos/seed/ordinary_gmj/80/112' },
+        { label: '아무튼, 여름', sublabel: '위고', posterUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=80&h=112&q=75&fit=crop&auto=format' },
+        { label: '보통의 언어들', sublabel: '김이나', posterUrl: 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=80&h=112&q=75&fit=crop&auto=format' },
       ],
       // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
       restaurants: [
-        { label: '진작다이닝', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/jinjak_gmj/148/96' },
+        { label: '진작다이닝', sublabel: '한남동', posterUrl: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=148&h=96&q=75&fit=crop&auto=format' },
       ],
       // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
       cafes: [
-        { label: '오츠커피', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/oatscoffee_gmj/148/96' },
+        { label: '오츠커피', sublabel: '한남동', posterUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=148&h=96&q=75&fit=crop&auto=format' },
       ],
     },
     places: {
       travelDestinations: [
-        { label: '오사카', posterUrl: 'https://picsum.photos/seed/osaka_gmj/148/96' },
-        { label: '런던', posterUrl: 'https://picsum.photos/seed/london_gmj/148/96' },
+        { label: '오사카', posterUrl: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=148&h=96&q=75&fit=crop&auto=format' },
+        { label: '런던', posterUrl: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=148&h=96&q=75&fit=crop&auto=format' },
       ],
     },
   },
@@ -215,50 +215,50 @@ export const MK_PROFILE = {
   life: {
     daily: {
       exercise: [
-        { label: '골프', posterUrl: 'https://picsum.photos/seed/golf_mk/80/80' },
-        { label: '웨이트', posterUrl: 'https://picsum.photos/seed/weight_mk/80/80' },
-        { label: '산책', posterUrl: 'https://picsum.photos/seed/walk_mk/80/80' },
+        { label: '골프', posterUrl: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=80&h=80&q=75&fit=crop&auto=format' },
+        { label: '웨이트', posterUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=80&h=80&q=75&fit=crop&auto=format' },
+        { label: '산책', posterUrl: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=80&h=80&q=75&fit=crop&auto=format' },
       ],
       pet: '고양이',
       petName: '모카',
-      petImage: 'https://picsum.photos/seed/moca_mk/160/160',
+      petImage: 'https://images.unsplash.com/photo-1533743983-6db3e3d99df4?w=160&h=160&q=75&fit=crop&auto=format',
     },
     tastes: {
       movies: [
-        { label: '인턴', sublabel: '2015', posterUrl: 'https://picsum.photos/seed/intern_mk/80/112' },
-        { label: '월터의 상상은 현실이 된다', sublabel: '2013', posterUrl: 'https://picsum.photos/seed/walter_mk/80/112' },
-        { label: '헤어질 결심', sublabel: '2022', posterUrl: 'https://picsum.photos/seed/decision_mk/80/112' },
+        { label: '인턴', sublabel: '2015', posterUrl: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=80&h=112&q=75&fit=crop&auto=format' },
+        { label: '월터의 상상은 현실이 된다', sublabel: '2013', posterUrl: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=80&h=112&q=75&fit=crop&auto=format' },
+        { label: '헤어질 결심', sublabel: '2022', posterUrl: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=80&h=112&q=75&fit=crop&auto=format' },
       ],
       music: [
-        { label: '주저하는 연인들을 위해', sublabel: '잔나비', posterUrl: 'https://picsum.photos/seed/jannabi_mk/80/80' },
-        { label: '희재', sublabel: '성시경', posterUrl: 'https://picsum.photos/seed/heejae_mk/80/80' },
-        { label: 'Yellow', sublabel: 'Coldplay', posterUrl: 'https://picsum.photos/seed/coldplay_mk/80/80' },
+        { label: '주저하는 연인들을 위해', sublabel: '잔나비', posterUrl: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=80&h=80&q=75&fit=crop&auto=format' },
+        { label: '희재', sublabel: '성시경', posterUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=80&h=80&q=75&fit=crop&auto=format' },
+        { label: 'Yellow', sublabel: 'Coldplay', posterUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=80&h=80&q=75&fit=crop&auto=format' },
       ],
       books: [
-        { label: '당신의 엔진을 뜨겁게 달궈라', sublabel: '권도균', posterUrl: 'https://picsum.photos/seed/engine_mk/80/112' },
-        { label: '원씽', sublabel: '게리 켈러', posterUrl: 'https://picsum.photos/seed/onething_mk/80/112' },
-        { label: '사피엔스', sublabel: '유발 하라리', posterUrl: 'https://picsum.photos/seed/sapiens_mk/80/112' },
+        { label: '당신의 엔진을 뜨겁게 달궈라', sublabel: '권도균', posterUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=80&h=112&q=75&fit=crop&auto=format' },
+        { label: '원씽', sublabel: '게리 켈러', posterUrl: 'https://images.unsplash.com/photo-1495741545814-2d7f4d75ea09?w=80&h=112&q=75&fit=crop&auto=format' },
+        { label: '사피엔스', sublabel: '유발 하라리', posterUrl: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=80&h=112&q=75&fit=crop&auto=format' },
       ],
       plays: [
-        { label: '웃는 남자', sublabel: '뮤지컬', posterUrl: 'https://picsum.photos/seed/laughingman_mk/80/112' },
+        { label: '웃는 남자', sublabel: '뮤지컬', posterUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=80&h=112&q=75&fit=crop&auto=format' },
       ],
       teams: [
-        { label: '토트넘 홋스퍼', sublabel: 'EPL', posterUrl: 'https://picsum.photos/seed/tottenham_mk/80/80' },
+        { label: '토트넘 홋스퍼', sublabel: 'EPL', posterUrl: 'https://images.unsplash.com/photo-1553778263-73a83bab9b0c?w=80&h=80&q=75&fit=crop&auto=format' },
       ],
       restaurants: [
-        { label: '몽탄', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/mongtan_mk/148/96' },
-        { label: '금돼지식당', sublabel: '한남동', posterUrl: 'https://picsum.photos/seed/goldpig_mk/148/96' },
+        { label: '몽탄', sublabel: '한남동', posterUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=148&h=96&q=75&fit=crop&auto=format' },
+        { label: '금돼지식당', sublabel: '한남동', posterUrl: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=148&h=96&q=75&fit=crop&auto=format' },
       ],
       cafes: [
-        { label: '테라로사', sublabel: '여러 지점', posterUrl: 'https://picsum.photos/seed/terarosa_mk/148/96' },
-        { label: '블루보틀', sublabel: '성수동', posterUrl: 'https://picsum.photos/seed/bluebottle_mk/148/96' },
+        { label: '테라로사', sublabel: '여러 지점', posterUrl: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=148&h=96&q=75&fit=crop&auto=format' },
+        { label: '블루보틀', sublabel: '성수동', posterUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=148&h=96&q=75&fit=crop&auto=format' },
       ],
     },
     places: {
       travelDestinations: [
-        { label: '뉴욕', posterUrl: 'https://picsum.photos/seed/newyork_mk/148/96' },
-        { label: '런던', posterUrl: 'https://picsum.photos/seed/london_mk/148/96' },
-        { label: '파리', posterUrl: 'https://picsum.photos/seed/paris_mk/148/96' },
+        { label: '뉴욕', posterUrl: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=148&h=96&q=75&fit=crop&auto=format' },
+        { label: '런던', posterUrl: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=148&h=96&q=75&fit=crop&auto=format' },
+        { label: '파리', posterUrl: 'https://images.unsplash.com/photo-1431274172761-fcdab704d114?w=148&h=96&q=75&fit=crop&auto=format' },
       ],
     },
   },
@@ -421,52 +421,52 @@ export const JIMIN_PROFILE = {
   life: {
     daily: {
       exercise: [
-        { label: '러닝', posterUrl: 'https://picsum.photos/seed/running_jm/80/80' },
-        { label: '골프', posterUrl: 'https://picsum.photos/seed/golf_jm/80/80' },
+        { label: '러닝', posterUrl: 'https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=80&h=80&q=75&fit=crop&auto=format' },
+        { label: '골프', posterUrl: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=80&h=80&q=75&fit=crop&auto=format' },
       ],
       pet: '없음',
     },
     tastes: {
       // TODO(real API): posterUrl from TMDB API — image.tmdb.org/t/p/w185/{poster_path}
       movies: [
-        { label: '머니볼', sublabel: '2011', posterUrl: 'https://picsum.photos/seed/moneyball_jm/80/112' },
-        { label: '소셜 네트워크', sublabel: '2010', posterUrl: 'https://picsum.photos/seed/socialnetwork_jm/80/112' },
-        { label: '나 홀로 집에 2', sublabel: '1992', posterUrl: 'https://picsum.photos/seed/homealone2_jm/80/112' },
+        { label: '머니볼', sublabel: '2011', posterUrl: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=80&h=112&q=75&fit=crop&auto=format' },
+        { label: '소셜 네트워크', sublabel: '2010', posterUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=80&h=112&q=75&fit=crop&auto=format' },
+        { label: '나 홀로 집에 2', sublabel: '1992', posterUrl: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=80&h=112&q=75&fit=crop&auto=format' },
       ],
       // TODO(real API): posterUrl from Spotify API — i.scdn.co album art URL
       music: [
-        { label: 'Tomboy', sublabel: '혁오', posterUrl: 'https://picsum.photos/seed/tomboy_jm/80/80' },
-        { label: 'Everything', sublabel: '검정치마', posterUrl: 'https://picsum.photos/seed/blackskirts_jm/80/80' },
-        { label: 'Replay', sublabel: '김동률', posterUrl: 'https://picsum.photos/seed/kimdongryul_jm/80/80' },
+        { label: 'Tomboy', sublabel: '혁오', posterUrl: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=80&h=80&q=75&fit=crop&auto=format' },
+        { label: 'Everything', sublabel: '검정치마', posterUrl: 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=80&h=80&q=75&fit=crop&auto=format' },
+        { label: 'Replay', sublabel: '김동률', posterUrl: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=80&h=80&q=75&fit=crop&auto=format' },
       ],
       // TODO(real API): posterUrl from 알라딘 API — cover image URL
       books: [
-        { label: '린 스타트업', sublabel: '에릭 리스', posterUrl: 'https://picsum.photos/seed/leanstartup_jm/80/112' },
-        { label: '제로 투 원', sublabel: '피터 틸', posterUrl: 'https://picsum.photos/seed/zerotone_jm/80/112' },
-        { label: '좋은 전략 나쁜 전략', sublabel: '리처드 루멜트', posterUrl: 'https://picsum.photos/seed/goodstrategy_jm/80/112' },
+        { label: '린 스타트업', sublabel: '에릭 리스', posterUrl: 'https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=80&h=112&q=75&fit=crop&auto=format' },
+        { label: '제로 투 원', sublabel: '피터 틸', posterUrl: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=80&h=112&q=75&fit=crop&auto=format' },
+        { label: '좋은 전략 나쁜 전략', sublabel: '리처드 루멜트', posterUrl: 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=80&h=112&q=75&fit=crop&auto=format' },
       ],
       plays: [
-        { label: '렛미플라이', sublabel: '뮤지컬', posterUrl: 'https://picsum.photos/seed/letmefly_jm/80/112' },
+        { label: '렛미플라이', sublabel: '뮤지컬', posterUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=80&h=112&q=75&fit=crop&auto=format' },
       ],
       teams: [
-        { label: 'LG 트윈스', sublabel: 'KBO', posterUrl: 'https://picsum.photos/seed/lgtwins_jm/80/80' },
+        { label: 'LG 트윈스', sublabel: 'KBO', posterUrl: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=80&h=80&q=75&fit=crop&auto=format' },
       ],
       // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
       restaurants: [
-        { label: '성수 우육미엔', sublabel: '성수동', posterUrl: 'https://picsum.photos/seed/seongsu_uuk_jm/148/96' },
-        { label: '압구정 뜸들이다', sublabel: '압구정', posterUrl: 'https://picsum.photos/seed/apgujeong_ddeum_jm/148/96' },
+        { label: '성수 우육미엔', sublabel: '성수동', posterUrl: 'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=148&h=96&q=75&fit=crop&auto=format' },
+        { label: '압구정 뜸들이다', sublabel: '압구정', posterUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=148&h=96&q=75&fit=crop&auto=format' },
       ],
       // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
       cafes: [
-        { label: '센터커피', sublabel: '성수동', posterUrl: 'https://picsum.photos/seed/centercoffee_jm/148/96' },
-        { label: '프릳츠 원서점', sublabel: '서촌', posterUrl: 'https://picsum.photos/seed/fritz_wonseo_jm/148/96' },
+        { label: '센터커피', sublabel: '성수동', posterUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=148&h=96&q=75&fit=crop&auto=format' },
+        { label: '프릳츠 원서점', sublabel: '서촌', posterUrl: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=148&h=96&q=75&fit=crop&auto=format' },
       ],
     },
     places: {
       travelDestinations: [
-        { label: '도쿄', posterUrl: 'https://picsum.photos/seed/tokyo_jm/148/96' },
-        { label: '교토', posterUrl: 'https://picsum.photos/seed/kyoto_jm/148/96' },
-        { label: '샌프란시스코', posterUrl: 'https://picsum.photos/seed/sf_jm/148/96' },
+        { label: '도쿄', posterUrl: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=148&h=96&q=75&fit=crop&auto=format' },
+        { label: '교토', posterUrl: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=148&h=96&q=75&fit=crop&auto=format' },
+        { label: '샌프란시스코', posterUrl: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=148&h=96&q=75&fit=crop&auto=format' },
       ],
     },
   },
@@ -486,12 +486,12 @@ export const JIMIN_PROFILE = {
     profileUrl: 'https://www.instagram.com/jimin_lee/',
     aiSummary: '스타트업 마케팅과 브랜딩 콘텐츠를 주로 공유합니다. 성장 전략과 커뮤니티 빌딩에 관심이 많습니다.',
     posts: [
-      { id: '1', imageUrl: 'https://picsum.photos/seed/jimin_ig1/400/400', caption: '마케팅 전략 세션 🎯', timestamp: '1일 전' },
-      { id: '2', imageUrl: 'https://picsum.photos/seed/jimin_ig2/400/400', caption: '팀 워크숍 💡', timestamp: '3일 전' },
-      { id: '3', imageUrl: 'https://picsum.photos/seed/jimin_ig3/400/400', caption: '콘퍼런스 참석 🌐', timestamp: '1주 전' },
-      { id: '4', imageUrl: 'https://picsum.photos/seed/jimin_ig4/400/400', caption: '스타트업 네트워킹 🤝', timestamp: '2주 전' },
-      { id: '5', imageUrl: 'https://picsum.photos/seed/jimin_ig5/400/400', caption: '브랜딩 작업 ✨', timestamp: '3주 전' },
-      { id: '6', imageUrl: 'https://picsum.photos/seed/jimin_ig6/400/400', caption: '팀 점심 🍱', timestamp: '1달 전' },
+      { id: '1', imageUrl: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=400&h=400&q=75&fit=crop&auto=format', caption: '마케팅 전략 세션 🎯', timestamp: '1일 전' },
+      { id: '2', imageUrl: 'https://images.unsplash.com/photo-1531545514256-b1400bc00f31?w=400&h=400&q=75&fit=crop&auto=format', caption: '팀 워크숍 💡', timestamp: '3일 전' },
+      { id: '3', imageUrl: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&h=400&q=75&fit=crop&auto=format', caption: '콘퍼런스 참석 🌐', timestamp: '1주 전' },
+      { id: '4', imageUrl: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?w=400&h=400&q=75&fit=crop&auto=format', caption: '스타트업 네트워킹 🤝', timestamp: '2주 전' },
+      { id: '5', imageUrl: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&h=400&q=75&fit=crop&auto=format', caption: '브랜딩 작업 ✨', timestamp: '3주 전' },
+      { id: '6', imageUrl: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=400&q=75&fit=crop&auto=format', caption: '팀 점심 🍱', timestamp: '1달 전' },
     ],
   },
   rememberHighlight: {

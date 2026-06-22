@@ -57,19 +57,19 @@ export function ProfileHighlightsSection({
                     <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={16} />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <div className="mb-0.5 flex items-center gap-1 text-[11px] text-[var(--color-text-tertiary)]">
-                      <span>{category?.label ?? '직접 입력'}</span>
-                      {entry.items.some((h) => h.verified) && (
-                        entry.categoryId === 'career-role'
-                          ? <ShieldCheck size={11} className="text-[var(--color-accent)]" />
-                          : <BadgeCheck size={11} className="text-[var(--color-accent)]" />
-                      )}
+                    <div className="mb-0.5 text-[11px] text-[var(--color-text-tertiary)]">
+                      {category?.label ?? '직접 입력'}
                     </div>
                     <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{preview.title}</div>
                     {preview.meta && (
                       <div className="mt-0.5 text-[12px] text-[var(--color-text-tertiary)]">{preview.meta}</div>
                     )}
                   </div>
+                  {entry.items.some((h) => h.verified) && !isGroupOpen && (
+                    entry.categoryId === 'career-role'
+                      ? <ShieldCheck size={20} className="shrink-0 text-[var(--color-accent)]" />
+                      : <BadgeCheck size={20} className="shrink-0 text-[var(--color-accent)]" />
+                  )}
                   {isGroupOpen ? <ChevronUp size={14} color="var(--color-text-tertiary)" /> : <ChevronDown size={14} color="var(--color-text-tertiary)" />}
                 </button>
                 <AnimatePresence initial={false}>
@@ -92,11 +92,11 @@ export function ProfileHighlightsSection({
                                   {hl.verified && (
                                     <span className="flex items-center gap-0.5">
                                       {hl.categoryId === 'career-role'
-                                        ? <ShieldCheck size={13} className="shrink-0 text-[var(--color-accent)]" />
-                                        : <BadgeCheck size={13} className="shrink-0 text-[var(--color-accent)]" />
+                                        ? <ShieldCheck size={12} className="shrink-0 text-[var(--color-accent)]" />
+                                        : <BadgeCheck size={12} className="shrink-0 text-[var(--color-accent)]" />
                                       }
-                                      <span className="text-[11px] font-semibold text-[var(--color-accent)]">
-                                        {hl.categoryId === 'career-role' ? '인증' : '확인'}
+                                      <span className="text-[10px] font-semibold text-[var(--color-accent)]">
+                                        {hl.categoryId === 'career-role' ? '검증됨' : '확인됨'}
                                       </span>
                                     </span>
                                   )}

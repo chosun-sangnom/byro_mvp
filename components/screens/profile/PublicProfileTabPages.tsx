@@ -1,5 +1,6 @@
 'use client'
 
+import { Lock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
@@ -73,6 +74,28 @@ function usePublicProfileTabData(username: string) {
   }
 }
 
+function LockedTabContent() {
+  return (
+    <div className="relative overflow-hidden">
+      <div className="px-5 py-6 space-y-3 select-none pointer-events-none" aria-hidden>
+        {[80, 60, 72, 48, 64].map((w, i) => (
+          <div key={i} className="h-4 rounded-full bg-[var(--color-bg-soft)]" style={{ width: `${w}%` }} />
+        ))}
+      </div>
+      <div className="absolute inset-0 backdrop-blur-md bg-[var(--color-bg-page)]/60" />
+      <div className="absolute inset-0 flex flex-col items-center justify-center px-8 text-center">
+        <div className="w-14 h-14 rounded-full bg-[var(--color-bg-soft)] border border-[var(--color-border-default)] flex items-center justify-center mb-4">
+          <Lock size={22} className="text-[var(--color-text-tertiary)]" />
+        </div>
+        <p className="text-[15px] font-bold text-[var(--color-text-primary)] mb-1.5">비공개 콘텐츠예요</p>
+        <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed">
+          프로필 주인이 이 섹션을 비공개로 설정했어요.
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export function PublicProfileWhoTabPage({
   username,
 }: {
@@ -81,7 +104,7 @@ export function PublicProfileWhoTabPage({
   const { store, profile, groupedHighlights, tabAccess } = usePublicProfileTabData(username)
 
   if (tabAccess.who !== 'visible') {
-    return null
+    return <LockedTabContent />
   }
 
   return (
@@ -119,7 +142,7 @@ export function PublicProfileLifeTabPage({
   const { profile, tabAccess } = usePublicProfileTabData(username)
 
   if (tabAccess.life !== 'visible') {
-    return null
+    return <LockedTabContent />
   }
 
   return <PublicProfileLifeSection life={profile.life} />
@@ -134,7 +157,7 @@ export function PublicProfileReputationTabPage({
   const { profile, keywordCounts, totalKeywordCount, featuredGuestbook, tabAccess } = usePublicProfileTabData(username)
 
   if (tabAccess.reputation !== 'visible') {
-    return null
+    return <LockedTabContent />
   }
 
   const getProfileAvatar = (linkId: string) => {

@@ -3,7 +3,7 @@
 import { useRef, useState, type ChangeEvent } from 'react'
 import { Camera, CheckCircle2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
-import { Button, Modal, TextArea, showToast } from '@/components/ui'
+import { Button, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
@@ -226,24 +226,28 @@ export function Step1Login() {
 
 type VerifyTab = 'kakao' | 'sms'
 
-function VerifyModal({ open, onClose, onVerified }: { open: boolean; onClose: () => void; onVerified: () => void }) {
+export function Step2Verify() {
+  const store = useByroStore()
   const [tab, setTab] = useState<VerifyTab>('kakao')
   const [phone, setPhone] = useState('')
   const [code, setCode] = useState('')
   const [smsSent, setSmsSent] = useState(false)
 
   const handleVerified = () => {
-    onVerified()
-    onClose()
+    store.setVerified(true)
+    store.nextStep()
   }
 
   return (
-    <Modal open={open} onClose={onClose}>
-      <p className="text-[15px] font-black text-[var(--color-text-strong)] mb-1">본인인증</p>
-      <p className="text-[11px] text-[var(--color-text-tertiary)] mb-4">인증 완료 시 프로필에 인증 뱃지가 붙어요</p>
+    <div className="flex flex-col h-full overflow-y-auto px-5 py-4">
+      <StepIntro
+        eyebrow="Security"
+        title={'본인인증을\n진행해요'}
+        description={'인증 완료 후 프로필을 만들 수 있어요.'}
+      />
 
       {/* 탭 */}
-      <div className="flex border-b -mx-1 mb-4" style={{ borderColor: 'var(--color-border-default)' }}>
+      <div className="flex border-b mb-5" style={{ borderColor: 'var(--color-border-default)' }}>
         {(['kakao', 'sms'] as VerifyTab[]).map((t) => (
           <button
             key={t}
@@ -262,23 +266,28 @@ function VerifyModal({ open, onClose, onVerified }: { open: boolean; onClose: ()
       </div>
 
       {tab === 'kakao' ? (
-        /* [임시] 카카오 본인인증 API 미연동 */
-        <Button variant="kakao" onClick={handleVerified}>카카오로 본인인증하기</Button>
+        <div>
+          <p className="text-[13px] text-[var(--color-text-secondary)] mb-4 leading-relaxed">
+            카카오페이 인증 또는 카카오 본인인증 서비스를 통해 인증해요.
+          </p>
+          {/* [임시] 카카오 본인인증 API 미연동 */}
+          <Button variant="kakao" onClick={handleVerified}>카카오로 본인인증하기</Button>
+        </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-3">
           <div className="flex gap-2">
             <input
               type="tel"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="휴대폰 번호"
+              onChange={(e) => setPhone(formatPhone(e.target.value))}
+              placeholder="010-0000-0000"
               disabled={smsSent}
               className="flex-1 border border-[var(--color-border-default)] rounded-xl px-3 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none disabled:opacity-50"
             />
             {/* [임시] SMS 발송 API 미연동 */}
             <button
               type="button"
-              disabled={phone.length < 10 || smsSent}
+              disabled={!isValidPhone(phone) || smsSent}
               onClick={() => setSmsSent(true)}
               className="flex-shrink-0 rounded-xl px-3 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
               style={{ backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
@@ -310,7 +319,7 @@ function VerifyModal({ open, onClose, onVerified }: { open: boolean; onClose: ()
           )}
         </div>
       )}
-    </Modal>
+    </div>
   )
 }
 
@@ -321,15 +330,12 @@ export function Step2BasicInfo() {
   const [useActivityName, setUseActivityName] = useState(!!store.onboardingNickname)
   const [birthDate, setBirthDate] = useState(store.onboardingBirthDate)
   const [showAge, setShowAge] = useState(store.onboardingShowAge)
-  const [isVerified, setIsVerified] = useState(store.isVerified)
-  const [verifyOpen, setVerifyOpen] = useState(false)
 
   const canProceed = name.trim().length > 0
 
   const handleNext = () => {
     if (!canProceed) return
     store.setOnboardingNameAndBirth({ name: name.trim(), nickname: useActivityName ? nickname.trim() : '', birthDate, showAge })
-    if (isVerified) store.setVerified(true)
     store.nextStep()
   }
 
@@ -341,41 +347,18 @@ export function Step2BasicInfo() {
         description={'나중에 기본정보 편집에서 바꿀 수 있어요.'}
       />
 
-      {/* 이름 (필수) + 본인인증 버튼 */}
+      {/* 이름 (필수) */}
       <div className="mb-4">
         <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">이름 *</label>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="실명을 입력해주세요"
-            maxLength={20}
-            className="flex-1 border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
-          />
-          {isVerified ? (
-            <div className="flex items-center gap-1 px-3 rounded-xl text-[11px] font-bold flex-shrink-0"
-              style={{ color: 'var(--color-state-success-text)', backgroundColor: 'var(--color-state-success-bg)' }}>
-              <CheckCircle2 size={13} />
-              인증완료
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setVerifyOpen(true)}
-              className="flex-shrink-0 rounded-xl px-3 py-2.5 text-[12px] font-bold border border-[var(--color-border-default)] text-[var(--color-text-secondary)] bg-[var(--color-bg-soft)] whitespace-nowrap"
-            >
-              본인인증
-            </button>
-          )}
-        </div>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="실명을 입력해주세요"
+          maxLength={20}
+          className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
+        />
       </div>
-
-      <VerifyModal
-        open={verifyOpen}
-        onClose={() => setVerifyOpen(false)}
-        onVerified={() => setIsVerified(true)}
-      />
 
       {/* 활동명 (선택) */}
       <div className="mb-5">

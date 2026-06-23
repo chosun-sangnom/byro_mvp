@@ -28,7 +28,7 @@ export type HighlightCategoryId =
   | 'volunteer'
   | 'other'
 
-export type OnboardingStep = 'login' | 'basicinfo' | 'profile' | 'complete'
+export type OnboardingStep = 'login' | 'verify' | 'basicinfo' | 'profile' | 'complete'
 
 export interface Highlight {
   id: string

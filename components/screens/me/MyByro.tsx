@@ -56,10 +56,11 @@ export default function MyByro() {
 
   const sectionParam = searchParams.get('section')
   const [screen, setScreen] = useState<Screen>(
-    sectionParam === 'highlight' ? 'editHighlight' :
-    sectionParam === 'life'      ? 'editLife'      :
-    sectionParam === 'sns'       ? 'editSNS'       :
-    sectionParam === 'contact'   ? 'editContact'   :
+    sectionParam === 'highlight'  ? 'editHighlight'  :
+    sectionParam === 'life'       ? 'editLife'        :
+    sectionParam === 'sns'        ? 'editSNS'         :
+    sectionParam === 'contact'    ? 'editContact'     :
+    sectionParam === 'visibility' ? 'editVisibility'  :
     searchParams.get('edit') === 'true' ? 'manage' : 'preview'
   )
   const [activeTab, setActiveTab] = useState<PublicProfileTabId>('who')

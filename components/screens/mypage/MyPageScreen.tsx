@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
-import { ChevronRight, Pencil, BookmarkCheck, CreditCard, Link2, Eye } from 'lucide-react'
+import { ChevronRight, Pencil, BookmarkCheck, CreditCard, Eye } from 'lucide-react'
 import { showToast } from '@/components/ui'
 
 type MenuItem = {
@@ -11,8 +11,6 @@ type MenuItem = {
   label: string
   description?: string
   href?: string
-  badge?: string
-  locked?: boolean
 }
 
 type Section = {
@@ -63,46 +61,33 @@ export default function MyPageScreen() {
       title: '계정',
       items: [
         {
-          id: 'link',
-          icon: Link2,
-          label: '내 링크',
-          description: `byro.io/${currentLinkId}`,
-          href: isPaid ? '/me?edit=true' : undefined,
-          badge: isPaid ? 'PRO' : undefined,
-          locked: !isPaid,
-        },
-        {
           id: 'billing',
           icon: CreditCard,
           label: '유료 결제',
-          description: '프리미엄 플랜 및 결제 내역',
+          description: isPaid
+            ? `PRO · 내 링크: byro.io/${currentLinkId}`
+            : '내 링크 커스터마이징 · 프리미엄 기능',
           href: undefined,
         },
       ],
     },
   ]
 
-  const handleItem = (item: MenuItem) => {
-    if (item.locked) { showToast('유료 플랜에서 사용할 수 있는 기능이에요'); return }
-    if (!item.href) { showToast('준비 중이에요'); return }
-    router.push(item.href)
-  }
-
   return (
-    <div className="flex flex-col bg-[var(--color-bg-page)] min-h-full pb-[env(safe-area-inset-bottom)]">
+    <div className="flex flex-col bg-[var(--color-bg-page)] min-h-full">
 
       {/* 프로필 카드 */}
       <button
         onClick={() => router.push('/me')}
-        className="flex items-center gap-3.5 px-5 py-5 bg-[var(--color-bg-surface)] border-b border-[var(--color-border-soft)] w-full text-left active:opacity-80 transition-opacity"
+        className="flex items-center gap-4 mx-4 mt-6 mb-2 px-4 py-4 rounded-2xl bg-[var(--color-bg-surface)] border border-[var(--color-border-soft)] w-[calc(100%-2rem)] text-left active:opacity-80 transition-opacity"
       >
-        <div className="w-[52px] h-[52px] rounded-full overflow-hidden flex-shrink-0">
+        <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0">
           {user?.avatarImage ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={user.avatarImage} alt={user.name} className="w-full h-full object-cover" />
           ) : (
             <div
-              className="w-full h-full flex items-center justify-center text-white text-[17px] font-bold"
+              className="w-full h-full flex items-center justify-center text-white text-[18px] font-bold"
               style={{ backgroundColor: user?.avatarColor ?? 'var(--color-accent-dark)' }}
             >
               {initials}
@@ -110,14 +95,13 @@ export default function MyPageScreen() {
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-[16px] font-black text-[var(--color-text-primary)] truncate leading-snug">{user?.name}</p>
-          <p className="text-[12px] text-[var(--color-accent-dark)] mt-0.5 font-medium">내 프로필 보기</p>
+          <p className="text-[16px] font-black text-[var(--color-text-primary)] truncate">{user?.name}</p>
+          <p className="text-[12px] text-[var(--color-accent-dark)] mt-0.5 font-medium">내 프로필 보기 →</p>
         </div>
-        <ChevronRight size={16} className="text-[var(--color-text-tertiary)] flex-shrink-0" />
       </button>
 
       {/* 메뉴 섹션 */}
-      <div className="flex flex-col gap-6 pt-6 px-4">
+      <div className="flex flex-col gap-5 px-4 mt-4 pb-[calc(env(safe-area-inset-bottom)+32px)]">
         {sections.map((section) => (
           <div key={section.title}>
             <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)] px-1 mb-2">
@@ -129,8 +113,11 @@ export default function MyPageScreen() {
                 return (
                   <button
                     key={item.id}
-                    onClick={() => handleItem(item)}
-                    className="flex items-center gap-3.5 w-full px-4 py-3.5 text-left active:bg-[var(--color-bg-muted)] transition-colors"
+                    onClick={() => {
+                      if (!item.href) { showToast('준비 중이에요'); return }
+                      router.push(item.href)
+                    }}
+                    className="flex items-center gap-3.5 w-full px-4 py-4 text-left active:bg-[var(--color-bg-muted)] transition-colors"
                   >
                     <div
                       className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
@@ -139,18 +126,7 @@ export default function MyPageScreen() {
                       <Icon size={16} className="text-[var(--color-text-secondary)]" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <p className="text-[14px] font-semibold text-[var(--color-text-primary)]">{item.label}</p>
-                        {item.badge && (
-                          <span className="rounded-full px-1.5 py-0.5 text-[9px] font-bold"
-                            style={{ background: 'var(--color-accent-bg-subtle)', color: 'var(--color-accent-dark)' }}>
-                            {item.badge}
-                          </span>
-                        )}
-                        {item.locked && (
-                          <span className="text-[11px] text-[var(--color-text-tertiary)]">🔒</span>
-                        )}
-                      </div>
+                      <p className="text-[14px] font-semibold text-[var(--color-text-primary)]">{item.label}</p>
                       {item.description && (
                         <p className="text-[12px] text-[var(--color-text-secondary)] mt-0.5 truncate">{item.description}</p>
                       )}

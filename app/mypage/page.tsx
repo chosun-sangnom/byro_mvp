@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
 import { NavBar } from '@/components/ui'
+import AppShell from '@/components/layout/AppShell'
 import MyPageScreen from '@/components/screens/mypage/MyPageScreen'
 
 export default function MyPage() {
@@ -17,11 +18,13 @@ export default function MyPage() {
   if (!store.isLoggedIn) return null
 
   return (
-    <div className="flex flex-col h-dvh">
-      <NavBar title="마이페이지" onBack={() => router.back()} />
-      <div className="flex-1 overflow-y-auto">
-        <MyPageScreen />
+    <AppShell showHeader>
+      <div className="flex flex-col h-full">
+        <NavBar title="마이페이지" onBack={() => router.back()} />
+        <div className="flex-1 overflow-y-auto">
+          <MyPageScreen />
+        </div>
       </div>
-    </div>
+    </AppShell>
   )
 }

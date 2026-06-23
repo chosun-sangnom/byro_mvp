@@ -121,8 +121,11 @@ export default function AppHeader() {
               transition={{ duration: 0.18, ease: 'easeOut' }}
               className="absolute right-0 top-14 z-40 w-56 bg-[var(--color-bg-page)] border border-[var(--color-border-soft)] rounded-xl shadow-xl mx-3 overflow-hidden"
             >
-              {/* 프로필 정보 */}
-              <div className="flex flex-col items-center gap-2 px-5 pt-5 pb-4">
+              {/* 프로필 정보 — 사진 클릭 시 내 프로필 보기 */}
+              <button
+                onClick={() => { setProfileOpen(false); router.push('/me') }}
+                className="flex flex-col items-center gap-2 px-5 pt-5 pb-4 w-full hover:bg-[var(--color-bg-soft)] transition-colors"
+              >
                 <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
                   {user?.avatarImage ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -137,12 +140,12 @@ export default function AppHeader() {
                   )}
                 </div>
                 <span className="text-[15px] font-semibold text-[var(--color-text-primary)]">{user?.name}</span>
-              </div>
+              </button>
 
               {/* 버튼 */}
               <div className="flex border-t border-[var(--color-border-soft)]">
                 <button
-                  onClick={() => { setProfileOpen(false); router.push('/me') }}
+                  onClick={() => { setProfileOpen(false); router.push('/mypage') }}
                   className="flex-1 py-3 text-[13px] font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-bg-soft)] transition-colors border-r border-[var(--color-border-soft)]"
                 >
                   마이페이지

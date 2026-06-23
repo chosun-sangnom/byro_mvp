@@ -45,21 +45,13 @@ type VirtualSearchResult = {
 }
 
 function matchesQuery(profile: SearchResult, q: string) {
-  const lower = q.toLowerCase()
-  return (
-    profile.name.toLowerCase().includes(lower) ||
-    profile.title.toLowerCase().includes(lower) ||
-    profile.school.toLowerCase().includes(lower)
-  )
+  const text = `${profile.name} ${profile.title} ${profile.school}`.toLowerCase()
+  return q.split(',').map((k) => k.trim()).filter(Boolean).every((k) => text.includes(k.toLowerCase()))
 }
 
 function matchesVirtualQuery(profile: VirtualSearchResult, q: string) {
-  const lower = q.toLowerCase()
-  return (
-    profile.name.toLowerCase().includes(lower) ||
-    profile.title.toLowerCase().includes(lower) ||
-    profile.tags.some((t) => t.toLowerCase().includes(lower))
-  )
+  const text = `${profile.name} ${profile.title} ${profile.tags.join(' ')}`.toLowerCase()
+  return q.split(',').map((k) => k.trim()).filter(Boolean).every((k) => text.includes(k.toLowerCase()))
 }
 
 interface SearchScreenProps {
@@ -92,45 +84,27 @@ export default function SearchScreen({ onClose }: SearchScreenProps) {
     )
   }
 
-  const handleQueryChange = (value: string) => {
-    if (value.includes(',')) {
-      const parts = value.split(',')
-      const keyword = parts[0].trim()
-      if (keyword) {
-        setSelectedChips((prev) => prev.includes(keyword) ? prev : [...prev, keyword])
-      }
-      setQuery(parts.slice(1).join(',').trimStart())
-    } else {
-      setQuery(value)
-    }
-  }
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      const keyword = query.trim()
-      if (keyword) {
-        setSelectedChips((prev) => prev.includes(keyword) ? prev : [...prev, keyword])
-        setQuery('')
-      }
-    }
-  }
 
   const q = query.trim()
   const suggestedChips = SUGGESTED_CHIPS[q] ?? []
 
-  const matchesChips = (text: string) =>
-    selectedChips.every((chip) => text.toLowerCase().includes(chip.toLowerCase()))
+  const matchesChips = (profile: SearchResult | VirtualSearchResult) => {
+    const text = 'school' in profile
+      ? `${profile.name} ${profile.title} ${profile.school}`.toLowerCase()
+      : `${profile.name} ${profile.title} ${(profile as VirtualSearchResult).tags.join(' ')}`.toLowerCase()
+    return selectedChips.every((chip) => text.includes(chip.toLowerCase()))
+  }
 
   const baseResults: SearchResult[] = q
-    ? SEARCHABLE_PROFILES.filter((p) => matchesQuery(p, q) && matchesChips(`${p.name} ${p.title} ${p.school}`))
+    ? SEARCHABLE_PROFILES.filter((p) => matchesQuery(p, q) && matchesChips(p))
     : []
   const extraResults: SearchResult[] = q
-    ? EXTRA_MOCK_MEMBERS.filter((p) => matchesQuery(p, q) && matchesChips(`${p.name} ${p.title} ${p.school}`))
+    ? EXTRA_MOCK_MEMBERS.filter((p) => matchesQuery(p, q) && matchesChips(p))
     : []
   const results = [...baseResults, ...extraResults]
 
   const virtualResults: VirtualSearchResult[] = q
-    ? VIRTUAL_PROFILES.filter((p) => matchesVirtualQuery(p, q) && matchesChips(`${p.name} ${p.title} ${p.tags.join(' ')}`))
+    ? VIRTUAL_PROFILES.filter((p) => matchesVirtualQuery(p, q) && matchesChips(p))
     : []
 
   const hasAnyResults = results.length > 0 || virtualResults.length > 0
@@ -157,8 +131,7 @@ export default function SearchScreen({ onClose }: SearchScreenProps) {
           <input
             ref={inputRef}
             value={query}
-            onChange={(e) => handleQueryChange(e.target.value)}
-            onKeyDown={handleKeyDown}
+            onChange={(e) => setQuery(e.target.value)}
             placeholder="이름, 직함, 회사로 검색"
             className="flex-1 bg-transparent text-[14px] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
           />
@@ -166,33 +139,38 @@ export default function SearchScreen({ onClose }: SearchScreenProps) {
       </div>
 
       {/* 키워드 Chip 행 */}
-      {(() => {
-        const customChips = selectedChips.filter((c) => !suggestedChips.includes(c))
-        const allChips = [...customChips, ...suggestedChips]
-        if (allChips.length === 0) return null
-        return (
-          <div className="flex gap-2 px-4 py-2.5 overflow-x-auto scrollbar-hide border-b border-[var(--color-border-soft)]">
-            {allChips.map((chip) => {
-              const active = selectedChips.includes(chip)
-              return (
-                <button
-                  key={chip}
-                  onClick={() => toggleChip(chip)}
-                  className="flex-shrink-0 flex items-center gap-1 rounded-full px-3 py-1 text-[12px] font-medium transition-colors"
-                  style={
-                    active
-                      ? { background: 'var(--color-accent-dark)', color: '#fff', border: '1px solid var(--color-accent-dark)' }
-                      : { background: 'var(--color-bg-soft)', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border-default)' }
-                  }
-                >
-                  {chip}
-                  {active && <X size={11} strokeWidth={2.5} />}
-                </button>
-              )
-            })}
-          </div>
-        )
-      })()}
+      <AnimatePresence>
+        {suggestedChips.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.18 }}
+            className="overflow-hidden"
+          >
+            <div className="flex gap-2 px-4 py-2.5 overflow-x-auto scrollbar-hide border-b border-[var(--color-border-soft)]">
+              {suggestedChips.map((chip) => {
+                const active = selectedChips.includes(chip)
+                return (
+                  <button
+                    key={chip}
+                    onClick={() => toggleChip(chip)}
+                    className="flex-shrink-0 flex items-center gap-1 rounded-full px-3 py-1 text-[12px] font-medium transition-colors"
+                    style={
+                      active
+                        ? { background: 'var(--color-accent-dark)', color: '#fff', border: '1px solid var(--color-accent-dark)' }
+                        : { background: 'var(--color-bg-soft)', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border-default)' }
+                    }
+                  >
+                    {chip}
+                    {active && <X size={11} strokeWidth={2.5} />}
+                  </button>
+                )
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* 본문 */}
       <div className="flex-1 overflow-y-auto">

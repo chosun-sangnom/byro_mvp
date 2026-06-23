@@ -119,14 +119,14 @@ export function PublicProfileShell({
 
         {isOwnerMode ? (
           <PublicProfileOwnerMatchZone whoIAm={profile.whoIAm} life={profile.life} />
-        ) : store.isLoggedIn ? (
+        ) : (
           <PublicProfileKemiZone
             kemi={profile.kemi}
             isLoggedIn={store.isLoggedIn}
             isLoading={kemiLoading}
             onCompatibilityOpen={profile.whoIAm ? () => setCompatibilityOpen(true) : undefined}
           />
-        ) : null}
+        )}
 
         {/* 나 / 라이프 / 관계 탭 */}
         <PublicProfileTabBar activeTab={activeTab} onTabChange={onTabChange} tabAccess={tabAccess} />

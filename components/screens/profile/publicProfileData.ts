@@ -14,7 +14,7 @@ import type {
   UserState,
 } from '@/types'
 
-export type TabAccessLevel = 'visible' | 'locked'
+export type TabAccessLevel = 'visible' | 'hidden'
 
 const DEFAULT_TAB_VISIBILITY: TabVisibility = { who: 'public', life: 'public', reputation: 'public' }
 
@@ -26,7 +26,7 @@ export function computeTabAccess(
   if (isOwner) return 'visible'
   const level: TabVisibilityLevel = tabVisibility[tab]
   if (level === 'public') return 'visible'
-  return 'locked'
+  return 'hidden'
 }
 
 export { DEFAULT_TAB_VISIBILITY }

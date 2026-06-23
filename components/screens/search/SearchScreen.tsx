@@ -92,19 +92,35 @@ export default function SearchScreen({ onClose }: SearchScreenProps) {
     )
   }
 
+  const handleQueryChange = (value: string) => {
+    if (value.includes(',')) {
+      const parts = value.split(',')
+      const keyword = parts[0].trim()
+      if (keyword) {
+        setSelectedChips((prev) => prev.includes(keyword) ? prev : [...prev, keyword])
+      }
+      setQuery(parts.slice(1).join(',').trimStart())
+    } else {
+      setQuery(value)
+    }
+  }
+
   const q = query.trim()
   const suggestedChips = SUGGESTED_CHIPS[q] ?? []
 
+  const matchesChips = (text: string) =>
+    selectedChips.every((chip) => text.toLowerCase().includes(chip.toLowerCase()))
+
   const baseResults: SearchResult[] = q
-    ? SEARCHABLE_PROFILES.filter((p) => matchesQuery(p, q))
+    ? SEARCHABLE_PROFILES.filter((p) => matchesQuery(p, q) && matchesChips(`${p.name} ${p.title} ${p.school}`))
     : []
   const extraResults: SearchResult[] = q
-    ? EXTRA_MOCK_MEMBERS.filter((p) => matchesQuery(p, q))
+    ? EXTRA_MOCK_MEMBERS.filter((p) => matchesQuery(p, q) && matchesChips(`${p.name} ${p.title} ${p.school}`))
     : []
   const results = [...baseResults, ...extraResults]
 
   const virtualResults: VirtualSearchResult[] = q
-    ? VIRTUAL_PROFILES.filter((p) => matchesVirtualQuery(p, q))
+    ? VIRTUAL_PROFILES.filter((p) => matchesVirtualQuery(p, q) && matchesChips(`${p.name} ${p.title} ${p.tags.join(' ')}`))
     : []
 
   const hasAnyResults = results.length > 0 || virtualResults.length > 0
@@ -131,7 +147,7 @@ export default function SearchScreen({ onClose }: SearchScreenProps) {
           <input
             ref={inputRef}
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => handleQueryChange(e.target.value)}
             placeholder="이름, 직함, 회사로 검색"
             className="flex-1 bg-transparent text-[14px] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
           />
@@ -139,46 +155,33 @@ export default function SearchScreen({ onClose }: SearchScreenProps) {
       </div>
 
       {/* 키워드 Chip 행 */}
-      <AnimatePresence>
-        {suggestedChips.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.18 }}
-            className="overflow-hidden"
-          >
-            <div className="flex gap-2 px-4 py-2.5 overflow-x-auto scrollbar-hide border-b border-[var(--color-border-soft)]">
-              {suggestedChips.map((chip) => {
-                const active = selectedChips.includes(chip)
-                return (
-                  <button
-                    key={chip}
-                    onClick={() => toggleChip(chip)}
-                    className="flex-shrink-0 flex items-center gap-1 rounded-full px-3 py-1 text-[12px] font-medium transition-colors"
-                    style={
-                      active
-                        ? {
-                            background: 'var(--color-accent-dark)',
-                            color: '#fff',
-                            border: '1px solid var(--color-accent-dark)',
-                          }
-                        : {
-                            background: 'var(--color-bg-soft)',
-                            color: 'var(--color-text-secondary)',
-                            border: '1px solid var(--color-border-default)',
-                          }
-                    }
-                  >
-                    {chip}
-                    {active && <X size={11} strokeWidth={2.5} />}
-                  </button>
-                )
-              })}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {(() => {
+        const customChips = selectedChips.filter((c) => !suggestedChips.includes(c))
+        const allChips = [...customChips, ...suggestedChips]
+        if (allChips.length === 0) return null
+        return (
+          <div className="flex gap-2 px-4 py-2.5 overflow-x-auto scrollbar-hide border-b border-[var(--color-border-soft)]">
+            {allChips.map((chip) => {
+              const active = selectedChips.includes(chip)
+              return (
+                <button
+                  key={chip}
+                  onClick={() => toggleChip(chip)}
+                  className="flex-shrink-0 flex items-center gap-1 rounded-full px-3 py-1 text-[12px] font-medium transition-colors"
+                  style={
+                    active
+                      ? { background: 'var(--color-accent-dark)', color: '#fff', border: '1px solid var(--color-accent-dark)' }
+                      : { background: 'var(--color-bg-soft)', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border-default)' }
+                  }
+                >
+                  {chip}
+                  {active && <X size={11} strokeWidth={2.5} />}
+                </button>
+              )
+            })}
+          </div>
+        )
+      })()}
 
       {/* 본문 */}
       <div className="flex-1 overflow-y-auto">

@@ -150,8 +150,8 @@ export function PublicProfileShell({
           </button>
         )}
 
-        {/* 메인 CTA */}
-        {isOwnerMode ? (
+        {/* 오너 편집 버튼 */}
+        {isOwnerMode && (
           <div className="mb-4">
             <button
               onClick={onOwnerEdit ?? (() => router.push('/me'))}
@@ -161,15 +161,7 @@ export function PublicProfileShell({
               편집
             </button>
           </div>
-        ) : !store.isLoggedIn ? (
-          <button
-            onClick={() => router.push('/signup')}
-            className="mb-4 w-full rounded-full py-3 text-[13px] font-semibold text-white whitespace-nowrap"
-            style={{ backgroundColor: 'var(--color-accent-dark)' }}
-          >
-            로그인하고 저장하기
-          </button>
-        ) : null}
+        )}
 
         {/* 연락처 채널 */}
         {/* TODO(contact): 공개 여부 설정에 따라 채널 노출 제어 필요 */}

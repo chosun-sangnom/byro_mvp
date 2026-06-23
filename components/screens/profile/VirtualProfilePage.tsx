@@ -1,9 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Trophy, Briefcase, Mic, FileText, BookOpen, Sparkles, AlertCircle, ChevronRight } from 'lucide-react'
 import { showToast } from '@/components/ui'
 import type { VirtualProfile, VirtualHighlight, VirtualHighlightIcon } from '@/lib/mocks/virtualProfiles'
+import { LoginModal } from '@/components/screens/profile/LoginModal'
 
 const ICON_MAP: Record<VirtualHighlightIcon, React.ElementType> = {
   trophy: Trophy,
@@ -14,6 +16,8 @@ const ICON_MAP: Record<VirtualHighlightIcon, React.ElementType> = {
 }
 
 export function VirtualProfilePage({ profile }: { profile: VirtualProfile }) {
+  const [loginModalOpen, setLoginModalOpen] = useState(false)
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto scrollbar-hide">
@@ -159,7 +163,7 @@ export function VirtualProfilePage({ profile }: { profile: VirtualProfile }) {
             {/* 로그인 유도 오버레이 */}
             <div className="absolute inset-0 flex items-end justify-center pb-4">
               <button
-                onClick={() => showToast('로그인 후 케미 리포트를 확인하세요')}
+                onClick={() => setLoginModalOpen(true)}
                 className="rounded-full px-4 py-2 text-[12px] font-bold text-white whitespace-nowrap"
                 style={{ backgroundColor: 'var(--color-accent-dark)' }}
               >
@@ -202,6 +206,8 @@ export function VirtualProfilePage({ profile }: { profile: VirtualProfile }) {
 
         <div className="pb-[calc(env(safe-area-inset-bottom)+16px)]" />
       </div>
+
+      <LoginModal open={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
     </div>
   )
 }

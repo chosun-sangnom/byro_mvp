@@ -36,11 +36,13 @@ export function PublicProfileKemiZone({
   isLoggedIn,
   isLoading,
   onCompatibilityOpen,
+  onLoginRequest,
 }: {
   kemi?: KemiData
   isLoggedIn: boolean
   isLoading?: boolean
   onCompatibilityOpen?: () => void
+  onLoginRequest?: () => void
 }) {
   if (!kemi && !isLoading) return null
 
@@ -157,7 +159,11 @@ export function PublicProfileKemiZone({
           </>
         ) : (
           /* Non-logged-in: blurred nudge */
-          <div className="relative">
+          <button
+            type="button"
+            onClick={onLoginRequest}
+            className="relative w-full text-left"
+          >
             <div
               className="pointer-events-none flex flex-wrap gap-1.5"
               style={{ filter: 'blur(5px)', opacity: 0.5 }}
@@ -168,13 +174,13 @@ export function PublicProfileKemiZone({
             </div>
             <div className="absolute inset-0 flex items-center justify-center">
               <span
-                className="text-[12px] font-semibold"
+                className="text-[12px] font-semibold underline underline-offset-2"
                 style={{ color: 'var(--color-accent-dark)' }}
               >
                 로그인하면 케미가 보여요
               </span>
             </div>
-          </div>
+          </button>
         )}
       </div>
     </div>

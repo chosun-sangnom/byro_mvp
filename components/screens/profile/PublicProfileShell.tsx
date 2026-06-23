@@ -25,6 +25,7 @@ import { ProfileHeroSection } from '@/components/screens/profile/PublicProfileHe
 import { PublicProfileTabBar, type PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
 import { PublicProfileKemiZone, PublicProfileOwnerMatchZone } from '@/components/screens/profile/PublicProfileKemiZone'
 import { PublicProfileCompatibilitySheet } from '@/components/screens/profile/PublicProfileCompatibilitySheet'
+import { LoginModal } from '@/components/screens/profile/LoginModal'
 
 
 export function PublicProfileShell({
@@ -84,6 +85,7 @@ export function PublicProfileShell({
   const [bookmarkSheetOpen, setBookmarkSheetOpen] = useState(false)
   const [bookmarkMemo, setBookmarkMemo] = useState('')
   const [unsaveSheetOpen, setUnsaveSheetOpen] = useState(false)
+  const [loginModalOpen, setLoginModalOpen] = useState(false)
 
   // 관계 탭에서만 "피드백 요청" 버튼 표시 (visitor only)
   const showReputationActions = activeTab === 'reputation' && !isOwnerMode
@@ -125,6 +127,7 @@ export function PublicProfileShell({
             isLoggedIn={store.isLoggedIn}
             isLoading={kemiLoading}
             onCompatibilityOpen={profile.whoIAm ? () => setCompatibilityOpen(true) : undefined}
+            onLoginRequest={() => setLoginModalOpen(true)}
           />
         )}
 
@@ -143,7 +146,7 @@ export function PublicProfileShell({
         {/* 평판 탭 visitor 전용 액션 */}
         {showReputationActions && (
           <button
-            onClick={() => setFeedbackRequestOpen(true)}
+            onClick={() => store.isLoggedIn ? setFeedbackRequestOpen(true) : setLoginModalOpen(true)}
             className="mb-4 w-full rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)] whitespace-nowrap"
           >
             피드백 요청
@@ -313,6 +316,8 @@ export function PublicProfileShell({
           </div>
         </BottomSheet>
       )}
+
+      <LoginModal open={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
 
     </div>
   )

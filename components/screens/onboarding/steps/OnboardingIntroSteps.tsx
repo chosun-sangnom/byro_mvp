@@ -1,12 +1,14 @@
 'use client'
 
 import { useRef, useState, type ChangeEvent } from 'react'
+import { useRouter } from 'next/navigation'
 import { Camera, CheckCircle2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { Button, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
+type Mode = 'choose' | 'signup' | 'login'
 type LoginView = 'main' | 'oauth' | 'phone'
 type OAuthProvider = 'kakao' | 'naver' | 'google'
 type OAuthStep = 'pending' | 'done'
@@ -56,6 +58,8 @@ function BackButton({ onClick }: { onClick: () => void }) {
 
 export function Step1Login() {
   const store = useByroStore()
+  const router = useRouter()
+  const [mode, setMode] = useState<Mode>('choose')
   const [view, setView] = useState<LoginView>('main')
   const [oauthProvider, setOauthProvider] = useState<OAuthProvider | null>(null)
   const [oauthStep, setOauthStep] = useState<OAuthStep>('pending')
@@ -64,6 +68,11 @@ export function Step1Login() {
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [email, setEmail] = useState('')
+
+  // 전화번호 로그인 폼
+  const [loginPhone, setLoginPhone] = useState('')
+  const [loginCode, setLoginCode] = useState('')
+  const [loginSmsSent, setLoginSmsSent] = useState(false)
 
   const passwordShort = password.length > 0 && password.length < 8
   const emailInvalid = email.length > 0 && !isValidEmail(email)
@@ -75,10 +84,23 @@ export function Step1Login() {
     setView('oauth')
   }
 
-  const handleBack = () => {
+  const handleBackToMain = () => {
     setView('main')
     setOauthProvider(null)
     setOauthStep('pending')
+  }
+
+  const handleBackToChoose = () => {
+    setMode('choose')
+    setView('main')
+    setOauthProvider(null)
+    setOauthStep('pending')
+  }
+
+  // [임시] 로그인 완료 처리
+  const handleLoginComplete = () => {
+    store.login()
+    router.push(`/${SAMPLE_PROFILE.linkId}`)
   }
 
   // --- OAuth 뷰 ---
@@ -86,6 +108,25 @@ export function Step1Login() {
     const meta = OAUTH_META[oauthProvider]
 
     if (oauthStep === 'done') {
+      if (mode === 'login') {
+        return (
+          <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+            <div className="flex-1 flex flex-col items-center justify-center text-center">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mb-5"
+                style={{ backgroundColor: 'var(--color-state-success-bg)' }}>
+                <CheckCircle2 size={32} style={{ color: 'var(--color-state-success-text)' }} />
+              </div>
+              <div className="text-xl font-black text-[var(--color-text-strong)] mb-2">
+                {meta.label} 로그인 완료
+              </div>
+              <p className="meta-text leading-relaxed">바이로에 오신 걸 환영해요!</p>
+            </div>
+            {/* [임시] 실제 로그인 API 미연동 */}
+            <Button onClick={handleLoginComplete}>시작하기</Button>
+          </div>
+        )
+      }
+
       return (
         <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
           <div className="flex-1 flex flex-col items-center justify-center text-center">
@@ -108,29 +149,29 @@ export function Step1Login() {
 
     return (
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <BackButton onClick={handleBack} />
+        <BackButton onClick={handleBackToMain} />
         <div className="mb-8">
           <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight mb-2">
-            {meta.label} 계정으로<br />시작하기
+            {meta.label} 계정으로<br />{mode === 'login' ? '로그인' : '시작하기'}
           </div>
           <p className="meta-text leading-relaxed">
             {meta.label} 계정을 바이로에 연결합니다.<br />
             아래 버튼을 누르면 {meta.label} 인증을 진행해요.
           </p>
         </div>
-        {/* [임시] 실제 OAuth 리다이렉트 미연동 — 버튼 클릭으로 연결 완료 시뮬레이션 */}
+        {/* [임시] 실제 OAuth 리다이렉트 미연동 — 버튼 클릭으로 완료 시뮬레이션 */}
         <Button variant={meta.variant} onClick={() => setOauthStep('done')}>
-          {meta.prefix}{meta.label}로 연결하기
+          {meta.prefix}{meta.label}로 {mode === 'login' ? '로그인' : '연결하기'}
         </Button>
       </div>
     )
   }
 
-  // --- 전화번호 뷰 ---
-  if (view === 'phone') {
+  // --- 전화번호 가입 뷰 ---
+  if (view === 'phone' && mode === 'signup') {
     return (
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <BackButton onClick={handleBack} />
+        <BackButton onClick={handleBackToMain} />
         <div className="mb-6">
           <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
             전화번호로<br />회원가입
@@ -194,10 +235,124 @@ export function Step1Login() {
     )
   }
 
-  // --- 메인 뷰 ---
+  // --- 전화번호 로그인 뷰 ---
+  if (view === 'phone' && mode === 'login') {
+    return (
+      <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+        <BackButton onClick={handleBackToMain} />
+        <div className="mb-6">
+          <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
+            전화번호로<br />로그인
+          </div>
+        </div>
+        <div className="space-y-3 mb-6">
+          <div className="flex gap-2">
+            <input
+              type="tel"
+              value={loginPhone}
+              onChange={(e) => setLoginPhone(formatPhone(e.target.value))}
+              placeholder="010-0000-0000"
+              disabled={loginSmsSent}
+              autoComplete="tel"
+              className="flex-1 border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] disabled:opacity-50"
+            />
+            {/* [임시] SMS 발송 API 미연동 */}
+            <button
+              type="button"
+              disabled={!isValidPhone(loginPhone) || loginSmsSent}
+              onClick={() => setLoginSmsSent(true)}
+              className="flex-shrink-0 rounded-xl px-3 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
+              style={{ backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
+            >
+              {loginSmsSent ? '발송됨' : '발송'}
+            </button>
+          </div>
+          {loginSmsSent && (
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={loginCode}
+                onChange={(e) => setLoginCode(e.target.value)}
+                placeholder="인증번호 6자리"
+                maxLength={6}
+                className="flex-1 border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
+              />
+              {/* [임시] 인증번호 확인 API 미연동 */}
+              <button
+                type="button"
+                disabled={loginCode.length < 6}
+                onClick={handleLoginComplete}
+                className="flex-shrink-0 rounded-xl px-4 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
+                style={{ backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
+              >
+                확인
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  // --- 로그인 메인 뷰 ---
+  if (mode === 'login') {
+    return (
+      <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+        <BackButton onClick={handleBackToChoose} />
+        <div className="mb-6">
+          <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
+            다시 오셨군요!
+          </div>
+          <p className="meta-text mt-1">연결했던 계정으로 로그인하세요.</p>
+        </div>
+        <div className="space-y-3">
+          <Button variant="kakao" onClick={() => handleOAuthSelect('kakao')}>카카오로 로그인</Button>
+          <Button variant="naver" onClick={() => handleOAuthSelect('naver')}>N  네이버로 로그인</Button>
+          <Button variant="google" onClick={() => handleOAuthSelect('google')}>G  구글로 로그인</Button>
+        </div>
+        <div className="flex items-center gap-3 my-4">
+          <div className="flex-1 h-px bg-[var(--color-border-default)]" />
+          <span className="text-[11px] text-[var(--color-text-tertiary)]">또는</span>
+          <div className="flex-1 h-px bg-[var(--color-border-default)]" />
+        </div>
+        <Button variant="outline" onClick={() => setView('phone')}>전화번호로 로그인</Button>
+      </div>
+    )
+  }
+
+  // --- 회원가입 메인 뷰 ---
+  if (mode === 'signup') {
+    return (
+      <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+        <BackButton onClick={handleBackToChoose} />
+        <div className="mb-6">
+          <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
+            처음 오셨군요!
+          </div>
+          <p className="meta-text mt-1">가입 방법을 선택해주세요.</p>
+        </div>
+        <div className="space-y-3">
+          <Button variant="kakao" onClick={() => handleOAuthSelect('kakao')}>카카오로 시작하기</Button>
+          <Button variant="naver" onClick={() => handleOAuthSelect('naver')}>N  네이버로 시작하기</Button>
+          <Button variant="google" onClick={() => handleOAuthSelect('google')}>G  구글로 시작하기</Button>
+        </div>
+        <div className="flex items-center gap-3 my-4">
+          <div className="flex-1 h-px bg-[var(--color-border-default)]" />
+          <span className="text-[11px] text-[var(--color-text-tertiary)]">또는</span>
+          <div className="flex-1 h-px bg-[var(--color-border-default)]" />
+        </div>
+        <Button variant="outline" onClick={() => setView('phone')}>전화번호로 회원가입</Button>
+        <p className="micro-text text-center mt-6">
+          시작하면 이용약관 및 개인정보 처리방침에 동의하게 됩니다
+        </p>
+      </div>
+    )
+  }
+
+  // --- 초기 선택 뷰 ---
   return (
     <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-      <div className="surface-card rounded-[32px] px-5 py-6 text-center mb-5">
+      <div className="surface-card rounded-[32px] px-5 py-6 text-center mb-6">
         <div className="micro-text uppercase tracking-[0.18em] mb-2">Branding Profile</div>
         <div className="text-3xl font-black mb-2">Byro</div>
         <div className="meta-text mt-3 leading-relaxed">
@@ -207,19 +362,9 @@ export function Step1Login() {
         </div>
       </div>
       <div className="space-y-3">
-        <Button variant="kakao" onClick={() => handleOAuthSelect('kakao')}>카카오로 시작하기</Button>
-        <Button variant="naver" onClick={() => handleOAuthSelect('naver')}>N  네이버로 시작하기</Button>
-        <Button variant="google" onClick={() => handleOAuthSelect('google')}>G  구글로 시작하기</Button>
+        <Button onClick={() => setMode('signup')}>처음이신가요? 회원가입</Button>
+        <Button variant="outline" onClick={() => setMode('login')}>이미 계정이 있어요</Button>
       </div>
-      <div className="flex items-center gap-3 my-4">
-        <div className="flex-1 h-px bg-[var(--color-border-default)]" />
-        <span className="text-[11px] text-[var(--color-text-tertiary)]">또는</span>
-        <div className="flex-1 h-px bg-[var(--color-border-default)]" />
-      </div>
-      <Button variant="outline" onClick={() => setView('phone')}>전화번호로 회원가입</Button>
-      <p className="micro-text text-center mt-6">
-        시작하면 이용약관 및 개인정보 처리방침에 동의하게 됩니다
-      </p>
     </div>
   )
 }

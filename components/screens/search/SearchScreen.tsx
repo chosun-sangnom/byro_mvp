@@ -105,6 +105,16 @@ export default function SearchScreen({ onClose }: SearchScreenProps) {
     }
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      const keyword = query.trim()
+      if (keyword) {
+        setSelectedChips((prev) => prev.includes(keyword) ? prev : [...prev, keyword])
+        setQuery('')
+      }
+    }
+  }
+
   const q = query.trim()
   const suggestedChips = SUGGESTED_CHIPS[q] ?? []
 
@@ -148,6 +158,7 @@ export default function SearchScreen({ onClose }: SearchScreenProps) {
             ref={inputRef}
             value={query}
             onChange={(e) => handleQueryChange(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="이름, 직함, 회사로 검색"
             className="flex-1 bg-transparent text-[14px] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)] outline-none"
           />

@@ -359,9 +359,10 @@ export function ProfileHeroCard({
             <button
               type="button"
               onClick={onOwnerEdit}
-              className="absolute right-4 top-4 z-10 rounded-full border border-white/14 bg-black/38 p-2.5 backdrop-blur-sm"
+              className="absolute right-4 top-4 z-10 flex flex-col items-center gap-1 rounded-[14px] border border-white/14 bg-black/38 px-2.5 py-2 backdrop-blur-sm"
             >
-              <Pencil size={17} className="text-white/88" />
+              <Pencil size={16} className="text-white/88" />
+              <span className="text-[10px] font-semibold text-white/72 leading-none">편집</span>
             </button>
           )}
         </div>

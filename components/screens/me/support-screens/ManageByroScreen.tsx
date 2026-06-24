@@ -2,8 +2,7 @@
 
 import { useState } from 'react'
 import { ChevronRight } from 'lucide-react'
-import { NavBar, Modal, Button, showToast } from '@/components/ui'
-import { useByroStore } from '@/store/useByroStore'
+import { NavBar, Modal, Button } from '@/components/ui'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import type { Highlight, PublicProfile, PublicProfileLife, PublicProfileWhoIAm, TabVisibility, TabVisibilityLevel, UserState } from '@/types'
 
@@ -64,7 +63,6 @@ export function ManageByroScreen({
   onEditVisibility,
   onResetMockData,
 }: ManageByroScreenProps) {
-  const store = useByroStore()
   const [withdrawOpen, setWithdrawOpen] = useState(false)
 
   const whoIAm = (profile.whoIAm ?? user.whoIAm) as PublicProfileWhoIAm

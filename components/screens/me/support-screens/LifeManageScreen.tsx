@@ -463,7 +463,7 @@ function LifeHub({
 
   return (
     <div className="flex h-full flex-col">
-      <NavBar title="라이프 편집" onBack={onBack} />
+      <NavBar title="바이브 편집" onBack={onBack} />
 
       {/* Free 슬롯 배너 */}
       {!isPro && <SlotBadge remaining={freeRemaining} onUpgrade={onUpgrade} />}
@@ -525,7 +525,7 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
 
   const saveAndBack = () => {
     store.updateUserLife(life)
-    showToast('라이프 정보가 저장됐어요')
+    showToast('바이브 정보가 저장됐어요')
     onBack()
   }
 

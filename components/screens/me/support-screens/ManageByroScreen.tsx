@@ -93,7 +93,7 @@ export function ManageByroScreen({
     { label: '기본정보', done: Boolean(whoIAm.mbti) },
     { label: '하이라이트', done: allHighlights.length > 0 },
 
-    { label: 'VIBE', done: activityCount + cultureCount + placeCount > 0 },
+    { label: '바이브', done: activityCount + cultureCount + placeCount > 0 },
     { label: 'SNS', done: connectedSnsCount > 0 },
     { label: '연락수단', done: activeContactCount > 0 },
   ]
@@ -124,7 +124,7 @@ export function ManageByroScreen({
       onClick: onEditHighlight,
     },
     {
-      title: 'VIBE',
+      title: '바이브',
       hint: '반려동물 · 운동 · 플레이스 · 여행지 · 문화',
       nudge: '취향이 겹치면 어색한 첫 대화가 자연스러워져요',
       meta: activityCount + cultureCount + placeCount > 0
@@ -224,7 +224,7 @@ export function ManageByroScreen({
             <div className="min-w-0 flex-1">
               <p className="text-[15px] font-semibold text-[var(--color-text-primary)]">공개 설정</p>
               <p className="mt-0.5 text-[11px] font-medium text-[var(--color-accent-dark)]">
-                WHO {VISIBILITY_LABEL[tabVisibility.who]} · VIBE {VISIBILITY_LABEL[tabVisibility.vibe]} · NETWORK {VISIBILITY_LABEL[tabVisibility.network]}
+                WHO {VISIBILITY_LABEL[tabVisibility.who]} · 바이브 {VISIBILITY_LABEL[tabVisibility.vibe]} · NETWORK {VISIBILITY_LABEL[tabVisibility.network]}
               </p>
             </div>
             <ChevronRight size={14} className="ml-3 flex-shrink-0 text-[var(--color-text-tertiary)] opacity-30" />

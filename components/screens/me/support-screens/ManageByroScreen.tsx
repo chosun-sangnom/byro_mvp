@@ -224,7 +224,7 @@ export function ManageByroScreen({
             <div className="min-w-0 flex-1">
               <p className="text-[15px] font-semibold text-[var(--color-text-primary)]">공개 설정</p>
               <p className="mt-0.5 text-[11px] font-medium text-[var(--color-accent-dark)]">
-                WHO {VISIBILITY_LABEL[tabVisibility.who]} · VIBE {VISIBILITY_LABEL[tabVisibility.life]} · NETWORK {VISIBILITY_LABEL[tabVisibility.reputation]}
+                WHO {VISIBILITY_LABEL[tabVisibility.who]} · VIBE {VISIBILITY_LABEL[tabVisibility.vibe]} · NETWORK {VISIBILITY_LABEL[tabVisibility.network]}
               </p>
             </div>
             <ChevronRight size={14} className="ml-3 flex-shrink-0 text-[var(--color-text-tertiary)] opacity-30" />

@@ -25,7 +25,7 @@ create table public.users (
   profile_images  jsonb not null default '[]',        -- string[]
   header_meta     jsonb not null default '{}',        -- { residence, mood, availability }
   contact_channels jsonb not null default '[]',       -- ContactChannel[]
-  tab_visibility  jsonb not null default '{"who":"public","life":"public","reputation":"public"}',
+  tab_visibility  jsonb not null default '{"who":"public","vibe":"public","network":"public"}',
   --
   created_at      timestamptz not null default now(),
   updated_at      timestamptz not null default now()
@@ -194,15 +194,15 @@ create policy "who_i_am viewable by allowed users"
 create policy "users manage own who_i_am"
   on public.user_who_i_am for all using (auth.uid() = user_id);
 
--- user_life: tab_visibility.life 기준
+-- user_life: tab_visibility.vibe 기준
 create policy "life viewable by allowed users"
   on public.user_life for select using (
     exists (
       select 1 from public.users u where u.id = user_id and (
         u.id = auth.uid()
-        or (u.tab_visibility->>'life') = 'public'
+        or (u.tab_visibility->>'vibe') = 'public'
         or (
-          (u.tab_visibility->>'life') = 'connected'
+          (u.tab_visibility->>'vibe') = 'connected'
           and exists (
             select 1 from public.connections c
             where c.status = 'accepted'
@@ -284,16 +284,16 @@ create policy "users can update own connections"
 create policy "users can delete own requests"
   on public.connections for delete using (auth.uid() = from_user_id);
 
--- experiences: tab_visibility.reputation 기준
--- 제출: 로그인 유저는 항상 가능, 비회원은 reputation=public인 프로필만
+-- experiences: tab_visibility.network 기준
+-- 제출: 로그인 유저는 항상 가능, 비회원은 network=public인 프로필만
 create policy "experiences viewable by allowed users"
   on public.experiences for select using (
     exists (
       select 1 from public.users u where u.link_id = target_link_id and (
         u.id = auth.uid()
-        or (u.tab_visibility->>'reputation') = 'public'
+        or (u.tab_visibility->>'network') = 'public'
         or (
-          (u.tab_visibility->>'reputation') = 'connected'
+          (u.tab_visibility->>'network') = 'connected'
           and exists (
             select 1 from public.connections c
             where c.status = 'accepted'
@@ -313,6 +313,6 @@ create policy "anyone can submit experience"
     or exists (
       select 1 from public.users u
       where u.link_id = target_link_id
-        and (u.tab_visibility->>'reputation') = 'public'
+        and (u.tab_visibility->>'network') = 'public'
     )
   );

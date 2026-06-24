@@ -257,8 +257,8 @@ export type TabVisibilityLevel = 'public' | 'private'
 
 export interface TabVisibility {
   who: TabVisibilityLevel
-  life: TabVisibilityLevel
-  reputation: TabVisibilityLevel
+  vibe: TabVisibilityLevel
+  network: TabVisibilityLevel
 }
 
 export interface UserState {

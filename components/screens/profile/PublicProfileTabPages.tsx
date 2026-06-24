@@ -30,8 +30,8 @@ function usePublicProfileTabData(username: string) {
   const tabAccessCtx = { isOwner: isOwnerMode, isLoggedIn: store.isLoggedIn }
   const tabAccess = {
     who: computeTabAccess(profile.tabVisibility, 'who', tabAccessCtx),
-    life: computeTabAccess(profile.tabVisibility, 'life', tabAccessCtx),
-    reputation: computeTabAccess(profile.tabVisibility, 'reputation', tabAccessCtx),
+    vibe: computeTabAccess(profile.tabVisibility, 'vibe', tabAccessCtx),
+    network: computeTabAccess(profile.tabVisibility, 'network', tabAccessCtx),
   }
 
   const groupedHighlights = HIGHLIGHT_GROUPS.map((group) => {
@@ -141,7 +141,7 @@ export function PublicProfileLifeTabPage({
 }) {
   const { profile, tabAccess } = usePublicProfileTabData(username)
 
-  if (tabAccess.life !== 'visible') {
+  if (tabAccess.vibe !== 'visible') {
     return <LockedTabContent />
   }
 
@@ -156,7 +156,7 @@ export function PublicProfileReputationTabPage({
   const router = useRouter()
   const { profile, keywordCounts, totalKeywordCount, featuredGuestbook, tabAccess } = usePublicProfileTabData(username)
 
-  if (tabAccess.reputation !== 'visible') {
+  if (tabAccess.network !== 'visible') {
     return <LockedTabContent />
   }
 

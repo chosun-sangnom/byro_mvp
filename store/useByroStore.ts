@@ -178,7 +178,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   selectedBioMethod: null,
 
   // 앱
-  tabVisibility: { who: 'public', life: 'public', reputation: 'public' } as TabVisibility,
+  tabVisibility: { who: 'public', vibe: 'public', network: 'public' } as TabVisibility,
   hlOpenStates: {},
   primaryHighlightOverrides: {},
   snsOpenStates: {},
@@ -584,7 +584,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       experienceKeywords: [],
       experienceMessage: '',
       // 탭 공개 설정
-      tabVisibility: { who: 'public', life: 'public', reputation: 'public' } as TabVisibility,
+      tabVisibility: { who: 'public', vibe: 'public', network: 'public' } as TabVisibility,
     })
   },
 
@@ -624,7 +624,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       activeArchiveTab: 'saved' as const,
       experienceKeywords: [],
       experienceMessage: '',
-      tabVisibility: { who: 'public', life: 'public', reputation: 'public' } as TabVisibility,
+      tabVisibility: { who: 'public', vibe: 'public', network: 'public' } as TabVisibility,
     })
   },
 

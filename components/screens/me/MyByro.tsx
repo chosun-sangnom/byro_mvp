@@ -57,7 +57,7 @@ export default function MyByro() {
   const sectionParam = searchParams.get('section')
   const [screen, setScreen] = useState<Screen>(
     sectionParam === 'highlight'  ? 'editHighlight'  :
-    sectionParam === 'life'       ? 'editLife'        :
+    sectionParam === 'vibe'       ? 'editLife'        :
     sectionParam === 'sns'        ? 'editSNS'         :
     sectionParam === 'contact'    ? 'editContact'     :
     sectionParam === 'visibility' ? 'editVisibility'  :
@@ -82,8 +82,8 @@ export default function MyByro() {
         onOwnerEdit={() => setScreen('manage')}
       >
         {activeTab === 'who' && <PublicProfileWhoTabPage username={user.linkId} />}
-        {activeTab === 'life' && <PublicProfileLifeTabPage username={user.linkId} />}
-        {activeTab === 'reputation' && <PublicProfileReputationTabPage username={user.linkId} />}
+        {activeTab === 'vibe' && <PublicProfileLifeTabPage username={user.linkId} />}
+        {activeTab === 'network' && <PublicProfileReputationTabPage username={user.linkId} />}
       </PublicProfileShell>
     )
   }
@@ -107,7 +107,7 @@ export default function MyByro() {
         onEditSNS={() => setScreen('editSNS')}
         onEditContact={() => setScreen('editContact')}
         user={user}
-        tabVisibility={store.tabVisibility ?? { who: 'public', life: 'public', reputation: 'public' }}
+        tabVisibility={store.tabVisibility ?? { who: 'public', vibe: 'public', network: 'public' }}
         onEditVisibility={() => setScreen('editVisibility')}
         onResetMockData={() => store.resetToMockDefaults()}
       />
@@ -159,7 +159,7 @@ export default function MyByro() {
   if (screen === 'editVisibility') {
     return (
       <VisibilitySettingScreen
-        tabVisibility={store.tabVisibility ?? { who: 'public', life: 'public', reputation: 'public' }}
+        tabVisibility={store.tabVisibility ?? { who: 'public', vibe: 'public', network: 'public' }}
         onUpdate={store.updateTabVisibility}
         onBack={() => setScreen('manage')}
       />

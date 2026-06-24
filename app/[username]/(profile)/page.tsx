@@ -35,8 +35,8 @@ export default function UserProfilePage({ params }: { params: { username: string
       onTabChange={setActiveTab}
     >
       {activeTab === 'who' && <PublicProfileWhoTabPage username={params.username} />}
-      {activeTab === 'life' && <PublicProfileLifeTabPage username={params.username} />}
-      {activeTab === 'reputation' && <PublicProfileReputationTabPage username={params.username} />}
+      {activeTab === 'vibe' && <PublicProfileLifeTabPage username={params.username} />}
+      {activeTab === 'network' && <PublicProfileReputationTabPage username={params.username} />}
     </PublicProfileShell>
   )
 }

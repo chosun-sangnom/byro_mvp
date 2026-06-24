@@ -59,8 +59,8 @@ export function PublicProfileShell({
 
   const tabAccess = {
     who: computeTabAccess(profile.tabVisibility, 'who', tabAccessCtx),
-    life: computeTabAccess(profile.tabVisibility, 'life', tabAccessCtx),
-    reputation: computeTabAccess(profile.tabVisibility, 'reputation', tabAccessCtx),
+    vibe: computeTabAccess(profile.tabVisibility, 'vibe', tabAccessCtx),
+    network: computeTabAccess(profile.tabVisibility, 'network', tabAccessCtx),
   }
 
   // 케미 로딩 트리거: 비로그인이거나 오너이면 케미 없음
@@ -86,8 +86,8 @@ export function PublicProfileShell({
   const [unsaveSheetOpen, setUnsaveSheetOpen] = useState(false)
   const [loginModalOpen, setLoginModalOpen] = useState(false)
 
-  // 관계 탭에서만 "피드백 요청" 버튼 표시 (visitor only)
-  const showReputationActions = activeTab === 'reputation' && !isOwnerMode
+  // NETWORK 탭에서만 "피드백 요청" 버튼 표시 (visitor only)
+  const showReputationActions = activeTab === 'network' && !isOwnerMode
 
   return (
     <div className="flex h-full flex-col">

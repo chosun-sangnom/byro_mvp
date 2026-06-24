@@ -50,7 +50,7 @@ export default function MyPageScreen() {
   }
 
   const VISIBILITY_LABEL: Record<string, string> = { public: '전체공개', private: '비공개' }
-  const visibilitySummary = `WHO ${VISIBILITY_LABEL[tabVisibility.who]} · VIBE ${VISIBILITY_LABEL[tabVisibility.life]} · NETWORK ${VISIBILITY_LABEL[tabVisibility.reputation]}`
+  const visibilitySummary = `WHO ${VISIBILITY_LABEL[tabVisibility.who]} · VIBE ${VISIBILITY_LABEL[tabVisibility.vibe]} · NETWORK ${VISIBILITY_LABEL[tabVisibility.network]}`
 
   // ── 유료결제 서브스크린 ──────────────────────────────────────────
   if (screen === 'billing') {

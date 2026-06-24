@@ -4,12 +4,12 @@ import { Lock } from 'lucide-react'
 import { motion } from 'framer-motion'
 import type { TabAccessLevel } from '@/components/screens/profile/publicProfileData'
 
-export type PublicProfileTabId = 'who' | 'life' | 'reputation'
+export type PublicProfileTabId = 'who' | 'vibe' | 'network'
 
 const TABS: Array<{ id: PublicProfileTabId; label: string }> = [
   { id: 'who', label: 'WHO' },
-  { id: 'life', label: 'VIBE' },
-  { id: 'reputation', label: 'NETWORK' },
+  { id: 'vibe', label: 'VIBE' },
+  { id: 'network', label: 'NETWORK' },
 ] as const
 
 export function PublicProfileTabBar({

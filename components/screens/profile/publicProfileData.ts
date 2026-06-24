@@ -16,7 +16,7 @@ import type {
 
 export type TabAccessLevel = 'visible' | 'locked'
 
-const DEFAULT_TAB_VISIBILITY: TabVisibility = { who: 'public', life: 'public', reputation: 'public' }
+const DEFAULT_TAB_VISIBILITY: TabVisibility = { who: 'public', vibe: 'public', network: 'public' }
 
 export function computeTabAccess(
   tabVisibility: TabVisibility,

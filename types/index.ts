@@ -251,6 +251,7 @@ export interface PublicProfile {
   guestbook?: GuestbookEntry[]
   kemi?: KemiData
   tabVisibility?: TabVisibility
+  isPaidUser?: boolean
 }
 
 export type TabVisibilityLevel = 'public' | 'private'

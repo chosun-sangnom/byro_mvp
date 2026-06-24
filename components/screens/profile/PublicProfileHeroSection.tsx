@@ -207,6 +207,7 @@ export function ProfileHeroCard({
     avatarColor?: string
     avatarImage?: string
     profileImages?: string[]
+    isPaidUser?: boolean
   }
   heroTheme: HeroTheme
   activeImage?: string
@@ -381,6 +382,11 @@ export function ProfileHeroCard({
             >
               {profile.name}
             </div>
+            {profile.isPaidUser && (
+              <div className="mb-2 rounded-full bg-white/20 px-2 py-0.5 backdrop-blur-sm border border-white/20">
+                <span className="text-[10px] font-black tracking-widest text-white/90">PRO</span>
+              </div>
+            )}
           </div>
 
           {showAge && (

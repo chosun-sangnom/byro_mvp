@@ -121,6 +121,7 @@ function buildEditableOwnerProfile(
     showAge: user.showAge ?? baseProfile.showAge,
     life: baseProfile.life,
     contactChannels: user.contactChannels ?? baseProfile.contactChannels,
+    isPaidUser: user.isPaidUser,
   }
 }
 

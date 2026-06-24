@@ -50,6 +50,7 @@ export default function MyPageScreen() {
 
   const [screen, setScreen] = useState<Screen>('main')
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('yearly')
+  const [cancelSheetOpen, setCancelSheetOpen] = useState(false)
   const [linkIdSheetOpen, setLinkIdSheetOpen] = useState(false)
   const [customLinkInput, setCustomLinkInput] = useState(user?.customLinkId ?? '')
   const [cardNumber, setCardNumber] = useState('')
@@ -356,7 +357,13 @@ export default function MyPageScreen() {
                   <span className="rounded-full bg-[var(--color-accent-soft)] px-2.5 py-1 text-[11px] font-bold text-[var(--color-accent-dark)]">PRO</span>
                   <p className="text-[15px] font-black text-[var(--color-text-primary)]">프리미엄 이용 중</p>
                 </div>
-                <p className="text-[12px] text-[var(--color-text-secondary)]">내 링크 커스터마이징 등 PRO 기능을 이용할 수 있어요.</p>
+                <p className="text-[12px] text-[var(--color-text-secondary)] mb-4">내 링크 커스터마이징 등 PRO 기능을 이용할 수 있어요.</p>
+                <button
+                  onClick={() => setCancelSheetOpen(true)}
+                  className="w-full rounded-full py-3 text-[13px] font-semibold border border-[var(--color-border-soft)] text-[var(--color-text-tertiary)]"
+                >
+                  구독 해제
+                </button>
               </>
             ) : (
               <>
@@ -402,6 +409,35 @@ export default function MyPageScreen() {
             </button>
           </div>
         </div>
+
+        {/* 구독 해제 확인 BottomSheet */}
+        <BottomSheet open={cancelSheetOpen} onClose={() => setCancelSheetOpen(false)}>
+          <div className="px-5 pb-8">
+            <p className="text-[18px] font-black text-[var(--color-text-primary)] mb-1">구독을 해제할까요?</p>
+            <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed mb-5">
+              구독 해제 시 즉시 무료 플랜으로 전환돼요. 커스텀 링크는 기본 링크로 복원되고, PRO 기능을 더 이상 이용할 수 없어요.
+            </p>
+            <button
+              onClick={() => {
+                store.setPaidUser(false)
+                store.setCustomLinkId(null)
+                setCustomLinkInput('')
+                setCancelSheetOpen(false)
+                showToast('구독이 해제됐어요')
+              }}
+              className="w-full rounded-full py-3.5 text-[14px] font-semibold mb-2"
+              style={{ backgroundColor: 'var(--color-state-danger-text)', color: '#fff' }}
+            >
+              구독 해제
+            </button>
+            <button
+              onClick={() => setCancelSheetOpen(false)}
+              className="w-full py-3 text-[13px] font-medium text-[var(--color-text-tertiary)]"
+            >
+              취소
+            </button>
+          </div>
+        </BottomSheet>
 
         {/* 내 링크 편집 BottomSheet */}
         <BottomSheet open={linkIdSheetOpen} onClose={() => setLinkIdSheetOpen(false)}>

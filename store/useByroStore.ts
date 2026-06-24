@@ -87,6 +87,7 @@ interface ByroStore {
   setVerified(v: boolean): void
   setLinkId(id: string): void
   setCustomLinkId(customId: string | null): void
+  setPaidUser(paid: boolean): void
   connectInstagram(): void
   disconnectInstagram(): void
   connectLinkedIn(): void
@@ -271,6 +272,12 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     set({
       user: { ...user, customLinkId: customId ?? undefined, linkId: resolvedLinkId },
     })
+  },
+
+  setPaidUser(paid) {
+    const { user } = get()
+    if (!user) return
+    set({ user: { ...user, isPaidUser: paid } })
   },
 
   connectInstagram() {

@@ -7,9 +7,9 @@ import type { TabAccessLevel } from '@/components/screens/profile/publicProfileD
 export type PublicProfileTabId = 'who' | 'life' | 'reputation'
 
 const TABS: Array<{ id: PublicProfileTabId; label: string }> = [
-  { id: 'who', label: '나' },
-  { id: 'life', label: '라이프' },
-  { id: 'reputation', label: '관계' },
+  { id: 'who', label: 'WHO' },
+  { id: 'life', label: 'VIBE' },
+  { id: 'reputation', label: 'NETWORK' },
 ] as const
 
 export function PublicProfileTabBar({

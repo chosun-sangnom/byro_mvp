@@ -10,9 +10,9 @@ const VISIBILITY_OPTIONS: Array<{ value: TabVisibilityLevel; label: string; desc
 ]
 
 const SECTIONS: Array<{ id: keyof TabVisibility; label: string; desc: string }> = [
-  { id: 'who',        label: '나',     desc: '하이라이트 · 자기소개' },
-  { id: 'life',       label: '라이프', desc: '취향 · 장소 · 활동'   },
-  { id: 'reputation', label: '관계',   desc: '평판 · 방명록'        },
+  { id: 'who',        label: 'WHO',     desc: '하이라이트 · 자기소개' },
+  { id: 'life',       label: 'VIBE',    desc: '취향 · 장소 · 활동'   },
+  { id: 'reputation', label: 'NETWORK', desc: '평판 · 방명록'        },
 ]
 
 export function VisibilitySettingScreen({

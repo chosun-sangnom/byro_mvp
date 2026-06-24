@@ -3,12 +3,26 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
-import { ChevronRight, Link, Lock, Pencil, BookmarkCheck, CreditCard, Eye } from 'lucide-react'
+import { ChevronRight, Link, Lock, Pencil, BookmarkCheck, CreditCard, Eye, Check, CheckCircle2 } from 'lucide-react'
 import { NavBar, BottomSheet, showToast } from '@/components/ui'
 
 const CUSTOM_LINK_ID_REGEX = /^[a-z0-9_]{2,20}$/
 
-type Screen = 'main' | 'billing'
+type Screen = 'main' | 'billing' | 'upgrade' | 'payment' | 'success'
+type BillingCycle = 'monthly' | 'yearly'
+
+const MONTHLY_PRICE = 7990
+const YEARLY_MONTHLY_PRICE = Math.round(MONTHLY_PRICE * 12 * 0.8 / 12)
+const YEARLY_TOTAL = YEARLY_MONTHLY_PRICE * 12
+
+const FEATURES: { label: string; free: string; pro: string }[] = [
+  { label: '하이라이트 블록', free: '최대 3개', pro: '무제한' },
+  { label: '바이브탭 항목', free: '탭당 5개', pro: '무제한' },
+  { label: '내 링크 커스터마이징', free: '—', pro: '✓' },
+  { label: '케미 체크', free: '하루 1회', pro: '하루 100회' },
+  { label: '피드백 요청', free: '하루 1회', pro: '무제한' },
+  { label: '방문자 통계', free: '숫자만', pro: '상세 분석' },
+]
 
 type MenuItem = {
   id: string
@@ -32,11 +46,16 @@ export default function MyPageScreen() {
   const isPaid = user?.isPaidUser ?? false
   const currentLinkId = user?.linkId ?? ''
   const randomLinkId = user?.randomLinkId ?? user?.linkId ?? ''
-  const tabVisibility = store.tabVisibility ?? { who: 'public', life: 'public', reputation: 'public' }
+  const tabVisibility = store.tabVisibility ?? { who: 'public', vibe: 'public', network: 'public' }
 
   const [screen, setScreen] = useState<Screen>('main')
+  const [billingCycle, setBillingCycle] = useState<BillingCycle>('yearly')
   const [linkIdSheetOpen, setLinkIdSheetOpen] = useState(false)
   const [customLinkInput, setCustomLinkInput] = useState(user?.customLinkId ?? '')
+  const [cardNumber, setCardNumber] = useState('')
+  const [cardExpiry, setCardExpiry] = useState('')
+  const [cardCvc, setCardCvc] = useState('')
+  const [cardName, setCardName] = useState('')
 
   const handleSaveCustomLinkId = () => {
     const trimmed = customLinkInput.trim().toLowerCase()
@@ -49,8 +68,278 @@ export default function MyPageScreen() {
     showToast(trimmed ? '링크가 변경됐어요!' : '기본 링크로 복원했어요')
   }
 
+  const formatCardNumber = (v: string) =>
+    v.replace(/\D/g, '').slice(0, 16).replace(/(.{4})/g, '$1 ').trim()
+
+  const formatExpiry = (v: string) => {
+    const digits = v.replace(/\D/g, '').slice(0, 4)
+    return digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits
+  }
+
+  const handlePay = () => {
+    if (!cardNumber || !cardExpiry || !cardCvc || !cardName.trim()) {
+      showToast('카드 정보를 모두 입력해주세요')
+      return
+    }
+    store.setPaidUser(true)
+    setScreen('success')
+  }
+
   const VISIBILITY_LABEL: Record<string, string> = { public: '전체공개', private: '비공개' }
   const visibilitySummary = `WHO ${VISIBILITY_LABEL[tabVisibility.who]} · VIBE ${VISIBILITY_LABEL[tabVisibility.vibe]} · NETWORK ${VISIBILITY_LABEL[tabVisibility.network]}`
+
+  // ── 업그레이드 화면 ──────────────────────────────────────────────
+  if (screen === 'upgrade') {
+    const price = billingCycle === 'monthly' ? MONTHLY_PRICE : YEARLY_MONTHLY_PRICE
+    return (
+      <div className="flex h-full flex-col bg-[var(--color-bg-page)]">
+        <NavBar title="PRO 업그레이드" onBack={() => setScreen('billing')} />
+
+        <div className="flex-1 overflow-y-auto pb-32">
+          {/* 헤더 */}
+          <div className="px-5 pt-6 pb-5 text-center">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-accent-soft)] px-3 py-1 mb-3">
+              <span className="text-[11px] font-black text-[var(--color-accent-dark)] tracking-wide">BYRO PRO</span>
+            </div>
+            <p className="text-[22px] font-black text-[var(--color-text-primary)] leading-tight">
+              더 넓게, 더 자유롭게
+            </p>
+            <p className="text-[13px] text-[var(--color-text-secondary)] mt-1.5">
+              제한 없이 나를 표현하는 프리미엄 플랜
+            </p>
+          </div>
+
+          {/* 결제 주기 토글 */}
+          <div className="mx-5 mb-5">
+            <div className="flex rounded-2xl p-1 gap-1" style={{ backgroundColor: 'var(--color-bg-muted)' }}>
+              {(['monthly', 'yearly'] as BillingCycle[]).map((cycle) => (
+                <button
+                  key={cycle}
+                  onClick={() => setBillingCycle(cycle)}
+                  className={[
+                    'flex-1 py-2.5 rounded-xl text-[13px] font-semibold transition-all',
+                    billingCycle === cycle
+                      ? 'bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] shadow-sm'
+                      : 'text-[var(--color-text-tertiary)]',
+                  ].join(' ')}
+                >
+                  {cycle === 'monthly' ? '월간' : (
+                    <span className="flex items-center justify-center gap-1.5">
+                      연간
+                      <span className="rounded-full bg-[var(--color-accent-dark)] px-1.5 py-0.5 text-[10px] font-bold text-white">20% 할인</span>
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 가격 카드 */}
+          <div className="mx-5 mb-5 rounded-2xl border-2 border-[var(--color-accent-dark)] bg-[var(--color-bg-surface)] px-5 py-5">
+            <div className="flex items-end gap-1 mb-1">
+              <span className="text-[32px] font-black text-[var(--color-text-primary)] leading-none">
+                {price.toLocaleString()}원
+              </span>
+              <span className="text-[13px] text-[var(--color-text-secondary)] mb-1">/월</span>
+            </div>
+            {billingCycle === 'yearly' && (
+              <p className="text-[12px] text-[var(--color-text-tertiary)]">
+                연 {YEARLY_TOTAL.toLocaleString()}원 청구 · 월간 대비 20% 절약
+              </p>
+            )}
+          </div>
+
+          {/* 기능 비교 */}
+          <div className="mx-5 rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] overflow-hidden">
+            <div className="grid grid-cols-3 border-b border-[var(--color-border-soft)]">
+              <div className="py-3 px-4 text-[11px] font-bold text-[var(--color-text-tertiary)] uppercase tracking-wide">기능</div>
+              <div className="py-3 text-center text-[11px] font-bold text-[var(--color-text-tertiary)] uppercase tracking-wide">무료</div>
+              <div className="py-3 text-center text-[11px] font-black text-[var(--color-accent-dark)] uppercase tracking-wide">PRO</div>
+            </div>
+            {FEATURES.map((f, i) => (
+              <div
+                key={f.label}
+                className={[
+                  'grid grid-cols-3 items-center',
+                  i < FEATURES.length - 1 ? 'border-b border-[var(--color-border-soft)]' : '',
+                ].join(' ')}
+              >
+                <div className="py-3.5 px-4 text-[12px] text-[var(--color-text-primary)] font-medium">{f.label}</div>
+                <div className="py-3.5 text-center text-[12px] text-[var(--color-text-tertiary)]">{f.free}</div>
+                <div className="py-3.5 text-center text-[12px] font-semibold text-[var(--color-accent-dark)]">{f.pro}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 하단 CTA */}
+        <div className="px-5 pb-[calc(env(safe-area-inset-bottom)+20px)] pt-4 bg-[var(--color-bg-page)] border-t border-[var(--color-border-soft)]">
+          <button
+            onClick={() => setScreen('payment')}
+            className="w-full rounded-full py-4 text-[15px] font-black text-white"
+            style={{ backgroundColor: 'var(--color-accent-dark)' }}
+          >
+            월 {price.toLocaleString()}원으로 시작하기
+          </button>
+          <p className="text-center text-[11px] text-[var(--color-text-tertiary)] mt-2.5">
+            언제든지 구독 취소 가능 · 환불 정책 적용
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  // ── 결제 화면 ──────────────────────────────────────────────────
+  if (screen === 'payment') {
+    const price = billingCycle === 'monthly' ? MONTHLY_PRICE : YEARLY_TOTAL
+    const label = billingCycle === 'monthly' ? '월간 PRO' : '연간 PRO'
+    return (
+      <div className="flex h-full flex-col bg-[var(--color-bg-page)]">
+        <NavBar title="결제" onBack={() => setScreen('upgrade')} />
+
+        <div className="flex-1 overflow-y-auto pb-32">
+          {/* 결제 요약 */}
+          <div className="mx-5 mt-5 rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-5 py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-[14px] font-black text-[var(--color-text-primary)]">{label}</p>
+                <p className="text-[12px] text-[var(--color-text-secondary)] mt-0.5">
+                  {billingCycle === 'monthly' ? '매월 자동 갱신' : '1년 단위 자동 갱신'}
+                </p>
+              </div>
+              <p className="text-[18px] font-black text-[var(--color-accent-dark)]">
+                {price.toLocaleString()}원
+              </p>
+            </div>
+          </div>
+
+          {/* 카드 입력 폼 */}
+          <div className="mx-5 mt-5">
+            <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)] mb-3">카드 정보</p>
+
+            <div className="rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] overflow-hidden divide-y divide-[var(--color-border-soft)]">
+              {/* 카드 번호 */}
+              <div className="px-4 py-3.5">
+                <p className="text-[10px] font-semibold text-[var(--color-text-tertiary)] mb-1.5 uppercase tracking-wide">카드 번호</p>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={cardNumber}
+                  onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                  placeholder="0000 0000 0000 0000"
+                  className="w-full bg-transparent text-[15px] font-semibold text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)] placeholder:font-normal tracking-wider"
+                />
+              </div>
+
+              {/* 유효기간 + CVC */}
+              <div className="flex divide-x divide-[var(--color-border-soft)]">
+                <div className="flex-1 px-4 py-3.5">
+                  <p className="text-[10px] font-semibold text-[var(--color-text-tertiary)] mb-1.5 uppercase tracking-wide">유효기간</p>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={cardExpiry}
+                    onChange={(e) => setCardExpiry(formatExpiry(e.target.value))}
+                    placeholder="MM/YY"
+                    className="w-full bg-transparent text-[15px] font-semibold text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)] placeholder:font-normal"
+                  />
+                </div>
+                <div className="flex-1 px-4 py-3.5">
+                  <p className="text-[10px] font-semibold text-[var(--color-text-tertiary)] mb-1.5 uppercase tracking-wide">CVC</p>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={cardCvc}
+                    onChange={(e) => setCardCvc(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                    placeholder="000"
+                    className="w-full bg-transparent text-[15px] font-semibold text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)] placeholder:font-normal"
+                  />
+                </div>
+              </div>
+
+              {/* 카드 소유자명 */}
+              <div className="px-4 py-3.5">
+                <p className="text-[10px] font-semibold text-[var(--color-text-tertiary)] mb-1.5 uppercase tracking-wide">카드 소유자명</p>
+                <input
+                  type="text"
+                  value={cardName}
+                  onChange={(e) => setCardName(e.target.value.toUpperCase())}
+                  placeholder="HONG GILDONG"
+                  className="w-full bg-transparent text-[15px] font-semibold text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)] placeholder:font-normal tracking-wider"
+                />
+              </div>
+            </div>
+
+            <p className="text-[11px] text-[var(--color-text-tertiary)] mt-3 leading-relaxed">
+              카드 정보는 암호화되어 안전하게 처리됩니다. 실제 결제가 발생하지 않는 목업 화면이에요.
+            </p>
+          </div>
+        </div>
+
+        {/* 하단 결제 버튼 */}
+        <div className="px-5 pb-[calc(env(safe-area-inset-bottom)+20px)] pt-4 bg-[var(--color-bg-page)] border-t border-[var(--color-border-soft)]">
+          <button
+            onClick={handlePay}
+            className="w-full rounded-full py-4 text-[15px] font-black text-white"
+            style={{ backgroundColor: 'var(--color-accent-dark)' }}
+          >
+            {price.toLocaleString()}원 결제하기
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // ── 결제 완료 화면 ──────────────────────────────────────────────
+  if (screen === 'success') {
+    return (
+      <div className="flex h-full flex-col items-center justify-center bg-[var(--color-bg-page)] px-6 text-center">
+        <div
+          className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
+          style={{ backgroundColor: 'var(--color-accent-soft)' }}
+        >
+          <CheckCircle2 size={40} className="text-[var(--color-accent-dark)]" />
+        </div>
+        <p className="text-[24px] font-black text-[var(--color-text-primary)] leading-tight mb-2">
+          PRO 업그레이드 완료!
+        </p>
+        <p className="text-[14px] text-[var(--color-text-secondary)] leading-relaxed mb-8">
+          이제 모든 PRO 기능을 제한 없이 이용할 수 있어요.
+        </p>
+
+        <div className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-5 py-4 mb-8">
+          {FEATURES.map((f, i) => (
+            <div
+              key={f.label}
+              className={[
+                'flex items-center gap-3 py-2.5',
+                i < FEATURES.length - 1 ? 'border-b border-[var(--color-border-soft)]' : '',
+              ].join(' ')}
+            >
+              <div
+                className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: 'var(--color-accent-soft)' }}
+              >
+                <Check size={11} className="text-[var(--color-accent-dark)]" />
+              </div>
+              <p className="text-[13px] text-[var(--color-text-primary)] text-left">
+                <span className="font-semibold">{f.label}</span>
+                <span className="text-[var(--color-text-secondary)]"> {f.pro}</span>
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <button
+          onClick={() => setScreen('billing')}
+          className="w-full rounded-full py-4 text-[15px] font-black text-white"
+          style={{ backgroundColor: 'var(--color-accent-dark)' }}
+        >
+          확인
+        </button>
+      </div>
+    )
+  }
 
   // ── 유료결제 서브스크린 ──────────────────────────────────────────
   if (screen === 'billing') {
@@ -74,7 +363,7 @@ export default function MyPageScreen() {
                 <p className="text-[15px] font-black text-[var(--color-text-primary)] mb-1">무료 플랜</p>
                 <p className="text-[12px] text-[var(--color-text-secondary)] mb-4">PRO로 업그레이드하면 내 링크 커스터마이징 등 프리미엄 기능을 쓸 수 있어요.</p>
                 <button
-                  onClick={() => showToast('준비 중이에요')}
+                  onClick={() => setScreen('upgrade')}
                   className="w-full rounded-full py-3 text-[13px] font-semibold text-white whitespace-nowrap"
                   style={{ backgroundColor: 'var(--color-accent-dark)' }}
                 >

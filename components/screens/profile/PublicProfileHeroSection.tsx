@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bookmark, BookmarkCheck, Sparkles, X } from 'lucide-react'
+import { Bookmark, BookmarkCheck, Pencil, Sparkles, X } from 'lucide-react'
 import { ActionMenu, ActionMenuItem, BottomSheet, showToast } from '@/components/ui'
 import type { PersonaReason } from '@/lib/personaGen'
 
@@ -27,6 +27,7 @@ export function ProfileHeroSection({
   isOwner,
   isBookmarked,
   onBookmarkClick,
+  onOwnerEdit,
 }: {
   profile: {
     name: string
@@ -45,6 +46,7 @@ export function ProfileHeroSection({
   isOwner?: boolean
   isBookmarked?: boolean
   onBookmarkClick?: () => void
+  onOwnerEdit?: () => void
 }) {
   const galleryImages = normalizeProfileImages(profile.profileImages, profile.avatarImage)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
@@ -80,6 +82,7 @@ export function ProfileHeroSection({
         isOwner={isOwner}
         isBookmarked={isBookmarked}
         onBookmarkClick={onBookmarkClick}
+        onOwnerEdit={onOwnerEdit}
       />
 
       {galleryImages.length > 1 && (
@@ -191,6 +194,7 @@ export function ProfileHeroCard({
   isOwner,
   isBookmarked,
   onBookmarkClick,
+  onOwnerEdit,
 }: {
   profile: {
     name: string
@@ -213,6 +217,7 @@ export function ProfileHeroCard({
   isOwner?: boolean
   isBookmarked?: boolean
   onBookmarkClick?: () => void
+  onOwnerEdit?: () => void
 }) {
   const [personaSheetOpen, setPersonaSheetOpen] = useState(false)
   const [moreSheetOpen, setMoreSheetOpen] = useState(false)
@@ -347,6 +352,17 @@ export function ProfileHeroCard({
                 </div>
               </div>
             </div>
+          )}
+
+          {/* 편집 아이콘 — 오너 전용, 카드 우상단 */}
+          {isOwner && onOwnerEdit && (
+            <button
+              type="button"
+              onClick={onOwnerEdit}
+              className="absolute right-4 top-4 z-10 rounded-full border border-white/14 bg-black/38 p-2.5 backdrop-blur-sm"
+            >
+              <Pencil size={17} className="text-white/88" />
+            </button>
           )}
         </div>
 

@@ -15,7 +15,6 @@
 
 import { useEffect, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
-import { Pencil } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { BottomSheet, TextArea, showToast } from '@/components/ui'
 import { getNormalizedPublicProfile, computeTabAccess } from '@/components/screens/profile/publicProfileData'
@@ -116,6 +115,7 @@ export function PublicProfileShell({
                 }
               : undefined
             }
+            onOwnerEdit={isOwnerMode ? (onOwnerEdit ?? (() => router.push('/me'))) : undefined}
           />
         </div>
 
@@ -151,19 +151,6 @@ export function PublicProfileShell({
           >
             피드백 요청
           </button>
-        )}
-
-        {/* 오너 편집 버튼 */}
-        {isOwnerMode && (
-          <div className="mb-4">
-            <button
-              onClick={onOwnerEdit ?? (() => router.push('/me'))}
-              className="flex w-full items-center justify-center gap-2 rounded-full border border-[var(--color-accent-dark)] bg-[var(--color-accent-bg-subtle)] py-3 text-[13px] font-semibold text-[var(--color-accent-dark)] whitespace-nowrap"
-            >
-              <Pencil size={14} />
-              편집
-            </button>
-          </div>
         )}
 
         {/* 연락처 채널 */}

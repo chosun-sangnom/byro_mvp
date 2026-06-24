@@ -1,9 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
-import { ChevronRight, Pencil, BookmarkCheck, CreditCard, Eye } from 'lucide-react'
-import { showToast } from '@/components/ui'
+import { ChevronRight, Link, Lock, Pencil, BookmarkCheck, CreditCard, Eye } from 'lucide-react'
+import { BottomSheet, showToast } from '@/components/ui'
+
+const CUSTOM_LINK_ID_REGEX = /^[a-z0-9_]{2,20}$/
 
 type MenuItem = {
   id: string
@@ -11,6 +14,7 @@ type MenuItem = {
   label: string
   description?: string
   href?: string
+  onClick?: () => void
 }
 
 type Section = {
@@ -25,7 +29,22 @@ export default function MyPageScreen() {
   const initials = user?.name ? user.name.slice(0, 2) : 'BY'
   const isPaid = user?.isPaidUser ?? false
   const currentLinkId = user?.linkId ?? ''
+  const randomLinkId = user?.randomLinkId ?? user?.linkId ?? ''
   const tabVisibility = store.tabVisibility ?? { who: 'public', life: 'public', reputation: 'public' }
+
+  const [linkIdSheetOpen, setLinkIdSheetOpen] = useState(false)
+  const [customLinkInput, setCustomLinkInput] = useState(user?.customLinkId ?? '')
+
+  const handleSaveCustomLinkId = () => {
+    const trimmed = customLinkInput.trim().toLowerCase()
+    if (trimmed && !CUSTOM_LINK_ID_REGEX.test(trimmed)) {
+      showToast('영문 소문자·숫자·_만 사용할 수 있어요 (2~20자)')
+      return
+    }
+    store.setCustomLinkId(trimmed || null)
+    setLinkIdSheetOpen(false)
+    showToast(trimmed ? '링크가 변경됐어요!' : '기본 링크로 복원했어요')
+  }
 
   const VISIBILITY_LABEL: Record<string, string> = { public: '전체공개', private: '비공개' }
   const visibilitySummary = `나 ${VISIBILITY_LABEL[tabVisibility.who]} · 라이프 ${VISIBILITY_LABEL[tabVisibility.life]} · 관계 ${VISIBILITY_LABEL[tabVisibility.reputation]}`
@@ -64,10 +83,14 @@ export default function MyPageScreen() {
           id: 'billing',
           icon: CreditCard,
           label: '유료 결제',
-          description: isPaid
-            ? `PRO · 내 링크: byro.io/${currentLinkId}`
-            : '내 링크 커스터마이징 · 프리미엄 기능',
-          href: undefined,
+          description: isPaid ? 'PRO · 프리미엄 기능 이용 중' : '내 링크 커스터마이징 · 프리미엄 기능',
+        },
+        {
+          id: 'mylink',
+          icon: Link,
+          label: '내 링크',
+          description: `byro.io/${currentLinkId}`,
+          onClick: () => isPaid ? setLinkIdSheetOpen(true) : showToast('유료 플랜에서 사용할 수 있는 기능이에요'),
         },
       ],
     },
@@ -114,6 +137,7 @@ export default function MyPageScreen() {
                   <button
                     key={item.id}
                     onClick={() => {
+                      if (item.onClick) { item.onClick(); return }
                       if (!item.href) { showToast('준비 중이에요'); return }
                       router.push(item.href)
                     }}
@@ -126,7 +150,13 @@ export default function MyPageScreen() {
                       <Icon size={16} className="text-[var(--color-text-secondary)]" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[14px] font-semibold text-[var(--color-text-primary)]">{item.label}</p>
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-[14px] font-semibold text-[var(--color-text-primary)]">{item.label}</p>
+                        {item.id === 'mylink' && !isPaid && <Lock size={11} className="text-[var(--color-text-tertiary)]" />}
+                        {item.id === 'mylink' && isPaid && (
+                          <span className="rounded-full bg-[var(--color-accent-soft)] px-2 py-0.5 text-[10px] font-bold text-[var(--color-accent-dark)]">PRO</span>
+                        )}
+                      </div>
                       {item.description && (
                         <p className="text-[12px] text-[var(--color-text-secondary)] mt-0.5 truncate">{item.description}</p>
                       )}
@@ -139,6 +169,52 @@ export default function MyPageScreen() {
           </div>
         ))}
       </div>
+
+      {/* 내 링크 편집 BottomSheet */}
+      <BottomSheet open={linkIdSheetOpen} onClose={() => setLinkIdSheetOpen(false)}>
+        <div className="px-5 pb-6">
+          <p className="text-[18px] font-black text-[var(--color-text-strong)] mb-1">내 링크 설정</p>
+          <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed mb-5">
+            나만의 링크를 설정하면 <span className="font-semibold">byro.io/내이름</span> 형태로 프로필을 공유할 수 있어요. 유료 이용 종료 시 기본 링크로 자동 복원돼요.
+          </p>
+
+          <p className="text-[11px] font-bold text-[var(--color-text-tertiary)] mb-1.5 uppercase tracking-[0.08em]">기본 링크 (변경 불가)</p>
+          <div className="flex items-center gap-1.5 mb-4 px-4 py-2.5 rounded-xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)]">
+            <span className="text-[13px] text-[var(--color-text-tertiary)]">byro.io/</span>
+            <span className="text-[13px] font-semibold text-[var(--color-text-tertiary)]">{randomLinkId}</span>
+          </div>
+
+          <p className="text-[11px] font-bold text-[var(--color-text-tertiary)] mb-1.5 uppercase tracking-[0.08em]">커스텀 링크</p>
+          <div className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] mb-1.5">
+            <span className="text-[13px] text-[var(--color-text-tertiary)] flex-shrink-0">byro.io/</span>
+            <input
+              type="text"
+              value={customLinkInput}
+              onChange={(e) => setCustomLinkInput(e.target.value.toLowerCase())}
+              placeholder="예: gangminjun"
+              maxLength={20}
+              className="flex-1 bg-transparent text-[13px] font-semibold text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)] placeholder:font-normal"
+            />
+          </div>
+          <p className="text-[11px] text-[var(--color-text-tertiary)] mb-5">영문 소문자·숫자·_만 사용, 2~20자</p>
+
+          <button
+            onClick={handleSaveCustomLinkId}
+            className="w-full rounded-full py-3.5 text-[14px] font-semibold text-white whitespace-nowrap"
+            style={{ backgroundColor: 'var(--color-accent-dark)' }}
+          >
+            저장
+          </button>
+          {user?.customLinkId && (
+            <button
+              onClick={() => { store.setCustomLinkId(null); setCustomLinkInput(''); setLinkIdSheetOpen(false); showToast('기본 링크로 복원했어요') }}
+              className="w-full mt-2 py-3 text-[13px] font-medium text-[var(--color-text-tertiary)]"
+            >
+              기본 링크로 복원
+            </button>
+          )}
+        </div>
+      </BottomSheet>
     </div>
   )
 }

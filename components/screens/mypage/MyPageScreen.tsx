@@ -207,6 +207,7 @@ export default function MyPageScreen() {
 
   return (
     <div className="flex flex-col bg-[var(--color-bg-page)] min-h-full">
+      <NavBar title="마이페이지" onBack={() => router.back()} />
 
       {/* 프로필 카드 */}
       <button

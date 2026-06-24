@@ -7,6 +7,50 @@ import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
 import type { PublicProfileWhoIAm, UserState } from '@/types'
 
+// ── AI 도구 정의 ─────────────────────────────────────────────────────────────
+const AI_TOOLS = [
+  {
+    id: 'chatgpt',
+    name: 'ChatGPT',
+    url: (p: string) => `https://chatgpt.com/?q=${encodeURIComponent(p)}`,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+        <path d="M22.28 9.82a5.98 5.98 0 0 0-.52-4.91 6.05 6.05 0 0 0-6.51-2.9A6.07 6.07 0 0 0 4.98 4.18a5.98 5.98 0 0 0-4 2.9 6.05 6.05 0 0 0 .74 7.1 5.98 5.98 0 0 0 .51 4.91 6.05 6.05 0 0 0 6.51 2.9A5.98 5.98 0 0 0 13.26 24a6.06 6.06 0 0 0 5.77-4.21 5.99 5.99 0 0 0 4-2.9 6.06 6.06 0 0 0-.75-7.07zm-9.02 12.62a4.48 4.48 0 0 1-2.88-1.04l.14-.08 4.78-2.76a.8.8 0 0 0 .39-.68V11.2l2.02 1.17v5.58a4.5 4.5 0 0 1-4.45 4.49zm-9.66-4.13a4.47 4.47 0 0 1-.53-3.01l.14.08 4.78 2.76a.77.77 0 0 0 .78 0l5.84-3.37v2.33l-4.82 2.78a4.5 4.5 0 0 1-6.19-1.57zM2.34 7.9a4.49 4.49 0 0 1 2.37-1.97v5.69a.77.77 0 0 0 .39.68l5.81 3.35-2.02 1.17-4.83-2.79A4.5 4.5 0 0 1 2.34 7.9zm16.1 3.86-5.84-3.37 2.02-1.17 4.83 2.79a4.49 4.49 0 0 1-.68 8.1v-5.68a.79.79 0 0 0-.33-.67zm2.01-3.02-.14-.09-4.77-2.78a.78.78 0 0 0-.79 0L9.41 9.23V6.9l4.83-2.79a4.5 4.5 0 0 1 6.21 4.63zM8.31 12.86 6.29 11.7V6.07a4.5 4.5 0 0 1 7.38-3.45l-.14.08-4.78 2.76a.79.79 0 0 0-.4.68v6.72zm1.1-2.37 2.6-1.5 2.61 1.5v3L11.99 15l-2.61-1.5.03-3.01z" />
+      </svg>
+    ),
+  },
+  {
+    id: 'claude',
+    name: 'Claude',
+    url: (p: string) => `https://claude.ai/new?q=${encodeURIComponent(p)}`,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+        <path d="M11.815 1.816 8.021 12.48.138 9.9l-.138.37 7.883 2.58L4.09 22.184l.37.138 3.905-9.75 3.777 10.612.37-.138-3.775-10.61 10.612 3.773.138-.37-10.61-3.773 3.773-9.497-.139-.37-3.771 9.495L.877 1.816l-.37.138 9.497 3.77L.138 14.22l.37.138 9.866-8.496 3.772 10.614.37-.138-3.77-10.612 9.497 3.773.138-.37-9.497-3.77 3.496-8.771-.37-.138-3.495 8.77-8.497-3.004-.138.37 8.497 3.004-3.496 8.77.37.138 3.496-8.77z" />
+      </svg>
+    ),
+  },
+  {
+    id: 'perplexity',
+    name: 'Perplexity',
+    url: (p: string) => `https://www.perplexity.ai/search?q=${encodeURIComponent(p)}`,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+        <path d="M22 12 12 2 2 12l10 10 10-10zM12 4.83 19.17 12 12 19.17 4.83 12 12 4.83zM12 8l-4 4 4 4 4-4-4-4zm0 2.83L13.17 12 12 13.17 10.83 12 12 10.83z" />
+      </svg>
+    ),
+  },
+  {
+    id: 'gemini',
+    name: 'Gemini',
+    url: (p: string) => `https://gemini.google.com/app?q=${encodeURIComponent(p)}`,
+    icon: (
+      <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
+        <path d="M12 2C9.2 9.2 2 9.2 2 12s7.2 2.8 10 10c2.8-7.2 10-7.2 10-10S14.8 9.2 12 2z" />
+      </svg>
+    ),
+  },
+]
+
 // ── AI 성향 채우기 바텀시트 ──────────────────────────────────────────────────
 function AiPersonalitySheet({
   open,
@@ -54,6 +98,11 @@ function AiPersonalitySheet({
     })
   }
 
+  const handleOpenTool = (tool: typeof AI_TOOLS[number]) => {
+    navigator.clipboard.writeText(promptText).catch(() => {})
+    window.open(tool.url(promptText), '_blank')
+  }
+
   return (
     <BottomSheet open={open} onClose={onClose}>
       <div className="px-5 pb-6 space-y-5">
@@ -67,21 +116,10 @@ function AiPersonalitySheet({
           </h3>
         </div>
 
-        {/* 헬퍼텍스트 */}
-        <div className="rounded-[16px] px-4 py-3.5" style={{ background: 'var(--color-accent-bg-subtle)', border: '1px solid var(--color-accent-border-soft)' }}>
-          <p className="mb-1.5 text-[13px] font-bold" style={{ color: 'var(--color-accent-dark)' }}>
-            AI가 나보다 내 성향을 더 잘 알 수도 있어요
-          </p>
-          <p className="text-[12px] leading-[1.75]" style={{ color: 'var(--color-text-secondary)' }}>
-            평소 ChatGPT나 Claude를 자주 쓴다면, 대화 기록 속에 이미 내 패턴이 담겨 있어요.
-            아래 프롬프트를 복사해서 AI에 붙여넣고, 결과를 아래 입력창에 그대로 붙여넣으세요.
-          </p>
-        </div>
-
-        {/* 프롬프트 예시 */}
+        {/* 프롬프트 */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <p className="text-[12px] font-bold" style={{ color: 'var(--color-text-secondary)' }}>프롬프트 예시</p>
+            <p className="text-[12px] font-bold" style={{ color: 'var(--color-text-secondary)' }}>프롬프트</p>
             <button
               type="button"
               onClick={handleCopy}
@@ -102,6 +140,32 @@ function AiPersonalitySheet({
           >
             {promptText}
           </div>
+        </div>
+
+        {/* AI 도구 선택 */}
+        <div>
+          <p className="mb-3 text-[12px] font-bold" style={{ color: 'var(--color-text-secondary)' }}>
+            AI로 바로 열기
+          </p>
+          <div className="grid grid-cols-4 gap-2">
+            {AI_TOOLS.map((tool) => (
+              <button
+                key={tool.id}
+                type="button"
+                onClick={() => handleOpenTool(tool)}
+                className="flex flex-col items-center gap-1.5 rounded-[16px] py-3.5 transition-opacity active:opacity-70"
+                style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-default)' }}
+              >
+                <span style={{ color: 'var(--color-text-primary)' }}>{tool.icon}</span>
+                <span className="text-[10px] font-semibold" style={{ color: 'var(--color-text-secondary)' }}>
+                  {tool.name}
+                </span>
+              </button>
+            ))}
+          </div>
+          <p className="mt-2 text-[11px] leading-[1.6]" style={{ color: 'var(--color-text-tertiary)' }}>
+            선택하면 프롬프트가 대화창에 자동 입력돼요. 답변을 받은 뒤 아래에 붙여넣으세요.
+          </p>
         </div>
 
         {/* 붙여넣기 입력창 */}

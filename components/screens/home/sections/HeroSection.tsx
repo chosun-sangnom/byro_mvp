@@ -1,25 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Button } from '@/components/ui'
 
-type HeroSectionProps = {
-  isLoggedIn: boolean
-  primaryLabel: string
-  secondaryLabel: string
-  onPrimary: () => void
-  onSecondary: () => void
-  onSampleProfile: () => void
-}
-
-export function HeroSection({
-  isLoggedIn,
-  primaryLabel,
-  secondaryLabel,
-  onPrimary,
-  onSecondary,
-  onSampleProfile,
-}: HeroSectionProps) {
+export function HeroSection() {
   return (
     <section className="min-h-[90vh] flex flex-col items-center justify-center px-6 pt-24 pb-12">
       <motion.div
@@ -46,30 +29,6 @@ export function HeroSection({
           </p>
         </div>
 
-        <div className="flex flex-col gap-3 mb-12">
-          <Button
-            onClick={onPrimary}
-            className="w-full h-12 text-white rounded-2xl shadow-lg"
-            style={{ backgroundColor: 'var(--color-accent-dark)' }}
-          >
-            {primaryLabel}
-          </Button>
-          <Button
-            variant="outline"
-            onClick={onSecondary}
-            className="w-full h-12 border-2 rounded-2xl"
-          >
-            {secondaryLabel}
-          </Button>
-          {!isLoggedIn && (
-            <button
-              onClick={onSampleProfile}
-              className="text-sm font-medium text-[var(--color-text-secondary)]"
-            >
-              샘플 프로필 보기
-            </button>
-          )}
-        </div>
 
         <motion.div
           initial={{ opacity: 0, y: 30 }}

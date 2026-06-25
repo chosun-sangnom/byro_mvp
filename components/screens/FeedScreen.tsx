@@ -194,6 +194,17 @@ export default function FeedScreen() {
             ))}
           </section>
 
+          {/* 랜딩 페이지 링크 */}
+          <div className="px-5 pb-10 pt-2 border-t border-[var(--color-border-soft)]">
+            <button
+              onClick={() => router.push('/landing')}
+              className="w-full flex items-center justify-center gap-1.5 py-3 text-[13px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
+            >
+              <span>Byro 서비스 소개 보기</span>
+              <ChevronRight size={14} />
+            </button>
+          </div>
+
         </div>
       </div>
     </ToastSingleton>

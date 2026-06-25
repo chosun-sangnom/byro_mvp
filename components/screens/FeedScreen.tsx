@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { Bell, Search, ChevronRight } from 'lucide-react'
-import { useByroStore } from '@/store/useByroStore'
+import { useAuth } from '@/hooks/useAuth'
 import { ToastSingleton, showToast } from '@/components/ui'
 
 type FeedProfile = {
@@ -62,7 +62,7 @@ function ProfileAvatar({ profile, size }: { profile: FeedProfile; size: number }
 
 export default function FeedScreen() {
   const router = useRouter()
-  const { isLoggedIn, user } = useByroStore()
+  const { isLoggedIn, user } = useAuth()
 
   const handleProfileClick = (linkId: string | null) => {
     if (!linkId) {

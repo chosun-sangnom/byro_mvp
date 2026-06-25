@@ -20,14 +20,6 @@ export default function Archive() {
   const [memoTarget, setMemoTarget] = useState<SavedProfile | null>(null)
   const [memoValue, setMemoValue] = useState('')
 
-  useEffect(() => {
-    if (!store.isLoggedIn) {
-      router.replace('/signup')
-    }
-  }, [store.isLoggedIn, router])
-
-  if (!store.isLoggedIn) return null
-
   const { activeArchiveTab, setActiveArchiveTab, savedProfiles } = store
   const { recentProfiles } = SAMPLE_PROFILE
 

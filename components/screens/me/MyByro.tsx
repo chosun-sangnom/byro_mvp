@@ -50,10 +50,6 @@ export default function MyByro() {
     setScreen('manage')
   }
 
-  useEffect(() => {
-    if (!store.isLoggedIn) router.replace('/signup')
-  }, [store.isLoggedIn, router])
-
   const sectionParam = searchParams.get('section')
   const [screen, setScreen] = useState<Screen>(
     sectionParam === 'highlight'  ? 'editHighlight'  :
@@ -65,7 +61,6 @@ export default function MyByro() {
   )
   const [activeTab, setActiveTab] = useState<PublicProfileTabId>('who')
 
-  if (!store.isLoggedIn) return null
   const user = store.user!
   const profile = getNormalizedPublicProfile({ username: user.linkId, user, ownerHighlights: store.highlights })
 

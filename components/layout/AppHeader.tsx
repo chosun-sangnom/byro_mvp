@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Bell, BookOpen, Search, Star, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useByroStore } from '@/store/useByroStore'
+import { useAuth } from '@/hooks/useAuth'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
 // [임시] 방명록·피드백 알림 목업 — API 연동 후 교체
@@ -24,7 +24,7 @@ const NOTIF_META = {
 
 export default function AppHeader() {
   const router = useRouter()
-  const { user, isLoggedIn, logout } = useByroStore()
+  const { user, isLoggedIn, logout } = useAuth()
   const [notiOpen, setNotiOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
 

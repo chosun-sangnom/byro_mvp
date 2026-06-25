@@ -1,7 +1,7 @@
 'use client'
 
-import HomeScreen from '@/components/screens/HomeScreen'
+import FeedScreen from '@/components/screens/FeedScreen'
 
 export default function HomePage() {
-  return <HomeScreen />
+  return <FeedScreen />
 }

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { Copy, Share2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
 import { showToast } from '@/components/ui'
+import { shareOrCopy } from '@/lib/share'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
 import { ProfileConnectSection } from '@/components/screens/profile/PublicProfileSections'
@@ -64,22 +65,11 @@ export default function PublicProfile({
     }
   }
 
-  const handleShareProfile = async () => {
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: `${profile.name}의 Byro`,
-          text: `${profile.name}의 Byro 프로필을 확인해보세요.`,
-          url: publicProfileUrl,
-        })
-        return
-      }
-      await navigator.clipboard.writeText(publicProfileUrl)
-      showToast('공유 기능을 지원하지 않아 링크를 복사했어요')
-    } catch {
-      showToast('공유를 취소했어요')
-    }
-  }
+  const handleShareProfile = () => shareOrCopy({
+    title: `${profile.name}의 Byro`,
+    text: `${profile.name}의 Byro 프로필을 확인해보세요.`,
+    url: publicProfileUrl,
+  })
 
   const handleLogout = () => {
     store.logout()

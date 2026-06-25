@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Bell, BookOpen, Search, Star, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
+import { Avatar } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
 // [임시] 방명록·피드백 알림 목업 — API 연동 후 교체
@@ -74,20 +75,10 @@ export default function AppHeader() {
             <motion.button
               whileTap={{ scale: 0.88 }}
               onClick={() => setProfileOpen((o) => !o)}
-              className="ml-1 w-8 h-8 rounded-full overflow-hidden flex-shrink-0"
+              className="ml-1"
               aria-label="프로필 메뉴"
             >
-              {user?.avatarImage ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={user.avatarImage} alt={user.name} className="w-full h-full object-cover" />
-              ) : (
-                <div
-                  className="w-full h-full flex items-center justify-center text-white text-[11px] font-bold"
-                  style={{ backgroundColor: user?.avatarColor ?? 'var(--color-accent-dark)' }}
-                >
-                  {initials}
-                </div>
-              )}
+              <Avatar src={user?.avatarImage} name={user?.name ?? ''} color={user?.avatarColor ?? 'var(--color-accent-dark)'} size={32} />
             </motion.button>
           ) : (
             <motion.button
@@ -128,19 +119,7 @@ export default function AppHeader() {
                 onClick={() => { setProfileOpen(false); router.push('/me') }}
                 className="flex flex-col items-center gap-2 px-5 pt-5 pb-4 w-full hover:bg-[var(--color-bg-soft)] transition-colors"
               >
-                <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0">
-                  {user?.avatarImage ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={user.avatarImage} alt={user?.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <div
-                      className="w-full h-full flex items-center justify-center text-white text-[18px] font-bold"
-                      style={{ backgroundColor: user?.avatarColor ?? 'var(--color-accent-dark)' }}
-                    >
-                      {initials}
-                    </div>
-                  )}
-                </div>
+                <Avatar src={user?.avatarImage} name={user?.name ?? ''} color={user?.avatarColor ?? 'var(--color-accent-dark)'} size={64} />
                 <span className="text-[15px] font-semibold text-[var(--color-text-primary)]">{user?.name}</span>
               </button>
 

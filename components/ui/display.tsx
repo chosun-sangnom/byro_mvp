@@ -7,12 +7,40 @@ export function Divider({ thick }: { thick?: boolean }) {
   return <div className="h-px bg-[var(--color-border-soft)] my-3" />
 }
 
-export function Avatar({ name, size = 'md' }: { name: string; size?: 'sm' | 'md' | 'lg' }) {
-  const char = name.charAt(0)
-  const sizeClass = size === 'sm' ? 'w-8 h-8 text-sm' : size === 'lg' ? 'w-14 h-14 text-xl' : 'w-10 h-10 text-base'
+export function Avatar({
+  name,
+  src,
+  color,
+  size = 40,
+}: {
+  name: string
+  src?: string
+  color?: string
+  size?: number
+}) {
+  const fontSize = Math.round(size * 0.28)
   return (
-    <div className={`${sizeClass} rounded-full bg-[var(--color-bg-muted)] flex items-center justify-center font-bold text-[var(--color-text-secondary)] flex-shrink-0`}>
-      {char}
+    <div
+      style={{
+        width: size,
+        height: size,
+        borderRadius: '50%',
+        overflow: 'hidden',
+        flexShrink: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: src ? undefined : (color ?? 'var(--color-bg-muted)'),
+      }}
+    >
+      {src ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={src} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      ) : (
+        <span style={{ color: color ? '#fff' : 'var(--color-text-secondary)', fontSize, fontWeight: 700 }}>
+          {name.slice(0, 2)}
+        </span>
+      )}
     </div>
   )
 }

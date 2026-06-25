@@ -1,19 +1,18 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useByroStore } from '@/store/useByroStore'
+import { useProfileOwner } from '@/hooks/useProfileOwner'
 import { getPublicProfileByUsername, getProfileAvatar } from '@/lib/mocks/publicProfiles'
 
 export default function GuestbookScreen({ username }: { username: string }) {
   const router = useRouter()
-  const store = useByroStore()
-  const isOwnProfile = store.user?.linkId === username
+  const { isOwner: isOwnProfile, user } = useProfileOwner(username)
   const baseProfile = getPublicProfileByUsername(username)
-  const profile = isOwnProfile && store.user
+  const profile = isOwnProfile && user
     ? {
       ...baseProfile,
-      name: store.user.name,
-      linkId: store.user.linkId,
+      name: user.name,
+      linkId: user.linkId,
       guestbook: baseProfile.guestbook,
     }
     : baseProfile

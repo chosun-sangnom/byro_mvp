@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation'
 import { Bell, Search, ChevronRight } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { ToastSingleton, showToast } from '@/components/ui'
+import { Avatar, ToastSingleton, showToast } from '@/components/ui'
 
 type FeedProfile = {
   linkId: string | null
@@ -35,30 +35,6 @@ const RECOMMENDED_PROFILES: FeedProfile[] = [
   { linkId: null, name: '이준혁', title: '변호사 · 스타트업 전문', avatarColor: '#9AACC4' },
 ]
 
-function ProfileAvatar({ profile, size }: { profile: FeedProfile; size: number }) {
-  const style: React.CSSProperties = {
-    width: size,
-    height: size,
-    borderRadius: '50%',
-    overflow: 'hidden',
-    flexShrink: 0,
-    backgroundColor: profile.avatarColor ?? '#C8BDB0',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  }
-  return (
-    <div style={style}>
-      {profile.avatarImage ? (
-        <img src={profile.avatarImage} alt={profile.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-      ) : (
-        <span style={{ color: '#fff', fontSize: size * 0.28, fontWeight: 700 }}>
-          {profile.name.slice(0, 2)}
-        </span>
-      )}
-    </div>
-  )
-}
 
 export default function FeedScreen() {
   const router = useRouter()
@@ -139,7 +115,7 @@ export default function FeedScreen() {
                   className="flex-shrink-0 flex flex-col items-center gap-2"
                   style={{ width: 72 }}
                 >
-                  <ProfileAvatar profile={p} size={60} />
+                  <Avatar src={p.avatarImage} name={p.name} color={p.avatarColor} size={60} />
                   <div className="text-center w-full">
                     <p className="text-[12px] font-semibold text-[var(--color-text-primary)] truncate">{p.name}</p>
                     <p className="text-[10px] text-[var(--color-text-tertiary)] truncate">{p.title.split(' · ')[0]}</p>
@@ -162,7 +138,7 @@ export default function FeedScreen() {
                   className="flex-shrink-0 flex flex-col items-center gap-2"
                   style={{ width: 72 }}
                 >
-                  <ProfileAvatar profile={p} size={60} />
+                  <Avatar src={p.avatarImage} name={p.name} color={p.avatarColor} size={60} />
                   <div className="text-center w-full">
                     <p className="text-[12px] font-semibold text-[var(--color-text-primary)] truncate">{p.name}</p>
                     <p className="text-[10px] text-[var(--color-text-tertiary)] truncate">{p.title.split(' · ')[0]}</p>
@@ -183,7 +159,7 @@ export default function FeedScreen() {
                 onClick={() => handleProfileClick(p.linkId)}
                 className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[var(--color-bg-soft)] transition-colors text-left"
               >
-                <ProfileAvatar profile={p} size={44} />
+                <Avatar src={p.avatarImage} name={p.name} color={p.avatarColor} size={44} />
                 <div className="min-w-0 flex-1">
                   <p className="text-[14px] font-semibold text-[var(--color-text-primary)] truncate">{p.name}</p>
                   <p className="text-[12px] text-[var(--color-text-secondary)] truncate">{p.title}</p>

@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Bookmark, BookmarkCheck, Pencil, Sparkles, X } from 'lucide-react'
 import { ActionMenu, ActionMenuItem, BottomSheet, showToast } from '@/components/ui'
+import { shareOrCopy } from '@/lib/share'
 import type { PersonaReason } from '@/lib/personaGen'
 
 type HeroTheme = {
@@ -317,14 +318,8 @@ export function ProfileHeroCard({
                     <ActionMenu open={moreSheetOpen} onClose={() => setMoreSheetOpen(false)}>
                       <ActionMenuItem
                         label="공유하기"
-                        onClick={() => {
-                          const url = window.location.href
-                          if (navigator.share) {
-                            navigator.share({ title: `${profile.name}의 바이로`, url })
-                          } else {
-                            navigator.clipboard.writeText(url)
-                            showToast('링크를 복사했어요')
-                          }
+                        onClick={async () => {
+                          await shareOrCopy({ title: `${profile.name}의 바이로`, url: window.location.href })
                           setMoreSheetOpen(false)
                         }}
                       />

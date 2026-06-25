@@ -7,6 +7,7 @@ import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
 
 
 import { getNormalizedPublicProfile, computeTabAccess } from '@/components/screens/profile/publicProfileData'
+import { useProfileOwner } from '@/hooks/useProfileOwner'
 import {
   ProfileFeedbackSection,
   ProfileRememberSection,
@@ -20,14 +21,14 @@ import { PublicProfileWhoIAmSection } from '@/components/screens/profile/PublicP
 
 function usePublicProfileTabData(username: string) {
   const store = useByroStore()
-  const isOwnerMode = store.isLoggedIn && store.user?.linkId === username
+  const { isOwner: isOwnerMode, isLoggedIn } = useProfileOwner(username)
   const profile = getNormalizedPublicProfile({
     username,
     user: store.user,
     ownerHighlights: store.highlights,
     ownerTabVisibility: store.tabVisibility,
   })
-  const tabAccessCtx = { isOwner: isOwnerMode, isLoggedIn: store.isLoggedIn }
+  const tabAccessCtx = { isOwner: isOwnerMode, isLoggedIn }
   const tabAccess = {
     who: computeTabAccess(profile.tabVisibility, 'who', tabAccessCtx),
     vibe: computeTabAccess(profile.tabVisibility, 'vibe', tabAccessCtx),

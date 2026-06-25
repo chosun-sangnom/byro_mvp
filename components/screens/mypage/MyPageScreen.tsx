@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
 import { ChevronRight, Link, Lock, Pencil, BookmarkCheck, CreditCard, Eye, Check, CheckCircle2 } from 'lucide-react'
-import { NavBar, BottomSheet, showToast } from '@/components/ui'
+import { Avatar, NavBar, BottomSheet, showToast } from '@/components/ui'
 
 const CUSTOM_LINK_ID_REGEX = /^[a-z0-9_]{2,20}$/
 
@@ -539,19 +539,7 @@ export default function MyPageScreen() {
         onClick={() => router.push('/me')}
         className="flex items-center gap-4 mx-4 mt-6 mb-2 px-4 py-4 rounded-2xl bg-[var(--color-bg-surface)] border border-[var(--color-border-soft)] w-[calc(100%-2rem)] text-left active:opacity-80 transition-opacity"
       >
-        <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0">
-          {user?.avatarImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={user.avatarImage} alt={user.name} className="w-full h-full object-cover" />
-          ) : (
-            <div
-              className="w-full h-full flex items-center justify-center text-white text-[18px] font-bold"
-              style={{ backgroundColor: user?.avatarColor ?? 'var(--color-accent-dark)' }}
-            >
-              {initials}
-            </div>
-          )}
-        </div>
+        <Avatar src={user?.avatarImage} name={user?.name ?? ''} color={user?.avatarColor ?? 'var(--color-accent-dark)'} size={56} />
         <div className="flex-1 min-w-0">
           <p className="text-[16px] font-black text-[var(--color-text-primary)] truncate">{user?.name}</p>
           <p className="text-[12px] text-[var(--color-accent-dark)] mt-0.5 font-medium">내 프로필 보기 →</p>

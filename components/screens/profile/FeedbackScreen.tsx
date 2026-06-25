@@ -2,13 +2,14 @@
 
 import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
+import { useProfileOwner } from '@/hooks/useProfileOwner'
 import { getPublicProfileByUsername } from '@/lib/mocks/publicProfiles'
 import type { Experience, PublicProfile } from '@/types'
 
 export default function FeedbackScreen({ username }: { username: string }) {
   const router = useRouter()
   const store = useByroStore()
-  const isOwnProfile = store.user?.linkId === username
+  const { isOwner: isOwnProfile } = useProfileOwner(username)
   const baseProfile = getPublicProfileByUsername(username)
   const profile = isOwnProfile && store.user
     ? { ...baseProfile, name: store.user.name, linkId: store.user.linkId }

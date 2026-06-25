@@ -25,6 +25,7 @@ import { PublicProfileTabBar, type PublicProfileTabId } from '@/components/scree
 import { PublicProfileKemiZone, PublicProfileOwnerMatchZone } from '@/components/screens/profile/PublicProfileKemiZone'
 import { PublicProfileCompatibilitySheet } from '@/components/screens/profile/PublicProfileCompatibilitySheet'
 import { LoginModal } from '@/components/screens/profile/LoginModal'
+import { useProfileOwner } from '@/hooks/useProfileOwner'
 
 
 export function PublicProfileShell({
@@ -49,7 +50,7 @@ export function PublicProfileShell({
     ownerTabVisibility: store.tabVisibility,
   })
 
-  const isOwnerMode = store.isLoggedIn && store.user?.linkId === username
+  const { isOwner: isOwnerMode } = useProfileOwner(username)
 
   // [임시] 오너 모드에서만 페르소나 생성 (목업 데이터 기반)
   const persona = isOwnerMode ? generatePersona(profile) : null

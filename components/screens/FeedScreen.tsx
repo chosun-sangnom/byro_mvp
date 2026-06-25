@@ -80,12 +80,11 @@ export default function FeedScreen() {
         <header className="flex items-center justify-between px-5 h-14 border-b border-[var(--color-border-soft)] flex-shrink-0">
           <span className="text-[18px] font-black tracking-tight text-[var(--color-text-strong)]">Byro</span>
           <div className="flex items-center gap-1">
-            <button
-              className="p-2 text-[var(--color-text-secondary)]"
-              onClick={() => !isLoggedIn && showToast('로그인 후 이용할 수 있어요')}
-            >
-              <Bell size={20} />
-            </button>
+            {isLoggedIn && (
+              <button className="p-2 text-[var(--color-text-secondary)]">
+                <Bell size={20} />
+              </button>
+            )}
             {isLoggedIn ? (
               <button onClick={() => router.push('/me')} className="ml-1">
                 {user?.avatarImage ? (

@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronRight, Lock, Mail, MessageCircle, Phone, Sparkles } from 'lucide-react'
 import type { ContactChannel, RememberIndustry } from '@/types'
+import { generateNetworkInsight } from '@/lib/networkInsight'
 
 const SECTION_EASE = [0.22, 1, 0.36, 1] as const
 
@@ -159,21 +160,28 @@ function MiniBar({ ratio, accent }: { ratio: number; accent?: boolean }) {
   )
 }
 
-function BreakdownList({ items, accent }: { items: RememberIndustry[]; accent?: boolean }) {
+function BreakdownList({ items, accent, total }: { items: RememberIndustry[]; accent?: boolean; total?: number }) {
   return (
     <div className="space-y-2">
-      {items.map((item) => (
-        <div key={item.name} className="flex items-center gap-2">
-          <span className="w-[88px] shrink-0 truncate text-[11px] text-[var(--color-text-secondary)]">{item.name}</span>
-          <MiniBar ratio={item.ratio} accent={accent} />
-          <span className="w-7 shrink-0 text-right text-[11px] font-semibold text-[var(--color-text-secondary)]">{item.ratio}%</span>
-        </div>
-      ))}
+      {items.map((item) => {
+        const count = item.count ?? (total ? Math.round(total * item.ratio / 100) : undefined)
+        return (
+          <div key={item.name} className="flex items-center gap-2">
+            <span className="w-[80px] shrink-0 truncate text-[11px] text-[var(--color-text-secondary)]">{item.name}</span>
+            <MiniBar ratio={item.ratio} accent={accent} />
+            <span className="w-7 shrink-0 text-right text-[11px] font-semibold text-[var(--color-text-secondary)]">{item.ratio}%</span>
+            {count !== undefined && (
+              <span className="w-8 shrink-0 text-right text-[10px] text-[var(--color-text-tertiary)]">{count}명</span>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }
 
 export function ProfileRememberSection({
+  profileName,
   total,
   industries,
   topIndustryRanks,
@@ -181,6 +189,7 @@ export function ProfileRememberSection({
   isLoggedIn,
   viewerNetworkDomain,
 }: {
+  profileName: string
   total: number
   industries: Array<{ name: string; ratio: number; count?: number }>
   topIndustryRanks?: RememberIndustry[]
@@ -189,13 +198,13 @@ export function ProfileRememberSection({
   viewerNetworkDomain?: string
 }) {
   const topIndustry = industries[0]
-
-  // 개인화 인사이트 조건
-  const isMatch = isLoggedIn && !!viewerNetworkDomain && viewerNetworkDomain === topIndustry?.name
-  const viewerIndustry = isLoggedIn && viewerNetworkDomain
-    ? industries.find((i) => i.name === viewerNetworkDomain)
-    : null
   const showPersonalized = isLoggedIn && !!viewerNetworkDomain
+
+  const insight = showPersonalized
+    ? generateNetworkInsight({ profileName, total, industries, topIndustryRanks, topIndustryRoles, viewerDomain: viewerNetworkDomain! })
+    : null
+
+  const topIndustryCount = topIndustry?.count ?? Math.round(total * (topIndustry?.ratio ?? 0) / 100)
 
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.02}>
@@ -223,9 +232,15 @@ export function ProfileRememberSection({
               <MiniBar ratio={topIndustry.ratio} accent />
               <span className="shrink-0 text-[13px] font-black" style={{ color: 'var(--color-accent-dark)' }}>{topIndustry.ratio}%</span>
             </div>
-            {topIndustry.count && (
-              <p className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">전체 {total}명 중 {topIndustry.count}명</p>
-            )}
+            <p className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">전체 {total}명 중 {topIndustryCount}명</p>
+          </div>
+        )}
+
+        {/* 직무 분포 (직급보다 위) */}
+        {topIndustryRoles && topIndustryRoles.length > 0 && (
+          <div>
+            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">{topIndustry?.name} · 직무</p>
+            <BreakdownList items={topIndustryRoles} total={topIndustryCount} />
           </div>
         )}
 
@@ -233,76 +248,42 @@ export function ProfileRememberSection({
         {topIndustryRanks && topIndustryRanks.length > 0 && (
           <div>
             <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">{topIndustry?.name} · 직급</p>
-            <BreakdownList items={topIndustryRanks} />
-          </div>
-        )}
-
-        {/* 직무 분포 */}
-        {topIndustryRoles && topIndustryRoles.length > 0 && (
-          <div>
-            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">{topIndustry?.name} · 직무</p>
-            <BreakdownList items={topIndustryRoles} />
+            <BreakdownList items={topIndustryRanks} total={topIndustryCount} />
           </div>
         )}
       </div>
 
       {/* 개인화 인사이트 — 조건부 */}
       <div className="mt-3">
-        {showPersonalized ? (
-          isMatch ? (
-            /* 일치 — 매치 하이라이트 카드 */
-            <div
-              className="rounded-[18px] px-4 py-4"
-              style={{ background: 'linear-gradient(135deg, var(--color-accent-bg), var(--color-bg-surface))', border: '1px solid color-mix(in srgb, var(--color-accent-dark) 40%, transparent)' }}
-            >
-              <div className="mb-1.5 flex items-center gap-1.5">
-                <Sparkles size={13} style={{ color: 'var(--color-accent-dark)' }} />
-                <span className="text-[11px] font-bold" style={{ color: 'var(--color-accent-dark)' }}>관심 도메인 매치</span>
-              </div>
-              <p className="text-[14px] font-black text-[var(--color-text-primary)] leading-snug">
-                당신이 관심 있는 {viewerNetworkDomain}이<br />이 분의 핵심 네트워크예요
-              </p>
-              <p className="mt-1.5 text-[12px] text-[var(--color-text-secondary)]">
-                전체의 {topIndustry?.ratio}% · {topIndustry?.count ?? '-'}명
-              </p>
+        {insight ? (
+          <div
+            className="rounded-[18px] px-4 py-4"
+            style={insight.isMatch
+              ? { background: 'linear-gradient(135deg, var(--color-accent-bg), var(--color-bg-surface))', border: '1px solid color-mix(in srgb, var(--color-accent-dark) 40%, transparent)' }
+              : { background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-default)' }
+            }
+          >
+            <div className="mb-2 flex items-center gap-1.5">
+              <Sparkles size={13} style={{ color: insight.isMatch ? 'var(--color-accent-dark)' : 'var(--color-text-tertiary)' }} />
+              <span
+                className="text-[11px] font-bold"
+                style={{ color: insight.isMatch ? 'var(--color-accent-dark)' : 'var(--color-text-tertiary)' }}
+              >
+                {insight.isMatch ? '관심 도메인 매치' : '내 관심 도메인 인사이트'}
+              </span>
             </div>
-          ) : viewerIndustry ? (
-            /* 미일치 — 뷰어 관심 도메인 비율 카드 */
-            <div className="rounded-[18px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-4">
-              <div className="mb-1.5 flex items-center gap-1.5">
-                <Sparkles size={13} className="text-[var(--color-text-tertiary)]" />
-                <span className="text-[11px] font-bold text-[var(--color-text-tertiary)]">내 관심 도메인</span>
-              </div>
-              <p className="text-[14px] font-black text-[var(--color-text-primary)] leading-snug">
-                {viewerNetworkDomain} 업계는 전체의 {viewerIndustry.ratio}%
-              </p>
-              {viewerIndustry.count && (
-                <p className="mt-1.5 text-[12px] text-[var(--color-text-secondary)]">{viewerIndustry.count}명</p>
-              )}
-            </div>
-          ) : (
-            /* 관심 도메인이 상대 네트워크에 없는 경우 */
-            <div className="rounded-[18px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-4">
-              <div className="mb-1 flex items-center gap-1.5">
-                <Sparkles size={13} className="text-[var(--color-text-tertiary)]" />
-                <span className="text-[11px] font-bold text-[var(--color-text-tertiary)]">내 관심 도메인</span>
-              </div>
-              <p className="text-[13px] text-[var(--color-text-secondary)]">
-                {viewerNetworkDomain} 업계 명함은 이 분의 네트워크에 없어요
-              </p>
-            </div>
-          )
+            <p className="text-[13px] leading-[1.65] text-[var(--color-text-primary)]">{insight.text}</p>
+          </div>
         ) : (
           /* 블러 넛지 — 비로그인 or 관심 도메인 미설정 */
-          <div className="relative overflow-hidden rounded-[18px]">
-            <div className="px-4 py-4 space-y-1.5 select-none pointer-events-none" aria-hidden>
-              {['스타트업 업계는 전체의 38%예요', '94명'].map((t, i) => (
-                <div key={i} className="h-3.5 rounded-full bg-[var(--color-bg-muted)]" style={{ width: i === 0 ? '80%' : '30%' }} />
-              ))}
+          <div className="relative overflow-hidden rounded-[18px]" style={{ minHeight: 80 }}>
+            <div className="px-4 py-4 space-y-2 select-none pointer-events-none" aria-hidden>
+              <div className="h-3 rounded-full bg-[var(--color-bg-muted)]" style={{ width: '85%' }} />
+              <div className="h-3 rounded-full bg-[var(--color-bg-muted)]" style={{ width: '60%' }} />
             </div>
             <div className="absolute inset-0 backdrop-blur-md bg-[var(--color-bg-page)]/60 rounded-[18px]" />
             <div className="absolute inset-0 flex flex-col items-center justify-center px-5 text-center">
-              <Lock size={16} className="mb-2 text-[var(--color-text-tertiary)]" />
+              <Lock size={15} className="mb-1.5 text-[var(--color-text-tertiary)]" />
               <p className="text-[12px] font-semibold text-[var(--color-text-secondary)]">
                 {isLoggedIn ? '관심 도메인을 설정하면 맞춤 인사이트를 볼 수 있어요' : '로그인하면 맞춤 네트워크 인사이트를 볼 수 있어요'}
               </p>

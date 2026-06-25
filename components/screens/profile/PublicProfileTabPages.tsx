@@ -170,6 +170,7 @@ export function PublicProfileReputationTabPage({
   return (
     <div className="pb-6">
       <ProfileRememberSection
+        profileName={profile.name}
         total={profile.rememberHighlight.total}
         industries={profile.rememberHighlight.industries}
         topIndustryRanks={profile.rememberHighlight.topIndustryRanks}

@@ -406,7 +406,7 @@ function AlbumView({
 
   return (
     <SubScreen
-      title="나를 표현하는 사진"
+      title="앨범"
       onBack={() => onSave(life.albumPhotos ?? [])}
       onSave={() => onSave(photos)}
     >
@@ -508,7 +508,7 @@ function LifeHub({
     {
       view: 'album',
       emoji: '🖼️',
-      title: '나를 표현하는 사진',
+      title: '앨범',
       meta: albumCount > 0 ? `${albumCount}장` : null,
       nudge: '취미, 일상, 좋아하는 공간을 사진으로 보여줘요',
     },

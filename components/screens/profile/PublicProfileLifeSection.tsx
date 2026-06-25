@@ -666,7 +666,7 @@ export function PublicProfileLifeSection({ life, isOwner }: { life?: PublicProfi
       {(life.albumPhotos && life.albumPhotos.length > 0 || isOwner) && (
         <>
           <SectionDivider />
-          <BlockHeader label="나를 표현하는 사진" />
+          <BlockHeader label="앨범" />
           <div className="px-5 pb-6">
             <div className="grid grid-cols-3 gap-1.5">
               {life.albumPhotos?.map((url, i) => (

@@ -44,7 +44,6 @@ export function PublicProfileKemiZone({
   onCompatibilityOpen?: () => void
   onLoginRequest?: () => void
 }) {
-  if (!isLoggedIn) return null
   if (!kemi && !isLoading) return null
 
   if (isLoading) {

@@ -206,6 +206,10 @@ export function ProfileRememberSection({
 
   const topIndustryCount = topIndustry?.count ?? Math.round(total * (topIndustry?.ratio ?? 0) / 100)
 
+  const viewerDomainEntry = showPersonalized ? industries.find((i) => i.name === viewerNetworkDomain) : undefined
+  const viewerDomainRatio = viewerDomainEntry?.ratio ?? 0
+  const viewerDomainCount = viewerDomainEntry?.count ?? Math.round(total * viewerDomainRatio / 100)
+
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.02}>
       <SectionTitle title="리멤버 네트워크" />
@@ -270,6 +274,22 @@ export function ProfileRememberSection({
                 style={{ color: insight.isMatch ? 'var(--color-accent-dark)' : 'var(--color-text-tertiary)' }}
               >
                 {insight.isMatch ? '관심 도메인 매치' : '내 관심 도메인 인사이트'}
+              </span>
+            </div>
+            {/* 뷰어 관심 도메인 비율 미니바 */}
+            <div className="mb-3 flex items-center gap-2">
+              <span
+                className="shrink-0 text-[11px] font-semibold"
+                style={{ color: insight.isMatch ? 'var(--color-accent-dark)' : 'var(--color-text-secondary)' }}
+              >
+                {viewerNetworkDomain}
+              </span>
+              <MiniBar ratio={viewerDomainRatio} accent={insight.isMatch} />
+              <span className="shrink-0 text-[11px] font-semibold text-[var(--color-text-secondary)]">
+                {viewerDomainRatio}%
+              </span>
+              <span className="shrink-0 text-[10px] text-[var(--color-text-tertiary)]">
+                {viewerDomainCount}명
               </span>
             </div>
             <p className="text-[13px] leading-[1.65] text-[var(--color-text-primary)]">{insight.text}</p>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, type ChangeEvent, type ReactNode } from 'react'
-import { Camera, ChevronRight, Zap } from 'lucide-react'
+import { Camera, ChevronRight, Plus, X, Zap } from 'lucide-react'
 import { Button, NavBar, showToast } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
@@ -15,7 +15,7 @@ import { TravelPicker } from './TravelPicker'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type LifeView = 'hub' | 'pet' | 'activity' | 'culture' | 'place' | 'travel'
+type LifeView = 'hub' | 'pet' | 'activity' | 'culture' | 'place' | 'travel' | 'album'
 
 const PET_OPTIONS = ['없음', '강아지', '고양이', '소형 포유류', '조류', '파충류', '어류', '기타']
 
@@ -395,6 +395,51 @@ function TravelView({
   )
 }
 
+function AlbumView({
+  life,
+  onSave,
+}: {
+  life: PublicProfileLife
+  onSave: (photos: string[]) => void
+}) {
+  const [photos, setPhotos] = useState<string[]>(life.albumPhotos ?? [])
+
+  return (
+    <SubScreen
+      title="나를 표현하는 사진"
+      onBack={() => onSave(life.albumPhotos ?? [])}
+      onSave={() => onSave(photos)}
+    >
+      <div className="grid grid-cols-3 gap-2">
+        {photos.map((url, i) => (
+          <div key={i} className="relative aspect-square overflow-hidden rounded-xl bg-[var(--color-bg-muted)]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={url} alt={`사진 ${i + 1}`} className="h-full w-full object-cover" />
+            <button
+              onClick={() => setPhotos((prev) => prev.filter((_, j) => j !== i))}
+              className="absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/60"
+            >
+              <X size={12} className="text-white" />
+            </button>
+          </div>
+        ))}
+        {/* [임시] 실제 업로드 미구현 */}
+        <button
+          onClick={() => showToast('사진 업로드는 준비 중이에요')}
+          className="aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1"
+          style={{ borderColor: 'var(--color-border-default)' }}
+        >
+          <Plus size={22} className="text-[var(--color-text-tertiary)]" />
+          <span className="text-[11px] text-[var(--color-text-tertiary)]">추가</span>
+        </button>
+      </div>
+      <p className="text-[12px] text-[var(--color-text-tertiary)] leading-relaxed">
+        나를 잘 표현하는 사진을 자유롭게 올려보세요. 취미, 일상, 좋아하는 공간 등 무엇이든 괜찮아요.
+      </p>
+    </SubScreen>
+  )
+}
+
 // ─── Hub ──────────────────────────────────────────────────────────────────────
 
 function LifeHub({
@@ -415,6 +460,7 @@ function LifeHub({
   const cultureCount = life.tastes.movies.length + life.tastes.music.length + life.tastes.books.length + (life.tastes.plays?.length ?? 0)
   const foodCount = life.tastes.restaurants.length + life.tastes.cafes.length
   const travelCount = life.places.travelDestinations.length
+  const albumCount = life.albumPhotos?.length ?? 0
 
   const totalCount = exerciseCount + teamsCount + cultureCount + foodCount + travelCount
   const freeRemaining = Math.max(0, FREE_LIMIT - totalCount)
@@ -458,6 +504,13 @@ function LifeHub({
       title: '여행',
       meta: travelCount > 0 ? `${travelCount}곳` : null,
       nudge: '가본 곳 또는 가고 싶은 곳 모두 좋아요',
+    },
+    {
+      view: 'album',
+      emoji: '🖼️',
+      title: '나를 표현하는 사진',
+      meta: albumCount > 0 ? `${albumCount}장` : null,
+      nudge: '취미, 일상, 좋아하는 공간을 사진으로 보여줘요',
     },
   ]
 
@@ -549,6 +602,11 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
     setView('hub')
   }
 
+  const updateAlbum = (albumPhotos: string[]) => {
+    setLife((prev) => ({ ...prev, albumPhotos }))
+    setView('hub')
+  }
+
   // Free 플랜: 각 서브뷰에 할당 가능한 최대 슬롯 수 계산 (다른 카테고리 항목 제외)
   const total = countLifeItems(life)
   const activityCount = life.daily.exercise.length + (life.tastes.teams?.length ?? 0)
@@ -573,6 +631,8 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
     return <PlaceView life={life} onSave={updateTastes} isPro={isPro} freeSlots={placeFreeSlots} onUpgrade={handleUpgrade} />
   if (view === 'travel')
     return <TravelView life={life} onSave={updateTravel} isPro={isPro} freeSlots={travelFreeSlots} onUpgrade={handleUpgrade} />
+  if (view === 'album')
+    return <AlbumView life={life} onSave={updateAlbum} />
 
   return (
     <>

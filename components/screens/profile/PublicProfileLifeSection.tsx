@@ -580,6 +580,7 @@ export function PublicProfileLifeSection({ life, isOwner }: { life?: PublicProfi
         onEnded={() => { setIsPlaying(false); setProgress(1) }}
       />
 
+      <BlockHeader label="바이브보드" />
       <VibeBoard
         items={vibeItems}
         layout={vibeLayout}

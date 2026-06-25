@@ -8,18 +8,11 @@ import { Button, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
-type Mode = 'choose' | 'signup' | 'login'
-type LoginView = 'main' | 'oauth' | 'phone'
+// ── 공통 유틸 ────────────────────────────────────────────────────────────────
+
 type OAuthProvider = 'kakao' | 'naver' | 'google'
-type OAuthStep = 'pending' | 'done'
 
-interface OAuthMeta {
-  label: string
-  variant: 'kakao' | 'naver' | 'google'
-  prefix: string
-}
-
-const OAUTH_META: Record<OAuthProvider, OAuthMeta> = {
+const OAUTH_META: Record<OAuthProvider, { label: string; variant: 'kakao' | 'naver' | 'google'; prefix: string }> = {
   kakao: { label: '카카오', variant: 'kakao', prefix: '' },
   naver: { label: '네이버', variant: 'naver', prefix: 'N  ' },
   google: { label: '구글', variant: 'google', prefix: 'G  ' },
@@ -41,7 +34,7 @@ function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
-function BackButton({ onClick }: { onClick: () => void }) {
+function BackButton({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button
       type="button"
@@ -51,18 +44,26 @@ function BackButton({ onClick }: { onClick: () => void }) {
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <path d="M10 3L5 8L10 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
-      다른 방법으로 가입
+      {label}
     </button>
   )
 }
 
-export function Step1Login() {
+// ── AuthStep ─────────────────────────────────────────────────────────────────
+// 회원가입과 로그인 진입을 하나의 화면에서 처리.
+// AuthView 단일 상태로 화면 전환을 관리.
+
+type AuthView =
+  | { kind: 'choose' }
+  | { kind: 'signup' }
+  | { kind: 'login' }
+  | { kind: 'oauth'; mode: 'signup' | 'login'; provider: OAuthProvider; done: boolean }
+  | { kind: 'phone'; mode: 'signup' | 'login' }
+
+export function AuthStep() {
   const store = useByroStore()
   const router = useRouter()
-  const [mode, setMode] = useState<Mode>('choose')
-  const [view, setView] = useState<LoginView>('main')
-  const [oauthProvider, setOauthProvider] = useState<OAuthProvider | null>(null)
-  const [oauthStep, setOauthStep] = useState<OAuthStep>('pending')
+  const [view, setView] = useState<AuthView>({ kind: 'choose' })
 
   // 전화번호 가입 폼
   const [phone, setPhone] = useState('')
@@ -78,55 +79,108 @@ export function Step1Login() {
   const emailInvalid = email.length > 0 && !isValidEmail(email)
   const canPhoneSubmit = isValidPhone(phone) && password.length >= 8 && (email === '' || isValidEmail(email))
 
-  const handleOAuthSelect = (provider: OAuthProvider) => {
-    setOauthProvider(provider)
-    setOauthStep('pending')
-    setView('oauth')
-  }
-
-  const handleBackToMain = () => {
-    setView('main')
-    setOauthProvider(null)
-    setOauthStep('pending')
-  }
-
-  const handleBackToChoose = () => {
-    setMode('choose')
-    setView('main')
-    setOauthProvider(null)
-    setOauthStep('pending')
-  }
-
-  // [임시] 로그인 완료 처리
+  // [임시] 로그인 완료 → 내 프로필로 이동
   const handleLoginComplete = () => {
     store.login()
-    router.push(`/${SAMPLE_PROFILE.linkId}`)
+    router.replace('/me')
   }
 
-  // --- OAuth 뷰 ---
-  if (view === 'oauth' && oauthProvider) {
-    const meta = OAUTH_META[oauthProvider]
-
-    if (oauthStep === 'done') {
-      if (mode === 'login') {
-        return (
-          <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-            <div className="flex-1 flex flex-col items-center justify-center text-center">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mb-5"
-                style={{ backgroundColor: 'var(--color-state-success-bg)' }}>
-                <CheckCircle2 size={32} style={{ color: 'var(--color-state-success-text)' }} />
-              </div>
-              <div className="text-xl font-black text-[var(--color-text-strong)] mb-2">
-                {meta.label} 로그인 완료
-              </div>
-              <p className="meta-text leading-relaxed">바이로에 오신 걸 환영해요!</p>
-            </div>
-            {/* [임시] 실제 로그인 API 미연동 */}
-            <Button onClick={handleLoginComplete}>시작하기</Button>
+  // ── choose ──────────────────────────────────────────────────────────────
+  if (view.kind === 'choose') {
+    return (
+      <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+        <div className="surface-card rounded-[32px] px-5 py-6 text-center mb-6">
+          <div className="micro-text uppercase tracking-[0.18em] mb-2">Branding Profile</div>
+          <div className="text-3xl font-black mb-2">Byro</div>
+          <div className="meta-text mt-3 leading-relaxed">
+            진짜 나를 보여주는 프로필.
+            <br />
+            만난 사람에게 바로 공유할 수 있어요.
           </div>
-        )
-      }
+        </div>
+        <div className="space-y-3">
+          <Button onClick={() => setView({ kind: 'signup' })}>처음이신가요? 회원가입</Button>
+          <Button variant="outline" onClick={() => setView({ kind: 'login' })}>이미 계정이 있어요</Button>
+        </div>
+      </div>
+    )
+  }
 
+  // ── signup 메서드 선택 ────────────────────────────────────────────────
+  if (view.kind === 'signup') {
+    return (
+      <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+        <BackButton label="돌아가기" onClick={() => setView({ kind: 'choose' })} />
+        <div className="mb-6">
+          <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">처음 오셨군요!</div>
+          <p className="meta-text mt-1">가입 방법을 선택해주세요.</p>
+        </div>
+        <div className="space-y-3">
+          {(['kakao', 'naver', 'google'] as OAuthProvider[]).map((provider) => {
+            const meta = OAUTH_META[provider]
+            return (
+              <Button
+                key={provider}
+                variant={meta.variant}
+                onClick={() => setView({ kind: 'oauth', mode: 'signup', provider, done: false })}
+              >
+                {meta.prefix}{meta.label}로 시작하기
+              </Button>
+            )
+          })}
+        </div>
+        <div className="flex items-center gap-3 my-4">
+          <div className="flex-1 h-px bg-[var(--color-border-default)]" />
+          <span className="text-[11px] text-[var(--color-text-tertiary)]">또는</span>
+          <div className="flex-1 h-px bg-[var(--color-border-default)]" />
+        </div>
+        <Button variant="outline" onClick={() => setView({ kind: 'phone', mode: 'signup' })}>전화번호로 회원가입</Button>
+        <p className="micro-text text-center mt-6">
+          시작하면 이용약관 및 개인정보 처리방침에 동의하게 됩니다
+        </p>
+      </div>
+    )
+  }
+
+  // ── login 메서드 선택 ─────────────────────────────────────────────────
+  if (view.kind === 'login') {
+    return (
+      <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+        <BackButton label="돌아가기" onClick={() => setView({ kind: 'choose' })} />
+        <div className="mb-6">
+          <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">다시 오셨군요!</div>
+          <p className="meta-text mt-1">연결했던 계정으로 로그인하세요.</p>
+        </div>
+        <div className="space-y-3">
+          {(['kakao', 'naver', 'google'] as OAuthProvider[]).map((provider) => {
+            const meta = OAUTH_META[provider]
+            return (
+              <Button
+                key={provider}
+                variant={meta.variant}
+                onClick={() => setView({ kind: 'oauth', mode: 'login', provider, done: false })}
+              >
+                {meta.prefix}{meta.label}로 로그인
+              </Button>
+            )
+          })}
+        </div>
+        <div className="flex items-center gap-3 my-4">
+          <div className="flex-1 h-px bg-[var(--color-border-default)]" />
+          <span className="text-[11px] text-[var(--color-text-tertiary)]">또는</span>
+          <div className="flex-1 h-px bg-[var(--color-border-default)]" />
+        </div>
+        <Button variant="outline" onClick={() => setView({ kind: 'phone', mode: 'login' })}>전화번호로 로그인</Button>
+      </div>
+    )
+  }
+
+  // ── OAuth 화면 ────────────────────────────────────────────────────────
+  if (view.kind === 'oauth') {
+    const meta = OAUTH_META[view.provider]
+    const isSignup = view.mode === 'signup'
+
+    if (view.done) {
       return (
         <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
           <div className="flex-1 flex flex-col items-center justify-center text-center">
@@ -135,24 +189,37 @@ export function Step1Login() {
               <CheckCircle2 size={32} style={{ color: 'var(--color-state-success-text)' }} />
             </div>
             <div className="text-xl font-black text-[var(--color-text-strong)] mb-2">
-              {meta.label} 연결 완료
+              {meta.label} {isSignup ? '연결 완료' : '로그인 완료'}
             </div>
-            <p className="meta-text leading-relaxed">이제 프로필을 만들어볼게요.</p>
+            <p className="meta-text leading-relaxed">
+              {isSignup ? '이제 프로필을 만들어볼게요.' : '바이로에 오신 걸 환영해요!'}
+            </p>
           </div>
-          <Button onClick={() => store.nextStep()}>계속하기</Button>
-          <p className="micro-text text-center mt-4">
-            시작하면 이용약관 및 개인정보 처리방침에 동의하게 됩니다
-          </p>
+          {/* [임시] 실제 OAuth API 미연동 */}
+          {isSignup
+            ? (
+              <>
+                <Button onClick={() => store.nextStep()}>계속하기</Button>
+                <p className="micro-text text-center mt-4">
+                  시작하면 이용약관 및 개인정보 처리방침에 동의하게 됩니다
+                </p>
+              </>
+            )
+            : <Button onClick={handleLoginComplete}>시작하기</Button>
+          }
         </div>
       )
     }
 
     return (
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <BackButton onClick={handleBackToMain} />
+        <BackButton
+          label={isSignup ? '다른 방법으로 가입' : '다른 방법으로 로그인'}
+          onClick={() => setView({ kind: view.mode })}
+        />
         <div className="mb-8">
           <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight mb-2">
-            {meta.label} 계정으로<br />{mode === 'login' ? '로그인' : '시작하기'}
+            {meta.label} 계정으로<br />{isSignup ? '시작하기' : '로그인'}
           </div>
           <p className="meta-text leading-relaxed">
             {meta.label} 계정을 바이로에 연결합니다.<br />
@@ -160,86 +227,91 @@ export function Step1Login() {
           </p>
         </div>
         {/* [임시] 실제 OAuth 리다이렉트 미연동 — 버튼 클릭으로 완료 시뮬레이션 */}
-        <Button variant={meta.variant} onClick={() => setOauthStep('done')}>
-          {meta.prefix}{meta.label}로 {mode === 'login' ? '로그인' : '연결하기'}
+        <Button
+          variant={meta.variant}
+          onClick={() => setView({ ...view, done: true })}
+        >
+          {meta.prefix}{meta.label}로 {isSignup ? '연결하기' : '로그인'}
         </Button>
       </div>
     )
   }
 
-  // --- 전화번호 가입 뷰 ---
-  if (view === 'phone' && mode === 'signup') {
-    return (
-      <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <BackButton onClick={handleBackToMain} />
-        <div className="mb-6">
-          <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
-            전화번호로<br />회원가입
-          </div>
-        </div>
-        <div className="space-y-4 mb-6">
-          <div>
-            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">전화번호 *</label>
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(formatPhone(e.target.value))}
-              placeholder="010-0000-0000"
-              autoComplete="tel"
-              className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
-            />
-          </div>
-          <div>
-            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">비밀번호 *</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="8자 이상 입력해주세요"
-              autoComplete="new-password"
-              className={`w-full border rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] ${
-                passwordShort ? 'border-[var(--color-state-danger-text)]' : 'border-[var(--color-border-default)]'
-              }`}
-            />
-            {passwordShort && (
-              <p className="mt-1 text-[11px] text-[var(--color-state-danger-text)]">비밀번호는 8자 이상이어야 해요</p>
-            )}
-          </div>
-          <div>
-            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">
-              이메일 <span className="text-[10px]">(선택 · 전화번호 변경 시 계정 복구용)</span>
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="example@email.com"
-              autoComplete="email"
-              className={`w-full border rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] ${
-                emailInvalid ? 'border-[var(--color-state-danger-text)]' : 'border-[var(--color-border-default)]'
-              }`}
-            />
-            {emailInvalid && (
-              <p className="mt-1 text-[11px] text-[var(--color-state-danger-text)]">올바른 이메일 형식을 입력해주세요</p>
-            )}
-          </div>
-        </div>
-        {/* [임시] 바이로 전화번호 회원가입 API 미연동 */}
-        <Button onClick={() => { if (canPhoneSubmit) store.nextStep() }} disabled={!canPhoneSubmit}>
-          가입하기
-        </Button>
-        <p className="micro-text text-center mt-4">
-          시작하면 이용약관 및 개인정보 처리방침에 동의하게 됩니다
-        </p>
-      </div>
-    )
-  }
+  // ── 전화번호 화면 ─────────────────────────────────────────────────────
+  if (view.kind === 'phone') {
+    const isSignup = view.mode === 'signup'
 
-  // --- 전화번호 로그인 뷰 ---
-  if (view === 'phone' && mode === 'login') {
+    if (isSignup) {
+      return (
+        <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+          <BackButton label="다른 방법으로 가입" onClick={() => setView({ kind: 'signup' })} />
+          <div className="mb-6">
+            <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
+              전화번호로<br />회원가입
+            </div>
+          </div>
+          <div className="space-y-4 mb-6">
+            <div>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">전화번호 *</label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(formatPhone(e.target.value))}
+                placeholder="010-0000-0000"
+                autoComplete="tel"
+                className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">비밀번호 *</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="8자 이상 입력해주세요"
+                autoComplete="new-password"
+                className={`w-full border rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] ${
+                  passwordShort ? 'border-[var(--color-state-danger-text)]' : 'border-[var(--color-border-default)]'
+                }`}
+              />
+              {passwordShort && (
+                <p className="mt-1 text-[11px] text-[var(--color-state-danger-text)]">비밀번호는 8자 이상이어야 해요</p>
+              )}
+            </div>
+            <div>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">
+                이메일 <span className="text-[10px]">(선택 · 전화번호 변경 시 계정 복구용)</span>
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="example@email.com"
+                autoComplete="email"
+                className={`w-full border rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] ${
+                  emailInvalid ? 'border-[var(--color-state-danger-text)]' : 'border-[var(--color-border-default)]'
+                }`}
+              />
+              {emailInvalid && (
+                <p className="mt-1 text-[11px] text-[var(--color-state-danger-text)]">올바른 이메일 형식을 입력해주세요</p>
+              )}
+            </div>
+          </div>
+          {/* [임시] 전화번호 회원가입 API 미연동 */}
+          <Button onClick={() => { if (canPhoneSubmit) store.nextStep() }} disabled={!canPhoneSubmit}>
+            가입하기
+          </Button>
+          <p className="micro-text text-center mt-4">
+            시작하면 이용약관 및 개인정보 처리방침에 동의하게 됩니다
+          </p>
+        </div>
+      )
+    }
+
+    // 전화번호 로그인
     return (
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <BackButton onClick={handleBackToMain} />
+        <BackButton label="다른 방법으로 로그인" onClick={() => setView({ kind: 'login' })} />
         <div className="mb-6">
           <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
             전화번호로<br />로그인
@@ -294,84 +366,14 @@ export function Step1Login() {
     )
   }
 
-  // --- 로그인 메인 뷰 ---
-  if (mode === 'login') {
-    return (
-      <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <BackButton onClick={handleBackToChoose} />
-        <div className="mb-6">
-          <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
-            다시 오셨군요!
-          </div>
-          <p className="meta-text mt-1">연결했던 계정으로 로그인하세요.</p>
-        </div>
-        <div className="space-y-3">
-          <Button variant="kakao" onClick={() => handleOAuthSelect('kakao')}>카카오로 로그인</Button>
-          <Button variant="naver" onClick={() => handleOAuthSelect('naver')}>N  네이버로 로그인</Button>
-          <Button variant="google" onClick={() => handleOAuthSelect('google')}>G  구글로 로그인</Button>
-        </div>
-        <div className="flex items-center gap-3 my-4">
-          <div className="flex-1 h-px bg-[var(--color-border-default)]" />
-          <span className="text-[11px] text-[var(--color-text-tertiary)]">또는</span>
-          <div className="flex-1 h-px bg-[var(--color-border-default)]" />
-        </div>
-        <Button variant="outline" onClick={() => setView('phone')}>전화번호로 로그인</Button>
-      </div>
-    )
-  }
-
-  // --- 회원가입 메인 뷰 ---
-  if (mode === 'signup') {
-    return (
-      <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <BackButton onClick={handleBackToChoose} />
-        <div className="mb-6">
-          <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
-            처음 오셨군요!
-          </div>
-          <p className="meta-text mt-1">가입 방법을 선택해주세요.</p>
-        </div>
-        <div className="space-y-3">
-          <Button variant="kakao" onClick={() => handleOAuthSelect('kakao')}>카카오로 시작하기</Button>
-          <Button variant="naver" onClick={() => handleOAuthSelect('naver')}>N  네이버로 시작하기</Button>
-          <Button variant="google" onClick={() => handleOAuthSelect('google')}>G  구글로 시작하기</Button>
-        </div>
-        <div className="flex items-center gap-3 my-4">
-          <div className="flex-1 h-px bg-[var(--color-border-default)]" />
-          <span className="text-[11px] text-[var(--color-text-tertiary)]">또는</span>
-          <div className="flex-1 h-px bg-[var(--color-border-default)]" />
-        </div>
-        <Button variant="outline" onClick={() => setView('phone')}>전화번호로 회원가입</Button>
-        <p className="micro-text text-center mt-6">
-          시작하면 이용약관 및 개인정보 처리방침에 동의하게 됩니다
-        </p>
-      </div>
-    )
-  }
-
-  // --- 초기 선택 뷰 ---
-  return (
-    <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-      <div className="surface-card rounded-[32px] px-5 py-6 text-center mb-6">
-        <div className="micro-text uppercase tracking-[0.18em] mb-2">Branding Profile</div>
-        <div className="text-3xl font-black mb-2">Byro</div>
-        <div className="meta-text mt-3 leading-relaxed">
-          진짜 나를 보여주는 프로필.
-          <br />
-          만난 사람에게 바로 공유할 수 있어요.
-        </div>
-      </div>
-      <div className="space-y-3">
-        <Button onClick={() => setMode('signup')}>처음이신가요? 회원가입</Button>
-        <Button variant="outline" onClick={() => setMode('login')}>이미 계정이 있어요</Button>
-      </div>
-    </div>
-  )
+  return <></>
 }
+
+// ── VerifyStep ────────────────────────────────────────────────────────────────
 
 type VerifyTab = 'kakao' | 'sms'
 
-export function Step2Verify() {
+export function VerifyStep() {
   const store = useByroStore()
   const [tab, setTab] = useState<VerifyTab>('kakao')
   const [phone, setPhone] = useState('')
@@ -391,7 +393,6 @@ export function Step2Verify() {
         description={'인증 완료 후 프로필을 만들 수 있어요.'}
       />
 
-      {/* 탭 */}
       <div className="flex border-b mb-5" style={{ borderColor: 'var(--color-border-default)' }}>
         {(['kakao', 'sms'] as VerifyTab[]).map((t) => (
           <button
@@ -468,7 +469,9 @@ export function Step2Verify() {
   )
 }
 
-export function Step2BasicInfo() {
+// ── BasicInfoStep ─────────────────────────────────────────────────────────────
+
+export function BasicInfoStep() {
   const store = useByroStore()
   const [name, setName] = useState(store.onboardingName)
   const [nickname, setNickname] = useState(store.onboardingNickname)
@@ -492,7 +495,6 @@ export function Step2BasicInfo() {
         description={'나중에 기본정보 편집에서 바꿀 수 있어요.'}
       />
 
-      {/* 이름 (필수) */}
       <div className="mb-4">
         <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">이름 *</label>
         <input
@@ -505,7 +507,6 @@ export function Step2BasicInfo() {
         />
       </div>
 
-      {/* 활동명 (선택) */}
       <div className="mb-5">
         <button
           type="button"
@@ -542,7 +543,6 @@ export function Step2BasicInfo() {
         </p>
       </div>
 
-      {/* 생년월일 */}
       <div className="mb-5">
         <div className="flex items-center justify-between mb-1">
           <label className="text-xs text-[var(--color-text-tertiary)]">생년월일 (선택)</label>
@@ -570,6 +570,7 @@ export function Step2BasicInfo() {
   )
 }
 
+// ── ProfileStep ───────────────────────────────────────────────────────────────
 
 const MBTI_DIMS = [
   { options: ['E', 'I'] as const, labels: ['외향', '내향'] },
@@ -578,7 +579,7 @@ const MBTI_DIMS = [
   { options: ['J', 'P'] as const, labels: ['판단', '인식'] },
 ]
 
-export function Step4Profile() {
+export function ProfileStep() {
   const store = useByroStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [avatarImage, setAvatarImage] = useState('')
@@ -615,7 +616,6 @@ export function Step4Profile() {
         description={'나중에 편집에서 언제든 바꿀 수 있어요.'}
       />
 
-      {/* 프로필 사진 */}
       <input ref={fileInputRef} type="file" accept="image/*" className="sr-only" onChange={handleFileChange} />
       <div className="mb-6 flex flex-col items-center">
         <button
@@ -640,7 +640,6 @@ export function Step4Profile() {
         )}
       </div>
 
-      {/* MBTI */}
       <div className="mb-5">
         <div className="flex items-center justify-between mb-2">
           <label className="text-xs text-[var(--color-text-tertiary)]">MBTI</label>
@@ -679,7 +678,6 @@ export function Step4Profile() {
         </div>
       </div>
 
-      {/* 자기소개 */}
       <div className="mb-5">
         <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">자기소개</label>
         <TextArea

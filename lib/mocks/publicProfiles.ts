@@ -64,6 +64,13 @@ export const SAMPLE_PROFILE = {
         { label: '런던', posterUrl: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=148&h=96&q=75&fit=crop&auto=format' },
       ],
     },
+    albumPhotos: [
+      'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=400&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=400&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&h=400&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=400&q=80&fit=crop',
+    ],
   },
   heroTheme: {
     cover: 'from-[#B69B8B] via-[#836F66] to-[#121212]',
@@ -304,6 +311,12 @@ export const MK_PROFILE = {
         { label: '파리', posterUrl: 'https://images.unsplash.com/photo-1431274172761-fcdab704d114?w=148&h=96&q=75&fit=crop&auto=format' },
       ],
     },
+    albumPhotos: [
+      'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=400&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1553484771-47a3aba16a77?w=400&h=400&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?w=400&h=400&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&h=400&q=80&fit=crop',
+    ],
   },
   heroTheme: {
     cover: 'from-[#8D887D] via-[#57534D] to-[#0E0E0E]',
@@ -512,6 +525,14 @@ export const JIMIN_PROFILE = {
         { label: '샌프란시스코', posterUrl: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=148&h=96&q=75&fit=crop&auto=format' },
       ],
     },
+    albumPhotos: [
+      'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=400&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=400&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&h=400&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=400&h=400&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1521334884684-d80222895322?w=400&h=400&q=80&fit=crop',
+      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=400&q=80&fit=crop',
+    ],
   },
   heroTheme: {
     cover: 'from-[#B9A597] via-[#7F6A61] to-[#101010]',

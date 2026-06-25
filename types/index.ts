@@ -176,6 +176,7 @@ export interface PublicProfileLife {
   places: {
     travelDestinations: LifeMediaItem[]
   }
+  albumPhotos?: string[]
 }
 
 export interface RememberIndustry {

@@ -125,7 +125,6 @@ export default function MyByro() {
     return (
       <RememberNetworkManageScreen
         userLinkId={user.linkId}
-        rememberHighlight={profile.rememberHighlight}
         onBack={handleBackToManage}
       />
     )

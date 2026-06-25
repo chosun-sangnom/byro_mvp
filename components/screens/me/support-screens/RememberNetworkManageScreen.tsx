@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { Mail, Copy } from 'lucide-react'
 import { NavBar, showToast } from '@/components/ui'
 import { useByroStore } from '@/store/useByroStore'
-import type { RememberInsight } from '@/types'
 
 const DOMAIN_OPTIONS = [
   'IT/테크', '스타트업', '금융/투자', '마케팅/PR',
@@ -12,19 +11,12 @@ const DOMAIN_OPTIONS = [
   '의료/바이오', '유통/물류', '건설/부동산', '에너지',
 ]
 
-interface RememberHighlight {
-  total: number
-  industries: Array<{ name: string; ratio: number; count?: number }>
-  insight?: RememberInsight
-}
 
 export function RememberNetworkManageScreen({
   userLinkId,
-  rememberHighlight,
   onBack,
 }: {
   userLinkId: string
-  rememberHighlight: RememberHighlight
   onBack: () => void
 }) {
   const store = useByroStore()

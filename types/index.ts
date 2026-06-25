@@ -199,6 +199,8 @@ export interface RememberInsight {
 export interface RememberHighlight {
   total: number
   industries: RememberIndustry[]
+  topIndustryRanks?: RememberIndustry[]
+  topIndustryRoles?: RememberIndustry[]
   insight?: RememberInsight
 }
 
@@ -285,6 +287,7 @@ export interface UserState {
   calendarType?: 'solar' | 'lunar'
   showAge?: boolean
   life?: PublicProfileLife
+  networkDomain?: string
   contactChannels?: ContactChannel[]
   tabVisibility?: TabVisibility
   isVerified?: boolean

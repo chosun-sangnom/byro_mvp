@@ -156,7 +156,7 @@ export function PublicProfileReputationTabPage({
   username: string
 }) {
   const router = useRouter()
-  const { profile, keywordCounts, totalKeywordCount, featuredGuestbook, tabAccess } = usePublicProfileTabData(username)
+  const { store, profile, keywordCounts, totalKeywordCount, featuredGuestbook, tabAccess } = usePublicProfileTabData(username)
 
   if (tabAccess.network !== 'visible') {
     return <LockedTabContent />
@@ -172,7 +172,10 @@ export function PublicProfileReputationTabPage({
       <ProfileRememberSection
         total={profile.rememberHighlight.total}
         industries={profile.rememberHighlight.industries}
-        insight={profile.rememberHighlight.insight}
+        topIndustryRanks={profile.rememberHighlight.topIndustryRanks}
+        topIndustryRoles={profile.rememberHighlight.topIndustryRoles}
+        isLoggedIn={store.isLoggedIn}
+        viewerNetworkDomain={store.user?.networkDomain}
       />
       <ProfileReputationSummarySection
         keywordCounts={keywordCounts}

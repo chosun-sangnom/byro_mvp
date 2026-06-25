@@ -97,10 +97,22 @@ export const SAMPLE_PROFILE = {
   rememberHighlight: {
     total: 247,
     industries: [
-      { name: '스타트업', ratio: 38 },
-      { name: '마케팅', ratio: 24 },
-      { name: 'IT', ratio: 22 },
-      { name: '투자', ratio: 16 },
+      { name: '스타트업', ratio: 38, count: 94 },
+      { name: '마케팅', ratio: 24, count: 59 },
+      { name: 'IT', ratio: 22, count: 54 },
+      { name: '투자', ratio: 16, count: 40 },
+    ],
+    topIndustryRanks: [
+      { name: '대표/임원', ratio: 45 },
+      { name: '팀장/부장', ratio: 30 },
+      { name: '과장/차장', ratio: 15 },
+      { name: '사원/주임', ratio: 10 },
+    ],
+    topIndustryRoles: [
+      { name: '기획/PM', ratio: 40 },
+      { name: '개발', ratio: 30 },
+      { name: '마케팅', ratio: 18 },
+      { name: '디자인', ratio: 12 },
     ],
     insight: {
       recentMeetings: 34,
@@ -369,6 +381,18 @@ export const MK_PROFILE = {
       { name: '컨설팅/법률', ratio: 6, count: 102 },
       { name: '교육/연구', ratio: 5, count: 88 },
     ],
+    topIndustryRanks: [
+      { name: '부장/이사', ratio: 42 },
+      { name: '차장', ratio: 28 },
+      { name: '과장', ratio: 18 },
+      { name: '대리/사원', ratio: 12 },
+    ],
+    topIndustryRoles: [
+      { name: '개발/엔지니어', ratio: 45 },
+      { name: '기획/PM', ratio: 25 },
+      { name: '데이터', ratio: 18 },
+      { name: '영업/BD', ratio: 12 },
+    ],
     insight: {
       recentMeetings: 58,
       recentMonths: 3,
@@ -561,10 +585,22 @@ export const JIMIN_PROFILE = {
   rememberHighlight: {
     total: 183,
     industries: [
-      { name: '스타트업', ratio: 38 },
-      { name: '마케팅', ratio: 24 },
-      { name: 'IT', ratio: 22 },
-      { name: '투자', ratio: 16 },
+      { name: '스타트업', ratio: 38, count: 70 },
+      { name: '마케팅', ratio: 24, count: 44 },
+      { name: 'IT', ratio: 22, count: 40 },
+      { name: '투자', ratio: 16, count: 29 },
+    ],
+    topIndustryRanks: [
+      { name: '대표/공동창업자', ratio: 40 },
+      { name: '팀장', ratio: 30 },
+      { name: '팀원', ratio: 20 },
+      { name: '인턴', ratio: 10 },
+    ],
+    topIndustryRoles: [
+      { name: '마케팅', ratio: 45 },
+      { name: '기획', ratio: 30 },
+      { name: '영업/BD', ratio: 15 },
+      { name: '기타', ratio: 10 },
     ],
     insight: {
       recentMeetings: 21,

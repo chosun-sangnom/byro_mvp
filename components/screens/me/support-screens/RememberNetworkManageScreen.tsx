@@ -1,9 +1,16 @@
 'use client'
 
+import { useState } from 'react'
 import { Mail, Copy } from 'lucide-react'
 import { NavBar, showToast } from '@/components/ui'
-import { RememberNetworkGraph } from '@/components/highlights/RememberNetworkGraph'
+import { useByroStore } from '@/store/useByroStore'
 import type { RememberInsight } from '@/types'
+
+const DOMAIN_OPTIONS = [
+  'IT/테크', '스타트업', '금융/투자', '마케팅/PR',
+  '대기업/제조', '컨설팅', '미디어/언론', '교육/연구',
+  '의료/바이오', '유통/물류', '건설/부동산', '에너지',
+]
 
 interface RememberHighlight {
   total: number
@@ -20,11 +27,18 @@ export function RememberNetworkManageScreen({
   rememberHighlight: RememberHighlight
   onBack: () => void
 }) {
+  const store = useByroStore()
+  const [selectedDomain, setSelectedDomain] = useState<string | undefined>(store.user?.networkDomain)
   const email = `${userLinkId}@data.byro.io`
 
   const handleCopyEmail = () => {
     navigator.clipboard.writeText(email).catch(() => {})
     showToast('이메일 주소가 복사됐어요!')
+  }
+
+  const handleSaveDomain = () => {
+    store.updateNetworkDomain(selectedDomain)
+    showToast(selectedDomain ? `${selectedDomain} 도메인으로 설정됐어요` : '관심 도메인이 해제됐어요')
   }
 
   const handleConfirm = () => {
@@ -38,16 +52,40 @@ export function RememberNetworkManageScreen({
 
       <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
 
-        {/* 현재 네트워크 미리보기 */}
+        {/* 관심 도메인 설정 */}
         <div>
-          <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color: 'var(--color-text-tertiary)' }}>
-            현재 네트워크
+          <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color: 'var(--color-text-tertiary)' }}>
+            관심 도메인
           </p>
-          <RememberNetworkGraph
-            total={rememberHighlight.total}
-            industries={rememberHighlight.industries}
-            insight={rememberHighlight.insight}
-          />
+          <p className="mb-3 text-[12px] leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
+            설정하면 다른 사람의 네트워크 탭에서 내 관심 분야와 얼마나 겹치는지 인사이트를 볼 수 있어요.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {DOMAIN_OPTIONS.map((domain) => {
+              const selected = domain === selectedDomain
+              return (
+                <button
+                  key={domain}
+                  onClick={() => setSelectedDomain(selected ? undefined : domain)}
+                  className="rounded-full border px-3.5 py-1.5 text-[12px] font-semibold transition-colors"
+                  style={{
+                    borderColor: selected ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
+                    background: selected ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
+                    color: selected ? '#fff' : 'var(--color-text-secondary)',
+                  }}
+                >
+                  {domain}
+                </button>
+              )
+            })}
+          </div>
+          <button
+            onClick={handleSaveDomain}
+            className="mt-3 w-full rounded-full py-2.5 text-[13px] font-bold text-white"
+            style={{ background: 'var(--color-accent-dark)' }}
+          >
+            저장
+          </button>
         </div>
 
         {/* 업데이트 방법 */}

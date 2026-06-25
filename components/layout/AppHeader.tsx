@@ -29,7 +29,6 @@ export default function AppHeader() {
   const [notiOpen, setNotiOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
 
-  const initials = user?.name ? user.name.slice(0, 2) : 'BY'
   const hasUnread = MOCK_NOTIFS.length > 0
 
   const allNotifs = MOCK_NOTIFS

@@ -42,7 +42,7 @@ export default function MyPageScreen() {
   const router = useRouter()
   const store = useByroStore()
   const user = store.user
-  const initials = user?.name ? user.name.slice(0, 2) : 'BY'
+
   const isPaid = user?.isPaidUser ?? false
   const currentLinkId = user?.linkId ?? ''
   const randomLinkId = user?.randomLinkId ?? user?.linkId ?? ''

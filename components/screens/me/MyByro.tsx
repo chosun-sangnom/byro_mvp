@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'

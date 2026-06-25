@@ -63,20 +63,7 @@ export default function FeedScreen() {
             )}
             {isLoggedIn ? (
               <button onClick={() => router.push('/me')} className="ml-1">
-                {user?.avatarImage ? (
-                  <img
-                    src={user.avatarImage}
-                    alt={user.name}
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
-                ) : (
-                  <div
-                    className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[11px] font-bold"
-                    style={{ backgroundColor: user?.avatarColor ?? 'var(--color-accent-dark)' }}
-                  >
-                    {user?.name?.slice(0, 2)}
-                  </div>
-                )}
+                <Avatar src={user?.avatarImage} name={user?.name ?? ''} color={user?.avatarColor ?? 'var(--color-accent-dark)'} size={32} />
               </button>
             ) : (
               <button

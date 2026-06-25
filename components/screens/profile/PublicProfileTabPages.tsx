@@ -141,12 +141,13 @@ export function PublicProfileLifeTabPage({
   username: string
 }) {
   const { profile, tabAccess } = usePublicProfileTabData(username)
+  const { isOwner: isOwnerMode } = useProfileOwner(username)
 
   if (tabAccess.vibe !== 'visible') {
     return <LockedTabContent />
   }
 
-  return <PublicProfileLifeSection life={profile.life} />
+  return <PublicProfileLifeSection life={profile.life} isOwner={isOwnerMode} />
 }
 
 export function PublicProfileReputationTabPage({

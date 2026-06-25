@@ -1,7 +1,9 @@
 'use client'
 
+import { createPortal } from 'react-dom'
 import { useRef, useState } from 'react'
-import { Pause, Play, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Pause, Play, Plus, X } from 'lucide-react'
+import { showToast } from '@/components/ui'
 import type { LifeMediaItem, PublicProfileLife } from '@/types'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -513,12 +515,13 @@ function MiniPlayer({
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife }) {
+export function PublicProfileLifeSection({ life, isOwner }: { life?: PublicProfileLife; isOwner?: boolean }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playingId, setPlayingId] = useState<string | null>(null)
   const [playingTrack, setPlayingTrack] = useState<LifeMediaItem | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
   const [{ vibeItems, vibeLayout }] = useState(() => ({
     vibeItems: life ? buildVibeItemsRandom(life) : [],
@@ -657,6 +660,86 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
             </div>
           )}
         </>
+      )}
+
+      {(life.albumPhotos && life.albumPhotos.length > 0 || isOwner) && (
+        <>
+          <SectionDivider />
+          <BlockHeader label="나를 표현하는 사진" />
+          <div className="px-5 pb-6">
+            <div className="grid grid-cols-3 gap-1.5">
+              {life.albumPhotos?.map((url, i) => (
+                <button
+                  key={i}
+                  onClick={() => setLightboxIndex(i)}
+                  className="aspect-square overflow-hidden rounded-xl bg-[var(--color-bg-muted)]"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={url} alt={`사진 ${i + 1}`} className="h-full w-full object-cover" />
+                </button>
+              ))}
+              {isOwner && (
+                // [임시] 실제 업로드 미구현 — 토스트만 표시
+                <button
+                  onClick={() => showToast('사진 업로드는 준비 중이에요')}
+                  className="aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1"
+                  style={{ borderColor: 'var(--color-border-default)' }}
+                >
+                  <Plus size={20} className="text-[var(--color-text-tertiary)]" />
+                  <span className="text-[11px] text-[var(--color-text-tertiary)]">추가</span>
+                </button>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {lightboxIndex !== null && typeof document !== 'undefined' && createPortal(
+        <div
+          className="fixed inset-0 z-[9999] flex flex-col"
+          style={{ backgroundColor: 'rgba(0,0,0,0.95)' }}
+          onClick={() => setLightboxIndex(null)}
+        >
+          <div className="flex items-center justify-end px-4 pt-4 pb-2">
+            <button
+              onClick={() => setLightboxIndex(null)}
+              className="flex h-9 w-9 items-center justify-center rounded-full"
+              style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}
+            >
+              <X size={18} className="text-white" />
+            </button>
+          </div>
+          <div className="flex flex-1 items-center justify-center px-4" onClick={(e) => e.stopPropagation()}>
+            <button
+              onClick={() => setLightboxIndex((i) => i !== null && i > 0 ? i - 1 : i)}
+              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
+              style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}
+              aria-label="이전"
+            >
+              <ChevronLeft size={22} className="text-white" />
+            </button>
+            <div className="mx-3 flex-1 flex items-center justify-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={life.albumPhotos?.[lightboxIndex] ?? ''}
+                alt={`사진 ${lightboxIndex + 1}`}
+                className="max-h-[70vh] w-full rounded-2xl object-contain"
+              />
+            </div>
+            <button
+              onClick={() => setLightboxIndex((i) => i !== null && life.albumPhotos && i < life.albumPhotos.length - 1 ? i + 1 : i)}
+              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
+              style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}
+              aria-label="다음"
+            >
+              <ChevronRight size={22} className="text-white" />
+            </button>
+          </div>
+          <div className="pb-8 text-center text-[13px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
+            {(lightboxIndex ?? 0) + 1} / {life.albumPhotos?.length ?? 0}
+          </div>
+        </div>,
+        document.body
       )}
 
       {playingTrack && (

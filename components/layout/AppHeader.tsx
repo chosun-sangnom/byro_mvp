@@ -54,18 +54,20 @@ export default function AppHeader() {
             <Search size={20} />
           </motion.button>
 
-          {/* 알림 — 드롭다운 */}
-          <motion.button
-            whileTap={{ scale: 0.88 }}
-            onClick={() => setNotiOpen((o) => !o)}
-            className="relative p-2 text-[var(--color-text-secondary)]"
-            aria-label="알림"
-          >
-            <Bell size={20} />
-            {hasUnread && (
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500" />
-            )}
-          </motion.button>
+          {/* 알림 — 로그인 시에만 표시 */}
+          {isLoggedIn && (
+            <motion.button
+              whileTap={{ scale: 0.88 }}
+              onClick={() => setNotiOpen((o) => !o)}
+              className="relative p-2 text-[var(--color-text-secondary)]"
+              aria-label="알림"
+            >
+              <Bell size={20} />
+              {hasUnread && (
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500" />
+              )}
+            </motion.button>
+          )}
 
           {/* 아바타 */}
           {isLoggedIn ? (

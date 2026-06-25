@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bookmark, BookmarkCheck, Pencil, Sparkles, X } from 'lucide-react'
+import { Bookmark, BookmarkCheck, Download, Pencil, Share2, Sparkles, X } from 'lucide-react'
 import { ActionMenu, ActionMenuItem, BottomSheet, showToast } from '@/components/ui'
 import { shareOrCopy } from '@/lib/share'
 import type { PersonaReason } from '@/lib/personaGen'
@@ -224,7 +224,50 @@ export function ProfileHeroCard({
   const [personaSheetOpen, setPersonaSheetOpen] = useState(false)
   const [moreSheetOpen, setMoreSheetOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [personaSharing, setPersonaSharing] = useState(false)
+  const personaCardRef = useRef<HTMLDivElement>(null)
   useEffect(() => { setMounted(true) }, [])
+
+  const handlePersonaShare = async () => {
+    if (!personaCardRef.current || personaSharing) return
+    setPersonaSharing(true)
+    try {
+      const html2canvas = (await import('html2canvas')).default
+      const canvas = await html2canvas(personaCardRef.current, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      })
+      await new Promise<void>((resolve) => {
+        canvas.toBlob(async (blob) => {
+          if (!blob) { resolve(); return }
+          const file = new File([blob], `byro-persona-${profile.name}.png`, { type: 'image/png' })
+          try {
+            if (navigator.canShare?.({ files: [file] })) {
+              await navigator.share({
+                files: [file],
+                title: `${profile.name}님의 AI 페르소나`,
+                text: `byro에서 ${profile.name}님의 AI 페르소나를 확인했어요!`,
+              })
+            } else {
+              const url = URL.createObjectURL(blob)
+              const a = document.createElement('a')
+              a.href = url
+              a.download = `byro-persona-${profile.name}.png`
+              a.click()
+              URL.revokeObjectURL(url)
+              showToast('이미지가 저장됐어요')
+            }
+          } catch { /* 공유 취소 */ }
+          resolve()
+        }, 'image/png')
+      })
+    } catch {
+      showToast('공유에 실패했어요')
+    } finally {
+      setPersonaSharing(false)
+    }
+  }
   const showAge = typeof profile.age === 'number' && profile.showAge !== false
 
   return (
@@ -236,32 +279,36 @@ export function ProfileHeroCard({
         {personaReasons && mounted && createPortal(
           <BottomSheet open={personaSheetOpen} onClose={() => setPersonaSheetOpen(false)}>
             <div className="pb-8">
-              {/* [임시] AI 이미지 생성 모델 연동 전 placeholder 이미지 */}
-              {personaImage && (
-                <div className="relative h-[200px] w-full shrink-0 overflow-hidden rounded-t-[inherit]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={personaImage} alt="AI 페르소나 이미지" className="h-full w-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/40" />
-                  <div className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-black/40 px-2 py-1 backdrop-blur-sm">
-                    <Sparkles size={9} className="text-white/60" />
-                    <span className="text-[9px] font-semibold uppercase tracking-wider text-white/60">AI generated</span>
+              {/* 캡처 대상 카드 */}
+              <div ref={personaCardRef} style={{ backgroundColor: '#ffffff' }}>
+                {/* [임시] AI 이미지 생성 모델 연동 전 placeholder 이미지 */}
+                {personaImage && (
+                  <div className="relative h-[200px] w-full shrink-0 overflow-hidden rounded-t-[inherit]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={personaImage} alt="AI 페르소나 이미지" className="h-full w-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/40" />
+                    <div className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-black/40 px-2 py-1 backdrop-blur-sm">
+                      <Sparkles size={9} className="text-white/60" />
+                      <span className="text-[9px] font-semibold uppercase tracking-wider text-white/60">AI generated</span>
+                    </div>
+                  </div>
+                )}
+
+                <div className="px-5 pt-5">
+                  <div className="mb-5">
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: '#9CA3AF' }}>
+                      <Sparkles size={11} />
+                      <span>AI 페르소나</span>
+                      <span className="rounded-full px-2 py-0.5 text-[9px]" style={{ background: '#F3F4F6' }}>매주 업데이트됨</span>
+                    </div>
+                    <p className="mt-3 text-[22px] font-black leading-[1.2]" style={{ color: '#111827' }}>{personaText}</p>
+                    <p className="mt-1.5 text-[12px]" style={{ color: '#6B7280' }}>{profile.name} · byro.io</p>
                   </div>
                 </div>
-              )}
+              </div>
 
-              <div className="px-5 pt-5">
-                <div className="mb-5">
-                  <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: 'var(--color-text-tertiary)' }}>
-                    <Sparkles size={11} />
-                    <span>AI 페르소나</span>
-                    <span className="rounded-full px-2 py-0.5 text-[9px]" style={{ background: 'var(--color-bg-soft)' }}>매주 업데이트됨</span>
-                  </div>
-                  <p className="mt-3 text-[22px] font-black leading-[1.2]" style={{ color: 'var(--color-text-primary)' }}>{personaText}</p>
-                  <p className="mt-2 text-[12px] leading-[1.65]" style={{ color: 'var(--color-text-tertiary)' }}>
-                    평판 키워드와 라이프스타일 데이터를 바탕으로 자동 생성된 문장이에요.
-                  </p>
-                </div>
-
+              {/* 생성 근거 (캡처 제외) */}
+              <div className="px-5">
                 <div className="space-y-2">
                   <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: 'var(--color-text-tertiary)' }}>생성 근거</p>
                   {personaReasons.map((reason) => (
@@ -274,6 +321,34 @@ export function ProfileHeroCard({
                       <span className="text-[13px] font-semibold" style={{ color: 'var(--color-text-primary)' }}>{reason.value}</span>
                     </div>
                   ))}
+                </div>
+
+                {/* 저장 / 공유 버튼 */}
+                <div className="mt-5 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={handlePersonaShare}
+                    disabled={personaSharing}
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-[14px] py-2.5 text-[13px] font-semibold transition-opacity active:opacity-70 disabled:opacity-50"
+                    style={{
+                      background: 'var(--color-accent-bg-subtle)',
+                      border: '1px solid var(--color-accent-border-soft)',
+                      color: 'var(--color-accent-dark)',
+                    }}
+                  >
+                    <Download size={13} />
+                    {personaSharing ? '저장 중…' : '저장'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handlePersonaShare}
+                    disabled={personaSharing}
+                    className="flex flex-1 items-center justify-center gap-1.5 rounded-[14px] py-2.5 text-[13px] font-semibold text-white transition-opacity active:opacity-70 disabled:opacity-50"
+                    style={{ background: 'linear-gradient(135deg, #1D4ED8, #7C3AED)' }}
+                  >
+                    <Share2 size={13} />
+                    {personaSharing ? '공유 중…' : '공유'}
+                  </button>
                 </div>
               </div>
             </div>

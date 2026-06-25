@@ -1,9 +1,9 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bookmark, BookmarkCheck, Download, Pencil, Share2, Sparkles, X } from 'lucide-react'
+import { Bookmark, BookmarkCheck, Pencil, Sparkles, X } from 'lucide-react'
 import { ActionMenu, ActionMenuItem, BottomSheet, showToast } from '@/components/ui'
 import { shareOrCopy } from '@/lib/share'
 import type { PersonaReason } from '@/lib/personaGen'
@@ -224,50 +224,7 @@ export function ProfileHeroCard({
   const [personaSheetOpen, setPersonaSheetOpen] = useState(false)
   const [moreSheetOpen, setMoreSheetOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const [personaSharing, setPersonaSharing] = useState(false)
-  const personaCardRef = useRef<HTMLDivElement>(null)
   useEffect(() => { setMounted(true) }, [])
-
-  const handlePersonaShare = async () => {
-    if (!personaCardRef.current || personaSharing) return
-    setPersonaSharing(true)
-    try {
-      const html2canvas = (await import('html2canvas')).default
-      const canvas = await html2canvas(personaCardRef.current, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-      })
-      await new Promise<void>((resolve) => {
-        canvas.toBlob(async (blob) => {
-          if (!blob) { resolve(); return }
-          const file = new File([blob], `byro-persona-${profile.name}.png`, { type: 'image/png' })
-          try {
-            if (navigator.canShare?.({ files: [file] })) {
-              await navigator.share({
-                files: [file],
-                title: `${profile.name}님의 AI 페르소나`,
-                text: `byro에서 ${profile.name}님의 AI 페르소나를 확인했어요!`,
-              })
-            } else {
-              const url = URL.createObjectURL(blob)
-              const a = document.createElement('a')
-              a.href = url
-              a.download = `byro-persona-${profile.name}.png`
-              a.click()
-              URL.revokeObjectURL(url)
-              showToast('이미지가 저장됐어요')
-            }
-          } catch { /* 공유 취소 */ }
-          resolve()
-        }, 'image/png')
-      })
-    } catch {
-      showToast('공유에 실패했어요')
-    } finally {
-      setPersonaSharing(false)
-    }
-  }
   const showAge = typeof profile.age === 'number' && profile.showAge !== false
 
   return (
@@ -279,8 +236,7 @@ export function ProfileHeroCard({
         {personaReasons && mounted && createPortal(
           <BottomSheet open={personaSheetOpen} onClose={() => setPersonaSheetOpen(false)}>
             <div className="pb-8">
-              {/* 캡처 대상 카드 */}
-              <div ref={personaCardRef} style={{ backgroundColor: '#ffffff' }}>
+              <div>
                 {/* [임시] AI 이미지 생성 모델 연동 전 placeholder 이미지 */}
                 {personaImage && (
                   <div className="relative h-[200px] w-full shrink-0 overflow-hidden rounded-t-[inherit]">
@@ -323,33 +279,6 @@ export function ProfileHeroCard({
                   ))}
                 </div>
 
-                {/* 저장 / 공유 버튼 */}
-                <div className="mt-5 flex gap-2">
-                  <button
-                    type="button"
-                    onClick={handlePersonaShare}
-                    disabled={personaSharing}
-                    className="flex flex-1 items-center justify-center gap-1.5 rounded-[14px] py-2.5 text-[13px] font-semibold transition-opacity active:opacity-70 disabled:opacity-50"
-                    style={{
-                      background: 'var(--color-accent-bg-subtle)',
-                      border: '1px solid var(--color-accent-border-soft)',
-                      color: 'var(--color-accent-dark)',
-                    }}
-                  >
-                    <Download size={13} />
-                    {personaSharing ? '저장 중…' : '저장'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handlePersonaShare}
-                    disabled={personaSharing}
-                    className="flex flex-1 items-center justify-center gap-1.5 rounded-[14px] py-2.5 text-[13px] font-semibold text-white transition-opacity active:opacity-70 disabled:opacity-50"
-                    style={{ background: 'linear-gradient(135deg, #1D4ED8, #7C3AED)' }}
-                  >
-                    <Share2 size={13} />
-                    {personaSharing ? '공유 중…' : '공유'}
-                  </button>
-                </div>
               </div>
             </div>
           </BottomSheet>,

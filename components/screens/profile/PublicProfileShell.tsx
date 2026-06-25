@@ -53,7 +53,7 @@ export function PublicProfileShell({
   const { isOwner: isOwnerMode } = useProfileOwner(username)
 
   // [임시] 오너 모드에서만 페르소나 생성 (목업 데이터 기반)
-  const persona = isOwnerMode ? generatePersona(profile) : null
+  const persona = generatePersona(profile)
 
   const isSaved = store.savedProfiles.some((p) => p.linkId === profile.linkId)
   const tabAccessCtx = { isOwner: isOwnerMode, isLoggedIn: store.isLoggedIn }

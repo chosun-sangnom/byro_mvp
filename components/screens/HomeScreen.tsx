@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { HeroSection } from '@/components/screens/home/sections/HeroSection'
 import { HighlightSection } from '@/components/screens/home/sections/HighlightSection'
@@ -13,23 +12,40 @@ import { useByroStore } from '@/store/useByroStore'
 
 export default function HomeScreen() {
   const router = useRouter()
-  const { isLoggedIn } = useByroStore()
+  const { isLoggedIn, login, logout } = useByroStore()
 
-  useEffect(() => {
-    if (isLoggedIn) router.replace('/me')
-  }, [isLoggedIn, router])
+  const primaryLabel = isLoggedIn ? '내 Byro 보러가기' : '내 Byro 만들기'
+  const secondaryLabel = isLoggedIn ? '로그아웃' : '로그인'
 
-  if (isLoggedIn) return null
+  const handlePrimary = () => {
+    if (isLoggedIn) {
+      router.push('/me')
+      return
+    }
+    router.push('/signup')
+  }
+
+  const handleSecondary = () => {
+    if (isLoggedIn) {
+      logout()
+      return
+    }
+    login()
+  }
+
+  const handleSampleProfile = () => {
+    router.push('/jiminlee')
+  }
 
   return (
     <div className="min-h-full bg-[var(--color-bg-page)] text-[var(--color-text-strong)] antialiased">
       <HeroSection
-        isLoggedIn={false}
-        primaryLabel="내 Byro 만들기"
-        secondaryLabel="로그인"
-        onPrimary={() => router.push('/signup')}
-        onSecondary={() => router.push('/signup')}
-        onSampleProfile={() => router.push('/jiminlee')}
+        isLoggedIn={isLoggedIn}
+        primaryLabel={primaryLabel}
+        secondaryLabel={secondaryLabel}
+        onPrimary={handlePrimary}
+        onSecondary={handleSecondary}
+        onSampleProfile={handleSampleProfile}
       />
       <ProblemSection />
       <SolutionSection />

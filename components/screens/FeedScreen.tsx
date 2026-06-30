@@ -57,9 +57,9 @@ function MyProfileCard() {
 
   if (!isLoggedIn || !user) {
     return (
-      <div className="mx-4 mt-4 mb-1 rounded-[20px] overflow-hidden bg-[#0F0F10] px-5 py-5 flex flex-col items-center gap-3">
-        <p className="text-[15px] font-black text-white">비즈니스 프로필을 만들어보세요</p>
-        <p className="text-[12px] text-white/40 text-center leading-relaxed">
+      <div className="mx-4 mt-4 mb-1 surface-card px-5 py-5 flex flex-col items-center gap-3">
+        <p className="text-[15px] font-black text-[var(--color-text-strong)]">비즈니스 프로필을 만들어보세요</p>
+        <p className="text-[12px] text-[var(--color-text-tertiary)] text-center leading-relaxed">
           나를 소개하는 바이로 프로필로{'\n'}더 많은 사람들과 연결되세요
         </p>
         <button
@@ -77,7 +77,7 @@ function MyProfileCard() {
   const isDone = pct >= 100
 
   return (
-    <div className="mx-4 mt-4 mb-1 rounded-[20px] overflow-hidden bg-[#0F0F10]">
+    <div className="mx-4 mt-4 mb-1 surface-card overflow-visible">
       <div className="px-4 pt-4 pb-3">
         {/* 상단: 아바타 + 이름/직함 + 버튼 */}
         <div className="flex items-center gap-3">
@@ -88,12 +88,13 @@ function MyProfileCard() {
             size={52}
           />
           <div className="flex-1 min-w-0">
-            <p className="text-[16px] font-black text-white truncate">{user.name}</p>
-            <p className="text-[12px] text-white/50 truncate mt-0.5">{user.title}</p>
+            <p className="text-[16px] font-black text-[var(--color-text-strong)] truncate">{user.name}</p>
+            <p className="text-[12px] text-[var(--color-text-secondary)] truncate mt-0.5">{user.title}</p>
           </div>
           <button
             onClick={() => router.push('/me')}
-            className="flex-shrink-0 px-3.5 py-1.5 rounded-full text-[12px] font-bold text-[#0F0F10] bg-white"
+            className="flex-shrink-0 px-3.5 py-1.5 rounded-full text-[12px] font-bold text-white"
+            style={{ backgroundColor: 'var(--color-accent-dark)' }}
           >
             내 바이로 보기
           </button>
@@ -101,7 +102,7 @@ function MyProfileCard() {
 
         {/* 완성도 바 */}
         <div className="mt-4">
-          <div className="relative h-2 rounded-full bg-white/10 overflow-visible">
+          <div className="relative h-2 rounded-full bg-[var(--color-bg-muted)] overflow-visible">
             <div
               className="h-full rounded-full transition-all duration-500"
               style={{
@@ -121,7 +122,7 @@ function MyProfileCard() {
             </span>
           </div>
           {!isDone && (
-            <p className="mt-3 text-[11px] text-white/40 text-center">
+            <p className="mt-3 text-[11px] text-[var(--color-text-tertiary)] text-center">
               프로필을 완성하면 더 많은 사람들이 나를 발견할 수 있어요!
             </p>
           )}

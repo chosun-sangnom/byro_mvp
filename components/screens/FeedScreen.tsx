@@ -1,9 +1,9 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { Bell, Search, ChevronRight } from 'lucide-react'
-import { useAuth } from '@/hooks/useAuth'
+import { Search, ChevronRight } from 'lucide-react'
 import { Avatar, ToastSingleton, showToast } from '@/components/ui'
+import AppHeader from '@/components/layout/AppHeader'
 
 type FeedProfile = {
   linkId: string | null
@@ -38,7 +38,6 @@ const RECOMMENDED_PROFILES: FeedProfile[] = [
 
 export default function FeedScreen() {
   const router = useRouter()
-  const { isLoggedIn, user } = useAuth()
 
   const handleProfileClick = (linkId: string | null) => {
     if (!linkId) {
@@ -50,32 +49,9 @@ export default function FeedScreen() {
 
   return (
     <ToastSingleton>
-      <div className="mx-auto w-full max-w-[430px] min-h-dvh flex flex-col bg-[var(--color-bg-page)]">
+      <div className="relative mx-auto w-full max-w-[430px] min-h-dvh flex flex-col bg-[var(--color-bg-page)]">
 
-        {/* Header */}
-        <header className="flex items-center justify-between px-5 h-14 border-b border-[var(--color-border-soft)] flex-shrink-0">
-          <span className="text-[18px] font-black tracking-tight text-[var(--color-text-strong)]">Byro</span>
-          <div className="flex items-center gap-1">
-            {isLoggedIn && (
-              <button className="p-2 text-[var(--color-text-secondary)]">
-                <Bell size={20} />
-              </button>
-            )}
-            {isLoggedIn ? (
-              <button onClick={() => router.push('/me')} className="ml-1">
-                <Avatar src={user?.avatarImage} name={user?.name ?? ''} color={user?.avatarColor ?? 'var(--color-accent-dark)'} size={32} />
-              </button>
-            ) : (
-              <button
-                onClick={() => router.push('/signup')}
-                className="ml-1 px-3 py-1.5 rounded-full text-[12px] font-bold text-white"
-                style={{ backgroundColor: 'var(--color-accent-dark)' }}
-              >
-                로그인
-              </button>
-            )}
-          </div>
-        </header>
+        <AppHeader />
 
         {/* Search Bar */}
         <div className="px-4 py-3 border-b border-[var(--color-border-soft)]">

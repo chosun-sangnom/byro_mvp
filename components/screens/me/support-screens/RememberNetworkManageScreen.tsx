@@ -24,10 +24,10 @@ export function RememberNetworkManageScreen({
   const currentDomain = store.user?.networkDomain
   const isCustom = currentDomain ? !DOMAIN_OPTIONS.includes(currentDomain) : false
 
-  const [selectedDomain, setSelectedDomain] = useState<string | undefined>(isCustom ? undefined : currentDomain)
+  const [selectedDomain, setSelectedDomain] = useState<string | undefined>(isCustom ? 'custom' : currentDomain)
   const [customDomain, setCustomDomain] = useState(isCustom ? (currentDomain ?? '') : '')
 
-  const effectiveDomain = customDomain.trim() || selectedDomain
+  const effectiveDomain = selectedDomain === 'custom' ? (customDomain.trim() || undefined) : selectedDomain
 
   const email = `${userLinkId}@data.byro.io`
 
@@ -38,16 +38,11 @@ export function RememberNetworkManageScreen({
 
   const handleChipSelect = (domain: string) => {
     setSelectedDomain((prev) => (prev === domain ? undefined : domain))
-    setCustomDomain('')
-  }
-
-  const handleCustomInput = (value: string) => {
-    setCustomDomain(value)
-    if (value.trim()) setSelectedDomain(undefined)
+    if (domain !== 'custom') setCustomDomain('')
   }
 
   const handleSaveDomain = () => {
-    store.updateNetworkDomain(effectiveDomain || undefined)
+    store.updateNetworkDomain(effectiveDomain)
     showToast(effectiveDomain ? `'${effectiveDomain}' 도메인으로 설정됐어요` : '관심 도메인이 해제됐어요')
   }
 
@@ -88,30 +83,42 @@ export function RememberNetworkManageScreen({
                 </button>
               )
             })}
+            {/* 직접입력 칩 */}
+            <button
+              onClick={() => handleChipSelect('custom')}
+              className="rounded-full border px-3.5 py-1.5 text-[12px] font-semibold transition-colors"
+              style={{
+                borderColor: selectedDomain === 'custom' ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
+                background: selectedDomain === 'custom' ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
+                color: selectedDomain === 'custom' ? '#fff' : 'var(--color-text-secondary)',
+              }}
+            >
+              직접입력
+            </button>
           </div>
 
-          {/* 직접 입력 */}
-          <div className="mt-4">
-            <p className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.08em]" style={{ color: 'var(--color-text-tertiary)' }}>
-              직접 입력
-            </p>
-            <input
-              type="text"
-              value={customDomain}
-              onChange={(e) => handleCustomInput(e.target.value)}
-              placeholder="예) 카카오"
-              maxLength={30}
-              className="w-full rounded-[14px] border px-4 py-3 text-[13px] outline-none"
-              style={{
-                borderColor: customDomain.trim() ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
-                background: 'var(--color-bg-soft)',
-                color: 'var(--color-text-primary)',
-              }}
-            />
-            <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'var(--color-text-tertiary)' }}>
-              특정 기업·분야 등 더 세부적인 도메인을 직접 입력하면 정밀한 인사이트를 받을 수 있어요.
-            </p>
-          </div>
+          {/* 직접입력 선택 시 텍스트 필드 */}
+          {selectedDomain === 'custom' && (
+            <div className="mt-3">
+              <input
+                type="text"
+                value={customDomain}
+                onChange={(e) => setCustomDomain(e.target.value)}
+                placeholder="예) 카카오"
+                maxLength={30}
+                autoFocus
+                className="w-full rounded-[14px] border px-4 py-3 text-[13px] outline-none"
+                style={{
+                  borderColor: customDomain.trim() ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
+                  background: 'var(--color-bg-soft)',
+                  color: 'var(--color-text-primary)',
+                }}
+              />
+              <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'var(--color-text-tertiary)' }}>
+                특정 기업·분야 등 더 세부적인 도메인을 입력하면 더 정밀한 인사이트를 받을 수 있어요.
+              </p>
+            </div>
+          )}
 
           <button
             onClick={handleSaveDomain}

@@ -56,7 +56,7 @@ export default function OnboardingScreen() {
 
       <Modal open={showExitModal} onClose={() => setShowExitModal(false)}>
         <div className="text-center">
-          <div className="text-base font-black mb-2">온보딩을 종료할까요?</div>
+          <div className="text-base font-black mb-2">회원가입을 종료할까요?</div>
           <div className="meta-text mb-5 leading-relaxed">
             지금 나가면 입력한 정보가<br />저장되지 않아요.
           </div>

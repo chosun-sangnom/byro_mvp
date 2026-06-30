@@ -51,9 +51,9 @@ function calcCompleteness(user: UserState | null, highlights: Highlight[]): numb
   return Math.min(score, 100)
 }
 
-function MyProfileCard() {
+function MyProfileCard({ onProfileClick }: { onProfileClick: (linkId: string | null) => void }) {
   const router = useRouter()
-  const { user, highlights, isLoggedIn } = useByroStore()
+  const { user, highlights, isLoggedIn, savedProfiles } = useByroStore()
 
   if (!isLoggedIn || !user) {
     return (
@@ -127,6 +127,37 @@ function MyProfileCard() {
             </p>
           )}
         </div>
+
+        {/* 저장한 프로필 */}
+        {savedProfiles.length > 0 && (
+          <>
+            <div className="mx-4 h-px bg-[var(--color-border-soft)]" />
+            <div className="pt-3 pb-4">
+              <div className="flex items-center justify-between px-4 mb-2.5">
+                <span className="text-[13px] font-bold text-[var(--color-text-primary)]">저장한 프로필</span>
+                <button
+                  onClick={() => router.push('/archive')}
+                  className="text-[11px] font-semibold text-[var(--color-accent-dark)]"
+                >
+                  전체보기
+                </button>
+              </div>
+              <div className="flex gap-3 px-4 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+                {savedProfiles.slice(0, 8).map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => onProfileClick(p.linkId)}
+                    className="flex-shrink-0 flex flex-col items-center gap-1.5"
+                    style={{ width: 52 }}
+                  >
+                    <Avatar src={getProfileAvatar(p.linkId)} name={p.name} size={44} />
+                    <p className="text-[10px] font-semibold text-[var(--color-text-primary)] truncate w-full text-center">{p.name}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
@@ -134,8 +165,6 @@ function MyProfileCard() {
 
 export default function FeedScreen() {
   const router = useRouter()
-  const { savedProfiles, isLoggedIn } = useByroStore()
-
   const handleProfileClick = (linkId: string | null) => {
     if (!linkId) {
       showToast('아직 준비 중인 프로필이에요')
@@ -153,47 +182,8 @@ export default function FeedScreen() {
         {/* Feed */}
         <div className="flex-1 overflow-y-auto">
 
-          {/* 내 프로필 카드 */}
-          <MyProfileCard />
-
-          {/* 아카이브한 사람들 */}
-          {isLoggedIn && savedProfiles.length > 0 && (
-            <section className="pt-5 pb-4">
-              <div className="flex items-center justify-between px-5 mb-3">
-                <h2 className="text-[15px] font-black text-[var(--color-text-strong)]">저장한 프로필</h2>
-                <button
-                  onClick={() => router.push('/archive')}
-                  className="text-[12px] font-semibold text-[var(--color-accent-dark)]"
-                >
-                  전체보기
-                </button>
-              </div>
-              <div className="flex gap-4 px-5 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
-                {savedProfiles.slice(0, 8).map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => handleProfileClick(p.linkId)}
-                    className="flex-shrink-0 flex flex-col items-center gap-2"
-                    style={{ width: 64 }}
-                  >
-                    <Avatar
-                      src={getProfileAvatar(p.linkId)}
-                      name={p.name}
-                      size={52}
-                    />
-                    <div className="text-center w-full">
-                      <p className="text-[12px] font-semibold text-[var(--color-text-primary)] truncate">{p.name}</p>
-                      <p className="text-[10px] text-[var(--color-text-tertiary)] truncate">{p.title.split(' · ')[0]}</p>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {(isLoggedIn && savedProfiles.length > 0) && (
-            <div className="h-px mx-5 bg-[var(--color-border-soft)]" />
-          )}
+          {/* 내 프로필 카드 (저장한 프로필 포함) */}
+          <MyProfileCard onProfileClick={handleProfileClick} />
 
           {/* 새로 가입했어요 */}
           <section className="pt-5 pb-4">

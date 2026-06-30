@@ -423,18 +423,20 @@ function AlbumView({
             </button>
           </div>
         ))}
-        {/* [임시] 실제 업로드 미구현 */}
-        <button
-          onClick={() => showToast('사진 업로드는 준비 중이에요')}
-          className="aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1"
-          style={{ borderColor: 'var(--color-border-default)' }}
-        >
-          <Plus size={22} className="text-[var(--color-text-tertiary)]" />
-          <span className="text-[11px] text-[var(--color-text-tertiary)]">추가</span>
-        </button>
+        {/* [임시] 실제 업로드 미구현 — 최대 9장 */}
+        {photos.length < 9 && (
+          <button
+            onClick={() => showToast('사진 업로드는 준비 중이에요')}
+            className="aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1"
+            style={{ borderColor: 'var(--color-border-default)' }}
+          >
+            <Plus size={22} className="text-[var(--color-text-tertiary)]" />
+            <span className="text-[11px] text-[var(--color-text-tertiary)]">추가</span>
+          </button>
+        )}
       </div>
       <p className="text-[12px] text-[var(--color-text-tertiary)] leading-relaxed">
-        나를 잘 표현하는 사진을 자유롭게 올려보세요. 취미, 일상, 좋아하는 공간 등 무엇이든 괜찮아요.
+        나를 잘 표현하는 사진을 자유롭게 올려보세요. 취미, 일상, 좋아하는 공간 등 무엇이든 괜찮아요. (최대 9장)
       </p>
     </SubScreen>
   )

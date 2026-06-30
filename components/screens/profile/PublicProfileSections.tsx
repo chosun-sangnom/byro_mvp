@@ -229,6 +229,15 @@ export function ProfileRememberSection({
           </div>
         </div>
 
+        {/* 관심 도메인 */}
+        {viewerNetworkDomain && (
+          <div className="flex items-center gap-1.5 -mt-1">
+            <span className="text-[11px] text-[var(--color-text-tertiary)]">관심 도메인</span>
+            <span className="text-[11px] text-[var(--color-text-tertiary)]">:</span>
+            <span className="text-[11px] font-bold" style={{ color: 'var(--color-accent-dark)' }}>{viewerNetworkDomain}</span>
+          </div>
+        )}
+
         {/* 1위 산업 */}
         {topIndustry && (
           <div>
@@ -296,25 +305,6 @@ export function ProfileRememberSection({
               </span>
             </div>
             <p className="text-[13px] leading-[1.65] text-[var(--color-text-primary)]">{insight.text}</p>
-          </div>
-        ) : isOwner && viewerNetworkDomain ? (
-          /* 내 프로필 — 설정한 관심 도메인 뱃지 */
-          <div
-            className="rounded-[18px] px-4 py-3.5 flex items-center gap-2.5"
-            style={{ background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-default)' }}
-          >
-            <Sparkles size={12} style={{ color: 'var(--color-text-tertiary)' }} />
-            <span className="text-[11px] font-bold text-[var(--color-text-tertiary)]">내 관심 도메인</span>
-            <span
-              className="ml-auto rounded-full px-3 py-1 text-[11px] font-bold"
-              style={{
-                background: 'var(--color-accent-bg)',
-                color: 'var(--color-accent-dark)',
-                border: '1px solid color-mix(in srgb, var(--color-accent-dark) 30%, transparent)',
-              }}
-            >
-              {viewerNetworkDomain}
-            </span>
           </div>
         ) : !isOwner ? (
           /* 블러 넛지 — 비로그인 or 관심 도메인 미설정 (본인 프로필 제외) */

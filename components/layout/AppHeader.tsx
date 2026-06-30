@@ -114,14 +114,19 @@ export default function AppHeader() {
               transition={{ duration: 0.18, ease: 'easeOut' }}
               className="absolute right-0 top-14 z-40 w-56 bg-[var(--color-bg-page)] border border-[var(--color-border-soft)] rounded-xl shadow-xl mx-3 overflow-hidden"
             >
-              {/* 프로필 정보 — 사진 클릭 시 내 프로필 보기 */}
-              <button
-                onClick={() => { setProfileOpen(false); router.push('/me') }}
-                className="flex flex-col items-center gap-2 px-5 pt-5 pb-4 w-full hover:bg-[var(--color-bg-soft)] transition-colors"
-              >
-                <Avatar src={user?.avatarImage} name={user?.name ?? ''} color={user?.avatarColor ?? 'var(--color-accent-dark)'} size={64} />
+              {/* 프로필 정보 */}
+              <div className="flex flex-col items-center gap-2 px-5 pt-5 pb-4 w-full">
+                <button onClick={() => { setProfileOpen(false); router.push('/me') }}>
+                  <Avatar src={user?.avatarImage} name={user?.name ?? ''} color={user?.avatarColor ?? 'var(--color-accent-dark)'} size={64} />
+                </button>
                 <span className="text-[15px] font-semibold text-[var(--color-text-primary)]">{user?.name}</span>
-              </button>
+                <button
+                  onClick={() => { setProfileOpen(false); router.push('/me') }}
+                  className="text-[11px] font-semibold text-[var(--color-accent-dark)]"
+                >
+                  내 Byro 보기
+                </button>
+              </div>
 
               {/* 버튼 */}
               <div className="flex border-t border-[var(--color-border-soft)]">

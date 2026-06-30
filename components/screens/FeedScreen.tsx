@@ -55,7 +55,23 @@ function MyProfileCard() {
   const router = useRouter()
   const { user, highlights, isLoggedIn } = useByroStore()
 
-  if (!isLoggedIn || !user) return null
+  if (!isLoggedIn || !user) {
+    return (
+      <div className="mx-4 mt-4 mb-1 rounded-[20px] overflow-hidden bg-[#0F0F10] px-5 py-5 flex flex-col items-center gap-3">
+        <p className="text-[15px] font-black text-white">비즈니스 프로필을 만들어보세요</p>
+        <p className="text-[12px] text-white/40 text-center leading-relaxed">
+          나를 소개하는 바이로 프로필로{'\n'}더 많은 사람들과 연결되세요
+        </p>
+        <button
+          onClick={() => router.push('/signup')}
+          className="mt-1 w-full py-3 rounded-2xl text-[14px] font-bold text-white"
+          style={{ backgroundColor: 'var(--color-accent-dark)' }}
+        >
+          로그인 / 가입하기
+        </button>
+      </div>
+    )
+  }
 
   const pct = calcCompleteness(user, highlights)
   const isDone = pct >= 100

@@ -83,10 +83,11 @@ export default function AppHeader() {
             <motion.button
               whileTap={{ scale: 0.88 }}
               onClick={() => router.push('/signup')}
-              className="ml-1 w-8 h-8 rounded-full bg-[var(--color-bg-muted)] flex items-center justify-center"
+              className="ml-1 px-3.5 py-1.5 rounded-full text-[12px] font-bold text-white"
+              style={{ backgroundColor: 'var(--color-accent-dark)' }}
               aria-label="로그인"
             >
-              <span className="text-[11px] font-bold text-[var(--color-text-tertiary)]">?</span>
+              로그인
             </motion.button>
           )}
         </div>

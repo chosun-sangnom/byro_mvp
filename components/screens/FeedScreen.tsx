@@ -1,9 +1,12 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { Search, ChevronRight } from 'lucide-react'
+import { ChevronRight } from 'lucide-react'
 import { Avatar, ToastSingleton, showToast } from '@/components/ui'
 import AppHeader from '@/components/layout/AppHeader'
+import { useByroStore } from '@/store/useByroStore'
+import { getProfileAvatar } from '@/lib/mocks/publicProfiles'
+import type { UserState, Highlight } from '@/types'
 
 type FeedProfile = {
   linkId: string | null
@@ -35,9 +38,86 @@ const RECOMMENDED_PROFILES: FeedProfile[] = [
   { linkId: null, name: '이준혁', title: '변호사 · 스타트업 전문', avatarColor: '#9AACC4' },
 ]
 
+function calcCompleteness(user: UserState | null, highlights: Highlight[]): number {
+  if (!user) return 0
+  let score = 0
+  if (user.avatarImage) score += 15
+  if (user.title?.trim()) score += 15
+  if (user.bio?.trim()) score += 20
+  if (highlights.length > 0) score += 25
+  if (user.whoIAm?.mbti?.trim()) score += 10
+  if (user.life?.daily?.exercise?.length || user.life?.tastes?.movies?.length) score += 10
+  if (user.contactChannels?.some((c) => c.enabled)) score += 5
+  return Math.min(score, 100)
+}
+
+function MyProfileCard() {
+  const router = useRouter()
+  const { user, highlights, isLoggedIn } = useByroStore()
+
+  if (!isLoggedIn || !user) return null
+
+  const pct = calcCompleteness(user, highlights)
+  const isDone = pct >= 100
+
+  return (
+    <div className="mx-4 mt-4 mb-1 rounded-[20px] overflow-hidden bg-[#0F0F10]">
+      <div className="px-4 pt-4 pb-3">
+        {/* 상단: 아바타 + 이름/직함 + 버튼 */}
+        <div className="flex items-center gap-3">
+          <Avatar
+            src={user.avatarImage}
+            name={user.name}
+            color={user.avatarColor ?? 'var(--color-accent-dark)'}
+            size={52}
+          />
+          <div className="flex-1 min-w-0">
+            <p className="text-[16px] font-black text-white truncate">{user.name}</p>
+            <p className="text-[12px] text-white/50 truncate mt-0.5">{user.title}</p>
+          </div>
+          <button
+            onClick={() => router.push('/me')}
+            className="flex-shrink-0 px-3.5 py-1.5 rounded-full text-[12px] font-bold text-[#0F0F10] bg-white"
+          >
+            내 바이로 보기
+          </button>
+        </div>
+
+        {/* 완성도 바 */}
+        <div className="mt-4">
+          <div className="relative h-2 rounded-full bg-white/10 overflow-visible">
+            <div
+              className="h-full rounded-full transition-all duration-500"
+              style={{
+                width: `${pct}%`,
+                backgroundColor: isDone ? '#22c55e' : 'var(--color-accent-light)',
+              }}
+            />
+            {/* % 뱃지 */}
+            <span
+              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full text-[10px] font-black text-white"
+              style={{
+                left: `${Math.min(pct, 96)}%`,
+                backgroundColor: isDone ? '#22c55e' : 'var(--color-accent-dark)',
+              }}
+            >
+              {pct}%
+            </span>
+          </div>
+          {!isDone && (
+            <p className="mt-3 text-[11px] text-white/40 text-center">
+              프로필을 완성하면 더 많은 사람들이 나를 발견할 수 있어요!
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function FeedScreen() {
   const router = useRouter()
+  const { savedProfiles, isLoggedIn } = useByroStore()
 
   const handleProfileClick = (linkId: string | null) => {
     if (!linkId) {
@@ -53,19 +133,50 @@ export default function FeedScreen() {
 
         <AppHeader />
 
-        {/* Search Bar */}
-        <div className="px-4 py-3 border-b border-[var(--color-border-soft)]">
-          <button
-            onClick={() => router.push('/search')}
-            className="w-full flex items-center gap-2.5 px-4 h-11 rounded-2xl bg-[var(--color-bg-soft)] text-left"
-          >
-            <Search size={16} className="text-[var(--color-text-tertiary)] flex-shrink-0" />
-            <span className="text-[14px] text-[var(--color-text-tertiary)]">이름, 직함, 회사로 검색</span>
-          </button>
-        </div>
-
         {/* Feed */}
         <div className="flex-1 overflow-y-auto">
+
+          {/* 내 프로필 카드 */}
+          <MyProfileCard />
+
+          {/* 아카이브한 사람들 */}
+          {isLoggedIn && savedProfiles.length > 0 && (
+            <section className="pt-5 pb-4">
+              <div className="flex items-center justify-between px-5 mb-3">
+                <h2 className="text-[15px] font-black text-[var(--color-text-strong)]">저장한 프로필</h2>
+                <button
+                  onClick={() => router.push('/archive')}
+                  className="text-[12px] font-semibold text-[var(--color-accent-dark)]"
+                >
+                  전체보기
+                </button>
+              </div>
+              <div className="flex gap-4 px-5 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+                {savedProfiles.slice(0, 8).map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => handleProfileClick(p.linkId)}
+                    className="flex-shrink-0 flex flex-col items-center gap-2"
+                    style={{ width: 64 }}
+                  >
+                    <Avatar
+                      src={getProfileAvatar(p.linkId)}
+                      name={p.name}
+                      size={52}
+                    />
+                    <div className="text-center w-full">
+                      <p className="text-[12px] font-semibold text-[var(--color-text-primary)] truncate">{p.name}</p>
+                      <p className="text-[10px] text-[var(--color-text-tertiary)] truncate">{p.title.split(' · ')[0]}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {(isLoggedIn && savedProfiles.length > 0) && (
+            <div className="h-px mx-5 bg-[var(--color-border-soft)]" />
+          )}
 
           {/* 새로 가입했어요 */}
           <section className="pt-5 pb-4">

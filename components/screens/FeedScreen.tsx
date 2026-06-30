@@ -4,9 +4,6 @@ import { useRouter } from 'next/navigation'
 import { ChevronRight } from 'lucide-react'
 import { Avatar, ToastSingleton, showToast } from '@/components/ui'
 import AppHeader from '@/components/layout/AppHeader'
-import { useByroStore } from '@/store/useByroStore'
-import { getProfileAvatar } from '@/lib/mocks/publicProfiles'
-import type { UserState, Highlight } from '@/types'
 
 type FeedProfile = {
   linkId: string | null
@@ -38,133 +35,9 @@ const RECOMMENDED_PROFILES: FeedProfile[] = [
   { linkId: null, name: '이준혁', title: '변호사 · 스타트업 전문', avatarColor: '#9AACC4' },
 ]
 
-function calcCompleteness(user: UserState | null, highlights: Highlight[]): number {
-  if (!user) return 0
-  let score = 0
-  if (user.avatarImage) score += 15
-  if (user.title?.trim()) score += 15
-  if (user.bio?.trim()) score += 20
-  if (highlights.length > 0) score += 25
-  if (user.whoIAm?.mbti?.trim()) score += 10
-  if (user.life?.daily?.exercise?.length || user.life?.tastes?.movies?.length) score += 10
-  if (user.contactChannels?.some((c) => c.enabled)) score += 5
-  return Math.min(score, 100)
-}
-
-function MyProfileCard({ onProfileClick }: { onProfileClick: (linkId: string | null) => void }) {
-  const router = useRouter()
-  const { user, highlights, isLoggedIn, savedProfiles } = useByroStore()
-
-  if (!isLoggedIn || !user) {
-    return (
-      <div className="mx-4 mt-4 mb-1 surface-card px-5 py-5 flex flex-col items-center gap-3">
-        <p className="text-[15px] font-black text-[var(--color-text-strong)]">비즈니스 프로필을 만들어보세요</p>
-        <p className="text-[12px] text-[var(--color-text-tertiary)] text-center leading-relaxed">
-          나를 소개하는 바이로 프로필로{'\n'}더 많은 사람들과 연결되세요
-        </p>
-        <button
-          onClick={() => router.push('/signup')}
-          className="mt-1 w-full py-3 rounded-2xl text-[14px] font-bold text-white"
-          style={{ backgroundColor: 'var(--color-accent-dark)' }}
-        >
-          로그인 / 가입하기
-        </button>
-      </div>
-    )
-  }
-
-  const pct = calcCompleteness(user, highlights)
-  const isDone = pct >= 100
-
-  return (
-    <div className="mx-4 mt-4 mb-1 surface-card overflow-visible">
-      <div className="px-4 pt-4 pb-3">
-        {/* 상단: 아바타 + 이름/직함 + 버튼 */}
-        <div className="flex items-center gap-3">
-          <Avatar
-            src={user.avatarImage}
-            name={user.name}
-            color={user.avatarColor ?? 'var(--color-accent-dark)'}
-            size={52}
-          />
-          <div className="flex-1 min-w-0">
-            <p className="text-[16px] font-black text-[var(--color-text-strong)] truncate">{user.name}</p>
-            <p className="text-[12px] text-[var(--color-text-secondary)] truncate mt-0.5">{user.title}</p>
-          </div>
-          <button
-            onClick={() => router.push('/me')}
-            className="flex-shrink-0 px-3.5 py-1.5 rounded-full text-[12px] font-bold text-white"
-            style={{ backgroundColor: 'var(--color-accent-dark)' }}
-          >
-            내 바이로 보기
-          </button>
-        </div>
-
-        {/* 완성도 바 */}
-        <div className="mt-4">
-          <div className="relative h-2 rounded-full bg-[var(--color-bg-muted)] overflow-visible">
-            <div
-              className="h-full rounded-full transition-all duration-500"
-              style={{
-                width: `${pct}%`,
-                backgroundColor: isDone ? '#22c55e' : 'var(--color-accent-light)',
-              }}
-            />
-            {/* % 뱃지 */}
-            <span
-              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-full text-[10px] font-black text-white"
-              style={{
-                left: `${Math.min(pct, 96)}%`,
-                backgroundColor: isDone ? '#22c55e' : 'var(--color-accent-dark)',
-              }}
-            >
-              {pct}%
-            </span>
-          </div>
-          {!isDone && (
-            <p className="mt-3 text-[11px] text-[var(--color-text-tertiary)] text-center">
-              프로필을 완성하면 더 많은 사람들이 나를 발견할 수 있어요!
-            </p>
-          )}
-        </div>
-
-        {/* 저장한 프로필 */}
-        {savedProfiles.length > 0 && (
-          <>
-            <div className="mx-4 h-px bg-[var(--color-border-soft)]" />
-            <div className="pt-3 pb-4">
-              <div className="flex items-center justify-between px-4 mb-2.5">
-                <span className="text-[13px] font-bold text-[var(--color-text-primary)]">저장한 프로필</span>
-                <button
-                  onClick={() => router.push('/archive')}
-                  className="text-[11px] font-semibold text-[var(--color-accent-dark)]"
-                >
-                  전체보기
-                </button>
-              </div>
-              <div className="flex gap-3 px-4 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
-                {savedProfiles.slice(0, 8).map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => onProfileClick(p.linkId)}
-                    className="flex-shrink-0 flex flex-col items-center gap-1.5"
-                    style={{ width: 52 }}
-                  >
-                    <Avatar src={getProfileAvatar(p.linkId)} name={p.name} size={44} />
-                    <p className="text-[10px] font-semibold text-[var(--color-text-primary)] truncate w-full text-center">{p.name}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
-  )
-}
-
 export default function FeedScreen() {
   const router = useRouter()
+
   const handleProfileClick = (linkId: string | null) => {
     if (!linkId) {
       showToast('아직 준비 중인 프로필이에요')
@@ -179,11 +52,7 @@ export default function FeedScreen() {
 
         <AppHeader />
 
-        {/* Feed */}
         <div className="flex-1 overflow-y-auto">
-
-          {/* 내 프로필 카드 (저장한 프로필 포함) */}
-          <MyProfileCard onProfileClick={handleProfileClick} />
 
           {/* 새로 가입했어요 */}
           <section className="pt-5 pb-4">

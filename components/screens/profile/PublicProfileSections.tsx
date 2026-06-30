@@ -188,6 +188,7 @@ export function ProfileRememberSection({
   topIndustryRoles,
   isLoggedIn,
   viewerNetworkDomain,
+  isOwner = false,
 }: {
   profileName: string
   total: number
@@ -196,6 +197,7 @@ export function ProfileRememberSection({
   topIndustryRoles?: RememberIndustry[]
   isLoggedIn: boolean
   viewerNetworkDomain?: string
+  isOwner?: boolean
 }) {
   const topIndustry = industries[0]
   const showPersonalized = isLoggedIn && !!viewerNetworkDomain
@@ -294,8 +296,8 @@ export function ProfileRememberSection({
             </div>
             <p className="text-[13px] leading-[1.65] text-[var(--color-text-primary)]">{insight.text}</p>
           </div>
-        ) : (
-          /* 블러 넛지 — 비로그인 or 관심 도메인 미설정 */
+        ) : !isOwner ? (
+          /* 블러 넛지 — 비로그인 or 관심 도메인 미설정 (본인 프로필 제외) */
           <div className="relative overflow-hidden rounded-[18px]" style={{ minHeight: 80 }}>
             <div className="px-4 py-4 space-y-2 select-none pointer-events-none" aria-hidden>
               <div className="h-3 rounded-full bg-[var(--color-bg-muted)]" style={{ width: '85%' }} />
@@ -309,7 +311,7 @@ export function ProfileRememberSection({
               </p>
             </div>
           </div>
-        )}
+        ) : null}
       </div>
     </AnimatedSection>
   )

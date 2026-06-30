@@ -157,6 +157,7 @@ export function PublicProfileReputationTabPage({
 }) {
   const router = useRouter()
   const { store, profile, keywordCounts, totalKeywordCount, featuredGuestbook, tabAccess } = usePublicProfileTabData(username)
+  const { isOwner } = useProfileOwner(username)
 
   if (tabAccess.network !== 'visible') {
     return <LockedTabContent />
@@ -177,6 +178,7 @@ export function PublicProfileReputationTabPage({
         topIndustryRoles={profile.rememberHighlight.topIndustryRoles}
         isLoggedIn={store.isLoggedIn}
         viewerNetworkDomain={store.user?.networkDomain}
+        isOwner={isOwner}
       />
       <ProfileReputationSummarySection
         keywordCounts={keywordCounts}

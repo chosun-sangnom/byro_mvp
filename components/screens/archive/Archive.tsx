@@ -42,7 +42,7 @@ export default function Archive() {
       {/* 헤더 */}
       <div className="flex items-center px-5 h-12 border-b flex-shrink-0" style={{ borderColor: 'var(--color-border-default)' }}>
         <button onClick={() => router.back()} className="text-sm mr-3 text-[var(--color-text-secondary)]">‹</button>
-        <span className="text-base font-black">아카이브</span>
+        <span className="text-base font-black">저장한 프로필</span>
       </div>
 
       {/* 탭 */}

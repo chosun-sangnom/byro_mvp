@@ -190,7 +190,7 @@ export function PublicProfileShell({
               {profile.name}님 저장
             </div>
             <p className="mb-5 text-[13px] leading-[1.65] text-[var(--color-text-secondary)]">
-              아카이브에 저장하고 메모를 남길 수 있어요.
+              저장한 프로필에 추가하고 메모를 남길 수 있어요.
             </p>
             <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-tertiary)]">
               메모 <span className="font-normal normal-case tracking-normal">(선택)</span>
@@ -229,7 +229,7 @@ export function PublicProfileShell({
               저장을 취소할까요?
             </div>
             <p className="mb-6 text-[13px] leading-[1.65] text-[var(--color-text-secondary)]">
-              {profile.name}님이 아카이브에서 삭제돼요.
+              {profile.name}님이 저장한 프로필에서 삭제돼요.
             </p>
             <div className="space-y-2">
               <button

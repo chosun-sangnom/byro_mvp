@@ -510,7 +510,7 @@ export default function MyPageScreen() {
         {
           id: 'archive',
           icon: BookmarkCheck,
-          label: '아카이브',
+          label: '저장한 프로필',
           description: '저장한 프로필 · 최근 본',
           href: '/archive',
         },

@@ -578,14 +578,57 @@ const MBTI_DIMS = [
   { options: ['J', 'P'] as const, labels: ['판단', '인식'] },
 ]
 
+function OnboardingPhotoSlot({
+  image,
+  label,
+  compact = false,
+  onClick,
+}: {
+  image: string
+  label: string
+  compact?: boolean
+  onClick: () => void
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="group relative h-full w-full overflow-hidden rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)]"
+    >
+      {image ? (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={image} alt={label} className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-active:scale-[1.02]" />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.04)_0%,rgba(0,0,0,0.10)_100%)]" />
+        </>
+      ) : (
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-[var(--color-text-tertiary)]">
+          <Camera size={compact ? 18 : 22} />
+          <span className="text-[11px] font-semibold">{label}</span>
+        </div>
+      )}
+      <div className="absolute left-2.5 top-2.5 rounded-full border border-white/15 bg-black/50 px-2 py-1 text-[10px] font-semibold text-white/92 backdrop-blur-sm">
+        {label}
+      </div>
+      {image && (
+        <div className="absolute inset-x-0 bottom-0 flex items-center justify-center bg-[linear-gradient(180deg,transparent_0%,rgba(0,0,0,0.42)_100%)] px-3 py-2 text-[11px] font-semibold text-white/92">
+          눌러서 변경
+        </div>
+      )}
+    </button>
+  )
+}
+
 export function Step4Profile() {
   const store = useByroStore()
-  const fileInputRef = useRef<HTMLInputElement>(null)
-  const [avatarImage, setAvatarImage] = useState('')
+  const mainPhotoInputRef = useRef<HTMLInputElement>(null)
+  const subPhotoInputRef = useRef<HTMLInputElement>(null)
+  const pendingSubIndexRef = useRef<number | null>(null)
+  const [profileImages, setProfileImages] = useState(['', '', '', ''])
   const [mbti, setMbti] = useState('')
   const [bio, setBio] = useState('')
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleMainFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
     if (!file.type.startsWith('image/')) {
@@ -594,14 +637,44 @@ export function Step4Profile() {
       return
     }
     const reader = new FileReader()
-    reader.onload = () => setAvatarImage(reader.result as string)
+    reader.onload = () => {
+      setProfileImages((prev) => {
+        const next = [...prev]
+        next[0] = reader.result as string
+        return next
+      })
+    }
     reader.readAsDataURL(file)
     event.target.value = ''
   }
 
+  const handleSubFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    const targetIndex = pendingSubIndexRef.current
+    if (!file || targetIndex === null) return
+    if (!file.type.startsWith('image/')) {
+      showToast('이미지 파일만 업로드할 수 있어요')
+      event.target.value = ''
+      pendingSubIndexRef.current = null
+      return
+    }
+    const reader = new FileReader()
+    reader.onload = () => {
+      setProfileImages((prev) => {
+        const next = [...prev]
+        next[targetIndex] = reader.result as string
+        return next
+      })
+    }
+    reader.readAsDataURL(file)
+    event.target.value = ''
+    pendingSubIndexRef.current = null
+  }
+
   const handleNext = () => {
     store.completeOnboarding()
-    if (avatarImage) store.updateUserInfo({ avatarImage, profileImages: [avatarImage] })
+    const filledImages = profileImages.filter(Boolean)
+    if (filledImages.length > 0) store.updateUserInfo({ avatarImage: profileImages[0], profileImages: filledImages })
     if (bio.trim()) store.updateUserInfo({ bio: bio.trim() })
     if (mbti.length === 4) store.updateUserWhoIAm({ ...SAMPLE_PROFILE.whoIAm, mbti })
     store.goToStep('complete')
@@ -616,28 +689,33 @@ export function Step4Profile() {
       />
 
       {/* 프로필 사진 */}
-      <input ref={fileInputRef} type="file" accept="image/*" className="sr-only" onChange={handleFileChange} />
-      <div className="mb-6 flex flex-col items-center">
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          className="relative h-24 w-24 overflow-hidden rounded-full border-2 border-dashed border-[var(--color-border-default)] bg-[var(--color-bg-soft)] transition-opacity active:opacity-70"
-        >
-          {avatarImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={avatarImage} alt="프로필" className="h-full w-full object-cover" />
-          ) : (
-            <div className="flex h-full w-full flex-col items-center justify-center gap-1 text-[var(--color-text-tertiary)]">
-              <Camera size={22} />
-              <span className="text-[10px] font-semibold">사진 추가</span>
-            </div>
-          )}
-        </button>
-        {avatarImage && (
-          <button onClick={() => fileInputRef.current?.click()} className="mt-2 text-xs font-semibold text-[var(--color-accent-dark)]">
-            변경하기
-          </button>
-        )}
+      <input ref={mainPhotoInputRef} type="file" accept="image/*" className="sr-only" onChange={handleMainFileChange} />
+      <input ref={subPhotoInputRef} type="file" accept="image/*" className="sr-only" onChange={handleSubFileChange} />
+      <div className="mb-5">
+        <div className="text-xs text-[var(--color-text-tertiary)] mb-2">
+          얼굴이 나온 대표 사진 1장과 분위기를 보여주는 서브 사진 3장을 넣어주세요.
+        </div>
+        <div className="grid h-[300px] grid-cols-[minmax(0,1fr)_86px] items-stretch gap-3">
+          <OnboardingPhotoSlot
+            image={profileImages[0]}
+            label="메인"
+            onClick={() => mainPhotoInputRef.current?.click()}
+          />
+          <div className="grid h-full grid-rows-3 gap-3">
+            {[1, 2, 3].map((index) => (
+              <OnboardingPhotoSlot
+                key={index}
+                image={profileImages[index]}
+                label={`서브 ${index}`}
+                compact
+                onClick={() => {
+                  pendingSubIndexRef.current = index
+                  subPhotoInputRef.current?.click()
+                }}
+              />
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* MBTI */}

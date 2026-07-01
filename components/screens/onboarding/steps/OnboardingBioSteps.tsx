@@ -117,32 +117,23 @@ function PreviewReputation() {
 }
 
 function PreviewConnect() {
+  const profiles = [
+    { initial: '김', name: '김철수', sub: 'B2B Sales · 5년차', savedAt: '어제' },
+    { initial: '이', name: '이지현', sub: '브랜드 마케터 · 3년차', savedAt: '3일 전' },
+    { initial: '박', name: '박준혁', sub: 'iOS 개발자 · 7년차', savedAt: '1주 전' },
+  ]
   return (
-    <div className="space-y-2">
-      <div className="rounded-[18px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-3">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-full bg-[var(--color-bg-muted)] flex items-center justify-center text-[13px] font-bold text-[var(--color-text-secondary)] flex-shrink-0">김</div>
+    <div className="rounded-[18px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] divide-y divide-[var(--color-border-soft)]">
+      {profiles.map((p) => (
+        <div key={p.name} className="flex items-center gap-3 px-4 py-3">
+          <div className="w-9 h-9 rounded-full bg-[var(--color-bg-muted)] flex items-center justify-center text-[12px] font-bold text-[var(--color-text-secondary)] flex-shrink-0">{p.initial}</div>
           <div className="flex-1 min-w-0">
-            <div className="text-[13px] font-semibold text-[var(--color-text-primary)]">김철수</div>
-            <div className="text-[11px] text-[var(--color-text-tertiary)]">B2B Sales · 5년차</div>
+            <div className="text-[13px] font-semibold text-[var(--color-text-primary)]">{p.name}</div>
+            <div className="text-[11px] text-[var(--color-text-tertiary)]">{p.sub}</div>
           </div>
-          <div className="rounded-full px-2.5 py-1 text-[10px] font-bold bg-[var(--color-bg-muted)] text-[var(--color-text-tertiary)]">연결 안 됨</div>
+          <div className="text-[10px] text-[var(--color-text-tertiary)]">{p.savedAt}</div>
         </div>
-        <div className="flex gap-2">
-          <button className="flex-1 rounded-full border border-[var(--color-border-default)] py-2 text-[12px] font-semibold text-[var(--color-text-secondary)]">평판 요청</button>
-          <button className="flex-1 rounded-full py-2 text-[12px] font-semibold text-white bg-[var(--color-accent-dark)]">연결하기</button>
-        </div>
-      </div>
-      <div className="rounded-[14px] border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-4 py-3">
-        <div className="flex items-center gap-3 mb-1.5">
-          <div className="w-7 h-7 rounded-full bg-[var(--color-accent-dark)] flex items-center justify-center text-[11px] font-bold text-white flex-shrink-0">이</div>
-          <div className="flex-1 min-w-0">
-            <div className="text-[12px] font-semibold text-[var(--color-text-primary)]">이지현</div>
-          </div>
-          <div className="rounded-full px-2 py-0.5 text-[10px] font-bold text-[var(--color-accent-dark)]" style={{ background: 'color-mix(in srgb, var(--color-accent-dark) 12%, transparent)' }}>연결됨</div>
-        </div>
-        <p className="text-[11px] text-[var(--color-text-tertiary)] leading-relaxed">연결된 친구는 비공개로 설정한 탭도 볼 수 있어요</p>
-      </div>
+      ))}
     </div>
   )
 }
@@ -282,9 +273,9 @@ const GUIDE_SLIDES: GuideSlide[] = [
   },
   {
     Preview: PreviewConnect,
-    title: '연결',
-    tags: ['평판 요청', '친구 연결', '비공개 공유'],
-    value: '연결이 생기면 더 깊은 정보와 관계가 열려요',
+    title: '저장한 프로필',
+    tags: ['프로필 저장', '나중에 보기', '최근 본 프로필'],
+    value: '관심 있는 프로필을 저장하고 언제든 다시 볼 수 있어요',
   },
 ]
 

@@ -472,7 +472,7 @@ export function Step2BasicInfo() {
   const store = useByroStore()
   const [name, setName] = useState(store.onboardingName)
   const [nickname, setNickname] = useState(store.onboardingNickname)
-  const [useActivityName, setUseActivityName] = useState(!!store.onboardingNickname)
+  const [useActivityName, setUseActivityName] = useState(false)
   const [birthDate, setBirthDate] = useState(store.onboardingBirthDate)
   const [showAge, setShowAge] = useState(store.onboardingShowAge)
 

@@ -193,12 +193,12 @@ function PreviewByroIntro() {
         <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-text-tertiary)] mb-2">Profile Card</div>
         <div className="rounded-[16px] bg-white/90 px-3 py-3">
           <div className="text-[15px] font-black text-[var(--color-text-strong)]">강민준 · 31</div>
-          <div className="text-[11px] text-[var(--color-text-tertiary)] mt-1">대화가 이어지는 라이프 프로필</div>
+          <div className="text-[11px] text-[var(--color-text-tertiary)] mt-1">대화가 이어지는 바이브 프로필</div>
         </div>
       </div>
       <div className="grid grid-cols-[1.1fr_0.9fr] gap-2">
         <div className="rounded-[18px] bg-[var(--color-bg-muted)] p-3">
-          <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] mb-2">라이프</div>
+          <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] mb-2">바이브</div>
           <div className="grid gap-1" style={{ gridTemplateColumns: '1.2fr 1fr', gridTemplateRows: '54px 40px' }}>
             <div className="rounded-[12px] bg-white/85 px-2 py-2 text-[11px] font-semibold text-[var(--color-text-secondary)]">러닝</div>
             <div className="rounded-[12px] bg-white/85 px-2 py-2 text-[11px] font-semibold text-[var(--color-text-secondary)]">재즈</div>
@@ -246,10 +246,10 @@ const GUIDE_SLIDES: GuideSlide[] = [
   },
   {
     Preview: PreviewLife,
-    title: '라이프',
+    title: '바이브',
     tags: ['취향', '운동', '여행지', '음식'],
     value: '취향과 일상을 채우면 첫 대화 소재가 생겨요',
-    ctaLabel: '라이프 채우러 가기',
+    ctaLabel: '바이브 채우러 가기',
     ctaRoute: '/me?section=life',
   },
   {

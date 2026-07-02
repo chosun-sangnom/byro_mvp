@@ -17,9 +17,7 @@ type LifeView = 'hub' | 'pet' | 'activity' | 'culture' | 'place' | 'album'
 
 const PET_OPTIONS = ['없음', '강아지', '고양이', '소형 포유류', '조류', '파충류', '어류', '기타']
 
-// [임시] 기본 목업 계정(SAMPLE_PROFILE) 데이터가 9개라 5로는 첫 화면부터
-// 슬롯이 이미 꽉 차 아무것도 추가할 수 없었음 — 여유를 두고 12로 상향
-const FREE_LIMIT = 12
+const FREE_LIMIT = 5
 
 function countLifeItems(life: PublicProfileLife): number {
   return (
@@ -520,7 +518,7 @@ function LifeHub({
 
 export function LifeManageScreen({ onBack }: { onBack: () => void }) {
   const store = useByroStore()
-  const isPro = store.isPro
+  const isPro = store.user?.isPaidUser ?? false
   const [view, setView] = useState<LifeView>('hub')
   const [life, setLife] = useState<PublicProfileLife>(store.user?.life ?? SAMPLE_PROFILE.life)
   const [showUpgrade, setShowUpgrade] = useState(false)

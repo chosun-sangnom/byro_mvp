@@ -324,12 +324,11 @@ export function ExercisePicker({
 
       {isAtLimit && (
         <p className="mb-3 text-center text-[12px] text-[var(--color-text-tertiary)]">
-          최대 {limit}개까지 추가할 수 있어요
+          슬롯이 가득 찼어요 · Pro로 업그레이드하면 더 추가할 수 있어요
         </p>
       )}
 
-      {!isAtLimit && (
-        <>
+      <div className={isAtLimit ? 'pointer-events-none opacity-40' : undefined}>
           <div className="flex gap-1.5 overflow-x-auto pb-2 mb-3 no-scrollbar">
             {CATEGORY_TABS.map((tab) => {
               const active = activeCategory === tab.id
@@ -375,19 +374,19 @@ export function ExercisePicker({
               onChange={(e) => setCustomInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustom() } }}
               placeholder="목록에 없으면 직접 입력..."
+              disabled={isAtLimit}
               className="flex-1 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-2.5 text-sm outline-none placeholder:text-[var(--color-text-tertiary)]"
             />
             <button
               onClick={addCustom}
-              disabled={!customInput.trim()}
+              disabled={!customInput.trim() || isAtLimit}
               className="flex-shrink-0 rounded-xl px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-40"
               style={{ background: 'var(--color-accent-dark)' }}
             >
               추가
             </button>
           </div>
-        </>
-      )}
+      </div>
     </div>
   )
 }

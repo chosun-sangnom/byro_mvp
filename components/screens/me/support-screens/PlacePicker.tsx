@@ -189,12 +189,11 @@ export function PlacePicker({
 
       {isAtLimit && (
         <p className="mb-3 text-center text-[12px] text-[var(--color-text-tertiary)]">
-          최대 {limit}개까지 추가할 수 있어요
+          슬롯이 가득 찼어요 · Pro로 업그레이드하면 더 추가할 수 있어요
         </p>
       )}
 
-      {!isAtLimit && (
-        <>
+      <div className={isAtLimit ? 'pointer-events-none opacity-40' : undefined}>
           {/* 검색창 */}
           <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]" />
@@ -202,6 +201,7 @@ export function PlacePicker({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={cfg.placeholder}
+              disabled={isAtLimit}
               className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] py-2.5 pl-9 pr-4 text-sm outline-none placeholder:text-[var(--color-text-tertiary)]"
             />
           </div>
@@ -277,6 +277,7 @@ export function PlacePicker({
           {/* 직접 입력 */}
           <button
             onClick={() => setShowDirect((v) => !v)}
+            disabled={isAtLimit}
             className="mt-3 flex items-center gap-1.5 text-[12px] font-semibold text-[var(--color-text-tertiary)]"
           >
             <PenLine size={12} />
@@ -290,6 +291,7 @@ export function PlacePicker({
                 onChange={(e) => setCustomName(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustom() } }}
                 placeholder={cfg.namePlaceholder}
+                disabled={isAtLimit}
                 className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-2.5 text-sm outline-none placeholder:text-[var(--color-text-tertiary)]"
               />
               <div className="flex gap-2">
@@ -298,11 +300,12 @@ export function PlacePicker({
                   onChange={(e) => setCustomAddr(e.target.value)}
                   onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustom() } }}
                   placeholder={cfg.addrPlaceholder}
+                  disabled={isAtLimit}
                   className="flex-1 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-2.5 text-sm outline-none placeholder:text-[var(--color-text-tertiary)]"
                 />
                 <button
                   onClick={addCustom}
-                  disabled={!customName.trim()}
+                  disabled={!customName.trim() || isAtLimit}
                   className="flex-shrink-0 rounded-xl px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-40"
                   style={{ background: 'var(--color-accent-dark)' }}
                 >
@@ -311,8 +314,7 @@ export function PlacePicker({
               </div>
             </div>
           )}
-        </>
-      )}
+      </div>
     </div>
   )
 }

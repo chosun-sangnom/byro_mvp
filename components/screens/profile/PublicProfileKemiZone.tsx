@@ -266,7 +266,7 @@ export function PublicProfileOwnerMatchZone({
                 </span>
               </div>
               <div className="mt-1 text-[15px] font-semibold text-[var(--color-text-primary)]">
-                나와 잘 맞는 사람의 결
+                나와 잘 맞는 사람
               </div>
               <p className="mt-2 text-[12px] leading-[1.6] text-[var(--color-text-secondary)]">
                 라이프스타일을 바탕으로 어떤 유형의 사람과 잘 맞는지 읽어줍니다.
@@ -315,7 +315,7 @@ function OwnerKemiReportSheet({
             <span>My Kemi Report</span>
           </div>
           <h3 className="mt-3 text-[24px] font-black leading-[1.2] text-[var(--color-text-primary)]">
-            나와 잘 맞는 사람의 결
+            나와 잘 맞는 사람
           </h3>
           <p className="mt-2 text-[13px] leading-[1.7] text-[var(--color-text-secondary)]">
             라이프스타일을 바탕으로 어떤 유형과 잘 연결되는지 읽어드려요.

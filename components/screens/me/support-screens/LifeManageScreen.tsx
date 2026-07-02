@@ -17,7 +17,9 @@ type LifeView = 'hub' | 'pet' | 'activity' | 'culture' | 'place' | 'album'
 
 const PET_OPTIONS = ['없음', '강아지', '고양이', '소형 포유류', '조류', '파충류', '어류', '기타']
 
-const FREE_LIMIT = 5
+// [임시] 기본 목업 계정(SAMPLE_PROFILE) 데이터가 9개라 5로는 첫 화면부터
+// 슬롯이 이미 꽉 차 아무것도 추가할 수 없었음 — 여유를 두고 12로 상향
+const FREE_LIMIT = 12
 
 function countLifeItems(life: PublicProfileLife): number {
   return (
@@ -496,7 +498,7 @@ function LifeHub({
         {!isPro && (
           <div className="mx-5 mt-3 mb-4 flex items-center justify-between rounded-xl bg-[var(--color-bg-soft)] px-4 py-3">
             <div>
-              <p className="text-[12px] font-semibold text-[var(--color-text-secondary)]">Free · 5개 슬롯</p>
+              <p className="text-[12px] font-semibold text-[var(--color-text-secondary)]">Free · {FREE_LIMIT}개 슬롯</p>
               <p className="text-[11px] text-[var(--color-text-tertiary)]">Pro는 카테고리별 최대 5개</p>
             </div>
             <button

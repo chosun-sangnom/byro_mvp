@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
 import { ChevronRight, Link, Lock, Pencil, BookmarkCheck, CreditCard, Eye, Check, CheckCircle2 } from 'lucide-react'
 import { Avatar, NavBar, BottomSheet, showToast } from '@/components/ui'
@@ -40,6 +40,7 @@ type Section = {
 
 export default function MyPageScreen() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const store = useByroStore()
   const user = store.user
 
@@ -48,7 +49,11 @@ export default function MyPageScreen() {
   const randomLinkId = user?.randomLinkId ?? user?.linkId ?? ''
   const tabVisibility = store.tabVisibility ?? { who: 'public', vibe: 'public', network: 'public' }
 
-  const [screen, setScreen] = useState<Screen>('main')
+  const screenParam = searchParams.get('screen')
+  const validScreens: Screen[] = ['main', 'billing', 'upgrade', 'payment', 'success']
+  const initialScreen = validScreens.includes(screenParam as Screen) ? (screenParam as Screen) : 'main'
+
+  const [screen, setScreen] = useState<Screen>(initialScreen)
   const [billingCycle, setBillingCycle] = useState<BillingCycle>('yearly')
   const [cancelSheetOpen, setCancelSheetOpen] = useState(false)
   const [linkIdSheetOpen, setLinkIdSheetOpen] = useState(false)

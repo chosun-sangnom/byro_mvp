@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, type ChangeEvent, type ReactNode } from 'react'
+import { useRouter } from 'next/navigation'
 import { Camera, ChevronRight, Plus, X, Zap } from 'lucide-react'
 import { Button, NavBar, showToast } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
@@ -28,36 +29,6 @@ function countLifeItems(life: PublicProfileLife): number {
     (life.tastes.plays?.length ?? 0) +
     life.tastes.restaurants.length +
     life.tastes.cafes.length
-  )
-}
-
-// ─── Pro 업그레이드 모달 ───────────────────────────────────────────────────────
-
-function ProUpgradeModal({ onClose }: { onClose: () => void }) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-end">
-      <button className="absolute inset-0 bg-black/50" onClick={onClose} aria-label="닫기" />
-      <div className="relative w-full rounded-t-3xl bg-[var(--color-bg-surface)] px-6 pt-6 pb-10">
-        <div
-          className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl"
-          style={{ background: 'var(--color-accent-dark)' }}
-        >
-          <Zap size={22} className="text-white" />
-        </div>
-        <p className="mb-1 text-[18px] font-bold text-[var(--color-text-primary)]">Pro로 업그레이드</p>
-        <p className="mb-6 text-[14px] leading-relaxed text-[var(--color-text-secondary)]">
-          Pro 플랜으로 업그레이드하면 카테고리별 최대 5개씩,
-          제한 없이 라이프를 채울 수 있어요.
-        </p>
-        <Button onClick={onClose}>곧 출시 예정이에요</Button>
-        <button
-          onClick={onClose}
-          className="mt-3 w-full py-2 text-sm text-[var(--color-text-tertiary)]"
-        >
-          닫기
-        </button>
-      </div>
-    </div>
   )
 }
 
@@ -517,11 +488,11 @@ function LifeHub({
 // ─── Main export ──────────────────────────────────────────────────────────────
 
 export function LifeManageScreen({ onBack }: { onBack: () => void }) {
+  const router = useRouter()
   const store = useByroStore()
   const isPro = store.user?.isPaidUser ?? false
   const [view, setView] = useState<LifeView>('hub')
   const [life, setLife] = useState<PublicProfileLife>(store.user?.life ?? SAMPLE_PROFILE.life)
-  const [showUpgrade, setShowUpgrade] = useState(false)
 
   const saveAndBack = () => {
     store.updateUserLife(life)
@@ -554,7 +525,10 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
   const cultureFreeSlots  = Math.max(0, FREE_LIMIT - (total - cultureCount))
   const placeFreeSlots    = Math.max(0, FREE_LIMIT - (total - placeCount))
 
-  const handleUpgrade = () => setShowUpgrade(true)
+  const handleUpgrade = () => {
+    store.updateUserLife(life)
+    router.push('/mypage?screen=upgrade')
+  }
 
   if (view === 'pet')
     return <PetView life={life} onSave={updateDaily} />
@@ -568,9 +542,6 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
     return <AlbumView life={life} onSave={updateAlbum} />
 
   return (
-    <>
-      <LifeHub life={life} onNavigate={setView} onBack={saveAndBack} isPro={isPro} onUpgrade={handleUpgrade} />
-      {showUpgrade && <ProUpgradeModal onClose={() => setShowUpgrade(false)} />}
-    </>
+    <LifeHub life={life} onNavigate={setView} onBack={saveAndBack} isPro={isPro} onUpgrade={handleUpgrade} />
   )
 }

@@ -45,8 +45,7 @@ create table public.user_who_i_am (
 create table public.user_life (
   user_id   uuid primary key references public.users(id) on delete cascade,
   daily     jsonb not null default '{}',   -- { exercise[], pets[], diet }
-  tastes    jsonb not null default '{}',   -- { movies[], music[], books[], cafes[], restaurants[], sports[] }
-  places    jsonb not null default '{}',   -- { neighborhoods[], travelDestinations[] }
+  tastes    jsonb not null default '{}',   -- { movies[], music[], books[], cafes[], restaurants[] }
   updated_at timestamptz not null default now()
 );
 

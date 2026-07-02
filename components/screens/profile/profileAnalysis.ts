@@ -41,7 +41,6 @@ export function getLifestyleSignals(life?: PublicProfileLife) {
   return {
     activity:
       life?.daily.exercise[0]?.label
-      ?? life?.tastes.teams?.[0]?.label
       ?? null,
     culture:
       life?.tastes.movies[0]?.label
@@ -52,7 +51,6 @@ export function getLifestyleSignals(life?: PublicProfileLife) {
     place:
       life?.tastes.cafes[0]?.label
       ?? life?.tastes.restaurants[0]?.label
-      ?? life?.places.travelDestinations[0]?.label
       ?? null,
     neighborhood: null,
     exercise: life?.daily.exercise[0]?.label ?? null,

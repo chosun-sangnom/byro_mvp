@@ -82,8 +82,7 @@ const editableHighlightIds = new Set(allManualHighlights.map(h => h.id))
 | 카테고리 | 필드 | 비고 |
 |----------|------|------|
 | **정체성** | MBTI, 혈액형, 종교, 자녀 유무 | `whoIAm` |
-| **취향** | 영화, 음악, 책, 운동, 카페, 음식점, 스포츠팀 | `life.tastes` |
-| **장소** | 동네, 여행지 | `life.places` |
+| **취향** | 영화, 음악, 책, 운동, 카페, 음식점 | `life.tastes` |
 | **라이프스타일** | 운동 종류, 반려동물, 식단 | `life.daily` |
 
 ### 매칭 로직 (`getSignalChips`, `getLifestyleSignals`)

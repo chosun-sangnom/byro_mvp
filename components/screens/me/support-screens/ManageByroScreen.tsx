@@ -67,7 +67,7 @@ export function ManageByroScreen({
 
   const whoIAm = (profile.whoIAm ?? user.whoIAm) as PublicProfileWhoIAm
   const life = (profile.life ?? user.life) as PublicProfileLife
-  const activityCount = life.daily.exercise.length + (life.tastes.teams?.length ?? 0)
+  const activityCount = life.daily.exercise.length
   const cultureCount =
     life.tastes.movies.length +
     life.tastes.music.length +
@@ -75,8 +75,7 @@ export function ManageByroScreen({
     (life.tastes.plays?.length ?? 0)
   const placeCount =
     life.tastes.restaurants.length +
-    life.tastes.cafes.length +
-    life.places.travelDestinations.length
+    life.tastes.cafes.length
   const activeContactCount =
     user.contactChannels?.filter((ch) => ch.enabled && ch.value.trim()).length ?? 0
   const connectedSnsCount = Number(instagramConnected) + Number(linkedinConnected)
@@ -125,7 +124,7 @@ export function ManageByroScreen({
     },
     {
       title: '바이브',
-      hint: '반려동물 · 운동 · 플레이스 · 여행지 · 문화',
+      hint: '반려동물 · 운동 · 플레이스 · 문화',
       nudge: '취향이 겹치면 어색한 첫 대화가 자연스러워져요',
       meta: activityCount + cultureCount + placeCount > 0
         ? `활동 ${activityCount} · 문화 ${cultureCount} · 장소 ${placeCount}`

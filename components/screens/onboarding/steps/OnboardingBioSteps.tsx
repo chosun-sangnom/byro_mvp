@@ -36,7 +36,7 @@ function PreviewLife() {
     { label: '🎵 재즈', style: { gridColumn: '2 / 4', gridRow: '1' } },
     { label: '🏃 러닝', style: { gridColumn: '2', gridRow: '2' } },
     { label: '🍣 스시', style: { gridColumn: '3', gridRow: '2' } },
-    { label: '✈️ 도쿄', style: { gridColumn: '2 / 4', gridRow: '3' } },
+    { label: '☕ 카페', style: { gridColumn: '2 / 4', gridRow: '3' } },
     { label: '📚 경제학', style: { gridColumn: '1', gridRow: '3' } },
   ]
   return (
@@ -238,10 +238,10 @@ const GUIDE_SLIDES: GuideSlide[] = [
   {
     Preview: PreviewLife,
     title: '바이브',
-    tags: ['취향', '운동', '여행지', '음식'],
+    tags: ['취향', '운동', '플레이스', '음식'],
     value: '취향과 일상을 채우면 첫 대화 소재가 생겨요',
     ctaLabel: '바이브 채우러 가기',
-    ctaRoute: '/me?section=life',
+    ctaRoute: '/me?section=vibe',
   },
   {
     Preview: PreviewSNS,

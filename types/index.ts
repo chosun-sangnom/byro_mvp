@@ -169,12 +169,8 @@ export interface PublicProfileLife {
     music: LifeMediaItem[]
     books: LifeMediaItem[]
     plays?: LifeMediaItem[]
-    teams?: LifeMediaItem[]
     restaurants: LifeMediaItem[]
     cafes: LifeMediaItem[]
-  }
-  places: {
-    travelDestinations: LifeMediaItem[]
   }
   albumPhotos?: string[]
 }

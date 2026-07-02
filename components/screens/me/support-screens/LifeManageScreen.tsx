@@ -7,15 +7,13 @@ import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useByroStore } from '@/store/useByroStore'
 import type { LifeMediaItem, PublicProfileLife } from '@/types'
 import { ExercisePicker } from './ExercisePicker'
-import { SportsTeamPicker } from './SportsTeamPicker'
 import { MusicSearchPicker } from './MusicSearchPicker'
 import { MediaSearchPicker } from './MediaSearchPicker'
 import { PlacePicker } from './PlacePicker'
-import { TravelPicker } from './TravelPicker'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type LifeView = 'hub' | 'pet' | 'activity' | 'culture' | 'place' | 'travel' | 'album'
+type LifeView = 'hub' | 'pet' | 'activity' | 'culture' | 'place' | 'album'
 
 const PET_OPTIONS = ['없음', '강아지', '고양이', '소형 포유류', '조류', '파충류', '어류', '기타']
 
@@ -24,14 +22,12 @@ const FREE_LIMIT = 5
 function countLifeItems(life: PublicProfileLife): number {
   return (
     life.daily.exercise.length +
-    (life.tastes.teams?.length ?? 0) +
     life.tastes.movies.length +
     life.tastes.music.length +
     life.tastes.books.length +
     (life.tastes.plays?.length ?? 0) +
     life.tastes.restaurants.length +
-    life.tastes.cafes.length +
-    life.places.travelDestinations.length
+    life.tastes.cafes.length
   )
 }
 
@@ -236,24 +232,21 @@ function ActivityView({
   onUpgrade,
 }: {
   life: PublicProfileLife
-  onSave: (daily: PublicProfileLife['daily'], teams: LifeMediaItem[]) => void
+  onSave: (daily: PublicProfileLife['daily']) => void
   isPro: boolean
   freeSlots: number
   onUpgrade: () => void
 }) {
   const [exercise, setExercise] = useState<LifeMediaItem[]>(life.daily.exercise)
-  const [teams, setTeams] = useState<LifeMediaItem[]>(life.tastes.teams ?? [])
 
-  const totalHere = exercise.length + teams.length
-  const exerciseMax = isPro ? 5 : Math.min(5, Math.max(0, freeSlots - (totalHere - exercise.length)))
-  const teamsMax = isPro ? 5 : Math.min(5, Math.max(0, freeSlots - (totalHere - teams.length)))
-  const freeRemaining = isPro ? undefined : Math.max(0, freeSlots - totalHere)
+  const exerciseMax = isPro ? 5 : Math.min(5, freeSlots)
+  const freeRemaining = isPro ? undefined : Math.max(0, freeSlots - exercise.length)
 
   return (
     <SubScreen
       title="활동"
-      onBack={() => onSave(life.daily, life.tastes.teams ?? [])}
-      onSave={() => onSave({ ...life.daily, exercise }, teams)}
+      onBack={() => onSave(life.daily)}
+      onSave={() => onSave({ ...life.daily, exercise })}
       slotBadge={freeRemaining !== undefined
         ? <SlotBadge remaining={freeRemaining} onUpgrade={onUpgrade} />
         : undefined
@@ -261,10 +254,6 @@ function ActivityView({
     >
       <FieldBlock label="즐기는 운동">
         <ExercisePicker selected={exercise} onChange={setExercise} maxItems={exerciseMax} />
-      </FieldBlock>
-
-      <FieldBlock label="응원하는 스포츠팀">
-        <SportsTeamPicker selected={teams} onChange={setTeams} maxItems={teamsMax} />
       </FieldBlock>
     </SubScreen>
   )
@@ -362,39 +351,6 @@ function PlaceView({
   )
 }
 
-function TravelView({
-  life,
-  onSave,
-  isPro,
-  freeSlots,
-  onUpgrade,
-}: {
-  life: PublicProfileLife
-  onSave: (destinations: LifeMediaItem[]) => void
-  isPro: boolean
-  freeSlots: number
-  onUpgrade: () => void
-}) {
-  const [destinations, setDestinations] = useState<LifeMediaItem[]>(life.places.travelDestinations)
-
-  const travelMax = isPro ? 5 : Math.min(5, freeSlots)
-  const freeRemaining = isPro ? undefined : Math.max(0, freeSlots - destinations.length)
-
-  return (
-    <SubScreen
-      title="여행"
-      onBack={() => onSave(life.places.travelDestinations)}
-      onSave={() => onSave(destinations)}
-      slotBadge={freeRemaining !== undefined
-        ? <SlotBadge remaining={freeRemaining} onUpgrade={onUpgrade} />
-        : undefined
-      }
-    >
-      <TravelPicker selected={destinations} onChange={setDestinations} maxItems={travelMax} />
-    </SubScreen>
-  )
-}
-
 function AlbumView({
   life,
   onSave,
@@ -458,13 +414,11 @@ function LifeHub({
   onUpgrade: () => void
 }) {
   const exerciseCount = life.daily.exercise.length
-  const teamsCount = life.tastes.teams?.length ?? 0
   const cultureCount = life.tastes.movies.length + life.tastes.music.length + life.tastes.books.length + (life.tastes.plays?.length ?? 0)
   const foodCount = life.tastes.restaurants.length + life.tastes.cafes.length
-  const travelCount = life.places.travelDestinations.length
   const albumCount = life.albumPhotos?.length ?? 0
 
-  const totalCount = exerciseCount + teamsCount + cultureCount + foodCount + travelCount
+  const totalCount = exerciseCount + cultureCount + foodCount
   const freeRemaining = Math.max(0, FREE_LIMIT - totalCount)
 
   const rows: Array<{ view: LifeView; emoji: string; title: string; meta: string | null; nudge: string }> = [
@@ -481,10 +435,8 @@ function LifeHub({
       view: 'activity',
       emoji: '🏃',
       title: '활동',
-      meta: exerciseCount + teamsCount > 0
-        ? [exerciseCount > 0 && `운동 ${exerciseCount}`, teamsCount > 0 && `팀 ${teamsCount}`].filter(Boolean).join(' · ')
-        : null,
-      nudge: '같은 운동이나 팀을 좋아하면 바로 친해져요',
+      meta: exerciseCount > 0 ? `운동 ${exerciseCount}` : null,
+      nudge: '같은 운동을 좋아하면 바로 친해져요',
     },
     {
       view: 'culture',
@@ -499,13 +451,6 @@ function LifeHub({
       title: '플레이스',
       meta: foodCount > 0 ? `맛집 ${life.tastes.restaurants.length} · 카페 ${life.tastes.cafes.length}` : null,
       nudge: '좋아하는 동네 맛집을 공유해보세요',
-    },
-    {
-      view: 'travel',
-      emoji: '✈️',
-      title: '여행',
-      meta: travelCount > 0 ? `${travelCount}곳` : null,
-      nudge: '가본 곳 또는 가고 싶은 곳 모두 좋아요',
     },
     {
       view: 'album',
@@ -589,18 +534,8 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
     setView('hub')
   }
 
-  const updateActivityTeams = (daily: PublicProfileLife['daily'], teams: LifeMediaItem[]) => {
-    setLife((prev) => ({ ...prev, daily, tastes: { ...prev.tastes, teams } }))
-    setView('hub')
-  }
-
   const updateTastes = (tastes: Partial<PublicProfileLife['tastes']>) => {
     setLife((prev) => ({ ...prev, tastes: { ...prev.tastes, ...tastes } }))
-    setView('hub')
-  }
-
-  const updateTravel = (travelDestinations: LifeMediaItem[]) => {
-    setLife((prev) => ({ ...prev, places: { ...prev.places, travelDestinations } }))
     setView('hub')
   }
 
@@ -611,28 +546,24 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
 
   // Free 플랜: 각 서브뷰에 할당 가능한 최대 슬롯 수 계산 (다른 카테고리 항목 제외)
   const total = countLifeItems(life)
-  const activityCount = life.daily.exercise.length + (life.tastes.teams?.length ?? 0)
+  const activityCount = life.daily.exercise.length
   const cultureCount  = life.tastes.movies.length + life.tastes.music.length + life.tastes.books.length + (life.tastes.plays?.length ?? 0)
   const placeCount    = life.tastes.restaurants.length + life.tastes.cafes.length
-  const travelCount   = life.places.travelDestinations.length
 
   const activityFreeSlots = Math.max(0, FREE_LIMIT - (total - activityCount))
   const cultureFreeSlots  = Math.max(0, FREE_LIMIT - (total - cultureCount))
   const placeFreeSlots    = Math.max(0, FREE_LIMIT - (total - placeCount))
-  const travelFreeSlots   = Math.max(0, FREE_LIMIT - (total - travelCount))
 
   const handleUpgrade = () => setShowUpgrade(true)
 
   if (view === 'pet')
     return <PetView life={life} onSave={updateDaily} />
   if (view === 'activity')
-    return <ActivityView life={life} onSave={updateActivityTeams} isPro={isPro} freeSlots={activityFreeSlots} onUpgrade={handleUpgrade} />
+    return <ActivityView life={life} onSave={updateDaily} isPro={isPro} freeSlots={activityFreeSlots} onUpgrade={handleUpgrade} />
   if (view === 'culture')
     return <CultureView life={life} onSave={updateTastes} isPro={isPro} freeSlots={cultureFreeSlots} onUpgrade={handleUpgrade} />
   if (view === 'place')
     return <PlaceView life={life} onSave={updateTastes} isPro={isPro} freeSlots={placeFreeSlots} onUpgrade={handleUpgrade} />
-  if (view === 'travel')
-    return <TravelView life={life} onSave={updateTravel} isPro={isPro} freeSlots={travelFreeSlots} onUpgrade={handleUpgrade} />
   if (view === 'album')
     return <AlbumView life={life} onSave={updateAlbum} />
 

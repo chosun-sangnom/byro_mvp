@@ -101,10 +101,8 @@ function buildVibeItemsRandom(life: PublicProfileLife): VibeItem[] {
     [life.tastes.books, '책', 'portrait', false],
     [life.tastes.plays ?? [], '뮤지컬', 'portrait', false],
     [life.daily.exercise, '운동', 'square', false],
-    [life.tastes.teams ?? [], '스포츠팀', 'square', false],
     [life.tastes.restaurants, '맛집', 'place', false],
     [life.tastes.cafes, '카페', 'place', false],
-    [life.places.travelDestinations, '여행지', 'place', false],
   ]
 
   // 카테고리당 1개 랜덤 뽑기 (이미지 있는 것 우선)
@@ -136,10 +134,8 @@ const CATEGORY_COLORS: Record<string, string> = {
   책: '#F59E0B',
   뮤지컬: '#A855F7',
   운동: '#EF4444',
-  스포츠팀: '#F97316',
   맛집: '#EC4899',
   카페: '#92400E',
-  여행지: '#0D9488',
   반려동물: '#FB923C',
 }
 
@@ -531,15 +527,14 @@ export function PublicProfileLifeSection({ life, isOwner }: { life?: PublicProfi
   if (!life) return null
 
   const exercise = life.daily.exercise ?? []
-  const teams = life.tastes.teams ?? []
-  const hasActivity = exercise.length > 0 || teams.length > 0
+  const hasActivity = exercise.length > 0
   const hasCulture =
     life.tastes.movies.length > 0 ||
     life.tastes.music.length > 0 ||
     life.tastes.books.length > 0 ||
     (life.tastes.plays?.length ?? 0) > 0
   const placeItems = [...life.tastes.restaurants, ...life.tastes.cafes]
-  const hasPlace = placeItems.length > 0 || life.places.travelDestinations.length > 0
+  const hasPlace = placeItems.length > 0
 
   const handleMusicToggle = (item: LifeMediaItem) => {
     const id = getItemId(item)
@@ -595,15 +590,9 @@ export function PublicProfileLifeSection({ life, isOwner }: { life?: PublicProfi
         <>
           <BlockHeader label="활동" />
           {exercise.length > 0 && (
-            <div className="mb-4">
+            <div>
               <SubHeader label="운동" />
               <SquareScroll items={exercise} />
-            </div>
-          )}
-          {teams.length > 0 && (
-            <div>
-              <SubHeader label="스포츠팀" />
-              <SquareScroll items={teams} />
             </div>
           )}
         </>
@@ -649,15 +638,9 @@ export function PublicProfileLifeSection({ life, isOwner }: { life?: PublicProfi
             </div>
           )}
           {life.tastes.cafes.length > 0 && (
-            <div className="mb-4">
+            <div>
               <SubHeader label="카페" />
               <PlaceScroll items={life.tastes.cafes} />
-            </div>
-          )}
-          {life.places.travelDestinations.length > 0 && (
-            <div>
-              <SubHeader label="여행지" />
-              <PlaceScroll items={life.places.travelDestinations} />
             </div>
           )}
         </>

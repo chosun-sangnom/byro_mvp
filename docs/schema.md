@@ -103,8 +103,7 @@ SNS 연동 데이터.
 |------|------|------|
 | `user_id` | uuid PK → users | |
 | `daily` | jsonb | `{ exercise[], pet, petName }` |
-| `tastes` | jsonb | `{ movies[], music[], books[], cafes[], restaurants[], teams[] }` |
-| `places` | jsonb | `{ travelDestinations[] }` |
+| `tastes` | jsonb | `{ movies[], music[], books[], cafes[], restaurants[] }` |
 | `updated_at` | timestamptz | auto-update trigger |
 
 ---

@@ -58,12 +58,6 @@ export const SAMPLE_PROFILE = {
         { label: '오츠커피', sublabel: '한남동', posterUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=148&h=96&q=75&fit=crop&auto=format' },
       ],
     },
-    places: {
-      travelDestinations: [
-        { label: '오사카', posterUrl: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=148&h=96&q=75&fit=crop&auto=format' },
-        { label: '런던', posterUrl: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=148&h=96&q=75&fit=crop&auto=format' },
-      ],
-    },
     albumPhotos: [
       'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=400&q=80&fit=crop',
       'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=400&q=80&fit=crop',
@@ -314,9 +308,6 @@ export const MK_PROFILE = {
       plays: [
         { label: '웃는 남자', sublabel: '뮤지컬', posterUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=80&h=112&q=75&fit=crop&auto=format' },
       ],
-      teams: [
-        { label: '토트넘 홋스퍼', sublabel: 'EPL', posterUrl: 'https://images.unsplash.com/photo-1553778263-73a83bab9b0c?w=80&h=80&q=75&fit=crop&auto=format' },
-      ],
       restaurants: [
         { label: '몽탄', sublabel: '한남동', posterUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=148&h=96&q=75&fit=crop&auto=format' },
         { label: '금돼지식당', sublabel: '한남동', posterUrl: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=148&h=96&q=75&fit=crop&auto=format' },
@@ -324,13 +315,6 @@ export const MK_PROFILE = {
       cafes: [
         { label: '테라로사', sublabel: '여러 지점', posterUrl: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=148&h=96&q=75&fit=crop&auto=format' },
         { label: '블루보틀', sublabel: '성수동', posterUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=148&h=96&q=75&fit=crop&auto=format' },
-      ],
-    },
-    places: {
-      travelDestinations: [
-        { label: '뉴욕', posterUrl: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=148&h=96&q=75&fit=crop&auto=format' },
-        { label: '런던', posterUrl: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=148&h=96&q=75&fit=crop&auto=format' },
-        { label: '파리', posterUrl: 'https://images.unsplash.com/photo-1431274172761-fcdab704d114?w=148&h=96&q=75&fit=crop&auto=format' },
       ],
     },
     albumPhotos: [
@@ -538,9 +522,6 @@ export const JIMIN_PROFILE = {
       plays: [
         { label: '렛미플라이', sublabel: '뮤지컬', posterUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=80&h=112&q=75&fit=crop&auto=format' },
       ],
-      teams: [
-        { label: 'LG 트윈스', sublabel: 'KBO', posterUrl: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=80&h=80&q=75&fit=crop&auto=format' },
-      ],
       // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
       restaurants: [
         { label: '성수 우육미엔', sublabel: '성수동', posterUrl: 'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=148&h=96&q=75&fit=crop&auto=format' },
@@ -550,13 +531,6 @@ export const JIMIN_PROFILE = {
       cafes: [
         { label: '센터커피', sublabel: '성수동', posterUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=148&h=96&q=75&fit=crop&auto=format' },
         { label: '프릳츠 원서점', sublabel: '서촌', posterUrl: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=148&h=96&q=75&fit=crop&auto=format' },
-      ],
-    },
-    places: {
-      travelDestinations: [
-        { label: '도쿄', posterUrl: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=148&h=96&q=75&fit=crop&auto=format' },
-        { label: '교토', posterUrl: 'https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=148&h=96&q=75&fit=crop&auto=format' },
-        { label: '샌프란시스코', posterUrl: 'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=148&h=96&q=75&fit=crop&auto=format' },
       ],
     },
     albumPhotos: [
@@ -720,11 +694,9 @@ export const PARKSOJIN_PROFILE = {
       music: [{ label: '검정치마', sublabel: '조휴일', previewUrl: '' }, { label: 'NewJeans', sublabel: 'Hanni', previewUrl: '' }],
       books: [{ label: '디자인의 디자인', sublabel: '하라 켄야' }, { label: '보이지 않는 고릴라', sublabel: '크리스토퍼 차브리스' }],
       plays: [],
-      teams: [],
       restaurants: [{ label: '마루 by 누룩', sublabel: '서울 마포' }],
       cafes: [{ label: '펠트커피', sublabel: '서울 마포' }, { label: '어니언', sublabel: '성수' }],
     },
-    places: { travelDestinations: [{ label: '도쿄' }, { label: '바르셀로나' }] },
   },
   manualHighlights: [
     { id: 'psj0', categoryId: 'career-role', icon: 'briefcase', title: 'Toss (비바리퍼블리카)', subtitle: '경력 · 재직 중', description: '금융 서비스의 사용자 경험 전반을 설계하고, UX 리서치를 통해 프로덕트 방향을 함께 정의하고 있어요.', year: '2021 - 현재', metadata: { status: '재직 중', role: 'Product Designer' } },
@@ -874,11 +846,9 @@ export const CHOISUNYOUNG_PROFILE = {
       music: [{ label: 'Radiohead', sublabel: 'Thom Yorke', previewUrl: '' }],
       books: [{ label: 'Zero to One', sublabel: '피터 틸' }, { label: '하드씽', sublabel: '벤 호로위츠' }],
       plays: [],
-      teams: [],
       restaurants: [{ label: '밍글스', sublabel: '서울 강남' }],
       cafes: [{ label: 'Fritz Coffee', sublabel: '서울 마포' }],
     },
-    places: { travelDestinations: [{ label: '샌프란시스코' }, { label: '싱가포르' }] },
   },
   manualHighlights: [
     { id: 'csy0', categoryId: 'career-role', icon: 'briefcase', title: 'Primer Partners', subtitle: '경력 · 재직 중', description: '초기 단계 B2B SaaS·딥테크 스타트업 발굴 및 투자심사, 포트폴리오 성장 지원을 담당하고 있어요.', year: '2020 - 현재', metadata: { status: '재직 중', role: '심사역' } },
@@ -947,11 +917,9 @@ export const YOONJISOO_PROFILE = {
       music: [{ label: 'MUNA', sublabel: 'Silk Chiffon', previewUrl: '' }, { label: '새소년', sublabel: '난춘', previewUrl: '' }],
       books: [{ label: '82년생 김지영', sublabel: '조남주' }],
       plays: [{ label: '킹키부츠', sublabel: '뮤지컬' }],
-      teams: [],
       restaurants: [{ label: '권숙수', sublabel: '서울 강남' }, { label: '오프레코드', sublabel: '서울 마포' }],
       cafes: [{ label: '카페 노티드', sublabel: '청담' }, { label: '테라로사', sublabel: '강릉' }],
     },
-    places: { travelDestinations: [{ label: '파리' }, { label: '발리' }, { label: '교토' }] },
     albumPhotos: [
       'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=400&fit=crop',
       'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=400&fit=crop',
@@ -1031,11 +999,9 @@ export const KWONMINSEOK_PROFILE = {
       music: [{ label: 'Radiohead', sublabel: 'OK Computer', previewUrl: '' }, { label: 'Bon Iver', sublabel: 'Skinny Love', previewUrl: '' }],
       books: [{ label: '생각에 관한 생각', sublabel: '다니엘 카너먼' }, { label: '넛지', sublabel: '리처드 탈러' }, { label: 'Factfulness', sublabel: '한스 로슬링' }],
       plays: [],
-      teams: [{ label: 'LA 레이커스', posterUrl: '' }],
       restaurants: [{ label: '을지로 양지설렁탕', sublabel: '서울 중구' }],
       cafes: [{ label: '블루보틀', sublabel: '성수' }],
     },
-    places: { travelDestinations: [{ label: '뉴욕' }, { label: '암스테르담' }] },
   },
   manualHighlights: [
     { id: 'kms0', categoryId: 'career-role', icon: 'briefcase', title: 'Kakao', subtitle: '경력 · 재직 중', description: '카카오 추천 시스템팀에서 개인화 알고리즘 개선과 A/B 테스트 프레임워크를 개발하고 있어요.', year: '2020 - 현재', metadata: { status: '재직 중', role: 'Data Scientist' } },
@@ -1114,11 +1080,9 @@ export const LIMJIYEON_PROFILE = {
       music: [],
       books: [{ label: '채식주의자', sublabel: '한강' }],
       plays: [],
-      teams: [],
       restaurants: [],
       cafes: [],
     },
-    places: { travelDestinations: [] },
   },
   manualHighlights: [] as Highlight[],
   kemi: null,
@@ -1174,11 +1138,9 @@ export const HANSANGHOON_PROFILE = {
       music: [{ label: 'Bruno Mars', sublabel: 'The Lazy Song', previewUrl: '' }],
       books: [{ label: 'Never Split the Difference', sublabel: '크리스 보스' }],
       plays: [],
-      teams: [{ label: '토트넘 홋스퍼', posterUrl: '' }],
       restaurants: [{ label: '하코야', sublabel: '서울 강남' }],
       cafes: [{ label: '스타벅스 리저브', sublabel: '서울 강남' }],
     },
-    places: { travelDestinations: [{ label: '싱가포르' }, { label: '도쿄' }, { label: '시드니' }] },
   },
   manualHighlights: [
     { id: 'hsh0', categoryId: 'career-role', icon: 'briefcase', title: 'Adobe', subtitle: '경력 · 재직 중', description: 'Creative Cloud 및 Document Cloud 엔터프라이즈 계정 APAC 세일즈를 담당하고 있어요.', year: '2020 - 현재', metadata: { status: '재직 중', role: 'Senior Account Executive' } },
@@ -1256,11 +1218,9 @@ export const OHYERIM_PROFILE = {
       music: [{ label: 'IU (아이유)', sublabel: '밤편지', previewUrl: '' }, { label: 'Novo Amor', sublabel: 'Birthplace', previewUrl: '' }],
       books: [{ label: '나는 나로 살기로 했다', sublabel: '김수현' }, { label: '어린 왕자', sublabel: '생텍쥐페리' }],
       plays: [],
-      teams: [],
       restaurants: [{ label: '이태원 경양식', sublabel: '서울 용산' }],
       cafes: [{ label: '어니언', sublabel: '성수' }, { label: '카페 할아버지', sublabel: '서울 마포' }],
     },
-    places: { travelDestinations: [{ label: '교토' }, { label: '프라하' }, { label: '강릉' }] },
     albumPhotos: [
       'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=400&fit=crop',
       'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&h=400&fit=crop',
@@ -1345,11 +1305,9 @@ export const JUNGWONHO_PROFILE = {
       music: [],
       books: [{ label: '호모 데우스', sublabel: '유발 하라리' }],
       plays: [],
-      teams: [],
       restaurants: [],
       cafes: [],
     },
-    places: { travelDestinations: [] },
   },
   manualHighlights: [
     { id: 'jwh0', categoryId: 'career-role', icon: 'briefcase', title: 'MedAI (메드에이아이)', subtitle: '경력 · 재직 중', description: '영상의학과 AI 진단 보조 솔루션을 개발하는 스타트업 창업. 병원 EMR 연동 및 FDA 인증을 준비 중이에요.', year: '2022 - 현재', metadata: { status: '재직 중', role: '대표' } },
@@ -1418,11 +1376,9 @@ export const BAEKHYUNJIN_PROFILE = {
       music: [{ label: 'Miles Davis', sublabel: 'Kind of Blue', previewUrl: '' }],
       books: [{ label: 'Good Strategy Bad Strategy', sublabel: '리처드 루멜트' }, { label: '총·균·쇠', sublabel: '재레드 다이아몬드' }, { label: 'The Innovator\'s Dilemma', sublabel: '클레이턴 크리스텐슨' }],
       plays: [],
-      teams: [],
       restaurants: [{ label: '정식당', sublabel: '서울 강남' }, { label: '나카', sublabel: '서울 청담' }],
       cafes: [{ label: 'Onyx Coffee Lab', sublabel: '서울 강남' }],
     },
-    places: { travelDestinations: [{ label: '뉴욕' }, { label: '런던' }, { label: '두바이' }] },
   },
   manualHighlights: [
     { id: 'bhj0', categoryId: 'career-role', icon: 'briefcase', title: 'McKinsey & Company', subtitle: '경력 · 재직 중', description: '전략 및 디지털 트랜스포메이션 컨설팅. 제조·금융·유통 분야 클라이언트 대상 대형 프로젝트 리드.', year: '2016 - 현재', metadata: { status: '재직 중', role: 'Engagement Manager' } },

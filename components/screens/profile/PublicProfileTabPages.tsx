@@ -9,6 +9,7 @@ import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
 import { getNormalizedPublicProfile, computeTabAccess } from '@/components/screens/profile/publicProfileData'
 import { useProfileOwner } from '@/hooks/useProfileOwner'
 import {
+  ProfileExperienceSection,
   ProfileFeedbackSection,
   ProfileRememberSection,
   ProfileReputationSummarySection,
@@ -158,6 +159,8 @@ export function PublicProfileReputationTabPage({
   const router = useRouter()
   const { store, profile, keywordCounts, totalKeywordCount, featuredGuestbook, tabAccess } = usePublicProfileTabData(username)
   const { isOwner } = useProfileOwner(username)
+  const submittedExps = store.submittedExperiences[profile.linkId] ?? []
+  const allExperiences = [...submittedExps, ...(profile.experiences ?? [])]
 
   if (tabAccess.network !== 'visible') {
     return <LockedTabContent />
@@ -190,6 +193,10 @@ export function PublicProfileReputationTabPage({
         getProfileAvatar={getProfileAvatar}
         onGuestbookEntryClick={(linkId) => router.push(`/${linkId}`)}
         onOpenGuestbook={() => router.push(`/${profile.linkId}/feedback`)}
+      />
+      <ProfileExperienceSection
+        experiences={allExperiences}
+        onViewAll={() => router.push(`/${profile.linkId}/feedback`)}
       />
     </div>
   )

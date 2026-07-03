@@ -45,7 +45,7 @@ type NormalizedPublicProfile = PublicProfile & {
   tabVisibility: TabVisibility
 }
 
-function deriveAgeFromBirthDate(birthDate?: string) {
+export function deriveAgeFromBirthDate(birthDate?: string) {
   if (!birthDate) return undefined
   const birth = new Date(birthDate)
   if (Number.isNaN(birth.getTime())) return undefined
@@ -93,6 +93,8 @@ const PUBLIC_PROFILE_FALLBACKS: {
   // TODO(real API): Replace with the public guestbook feed for the profile owner.
   guestbook: [],
 }
+
+export const DEFAULT_HERO_THEME: HeroTheme = PUBLIC_PROFILE_FALLBACKS.heroTheme
 
 function buildEditableOwnerProfile(
   username: string,

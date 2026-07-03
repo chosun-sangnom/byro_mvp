@@ -1,9 +1,11 @@
 'use client'
 
 import { useRef, useState, type ChangeEvent, type PointerEvent } from 'react'
-import { Camera, Copy, Check, Info, Sparkles } from 'lucide-react'
+import { Camera, ChevronDown, Copy, Check, Info, Sparkles } from 'lucide-react'
 import { BottomSheet, Button, NavBar, showToast, TextArea } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
+import { ProfileHeroCard } from '@/components/screens/profile/PublicProfileHeroSection'
+import { DEFAULT_HERO_THEME, deriveAgeFromBirthDate } from '@/components/screens/profile/publicProfileData'
 import { useByroStore } from '@/store/useByroStore'
 import type { PublicProfileWhoIAm, UserState } from '@/types'
 
@@ -332,7 +334,7 @@ import {
 } from '@/lib/imageCropUtils'
 
 interface BasicInfoEditScreenProps {
-  user: Pick<UserState, 'name' | 'realName' | 'activityName' | 'activityNameChangedAt' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'profileImages' | 'birthDate' | 'birthTime' | 'calendarType' | 'showAge'>
+  user: Pick<UserState, 'name' | 'realName' | 'activityName' | 'activityNameChangedAt' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'profileImages' | 'birthDate' | 'birthTime' | 'calendarType' | 'showAge' | 'isPaidUser'>
   onBack: () => void
 }
 
@@ -419,6 +421,7 @@ export function BasicInfoEditScreen({
   const [calendarType, setCalendarType] = useState<'solar' | 'lunar'>(user.calendarType ?? SAMPLE_PROFILE.calendarType ?? 'solar')
   const [showAge, setShowAge] = useState(user.showAge ?? SAMPLE_PROFILE.showAge ?? true)
   const [profileImages, setProfileImages] = useState(() => normalizeProfileImages(user.profileImages, user.avatarImage))
+  const [previewOpen, setPreviewOpen] = useState(true)
   const [cropSource, setCropSource] = useState('')
   const [cropOpen, setCropOpen] = useState(false)
   const [cropFrame, setCropFrame] = useState({ x: 44, y: 74, width: DEFAULT_CROP_FRAME.width, height: DEFAULT_CROP_FRAME.height })
@@ -574,12 +577,47 @@ export function BasicInfoEditScreen({
     showToast('사진이 적용됐어요')
   }
 
+  const previewProfileImages = profileImages.filter(Boolean)
+  const previewName = (useActivityName ? activityName.trim() : '') || (user.realName ?? user.name)
+
   return (
     <div className="flex flex-col h-full">
       <NavBar title="프로필카드 편집" onBack={onBack} />
 
       <div className="flex-1 overflow-y-auto">
         <div className="px-5 py-5">
+          <div className="mb-6">
+            <button
+              type="button"
+              onClick={() => setPreviewOpen((prev) => !prev)}
+              className="mb-3 flex w-full items-center justify-between"
+            >
+              <span className="text-[13px] font-bold text-[var(--color-text-secondary)]">미리보기</span>
+              <ChevronDown
+                size={16}
+                className="text-[var(--color-text-tertiary)] transition-transform"
+                style={{ transform: previewOpen ? 'rotate(180deg)' : 'none' }}
+              />
+            </button>
+            {previewOpen && (
+              <ProfileHeroCard
+                profile={{
+                  name: previewName,
+                  linkId: user.linkId,
+                  age: deriveAgeFromBirthDate(birthDate),
+                  birthDate,
+                  showAge,
+                  avatarImage: previewProfileImages[0],
+                  profileImages: previewProfileImages,
+                  isPaidUser: user.isPaidUser,
+                }}
+                heroTheme={DEFAULT_HERO_THEME}
+                activeImage={previewProfileImages[0]}
+                isOwner
+              />
+            )}
+          </div>
+
           <div className="mb-7">
             <div className="mb-1 text-[24px] font-black tracking-[-0.03em] text-[var(--color-text-primary)]">프로필 사진</div>
             <div className="text-[13px] text-[var(--color-text-secondary)]">

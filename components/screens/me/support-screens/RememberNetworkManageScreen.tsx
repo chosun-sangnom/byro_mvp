@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Mail, Copy, ScanLine, Sparkles } from 'lucide-react'
 import { NavBar, Avatar, showToast } from '@/components/ui'
 import { useByroStore } from '@/store/useByroStore'
+import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
 const DOMAIN_OPTIONS = [
   'IT/테크', '스타트업', '금융/투자', '마케팅/PR',
@@ -13,14 +14,15 @@ const DOMAIN_OPTIONS = [
 
 type ImportStep = 'idle' | 'analyzing' | 'imported'
 
-// [임시] 명함 인식 결과 목업 — 실제 구현 시 서버에서 파싱한 명함 목록으로 교체
+// [임시] 명함 인식 결과 목업 — 실제 구현 시 서버에서 파싱한 명함 목록으로 교체.
+// 강민준(SAMPLE_PROFILE)의 리멤버 네트워크 산업 비중을 그대로 반영한 예시 인물
 const MOCK_IMPORTED_CONTACTS = [
-  { name: '김민준', company: '네이버', role: '프로덕트 매니저', color: '#7B9FE8' },
-  { name: '이서연', company: '카카오', role: '마케팅팀', color: '#E8B84B' },
-  { name: '박지훈', company: '토스', role: '백엔드 엔지니어', color: '#4A7B5E' },
-  { name: '최유진', company: '당근마켓', role: '디자이너', color: '#C47A5A' },
+  { name: '김도윤', company: '스타트업 · 시리즈 A', role: '기획/PM', color: '#7B9FE8' },
+  { name: '이서연', company: '마케팅 에이전시', role: '마케팅', color: '#E8B84B' },
+  { name: '박지훈', company: 'IT 기업', role: '개발', color: '#4A7B5E' },
+  { name: '최유나', company: '벤처캐피탈', role: '투자 심사역', color: '#C47A5A' },
 ]
-const MOCK_IMPORTED_TOTAL = 14
+const MOCK_IMPORTED_TOTAL = SAMPLE_PROFILE.rememberHighlight.total
 
 
 export function RememberNetworkManageScreen({

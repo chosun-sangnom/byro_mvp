@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { MoreHorizontal } from 'lucide-react'
+import { MoreHorizontal, ChevronLeft, ChevronRight } from 'lucide-react'
 import { NavBar, ActionMenu, ActionMenuItem, Modal, BottomSheet, Button, CheckRow, TextArea, showToast } from '@/components/ui'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mocks/publicProfiles'
@@ -13,6 +13,8 @@ const REPORT_REASONS = [
   '스팸 · 광고성 내용이에요',
   '기타',
 ]
+
+const FEEDBACK_PAGE_SIZE = 3
 
 function FeedbackRow({
   entry,
@@ -79,6 +81,51 @@ function FeedbackRow({
   )
 }
 
+function FeedbackPagination({
+  page,
+  totalPages,
+  onChange,
+}: {
+  page: number
+  totalPages: number
+  onChange: (page: number) => void
+}) {
+  if (totalPages <= 1) return null
+
+  return (
+    <div className="mt-4 flex items-center justify-center gap-1">
+      <button
+        onClick={() => onChange(page - 1)}
+        disabled={page <= 1}
+        aria-label="이전 페이지"
+        className="flex h-7 w-7 items-center justify-center rounded-full text-[var(--color-text-secondary)] disabled:opacity-30"
+      >
+        <ChevronLeft size={16} />
+      </button>
+      {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+        <button
+          key={p}
+          onClick={() => onChange(p)}
+          className="flex h-7 w-7 items-center justify-center rounded-full text-[12px] font-semibold"
+          style={p === page
+            ? { background: 'var(--color-accent-dark)', color: '#fff' }
+            : { color: 'var(--color-text-secondary)' }}
+        >
+          {p}
+        </button>
+      ))}
+      <button
+        onClick={() => onChange(page + 1)}
+        disabled={page >= totalPages}
+        aria-label="다음 페이지"
+        className="flex h-7 w-7 items-center justify-center rounded-full text-[var(--color-text-secondary)] disabled:opacity-30"
+      >
+        <ChevronRight size={16} />
+      </button>
+    </div>
+  )
+}
+
 export function ReputationManageScreen({
   onBack,
 }: {
@@ -96,6 +143,7 @@ export function ReputationManageScreen({
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<GuestbookEntry | null>(null)
   const [showAllFeedback, setShowAllFeedback] = useState(false)
+  const [feedbackPage, setFeedbackPage] = useState(1)
   const [reportTarget, setReportTarget] = useState<GuestbookEntry | null>(null)
   const [reportReason, setReportReason] = useState<string | undefined>(undefined)
   const [reportDetail, setReportDetail] = useState('')
@@ -103,6 +151,13 @@ export function ReputationManageScreen({
   const allEntries = SAMPLE_PROFILE.guestbook.filter((e) => !deletedIds.includes(e.id))
   const displayedEntries = allEntries.slice(0, 3)
   const hasMore = allEntries.length > 3
+
+  const totalFeedbackPages = Math.max(1, Math.ceil(allEntries.length / FEEDBACK_PAGE_SIZE))
+  const safeFeedbackPage = Math.min(feedbackPage, totalFeedbackPages)
+  const pagedEntries = allEntries.slice(
+    (safeFeedbackPage - 1) * FEEDBACK_PAGE_SIZE,
+    safeFeedbackPage * FEEDBACK_PAGE_SIZE
+  )
 
   const handleConfirmDelete = () => {
     if (!deleteTarget) return
@@ -186,7 +241,7 @@ export function ReputationManageScreen({
         <div className="flex-1 overflow-y-auto px-5 py-4">
           <div className="mb-3 text-[12px] text-[var(--color-text-tertiary)]">총 {allEntries.length}개의 피드백이에요</div>
           <div className="divide-y divide-[var(--color-border-soft)]">
-            {allEntries.map((entry) => (
+            {pagedEntries.map((entry) => (
               <FeedbackRow
                 key={entry.id}
                 entry={entry}
@@ -197,6 +252,7 @@ export function ReputationManageScreen({
               />
             ))}
           </div>
+          <FeedbackPagination page={safeFeedbackPage} totalPages={totalFeedbackPages} onChange={setFeedbackPage} />
         </div>
         {deleteConfirmModal}
         {reportSheet}
@@ -287,7 +343,10 @@ export function ReputationManageScreen({
 
               {hasMore && (
                 <button
-                  onClick={() => setShowAllFeedback(true)}
+                  onClick={() => {
+                    setFeedbackPage(1)
+                    setShowAllFeedback(true)
+                  }}
                   className="mt-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-secondary)]"
                 >
                   더보기

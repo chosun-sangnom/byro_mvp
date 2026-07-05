@@ -2,21 +2,30 @@
 
 import { useState } from 'react'
 import { MoreHorizontal } from 'lucide-react'
-import { NavBar, ActionMenu, ActionMenuItem, Modal, Button, showToast } from '@/components/ui'
+import { NavBar, ActionMenu, ActionMenuItem, Modal, BottomSheet, Button, CheckRow, TextArea, showToast } from '@/components/ui'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mocks/publicProfiles'
 import type { GuestbookEntry } from '@/types'
+
+const REPORT_REASONS = [
+  '불쾌한 표현이 있어요',
+  '허위 사실이에요',
+  '스팸 · 광고성 내용이에요',
+  '기타',
+]
 
 function FeedbackRow({
   entry,
   openMenuId,
   setOpenMenuId,
   onRequestDelete,
+  onRequestReport,
 }: {
   entry: GuestbookEntry
   openMenuId: string | null
   setOpenMenuId: (id: string | null) => void
   onRequestDelete: (entry: GuestbookEntry) => void
+  onRequestReport: (entry: GuestbookEntry) => void
 }) {
   const avatar = getProfileAvatar(entry.linkId)
   return (
@@ -57,7 +66,7 @@ function FeedbackRow({
                   label="신고하기"
                   onClick={() => {
                     setOpenMenuId(null)
-                    showToast('신고가 접수됐어요')
+                    onRequestReport(entry)
                   }}
                 />
               </ActionMenu>
@@ -87,6 +96,9 @@ export function ReputationManageScreen({
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<GuestbookEntry | null>(null)
   const [showAllFeedback, setShowAllFeedback] = useState(false)
+  const [reportTarget, setReportTarget] = useState<GuestbookEntry | null>(null)
+  const [reportReason, setReportReason] = useState<string | undefined>(undefined)
+  const [reportDetail, setReportDetail] = useState('')
 
   const allEntries = SAMPLE_PROFILE.guestbook.filter((e) => !deletedIds.includes(e.id))
   const displayedEntries = allEntries.slice(0, 3)
@@ -97,6 +109,18 @@ export function ReputationManageScreen({
     setDeletedIds((prev) => [...prev, deleteTarget.id])
     setDeleteTarget(null)
     showToast('피드백을 삭제했어요')
+  }
+
+  const closeReportSheet = () => {
+    setReportTarget(null)
+    setReportReason(undefined)
+    setReportDetail('')
+  }
+
+  const handleSubmitReport = () => {
+    if (!reportReason) return
+    closeReportSheet()
+    showToast('신고가 접수됐어요')
   }
 
   const deleteConfirmModal = (
@@ -116,6 +140,45 @@ export function ReputationManageScreen({
     </Modal>
   )
 
+  const reportSheet = (
+    <BottomSheet open={!!reportTarget} onClose={closeReportSheet}>
+      <div className="px-5 pb-6">
+        <div className="text-base font-black mb-1" style={{ color: 'var(--color-text-primary)' }}>
+          피드백 신고하기
+        </div>
+        <p className="text-[12px] text-[var(--color-text-tertiary)] mb-4 leading-relaxed">
+          {reportTarget?.authorName}님이 남긴 피드백을 신고해요. 사유를 선택해주세요.
+        </p>
+
+        <div className="mb-4">
+          {REPORT_REASONS.map((reason) => (
+            <CheckRow
+              key={reason}
+              label={reason}
+              checked={reportReason === reason}
+              onToggle={() => setReportReason(reason)}
+            />
+          ))}
+        </div>
+
+        <TextArea
+          value={reportDetail}
+          onChange={setReportDetail}
+          placeholder="구체적인 내용을 적어주시면 검토에 도움이 돼요 (선택)"
+          maxLength={300}
+          rows={3}
+          dark
+        />
+
+        <div className="mt-4">
+          <Button variant="danger" disabled={!reportReason} onClick={handleSubmitReport}>
+            제출하기
+          </Button>
+        </div>
+      </div>
+    </BottomSheet>
+  )
+
   if (showAllFeedback) {
     return (
       <div className="flex flex-col h-full">
@@ -130,11 +193,13 @@ export function ReputationManageScreen({
                 openMenuId={openMenuId}
                 setOpenMenuId={setOpenMenuId}
                 onRequestDelete={setDeleteTarget}
+                onRequestReport={setReportTarget}
               />
             ))}
           </div>
         </div>
         {deleteConfirmModal}
+        {reportSheet}
       </div>
     )
   }
@@ -215,6 +280,7 @@ export function ReputationManageScreen({
                     openMenuId={openMenuId}
                     setOpenMenuId={setOpenMenuId}
                     onRequestDelete={setDeleteTarget}
+                    onRequestReport={setReportTarget}
                   />
                 ))}
               </div>
@@ -235,6 +301,7 @@ export function ReputationManageScreen({
       </div>
 
       {deleteConfirmModal}
+      {reportSheet}
     </div>
   )
 }

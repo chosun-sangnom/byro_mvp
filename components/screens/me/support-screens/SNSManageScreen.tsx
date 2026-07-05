@@ -6,7 +6,7 @@ import { useByroStore } from '@/store/useByroStore'
 import { BottomSheet, Button, NavBar, showToast } from '@/components/ui'
 import { INSTAGRAM_PROFILE } from '@/lib/mocks/socialProfiles'
 
-type SnsId = 'instagram' | 'linkedin'
+type SnsId = 'instagram' | 'linkedin' | 'youtube' | 'tiktok'
 
 interface SnsConfig {
   id: SnsId
@@ -37,7 +37,39 @@ const SNS_CONFIG: SnsConfig[] = [
     urlPrefix: 'linkedin.com/in/',
     hint: '프로필 URL 또는 아이디를 입력해주세요',
   },
+  {
+    id: 'youtube',
+    label: 'YouTube',
+    bg: '#FF0000',
+    iconLabel: 'YT',
+    placeholder: 'gangminjun',
+    urlPrefix: 'youtube.com/@',
+    hint: '채널 URL 또는 아이디를 입력해주세요',
+  },
+  {
+    id: 'tiktok',
+    label: 'TikTok',
+    bg: '#111111',
+    iconLabel: 'TT',
+    placeholder: 'gangminjun',
+    urlPrefix: 'tiktok.com/@',
+    hint: '아이디만 입력하면 연동됩니다',
+  },
 ]
+
+const CONNECTED_FLAG: Record<SnsId, 'instagramConnected' | 'linkedinConnected' | 'youtubeConnected' | 'tiktokConnected'> = {
+  instagram: 'instagramConnected',
+  linkedin: 'linkedinConnected',
+  youtube: 'youtubeConnected',
+  tiktok: 'tiktokConnected',
+}
+
+const DEFAULT_INPUT: Record<SnsId, string> = {
+  instagram: INSTAGRAM_PROFILE.username,
+  linkedin: 'myongkoo-kang',
+  youtube: 'gangminjun',
+  tiktok: 'gangminjun',
+}
 
 export function SNSManageScreen({ onBack }: { onBack: () => void }) {
   const store = useByroStore()
@@ -45,18 +77,19 @@ export function SNSManageScreen({ onBack }: { onBack: () => void }) {
   const [selectedSns, setSelectedSns] = useState<SnsId | null>(null)
   const [inputValue, setInputValue] = useState('')
 
-  const isConnected = (id: SnsId) =>
-    id === 'instagram' ? store.instagramConnected : store.linkedinConnected
+  const isConnected = (id: SnsId) => store[CONNECTED_FLAG[id]]
 
   const openSheet = (id: SnsId) => {
     setSelectedSns(id)
-    setInputValue(id === 'instagram' ? INSTAGRAM_PROFILE.username : 'myongkoo-kang')
+    setInputValue(DEFAULT_INPUT[id])
     setSheetOpen(true)
   }
 
   const handleConnect = () => {
     if (selectedSns === 'instagram') store.connectInstagram()
     if (selectedSns === 'linkedin') store.connectLinkedIn()
+    if (selectedSns === 'youtube') store.connectYoutube()
+    if (selectedSns === 'tiktok') store.connectTiktok()
     setSheetOpen(false)
     showToast('SNS 연동이 완료됐어요!')
   }
@@ -64,6 +97,8 @@ export function SNSManageScreen({ onBack }: { onBack: () => void }) {
   const handleDisconnect = () => {
     if (selectedSns === 'instagram') store.disconnectInstagram()
     if (selectedSns === 'linkedin') store.disconnectLinkedIn()
+    if (selectedSns === 'youtube') store.disconnectYoutube()
+    if (selectedSns === 'tiktok') store.disconnectTiktok()
     setSheetOpen(false)
     showToast('SNS 연동이 해제됐어요')
   }
@@ -114,30 +149,6 @@ export function SNSManageScreen({ onBack }: { onBack: () => void }) {
           })}
         </div>
 
-        {/* 준비중 SNS */}
-        <div className="overflow-hidden rounded-2xl border border-[var(--color-border-soft)]">
-          {([
-            { label: 'YouTube', bg: '#FF0000', iconLabel: 'YT' },
-            { label: 'TikTok',  bg: '#111111', iconLabel: 'TT' },
-          ] as const).map(({ label, bg, iconLabel }, i) => (
-            <div
-              key={label}
-              className={[
-                'flex items-center gap-3 px-5 py-4 opacity-40',
-                i === 0 ? 'border-b border-[var(--color-border-soft)]' : '',
-              ].join(' ')}
-            >
-              <SnsIcon label={iconLabel} bg={bg} />
-              <div className="flex-1">
-                <p className="text-[15px] font-semibold text-[var(--color-text-primary)]">{label}</p>
-                <p className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">준비중</p>
-              </div>
-              <span className="rounded-full bg-[var(--color-bg-muted)] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-tertiary)]">
-                준비중
-              </span>
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* 연동 바텀시트 */}
@@ -164,10 +175,11 @@ export function SNSManageScreen({ onBack }: { onBack: () => void }) {
             </p>
 
             <div className="space-y-2">
-              <Button onClick={handleConnect}>연동하기</Button>
-              <Button variant="outline" disabled={!connected} onClick={handleDisconnect}>
-                연동 해제
-              </Button>
+              {connected ? (
+                <Button variant="outline" onClick={handleDisconnect}>연동 해제</Button>
+              ) : (
+                <Button onClick={handleConnect}>연동하기</Button>
+              )}
               <Button variant="ghost" onClick={() => setSheetOpen(false)}>취소</Button>
             </div>
           </div>

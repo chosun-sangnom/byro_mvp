@@ -44,6 +44,8 @@ interface ByroStore {
   linkId: string
   instagramConnected: boolean
   linkedinConnected: boolean
+  youtubeConnected: boolean
+  tiktokConnected: boolean
   onboardingContactChannels: ContactChannel[]
   highlights: Highlight[]
   bio: string
@@ -89,6 +91,10 @@ interface ByroStore {
   disconnectInstagram(): void
   connectLinkedIn(): void
   disconnectLinkedIn(): void
+  connectYoutube(): void
+  disconnectYoutube(): void
+  connectTiktok(): void
+  disconnectTiktok(): void
   setOnboardingContactChannels(channels: ContactChannel[]): void
   addHighlight(h: Omit<Highlight, 'id'>): void
   updateHighlight(id: string, h: Omit<Highlight, 'id'>): void
@@ -169,6 +175,8 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
   linkId: '',
   instagramConnected: false,
   linkedinConnected: false,
+  youtubeConnected: false,
+  tiktokConnected: false,
   onboardingContactChannels: SAMPLE_PROFILE.contactChannels,
   highlights: [],
   bio: '',
@@ -288,6 +296,22 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
 
   disconnectLinkedIn() {
     set({ linkedinConnected: false })
+  },
+
+  connectYoutube() {
+    set({ youtubeConnected: true })
+  },
+
+  disconnectYoutube() {
+    set({ youtubeConnected: false })
+  },
+
+  connectTiktok() {
+    set({ tiktokConnected: true })
+  },
+
+  disconnectTiktok() {
+    set({ tiktokConnected: false })
   },
 
   setOnboardingContactChannels(channels) {
@@ -436,6 +460,8 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       linkId: '',
       instagramConnected: false,
       linkedinConnected: false,
+      youtubeConnected: false,
+      tiktokConnected: false,
       onboardingContactChannels: SAMPLE_PROFILE.contactChannels,
       highlights: [],
       highlightsInitialized: false,
@@ -615,6 +641,8 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       linkId: '',
       instagramConnected: false,
       linkedinConnected: false,
+      youtubeConnected: false,
+      tiktokConnected: false,
       onboardingContactChannels: SAMPLE_PROFILE.contactChannels,
       highlights: [],
       highlightsInitialized: false,
@@ -689,6 +717,8 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     linkId: state.linkId,
     instagramConnected: state.instagramConnected,
     linkedinConnected: state.linkedinConnected,
+    youtubeConnected: state.youtubeConnected,
+    tiktokConnected: state.tiktokConnected,
     onboardingContactChannels: state.onboardingContactChannels,
     highlights: state.highlights,
     bio: state.bio,

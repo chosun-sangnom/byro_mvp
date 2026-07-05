@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { Mail, Copy } from 'lucide-react'
-import { NavBar, showToast } from '@/components/ui'
+import { useEffect, useRef, useState } from 'react'
+import { Mail, Copy, ScanLine, Sparkles } from 'lucide-react'
+import { NavBar, Avatar, showToast } from '@/components/ui'
 import { useByroStore } from '@/store/useByroStore'
 
 const DOMAIN_OPTIONS = [
@@ -10,6 +10,17 @@ const DOMAIN_OPTIONS = [
   '대기업/제조', '컨설팅', '미디어/언론', '교육/연구',
   '의료/바이오', '유통/물류', '건설/부동산', '에너지',
 ]
+
+type ImportStep = 'idle' | 'analyzing' | 'imported'
+
+// [임시] 명함 인식 결과 목업 — 실제 구현 시 서버에서 파싱한 명함 목록으로 교체
+const MOCK_IMPORTED_CONTACTS = [
+  { name: '김민준', company: '네이버', role: '프로덕트 매니저', color: '#7B9FE8' },
+  { name: '이서연', company: '카카오', role: '마케팅팀', color: '#E8B84B' },
+  { name: '박지훈', company: '토스', role: '백엔드 엔지니어', color: '#4A7B5E' },
+  { name: '최유진', company: '당근마켓', role: '디자이너', color: '#C47A5A' },
+]
+const MOCK_IMPORTED_TOTAL = 14
 
 
 export function RememberNetworkManageScreen({
@@ -20,6 +31,15 @@ export function RememberNetworkManageScreen({
   onBack: () => void
 }) {
   const store = useByroStore()
+
+  const [importStep, setImportStep] = useState<ImportStep>('idle')
+  const analyzeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (analyzeTimeoutRef.current) clearTimeout(analyzeTimeoutRef.current)
+    }
+  }, [])
 
   const currentDomain = store.user?.networkDomain
   const isCustom = currentDomain ? !DOMAIN_OPTIONS.includes(currentDomain) : false
@@ -47,7 +67,15 @@ export function RememberNetworkManageScreen({
   }
 
   const handleConfirm = () => {
-    showToast('인증 메일 발송 후 반영을 기다려주세요')
+    setImportStep('analyzing')
+    // [임시] 실제 명함 확인 대신 1.2초 딜레이 후 목업 결과 표시
+    analyzeTimeoutRef.current = setTimeout(() => {
+      setImportStep('imported')
+    }, 1200)
+  }
+
+  const handleApply = () => {
+    showToast('네트워크에 반영됐어요!')
     onBack()
   }
 
@@ -131,70 +159,138 @@ export function RememberNetworkManageScreen({
 
         {/* 업데이트 방법 */}
         <div className="rounded-[22px] border border-[var(--color-border-soft)] overflow-hidden">
-          <div className="px-5 pt-5 pb-4">
-            <div className="flex h-10 w-10 items-center justify-center rounded-[14px] mb-3" style={{ background: 'var(--color-accent-bg)', color: 'var(--color-accent-dark)' }}>
-              <Mail size={18} />
-            </div>
-            <p className="text-[16px] font-black tracking-[-0.02em]" style={{ color: 'var(--color-text-primary)' }}>
-              네트워크 업데이트
-            </p>
-            <p className="mt-1.5 text-[13px] leading-[1.65]" style={{ color: 'var(--color-text-secondary)' }}>
-              리멤버 앱에서 명함을 내보내기 한 뒤, 아래 이메일로 파일을 보내주세요.
-              확인 후 1-2 영업일 내에 반영돼요.
-            </p>
-          </div>
-
-          <div className="mx-5 mb-5 rounded-[16px] px-4 py-3.5" style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-default)' }}>
-            <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: 'var(--color-text-tertiary)' }}>
-              나의 Byro 인증 이메일
-            </p>
-            <div className="flex items-center gap-2">
-              <p className="flex-1 truncate text-[13px] font-mono font-bold" style={{ color: 'var(--color-text-primary)' }}>
-                {email}
-              </p>
-              <button
-                type="button"
-                onClick={handleCopyEmail}
-                className="flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-semibold text-white"
-                style={{ background: 'var(--color-accent-dark)' }}
-              >
-                <Copy size={11} />
-                복사
-              </button>
-            </div>
-          </div>
-
-          {/* 단계별 안내 */}
-          <div className="px-5 pb-5 space-y-2">
-            {[
-              '리멤버 앱 → 명함첩 → 우측 상단 메뉴 → 내보내기',
-              '내보낸 파일을 위 이메일로 첨부해서 보내기',
-              '확인 후 네트워크 데이터가 업데이트돼요',
-            ].map((step, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <span
-                  className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-black text-white"
-                  style={{ background: 'var(--color-accent-dark)' }}
-                >
-                  {i + 1}
-                </span>
-                <p className="text-[12px] leading-[1.6]" style={{ color: 'var(--color-text-secondary)' }}>
-                  {step}
+          {importStep === 'idle' && (
+            <>
+              <div className="px-5 pt-5 pb-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-[14px] mb-3" style={{ background: 'var(--color-accent-bg)', color: 'var(--color-accent-dark)' }}>
+                  <Mail size={18} />
+                </div>
+                <p className="text-[16px] font-black tracking-[-0.02em]" style={{ color: 'var(--color-text-primary)' }}>
+                  네트워크 업데이트
+                </p>
+                <p className="mt-1.5 text-[13px] leading-[1.65]" style={{ color: 'var(--color-text-secondary)' }}>
+                  리멤버 앱에서 명함을 내보내기 한 뒤, 아래 이메일로 파일을 보내주세요.
+                  확인 후 1-2 영업일 내에 반영돼요.
                 </p>
               </div>
-            ))}
-          </div>
 
-          <div className="px-5 pb-5">
-            <button
-              type="button"
-              onClick={handleConfirm}
-              className="w-full rounded-full py-3.5 text-[14px] font-bold text-white"
-              style={{ background: 'linear-gradient(135deg, var(--color-accent-light), var(--color-accent-dark))' }}
-            >
-              메일 보냈어요
-            </button>
-          </div>
+              <div className="mx-5 mb-5 rounded-[16px] px-4 py-3.5" style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-default)' }}>
+                <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: 'var(--color-text-tertiary)' }}>
+                  나의 Byro 인증 이메일
+                </p>
+                <div className="flex items-center gap-2">
+                  <p className="flex-1 truncate text-[13px] font-mono font-bold" style={{ color: 'var(--color-text-primary)' }}>
+                    {email}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleCopyEmail}
+                    className="flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-semibold text-white"
+                    style={{ background: 'var(--color-accent-dark)' }}
+                  >
+                    <Copy size={11} />
+                    복사
+                  </button>
+                </div>
+              </div>
+
+              {/* 단계별 안내 */}
+              <div className="px-5 pb-5 space-y-2">
+                {[
+                  '리멤버 앱 → 명함첩 → 우측 상단 메뉴 → 내보내기',
+                  '내보낸 파일을 위 이메일로 첨부해서 보내기',
+                  '확인 후 네트워크 데이터가 업데이트돼요',
+                ].map((step, i) => (
+                  <div key={i} className="flex items-start gap-3">
+                    <span
+                      className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-black text-white"
+                      style={{ background: 'var(--color-accent-dark)' }}
+                    >
+                      {i + 1}
+                    </span>
+                    <p className="text-[12px] leading-[1.6]" style={{ color: 'var(--color-text-secondary)' }}>
+                      {step}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="px-5 pb-5">
+                <button
+                  type="button"
+                  onClick={handleConfirm}
+                  className="w-full rounded-full py-3.5 text-[14px] font-bold text-white"
+                  style={{ background: 'linear-gradient(135deg, var(--color-accent-light), var(--color-accent-dark))' }}
+                >
+                  메일 보냈어요
+                </button>
+              </div>
+            </>
+          )}
+
+          {importStep === 'analyzing' && (
+            <div className="flex flex-col items-center justify-center py-16 gap-4">
+              <div
+                className="flex h-14 w-14 items-center justify-center rounded-full"
+                style={{ background: 'var(--color-accent-bg)', color: 'var(--color-accent-dark)' }}
+              >
+                <ScanLine size={26} className="animate-pulse" />
+              </div>
+              <div className="text-center">
+                <p className="text-[15px] font-bold" style={{ color: 'var(--color-text-primary)' }}>명함을 확인하고 있어요</p>
+                <p className="mt-1 text-[13px]" style={{ color: 'var(--color-text-tertiary)' }}>보내주신 파일을 분석하고 있어요</p>
+              </div>
+            </div>
+          )}
+
+          {importStep === 'imported' && (
+            <div className="px-5 pt-6 pb-5">
+              <div className="flex flex-col items-center text-center mb-5">
+                <div
+                  className="flex h-14 w-14 items-center justify-center rounded-full mb-3"
+                  style={{ background: 'var(--color-accent-bg)', color: 'var(--color-accent-dark)' }}
+                >
+                  <Sparkles size={24} />
+                </div>
+                <p className="text-[16px] font-black tracking-[-0.02em]" style={{ color: 'var(--color-text-primary)' }}>
+                  명함 {MOCK_IMPORTED_TOTAL}장을 가져왔어요!
+                </p>
+                <p className="mt-1 text-[13px] leading-[1.6]" style={{ color: 'var(--color-text-secondary)' }}>
+                  확인을 누르면 내 네트워크에 반영돼요
+                </p>
+              </div>
+
+              <div className="mb-5 space-y-2">
+                {MOCK_IMPORTED_CONTACTS.map((contact) => (
+                  <div
+                    key={contact.name}
+                    className="flex items-center gap-3 rounded-[16px] px-4 py-3"
+                    style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-default)' }}
+                  >
+                    <Avatar name={contact.name} color={contact.color} size={34} />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[13px] font-bold" style={{ color: 'var(--color-text-primary)' }}>{contact.name}</p>
+                      <p className="truncate text-[11px]" style={{ color: 'var(--color-text-tertiary)' }}>{contact.company} · {contact.role}</p>
+                    </div>
+                  </div>
+                ))}
+                {MOCK_IMPORTED_TOTAL > MOCK_IMPORTED_CONTACTS.length && (
+                  <p className="pt-1 text-center text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>
+                    외 {MOCK_IMPORTED_TOTAL - MOCK_IMPORTED_CONTACTS.length}명 더
+                  </p>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={handleApply}
+                className="w-full rounded-full py-3.5 text-[14px] font-bold text-white"
+                style={{ background: 'linear-gradient(135deg, var(--color-accent-light), var(--color-accent-dark))' }}
+              >
+                확인
+              </button>
+            </div>
+          )}
         </div>
 
       </div>

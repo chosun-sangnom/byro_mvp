@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, type ChangeEvent, type PointerEvent } from 'react'
-import { Camera, ChevronDown, Copy, Check, Info, Sparkles } from 'lucide-react'
+import { Camera, Copy, Check, Eye, Info, Sparkles } from 'lucide-react'
 import { BottomSheet, Button, NavBar, showToast, TextArea } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { ProfileHeroCard } from '@/components/screens/profile/PublicProfileHeroSection'
@@ -421,7 +421,7 @@ export function BasicInfoEditScreen({
   const [calendarType, setCalendarType] = useState<'solar' | 'lunar'>(user.calendarType ?? SAMPLE_PROFILE.calendarType ?? 'solar')
   const [showAge, setShowAge] = useState(user.showAge ?? SAMPLE_PROFILE.showAge ?? true)
   const [profileImages, setProfileImages] = useState(() => normalizeProfileImages(user.profileImages, user.avatarImage))
-  const [previewOpen, setPreviewOpen] = useState(true)
+  const [previewOpen, setPreviewOpen] = useState(false)
   const [cropSource, setCropSource] = useState('')
   const [cropOpen, setCropOpen] = useState(false)
   const [cropFrame, setCropFrame] = useState({ x: 44, y: 74, width: DEFAULT_CROP_FRAME.width, height: DEFAULT_CROP_FRAME.height })
@@ -586,38 +586,6 @@ export function BasicInfoEditScreen({
 
       <div className="flex-1 overflow-y-auto">
         <div className="px-5 py-5">
-          <div className="mb-6">
-            <button
-              type="button"
-              onClick={() => setPreviewOpen((prev) => !prev)}
-              className="mb-3 flex w-full items-center justify-between"
-            >
-              <span className="text-[13px] font-bold text-[var(--color-text-secondary)]">미리보기</span>
-              <ChevronDown
-                size={16}
-                className="text-[var(--color-text-tertiary)] transition-transform"
-                style={{ transform: previewOpen ? 'rotate(180deg)' : 'none' }}
-              />
-            </button>
-            {previewOpen && (
-              <ProfileHeroCard
-                profile={{
-                  name: previewName,
-                  linkId: user.linkId,
-                  age: deriveAgeFromBirthDate(birthDate),
-                  birthDate,
-                  showAge,
-                  avatarImage: previewProfileImages[0],
-                  profileImages: previewProfileImages,
-                  isPaidUser: user.isPaidUser,
-                }}
-                heroTheme={DEFAULT_HERO_THEME}
-                activeImage={previewProfileImages[0]}
-                isOwner
-              />
-            )}
-          </div>
-
           <div className="mb-7">
             <div className="mb-1 text-[24px] font-black tracking-[-0.03em] text-[var(--color-text-primary)]">프로필 사진</div>
             <div className="text-[13px] text-[var(--color-text-secondary)]">
@@ -811,6 +779,37 @@ export function BasicInfoEditScreen({
           <Button onClick={handleSave}>저장</Button>
         </div>
       </div>
+
+      <button
+        type="button"
+        onClick={() => setPreviewOpen(true)}
+        className="fixed bottom-6 right-5 z-20 flex items-center gap-1.5 rounded-full px-4 py-2.5 shadow-[0_8px_24px_rgba(0,0,0,0.18)]"
+        style={{ background: 'var(--color-text-primary)' }}
+      >
+        <Eye size={14} className="text-white" />
+        <span className="text-[12px] font-bold text-white">미리보기</span>
+      </button>
+
+      <BottomSheet open={previewOpen} onClose={() => setPreviewOpen(false)}>
+        <div className="px-5 pb-8">
+          <p className="mb-3 text-[13px] font-bold text-[var(--color-text-secondary)]">미리보기</p>
+          <ProfileHeroCard
+            profile={{
+              name: previewName,
+              linkId: user.linkId,
+              age: deriveAgeFromBirthDate(birthDate),
+              birthDate,
+              showAge,
+              avatarImage: previewProfileImages[0],
+              profileImages: previewProfileImages,
+              isPaidUser: user.isPaidUser,
+            }}
+            heroTheme={DEFAULT_HERO_THEME}
+            activeImage={previewProfileImages[0]}
+            isOwner
+          />
+        </div>
+      </BottomSheet>
 
       {cropOpen && (
         <div className="absolute inset-0 z-50 bg-black text-white">

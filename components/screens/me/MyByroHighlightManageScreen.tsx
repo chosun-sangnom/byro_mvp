@@ -375,13 +375,17 @@ function buildGroupedCategoryCards(
           allManualHighlights.filter((item) => item.categoryId === category.id),
           primaryHighlightOverrides[category.id],
         )
+        return { category, items }
+      })
+      .filter(({ items }) => items.length > 0)
+      .map(({ category, items }) => {
         const preview = getGroupedHighlightPreview(items, primaryHighlightOverrides[category.id])
         return {
           kind: 'manual' as const,
           category,
-          title: preview.title || `${category.label} 항목 추가`,
-          meta: preview.meta || '아직 추가된 항목이 없어요',
-          countLabel: items.length > 0 ? `${items.length}개 항목` : '0개 항목',
+          title: preview.title,
+          meta: preview.meta,
+          countLabel: `${items.length}개 항목`,
         }
       }),
   }))

@@ -2,9 +2,73 @@
 
 import { useState } from 'react'
 import { MoreHorizontal } from 'lucide-react'
-import { NavBar, ActionMenu, ActionMenuItem, showToast } from '@/components/ui'
+import { NavBar, ActionMenu, ActionMenuItem, Modal, Button, showToast } from '@/components/ui'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mocks/publicProfiles'
+import type { GuestbookEntry } from '@/types'
+
+function FeedbackRow({
+  entry,
+  openMenuId,
+  setOpenMenuId,
+  onRequestDelete,
+}: {
+  entry: GuestbookEntry
+  openMenuId: string | null
+  setOpenMenuId: (id: string | null) => void
+  onRequestDelete: (entry: GuestbookEntry) => void
+}) {
+  const avatar = getProfileAvatar(entry.linkId)
+  return (
+    <div className="flex gap-3 py-3.5 first:pt-0">
+      {avatar ? (
+        <div className="mt-0.5 h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-[var(--color-bg-soft)]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={avatar} alt={entry.authorName} className="h-full w-full object-cover" />
+        </div>
+      ) : (
+        <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-xs font-bold text-[var(--color-text-secondary)]">
+          {entry.authorName.charAt(0)}
+        </div>
+      )}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center justify-between gap-2">
+          <div className="text-[12px] font-semibold text-[var(--color-text-primary)]">{entry.authorName}</div>
+          <div className="flex items-center gap-2">
+            <div className="text-[10px] text-[var(--color-text-tertiary)]">{entry.date}</div>
+            <div className="relative">
+              <button
+                onClick={() => setOpenMenuId(openMenuId === entry.id ? null : entry.id)}
+                className="flex h-6 w-6 items-center justify-center rounded-full text-[var(--color-text-tertiary)] opacity-40 active:opacity-100 transition-opacity"
+                aria-label="더보기"
+              >
+                <MoreHorizontal size={13} />
+              </button>
+              <ActionMenu open={openMenuId === entry.id} onClose={() => setOpenMenuId(null)}>
+                <ActionMenuItem
+                  label="삭제하기"
+                  danger
+                  onClick={() => {
+                    setOpenMenuId(null)
+                    onRequestDelete(entry)
+                  }}
+                />
+                <ActionMenuItem
+                  label="신고하기"
+                  onClick={() => {
+                    setOpenMenuId(null)
+                    showToast('신고가 접수됐어요')
+                  }}
+                />
+              </ActionMenu>
+            </div>
+          </div>
+        </div>
+        <div className="mt-1 text-[13px] leading-snug text-[var(--color-text-secondary)]">{entry.message}</div>
+      </div>
+    </div>
+  )
+}
 
 export function ReputationManageScreen({
   onBack,
@@ -20,12 +84,60 @@ export function ReputationManageScreen({
     SAMPLE_PROFILE.reputationKeywords.find((item) => item.keyword === keyword)?.count ?? 0
 
   const [deletedIds, setDeletedIds] = useState<string[]>([])
-  const [expanded, setExpanded] = useState(false)
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<GuestbookEntry | null>(null)
+  const [showAllFeedback, setShowAllFeedback] = useState(false)
 
   const allEntries = SAMPLE_PROFILE.guestbook.filter((e) => !deletedIds.includes(e.id))
-  const displayedEntries = expanded ? allEntries : allEntries.slice(0, 3)
-  const hasMore = allEntries.length > 3 && !expanded
+  const displayedEntries = allEntries.slice(0, 3)
+  const hasMore = allEntries.length > 3
+
+  const handleConfirmDelete = () => {
+    if (!deleteTarget) return
+    setDeletedIds((prev) => [...prev, deleteTarget.id])
+    setDeleteTarget(null)
+    showToast('피드백을 삭제했어요')
+  }
+
+  const deleteConfirmModal = (
+    <Modal open={!!deleteTarget} onClose={() => setDeleteTarget(null)}>
+      <div className="text-center">
+        <div className="text-base font-black mb-1" style={{ color: 'var(--color-state-danger-text)' }}>
+          피드백을 삭제하시겠어요?
+        </div>
+        <p className="text-[12px] text-[var(--color-text-tertiary)] mb-4 leading-relaxed">
+          삭제하면 복구할 수 없어요.
+        </p>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setDeleteTarget(null)}>취소</Button>
+          <Button variant="danger" size="sm" onClick={handleConfirmDelete}>삭제하기</Button>
+        </div>
+      </div>
+    </Modal>
+  )
+
+  if (showAllFeedback) {
+    return (
+      <div className="flex flex-col h-full">
+        <NavBar title="받은 피드백" onBack={() => setShowAllFeedback(false)} />
+        <div className="flex-1 overflow-y-auto px-5 py-4">
+          <div className="mb-3 text-[12px] text-[var(--color-text-tertiary)]">총 {allEntries.length}개의 피드백이에요</div>
+          <div className="divide-y divide-[var(--color-border-soft)]">
+            {allEntries.map((entry) => (
+              <FeedbackRow
+                key={entry.id}
+                entry={entry}
+                openMenuId={openMenuId}
+                setOpenMenuId={setOpenMenuId}
+                onRequestDelete={setDeleteTarget}
+              />
+            ))}
+          </div>
+        </div>
+        {deleteConfirmModal}
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -96,64 +208,20 @@ export function ReputationManageScreen({
           ) : (
             <>
               <div className="divide-y divide-[var(--color-border-soft)]">
-                {displayedEntries.map((entry) => {
-                  const avatar = getProfileAvatar(entry.linkId)
-                  return (
-                    <div key={entry.id} className="flex gap-3 py-3.5 first:pt-0">
-                      {avatar ? (
-                        <div className="mt-0.5 h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-[var(--color-bg-soft)]">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={avatar} alt={entry.authorName} className="h-full w-full object-cover" />
-                        </div>
-                      ) : (
-                        <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-xs font-bold text-[var(--color-text-secondary)]">
-                          {entry.authorName.charAt(0)}
-                        </div>
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="text-[12px] font-semibold text-[var(--color-text-primary)]">{entry.authorName}</div>
-                          <div className="flex items-center gap-2">
-                            <div className="text-[10px] text-[var(--color-text-tertiary)]">{entry.date}</div>
-                            <div className="relative">
-                              <button
-                                onClick={() => setOpenMenuId(openMenuId === entry.id ? null : entry.id)}
-                                className="flex h-6 w-6 items-center justify-center rounded-full text-[var(--color-text-tertiary)] opacity-40 active:opacity-100 transition-opacity"
-                                aria-label="더보기"
-                              >
-                                <MoreHorizontal size={13} />
-                              </button>
-                              <ActionMenu open={openMenuId === entry.id} onClose={() => setOpenMenuId(null)}>
-                                <ActionMenuItem
-                                  label="삭제하기"
-                                  danger
-                                  onClick={() => {
-                                    setDeletedIds((prev) => [...prev, entry.id])
-                                    setOpenMenuId(null)
-                                    showToast('피드백을 삭제했어요')
-                                  }}
-                                />
-                                <ActionMenuItem
-                                  label="신고하기"
-                                  onClick={() => {
-                                    setOpenMenuId(null)
-                                    showToast('신고가 접수됐어요')
-                                  }}
-                                />
-                              </ActionMenu>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="mt-1 text-[13px] leading-snug text-[var(--color-text-secondary)]">{entry.message}</div>
-                      </div>
-                    </div>
-                  )
-                })}
+                {displayedEntries.map((entry) => (
+                  <FeedbackRow
+                    key={entry.id}
+                    entry={entry}
+                    openMenuId={openMenuId}
+                    setOpenMenuId={setOpenMenuId}
+                    onRequestDelete={setDeleteTarget}
+                  />
+                ))}
               </div>
 
               {hasMore && (
                 <button
-                  onClick={() => setExpanded(true)}
+                  onClick={() => setShowAllFeedback(true)}
                   className="mt-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-secondary)]"
                 >
                   더보기
@@ -166,6 +234,7 @@ export function ReputationManageScreen({
         <div className="h-4" />
       </div>
 
+      {deleteConfirmModal}
     </div>
   )
 }

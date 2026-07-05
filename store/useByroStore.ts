@@ -438,6 +438,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       linkedinConnected: false,
       onboardingContactChannels: SAMPLE_PROFILE.contactChannels,
       highlights: [],
+      highlightsInitialized: false,
       primaryHighlightOverrides: {},
       bio: '',
       bioMode: null,

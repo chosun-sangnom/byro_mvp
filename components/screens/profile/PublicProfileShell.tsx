@@ -53,12 +53,16 @@ export function PublicProfileShell({
   })
 
   const { isOwner: isOwnerMode } = useProfileOwner(username)
+  // localStorage 기반 로그인 상태는 SSR에서 항상 false라 마운트 전엔 guest 값으로 고정 (hydration mismatch 방지)
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+  const isLoggedIn = mounted && store.isLoggedIn
 
   // [임시] 오너 모드에서만 페르소나 생성 (목업 데이터 기반)
   const persona = generatePersona(profile)
 
   const isSaved = store.savedProfiles.some((p) => p.linkId === profile.linkId)
-  const tabAccessCtx = { isOwner: isOwnerMode, isLoggedIn: store.isLoggedIn }
+  const tabAccessCtx = { isOwner: isOwnerMode, isLoggedIn }
 
   const tabAccess = {
     who: computeTabAccess(profile.tabVisibility, 'who', tabAccessCtx),
@@ -68,7 +72,7 @@ export function PublicProfileShell({
 
   // 케미 로딩 트리거: 비로그인이거나 오너이면 케미 없음
   const kemiAlreadyComputed = store.kemiComputedProfiles.includes(profile.linkId)
-  const shouldComputeKemi = store.isLoggedIn && !isOwnerMode && !!profile.kemi
+  const shouldComputeKemi = isLoggedIn && !isOwnerMode && !!profile.kemi
   const [kemiLoading, setKemiLoading] = useState(shouldComputeKemi && !kemiAlreadyComputed)
 
   useEffect(() => {
@@ -111,8 +115,8 @@ export function PublicProfileShell({
             personaReasons={persona?.reasons}
             personaImage={persona?.image}
             isOwner={isOwnerMode}
-            isBookmarked={store.isLoggedIn && !isOwnerMode ? isSaved : undefined}
-            onBookmarkClick={store.isLoggedIn && !isOwnerMode
+            isBookmarked={isLoggedIn && !isOwnerMode ? isSaved : undefined}
+            onBookmarkClick={isLoggedIn && !isOwnerMode
               ? () => {
                   if (isSaved) {
                     setUnsaveSheetOpen(true)
@@ -132,7 +136,7 @@ export function PublicProfileShell({
         ) : (
           <PublicProfileKemiZone
             kemi={profile.kemi}
-            isLoggedIn={store.isLoggedIn}
+            isLoggedIn={isLoggedIn}
             isLoading={kemiLoading}
             onCompatibilityOpen={profile.whoIAm ? () => setCompatibilityOpen(true) : undefined}
             onLoginRequest={() => setLoginModalOpen(true)}

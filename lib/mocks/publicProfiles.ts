@@ -447,10 +447,10 @@ export const MK_PROFILE = {
       { index: 1, missingItems: ['MBTI 또는 바이브 1종'] },
       { index: 2, missingItems: ['MBTI', '바이브 2종'] },
       { index: 3, missingItems: ['바이브 3종', '자기소개'] },
-      { index: 4, missingItems: ['직무', '하이라이트 1개'] },
+      { index: 4, missingItems: ['하이라이트 2개'] },
       { index: 5, missingItems: ['성향', '바이브 5종'] },
     ],
-    missingItems: ['MBTI', '성향', '바이브 5종', '자기소개', '직무', '하이라이트 1개'],
+    missingItems: ['MBTI', '성향', '바이브 5종', '자기소개', '하이라이트 2개'],
   },
   reputationKeywords: [
     { keyword: '어려울 때 생각나는 사람이에요', count: 9 },

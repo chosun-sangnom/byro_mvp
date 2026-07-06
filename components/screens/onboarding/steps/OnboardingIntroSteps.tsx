@@ -4,7 +4,7 @@ import { useRef, useState, type ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { Camera, CheckCircle2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
-import { Button, TextArea, showToast } from '@/components/ui'
+import { Button, CheckRow, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
@@ -140,9 +140,6 @@ export function Step1Login() {
             <p className="meta-text leading-relaxed">이제 프로필을 만들어볼게요.</p>
           </div>
           <Button onClick={() => store.nextStep()}>계속하기</Button>
-          <p className="micro-text text-center mt-4">
-            시작하면 이용약관 및 개인정보 처리방침에 동의하게 됩니다
-          </p>
         </div>
       )
     }
@@ -228,9 +225,6 @@ export function Step1Login() {
         <Button onClick={() => { if (canPhoneSubmit) store.nextStep() }} disabled={!canPhoneSubmit}>
           가입하기
         </Button>
-        <p className="micro-text text-center mt-4">
-          시작하면 이용약관 및 개인정보 처리방침에 동의하게 됩니다
-        </p>
       </div>
     )
   }
@@ -322,6 +316,7 @@ export function Step1Login() {
 
   // --- 회원가입 메인 뷰 ---
   if (mode === 'signup') {
+    const canStartSignup = store.agreedTerms && store.agreedPrivacy
     return (
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
         <BackButton onClick={handleBackToChoose} />
@@ -331,20 +326,31 @@ export function Step1Login() {
           </div>
           <p className="meta-text mt-1">가입 방법을 선택해주세요.</p>
         </div>
+        <div className="mb-5">
+          <CheckRow
+            label="[필수] 이용약관 동의"
+            checked={store.agreedTerms}
+            onToggle={() => store.setAgreedTerms(!store.agreedTerms)}
+            onDetail={() => showToast('준비 중인 페이지예요')}
+          />
+          <CheckRow
+            label="[필수] 개인정보 처리방침 동의"
+            checked={store.agreedPrivacy}
+            onToggle={() => store.setAgreedPrivacy(!store.agreedPrivacy)}
+            onDetail={() => showToast('준비 중인 페이지예요')}
+          />
+        </div>
         <div className="space-y-3">
-          <Button variant="kakao" onClick={() => handleOAuthSelect('kakao')}>카카오로 시작하기</Button>
-          <Button variant="naver" onClick={() => handleOAuthSelect('naver')}>N  네이버로 시작하기</Button>
-          <Button variant="google" onClick={() => handleOAuthSelect('google')}>G  구글로 시작하기</Button>
+          <Button variant="kakao" disabled={!canStartSignup} onClick={() => handleOAuthSelect('kakao')}>카카오로 시작하기</Button>
+          <Button variant="naver" disabled={!canStartSignup} onClick={() => handleOAuthSelect('naver')}>N  네이버로 시작하기</Button>
+          <Button variant="google" disabled={!canStartSignup} onClick={() => handleOAuthSelect('google')}>G  구글로 시작하기</Button>
         </div>
         <div className="flex items-center gap-3 my-4">
           <div className="flex-1 h-px bg-[var(--color-border-default)]" />
           <span className="text-[11px] text-[var(--color-text-tertiary)]">또는</span>
           <div className="flex-1 h-px bg-[var(--color-border-default)]" />
         </div>
-        <Button variant="outline" onClick={() => setView('phone')}>전화번호로 회원가입</Button>
-        <p className="micro-text text-center mt-6">
-          시작하면 이용약관 및 개인정보 처리방침에 동의하게 됩니다
-        </p>
+        <Button variant="outline" disabled={!canStartSignup} onClick={() => setView('phone')}>전화번호로 회원가입</Button>
       </div>
     )
   }

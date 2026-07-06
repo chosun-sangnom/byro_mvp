@@ -436,7 +436,7 @@ export const MK_PROFILE = {
   ] as Highlight[],
   // TODO(real API): Replace with viewer-relative kemi payload from /profiles/:id/kemi?viewer_id=... endpoint
   // [임시] 강명구: 프로필 미입력 가정 — 전체 블록 잠금 목업 (케미 정책 문서 4-1절: 상대 데이터 부족 시 공통점 없음)
-  // 여행지 항목은 앱에 구현되어 있지 않아 3번 블록 조건에서 제외 — 자기소개(bio)로 대체
+  // 여행지·스포츠팀은 바이브 정책에서 기획 자체가 제외(삭제)됨 — 3번 블록 조건은 자기소개(bio)로 대체
   kemi: {
     matchCount: 0,
     matchItems: [],

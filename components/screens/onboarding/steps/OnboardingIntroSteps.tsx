@@ -510,16 +510,12 @@ export function Step2Verify() {
       )}
 
       <div className="flex-1" />
-      {/* [임시] 본인인증 건너뛰기 — 실제 서비스 연동 후 제거 예정 */}
-      <div className="mt-6">
-        <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)] opacity-50">DEV ONLY</p>
-        <button
-          onClick={() => store.nextStep()}
-          className="w-full rounded-2xl border border-dashed border-[var(--color-border-soft)] py-3.5 text-[13px] font-semibold text-[var(--color-text-tertiary)] opacity-60 active:opacity-40"
-        >
-          본인인증 건너뛰기
-        </button>
-      </div>
+      <button
+        onClick={() => store.nextStep()}
+        className="mt-6 text-center text-[12px] font-medium text-[var(--color-text-tertiary)] underline underline-offset-2"
+      >
+        외국인이라 본인인증이 어려우신가요? 건너뛰기
+      </button>
     </div>
   )
 }

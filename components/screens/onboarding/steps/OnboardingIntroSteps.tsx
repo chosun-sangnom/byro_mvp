@@ -127,6 +127,7 @@ export function Step1Login() {
         )
       }
 
+      const canContinueOAuthSignup = store.agreedTerms && store.agreedPrivacy
       return (
         <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
           <div className="flex-1 flex flex-col items-center justify-center text-center">
@@ -139,7 +140,21 @@ export function Step1Login() {
             </div>
             <p className="meta-text leading-relaxed">이제 프로필을 만들어볼게요.</p>
           </div>
-          <Button onClick={() => store.nextStep()}>계속하기</Button>
+          <div className="mb-4">
+            <CheckRow
+              label="[필수] 이용약관 동의"
+              checked={store.agreedTerms}
+              onToggle={() => store.setAgreedTerms(!store.agreedTerms)}
+              onDetail={() => showToast('준비 중인 페이지예요')}
+            />
+            <CheckRow
+              label="[필수] 개인정보 처리방침 동의"
+              checked={store.agreedPrivacy}
+              onToggle={() => store.setAgreedPrivacy(!store.agreedPrivacy)}
+              onDetail={() => showToast('준비 중인 페이지예요')}
+            />
+          </div>
+          <Button disabled={!canContinueOAuthSignup} onClick={() => store.nextStep()}>계속하기</Button>
         </div>
       )
     }
@@ -221,8 +236,25 @@ export function Step1Login() {
             )}
           </div>
         </div>
+        <div className="mb-4">
+          <CheckRow
+            label="[필수] 이용약관 동의"
+            checked={store.agreedTerms}
+            onToggle={() => store.setAgreedTerms(!store.agreedTerms)}
+            onDetail={() => showToast('준비 중인 페이지예요')}
+          />
+          <CheckRow
+            label="[필수] 개인정보 처리방침 동의"
+            checked={store.agreedPrivacy}
+            onToggle={() => store.setAgreedPrivacy(!store.agreedPrivacy)}
+            onDetail={() => showToast('준비 중인 페이지예요')}
+          />
+        </div>
         {/* [임시] 바이로 전화번호 회원가입 API 미연동 */}
-        <Button onClick={() => { if (canPhoneSubmit) store.nextStep() }} disabled={!canPhoneSubmit}>
+        <Button
+          onClick={() => { if (canPhoneSubmit && store.agreedTerms && store.agreedPrivacy) store.nextStep() }}
+          disabled={!canPhoneSubmit || !store.agreedTerms || !store.agreedPrivacy}
+        >
           가입하기
         </Button>
       </div>
@@ -316,7 +348,6 @@ export function Step1Login() {
 
   // --- 회원가입 메인 뷰 ---
   if (mode === 'signup') {
-    const canStartSignup = store.agreedTerms && store.agreedPrivacy
     return (
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
         <BackButton onClick={handleBackToChoose} />
@@ -326,31 +357,17 @@ export function Step1Login() {
           </div>
           <p className="meta-text mt-1">가입 방법을 선택해주세요.</p>
         </div>
-        <div className="mb-5">
-          <CheckRow
-            label="[필수] 이용약관 동의"
-            checked={store.agreedTerms}
-            onToggle={() => store.setAgreedTerms(!store.agreedTerms)}
-            onDetail={() => showToast('준비 중인 페이지예요')}
-          />
-          <CheckRow
-            label="[필수] 개인정보 처리방침 동의"
-            checked={store.agreedPrivacy}
-            onToggle={() => store.setAgreedPrivacy(!store.agreedPrivacy)}
-            onDetail={() => showToast('준비 중인 페이지예요')}
-          />
-        </div>
         <div className="space-y-3">
-          <Button variant="kakao" disabled={!canStartSignup} onClick={() => handleOAuthSelect('kakao')}>카카오로 시작하기</Button>
-          <Button variant="naver" disabled={!canStartSignup} onClick={() => handleOAuthSelect('naver')}>N  네이버로 시작하기</Button>
-          <Button variant="google" disabled={!canStartSignup} onClick={() => handleOAuthSelect('google')}>G  구글로 시작하기</Button>
+          <Button variant="kakao" onClick={() => handleOAuthSelect('kakao')}>카카오로 시작하기</Button>
+          <Button variant="naver" onClick={() => handleOAuthSelect('naver')}>N  네이버로 시작하기</Button>
+          <Button variant="google" onClick={() => handleOAuthSelect('google')}>G  구글로 시작하기</Button>
         </div>
         <div className="flex items-center gap-3 my-4">
           <div className="flex-1 h-px bg-[var(--color-border-default)]" />
           <span className="text-[11px] text-[var(--color-text-tertiary)]">또는</span>
           <div className="flex-1 h-px bg-[var(--color-border-default)]" />
         </div>
-        <Button variant="outline" disabled={!canStartSignup} onClick={() => setView('phone')}>전화번호로 회원가입</Button>
+        <Button variant="outline" onClick={() => setView('phone')}>전화번호로 회원가입</Button>
       </div>
     )
   }

@@ -209,9 +209,9 @@ export const SAMPLE_PROFILE = {
     // [임시] 목업 기본값
     completenessPercent: 80,
     lockedBlocks: [
-      { index: 5, missingItems: ['취향 1개'] },
+      { index: 5, missingItems: ['바이브 1개'] },
     ],
-    missingItems: ['취향 1개'],
+    missingItems: ['바이브 1개'],
   },
   experiences: [
     { id: 'e1', authorName: '김지수', isAnonymous: false, keywords: ['전문성이 느껴져요', '대화하면 생각이 넓어져요'], message: '대화하면 생각이 넓어지고 일도 깔끔하게 풀어가는 분이에요.', date: '2일 전' },
@@ -444,13 +444,13 @@ export const MK_PROFILE = {
     aiCopy: '아직 케미를 분석할 정보가 부족해요. 프로필을 채우면 공통점을 확인할 수 있어요.',
     completenessPercent: 0,
     lockedBlocks: [
-      { index: 1, missingItems: ['MBTI 또는 취향 1종'] },
-      { index: 2, missingItems: ['MBTI', '취향 2종'] },
-      { index: 3, missingItems: ['취향 3종', '자기소개'] },
+      { index: 1, missingItems: ['MBTI 또는 바이브 1종'] },
+      { index: 2, missingItems: ['MBTI', '바이브 2종'] },
+      { index: 3, missingItems: ['바이브 3종', '자기소개'] },
       { index: 4, missingItems: ['직무', '하이라이트 1개'] },
-      { index: 5, missingItems: ['성향', '취향 5종'] },
+      { index: 5, missingItems: ['성향', '바이브 5종'] },
     ],
-    missingItems: ['MBTI', '성향', '취향 5종', '자기소개', '직무', '하이라이트 1개'],
+    missingItems: ['MBTI', '성향', '바이브 5종', '자기소개', '직무', '하이라이트 1개'],
   },
   reputationKeywords: [
     { keyword: '어려울 때 생각나는 사람이에요', count: 9 },
@@ -778,8 +778,8 @@ export const LEEJUNHYUK_PROFILE = {
     ],
     aiCopy: '스타트업에서 기술을 이끄는 분이에요. 개발 문화나 팀 빌딩 경험으로 대화를 시작해보세요.',
     completenessPercent: 60,
-    lockedBlocks: [{ index: 3, missingItems: ['취향 2개'] }, { index: 4, missingItems: ['장소 1개'] }, { index: 5, missingItems: ['라이프스타일 1개'] }],
-    missingItems: ['취향 2개', '장소 1개'],
+    lockedBlocks: [{ index: 3, missingItems: ['바이브 2개'] }, { index: 4, missingItems: ['바이브 1개'] }, { index: 5, missingItems: ['바이브 1개'] }],
+    missingItems: ['바이브 2개'],
   },
   experiences: [
     { id: 'ljhe1', authorName: null, isAnonymous: true, keywords: ['전문성이 느껴져요', '믿고 맡길 수 있어요'], message: '기술적 판단력이 탁월하고 팀을 잘 이끄는 분이에요.', date: '3일 전' },
@@ -1150,8 +1150,8 @@ export const HANSANGHOON_PROFILE = {
     ],
     aiCopy: '골프와 글로벌 비즈니스를 즐기는 세일즈 전문가예요. 해외 시장이나 영업 전략으로 대화를 시작해보세요.',
     completenessPercent: 70,
-    lockedBlocks: [{ index: 4, missingItems: ['취향 1개'] }, { index: 5, missingItems: ['장소 1개'] }],
-    missingItems: ['취향 1개', '장소 1개'],
+    lockedBlocks: [{ index: 4, missingItems: ['바이브 1개'] }, { index: 5, missingItems: ['바이브 1개'] }],
+    missingItems: ['바이브 1개'],
   },
   experiences: [
     { id: 'hshe1', authorName: '최선영', isAnonymous: false, keywords: ['믿고 맡길 수 있어요', '일 처리가 빠르고 깔끔해요'], message: '딜 클로징 능력이 정말 탁월해요.', date: '3일 전' },

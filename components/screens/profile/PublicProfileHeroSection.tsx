@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Bookmark, BookmarkCheck, Download, Pencil, Share2, Sparkles, X } from 'lucide-react'
-import { ActionMenu, ActionMenuItem, BottomSheet, showToast } from '@/components/ui'
+import { ActionMenu, ActionMenuItem, BottomSheet, Button, CheckRow, TextArea, showToast } from '@/components/ui'
 import { shareOrCopy } from '@/lib/share'
 import type { PersonaReason } from '@/lib/personaGen'
 
@@ -12,6 +12,13 @@ type HeroTheme = {
   cover: string
   avatar: string
 }
+
+const PROFILE_REPORT_REASONS = [
+  '허위 프로필이에요',
+  '부적절한 사진이 있어요',
+  '스팸 · 광고성 계정이에요',
+  '기타',
+]
 
 function normalizeProfileImages(images?: string[], avatarImage?: string) {
   const merged = [...(images ?? [])]
@@ -256,9 +263,24 @@ export function ProfileHeroCard({
     }
   }
   const [moreSheetOpen, setMoreSheetOpen] = useState(false)
+  const [reportSheetOpen, setReportSheetOpen] = useState(false)
+  const [reportReason, setReportReason] = useState<string | undefined>(undefined)
+  const [reportDetail, setReportDetail] = useState('')
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
   const showAge = typeof profile.age === 'number' && profile.showAge !== false
+
+  const closeReportSheet = () => {
+    setReportSheetOpen(false)
+    setReportReason(undefined)
+    setReportDetail('')
+  }
+
+  const handleSubmitReport = () => {
+    if (!reportReason) return
+    closeReportSheet()
+    showToast('신고가 접수됐어요')
+  }
 
   return (
     <div className="hero-card border border-[var(--color-border-default)] bg-[var(--color-glass-strong)] p-[8px] backdrop-blur-sm">
@@ -342,6 +364,47 @@ export function ProfileHeroCard({
           document.body
         )}
 
+        {/* 프로필 신고 바텀시트 — createPortal로 transform 컨텍스트 탈출 */}
+        {mounted && createPortal(
+          <BottomSheet open={reportSheetOpen} onClose={closeReportSheet}>
+            <div className="px-5 pb-6">
+              <div className="text-base font-black mb-1" style={{ color: 'var(--color-text-primary)' }}>
+                프로필 신고
+              </div>
+              <p className="text-[12px] text-[var(--color-text-tertiary)] mb-4 leading-relaxed">
+                {profile.name}님의 프로필을 신고해요. 사유를 선택해주세요.
+              </p>
+
+              <div className="mb-4">
+                {PROFILE_REPORT_REASONS.map((reason) => (
+                  <CheckRow
+                    key={reason}
+                    label={reason}
+                    checked={reportReason === reason}
+                    onToggle={() => setReportReason(reason)}
+                  />
+                ))}
+              </div>
+
+              <TextArea
+                value={reportDetail}
+                onChange={setReportDetail}
+                placeholder="구체적인 내용을 적어주시면 검토에 도움이 돼요 (선택)"
+                maxLength={300}
+                rows={3}
+                dark
+              />
+
+              <div className="mt-4">
+                <Button variant="danger" disabled={!reportReason} onClick={handleSubmitReport}>
+                  제출하기
+                </Button>
+              </div>
+            </div>
+          </BottomSheet>,
+          document.body
+        )}
+
         <div className="relative h-full">
           {activeImage ? (
             <button
@@ -401,11 +464,10 @@ export function ProfileHeroCard({
                       setMoreSheetOpen(false)
                     }}
                   />
-                  {/* [임시] 프로필 신고 API 미연동 */}
                   <ActionMenuItem
                     label="프로필 신고"
                     danger
-                    onClick={() => { setMoreSheetOpen(false); showToast('신고가 접수됐어요') }}
+                    onClick={() => { setMoreSheetOpen(false); setReportSheetOpen(true) }}
                   />
                 </ActionMenu>
               </div>

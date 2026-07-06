@@ -127,7 +127,6 @@ export function Step1Login() {
         )
       }
 
-      const canContinueOAuthSignup = store.agreedTerms && store.agreedPrivacy
       return (
         <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
           <div className="flex-1 flex flex-col items-center justify-center text-center">
@@ -140,21 +139,7 @@ export function Step1Login() {
             </div>
             <p className="meta-text leading-relaxed">이제 프로필을 만들어볼게요.</p>
           </div>
-          <div className="mb-4">
-            <CheckRow
-              label="[필수] 이용약관 동의"
-              checked={store.agreedTerms}
-              onToggle={() => store.setAgreedTerms(!store.agreedTerms)}
-              onDetail={() => showToast('준비 중인 페이지예요')}
-            />
-            <CheckRow
-              label="[필수] 개인정보 처리방침 동의"
-              checked={store.agreedPrivacy}
-              onToggle={() => store.setAgreedPrivacy(!store.agreedPrivacy)}
-              onDetail={() => showToast('준비 중인 페이지예요')}
-            />
-          </div>
-          <Button disabled={!canContinueOAuthSignup} onClick={() => store.nextStep()}>계속하기</Button>
+          <Button onClick={() => store.nextStep()}>계속하기</Button>
         </div>
       )
     }
@@ -236,25 +221,8 @@ export function Step1Login() {
             )}
           </div>
         </div>
-        <div className="mb-4">
-          <CheckRow
-            label="[필수] 이용약관 동의"
-            checked={store.agreedTerms}
-            onToggle={() => store.setAgreedTerms(!store.agreedTerms)}
-            onDetail={() => showToast('준비 중인 페이지예요')}
-          />
-          <CheckRow
-            label="[필수] 개인정보 처리방침 동의"
-            checked={store.agreedPrivacy}
-            onToggle={() => store.setAgreedPrivacy(!store.agreedPrivacy)}
-            onDetail={() => showToast('준비 중인 페이지예요')}
-          />
-        </div>
         {/* [임시] 바이로 전화번호 회원가입 API 미연동 */}
-        <Button
-          onClick={() => { if (canPhoneSubmit && store.agreedTerms && store.agreedPrivacy) store.nextStep() }}
-          disabled={!canPhoneSubmit || !store.agreedTerms || !store.agreedPrivacy}
-        >
+        <Button onClick={() => { if (canPhoneSubmit) store.nextStep() }} disabled={!canPhoneSubmit}>
           가입하기
         </Button>
       </div>
@@ -388,6 +356,59 @@ export function Step1Login() {
         <Button onClick={() => setMode('signup')}>처음이신가요? 회원가입</Button>
         <Button variant="outline" onClick={() => setMode('login')}>이미 계정이 있어요</Button>
       </div>
+    </div>
+  )
+}
+
+export function StepTermsAgreement() {
+  const store = useByroStore()
+  const allAgreed = store.agreedTerms && store.agreedPrivacy && store.agreedMarketing
+  const canProceed = store.agreedTerms && store.agreedPrivacy
+
+  return (
+    <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+      <div className="mb-8">
+        <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
+          본인인증 하기 전
+          <br />
+          <span style={{ color: 'var(--color-accent-dark)' }}>이용약관 동의</span>해 주세요
+        </div>
+      </div>
+
+      <div className="pb-4 mb-2 border-b border-[var(--color-border-default)]">
+        <CheckRow
+          label="전체 동의"
+          checked={allAgreed}
+          onToggle={() => store.toggleAllAgreed()}
+        />
+      </div>
+
+      <CheckRow
+        label="이용약관 (필수)"
+        checked={store.agreedTerms}
+        onToggle={() => store.setAgreedTerms(!store.agreedTerms)}
+        onDetail={() => showToast('준비 중인 페이지예요')}
+      />
+      <CheckRow
+        label="개인정보 수집 및 이용 (필수)"
+        checked={store.agreedPrivacy}
+        onToggle={() => store.setAgreedPrivacy(!store.agreedPrivacy)}
+        onDetail={() => showToast('준비 중인 페이지예요')}
+      />
+      <CheckRow
+        label="마케팅 정보 수신 동의 (선택)"
+        checked={store.agreedMarketing}
+        onToggle={() => store.setAgreedMarketing(!store.agreedMarketing)}
+        onDetail={() => showToast('준비 중인 페이지예요')}
+      />
+      <div className="flex items-center gap-3 mt-1 mb-8 pl-8 text-[11px] text-[var(--color-text-tertiary)]">
+        <span>✓ 앱 푸시</span>
+        <span>✓ 문자</span>
+        <span>✓ 이메일</span>
+      </div>
+
+      <div className="flex-1" />
+      <Button disabled={!canProceed} onClick={() => store.nextStep()}>인증하기</Button>
     </div>
   )
 }

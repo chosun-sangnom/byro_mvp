@@ -22,7 +22,7 @@ function generateRandomLinkId(): string {
   return Array.from({ length: 8 }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
 }
 
-const STEP_ORDER: OnboardingStep[] = ['login', 'verify', 'basicinfo', 'profile', 'complete']
+const STEP_ORDER: OnboardingStep[] = ['login', 'terms', 'verify', 'basicinfo', 'profile', 'complete']
 
 interface ByroStore {
   // 인증
@@ -684,7 +684,7 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     const state = persistedState as ByroStore | undefined
     if (!state) return persistedState
     const persistedStep = state.step as string
-    const validSteps: OnboardingStep[] = ['login', 'verify', 'basicinfo', 'profile', 'complete']
+    const validSteps: OnboardingStep[] = ['login', 'terms', 'verify', 'basicinfo', 'profile', 'complete']
     const migratedStep: OnboardingStep = validSteps.includes(persistedStep as OnboardingStep)
       ? (persistedStep as OnboardingStep)
       : 'login'

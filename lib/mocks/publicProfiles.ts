@@ -629,14 +629,9 @@ export const JIMIN_PROFILE = {
     ],
     // TODO(AI): Replace with LLM-generated conversation starter based on full profile match context
     aiCopy: '아이유를 좋아하고 한남동을 자주 찾는 분이에요. 같은 동네 카페 얘기로 자연스럽게 시작해보세요.',
-    // [임시] 이지민: 3~5번 블록 잠금 목업 (프로필 데이터 부족 시나리오)
-    completenessPercent: 40,
-    lockedBlocks: [
-      { index: 3, missingItems: ['취향 3개'] },
-      { index: 4, missingItems: ['하이라이트'] },
-      { index: 5, missingItems: ['성향', '취향 3개'] },
-    ],
-    missingItems: ['성향', '하이라이트', '취향 3개'],
+    completenessPercent: 100,
+    lockedBlocks: [],
+    missingItems: [],
   },
   reputationKeywords: [
     { keyword: '전문성이 느껴져요', count: 5 },

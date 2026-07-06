@@ -435,22 +435,21 @@ export const MK_PROFILE = {
     },
   ] as Highlight[],
   // TODO(real API): Replace with viewer-relative kemi payload from /profiles/:id/kemi?viewer_id=... endpoint
+  // [임시] 강명구: 프로필 미입력 가정 — 전체 블록 잠금 목업 (케미 정책 문서 4-1절: 상대 데이터 부족 시 공통점 없음)
   kemi: {
-    matchCount: 5,
-    matchItems: [
-      { label: '골프', category: 'lifestyle' },
-      { label: '축구', category: 'taste' },
-      { label: '성수동', category: 'place' },
-      { label: 'FC 온라인', category: 'taste' },
-      { label: '일반식', category: 'lifestyle' },
-    ],
+    matchCount: 0,
+    matchItems: [],
     // TODO(AI): Replace with LLM-generated conversation starter based on full profile match context
-    aiCopy: '골프와 축구를 즐기고 성수동을 자주 찾는 분이에요. FC 얘기나 성수 맛집으로 바로 들어가도 어색하지 않아요.',
-    // [임시] 강명구: 전체 블록 오픈 목업
-    completenessPercent: 100,
-    lockedBlocks: [],
-    missingItems: [],
-
+    aiCopy: '아직 케미를 분석할 정보가 부족해요. 프로필을 채우면 공통점을 확인할 수 있어요.',
+    completenessPercent: 0,
+    lockedBlocks: [
+      { index: 1, missingItems: ['MBTI 또는 취향 1종'] },
+      { index: 2, missingItems: ['MBTI', '취향 2종'] },
+      { index: 3, missingItems: ['취향 3종', '여행지 1개'] },
+      { index: 4, missingItems: ['직무', '하이라이트 1개'] },
+      { index: 5, missingItems: ['성향', '취향 5종'] },
+    ],
+    missingItems: ['MBTI', '성향', '취향 5종', '여행지 1개', '직무', '하이라이트 1개'],
   },
   reputationKeywords: [
     { keyword: '어려울 때 생각나는 사람이에요', count: 9 },

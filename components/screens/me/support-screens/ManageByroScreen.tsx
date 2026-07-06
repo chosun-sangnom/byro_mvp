@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { ChevronRight } from 'lucide-react'
 import { NavBar, Modal, Button } from '@/components/ui'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
-import type { Highlight, PublicProfile, PublicProfileLife, PublicProfileWhoIAm, TabVisibility, TabVisibilityLevel, UserState } from '@/types'
+import type { Highlight, PublicProfile, PublicProfileLife, PublicProfileWhoIAm, UserState } from '@/types'
 
 interface ManageByroScreenProps {
   allHighlights: Highlight[]
@@ -23,15 +23,8 @@ interface ManageByroScreenProps {
   onEditSNS: () => void
   onEditContact: () => void
   user: UserState
-  tabVisibility: TabVisibility
-  onEditVisibility: () => void
   // [임시] 목업 초기화 — CRUD 연동 전 디자인 검토용. 실제 API 연동 후 제거 예정.
   onResetMockData: () => void
-}
-
-const VISIBILITY_LABEL: Record<TabVisibilityLevel, string> = {
-  public: '전체공개',
-  private: '비공개',
 }
 
 interface EditRow {
@@ -59,8 +52,6 @@ export function ManageByroScreen({
   onEditSNS,
   onEditContact,
   user,
-  tabVisibility,
-  onEditVisibility,
   onResetMockData,
 }: ManageByroScreenProps) {
   const [withdrawOpen, setWithdrawOpen] = useState(false)
@@ -212,22 +203,6 @@ export function ManageByroScreen({
               <ChevronRight size={14} className="ml-3 flex-shrink-0 text-[var(--color-text-tertiary)] opacity-30" />
             </button>
           ))}
-        </div>
-
-        {/* 공개 설정 */}
-        <div className="mx-5 mt-4 overflow-hidden rounded-2xl border border-[var(--color-border-soft)]">
-          <button
-            onClick={onEditVisibility}
-            className="flex w-full items-center justify-between px-5 py-4 text-left transition-colors active:bg-white/[0.03]"
-          >
-            <div className="min-w-0 flex-1">
-              <p className="text-[15px] font-semibold text-[var(--color-text-primary)]">공개 설정</p>
-              <p className="mt-0.5 text-[11px] font-medium text-[var(--color-accent-dark)]">
-                WHO {VISIBILITY_LABEL[tabVisibility.who]} · 바이브 {VISIBILITY_LABEL[tabVisibility.vibe]} · NETWORK {VISIBILITY_LABEL[tabVisibility.network]}
-              </p>
-            </div>
-            <ChevronRight size={14} className="ml-3 flex-shrink-0 text-[var(--color-text-tertiary)] opacity-30" />
-          </button>
         </div>
 
         {/* 회원탈퇴 */}

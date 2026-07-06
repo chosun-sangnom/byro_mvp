@@ -102,8 +102,6 @@ export default function MyByro() {
         onEditSNS={() => setScreen('editSNS')}
         onEditContact={() => setScreen('editContact')}
         user={user}
-        tabVisibility={store.tabVisibility ?? { who: 'public', vibe: 'public', network: 'public' }}
-        onEditVisibility={() => setScreen('editVisibility')}
         onResetMockData={() => store.resetToMockDefaults()}
       />
     )
@@ -155,7 +153,7 @@ export default function MyByro() {
       <VisibilitySettingScreen
         tabVisibility={store.tabVisibility ?? { who: 'public', vibe: 'public', network: 'public' }}
         onUpdate={store.updateTabVisibility}
-        onBack={() => setScreen('manage')}
+        onBack={handleBackToManage}
       />
     )
   }

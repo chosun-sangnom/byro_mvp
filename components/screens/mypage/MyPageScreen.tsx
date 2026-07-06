@@ -510,7 +510,7 @@ export default function MyPageScreen() {
           icon: Eye,
           label: '공개 설정',
           description: visibilitySummary,
-          href: '/me?section=visibility',
+          href: '/me?section=visibility&returnTo=%2Fmypage',
         },
         {
           id: 'archive',

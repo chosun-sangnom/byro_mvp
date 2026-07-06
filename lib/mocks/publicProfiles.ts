@@ -436,6 +436,7 @@ export const MK_PROFILE = {
   ] as Highlight[],
   // TODO(real API): Replace with viewer-relative kemi payload from /profiles/:id/kemi?viewer_id=... endpoint
   // [임시] 강명구: 프로필 미입력 가정 — 전체 블록 잠금 목업 (케미 정책 문서 4-1절: 상대 데이터 부족 시 공통점 없음)
+  // 여행지 항목은 앱에 구현되어 있지 않아 3번 블록 조건에서 제외 — 자기소개(bio)로 대체
   kemi: {
     matchCount: 0,
     matchItems: [],
@@ -445,11 +446,11 @@ export const MK_PROFILE = {
     lockedBlocks: [
       { index: 1, missingItems: ['MBTI 또는 취향 1종'] },
       { index: 2, missingItems: ['MBTI', '취향 2종'] },
-      { index: 3, missingItems: ['취향 3종', '여행지 1개'] },
+      { index: 3, missingItems: ['취향 3종', '자기소개'] },
       { index: 4, missingItems: ['직무', '하이라이트 1개'] },
       { index: 5, missingItems: ['성향', '취향 5종'] },
     ],
-    missingItems: ['MBTI', '성향', '취향 5종', '여행지 1개', '직무', '하이라이트 1개'],
+    missingItems: ['MBTI', '성향', '취향 5종', '자기소개', '직무', '하이라이트 1개'],
   },
   reputationKeywords: [
     { keyword: '어려울 때 생각나는 사람이에요', count: 9 },

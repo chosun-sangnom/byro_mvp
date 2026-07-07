@@ -36,8 +36,15 @@ export default function OnboardingScreen() {
   const CurrentStep = STEP_COMPONENTS[store.step]
   const hasBack = stepNum >= 1 && stepNum <= 4
   const isLoginFlow = store.step === 'login' && loginFlowMode === 'login'
+  const isChooseScreen = store.step === 'login' && loginFlowMode === 'choose'
 
-  const handleClose = () => setShowExitModal(true)
+  const handleClose = () => {
+    if (isChooseScreen) {
+      router.push('/')
+      return
+    }
+    setShowExitModal(true)
+  }
   const handleExitConfirm = () => {
     setShowExitModal(false)
     router.push('/')

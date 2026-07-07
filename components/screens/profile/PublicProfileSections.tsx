@@ -403,9 +403,10 @@ export function ContactActionButton({
   return (
     <motion.button
       onClick={onClick}
-      whileTap={{ scale: 0.88 }}
+      disabled={!channel.enabled}
+      whileTap={channel.enabled ? { scale: 0.88 } : undefined}
       transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-      className={['flex flex-col items-center gap-2', channel.enabled ? '' : 'opacity-30'].join(' ')}
+      className={['flex flex-col items-center gap-2', channel.enabled ? '' : 'opacity-30 pointer-events-none'].join(' ')}
     >
       <div className="flex h-[52px] w-[52px] items-center justify-center rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-muted)]">
         <Icon size={18} color="var(--color-text-secondary)" />

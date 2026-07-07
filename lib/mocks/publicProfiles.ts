@@ -1419,6 +1419,37 @@ export const BAEKHYUNJIN_PROFILE = {
   tabVisibility: { who: 'public' as const, vibe: 'public' as const, network: 'public' as const },
 }
 
+// ─── 홍길동 ───────────────────────────────────────────────────────────────────
+// 엣지케이스: 정보를 거의 입력하지 않은 빈 프로필 — 사진/자기소개/MBTI/성향/하이라이트/라이프/SNS/연락처 전부 없음
+export const HONGGILDONG_PROFILE = {
+  linkId: 'honggildong',
+  name: '홍길동',
+  title: '',
+  headline: '',
+  school: '',
+  bio: '',
+  avatarColor: '#B8C4CE', avatarImage: undefined, profileImages: [] as string[],
+  whoIAm: undefined,
+  instagramConnected: false,
+  linkedinConnected: false,
+  rememberHighlight: {
+    total: 0,
+    industries: [],
+  },
+  manualHighlights: [] as Highlight[],
+  kemi: null,
+  experiences: [],
+  savedProfiles: [], recentProfiles: [], receivedRequests: [],
+  reputationKeywords: [],
+  guestbook: [],
+  contactChannels: [
+    { id: 'phone', label: '전화', value: '', enabled: false },
+    { id: 'email', label: '이메일', value: '', enabled: false },
+    { id: 'kakao', label: '카카오', value: '', enabled: false },
+  ] as ContactChannel[],
+  tabVisibility: { who: 'public' as const, vibe: 'public' as const, network: 'public' as const },
+}
+
 // TODO(real API): Replace this mock selector with a profile lookup against the public profile endpoint.
 export function getPublicProfileByUsername(username: string) {
   if (username === 'jiminlee') return JIMIN_PROFILE
@@ -1433,6 +1464,7 @@ export function getPublicProfileByUsername(username: string) {
   if (username === 'ohyerim') return OHYERIM_PROFILE
   if (username === 'jungwonho') return JUNGWONHO_PROFILE
   if (username === 'baekhyunjin') return BAEKHYUNJIN_PROFILE
+  if (username === 'honggildong') return HONGGILDONG_PROFILE
   return SAMPLE_PROFILE
 }
 

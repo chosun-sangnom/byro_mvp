@@ -180,7 +180,6 @@ export function PublicProfileShell({
         )}
 
         {/* 연락처 채널 */}
-        {/* TODO(contact): 공개 여부 설정에 따라 채널 노출 제어 필요 */}
         <div>
           <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">
             Contact
@@ -191,14 +190,7 @@ export function PublicProfileShell({
                 key={channel.id}
                 channel={channel}
                 onClick={() => {
-                  if (!channel.enabled) {
-                    showToast('비활성화된 연락 수단이에요')
-                    return
-                  }
-                  if (!channel.href) {
-                    showToast('연결 정보를 준비 중이에요')
-                    return
-                  }
+                  if (!channel.enabled || !channel.href) return
                   window.open(channel.href, channel.href.startsWith('http') ? '_blank' : '_self')
                 }}
               />

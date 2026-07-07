@@ -31,6 +31,14 @@ export function computeTabAccess(
 
 export { DEFAULT_TAB_VISIBILITY }
 
+const CONTACT_CHANNEL_ORDER: ContactChannel['id'][] = ['phone', 'email', 'kakao']
+
+function sortContactChannels(channels: ContactChannel[]): ContactChannel[] {
+  return [...channels].sort(
+    (a, b) => CONTACT_CHANNEL_ORDER.indexOf(a.id) - CONTACT_CHANNEL_ORDER.indexOf(b.id),
+  )
+}
+
 type NormalizedLinkedInProfile = LinkedInProfile & {
   previewImage: string
 }
@@ -169,7 +177,7 @@ export function getNormalizedPublicProfile({
       previewImage: linkedin?.previewImage ?? PUBLIC_PROFILE_FALLBACKS.linkedin.previewImage,
     },
     heroTheme: rawProfile.heroTheme ?? PUBLIC_PROFILE_FALLBACKS.heroTheme,
-    contactChannels: rawProfile.contactChannels ?? PUBLIC_PROFILE_FALLBACKS.contactChannels,
+    contactChannels: sortContactChannels(rawProfile.contactChannels ?? PUBLIC_PROFILE_FALLBACKS.contactChannels),
     reputationKeywords: rawProfile.reputationKeywords ?? PUBLIC_PROFILE_FALLBACKS.reputationKeywords,
     guestbook: rawProfile.guestbook ?? PUBLIC_PROFILE_FALLBACKS.guestbook,
   }

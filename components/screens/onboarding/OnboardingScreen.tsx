@@ -35,11 +35,10 @@ export default function OnboardingScreen() {
   const stepNum = STEP_NUMS[store.step]
   const CurrentStep = STEP_COMPONENTS[store.step]
   const hasBack = stepNum >= 1 && stepNum <= 4
-  const isLoginFlow = store.step === 'login' && loginFlowMode === 'login'
-  const isChooseScreen = store.step === 'login' && loginFlowMode === 'choose'
+  const skipExitModal = store.step === 'login' && loginFlowMode !== 'signup'
 
   const handleClose = () => {
-    if (isChooseScreen) {
+    if (skipExitModal) {
       router.push('/')
       return
     }
@@ -67,9 +66,7 @@ export default function OnboardingScreen() {
 
       <Modal open={showExitModal} onClose={() => setShowExitModal(false)}>
         <div className="text-center">
-          <div className="text-base font-black mb-2">
-            {isLoginFlow ? '로그인을 종료할까요?' : '회원가입을 종료할까요?'}
-          </div>
+          <div className="text-base font-black mb-2">회원가입을 종료할까요?</div>
           <div className="meta-text mb-5 leading-relaxed">
             지금 나가면 입력한 정보가<br />저장되지 않아요.
           </div>

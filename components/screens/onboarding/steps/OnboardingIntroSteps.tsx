@@ -41,7 +41,7 @@ function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
-function BackButton({ onClick, label = '다른 방법으로 가입' }: { onClick: () => void; label?: string }) {
+function BackButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       type="button"
@@ -51,7 +51,7 @@ function BackButton({ onClick, label = '다른 방법으로 가입' }: { onClick
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <path d="M10 3L5 8L10 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
-      {label}
+      뒤로가기
     </button>
   )
 }
@@ -150,7 +150,7 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
 
     return (
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <BackButton onClick={handleBackToMain} label={mode === 'login' ? '다른 방법으로 로그인' : '다른 방법으로 가입'} />
+        <BackButton onClick={handleBackToMain} />
         <div className="mb-8">
           <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight mb-2">
             {meta.label} 계정으로<br />{mode === 'login' ? '로그인' : '시작하기'}
@@ -237,7 +237,7 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
   if (view === 'phone' && mode === 'login') {
     return (
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <BackButton onClick={handleBackToMain} label="다른 방법으로 로그인" />
+        <BackButton onClick={handleBackToMain} />
         <div className="mb-6">
           <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
             전화번호로<br />로그인
@@ -296,7 +296,7 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
   if (mode === 'login') {
     return (
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <BackButton onClick={handleBackToChoose} label="다른 방법으로 로그인" />
+        <BackButton onClick={handleBackToChoose} />
         <div className="mb-6">
           <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
             다시 오셨군요!

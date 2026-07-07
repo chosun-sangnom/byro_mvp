@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
 import { Button, Modal, NavBar, StepBar } from '@/components/ui'
 import type { OnboardingStep } from '@/types'
-import { Step1Login, StepTermsAgreement, Step2Verify, Step2BasicInfo, Step4Profile } from '@/components/screens/onboarding/steps/OnboardingIntroSteps'
+import { Step1Login, StepTermsAgreement, Step2Verify, Step2BasicInfo, Step4Profile, type Mode } from '@/components/screens/onboarding/steps/OnboardingIntroSteps'
 import { Step9Complete } from '@/components/screens/onboarding/steps/OnboardingBioSteps'
 
 const STEP_NUMS: Record<OnboardingStep, number> = {
@@ -30,10 +30,12 @@ export default function OnboardingScreen() {
   const router = useRouter()
   const store = useByroStore()
   const [showExitModal, setShowExitModal] = useState(false)
+  const [loginFlowMode, setLoginFlowMode] = useState<Mode>('choose')
 
   const stepNum = STEP_NUMS[store.step]
   const CurrentStep = STEP_COMPONENTS[store.step]
   const hasBack = stepNum >= 1 && stepNum <= 4
+  const isLoginFlow = store.step === 'login' && loginFlowMode === 'login'
 
   const handleClose = () => setShowExitModal(true)
   const handleExitConfirm = () => {
@@ -53,12 +55,14 @@ export default function OnboardingScreen() {
       )}
 
       <div className="flex-1 overflow-hidden">
-        <CurrentStep />
+        {store.step === 'login' ? <Step1Login onModeChange={setLoginFlowMode} /> : <CurrentStep />}
       </div>
 
       <Modal open={showExitModal} onClose={() => setShowExitModal(false)}>
         <div className="text-center">
-          <div className="text-base font-black mb-2">회원가입을 종료할까요?</div>
+          <div className="text-base font-black mb-2">
+            {isLoginFlow ? '로그인을 종료할까요?' : '회원가입을 종료할까요?'}
+          </div>
           <div className="meta-text mb-5 leading-relaxed">
             지금 나가면 입력한 정보가<br />저장되지 않아요.
           </div>

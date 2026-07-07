@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, type ChangeEvent } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { Camera, CheckCircle2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
@@ -8,7 +8,7 @@ import { Button, CheckRow, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
-type Mode = 'choose' | 'signup' | 'login'
+export type Mode = 'choose' | 'signup' | 'login'
 type LoginView = 'main' | 'oauth' | 'phone'
 type OAuthProvider = 'kakao' | 'naver' | 'google'
 type OAuthStep = 'pending' | 'done'
@@ -41,7 +41,7 @@ function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
-function BackButton({ onClick }: { onClick: () => void }) {
+function BackButton({ onClick, label = '다른 방법으로 가입' }: { onClick: () => void; label?: string }) {
   return (
     <button
       type="button"
@@ -51,18 +51,22 @@ function BackButton({ onClick }: { onClick: () => void }) {
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
         <path d="M10 3L5 8L10 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
-      다른 방법으로 가입
+      {label}
     </button>
   )
 }
 
-export function Step1Login() {
+export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => void } = {}) {
   const store = useByroStore()
   const router = useRouter()
   const [mode, setMode] = useState<Mode>('choose')
   const [view, setView] = useState<LoginView>('main')
   const [oauthProvider, setOauthProvider] = useState<OAuthProvider | null>(null)
   const [oauthStep, setOauthStep] = useState<OAuthStep>('pending')
+
+  useEffect(() => {
+    onModeChange?.(mode)
+  }, [mode, onModeChange])
 
   // 전화번호 가입 폼
   const [phone, setPhone] = useState('')
@@ -146,7 +150,7 @@ export function Step1Login() {
 
     return (
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <BackButton onClick={handleBackToMain} />
+        <BackButton onClick={handleBackToMain} label={mode === 'login' ? '다른 방법으로 로그인' : '다른 방법으로 가입'} />
         <div className="mb-8">
           <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight mb-2">
             {meta.label} 계정으로<br />{mode === 'login' ? '로그인' : '시작하기'}
@@ -233,7 +237,7 @@ export function Step1Login() {
   if (view === 'phone' && mode === 'login') {
     return (
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <BackButton onClick={handleBackToMain} />
+        <BackButton onClick={handleBackToMain} label="다른 방법으로 로그인" />
         <div className="mb-6">
           <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
             전화번호로<br />로그인
@@ -292,7 +296,7 @@ export function Step1Login() {
   if (mode === 'login') {
     return (
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <BackButton onClick={handleBackToChoose} />
+        <BackButton onClick={handleBackToChoose} label="다른 방법으로 로그인" />
         <div className="mb-6">
           <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
             다시 오셨군요!

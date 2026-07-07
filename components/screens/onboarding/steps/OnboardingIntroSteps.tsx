@@ -125,7 +125,7 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
               <p className="meta-text leading-relaxed">바이로에 오신 걸 환영해요!</p>
             </div>
             {/* [임시] 실제 로그인 API 미연동 */}
-            <Button onClick={handleLoginComplete}>시작하기</Button>
+            <Button onClick={handleLoginComplete}>내 Byro 보기</Button>
           </div>
         )
       }

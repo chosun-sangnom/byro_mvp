@@ -5,11 +5,23 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Search, X } from 'lucide-react'
 import { showToast } from '@/components/ui'
-import { SAMPLE_PROFILE, MK_PROFILE, JIMIN_PROFILE } from '@/lib/mocks/publicProfiles'
+import {
+  SAMPLE_PROFILE, MK_PROFILE, JIMIN_PROFILE,
+  PARKSOJIN_PROFILE, LEEJUNHYUK_PROFILE, CHOISUNYOUNG_PROFILE,
+  YOONJISOO_PROFILE, KWONMINSEOK_PROFILE, LIMJIYEON_PROFILE,
+  HANSANGHOON_PROFILE, OHYERIM_PROFILE, JUNGWONHO_PROFILE,
+  BAEKHYUNJIN_PROFILE,
+} from '@/lib/mocks/publicProfiles'
 import { ALL_VIRTUAL_PROFILES } from '@/lib/mocks/virtualProfiles'
 
 // [임시] 목업 검색 대상 — API 연동 후 서버 검색으로 교체
-const SEARCHABLE_PROFILES = [SAMPLE_PROFILE, MK_PROFILE, JIMIN_PROFILE]
+const SEARCHABLE_PROFILES = [
+  SAMPLE_PROFILE, MK_PROFILE, JIMIN_PROFILE,
+  PARKSOJIN_PROFILE, LEEJUNHYUK_PROFILE, CHOISUNYOUNG_PROFILE,
+  YOONJISOO_PROFILE, KWONMINSEOK_PROFILE, LIMJIYEON_PROFILE,
+  HANSANGHOON_PROFILE, OHYERIM_PROFILE, JUNGWONHO_PROFILE,
+  BAEKHYUNJIN_PROFILE,
+]
 
 // [임시] 동명이인 시연용 가입자 김영석
 const EXTRA_MOCK_MEMBERS: SearchResult[] = [

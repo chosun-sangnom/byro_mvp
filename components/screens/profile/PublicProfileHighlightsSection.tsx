@@ -30,6 +30,8 @@ export function ProfileHighlightsSection({
   getHighlightOpen: (key: string) => boolean
   onToggleHighlight: (key: string) => void
 }) {
+  if (groupedHighlights.length === 0) return null
+
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06}>
       <SectionTitle title="하이라이트" />

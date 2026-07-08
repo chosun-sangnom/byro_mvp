@@ -44,27 +44,35 @@ export function ProfileReputationSummarySection({
   keywordCounts: KeywordCount[]
   totalKeywordCount: number
 }) {
+  const isEmpty = keywordCounts.length === 0
+
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.04}>
       <SectionTitle title="평판" />
       <div className="rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-4">
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Reputation</div>
-            <div className="mt-0.5 text-[22px] font-black tracking-[-0.04em] text-[var(--color-text-strong)]">누적 평판</div>
-          </div>
-          <div className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
-            총 {totalKeywordCount}
-          </div>
-        </div>
+        {isEmpty ? (
+          <p className="py-1 text-center text-[13px] text-[var(--color-text-tertiary)]">아직 받은 평판이 없어요</p>
+        ) : (
+          <>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Reputation</div>
+                <div className="mt-0.5 text-[22px] font-black tracking-[-0.04em] text-[var(--color-text-strong)]">누적 평판</div>
+              </div>
+              <div className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
+                총 {totalKeywordCount}
+              </div>
+            </div>
 
-        <div className="mt-3 flex flex-wrap gap-2">
-          {keywordCounts.map((item) => (
-            <span key={item.keyword} className="chip-metric">
-              {item.keyword} <span className="ml-1 font-black text-[var(--color-text-strong)]">{item.count}</span>
-            </span>
-          ))}
-        </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {keywordCounts.map((item) => (
+                <span key={item.keyword} className="chip-metric">
+                  {item.keyword} <span className="ml-1 font-black text-[var(--color-text-strong)]">{item.count}</span>
+                </span>
+              ))}
+            </div>
+          </>
+        )}
       </div>
     </AnimatedSection>
   )
@@ -99,33 +107,37 @@ export function ProfileFeedbackSection({
           </div>
         </div>
 
-        <div className="divide-y divide-[var(--color-border-soft)]">
-          {featuredGuestbook.map((entry) => (
-            <button
-              key={entry.id}
-              onClick={() => onGuestbookEntryClick(entry.linkId)}
-              className="flex w-full gap-2.5 py-3 text-left first:pt-0 last:pb-0"
-            >
-              {getProfileAvatar(entry.linkId) ? (
-                <div className="mt-0.5 h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-[var(--color-bg-soft)]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={getProfileAvatar(entry.linkId)} alt={`${entry.authorName} 프로필 사진`} className="h-full w-full object-cover" />
+        {profile.guestbook.length === 0 ? (
+          <p className="py-1 text-center text-[13px] text-[var(--color-text-tertiary)]">아직 방명록이 없어요</p>
+        ) : (
+          <div className="divide-y divide-[var(--color-border-soft)]">
+            {featuredGuestbook.map((entry) => (
+              <button
+                key={entry.id}
+                onClick={() => onGuestbookEntryClick(entry.linkId)}
+                className="flex w-full gap-2.5 py-3 text-left first:pt-0 last:pb-0"
+              >
+                {getProfileAvatar(entry.linkId) ? (
+                  <div className="mt-0.5 h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-[var(--color-bg-soft)]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={getProfileAvatar(entry.linkId)} alt={`${entry.authorName} 프로필 사진`} className="h-full w-full object-cover" />
+                  </div>
+                ) : (
+                  <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-xs font-bold text-[var(--color-text-secondary)]">
+                    {entry.authorName.charAt(0)}
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-[12px] font-semibold text-[var(--color-text-primary)]">{entry.authorName}</div>
+                    <div className="text-[10px] text-[var(--color-text-tertiary)]">{entry.date}</div>
+                  </div>
+                  <div className="mt-1 text-[13px] leading-6 text-[var(--color-text-secondary)] line-clamp-2">{entry.message}</div>
                 </div>
-              ) : (
-                <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-xs font-bold text-[var(--color-text-secondary)]">
-                  {entry.authorName.charAt(0)}
-                </div>
-              )}
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="text-[12px] font-semibold text-[var(--color-text-primary)]">{entry.authorName}</div>
-                  <div className="text-[10px] text-[var(--color-text-tertiary)]">{entry.date}</div>
-                </div>
-                <div className="mt-1 text-[13px] leading-6 text-[var(--color-text-secondary)] line-clamp-2">{entry.message}</div>
-              </div>
-            </button>
-          ))}
-        </div>
+              </button>
+            ))}
+          </div>
+        )}
 
         {profile.guestbook.length > 0 && (
           <button
@@ -212,6 +224,8 @@ export function ProfileRememberSection({
   const viewerDomainRatio = viewerDomainEntry?.ratio ?? 0
   const viewerDomainCount = viewerDomainEntry?.count ?? Math.round(total * viewerDomainRatio / 100)
 
+  const isEmpty = total === 0
+
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.02}>
       <SectionTitle title="리멤버 네트워크" />
@@ -229,46 +243,53 @@ export function ProfileRememberSection({
           </div>
         </div>
 
-        {/* 관심 도메인 */}
-        {viewerNetworkDomain && (
-          <div className="flex items-center gap-1.5 -mt-1">
-            <span className="text-[11px] text-[var(--color-text-tertiary)]">관심 도메인</span>
-            <span className="text-[11px] text-[var(--color-text-tertiary)]">:</span>
-            <span className="text-[11px] font-bold" style={{ color: 'var(--color-accent-dark)' }}>{viewerNetworkDomain}</span>
-          </div>
-        )}
+        {isEmpty ? (
+          <p className="py-1 text-center text-[13px] text-[var(--color-text-tertiary)]">아직 리멤버 활동이 없어요</p>
+        ) : (
+          <>
+            {/* 관심 도메인 */}
+            {viewerNetworkDomain && (
+              <div className="flex items-center gap-1.5 -mt-1">
+                <span className="text-[11px] text-[var(--color-text-tertiary)]">관심 도메인</span>
+                <span className="text-[11px] text-[var(--color-text-tertiary)]">:</span>
+                <span className="text-[11px] font-bold" style={{ color: 'var(--color-accent-dark)' }}>{viewerNetworkDomain}</span>
+              </div>
+            )}
 
-        {/* 1위 산업 */}
-        {topIndustry && (
-          <div>
-            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">주요 산업</p>
-            <div className="flex items-center gap-2">
-              <span className="text-[13px] font-bold text-[var(--color-text-primary)]">{topIndustry.name}</span>
-              <MiniBar ratio={topIndustry.ratio} accent />
-              <span className="shrink-0 text-[13px] font-black" style={{ color: 'var(--color-accent-dark)' }}>{topIndustry.ratio}%</span>
-            </div>
-            <p className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">전체 {total}명 중 {topIndustryCount}명</p>
-          </div>
-        )}
+            {/* 1위 산업 */}
+            {topIndustry && (
+              <div>
+                <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">주요 산업</p>
+                <div className="flex items-center gap-2">
+                  <span className="text-[13px] font-bold text-[var(--color-text-primary)]">{topIndustry.name}</span>
+                  <MiniBar ratio={topIndustry.ratio} accent />
+                  <span className="shrink-0 text-[13px] font-black" style={{ color: 'var(--color-accent-dark)' }}>{topIndustry.ratio}%</span>
+                </div>
+                <p className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">전체 {total}명 중 {topIndustryCount}명</p>
+              </div>
+            )}
 
-        {/* 직무 분포 (직급보다 위) */}
-        {topIndustryRoles && topIndustryRoles.length > 0 && (
-          <div>
-            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">{topIndustry?.name} · 직무</p>
-            <BreakdownList items={topIndustryRoles} total={topIndustryCount} />
-          </div>
-        )}
+            {/* 직무 분포 (직급보다 위) */}
+            {topIndustryRoles && topIndustryRoles.length > 0 && (
+              <div>
+                <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">{topIndustry?.name} · 직무</p>
+                <BreakdownList items={topIndustryRoles} total={topIndustryCount} />
+              </div>
+            )}
 
-        {/* 직급 분포 */}
-        {topIndustryRanks && topIndustryRanks.length > 0 && (
-          <div>
-            <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">{topIndustry?.name} · 직급</p>
-            <BreakdownList items={topIndustryRanks} total={topIndustryCount} />
-          </div>
+            {/* 직급 분포 */}
+            {topIndustryRanks && topIndustryRanks.length > 0 && (
+              <div>
+                <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">{topIndustry?.name} · 직급</p>
+                <BreakdownList items={topIndustryRanks} total={topIndustryCount} />
+              </div>
+            )}
+          </>
         )}
       </div>
 
       {/* 개인화 인사이트 — 조건부 */}
+      {!isEmpty && (
       <div className="mt-3">
         {insight && !isOwner ? (
           /* 타인 프로필 — 관심 도메인 인사이트 */
@@ -323,6 +344,7 @@ export function ProfileRememberSection({
           </div>
         ) : null}
       </div>
+      )}
     </AnimatedSection>
   )
 }
@@ -423,8 +445,7 @@ export function ProfileExperienceSection({
   experiences: Experience[]
   onViewAll: () => void
 }) {
-  if (experiences.length === 0) return null
-
+  const isEmpty = experiences.length === 0
   const preview = experiences.slice(0, 5)
 
   return (
@@ -441,21 +462,27 @@ export function ProfileExperienceSection({
           </div>
         </div>
 
-        <div className="divide-y divide-[var(--color-border-soft)] px-4">
-          {preview.map((exp) => (
-            <ExperienceCard key={exp.id} experience={exp} />
-          ))}
-        </div>
+        {isEmpty ? (
+          <p className="px-4 pb-4 text-center text-[13px] text-[var(--color-text-tertiary)]">아직 남겨진 경험이 없어요</p>
+        ) : (
+          <>
+            <div className="divide-y divide-[var(--color-border-soft)] px-4">
+              {preview.map((exp) => (
+                <ExperienceCard key={exp.id} experience={exp} />
+              ))}
+            </div>
 
-        <div className="px-4 pb-4 pt-3">
-          <button
-            onClick={onViewAll}
-            className="flex w-full items-center justify-between rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-left active:opacity-70"
-          >
-            <span className="text-[12px] font-semibold text-[var(--color-text-secondary)]">경험 전체보기</span>
-            <ChevronRight className="h-4 w-4 text-[var(--color-text-tertiary)]" />
-          </button>
-        </div>
+            <div className="px-4 pb-4 pt-3">
+              <button
+                onClick={onViewAll}
+                className="flex w-full items-center justify-between rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-left active:opacity-70"
+              >
+                <span className="text-[12px] font-semibold text-[var(--color-text-secondary)]">경험 전체보기</span>
+                <ChevronRight className="h-4 w-4 text-[var(--color-text-tertiary)]" />
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </AnimatedSection>
   )

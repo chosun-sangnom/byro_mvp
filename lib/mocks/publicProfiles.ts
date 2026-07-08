@@ -61,6 +61,9 @@ export const SAMPLE_PROFILE = {
       cafes: [
         { label: '오츠커피', sublabel: '한남동', posterUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=148&h=96&q=75&fit=crop&auto=format' },
       ],
+      plays: [
+        { label: '햄릿', sublabel: '연극', posterUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=80&h=112&q=75&fit=crop&auto=format' },
+      ],
     },
     albumPhotos: [
       'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=400&q=80&fit=crop',

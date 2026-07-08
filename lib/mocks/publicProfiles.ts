@@ -9,6 +9,7 @@ import { INSTAGRAM_PROFILE, LINKEDIN_PROFILE, MK_LINKEDIN_PROFILE } from '@/lib/
 export const SAMPLE_PROFILE = {
   linkId: 'gangminjun',
   name: '강민준',
+  isVerified: true,
   title: 'B2B SaaS Product Owner · 스타트업 공동창업자',
   avatarColor: '#DCC5B6',
   avatarImage: '/images/mj1.jpg',

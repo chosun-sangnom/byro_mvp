@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bookmark, BookmarkCheck, Download, Pencil, Share2, Sparkles, X } from 'lucide-react'
+import { BadgeCheck, Bookmark, BookmarkCheck, Download, Pencil, Share2, Sparkles, X } from 'lucide-react'
 import { ActionMenu, ActionMenuItem, BottomSheet, Button, CheckRow, TextArea, showToast } from '@/components/ui'
 import { shareOrCopy } from '@/lib/share'
 import type { PersonaReason } from '@/lib/personaGen'
@@ -46,6 +46,7 @@ export function ProfileHeroSection({
     avatarColor?: string
     avatarImage?: string
     profileImages?: string[]
+    isVerified?: boolean
   }
   heroTheme: HeroTheme
   personaText?: string
@@ -189,7 +190,6 @@ export function ProfileHeroSection({
  * → 소셜 관리: /me 페이지
  *
  * TODO(profile-image): 프로필 사진 업로드/크롭 플로우 연동
- * TODO(verified): BadgeCheck 표시 조건을 인증 여부 필드로 제어
  */
 export function ProfileHeroCard({
   profile,
@@ -216,6 +216,7 @@ export function ProfileHeroCard({
     avatarImage?: string
     profileImages?: string[]
     isPaidUser?: boolean
+    isVerified?: boolean
   }
   heroTheme: HeroTheme
   activeImage?: string
@@ -501,6 +502,13 @@ export function ProfileHeroCard({
             >
               {profile.name}
             </div>
+            {profile.isVerified && (
+              <BadgeCheck
+                size={20}
+                className="mb-2 shrink-0 fill-[#3B82F6] text-white"
+                strokeWidth={2.5}
+              />
+            )}
             {profile.isPaidUser && (
               <div className="mb-2 rounded-full bg-white/20 px-2 py-0.5 backdrop-blur-sm border border-white/20">
                 <span className="text-[10px] font-black tracking-widest text-white/90">PRO</span>

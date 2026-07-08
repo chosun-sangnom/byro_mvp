@@ -130,6 +130,7 @@ function buildEditableOwnerProfile(
     life: baseProfile.life,
     contactChannels: user.contactChannels ?? baseProfile.contactChannels,
     isPaidUser: user.isPaidUser,
+    isVerified: user.isVerified,
   }
 }
 

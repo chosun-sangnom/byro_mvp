@@ -251,6 +251,7 @@ export interface PublicProfile {
   kemi?: KemiData
   tabVisibility?: TabVisibility
   isPaidUser?: boolean
+  isVerified?: boolean
 }
 
 export type TabVisibilityLevel = 'public' | 'private'

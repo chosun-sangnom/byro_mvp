@@ -32,6 +32,9 @@ export const SAMPLE_PROFILE = {
       exercise: [
         { label: '필라테스', posterUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=80&h=80&q=75&fit=crop&auto=format' },
       ],
+      pet: '강아지',
+      petName: '보리',
+      petImage: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=160&h=160&q=75&fit=crop&auto=format',
     },
     tastes: {
       // TODO(real API): posterUrl from TMDB API — image.tmdb.org/t/p/w185/{poster_path}

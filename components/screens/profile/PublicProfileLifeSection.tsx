@@ -282,18 +282,6 @@ function SubHeader({ label }: { label: string }) {
   )
 }
 
-function SectionDivider() {
-  return (
-    <div className="flex items-center gap-3 px-5 pt-6 pb-2">
-      <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
-      <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)]">
-        전체
-      </span>
-      <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
-    </div>
-  )
-}
-
 // ─── Scroll rows ──────────────────────────────────────────────────────────────
 
 function PortraitScroll({ items }: { items: LifeMediaItem[] }) {
@@ -587,8 +575,6 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
         onMusicToggle={handleMusicToggle}
       />
 
-      {(hasPet || hasActivity || hasCulture || hasPlace) && <SectionDivider />}
-
       {hasPet && (
         <>
           <BlockHeader label="반려동물" />
@@ -664,7 +650,6 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
 
       {life.albumPhotos && life.albumPhotos.length > 0 && (
         <>
-          <SectionDivider />
           <BlockHeader label="앨범" />
           <div className="px-5 pb-6">
             <div className="grid grid-cols-3 gap-1.5">

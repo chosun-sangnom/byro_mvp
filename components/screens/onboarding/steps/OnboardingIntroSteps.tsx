@@ -435,7 +435,7 @@ export function Step2Verify() {
       <StepIntro
         eyebrow="Security"
         title={'본인인증을\n진행해요'}
-        description={'인증 완료 후 프로필을 만들 수 있어요.'}
+        description={'인증하면 프로필에 인증 뱃지가 표시돼요. 필수는 아니에요.'}
       />
 
       {/* 탭 */}
@@ -517,7 +517,7 @@ export function Step2Verify() {
         onClick={() => store.nextStep()}
         className="mt-6 text-center text-[12px] font-medium text-[var(--color-text-tertiary)] underline underline-offset-2"
       >
-        외국인이라 본인인증이 어려우신가요? 건너뛰기
+        건너뛰기
       </button>
     </div>
   )

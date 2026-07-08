@@ -2,8 +2,7 @@
 
 import { createPortal } from 'react-dom'
 import { useRef, useState } from 'react'
-import { ChevronLeft, ChevronRight, Pause, Play, Plus, X } from 'lucide-react'
-import { showToast } from '@/components/ui'
+import { ChevronLeft, ChevronRight, Pause, Play, X } from 'lucide-react'
 import type { LifeMediaItem, PublicProfileLife } from '@/types'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -511,7 +510,7 @@ function MiniPlayer({
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-export function PublicProfileLifeSection({ life, isOwner }: { life?: PublicProfileLife; isOwner?: boolean }) {
+export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife }) {
   const audioRef = useRef<HTMLAudioElement>(null)
   const [playingId, setPlayingId] = useState<string | null>(null)
   const [playingTrack, setPlayingTrack] = useState<LifeMediaItem | null>(null)
@@ -646,13 +645,13 @@ export function PublicProfileLifeSection({ life, isOwner }: { life?: PublicProfi
         </>
       )}
 
-      {(life.albumPhotos && life.albumPhotos.length > 0 || isOwner) && (
+      {life.albumPhotos && life.albumPhotos.length > 0 && (
         <>
           <SectionDivider />
           <BlockHeader label="앨범" />
           <div className="px-5 pb-6">
             <div className="grid grid-cols-3 gap-1.5">
-              {life.albumPhotos?.map((url, i) => (
+              {life.albumPhotos.map((url, i) => (
                 <button
                   key={i}
                   onClick={() => setLightboxIndex(i)}
@@ -662,17 +661,6 @@ export function PublicProfileLifeSection({ life, isOwner }: { life?: PublicProfi
                   <img src={url} alt={`사진 ${i + 1}`} className="h-full w-full object-cover" />
                 </button>
               ))}
-              {isOwner && (
-                // [임시] 실제 업로드 미구현 — 토스트만 표시
-                <button
-                  onClick={() => showToast('사진 업로드는 준비 중이에요')}
-                  className="aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1"
-                  style={{ borderColor: 'var(--color-border-default)' }}
-                >
-                  <Plus size={20} className="text-[var(--color-text-tertiary)]" />
-                  <span className="text-[11px] text-[var(--color-text-tertiary)]">추가</span>
-                </button>
-              )}
             </div>
           </div>
         </>

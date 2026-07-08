@@ -417,7 +417,7 @@ export function PublicProfileCompatibilitySheet({
   onClose: () => void
   profileName: string
   profileAvatar?: string
-  whoIAm: PublicProfileWhoIAm
+  whoIAm?: PublicProfileWhoIAm
   life?: PublicProfileLife
   kemi?: KemiData
 }) {
@@ -445,7 +445,8 @@ export function PublicProfileCompatibilitySheet({
     }, 1600)
   }
 
-  const report = buildCompatibilityReport(profileName, whoIAm, life)
+  // whoIAm(MBTI)이 아예 없으면 문장을 만들 근거가 없으므로 리포트를 생성하지 않는다.
+  const report = whoIAm ? buildCompatibilityReport(profileName, whoIAm, life) : null
   const lockedBlocks = kemi?.lockedBlocks ?? []
   const completenessPercent = kemi?.completenessPercent ?? 100
   const missingItems = kemi?.missingItems ?? []
@@ -500,7 +501,7 @@ export function PublicProfileCompatibilitySheet({
     }
   }
 
-  const blocks = [
+  const blocks = report ? [
     {
       index: 1,
       content: (
@@ -620,7 +621,7 @@ export function PublicProfileCompatibilitySheet({
         </p>
       ),
     },
-  ]
+  ] : []
 
   return (
     <BottomSheet open={open} onClose={onClose}>
@@ -673,35 +674,46 @@ export function PublicProfileCompatibilitySheet({
           )}
         </div>
 
-        {/* 5개 블록 */}
-        <div className="space-y-3">
-          {blocks.map(({ index, content }) => {
-            const meta = BLOCK_META[index - 1]
-            const blockMissing = lockedBlockMap[index]
-            const isLocked = blockMissing !== undefined
-            const Icon = meta.Icon
+        {/* 5개 블록 — 분석 근거(whoIAm)가 아예 없으면 단일 안내로 대체 */}
+        {report ? (
+          <div className="space-y-3">
+            {blocks.map(({ index, content }) => {
+              const meta = BLOCK_META[index - 1]
+              const blockMissing = lockedBlockMap[index]
+              const isLocked = blockMissing !== undefined
+              const Icon = meta.Icon
 
-            return (
-              <div
-                key={index}
-                className="relative overflow-hidden rounded-[22px] px-4 py-4"
-                style={{ border: '1px solid var(--color-border-default)', background: 'var(--color-bg-surface)' }}
-              >
+              return (
                 <div
-                  className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.1em]"
-                  style={{ color: 'var(--color-text-tertiary)' }}
+                  key={index}
+                  className="relative overflow-hidden rounded-[22px] px-4 py-4"
+                  style={{ border: '1px solid var(--color-border-default)', background: 'var(--color-bg-surface)' }}
                 >
-                  <Icon size={12} />
-                  <span>{meta.label}</span>
+                  <div
+                    className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.1em]"
+                    style={{ color: 'var(--color-text-tertiary)' }}
+                  >
+                    <Icon size={12} />
+                    <span>{meta.label}</span>
+                  </div>
+                  <div style={isLocked ? { filter: 'blur(4px)', userSelect: 'none', pointerEvents: 'none' } : {}}>
+                    {content}
+                  </div>
+                  {isLocked && <LockedBlockOverlay missingItems={blockMissing} />}
                 </div>
-                <div style={isLocked ? { filter: 'blur(4px)', userSelect: 'none', pointerEvents: 'none' } : {}}>
-                  {content}
-                </div>
-                {isLocked && <LockedBlockOverlay missingItems={blockMissing} />}
-              </div>
-            )
-          })}
-        </div>
+              )
+            })}
+          </div>
+        ) : (
+          <div
+            className="rounded-[22px] px-5 py-8 text-center"
+            style={{ border: '1px solid var(--color-border-default)', background: 'var(--color-bg-surface)' }}
+          >
+            <p className="text-[13px] leading-[1.7]" style={{ color: 'var(--color-text-secondary)' }}>
+              {profileName}님의 프로필 정보가 아직 부족해서 케미를 분석할 수 없어요.
+            </p>
+          </div>
+        )}
 
         {/* [임시] 폴라로이드 캡처용 오프스크린 카드 */}
         <PolaroidCard

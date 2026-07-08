@@ -138,7 +138,7 @@ export function PublicProfileShell({
             kemi={profile.kemi}
             isLoggedIn={isLoggedIn}
             isLoading={kemiLoading}
-            onCompatibilityOpen={profile.whoIAm ? () => setCompatibilityOpen(true) : undefined}
+            onCompatibilityOpen={profile.kemi ? () => setCompatibilityOpen(true) : undefined}
             onLoginRequest={() => setLoginModalOpen(true)}
           />
         )}
@@ -272,7 +272,7 @@ export function PublicProfileShell({
         </BottomSheet>
       )}
 
-      {!isOwnerMode && profile.whoIAm && (
+      {!isOwnerMode && profile.kemi && (
         <PublicProfileCompatibilitySheet
           open={compatibilityOpen}
           onClose={() => setCompatibilityOpen(false)}

@@ -1441,7 +1441,16 @@ export const HONGGILDONG_PROFILE = {
     industries: [],
   },
   manualHighlights: [] as Highlight[],
-  kemi: null,
+  // 엣지케이스: whoIAm(MBTI)조차 없어 분석 근거가 전혀 없음 — 배너/버튼은 노출하되
+  // 리포트 시트에서 "분석할 수 없어요" 단일 안내로 대체(케미 정책 문서 참고)
+  kemi: {
+    matchCount: 0,
+    matchItems: [],
+    aiCopy: '아직 케미를 분석할 정보가 부족해요. 프로필을 채우면 공통점을 확인할 수 있어요.',
+    completenessPercent: 0,
+    lockedBlocks: [],
+    missingItems: [],
+  },
   experiences: [],
   savedProfiles: [], recentProfiles: [], receivedRequests: [],
   reputationKeywords: [],

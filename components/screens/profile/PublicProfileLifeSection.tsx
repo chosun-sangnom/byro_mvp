@@ -528,7 +528,9 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
   if (!life) return null
 
   const exercise = life.daily.exercise ?? []
-  const hasActivity = exercise.length > 0
+  const pet = life.daily.pet
+  const hasPet = !!pet && pet !== '없음'
+  const hasActivity = exercise.length > 0 || hasPet
   const hasCulture =
     life.tastes.movies.length > 0 ||
     life.tastes.music.length > 0 ||
@@ -591,9 +593,23 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
         <>
           <BlockHeader label="활동" />
           {exercise.length > 0 && (
-            <div>
+            <div className={hasPet ? 'mb-4' : undefined}>
               <SubHeader label="운동" />
               <SquareScroll items={exercise} />
+            </div>
+          )}
+          {hasPet && (
+            <div>
+              <SubHeader label="반려동물" />
+              <SquareScroll
+                items={[
+                  {
+                    label: life.daily.petName ?? pet,
+                    sublabel: life.daily.petName ? pet : undefined,
+                    posterUrl: life.daily.petImage,
+                  },
+                ]}
+              />
             </div>
           )}
         </>

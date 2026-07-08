@@ -530,7 +530,7 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
   const exercise = life.daily.exercise ?? []
   const pet = life.daily.pet
   const hasPet = !!pet && pet !== '없음'
-  const hasActivity = exercise.length > 0 || hasPet
+  const hasActivity = exercise.length > 0
   const hasCulture =
     life.tastes.movies.length > 0 ||
     life.tastes.music.length > 0 ||
@@ -587,31 +587,30 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
         onMusicToggle={handleMusicToggle}
       />
 
-      {(hasActivity || hasCulture || hasPlace) && <SectionDivider />}
+      {(hasPet || hasActivity || hasCulture || hasPlace) && <SectionDivider />}
+
+      {hasPet && (
+        <>
+          <BlockHeader label="반려동물" />
+          <SquareScroll
+            items={[
+              {
+                label: life.daily.petName ?? pet,
+                sublabel: life.daily.petName ? pet : undefined,
+                posterUrl: life.daily.petImage,
+              },
+            ]}
+          />
+        </>
+      )}
 
       {hasActivity && (
         <>
           <BlockHeader label="활동" />
-          {exercise.length > 0 && (
-            <div className={hasPet ? 'mb-4' : undefined}>
-              <SubHeader label="운동" />
-              <SquareScroll items={exercise} />
-            </div>
-          )}
-          {hasPet && (
-            <div>
-              <SubHeader label="반려동물" />
-              <SquareScroll
-                items={[
-                  {
-                    label: life.daily.petName ?? pet,
-                    sublabel: life.daily.petName ? pet : undefined,
-                    posterUrl: life.daily.petImage,
-                  },
-                ]}
-              />
-            </div>
-          )}
+          <div>
+            <SubHeader label="운동" />
+            <SquareScroll items={exercise} />
+          </div>
         </>
       )}
 

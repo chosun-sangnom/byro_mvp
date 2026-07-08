@@ -468,6 +468,7 @@ function LifeHub({
           <div className="mx-5 mt-3 mb-4 flex items-center justify-between rounded-xl bg-[var(--color-bg-soft)] px-4 py-3">
             <div>
               <p className="text-[12px] font-semibold text-[var(--color-text-secondary)]">Free · {FREE_LIMIT}개 슬롯</p>
+              <p className="text-[11px] text-[var(--color-text-tertiary)]">반려동물 제외, 활동·문화·플레이스 합산 최대 5개</p>
               <p className="text-[11px] text-[var(--color-text-tertiary)]">Pro는 카테고리별 최대 5개</p>
             </div>
             <button

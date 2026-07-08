@@ -468,41 +468,43 @@ function MiniPlayer({
   onClose: () => void
 }) {
   return (
-    <div
-      className="fixed bottom-20 left-4 right-4 z-50 overflow-hidden rounded-2xl shadow-xl"
-      style={{
-        backgroundColor: 'var(--color-bg-surface)',
-        border: '1px solid var(--color-border-default)',
-        backdropFilter: 'blur(16px)',
-      }}
-    >
+    <div className="fixed inset-x-0 bottom-20 z-50 px-4">
       <div
-        className="h-0.5 transition-all duration-300"
-        style={{ width: `${progress * 100}%`, backgroundColor: 'var(--color-accent-dark)' }}
-      />
-      <div className="flex items-center gap-3 px-4 py-3">
-        <div className="h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg bg-[var(--color-bg-muted)]">
-          {track.posterUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={track.posterUrl} alt={track.label} className="h-full w-full object-cover" />
-          )}
+        className="mx-auto w-full max-w-[430px] overflow-hidden rounded-2xl shadow-xl"
+        style={{
+          backgroundColor: 'var(--color-bg-surface)',
+          border: '1px solid var(--color-border-default)',
+          backdropFilter: 'blur(16px)',
+        }}
+      >
+        <div
+          className="h-0.5 transition-all duration-300"
+          style={{ width: `${progress * 100}%`, backgroundColor: 'var(--color-accent-dark)' }}
+        />
+        <div className="flex items-center gap-3 px-4 py-3">
+          <div className="h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg bg-[var(--color-bg-muted)]">
+            {track.posterUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={track.posterUrl} alt={track.label} className="h-full w-full object-cover" />
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[13px] font-semibold text-[var(--color-text-strong)]">{track.label}</p>
+            {track.sublabel && (
+              <p className="truncate text-[11px] text-[var(--color-text-tertiary)]">{track.sublabel}</p>
+            )}
+          </div>
+          <button
+            onClick={onToggle}
+            className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full"
+            style={{ backgroundColor: 'var(--color-accent-dark)' }}
+          >
+            {isPlaying ? <Pause size={15} className="text-white" /> : <Play size={15} className="translate-x-0.5 text-white" />}
+          </button>
+          <button onClick={onClose} className="flex-shrink-0 p-1">
+            <X size={16} className="text-[var(--color-text-tertiary)]" />
+          </button>
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-[13px] font-semibold text-[var(--color-text-strong)]">{track.label}</p>
-          {track.sublabel && (
-            <p className="truncate text-[11px] text-[var(--color-text-tertiary)]">{track.sublabel}</p>
-          )}
-        </div>
-        <button
-          onClick={onToggle}
-          className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full"
-          style={{ backgroundColor: 'var(--color-accent-dark)' }}
-        >
-          {isPlaying ? <Pause size={15} className="text-white" /> : <Play size={15} className="translate-x-0.5 text-white" />}
-        </button>
-        <button onClick={onClose} className="flex-shrink-0 p-1">
-          <X size={16} className="text-[var(--color-text-tertiary)]" />
-        </button>
       </div>
     </div>
   )

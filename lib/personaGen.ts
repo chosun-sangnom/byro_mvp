@@ -15,6 +15,8 @@ export type PersonaResult = {
   image?: string
 }
 
+const EMPTY_PERSONA_TEXT = '아직 페르소나를 만들 데이터가 없어요'
+
 export function generatePersona(profile: PublicProfile): PersonaResult {
   const reasons: PersonaReason[] = []
 
@@ -34,6 +36,11 @@ export function generatePersona(profile: PublicProfile): PersonaResult {
   if (book) reasons.push({ category: '읽는 책', value: book.label })
   if (topKeyword) reasons.push({ category: '가장 많이 받은 평판', value: topKeyword })
   if (titleShort) reasons.push({ category: '직함', value: titleShort })
+
+  // 근거가 하나도 없으면 가짜 텍스트/이미지를 만들지 않고 빈 상태로 알려준다.
+  if (reasons.length === 0) {
+    return { text: EMPTY_PERSONA_TEXT, reasons: [] }
+  }
 
   const text = buildSentence({ music, exercise, cafe, book, topKeyword, titleShort })
 

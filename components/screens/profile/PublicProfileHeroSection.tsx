@@ -270,6 +270,7 @@ export function ProfileHeroCard({
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
   const showAge = typeof profile.age === 'number' && profile.showAge !== false
+  const hasPersonaData = !!personaReasons && personaReasons.length > 0
 
   const closeReportSheet = () => {
     setReportSheetOpen(false)
@@ -289,7 +290,7 @@ export function ProfileHeroCard({
 
 
         {/* AI 페르소나 바텀시트 — createPortal로 transform 컨텍스트 탈출 */}
-        {personaReasons && mounted && createPortal(
+        {hasPersonaData && mounted && createPortal(
           <BottomSheet open={personaSheetOpen} onClose={() => setPersonaSheetOpen(false)}>
             <div className="pb-8">
               {/* 캡처 대상 카드 */}
@@ -528,17 +529,22 @@ export function ProfileHeroCard({
           )}
 
           {personaText && (
-            <button
-              type="button"
-              onClick={personaReasons ? () => setPersonaSheetOpen(true) : undefined}
-              className="mt-2 flex items-center gap-1.5 rounded-full border border-white/14 bg-black/28 px-3 py-1.5 backdrop-blur-sm"
-            >
-              <Sparkles size={11} className="text-white/60 shrink-0" />
-              <span className="text-[12px] font-medium italic text-white/80">{personaText}</span>
-              {personaReasons && (
+            hasPersonaData ? (
+              <button
+                type="button"
+                onClick={() => setPersonaSheetOpen(true)}
+                className="mt-2 flex items-center gap-1.5 rounded-full border border-white/14 bg-black/28 px-3 py-1.5 backdrop-blur-sm"
+              >
+                <Sparkles size={11} className="text-white/60 shrink-0" />
+                <span className="text-[12px] font-medium italic text-white/80">{personaText}</span>
                 <span className="ml-1 rounded-full bg-white/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white/50">AI</span>
-              )}
-            </button>
+              </button>
+            ) : (
+              <div className="mt-2 flex items-center gap-1.5 rounded-full border border-white/10 bg-black/15 px-3 py-1.5">
+                <Sparkles size={11} className="text-white/30 shrink-0" />
+                <span className="text-[12px] font-medium text-white/40">{personaText}</span>
+              </div>
+            )
           )}
 
           <div className="mt-2.5 text-[11px] font-semibold text-white/38">

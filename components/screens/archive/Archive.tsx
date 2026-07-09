@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { MoreHorizontal, Search, X } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
@@ -9,6 +9,8 @@ import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mocks/publicProfiles'
 import type { SavedProfile } from '@/types'
 
 type SortKey = 'name' | 'recent'
+
+const SAVED_PAGE_SIZE = 10
 
 export default function Archive() {
   const router = useRouter()
@@ -31,6 +33,27 @@ export default function Archive() {
   const filtered = q
     ? sorted.filter((p) => p.name.toLowerCase().includes(q) || p.title.toLowerCase().includes(q))
     : sorted
+
+  const [visibleCount, setVisibleCount] = useState(SAVED_PAGE_SIZE)
+  const loadMoreRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    setVisibleCount(SAVED_PAGE_SIZE)
+  }, [searchQuery, sort])
+
+  useEffect(() => {
+    const sentinel = loadMoreRef.current
+    if (!sentinel) return
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setVisibleCount((prev) => Math.min(prev + SAVED_PAGE_SIZE, filtered.length))
+      }
+    }, { rootMargin: '200px' })
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [filtered.length])
+
+  const visibleProfiles = filtered.slice(0, visibleCount)
 
   const tabs = [
     { key: 'saved' as const, label: `저장됨 ${savedProfiles.length}` },
@@ -110,7 +133,7 @@ export default function Archive() {
                 <p className="micro-text text-center pt-10">
                   {q ? '검색 결과가 없어요' : '저장된 프로필이 없어요'}
                 </p>
-              ) : filtered.map((p) => (
+              ) : visibleProfiles.map((p) => (
                 <div key={p.id} className="surface-card flex items-center gap-3 rounded-[22px] px-4 py-4 w-full text-left mb-3">
                   <button className="flex items-center gap-3 flex-1 min-w-0" onClick={() => router.push(`/${p.linkId}`)}>
                     <ProfileAvatar linkId={p.linkId} name={p.name} size={40} />
@@ -149,6 +172,11 @@ export default function Archive() {
                   </div>
                 </div>
               ))}
+              {visibleCount < filtered.length && (
+                <div ref={loadMoreRef} className="py-4 text-center">
+                  <span className="micro-text">불러오는 중…</span>
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
 import { ChevronRight, Link, Lock, Pencil, BookmarkCheck, CreditCard, Eye, Check, CheckCircle2, BadgeCheck } from 'lucide-react'
-import { Avatar, NavBar, BottomSheet, showToast } from '@/components/ui'
+import { Avatar, NavBar, BottomSheet, Modal, Button, showToast } from '@/components/ui'
 
 const CUSTOM_LINK_ID_REGEX = /^[a-z0-9_]{2,20}$/
 
@@ -79,6 +79,7 @@ export default function MyPageScreen() {
   const [verifyPhone, setVerifyPhone] = useState('')
   const [verifyCode, setVerifyCode] = useState('')
   const [verifySmsSent, setVerifySmsSent] = useState(false)
+  const [withdrawOpen, setWithdrawOpen] = useState(false)
 
   const handleSaveCustomLinkId = () => {
     const trimmed = customLinkInput.trim().toLowerCase()
@@ -727,7 +728,53 @@ export default function MyPageScreen() {
             </div>
           </div>
         ))}
+
+        {/* 회원탈퇴 */}
+        <div>
+          <Button variant="danger" size="sm" onClick={() => setWithdrawOpen(true)} style={{ backgroundColor: 'transparent' }}>회원탈퇴</Button>
+        </div>
       </div>
+
+      {/* 탈퇴 확인 모달 */}
+      <Modal open={withdrawOpen} onClose={() => setWithdrawOpen(false)}>
+        <div className="text-center">
+          <div className="text-base font-black mb-1" style={{ color: 'var(--color-state-danger-text)' }}>
+            정말 탈퇴하시겠습니까?
+          </div>
+          <p className="text-[12px] text-[var(--color-text-tertiary)] mb-4 leading-relaxed">
+            탈퇴 즉시 아래 데이터가 <span className="font-bold text-[var(--color-text-secondary)]">영구 삭제</span>되며 복구할 수 없어요.
+          </p>
+          <ul className="text-left rounded-xl bg-[var(--color-bg-muted)] px-4 py-3 mb-4 space-y-1.5">
+            {[
+              '내 프로필 정보',
+              '연결 관계',
+              '내가 남긴 리뷰 · 방명록',
+              '받은 리뷰 · 방명록',
+            ].map((item) => (
+              <li key={item} className="flex items-start gap-2 text-[12px] text-[var(--color-text-secondary)]">
+                <span className="mt-0.5 flex-shrink-0 text-[var(--color-state-danger-text)]">✕</span>
+                {item}
+              </li>
+            ))}
+          </ul>
+          <p className="text-[11px] text-[var(--color-text-tertiary)] mb-5 leading-relaxed">
+            탈퇴 후 동일 전화번호로 재가입은 가능하지만,<br />이전 데이터는 복구되지 않습니다.
+          </p>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => setWithdrawOpen(false)}>취소</Button>
+            <Button
+              variant="danger"
+              size="sm"
+              onClick={() => {
+                setWithdrawOpen(false)
+                store.resetAll()
+              }}
+            >
+              탈퇴하기
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

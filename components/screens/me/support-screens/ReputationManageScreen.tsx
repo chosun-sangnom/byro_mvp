@@ -1,11 +1,12 @@
 'use client'
 
 import { useState } from 'react'
-import { MoreHorizontal, ChevronLeft, ChevronRight } from 'lucide-react'
+import { MoreHorizontal } from 'lucide-react'
 import { NavBar, ActionMenu, ActionMenuItem, Modal, BottomSheet, Button, CheckRow, TextArea, showToast } from '@/components/ui'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
-import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mocks/publicProfiles'
-import type { GuestbookEntry } from '@/types'
+import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
+import { useByroStore } from '@/store/useByroStore'
+import type { Experience } from '@/types'
 
 const REPORT_REASONS = [
   '불쾌한 표현이 있어요',
@@ -14,114 +15,75 @@ const REPORT_REASONS = [
   '기타',
 ]
 
-const FEEDBACK_PAGE_SIZE = 3
-
 function FeedbackRow({
-  entry,
+  exp,
   openMenuId,
   setOpenMenuId,
   onRequestDelete,
   onRequestReport,
 }: {
-  entry: GuestbookEntry
+  exp: Experience
   openMenuId: string | null
   setOpenMenuId: (id: string | null) => void
-  onRequestDelete: (entry: GuestbookEntry) => void
-  onRequestReport: (entry: GuestbookEntry) => void
+  onRequestDelete: (exp: Experience) => void
+  onRequestReport: (exp: Experience) => void
 }) {
-  const avatar = getProfileAvatar(entry.linkId)
+  const displayName = exp.isAnonymous ? 'Byro사용자' : (exp.authorName ?? 'Byro사용자')
   return (
-    <div className="flex gap-3 py-3.5 first:pt-0">
-      {avatar ? (
-        <div className="mt-0.5 h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-[var(--color-bg-soft)]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={avatar} alt={entry.authorName} className="h-full w-full object-cover" />
+    <div className="py-3.5 first:pt-0">
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-muted)] text-[12px] font-bold text-[var(--color-text-secondary)]">
+            {exp.isAnonymous ? 'B' : (exp.authorName?.charAt(0) ?? '?')}
+          </div>
+          <span className="text-[12px] font-semibold text-[var(--color-text-primary)]">{displayName}</span>
         </div>
-      ) : (
-        <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-xs font-bold text-[var(--color-text-secondary)]">
-          {entry.authorName.charAt(0)}
-        </div>
-      )}
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center justify-between gap-2">
-          <div className="text-[12px] font-semibold text-[var(--color-text-primary)]">{entry.authorName}</div>
-          <div className="flex items-center gap-2">
-            <div className="text-[10px] text-[var(--color-text-tertiary)]">{entry.date}</div>
-            <div className="relative">
-              <button
-                onClick={() => setOpenMenuId(openMenuId === entry.id ? null : entry.id)}
-                className="flex h-6 w-6 items-center justify-center rounded-full text-[var(--color-text-tertiary)] opacity-40 active:opacity-100 transition-opacity"
-                aria-label="더보기"
-              >
-                <MoreHorizontal size={13} />
-              </button>
-              <ActionMenu open={openMenuId === entry.id} onClose={() => setOpenMenuId(null)}>
-                <ActionMenuItem
-                  label="삭제하기"
-                  danger
-                  onClick={() => {
-                    setOpenMenuId(null)
-                    onRequestDelete(entry)
-                  }}
-                />
-                <ActionMenuItem
-                  label="신고하기"
-                  onClick={() => {
-                    setOpenMenuId(null)
-                    onRequestReport(entry)
-                  }}
-                />
-              </ActionMenu>
-            </div>
+        <div className="flex items-center gap-2">
+          <div className="text-[10px] text-[var(--color-text-tertiary)]">{exp.date}</div>
+          <div className="relative">
+            <button
+              onClick={() => setOpenMenuId(openMenuId === exp.id ? null : exp.id)}
+              className="flex h-6 w-6 items-center justify-center rounded-full text-[var(--color-text-tertiary)] opacity-40 active:opacity-100 transition-opacity"
+              aria-label="더보기"
+            >
+              <MoreHorizontal size={13} />
+            </button>
+            <ActionMenu open={openMenuId === exp.id} onClose={() => setOpenMenuId(null)}>
+              <ActionMenuItem
+                label="삭제하기"
+                danger
+                onClick={() => {
+                  setOpenMenuId(null)
+                  onRequestDelete(exp)
+                }}
+              />
+              <ActionMenuItem
+                label="신고하기"
+                onClick={() => {
+                  setOpenMenuId(null)
+                  onRequestReport(exp)
+                }}
+              />
+            </ActionMenu>
           </div>
         </div>
-        <div className="mt-1 text-[13px] leading-snug text-[var(--color-text-secondary)]">{entry.message}</div>
       </div>
-    </div>
-  )
-}
-
-function FeedbackPagination({
-  page,
-  totalPages,
-  onChange,
-}: {
-  page: number
-  totalPages: number
-  onChange: (page: number) => void
-}) {
-  if (totalPages <= 1) return null
-
-  return (
-    <div className="mt-4 flex items-center justify-center gap-1">
-      <button
-        onClick={() => onChange(page - 1)}
-        disabled={page <= 1}
-        aria-label="이전 페이지"
-        className="flex h-7 w-7 items-center justify-center rounded-full text-[var(--color-text-secondary)] disabled:opacity-30"
-      >
-        <ChevronLeft size={16} />
-      </button>
-      {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-        <button
-          key={p}
-          onClick={() => onChange(p)}
-          className="flex h-7 w-7 items-center justify-center rounded-full text-[12px] font-semibold"
-          style={p === page
-            ? { background: 'var(--color-accent-dark)', color: '#fff' }
-            : { color: 'var(--color-text-secondary)' }}
-        >
-          {p}
-        </button>
-      ))}
-      <button
-        onClick={() => onChange(page + 1)}
-        disabled={page >= totalPages}
-        aria-label="다음 페이지"
-        className="flex h-7 w-7 items-center justify-center rounded-full text-[var(--color-text-secondary)] disabled:opacity-30"
-      >
-        <ChevronRight size={16} />
-      </button>
+      {exp.keywords.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {exp.keywords.map((kw) => (
+            <span
+              key={kw}
+              className="rounded-full px-2.5 py-1 text-[11px] font-semibold"
+              style={{ backgroundColor: 'var(--color-accent-bg)', color: 'var(--color-accent-dark)' }}
+            >
+              {kw}
+            </span>
+          ))}
+        </div>
+      )}
+      {exp.message && (
+        <p className="mt-2 text-[13px] leading-snug text-[var(--color-text-secondary)]">{exp.message}</p>
+      )}
     </div>
   )
 }
@@ -139,25 +101,21 @@ export function ReputationManageScreen({
   const getReputationCount = (keyword: string) =>
     SAMPLE_PROFILE.reputationKeywords.find((item) => item.keyword === keyword)?.count ?? 0
 
+  const store = useByroStore()
   const [deletedIds, setDeletedIds] = useState<string[]>([])
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
-  const [deleteTarget, setDeleteTarget] = useState<GuestbookEntry | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<Experience | null>(null)
   const [showAllFeedback, setShowAllFeedback] = useState(false)
-  const [feedbackPage, setFeedbackPage] = useState(1)
-  const [reportTarget, setReportTarget] = useState<GuestbookEntry | null>(null)
+  const [reportTarget, setReportTarget] = useState<Experience | null>(null)
   const [reportReason, setReportReason] = useState<string | undefined>(undefined)
   const [reportDetail, setReportDetail] = useState('')
 
-  const allEntries = SAMPLE_PROFILE.guestbook.filter((e) => !deletedIds.includes(e.id))
-  const displayedEntries = allEntries.slice(0, 3)
-  const hasMore = allEntries.length > 3
-
-  const totalFeedbackPages = Math.max(1, Math.ceil(allEntries.length / FEEDBACK_PAGE_SIZE))
-  const safeFeedbackPage = Math.min(feedbackPage, totalFeedbackPages)
-  const pagedEntries = allEntries.slice(
-    (safeFeedbackPage - 1) * FEEDBACK_PAGE_SIZE,
-    safeFeedbackPage * FEEDBACK_PAGE_SIZE
+  const submittedExps = store.submittedExperiences[SAMPLE_PROFILE.linkId] ?? []
+  const allExperiences: Experience[] = [...submittedExps, ...(SAMPLE_PROFILE.experiences ?? [])].filter(
+    (exp) => !deletedIds.includes(exp.id)
   )
+  const displayedEntries = allExperiences.slice(0, 3)
+  const hasMore = allExperiences.length > 3
 
   const handleConfirmDelete = () => {
     if (!deleteTarget) return
@@ -202,7 +160,7 @@ export function ReputationManageScreen({
           피드백 신고하기
         </div>
         <p className="text-[12px] text-[var(--color-text-tertiary)] mb-4 leading-relaxed">
-          {reportTarget?.authorName}님이 남긴 피드백을 신고해요. 사유를 선택해주세요.
+          {reportTarget?.isAnonymous ? 'Byro사용자' : (reportTarget?.authorName ?? 'Byro사용자')}님이 남긴 피드백을 신고해요. 사유를 선택해주세요.
         </p>
 
         <div className="mb-4">
@@ -239,12 +197,12 @@ export function ReputationManageScreen({
       <div className="flex flex-col h-full">
         <NavBar title="받은 피드백" onBack={() => setShowAllFeedback(false)} />
         <div className="flex-1 overflow-y-auto px-5 py-4">
-          <div className="mb-3 text-[12px] text-[var(--color-text-tertiary)]">총 {allEntries.length}개의 피드백이에요</div>
+          <div className="mb-3 text-[12px] text-[var(--color-text-tertiary)]">총 {allExperiences.length}개의 피드백이에요</div>
           <div className="divide-y divide-[var(--color-border-soft)]">
-            {pagedEntries.map((entry) => (
+            {allExperiences.map((exp) => (
               <FeedbackRow
-                key={entry.id}
-                entry={entry}
+                key={exp.id}
+                exp={exp}
                 openMenuId={openMenuId}
                 setOpenMenuId={setOpenMenuId}
                 onRequestDelete={setDeleteTarget}
@@ -252,7 +210,6 @@ export function ReputationManageScreen({
               />
             ))}
           </div>
-          <FeedbackPagination page={safeFeedbackPage} totalPages={totalFeedbackPages} onChange={setFeedbackPage} />
         </div>
         {deleteConfirmModal}
         {reportSheet}
@@ -278,7 +235,7 @@ export function ReputationManageScreen({
               키워드 누적 {totalReputationCount}회
             </span>
             <span className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
-              피드백 {allEntries.length}개
+              피드백 {allExperiences.length}개
             </span>
             {topKeywords.slice(0, 3).map((item) => (
               <span key={item.keyword} className="chip-metric">
@@ -322,17 +279,17 @@ export function ReputationManageScreen({
         {/* 받은 피드백 */}
         <div>
           <div className="mb-3 text-[13px] font-bold text-[var(--color-text-primary)]">받은 피드백</div>
-          {allEntries.length === 0 ? (
+          {allExperiences.length === 0 ? (
             <div className="rounded-2xl border border-[var(--color-border-soft)] px-4 py-6 text-center text-[12px] text-[var(--color-text-tertiary)]">
               아직 받은 피드백이 없어요
             </div>
           ) : (
             <>
               <div className="divide-y divide-[var(--color-border-soft)]">
-                {displayedEntries.map((entry) => (
+                {displayedEntries.map((exp) => (
                   <FeedbackRow
-                    key={entry.id}
-                    entry={entry}
+                    key={exp.id}
+                    exp={exp}
                     openMenuId={openMenuId}
                     setOpenMenuId={setOpenMenuId}
                     onRequestDelete={setDeleteTarget}
@@ -343,10 +300,7 @@ export function ReputationManageScreen({
 
               {hasMore && (
                 <button
-                  onClick={() => {
-                    setFeedbackPage(1)
-                    setShowAllFeedback(true)
-                  }}
+                  onClick={() => setShowAllFeedback(true)}
                   className="mt-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-secondary)]"
                 >
                   더보기

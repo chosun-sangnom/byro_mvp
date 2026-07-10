@@ -58,17 +58,6 @@ export default function FeedbackScreen({ username }: { username: string }) {
                   </div>
                   <span className="text-[11px] text-[var(--color-text-tertiary)]">{exp.date}</span>
                 </div>
-                <div className="mb-2.5 flex flex-wrap gap-1.5">
-                  {exp.keywords.map((kw) => (
-                    <span
-                      key={kw}
-                      className="rounded-full px-2.5 py-1 text-[11px] font-semibold"
-                      style={{ backgroundColor: 'var(--color-accent-bg)', color: 'var(--color-accent-dark)' }}
-                    >
-                      {kw}
-                    </span>
-                  ))}
-                </div>
                 {exp.message && (
                   <p className="text-[13px] leading-relaxed text-[var(--color-text-secondary)]">{exp.message}</p>
                 )}

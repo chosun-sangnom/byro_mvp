@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { MoreHorizontal, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { MoreHorizontal } from 'lucide-react'
 import { NavBar, ActionMenu, ActionMenuItem, Modal, BottomSheet, Button, CheckRow, TextArea, showToast } from '@/components/ui'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mocks/publicProfiles'
@@ -14,7 +14,7 @@ const REPORT_REASONS = [
   '기타',
 ]
 
-const FEEDBACK_PAGE_SIZE = 3
+const FEEDBACK_PAGE_SIZE = 5
 
 function FeedbackRow({
   entry,
@@ -81,51 +81,6 @@ function FeedbackRow({
   )
 }
 
-function FeedbackPagination({
-  page,
-  totalPages,
-  onChange,
-}: {
-  page: number
-  totalPages: number
-  onChange: (page: number) => void
-}) {
-  if (totalPages <= 1) return null
-
-  return (
-    <div className="mt-4 flex items-center justify-center gap-1">
-      <button
-        onClick={() => onChange(page - 1)}
-        disabled={page <= 1}
-        aria-label="이전 페이지"
-        className="flex h-7 w-7 items-center justify-center rounded-full text-[var(--color-text-secondary)] disabled:opacity-30"
-      >
-        <ChevronLeft size={16} />
-      </button>
-      {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-        <button
-          key={p}
-          onClick={() => onChange(p)}
-          className="flex h-7 w-7 items-center justify-center rounded-full text-[12px] font-semibold"
-          style={p === page
-            ? { background: 'var(--color-accent-dark)', color: '#fff' }
-            : { color: 'var(--color-text-secondary)' }}
-        >
-          {p}
-        </button>
-      ))}
-      <button
-        onClick={() => onChange(page + 1)}
-        disabled={page >= totalPages}
-        aria-label="다음 페이지"
-        className="flex h-7 w-7 items-center justify-center rounded-full text-[var(--color-text-secondary)] disabled:opacity-30"
-      >
-        <ChevronRight size={16} />
-      </button>
-    </div>
-  )
-}
-
 export function ReputationManageScreen({
   onBack,
 }: {
@@ -143,21 +98,31 @@ export function ReputationManageScreen({
   const [openMenuId, setOpenMenuId] = useState<string | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<GuestbookEntry | null>(null)
   const [showAllFeedback, setShowAllFeedback] = useState(false)
-  const [feedbackPage, setFeedbackPage] = useState(1)
+  const [visibleCount, setVisibleCount] = useState(FEEDBACK_PAGE_SIZE)
   const [reportTarget, setReportTarget] = useState<GuestbookEntry | null>(null)
   const [reportReason, setReportReason] = useState<string | undefined>(undefined)
   const [reportDetail, setReportDetail] = useState('')
+  const loadMoreRef = useRef<HTMLDivElement | null>(null)
 
   const allEntries = SAMPLE_PROFILE.guestbook.filter((e) => !deletedIds.includes(e.id))
   const displayedEntries = allEntries.slice(0, 3)
   const hasMore = allEntries.length > 3
 
-  const totalFeedbackPages = Math.max(1, Math.ceil(allEntries.length / FEEDBACK_PAGE_SIZE))
-  const safeFeedbackPage = Math.min(feedbackPage, totalFeedbackPages)
-  const pagedEntries = allEntries.slice(
-    (safeFeedbackPage - 1) * FEEDBACK_PAGE_SIZE,
-    safeFeedbackPage * FEEDBACK_PAGE_SIZE
-  )
+  const visibleEntries = allEntries.slice(0, visibleCount)
+  const hasMoreToLoad = visibleCount < allEntries.length
+
+  useEffect(() => {
+    if (!showAllFeedback) return
+    const sentinel = loadMoreRef.current
+    if (!sentinel) return
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setVisibleCount((prev) => Math.min(prev + FEEDBACK_PAGE_SIZE, allEntries.length))
+      }
+    }, { rootMargin: '200px' })
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [showAllFeedback, allEntries.length, visibleCount])
 
   const handleConfirmDelete = () => {
     if (!deleteTarget) return
@@ -241,7 +206,7 @@ export function ReputationManageScreen({
         <div className="flex-1 overflow-y-auto px-5 py-4">
           <div className="mb-3 text-[12px] text-[var(--color-text-tertiary)]">총 {allEntries.length}개의 피드백이에요</div>
           <div className="divide-y divide-[var(--color-border-soft)]">
-            {pagedEntries.map((entry) => (
+            {visibleEntries.map((entry) => (
               <FeedbackRow
                 key={entry.id}
                 entry={entry}
@@ -252,7 +217,11 @@ export function ReputationManageScreen({
               />
             ))}
           </div>
-          <FeedbackPagination page={safeFeedbackPage} totalPages={totalFeedbackPages} onChange={setFeedbackPage} />
+          {hasMoreToLoad && (
+            <div ref={loadMoreRef} className="py-4 text-center">
+              <span className="text-[11px] text-[var(--color-text-tertiary)]">불러오는 중…</span>
+            </div>
+          )}
         </div>
         {deleteConfirmModal}
         {reportSheet}
@@ -344,7 +313,7 @@ export function ReputationManageScreen({
               {hasMore && (
                 <button
                   onClick={() => {
-                    setFeedbackPage(1)
+                    setVisibleCount(FEEDBACK_PAGE_SIZE)
                     setShowAllFeedback(true)
                   }}
                   className="mt-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-secondary)]"

@@ -51,7 +51,7 @@ export default function Archive() {
     }, { rootMargin: '200px' })
     observer.observe(sentinel)
     return () => observer.disconnect()
-  }, [filtered.length])
+  }, [filtered.length, visibleCount])
 
   const visibleProfiles = filtered.slice(0, visibleCount)
 

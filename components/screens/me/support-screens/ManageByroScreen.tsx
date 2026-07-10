@@ -10,7 +10,6 @@ interface ManageByroScreenProps {
   profile: PublicProfile
   instagramConnected: boolean
   linkedinConnected: boolean
-  onLogout: () => void
   onBack: () => void
   onEditBasic: () => void
   onEditWhoIAm: () => void
@@ -38,7 +37,6 @@ export function ManageByroScreen({
   profile,
   instagramConnected,
   linkedinConnected,
-  onLogout,
   onBack,
   onEditBasic,
   onEditWhoIAm,
@@ -169,7 +167,7 @@ export function ManageByroScreen({
 
   return (
     <div className="flex h-full flex-col">
-      <NavBar title="편집" onBack={onBack} right={<button onClick={onLogout} className="text-xs text-[var(--color-text-tertiary)]">로그아웃</button>} />
+      <NavBar title="편집" onBack={onBack} />
 
       <div className="flex-1 overflow-y-auto">
 

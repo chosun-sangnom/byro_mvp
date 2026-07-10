@@ -90,7 +90,6 @@ export default function MyByro() {
         profile={profile}
         instagramConnected={store.instagramConnected}
         linkedinConnected={store.linkedinConnected}
-        onLogout={() => store.logout()}
         onBack={() => setScreen('preview')}
         onEditBasic={() => setScreen('editBasic')}
         onEditWhoIAm={() => setScreen('editWhoIAm')}

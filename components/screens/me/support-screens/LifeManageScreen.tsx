@@ -42,27 +42,33 @@ function SlotBadge({
   onUpgrade: () => void
 }) {
   return (
-    <div className="mx-5 mt-3 flex items-center justify-between rounded-xl border border-[var(--color-border-soft)] bg-[var(--color-bg-soft)] px-4 py-2.5">
-      {remaining > 0 ? (
-        <span className="text-[12px] font-semibold text-[var(--color-text-secondary)]">
-          슬롯 {remaining}개 남음
-          <span className="ml-1.5 font-normal text-[var(--color-text-tertiary)]">· Free 플랜</span>
+    <div className="mx-5 mt-3 rounded-xl border border-[var(--color-border-soft)] bg-[var(--color-bg-soft)] px-4 py-2.5">
+      <div className="flex items-center justify-between">
+        <span
+          className="text-[12px] font-semibold"
+          style={remaining > 0 ? { color: 'var(--color-text-secondary)' } : { color: 'var(--color-state-danger-text, #ef4444)' }}
+        >
+          {remaining > 0 ? (
+            <>
+              슬롯 {remaining}개 남음
+              <span className="ml-1.5 font-normal text-[var(--color-text-tertiary)]">· Free 플랜</span>
+            </>
+          ) : (
+            '슬롯이 모두 찼어요'
+          )}
         </span>
-      ) : (
-        <>
-          <span className="text-[12px] font-semibold" style={{ color: 'var(--color-state-danger-text, #ef4444)' }}>
-            슬롯이 모두 찼어요
-          </span>
-          <button
-            onClick={onUpgrade}
-            className="flex items-center gap-1 text-[12px] font-bold"
-            style={{ color: 'var(--color-accent-dark)' }}
-          >
-            <Zap size={11} />
-            Pro 업그레이드
-          </button>
-        </>
-      )}
+        <button
+          onClick={onUpgrade}
+          className="flex flex-shrink-0 items-center gap-1 text-[12px] font-bold"
+          style={{ color: 'var(--color-accent-dark)' }}
+        >
+          <Zap size={11} />
+          Pro 업그레이드
+        </button>
+      </div>
+      <p className="mt-1.5 text-[11px] text-[var(--color-text-tertiary)]">
+        Free는 반려동물 제외 최대 5개, Pro는 카테고리별 무제한이에요
+      </p>
     </div>
   )
 }

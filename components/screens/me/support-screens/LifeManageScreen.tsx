@@ -36,36 +36,24 @@ function countLifeItems(life: PublicProfileLife): number {
 
 function SlotBadge({
   remaining,
-  onUpgrade,
 }: {
   remaining: number
-  onUpgrade: () => void
 }) {
   return (
     <div className="mx-5 mt-3 rounded-xl border border-[var(--color-border-soft)] bg-[var(--color-bg-soft)] px-4 py-2.5">
-      <div className="flex items-center justify-between">
-        <span
-          className="text-[12px] font-semibold"
-          style={remaining > 0 ? { color: 'var(--color-text-secondary)' } : { color: 'var(--color-state-danger-text, #ef4444)' }}
-        >
-          {remaining > 0 ? (
-            <>
-              슬롯 {remaining}개 남음
-              <span className="ml-1.5 font-normal text-[var(--color-text-tertiary)]">· Free 플랜</span>
-            </>
-          ) : (
-            '슬롯이 모두 찼어요'
-          )}
-        </span>
-        <button
-          onClick={onUpgrade}
-          className="flex flex-shrink-0 items-center gap-1 text-[12px] font-bold"
-          style={{ color: 'var(--color-accent-dark)' }}
-        >
-          <Zap size={11} />
-          Pro 업그레이드
-        </button>
-      </div>
+      <span
+        className="text-[12px] font-semibold"
+        style={remaining > 0 ? { color: 'var(--color-text-secondary)' } : { color: 'var(--color-state-danger-text, #ef4444)' }}
+      >
+        {remaining > 0 ? (
+          <>
+            슬롯 {remaining}개 남음
+            <span className="ml-1.5 font-normal text-[var(--color-text-tertiary)]">· Free 플랜</span>
+          </>
+        ) : (
+          '슬롯이 모두 찼어요'
+        )}
+      </span>
       <p className="mt-1.5 text-[11px] text-[var(--color-text-tertiary)]">
         Free는 반려동물 제외 최대 5개, Pro는 카테고리별 무제한이에요
       </p>
@@ -225,7 +213,7 @@ function ActivityView({
       onBack={() => onSave(life.daily)}
       onSave={() => onSave({ ...life.daily, exercise })}
       slotBadge={freeRemaining !== undefined
-        ? <SlotBadge remaining={freeRemaining} onUpgrade={onUpgrade} />
+        ? <SlotBadge remaining={freeRemaining} />
         : undefined
       }
     >
@@ -267,7 +255,7 @@ function CultureView({
       onBack={() => onSave({})}
       onSave={() => onSave({ movies, music, books, plays })}
       slotBadge={freeRemaining !== undefined
-        ? <SlotBadge remaining={freeRemaining} onUpgrade={onUpgrade} />
+        ? <SlotBadge remaining={freeRemaining} />
         : undefined
       }
     >
@@ -314,7 +302,7 @@ function PlaceView({
       onBack={() => onSave({})}
       onSave={() => onSave({ restaurants, cafes })}
       slotBadge={freeRemaining !== undefined
-        ? <SlotBadge remaining={freeRemaining} onUpgrade={onUpgrade} />
+        ? <SlotBadge remaining={freeRemaining} />
         : undefined
       }
     >
@@ -443,7 +431,7 @@ function LifeHub({
       <NavBar title="바이브 편집" onBack={onBack} />
 
       {/* Free 슬롯 배너 */}
-      {!isPro && <SlotBadge remaining={freeRemaining} onUpgrade={onUpgrade} />}
+      {!isPro && <SlotBadge remaining={freeRemaining} />}
 
       <div className="flex-1 overflow-y-auto">
         <div className="mx-5 mt-4 overflow-hidden rounded-2xl border border-[var(--color-border-soft)]">

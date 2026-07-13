@@ -31,9 +31,13 @@ const MOCK_OCR_RESULT: PreviewItem[] = [
 export function HighlightLlmImportSheet({
   open,
   onClose,
+  isPro,
+  freeRemaining,
 }: {
   open: boolean
   onClose: () => void
+  isPro: boolean
+  freeRemaining: number
 }) {
   const store = useByroStore()
   const [step, setStep] = useState<Step>('upload')
@@ -73,6 +77,10 @@ export function HighlightLlmImportSheet({
   const handleSave = () => {
     const selected = items.filter((i) => i.selected)
     if (selected.length === 0) return
+    if (!isPro && selected.length > freeRemaining) {
+      showToast('Free 플랜은 하이라이트를 최대 3개까지 추가할 수 있어요')
+      return
+    }
 
     selected.forEach((item) => {
       if (item.type === 'career') {
@@ -231,11 +239,15 @@ export function HighlightLlmImportSheet({
             <button
               type="button"
               onClick={handleSave}
-              disabled={selectedCount === 0}
+              disabled={selectedCount === 0 || (!isPro && selectedCount > freeRemaining)}
               className="w-full rounded-full py-3.5 text-[14px] font-bold text-white transition-opacity disabled:opacity-40"
               style={{ background: 'linear-gradient(135deg, var(--color-accent-light), var(--color-accent-dark))' }}
             >
-              {selectedCount > 0 ? `${selectedCount}개 하이라이트에 추가` : '항목을 선택해주세요'}
+              {selectedCount === 0
+                ? '항목을 선택해주세요'
+                : !isPro && selectedCount > freeRemaining
+                  ? `Free 플랜은 최대 ${freeRemaining}개까지 선택할 수 있어요`
+                  : `${selectedCount}개 하이라이트에 추가`}
             </button>
           </>
         )}

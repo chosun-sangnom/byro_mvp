@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { showToast } from '@/components/ui'
 import { useByroStore } from '@/store/useByroStore'
 import type { Highlight, HighlightIconId } from '@/types'
@@ -20,6 +21,8 @@ import {
   type YearPickerTarget,
 } from '@/components/screens/me/highlight-manage/constants'
 
+const HIGHLIGHT_FREE_LIMIT = 3
+
 interface HighlightManageScreenProps {
   onBack: () => void
 }
@@ -27,7 +30,9 @@ interface HighlightManageScreenProps {
 export function HighlightManageScreen({
   onBack,
 }: HighlightManageScreenProps) {
+  const router = useRouter()
   const store = useByroStore()
+  const isPro = store.user?.isPaidUser ?? false
   const [mode, setMode] = useState<HighlightManageMode>('list')
   const [editingHl, setEditingHl] = useState<Highlight | null>(null)
   const [selectedCat, setSelectedCat] = useState<HighlightManageCategory | null>(null)
@@ -69,6 +74,7 @@ export function HighlightManageScreen({
       )
     : []
   const groupedCategoryCards = buildGroupedCategoryCards(allManualHighlights, store.primaryHighlightOverrides)
+  const freeRemaining = Math.max(0, HIGHLIGHT_FREE_LIMIT - allManualHighlights.length)
   const saveDisabled = !selectedCat
     || !hlTitle.trim()
     || (isCareerRole && (!hlRole.trim() || !hlStatus || !hlStartYear || (hlStatus === '종료' && !hlEndYear)))
@@ -107,6 +113,19 @@ export function HighlightManageScreen({
   const openCategory = (category: HighlightManageCategory) => {
     setSelectedCat(category)
     setMode('group')
+  }
+
+  const handleUpgrade = () => {
+    router.push('/mypage?screen=upgrade')
+  }
+
+  const openAddForm = () => {
+    if (!isPro && freeRemaining <= 0) {
+      showToast('Free 플랜은 하이라이트를 최대 3개까지 추가할 수 있어요')
+      return
+    }
+    resetFormFields()
+    setMode('form')
   }
 
   const openEditSheet = (highlight: Highlight) => {
@@ -269,10 +288,7 @@ export function HighlightManageScreen({
           store.removeHighlight(highlight.id)
           showToast('삭제됐어요')
         }}
-        onAdd={() => {
-          resetFormFields()
-          setMode('form')
-        }}
+        onAdd={openAddForm}
         onVerify={(method) => { setVerifyMethod(method); setMode('verify') }}
       />
     )
@@ -352,11 +368,16 @@ export function HighlightManageScreen({
           setMode('picker')
         }}
         onLlmImport={() => setLlmImportOpen(true)}
+        isPro={isPro}
+        freeRemaining={freeRemaining}
+        onUpgrade={handleUpgrade}
       />
       {/* [임시] LLM 클립보드 브릿지 임포트 시트 */}
       <HighlightLlmImportSheet
         open={llmImportOpen}
         onClose={() => setLlmImportOpen(false)}
+        isPro={isPro}
+        freeRemaining={freeRemaining}
       />
     </>
   )

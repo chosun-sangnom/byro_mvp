@@ -456,7 +456,7 @@ export const MK_PROFILE = {
     matchCount: 0,
     matchItems: [],
     // TODO(AI): Replace with LLM-generated conversation starter based on full profile match context
-    aiCopy: '아직 케미를 분석할 정보가 부족해요. 프로필을 채우면 공통점을 확인할 수 있어요.',
+    aiCopy: '아직 케미를 분석할 정보가 부족해요. 프로필이 더 채워지면 공통점을 확인할 수 있어요.',
     completenessPercent: 0,
     lockedBlocks: [
       { index: 1, missingItems: ['MBTI 또는 바이브 1종'] },
@@ -1457,7 +1457,7 @@ export const HONGGILDONG_PROFILE = {
   kemi: {
     matchCount: 0,
     matchItems: [],
-    aiCopy: '아직 케미를 분석할 정보가 부족해요. 프로필을 채우면 공통점을 확인할 수 있어요.',
+    aiCopy: '아직 케미를 분석할 정보가 부족해요. 프로필이 더 채워지면 공통점을 확인할 수 있어요.',
     completenessPercent: 0,
     lockedBlocks: [],
     missingItems: [],

@@ -194,13 +194,11 @@ function ActivityView({
   onSave,
   isPro,
   freeSlots,
-  onUpgrade,
 }: {
   life: PublicProfileLife
   onSave: (daily: PublicProfileLife['daily']) => void
   isPro: boolean
   freeSlots: number
-  onUpgrade: () => void
 }) {
   const [exercise, setExercise] = useState<LifeMediaItem[]>(life.daily.exercise)
 
@@ -229,13 +227,11 @@ function CultureView({
   onSave,
   isPro,
   freeSlots,
-  onUpgrade,
 }: {
   life: PublicProfileLife
   onSave: (tastes: Partial<PublicProfileLife['tastes']>) => void
   isPro: boolean
   freeSlots: number
-  onUpgrade: () => void
 }) {
   const [movies, setMovies] = useState<LifeMediaItem[]>(life.tastes.movies)
   const [music, setMusic] = useState<LifeMediaItem[]>(life.tastes.music)
@@ -280,13 +276,11 @@ function PlaceView({
   onSave,
   isPro,
   freeSlots,
-  onUpgrade,
 }: {
   life: PublicProfileLife
   onSave: (tastes: Partial<PublicProfileLife['tastes']>) => void
   isPro: boolean
   freeSlots: number
-  onUpgrade: () => void
 }) {
   const [restaurants, setRestaurants] = useState<LifeMediaItem[]>(life.tastes.restaurants)
   const [cafes, setCafes] = useState<LifeMediaItem[]>(life.tastes.cafes)
@@ -528,11 +522,11 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
   if (view === 'pet')
     return <PetView life={life} onSave={updateDaily} />
   if (view === 'activity')
-    return <ActivityView life={life} onSave={updateDaily} isPro={isPro} freeSlots={activityFreeSlots} onUpgrade={handleUpgrade} />
+    return <ActivityView life={life} onSave={updateDaily} isPro={isPro} freeSlots={activityFreeSlots} />
   if (view === 'culture')
-    return <CultureView life={life} onSave={updateTastes} isPro={isPro} freeSlots={cultureFreeSlots} onUpgrade={handleUpgrade} />
+    return <CultureView life={life} onSave={updateTastes} isPro={isPro} freeSlots={cultureFreeSlots} />
   if (view === 'place')
-    return <PlaceView life={life} onSave={updateTastes} isPro={isPro} freeSlots={placeFreeSlots} onUpgrade={handleUpgrade} />
+    return <PlaceView life={life} onSave={updateTastes} isPro={isPro} freeSlots={placeFreeSlots} />
   if (view === 'album')
     return <AlbumView life={life} onSave={updateAlbum} />
 

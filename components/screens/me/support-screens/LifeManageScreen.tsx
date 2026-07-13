@@ -210,7 +210,7 @@ function ActivityView({
 }) {
   const [exercise, setExercise] = useState<LifeMediaItem[]>(life.daily.exercise)
 
-  const exerciseMax = isPro ? 5 : Math.min(5, freeSlots)
+  const exerciseMax = isPro ? Infinity : Math.min(5, freeSlots)
   const freeRemaining = isPro ? undefined : Math.max(0, freeSlots - exercise.length)
 
   return (
@@ -249,10 +249,10 @@ function CultureView({
   const [plays, setPlays] = useState<LifeMediaItem[]>(life.tastes.plays ?? [])
 
   const totalHere = movies.length + music.length + books.length + plays.length
-  const movieMax  = isPro ? 5 : Math.min(5, Math.max(0, freeSlots - (totalHere - movies.length)))
-  const musicMax  = isPro ? 5 : Math.min(5, Math.max(0, freeSlots - (totalHere - music.length)))
-  const bookMax   = isPro ? 5 : Math.min(5, Math.max(0, freeSlots - (totalHere - books.length)))
-  const playMax   = isPro ? 5 : Math.min(5, Math.max(0, freeSlots - (totalHere - plays.length)))
+  const movieMax  = isPro ? Infinity : Math.min(5, Math.max(0, freeSlots - (totalHere - movies.length)))
+  const musicMax  = isPro ? Infinity : Math.min(5, Math.max(0, freeSlots - (totalHere - music.length)))
+  const bookMax   = isPro ? Infinity : Math.min(5, Math.max(0, freeSlots - (totalHere - books.length)))
+  const playMax   = isPro ? Infinity : Math.min(5, Math.max(0, freeSlots - (totalHere - plays.length)))
   const freeRemaining = isPro ? undefined : Math.max(0, freeSlots - totalHere)
 
   return (
@@ -298,8 +298,8 @@ function PlaceView({
   const [cafes, setCafes] = useState<LifeMediaItem[]>(life.tastes.cafes)
 
   const totalHere = restaurants.length + cafes.length
-  const restaurantMax = isPro ? 5 : Math.min(5, Math.max(0, freeSlots - (totalHere - restaurants.length)))
-  const cafeMax       = isPro ? 5 : Math.min(5, Math.max(0, freeSlots - (totalHere - cafes.length)))
+  const restaurantMax = isPro ? Infinity : Math.min(5, Math.max(0, freeSlots - (totalHere - restaurants.length)))
+  const cafeMax       = isPro ? Infinity : Math.min(5, Math.max(0, freeSlots - (totalHere - cafes.length)))
   const freeRemaining = isPro ? undefined : Math.max(0, freeSlots - totalHere)
 
   return (
@@ -469,7 +469,7 @@ function LifeHub({
             <div>
               <p className="text-[12px] font-semibold text-[var(--color-text-secondary)]">Free · {FREE_LIMIT}개 슬롯</p>
               <p className="text-[11px] text-[var(--color-text-tertiary)]">반려동물 제외, 활동·문화·플레이스 합산 최대 5개</p>
-              <p className="text-[11px] text-[var(--color-text-tertiary)]">Pro는 카테고리별 최대 5개</p>
+              <p className="text-[11px] text-[var(--color-text-tertiary)]">Pro는 카테고리별 무제한</p>
             </div>
             <button
               onClick={onUpgrade}

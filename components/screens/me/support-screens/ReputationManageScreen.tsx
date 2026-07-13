@@ -289,12 +289,10 @@ export function ReputationManageScreen({
         </div>
 
         {/* 받은 피드백 */}
-        <div>
+        <div className="rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-4 py-4">
           <div className="mb-3 text-[13px] font-bold text-[var(--color-text-primary)]">받은 피드백</div>
           {allEntries.length === 0 ? (
-            <div className="rounded-2xl border border-[var(--color-border-soft)] px-4 py-6 text-center text-[12px] text-[var(--color-text-tertiary)]">
-              아직 받은 피드백이 없어요
-            </div>
+            <p className="py-1 text-center text-[12px] text-[var(--color-text-tertiary)]">아직 받은 피드백이 없어요</p>
           ) : (
             <>
               <div className="divide-y divide-[var(--color-border-soft)]">

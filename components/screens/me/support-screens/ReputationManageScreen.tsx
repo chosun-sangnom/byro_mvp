@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { MoreHorizontal } from 'lucide-react'
+import { ChevronRight, MoreHorizontal } from 'lucide-react'
 import { NavBar, ActionMenu, ActionMenuItem, Modal, BottomSheet, Button, CheckRow, TextArea, showToast } from '@/components/ui'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mocks/publicProfiles'
@@ -316,9 +316,12 @@ export function ReputationManageScreen({
                     setVisibleCount(FEEDBACK_PAGE_SIZE)
                     setShowAllFeedback(true)
                   }}
-                  className="mt-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--color-text-secondary)]"
+                  className="mt-4 flex w-full items-center justify-between rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-left active:opacity-70"
                 >
-                  더보기
+                  <span className="text-[12px] font-semibold text-[var(--color-text-secondary)]">
+                    더보기
+                  </span>
+                  <ChevronRight className="h-4 w-4 text-[var(--color-text-tertiary)]" />
                 </button>
               )}
             </>

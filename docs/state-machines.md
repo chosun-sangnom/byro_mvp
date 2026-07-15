@@ -3,15 +3,19 @@
 ## 1. 온보딩 플로우
 
 ```
-login → basicinfo → profile → complete
+login → terms → verify → basicinfo → profile → complete
 ```
 
 | 단계 | 컴포넌트 | 내용 |
 |------|----------|------|
 | `login` | `Step1Login` | Kakao / Google / Naver OAuth 버튼 |
-| `basicinfo` | `Step2BasicInfo` | 직함·학교 입력 |
-| `profile` | `Step3Profile` | 이름·생년월일·MBTI 입력 |
+| `terms` | `StepTermsAgreement` | 약관 동의 |
+| `verify` | `Step2Verify` | 본인인증 |
+| `basicinfo` | `Step2BasicInfo` | 이름·생년월일 입력 |
+| `profile` | `Step4Profile` | MBTI 등 프로필 입력 |
 | `complete` | `Step9Complete` | 가입 완료 |
+
+`StepBar`는 `terms`~`profile` 구간을 4단계로 표시한다 (`total={4}`).
 
 **전환 액션**
 - `nextStep()` — 다음 단계
@@ -29,22 +33,24 @@ login → basicinfo → profile → complete
 
 ```
 preview
-  ├─ 탭 변경 → activeTab: 'who' | 'life' | 'reputation' 갱신
+  ├─ 탭 변경 → activeTab: 'who' | 'vibe' | 'network' 갱신
   └─ 편집 버튼 → manage
 
 manage
   ├─ 뒤로가기 → preview
   ├─ 기본 정보 편집 → editBasic
+  ├─ 나는 어떤 사람 편집 → editWhoIAm
   ├─ 하이라이트 관리 → editHighlight
   ├─ 라이프 관리 → editLife
+  ├─ 네트워크 관리 → editNetwork
   ├─ 평판 관리 → editReputation
   ├─ SNS 연동 → editSNS
   ├─ 연락 수단 → editContact
   ├─ 공개 설정 → editVisibility
   └─ [임시] 목업 초기화 → store.resetToMockDefaults()
 
-editBasic | editHighlight | editLife | editReputation |
-editSNS | editContact | editVisibility
+editBasic | editWhoIAm | editHighlight | editLife | editNetwork |
+editReputation | editSNS | editContact | editVisibility
   └─ 뒤로가기 → manage
 ```
 
@@ -101,3 +107,4 @@ const alreadySubmitted = !!submittedAt && (Date.now() - submittedAt < ONE_DAY_MS
 | 11 | 초기 구조 |
 | 12 | `expSubmittedProfiles: string[]` → `expSubmittedAt: Record<string, number>` (24h 제한) |
 | 16 | 연결(Connection) 기능 제거, 아카이브 구조 단순화 |
+| 19 | **현재 버전** (17~19 세부 이력은 git 히스토리 참조) |

@@ -27,7 +27,7 @@ lib/
   mocks/              목업 데이터 (SAMPLE_PROFILE 등)
   supabase/           Supabase 클라이언트 (미연동)
 store/
-  useByroStore.ts     Zustand 전역 상태 (version 16)
+  useByroStore.ts     Zustand 전역 상태 (version 19)
 types/index.ts        전체 TypeScript 타입 정의
 supabase/migrations/  DB 마이그레이션 SQL
 docs/                 기술 문서

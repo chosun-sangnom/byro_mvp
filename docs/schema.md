@@ -32,7 +32,7 @@
 | `profile_images` | jsonb | string[] |
 | `header_meta` | jsonb | `{ residence, mood, availability }` |
 | `contact_channels` | jsonb | `ContactChannel[]` |
-| `tab_visibility` | jsonb | `{ who, life, reputation }` |
+| `tab_visibility` | jsonb | `{ who, vibe, network }` |
 | `created_at` | timestamptz | |
 | `updated_at` | timestamptz | auto-update trigger |
 
@@ -91,7 +91,7 @@ SNS 연동 데이터.
 
 ---
 
-### 라이프(Life) 탭 — `tab_visibility.life` 기준
+### 라이프(VIBE) 탭 — `tab_visibility.vibe` 기준
 
 **슬롯 정책**: Free 전체 5개 / Pro 카테고리별 최대 5개 (무제한)
 
@@ -108,7 +108,7 @@ SNS 연동 데이터.
 
 ---
 
-### 평판(Reputation) 탭 — `tab_visibility.reputation` 기준
+### 평판(NETWORK) 탭 — `tab_visibility.network` 기준
 
 #### `experiences`
 
@@ -116,7 +116,7 @@ SNS 연동 데이터.
 
 **작성 자격**:
 - 평판 탭이 `public`이면 로그인 유저 누구나 + 비로그인 유저(익명 처리)
-- 평판 탭이 `connected`이면 연결된 사람만 *(연결 기능 제거 후 정책 재확정 예정)*
+- 평판 탭이 `private`이면 작성 불가 (잠금 화면으로 진입 차단)
 
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
@@ -140,8 +140,8 @@ SNS 연동 데이터.
 | user_who_i_am | tab_visibility.who 따름 | 본인만 |
 | highlights | tab_visibility.who 따름 | 본인만 |
 | user_sns | tab_visibility.who 따름 | 본인만 |
-| user_life | tab_visibility.life 따름 | 본인만 |
-| experiences | tab_visibility.reputation 따름 | 로그인 유저는 항상 / 비회원은 reputation=public인 프로필만 |
+| user_life | tab_visibility.vibe 따름 | 본인만 |
+| experiences | tab_visibility.network 따름 | 로그인 유저는 항상 / 비회원은 network=public인 프로필만 |
 
 ---
 
@@ -189,10 +189,10 @@ interface UserState {
 ### 중요 타입들
 
 ```typescript
-type OnboardingStep = 'login' | 'basicinfo' | 'profile' | 'complete'
+type OnboardingStep = 'login' | 'terms' | 'verify' | 'basicinfo' | 'profile' | 'complete'
 
-type TabVisibilityLevel = 'public' | 'connected' | 'private'
-interface TabVisibility { who: TabVisibilityLevel; life: TabVisibilityLevel; reputation: TabVisibilityLevel }
+type TabVisibilityLevel = 'public' | 'private'
+interface TabVisibility { who: TabVisibilityLevel; vibe: TabVisibilityLevel; network: TabVisibilityLevel }
 
 interface Highlight {
   id: string; categoryId: HighlightCategoryId; icon: string

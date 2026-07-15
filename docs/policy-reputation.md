@@ -8,8 +8,10 @@
 
 | 공개 범위 | 작성 가능 대상 |
 |----------|--------------|
-| 전체공개 | 로그인 유저 누구나 / 비로그인 유저 (익명 처리) |
-| 연결된 사람만 | 연결된 사람만 *(연결 기능 제거 후 정책 재확정 예정)* |
+| 전체공개 (`public`) | 로그인 유저 누구나 / 비로그인 유저 (익명 처리) |
+| 비공개 (`private`) | 작성 불가 (탭 잠금으로 진입 차단) |
+
+*(~~연결된 사람만~~ — 연결 기능 제거로 삭제)*
 
 ### 1-2. 자기 자신에 대한 리뷰
 
@@ -73,7 +75,7 @@
 
 | 항목 | 파일 |
 |------|------|
-| 경험 제출 UI | `components/screens/profile/PublicProfileSections.tsx` |
+| 경험 제출 UI | `components/screens/profile/PublicProfileOverlays.tsx` — `ExperienceBottomSheet` (호출부: `PublicProfileShell.tsx`, 키워드 최대 3개 제한) |
 | 경험 데이터 흐름 | `docs/data-pipeline.md` 4절 참조 |
 | 스토어 액션 | `store/useByroStore.ts` — `submitExperience()`, `markExpSubmitted()` |
 | 1일 1회 제한 | `docs/state-machines.md` 3절 참조 |

@@ -14,16 +14,21 @@
 
 ```
 /                          홈 (로그인/회원가입 진입)
+/landing                   랜딩 페이지
 /signup                    온보딩 (4단계)
 /me                        내 바이로
   ?edit=true               → 편집 모드(manage 화면)로 진입
-/[username]                공개 프로필
-  /                        → 나 탭 (기본)
-  /life                    → 라이프 탭
-  /reputation              → 관계 탭
+/mypage                    마이페이지 (플랜·설정)
+/search                    검색
+/[username]                공개 프로필 — (profile) 라우트 그룹
+  /                        → WHO 탭 (기본)
+  /vibe                    → VIBE 탭 (라이프)
+  /network                 → NETWORK 탭 (평판)
   /feedback                → 피드백 전체 보기
   /guestbook               → 방명록 전체 보기
+/virtual/[id]              가상 프로필 (미가입자)
 /archive                   아카이브 (저장됨 / 최근 본)
+/api/ai-search             AI 검색 API 라우트
 ```
 
 ## 핵심 화면 컴포넌트
@@ -56,6 +61,8 @@ API 연동 전까지 모든 프로필 데이터는 `lib/mocks/publicProfiles.ts`
 |------|--------|------|
 | `SAMPLE_PROFILE` | `gangminjun` | 로그인 시 사용되는 기본 사용자 |
 | `MK_PROFILE` | `mk` | 서브 사용자 |
-| `JIMINLEE_PROFILE` | `jiminlee` | 추가 테스트용 사용자 |
+| `JIMIN_PROFILE` | `jiminlee` | 추가 테스트용 사용자 |
+| `HONGGILDONG_PROFILE` | `honggildong` | 빈 프로필 (빈 상태 UI 테스트용) |
+| 기타 10여 개 (`PARKSOJIN_PROFILE` 등) | `parksojin` 등 | 검색·아카이브 목록용 프로필 |
 
 `getPublicProfileByUsername(username)` — username으로 목업 프로필 조회.

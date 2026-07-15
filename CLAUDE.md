@@ -8,6 +8,7 @@
 ## 핵심 규칙
 
 - **커밋 후 즉시 push** — 매 작업마다 commit & push
+- **용어 사전 준수** — 문서·UI 문구 작성 시 [docs/glossary.md](docs/glossary.md) 표준어만 사용 (예: 방명록·한마디·리뷰 → 피드백)
 - **목업 디자인 보존** — 기능 구현 시 기존 목업 UI 훼손 금지
 - **사주(사주팔자) 관련 코드 없음** — 생년월일/생시는 단순 날짜 필드로만 취급
 - **임시 기능 주석** — dev-only 기능은 반드시 `// [임시]` 주석
@@ -35,6 +36,7 @@ docs/                 기술 문서
 
 ## 자세한 문서
 
+- [용어 사전](docs/glossary.md)
 - [아키텍처 & 라우팅](docs/architecture.md)
 - [상태 전이](docs/state-machines.md)
 - [데이터 파이프라인 & 공통점 감지](docs/data-pipeline.md)

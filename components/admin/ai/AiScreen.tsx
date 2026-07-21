@@ -11,6 +11,8 @@ const TABS: { key: AiFeatureKey; label: string }[] = [
   { key: 'persona', label: 'AI 페르소나' },
   { key: 'bio', label: 'AI 자기소개' },
   { key: 'kemi', label: '케미 리포트' },
+  { key: 'search', label: 'AI 검색' },
+  { key: 'virtual', label: '가상 프로필' },
 ]
 
 function InfoBanner({ children }: { children: React.ReactNode }) {
@@ -306,6 +308,202 @@ function KemiPanel() {
   )
 }
 
+function SearchPanel() {
+  const adminUser = useAdminStore((s) => s.adminUser)
+  const config = useAdminStore((s) => s.aiSearchConfig)
+  const updateSearchConfig = useAdminStore((s) => s.updateSearchConfig)
+  const toggleSearchCategory = useAdminStore((s) => s.toggleSearchCategory)
+  const canEdit = hasRole(adminUser?.role, 'admin')
+
+  const [model, setModel] = useState(config.model)
+  const [temperature, setTemperature] = useState(String(config.temperature))
+  const [maxTokens, setMaxTokens] = useState(String(config.maxTokens))
+  const globalDirty =
+    model !== config.model || Number(temperature) !== config.temperature || Number(maxTokens) !== config.maxTokens
+
+  const [selectedCategory, setSelectedCategory] = useState(config.categories[0].key)
+  const category = config.categories.find((c) => c.key === selectedCategory) ?? config.categories[0]
+  const [promptDraft, setPromptDraft] = useState(category.promptDraft)
+  const promptDirty = promptDraft !== category.promptDraft
+
+  const handleSelectCategory = (key: string) => {
+    setSelectedCategory(key)
+    setPromptDraft(config.categories.find((c) => c.key === key)?.promptDraft ?? '')
+  }
+
+  return (
+    <div>
+      <InfoBanner>
+        구현 상태: <strong>{config.status}</strong> — 마이 바이로 편집의 장소·미디어·음악 검색 피커(PlacePicker, MediaSearchPicker,
+        MusicSearchPicker)에서 실제로 OpenAI API를 호출합니다(app/api/ai-search/route.ts). 카테고리별 전용 API(TMDB·Spotify·알라딘·Kakao
+        Local) 연동 전까지의 폴백입니다. 아래 값은 참고·요청용 설정이며, 실제 반영에는 코드 배포가 필요합니다.
+      </InfoBanner>
+
+      <AdminCard className="mb-4">
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <div className="text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>AI 검색 전체 사용</div>
+            <div className="text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>끄면 모든 카테고리의 AI 검색을 사용하지 않습니다 (코드 반영 필요)</div>
+          </div>
+          <ToggleSwitch checked={config.enabled} disabled={!canEdit} onChange={(v) => updateSearchConfig({ enabled: v }, `전체 사용 ${v ? 'ON' : 'OFF'}`)} />
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          <div>
+            <div className="mb-1 text-[12px] font-semibold" style={{ color: 'var(--color-text-tertiary)' }}>모델</div>
+            <input
+              disabled={!canEdit}
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+              className="w-full rounded-lg border px-3 py-2 text-[13px] disabled:opacity-50"
+              style={{ borderColor: 'var(--color-border-default)' }}
+            />
+          </div>
+          <div>
+            <div className="mb-1 text-[12px] font-semibold" style={{ color: 'var(--color-text-tertiary)' }}>temperature</div>
+            <input
+              type="number"
+              step="0.1"
+              min={0}
+              max={2}
+              disabled={!canEdit}
+              value={temperature}
+              onChange={(e) => setTemperature(e.target.value)}
+              className="w-full rounded-lg border px-3 py-2 text-[13px] disabled:opacity-50"
+              style={{ borderColor: 'var(--color-border-default)' }}
+            />
+          </div>
+          <div>
+            <div className="mb-1 text-[12px] font-semibold" style={{ color: 'var(--color-text-tertiary)' }}>max_tokens</div>
+            <input
+              type="number"
+              disabled={!canEdit}
+              value={maxTokens}
+              onChange={(e) => setMaxTokens(e.target.value)}
+              className="w-full rounded-lg border px-3 py-2 text-[13px] disabled:opacity-50"
+              style={{ borderColor: 'var(--color-border-default)' }}
+            />
+          </div>
+        </div>
+        <SaveFooter
+          updatedBy={config.updatedBy}
+          updatedAt={config.updatedAt}
+          disabled={!canEdit || !globalDirty || !model.trim()}
+          onSave={() =>
+            updateSearchConfig(
+              { model: model.trim(), temperature: Number(temperature) || config.temperature, maxTokens: Number(maxTokens) || config.maxTokens },
+              `모델 설정 변경 (${model.trim()}, temp ${temperature})`,
+            )
+          }
+        />
+      </AdminCard>
+
+      <AdminCard className="mb-4">
+        <div className="mb-3 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>카테고리별 사용 여부</div>
+        <div className="space-y-2">
+          {config.categories.map((c) => (
+            <div key={c.key} className="flex items-center justify-between rounded-lg border px-3 py-2" style={{ borderColor: 'var(--color-border-soft)' }}>
+              <div>
+                <div className="text-[13px] font-bold" style={{ color: 'var(--color-text-primary)' }}>{c.label}</div>
+                <div className="text-[11.5px]" style={{ color: 'var(--color-text-tertiary)' }}>{c.replacementApi}</div>
+              </div>
+              <ToggleSwitch checked={c.enabled} disabled={!canEdit} onChange={(v) => toggleSearchCategory(c.key, v)} />
+            </div>
+          ))}
+        </div>
+        {!canEdit && <div className="mt-3"><RoleLockNotice required="admin" /></div>}
+      </AdminCard>
+
+      <AdminCard>
+        <div className="mb-3 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>카테고리별 프롬프트 초안</div>
+        <div className="mb-3 flex flex-wrap gap-1.5">
+          {config.categories.map((c) => (
+            <Chip key={c.key} label={c.label} selected={selectedCategory === c.key} onClick={() => handleSelectCategory(c.key)} />
+          ))}
+        </div>
+        <textarea
+          disabled={!canEdit}
+          value={promptDraft}
+          onChange={(e) => setPromptDraft(e.target.value)}
+          rows={6}
+          className="w-full rounded-lg border px-3 py-2 font-mono text-[12px] disabled:opacity-50"
+          style={{ borderColor: 'var(--color-border-default)' }}
+        />
+        <SaveFooter
+          updatedBy={config.updatedBy}
+          updatedAt={config.updatedAt}
+          disabled={!canEdit || !promptDirty}
+          onSave={() => {
+            const nextCategories = config.categories.map((c) => (c.key === category.key ? { ...c, promptDraft } : c))
+            updateSearchConfig({ categories: nextCategories }, `${category.label} 프롬프트 초안 수정`)
+          }}
+        />
+      </AdminCard>
+    </div>
+  )
+}
+
+function VirtualPanel() {
+  const adminUser = useAdminStore((s) => s.adminUser)
+  const config = useAdminStore((s) => s.aiVirtualConfig)
+  const updateVirtualConfig = useAdminStore((s) => s.updateVirtualConfig)
+  const toggleVirtualSourceType = useAdminStore((s) => s.toggleVirtualSourceType)
+  const canEdit = hasRole(adminUser?.role, 'admin')
+
+  const [disclaimerText, setDisclaimerText] = useState(config.disclaimerText)
+  const dirty = disclaimerText !== config.disclaimerText
+
+  return (
+    <div>
+      <InfoBanner>
+        구현 상태: <strong>{config.status}</strong> — 검색 결과에 노출되는 가상 프로필(비가입자를 공개 정보로 구조화한 추정 프로필)은
+        현재 lib/mocks/virtualProfiles.ts에 고정된 3건뿐이며 실제 생성 로직은 없습니다. 본인이 실제 소유자임을 주장하는 클레임 요청은
+        인증 검토(VRFY-02) 화면에서 별도로 심사합니다.
+      </InfoBanner>
+
+      <AdminCard className="mb-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>가상 프로필 노출</div>
+            <div className="text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>끄면 검색 결과에 가상 프로필이 노출되지 않습니다</div>
+          </div>
+          <ToggleSwitch checked={config.enabled} disabled={!canEdit} onChange={(v) => updateVirtualConfig({ enabled: v }, `노출 ${v ? 'ON' : 'OFF'}`)} />
+        </div>
+        {!canEdit && <div className="mt-3"><RoleLockNotice required="admin" /></div>}
+      </AdminCard>
+
+      <AdminCard className="mb-4">
+        <div className="mb-3 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>생성 근거로 허용하는 출처</div>
+        <div className="space-y-2">
+          {config.sourceTypes.map((s) => (
+            <div key={s.key} className="flex items-center justify-between rounded-lg border px-3 py-2" style={{ borderColor: 'var(--color-border-soft)' }}>
+              <div className="text-[13px]" style={{ color: 'var(--color-text-primary)' }}>{s.label}</div>
+              <ToggleSwitch checked={s.allowed} disabled={!canEdit} onChange={(v) => toggleVirtualSourceType(s.key, v)} />
+            </div>
+          ))}
+        </div>
+      </AdminCard>
+
+      <AdminCard>
+        <div className="mb-2 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>안내 문구</div>
+        <textarea
+          disabled={!canEdit}
+          value={disclaimerText}
+          onChange={(e) => setDisclaimerText(e.target.value)}
+          rows={2}
+          className="w-full rounded-lg border px-3 py-2 text-[13px] disabled:opacity-50"
+          style={{ borderColor: 'var(--color-border-default)' }}
+        />
+        <SaveFooter
+          updatedBy={config.updatedBy}
+          updatedAt={config.updatedAt}
+          disabled={!canEdit || !dirty || !disclaimerText.trim()}
+          onSave={() => updateVirtualConfig({ disclaimerText: disclaimerText.trim() }, '안내 문구 수정')}
+        />
+      </AdminCard>
+    </div>
+  )
+}
+
 export default function AiScreen() {
   const [tab, setTab] = useState<AiFeatureKey>('persona')
 
@@ -322,6 +520,8 @@ export default function AiScreen() {
       {tab === 'persona' && <PersonaPanel />}
       {tab === 'bio' && <BioPanel />}
       {tab === 'kemi' && <KemiPanel />}
+      {tab === 'search' && <SearchPanel />}
+      {tab === 'virtual' && <VirtualPanel />}
     </div>
   )
 }

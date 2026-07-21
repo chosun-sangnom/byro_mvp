@@ -167,8 +167,8 @@ export interface EventSpec {
 }
 
 // AI 관리 (AI-01~03) — 근거: Notion "AI 정책" 문서
-export type AiFeatureKey = 'persona' | 'bio' | 'kemi'
-export type AiFeatureStatus = '규칙 기반 구현' | '미구현(스텁)' | '미구현(목업 고정값)'
+export type AiFeatureKey = 'persona' | 'bio' | 'kemi' | 'search' | 'virtual'
+export type AiFeatureStatus = '규칙 기반 구현' | '미구현(스텁)' | '미구현(목업 고정값)' | '실제 LLM 연동(OpenAI)'
 
 export interface AiWeightItem {
   key: string
@@ -204,6 +204,40 @@ export interface AiKemiConfig {
   cacheInvalidateOnProfileEdit: boolean
   weights: AiWeightItem[]
   copyPromptTemplate: string
+  updatedBy?: string
+  updatedAt?: string
+}
+
+export interface AiSearchCategoryConfig {
+  key: string
+  label: string
+  enabled: boolean
+  replacementApi: string
+  promptDraft: string
+}
+
+export interface AiSearchConfig {
+  enabled: boolean
+  status: AiFeatureStatus
+  model: string
+  temperature: number
+  maxTokens: number
+  categories: AiSearchCategoryConfig[]
+  updatedBy?: string
+  updatedAt?: string
+}
+
+export interface AiSourceTypeItem {
+  key: string
+  label: string
+  allowed: boolean
+}
+
+export interface AiVirtualProfileConfig {
+  enabled: boolean
+  status: AiFeatureStatus
+  disclaimerText: string
+  sourceTypes: AiSourceTypeItem[]
   updatedBy?: string
   updatedAt?: string
 }

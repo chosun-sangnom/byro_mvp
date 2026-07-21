@@ -10,6 +10,8 @@ import type {
   AiBioConfig,
   AiKemiConfig,
   AiPersonaConfig,
+  AiSearchConfig,
+  AiVirtualProfileConfig,
   AuditLogEntry,
   CsTicket,
   FaqItem,
@@ -28,6 +30,8 @@ import {
   MOCK_AI_BIO_CONFIG,
   MOCK_AI_KEMI_CONFIG,
   MOCK_AI_PERSONA_CONFIG,
+  MOCK_AI_SEARCH_CONFIG,
+  MOCK_AI_VIRTUAL_CONFIG,
   MOCK_AUDIT_LOG,
   MOCK_FAQ,
   MOCK_PAYMENTS,
@@ -93,9 +97,15 @@ interface AdminStore {
   aiPersonaConfig: AiPersonaConfig
   aiBioConfig: AiBioConfig
   aiKemiConfig: AiKemiConfig
+  aiSearchConfig: AiSearchConfig
+  aiVirtualConfig: AiVirtualProfileConfig
   updatePersonaConfig: (patch: Partial<AiPersonaConfig>, changeSummary: string) => void
   updateBioConfig: (patch: Partial<AiBioConfig>, changeSummary: string) => void
   updateKemiConfig: (patch: Partial<AiKemiConfig>, changeSummary: string) => void
+  updateSearchConfig: (patch: Partial<AiSearchConfig>, changeSummary: string) => void
+  toggleSearchCategory: (key: string, enabled: boolean) => void
+  updateVirtualConfig: (patch: Partial<AiVirtualProfileConfig>, changeSummary: string) => void
+  toggleVirtualSourceType: (key: string, allowed: boolean) => void
 }
 
 export const useAdminStore = create<AdminStore>()(
@@ -247,6 +257,45 @@ export const useAdminStore = create<AdminStore>()(
         set((s) => ({ aiKemiConfig: { ...s.aiKemiConfig, ...patch, updatedBy: actor, updatedAt: nowLabel() } }))
         get().appendAudit('케미 리포트 설정 변경', 'AI 관리 · 케미 리포트', changeSummary)
       },
+
+      aiSearchConfig: MOCK_AI_SEARCH_CONFIG,
+      aiVirtualConfig: MOCK_AI_VIRTUAL_CONFIG,
+      updateSearchConfig: (patch, changeSummary) => {
+        const actor = get().adminUser?.name ?? '알수없음'
+        set((s) => ({ aiSearchConfig: { ...s.aiSearchConfig, ...patch, updatedBy: actor, updatedAt: nowLabel() } }))
+        get().appendAudit('AI 검색 설정 변경', 'AI 관리 · AI 검색', changeSummary)
+      },
+      toggleSearchCategory: (key, enabled) => {
+        const actor = get().adminUser?.name ?? '알수없음'
+        const category = get().aiSearchConfig.categories.find((c) => c.key === key)
+        set((s) => ({
+          aiSearchConfig: {
+            ...s.aiSearchConfig,
+            categories: s.aiSearchConfig.categories.map((c) => (c.key === key ? { ...c, enabled } : c)),
+            updatedBy: actor,
+            updatedAt: nowLabel(),
+          },
+        }))
+        get().appendAudit('AI 검색 카테고리 사용 변경', 'AI 관리 · AI 검색', `${category?.label ?? key} ${enabled ? 'ON' : 'OFF'}`)
+      },
+      updateVirtualConfig: (patch, changeSummary) => {
+        const actor = get().adminUser?.name ?? '알수없음'
+        set((s) => ({ aiVirtualConfig: { ...s.aiVirtualConfig, ...patch, updatedBy: actor, updatedAt: nowLabel() } }))
+        get().appendAudit('가상 프로필 설정 변경', 'AI 관리 · 가상 프로필', changeSummary)
+      },
+      toggleVirtualSourceType: (key, allowed) => {
+        const actor = get().adminUser?.name ?? '알수없음'
+        const sourceType = get().aiVirtualConfig.sourceTypes.find((s) => s.key === key)
+        set((s) => ({
+          aiVirtualConfig: {
+            ...s.aiVirtualConfig,
+            sourceTypes: s.aiVirtualConfig.sourceTypes.map((st) => (st.key === key ? { ...st, allowed } : st)),
+            updatedBy: actor,
+            updatedAt: nowLabel(),
+          },
+        }))
+        get().appendAudit('가상 프로필 출처 허용 변경', 'AI 관리 · 가상 프로필', `${sourceType?.label ?? key} ${allowed ? '허용' : '금지'}`)
+      },
     }),
     {
       name: 'byro-admin-store',
@@ -267,6 +316,8 @@ export const useAdminStore = create<AdminStore>()(
         aiPersonaConfig: state.aiPersonaConfig,
         aiBioConfig: state.aiBioConfig,
         aiKemiConfig: state.aiKemiConfig,
+        aiSearchConfig: state.aiSearchConfig,
+        aiVirtualConfig: state.aiVirtualConfig,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true)

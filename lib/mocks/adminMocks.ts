@@ -6,6 +6,8 @@ import type {
   AiBioConfig,
   AiKemiConfig,
   AiPersonaConfig,
+  AiSearchConfig,
+  AiVirtualProfileConfig,
   AuditLogEntry,
   CsTicket,
   EventSpec,
@@ -391,4 +393,93 @@ export const MOCK_AI_KEMI_CONFIG: AiKemiConfig = {
   copyPromptTemplate: '두 프로필의 공통점을 바탕으로 자연스러운 대화 시작 문구를 1문장으로 제안해줘.',
   updatedBy: '박관리',
   updatedAt: '2026-06-25 16:00',
+}
+
+// AI 검색(app/api/ai-search/route.ts) — 실제 OpenAI(gpt-4o-mini) 연동. 마이 바이로 편집의
+// 장소·미디어·음악 검색 피커(PlacePicker/MediaSearchPicker/MusicSearchPicker)에서 사용.
+// promptDraft는 route.ts의 SYSTEM_PROMPTS를 그대로 옮긴 참고용 초안 — 여기서 수정해도 코드 배포 전까진 실제 반영되지 않음.
+export const MOCK_AI_SEARCH_CONFIG: AiSearchConfig = {
+  enabled: true,
+  status: '실제 LLM 연동(OpenAI)',
+  model: 'gpt-4o-mini',
+  temperature: 0.1,
+  maxTokens: 600,
+  categories: [
+    {
+      key: 'movie',
+      label: '영화',
+      enabled: true,
+      replacementApi: 'TMDB 연동 예정 (GET /3/search/movie)',
+      promptDraft:
+        'You are a Korean movie search assistant. Given a partial or full query (may be in Korean), return the 5 most relevant movies.\nRespond ONLY with valid JSON: {"items":[{"id":"tmdb-123","title":"한국어제목","subtitle":"감독","detail":"개봉연도","posterUrl":null}]}\nUse the Korean release title. If you know the TMDB numeric ID, use "tmdb-{id}" format.',
+    },
+    {
+      key: 'book',
+      label: '책',
+      enabled: true,
+      replacementApi: '알라딘 Open API 연동 예정',
+      promptDraft:
+        'You are a book search assistant fluent in Korean. Given a query, return the 5 most relevant books.\nRespond ONLY with valid JSON: {"items":[{"id":"book-1","title":"제목","subtitle":"저자","detail":"출판사","posterUrl":null}]}',
+    },
+    {
+      key: 'play',
+      label: '공연',
+      enabled: true,
+      replacementApi: '전용 API 없음 — AI 검색 계속 사용',
+      promptDraft:
+        'You are a Korean musical and theater search assistant. Given a query, return the 5 most relevant musicals or plays staged in Korea.\nRespond ONLY with valid JSON: {"items":[{"id":"play-1","title":"공연명","subtitle":"공연장","detail":"초연연도 또는 공연기간","posterUrl":null}]}',
+    },
+    {
+      key: 'music',
+      label: '음악',
+      enabled: true,
+      replacementApi: 'Spotify 연동 예정 (GET /v1/search)',
+      promptDraft:
+        'You are a music search assistant. Given a query (may be Korean song title or artist name), return the 5 most relevant songs.\nRespond ONLY with valid JSON: {"items":[{"id":"track-1","title":"곡명","subtitle":"아티스트","detail":"앨범","posterUrl":null}]}',
+    },
+    {
+      key: 'restaurant',
+      label: '맛집',
+      enabled: true,
+      replacementApi: 'Kakao Local API 연동 예정',
+      promptDraft:
+        'You are a Korean restaurant search assistant. Given a query (restaurant name or neighborhood), return 5 relevant restaurants in Korea.\nRespond ONLY with valid JSON: {"items":[{"id":"r-1","title":"식당명","subtitle":"동네 또는 주소","detail":"음식 종류","posterUrl":null}]}',
+    },
+    {
+      key: 'cafe',
+      label: '카페',
+      enabled: true,
+      replacementApi: 'Kakao Local API 연동 예정',
+      promptDraft:
+        'You are a Korean cafe search assistant. Given a query, return 5 relevant cafes in Korea.\nRespond ONLY with valid JSON: {"items":[{"id":"c-1","title":"카페명","subtitle":"동네 또는 주소","detail":"특징","posterUrl":null}]}',
+    },
+    {
+      key: 'travel',
+      label: '여행지',
+      enabled: true,
+      replacementApi: '전용 API 미정',
+      promptDraft:
+        'You are a travel destination search assistant. Given a partial query (may be Korean), return 5 relevant travel destinations.\nRespond ONLY with valid JSON: {"items":[{"id":"city-1","title":"도시명(한국어)","subtitle":"국가","detail":"지역","posterUrl":null}]}',
+    },
+  ],
+  updatedBy: '박관리',
+  updatedAt: '2026-07-15 14:00',
+}
+
+// 가상 프로필(components/screens/profile/VirtualProfilePage.tsx) — 비가입자를 공개 정보로 구조화한
+// 추정 프로필. lib/mocks/virtualProfiles.ts에 3건 고정 목업, 실제 생성 로직 없음.
+// 클레임(본인 인증) 심사는 별도로 인증 검토(VRFY-02) 화면에서 처리됨.
+export const MOCK_AI_VIRTUAL_CONFIG: AiVirtualProfileConfig = {
+  enabled: true,
+  status: '미구현(목업 고정값)',
+  disclaimerText: 'AI가 구조화한 추정 프로필입니다',
+  sourceTypes: [
+    { key: 'news', label: '뉴스 기사', allowed: true },
+    { key: 'org_page', label: '회사·기관 소개 페이지', allowed: true },
+    { key: 'public_sns', label: '공개 SNS 게시물', allowed: true },
+    { key: 'award_db', label: '수상·이력 데이터베이스', allowed: true },
+    { key: 'private_paid', label: '비공개·유료 데이터', allowed: false },
+  ],
+  updatedBy: '박관리',
+  updatedAt: '2026-06-10 10:00',
 }

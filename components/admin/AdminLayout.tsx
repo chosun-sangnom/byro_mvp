@@ -11,6 +11,7 @@ import {
   MessageCircle,
   ShieldAlert,
   Sliders,
+  Sparkles,
   Users,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
@@ -24,6 +25,7 @@ const NAV = [
   { href: '/admin/verification', label: '인증 검토', code: 'VRFY', icon: BadgeCheck },
   { href: '/admin/billing', label: '결제 관리', code: 'BILL', icon: CreditCard },
   { href: '/admin/cs', label: '문의', code: 'CS', icon: MessageCircle },
+  { href: '/admin/ai', label: 'AI 관리', code: 'AI', icon: Sparkles },
   { href: '/admin/settings', label: '권한·감사', code: 'ADMN', icon: Sliders },
 ] as const
 

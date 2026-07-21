@@ -3,6 +3,9 @@
 import type {
   AdminOperator,
   AdminUserRow,
+  AiBioConfig,
+  AiKemiConfig,
+  AiPersonaConfig,
   AuditLogEntry,
   CsTicket,
   EventSpec,
@@ -339,3 +342,53 @@ export const EVENT_SPECS: EventSpec[] = [
   { name: 'upgrade_view', timing: 'Pro 비교표/업그레이드 모달 노출', params: 'trigger (슬롯 초과 등)' },
   { name: 'purchase_complete', timing: '결제 완료', params: 'plan, amount' },
 ]
+
+// AI 관리 초기값 — 근거: Notion "AI 정책" 문서 (페르소나·자기소개 가중치). 케미 리포트는 정책 문서에
+// 가중치가 아직 확정되지 않아 lib/profileAnalysis.ts의 신호 카테고리(정체성/라이프스타일/취향)를 기준으로 임시값 부여.
+export const MOCK_AI_PERSONA_CONFIG: AiPersonaConfig = {
+  enabled: true,
+  status: '규칙 기반 구현',
+  autoRefreshWeekly: true,
+  manualEditAllowed: false,
+  weights: [
+    { key: 'reputation', label: '평판 키워드', weight: 35 },
+    { key: 'title', label: '직함', weight: 25 },
+    { key: 'music', label: '음악', weight: 10 },
+    { key: 'exercise', label: '운동', weight: 10 },
+    { key: 'cafe', label: '카페', weight: 10 },
+    { key: 'book', label: '책', weight: 10 },
+  ],
+  emptyStateText: '아직 페르소나를 만들 근거가 부족해요',
+  updatedBy: '이서연',
+  updatedAt: '2026-07-13 11:20',
+}
+
+export const MOCK_AI_BIO_CONFIG: AiBioConfig = {
+  enabled: false,
+  status: '미구현(스텁)',
+  regenerateOnEveryClick: true,
+  maxLength: 300,
+  weights: [
+    { key: 'highlight', label: '하이라이트', weight: 35 },
+    { key: 'title', label: '직함', weight: 30 },
+    { key: 'reputation', label: '평판 키워드', weight: 25 },
+    { key: 'existingBio', label: '기존 자기소개', weight: 10 },
+  ],
+  promptTemplate: '다음 정보를 바탕으로 80~150자 분량의 자기소개를 3~5문장, 자연스러운 존댓말로 작성해줘.',
+  updatedBy: '이서연',
+  updatedAt: '2026-07-10 09:40',
+}
+
+export const MOCK_AI_KEMI_CONFIG: AiKemiConfig = {
+  enabled: false,
+  status: '미구현(목업 고정값)',
+  cacheInvalidateOnProfileEdit: true,
+  weights: [
+    { key: 'identity', label: '정체성 (MBTI · 동네 등)', weight: 40 },
+    { key: 'lifestyle', label: '라이프스타일 (운동 · 카페 등)', weight: 35 },
+    { key: 'taste', label: '취향 (음악 · 책 등)', weight: 25 },
+  ],
+  copyPromptTemplate: '두 프로필의 공통점을 바탕으로 자연스러운 대화 시작 문구를 1문장으로 제안해줘.',
+  updatedBy: '박관리',
+  updatedAt: '2026-06-25 16:00',
+}

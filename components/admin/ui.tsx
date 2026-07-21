@@ -168,6 +168,31 @@ export function Drawer({ open, onClose, title, children }: { open: boolean; onCl
   )
 }
 
+export function ToggleSwitch({
+  checked,
+  onChange,
+  disabled,
+}: {
+  checked: boolean
+  onChange: (value: boolean) => void
+  disabled?: boolean
+}) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={() => onChange(!checked)}
+      className="relative h-6 w-11 shrink-0 rounded-full transition-colors disabled:opacity-40"
+      style={{ backgroundColor: checked ? 'var(--color-accent-dark)' : 'var(--color-bg-muted)' }}
+    >
+      <span
+        className="absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform"
+        style={{ transform: checked ? 'translateX(22px)' : 'translateX(2px)' }}
+      />
+    </button>
+  )
+}
+
 export function RoleLockNotice({ required }: { required: AdminRole }) {
   const label = required === 'admin' ? '관리자' : '운영'
   return (

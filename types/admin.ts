@@ -165,3 +165,45 @@ export interface EventSpec {
   timing: string
   params: string
 }
+
+// AI 관리 (AI-01~03) — 근거: Notion "AI 정책" 문서
+export type AiFeatureKey = 'persona' | 'bio' | 'kemi'
+export type AiFeatureStatus = '규칙 기반 구현' | '미구현(스텁)' | '미구현(목업 고정값)'
+
+export interface AiWeightItem {
+  key: string
+  label: string
+  weight: number
+}
+
+export interface AiPersonaConfig {
+  enabled: boolean
+  status: AiFeatureStatus
+  autoRefreshWeekly: boolean
+  manualEditAllowed: boolean
+  weights: AiWeightItem[]
+  emptyStateText: string
+  updatedBy?: string
+  updatedAt?: string
+}
+
+export interface AiBioConfig {
+  enabled: boolean
+  status: AiFeatureStatus
+  regenerateOnEveryClick: boolean
+  maxLength: number
+  weights: AiWeightItem[]
+  promptTemplate: string
+  updatedBy?: string
+  updatedAt?: string
+}
+
+export interface AiKemiConfig {
+  enabled: boolean
+  status: AiFeatureStatus
+  cacheInvalidateOnProfileEdit: boolean
+  weights: AiWeightItem[]
+  copyPromptTemplate: string
+  updatedBy?: string
+  updatedAt?: string
+}

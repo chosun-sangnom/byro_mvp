@@ -7,6 +7,9 @@ import type {
   AdminOperator,
   AdminRole,
   AdminUserRow,
+  AiBioConfig,
+  AiKemiConfig,
+  AiPersonaConfig,
   AuditLogEntry,
   CsTicket,
   FaqItem,
@@ -22,6 +25,9 @@ import type {
 } from '@/types/admin'
 import {
   ADMIN_OPERATORS,
+  MOCK_AI_BIO_CONFIG,
+  MOCK_AI_KEMI_CONFIG,
+  MOCK_AI_PERSONA_CONFIG,
   MOCK_AUDIT_LOG,
   MOCK_FAQ,
   MOCK_PAYMENTS,
@@ -82,6 +88,14 @@ interface AdminStore {
   auditLog: AuditLogEntry[]
   setOperatorRole: (id: string, role: AdminRole) => void
   appendAudit: (action: string, target: string, reason?: string) => void
+
+  // AI
+  aiPersonaConfig: AiPersonaConfig
+  aiBioConfig: AiBioConfig
+  aiKemiConfig: AiKemiConfig
+  updatePersonaConfig: (patch: Partial<AiPersonaConfig>, changeSummary: string) => void
+  updateBioConfig: (patch: Partial<AiBioConfig>, changeSummary: string) => void
+  updateKemiConfig: (patch: Partial<AiKemiConfig>, changeSummary: string) => void
 }
 
 export const useAdminStore = create<AdminStore>()(
@@ -214,6 +228,25 @@ export const useAdminStore = create<AdminStore>()(
           auditLog: [{ id: uuidv4(), actor, action, target, reason, createdAt: nowLabel() }, ...s.auditLog],
         }))
       },
+
+      aiPersonaConfig: MOCK_AI_PERSONA_CONFIG,
+      aiBioConfig: MOCK_AI_BIO_CONFIG,
+      aiKemiConfig: MOCK_AI_KEMI_CONFIG,
+      updatePersonaConfig: (patch, changeSummary) => {
+        const actor = get().adminUser?.name ?? '알수없음'
+        set((s) => ({ aiPersonaConfig: { ...s.aiPersonaConfig, ...patch, updatedBy: actor, updatedAt: nowLabel() } }))
+        get().appendAudit('AI 페르소나 설정 변경', 'AI 관리 · 페르소나', changeSummary)
+      },
+      updateBioConfig: (patch, changeSummary) => {
+        const actor = get().adminUser?.name ?? '알수없음'
+        set((s) => ({ aiBioConfig: { ...s.aiBioConfig, ...patch, updatedBy: actor, updatedAt: nowLabel() } }))
+        get().appendAudit('AI 자기소개 설정 변경', 'AI 관리 · 자기소개', changeSummary)
+      },
+      updateKemiConfig: (patch, changeSummary) => {
+        const actor = get().adminUser?.name ?? '알수없음'
+        set((s) => ({ aiKemiConfig: { ...s.aiKemiConfig, ...patch, updatedBy: actor, updatedAt: nowLabel() } }))
+        get().appendAudit('케미 리포트 설정 변경', 'AI 관리 · 케미 리포트', changeSummary)
+      },
     }),
     {
       name: 'byro-admin-store',
@@ -231,6 +264,9 @@ export const useAdminStore = create<AdminStore>()(
         faq: state.faq,
         operators: state.operators,
         auditLog: state.auditLog,
+        aiPersonaConfig: state.aiPersonaConfig,
+        aiBioConfig: state.aiBioConfig,
+        aiKemiConfig: state.aiKemiConfig,
       }),
       onRehydrateStorage: () => (state) => {
         state?.setHasHydrated(true)

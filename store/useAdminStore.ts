@@ -111,7 +111,7 @@ interface AdminStore {
   updateBioConfig: (patch: Partial<AiBioConfig>, changeSummary: string) => void
   updateKemiConfig: (patch: Partial<AiKemiConfig>, changeSummary: string) => void
   toggleKemiKeywordCategory: (key: string, allowed: boolean) => void
-  updateKemiBlock: (key: KemiBlockKey, patch: Partial<Pick<KemiBlockConfig, 'enabled' | 'unlockCondition'>>) => void
+  updateKemiBlock: (key: KemiBlockKey, patch: Partial<Pick<KemiBlockConfig, 'enabled' | 'promptTemplate' | 'weights'>>) => void
   updateSearchConfig: (patch: Partial<AiSearchConfig>, changeSummary: string) => void
   toggleSearchCategory: (key: string, enabled: boolean) => void
   updateVirtualConfig: (patch: Partial<AiVirtualProfileConfig>, changeSummary: string) => void
@@ -332,7 +332,12 @@ export const useAdminStore = create<AdminStore>()(
             updatedAt: nowLabel(),
           },
         }))
-        const summary = 'enabled' in patch ? `${patch.enabled ? '활성화' : '비활성화'}` : `잠금 해제 조건 수정: ${patch.unlockCondition}`
+        const summary =
+          'enabled' in patch
+            ? `${patch.enabled ? '활성화' : '비활성화'}`
+            : patch.weights
+              ? `가중치 수정 (합계 ${patch.weights.reduce((sum, w) => sum + w.weight, 0)}%)`
+              : '응답 프롬프트 수정'
         get().appendAudit('케미 블록 설정 변경', `AI 관리 · 케미 리포트 · ${block?.label ?? key}`, summary)
       },
 
@@ -377,7 +382,7 @@ export const useAdminStore = create<AdminStore>()(
     }),
     {
       name: 'byro-admin-store',
-      version: 4,
+      version: 5,
       partialize: (state) => ({
         adminUser: state.adminUser,
         users: state.users,

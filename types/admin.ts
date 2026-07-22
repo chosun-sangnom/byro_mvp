@@ -220,7 +220,8 @@ export interface KemiBlockConfig {
   label: string
   description: string
   enabled: boolean
-  unlockCondition: string
+  promptTemplate: string
+  weights: AiWeightItem[]
 }
 
 export interface AiKemiConfig {
@@ -230,7 +231,6 @@ export interface AiKemiConfig {
   completenessWeights: AiWeightItem[]
   keywordCategories: AiSourceTypeItem[]
   blocks: KemiBlockConfig[]
-  copyPromptTemplate: string
   dailyLimitFree: number
   proUnlimited: boolean
   updatedBy?: string

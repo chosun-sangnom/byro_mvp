@@ -234,29 +234,45 @@ function BioPanel() {
 
 function KemiBlockCard({ block }: { block: KemiBlockConfig }) {
   const updateKemiBlock = useAdminStore((s) => s.updateKemiBlock)
-  const [condition, setCondition] = useState(block.unlockCondition)
-  const dirty = condition !== block.unlockCondition
+  const [prompt, setPrompt] = useState(block.promptTemplate)
+  const [weights, setWeights] = useState<AiWeightItem[]>(block.weights)
+  const total = weights.reduce((sum, w) => sum + w.weight, 0)
+  const promptDirty = prompt !== block.promptTemplate
+  const weightsDirty = JSON.stringify(weights) !== JSON.stringify(block.weights)
 
   return (
     <AdminCard className="mb-3">
-      <div className="mb-2 flex items-center justify-between">
+      <div className="mb-3 flex items-center justify-between">
         <div>
           <div className="text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>{block.label}</div>
           <div className="text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>{block.description}</div>
         </div>
         <ToggleSwitch checked={block.enabled} onChange={(v) => updateKemiBlock(block.key, { enabled: v })} />
       </div>
-      <div className="mb-1 text-[12px] font-semibold" style={{ color: 'var(--color-text-tertiary)' }}>잠금 해제 조건</div>
+
+      <div className="mb-1 text-[12px] font-semibold" style={{ color: 'var(--color-text-tertiary)' }}>신호 가중치</div>
+      <WeightEditor weights={weights} onChange={setWeights} />
+
+      <div className="mt-4 mb-1 text-[12px] font-semibold" style={{ color: 'var(--color-text-tertiary)' }}>응답 프롬프트</div>
       <textarea
-        value={condition}
-        onChange={(e) => setCondition(e.target.value)}
-        rows={1}
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
+        rows={2}
         className="w-full rounded-lg border px-3 py-2 text-[13px]"
         style={{ borderColor: 'var(--color-border-default)' }}
       />
+
       <div className="mt-2 flex justify-end">
-        <Button size="sm" fullWidth={false} disabled={!dirty} onClick={() => updateKemiBlock(block.key, { unlockCondition: condition })}>
-          조건 저장
+        <Button
+          size="sm"
+          fullWidth={false}
+          disabled={(!promptDirty && !weightsDirty) || total !== 100}
+          onClick={() => {
+            if (weightsDirty) updateKemiBlock(block.key, { weights })
+            if (promptDirty) updateKemiBlock(block.key, { promptTemplate: prompt })
+          }}
+        >
+          저장
         </Button>
       </div>
     </AdminCard>
@@ -269,19 +285,17 @@ function KemiPanel() {
   const toggleKemiKeywordCategory = useAdminStore((s) => s.toggleKemiKeywordCategory)
 
   const [completenessWeights, setCompletenessWeights] = useState<AiWeightItem[]>(config.completenessWeights)
-  const [copyPromptTemplate, setCopyPromptTemplate] = useState(config.copyPromptTemplate)
   const [dailyLimitFree, setDailyLimitFree] = useState(String(config.dailyLimitFree))
   const total = completenessWeights.reduce((sum, w) => sum + w.weight, 0)
   const weightsDirty = JSON.stringify(completenessWeights) !== JSON.stringify(config.completenessWeights)
-  const promptDirty = copyPromptTemplate !== config.copyPromptTemplate
   const limitDirty = dailyLimitFree !== String(config.dailyLimitFree)
 
   return (
     <div>
       <InfoBanner>
         구현 상태: <strong>{config.status}</strong> — 방문자와의 공통점 매칭·점수 산정 로직이 아직 없어 케미 카드의 매칭 수·대화 시작
-        문구(aiCopy)는 목업에 하드코딩되어 있습니다. 블록 구성·잠금 조건·완성도 기준·열람 제한은 Notion &quot;케미 정책(미완)&quot; 문서를
-        기준으로 하며, 아래 값은 그 정책을 반영한 설정 초안입니다.
+        문구(aiCopy)는 목업에 하드코딩되어 있습니다. 블록 구성·완성도 기준·열람 제한은 Notion &quot;케미 정책(미완)&quot; 문서를 기준으로 하며,
+        블록별 응답 프롬프트와 신호 가중치는 추후 서버 사이드 LLM 연동 시 사용할 설정 초안입니다.
       </InfoBanner>
 
       <AdminCard className="mb-4">
@@ -325,23 +339,6 @@ function KemiPanel() {
             </div>
           ))}
         </div>
-      </AdminCard>
-
-      <AdminCard className="mb-4">
-        <div className="mb-3 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>대화스타터(aiCopy) 프롬프트 템플릿</div>
-        <textarea
-          value={copyPromptTemplate}
-          onChange={(e) => setCopyPromptTemplate(e.target.value)}
-          rows={3}
-          className="w-full rounded-lg border px-3 py-2 text-[13px]"
-          style={{ borderColor: 'var(--color-border-default)' }}
-        />
-        <SaveFooter
-          updatedBy={config.updatedBy}
-          updatedAt={config.updatedAt}
-          disabled={!promptDirty}
-          onSave={() => updateKemiConfig({ copyPromptTemplate }, '대화스타터 프롬프트 수정')}
-        />
       </AdminCard>
 
       <AdminCard className="mb-4">

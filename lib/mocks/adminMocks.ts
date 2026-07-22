@@ -395,7 +395,16 @@ export const MOCK_AI_BIO_CONFIG: AiBioConfig = {
   updatedAt: '2026-07-10 09:40',
 }
 
-// Notion "케미 정책(미완)" 기준 — 완성도 기여도(§3), 공통 키워드 카테고리(§7), 블록 잠금 조건(§1~2)
+// 블록별 신호 가중치에 공통으로 쓰는 5개 키 (완성도 기준과 동일 신호: MBTI/성향/바이브/하이라이트/자기소개)
+const kemiBlockWeights = (mbti: number, personality: number, vibe: number, highlight: number, bio: number) => [
+  { key: 'mbti', label: 'MBTI', weight: mbti },
+  { key: 'personality', label: '성향(personality)', weight: personality },
+  { key: 'vibe', label: '바이브', weight: vibe },
+  { key: 'highlight', label: '하이라이트', weight: highlight },
+  { key: 'bio', label: '자기소개(bio)', weight: bio },
+]
+
+// Notion "케미 정책(미완)" 기준 — 완성도 기여도(§3), 공통 키워드 카테고리(§7), 블록 구성(§1)
 export const MOCK_AI_KEMI_CONFIG: AiKemiConfig = {
   enabled: false,
   status: '미구현(목업 고정값)',
@@ -414,13 +423,47 @@ export const MOCK_AI_KEMI_CONFIG: AiKemiConfig = {
     { key: 'identity', label: '정체성', allowed: true },
   ],
   blocks: [
-    { key: 'commonality', label: '공통점', description: '상대와의 취향·성향 공통 키워드', enabled: true, unlockCondition: '바이브 1종 이상 OR MBTI 입력' },
-    { key: 'starter', label: '대화스타터', description: 'AI 생성 대화 시작 문장', enabled: true, unlockCondition: 'MBTI 입력 AND 바이브 2종 이상' },
-    { key: 'flow', label: '관계흐름', description: '관계가 이어지는 방식 분석', enabled: true, unlockCondition: '바이브 3종 이상 AND 자기소개 입력' },
-    { key: 'collab', label: '협업결', description: '협업·업무 궁합 분석', enabled: true, unlockCondition: '하이라이트 2개 이상' },
-    { key: 'value', label: '연결가치', description: '장기적 연결 가치 종합', enabled: true, unlockCondition: '성향 입력 AND 바이브 5종 이상' },
+    {
+      key: 'commonality',
+      label: '공통점',
+      description: '상대와의 취향·성향 공통 키워드',
+      enabled: true,
+      promptTemplate: '두 프로필의 취향·장소·라이프스타일·정체성 키워드 중 겹치는 항목을 찾아 3개 이내로 요약해줘.',
+      weights: kemiBlockWeights(30, 10, 50, 5, 5),
+    },
+    {
+      key: 'starter',
+      label: '대화스타터',
+      description: 'AI 생성 대화 시작 문장',
+      enabled: true,
+      promptTemplate: '두 프로필의 공통점을 바탕으로 자연스러운 대화 시작 문구를 1문장으로 제안해줘.',
+      weights: kemiBlockWeights(35, 5, 50, 5, 5),
+    },
+    {
+      key: 'flow',
+      label: '관계흐름',
+      description: '관계가 이어지는 방식 분석',
+      enabled: true,
+      promptTemplate: '두 사람의 MBTI와 바이브 패턴을 바탕으로 관계가 이어지는 방식(대화 주도권, 친밀도 형성 속도 등)을 2문장으로 분석해줘.',
+      weights: kemiBlockWeights(10, 10, 45, 5, 30),
+    },
+    {
+      key: 'collab',
+      label: '협업결',
+      description: '협업·업무 궁합 분석',
+      enabled: true,
+      promptTemplate: '두 사람의 하이라이트(경력·활동 이력)를 바탕으로 협업·업무 궁합을 2문장으로 분석해줘.',
+      weights: kemiBlockWeights(10, 10, 10, 60, 10),
+    },
+    {
+      key: 'value',
+      label: '연결가치',
+      description: '장기적 연결 가치 종합',
+      enabled: true,
+      promptTemplate: '두 사람의 성향과 공통 바이브를 종합해 장기적으로 어떤 가치를 나눌 수 있는 관계인지 2문장으로 요약해줘.',
+      weights: kemiBlockWeights(5, 35, 50, 5, 5),
+    },
   ],
-  copyPromptTemplate: '두 프로필의 공통점을 바탕으로 자연스러운 대화 시작 문구를 1문장으로 제안해줘.',
   dailyLimitFree: 1,
   proUnlimited: true,
   updatedBy: '박관리',

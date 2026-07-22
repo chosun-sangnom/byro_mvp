@@ -5,13 +5,84 @@ import { useAdminStore } from '@/store/useAdminStore'
 import { AdminCard, SectionHeading, StatusBadge, TableShell, Td, Th } from '@/components/admin/ui'
 import { Button } from '@/components/ui'
 import { MOCK_DASH_STATS } from '@/lib/mocks/adminMocks'
-import type { SubscriptionStatus, PaymentStatus } from '@/types/admin'
+import type { PaymentRecord, PaymentStatus, SubscriptionStatus } from '@/types/admin'
 
-const SUB_TONE: Record<SubscriptionStatus, 'success' | 'warn' | 'neutral'> = { 활성: 'success', '해지 예약': 'warn', 만료: 'neutral' }
+const SUB_TONE: Record<SubscriptionStatus, 'success' | 'warn' | 'neutral' | 'danger'> = {
+  활성: 'success',
+  '해지 예약': 'warn',
+  청약철회: 'danger',
+  만료: 'neutral',
+}
 const PAY_TONE: Record<PaymentStatus, 'success' | 'danger' | 'neutral' | 'warn'> = {
   결제완료: 'success',
   결제실패: 'danger',
   취소: 'neutral',
+  환불: 'warn',
+}
+
+const WITHDRAWAL_WINDOW_DAYS = 7
+
+function daysSince(dateStr: string) {
+  const diffMs = Date.now() - new Date(dateStr).getTime()
+  return Math.floor(diffMs / (1000 * 60 * 60 * 24))
+}
+
+function PaymentActionCell({ payment }: { payment: PaymentRecord }) {
+  const withdrawSubscription = useAdminStore((s) => s.withdrawSubscription)
+  const [withdrawing, setWithdrawing] = useState(false)
+  const [reason, setReason] = useState('')
+
+  if (payment.status !== '결제완료') return null
+
+  const elapsed = daysSince(payment.paidAt)
+  const eligible = !payment.hasUsedProContent && elapsed <= WITHDRAWAL_WINDOW_DAYS
+
+  if (!eligible) {
+    return (
+      <span className="text-[11.5px]" style={{ color: 'var(--color-text-tertiary)' }}>
+        {payment.hasUsedProContent ? '구독전용 콘텐츠 이용함 · 철회 불가' : `청약철회 기간(${WITHDRAWAL_WINDOW_DAYS}일) 경과`}
+      </span>
+    )
+  }
+
+  if (!withdrawing) {
+    return (
+      <button onClick={() => setWithdrawing(true)} className="text-[12.5px] font-bold" style={{ color: 'var(--color-state-danger-text)' }}>
+        청약철회 처리
+      </button>
+    )
+  }
+
+  return (
+    <div className="space-y-1.5">
+      <textarea
+        value={reason}
+        onChange={(e) => setReason(e.target.value)}
+        placeholder="철회 사유 (필수)"
+        rows={2}
+        className="w-full min-w-[160px] rounded-lg border px-2.5 py-1.5 text-[12.5px]"
+        style={{ borderColor: 'var(--color-border-default)' }}
+      />
+      <div className="flex gap-1.5">
+        <Button
+          variant="danger"
+          size="sm"
+          fullWidth={false}
+          disabled={!reason.trim()}
+          onClick={() => {
+            withdrawSubscription(payment.id, reason.trim())
+            setWithdrawing(false)
+            setReason('')
+          }}
+        >
+          철회 확정
+        </Button>
+        <Button variant="outline" size="sm" fullWidth={false} onClick={() => { setWithdrawing(false); setReason('') }}>
+          취소
+        </Button>
+      </div>
+    </div>
+  )
 }
 
 export default function BillingScreen() {
@@ -28,7 +99,10 @@ export default function BillingScreen() {
 
   return (
     <div>
-      <SectionHeading title="결제 관리" description="Pro 구독 현황, 결제 내역, 수동 플랜 부여를 처리합니다. 환불은 지원하지 않습니다. (BILL-01~05)" />
+      <SectionHeading
+        title="결제 관리"
+        description={`Pro 구독 현황, 결제 내역, 수동 플랜 부여를 처리합니다. 구독전용 콘텐츠를 이용하지 않은 채 결제일로부터 ${WITHDRAWAL_WINDOW_DAYS}일 이내인 경우에만 청약철회(환불)가 가능하며, 그 외에는 환불 없이 잔여 기간 동안 구독전용 기능을 계속 이용할 수 있습니다. (BILL-01~05)`}
+      />
 
       <div className="mb-6 grid grid-cols-3 gap-3">
         <AdminCard>
@@ -72,7 +146,7 @@ export default function BillingScreen() {
       </div>
 
       <div className="mb-6">
-        <div className="mb-3 text-[13px] font-bold" style={{ color: 'var(--color-text-secondary)' }}>결제 내역 (BILL-02)</div>
+        <div className="mb-3 text-[13px] font-bold" style={{ color: 'var(--color-text-secondary)' }}>결제 내역 (BILL-02, BILL-03)</div>
         <TableShell>
           <thead>
             <tr className="border-b" style={{ borderColor: 'var(--color-border-soft)' }}>
@@ -81,6 +155,7 @@ export default function BillingScreen() {
               <Th>상태</Th>
               <Th>PG 거래 ID</Th>
               <Th>결제일</Th>
+              <Th>처리</Th>
             </tr>
           </thead>
           <tbody>
@@ -91,6 +166,7 @@ export default function BillingScreen() {
                 <Td><StatusBadge label={p.status} tone={PAY_TONE[p.status]} /></Td>
                 <Td className="font-mono">{p.pgTransactionId}</Td>
                 <Td>{p.paidAt}</Td>
+                <Td><PaymentActionCell payment={p} /></Td>
               </tr>
             ))}
           </tbody>

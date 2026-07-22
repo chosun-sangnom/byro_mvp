@@ -308,12 +308,13 @@ export const MOCK_SUBSCRIPTIONS: Subscription[] = [
   { id: 'sub-6', linkId: 'baekhyunjin', name: '백현진', status: '활성', startedAt: '2025-07-02', nextBillingAt: '2026-08-02', amount: 9900 },
 ]
 
+// hasUsedProContent: 결제(구독 갱신) 이후 구독전용 콘텐츠 이용 여부 — 청약철회 정책(7일 이내 + 미이용) 판단에 사용
 export const MOCK_PAYMENTS: PaymentRecord[] = [
-  { id: 'pay-1', linkId: 'mk', name: '강명구', amount: 9900, status: '결제완료', pgTransactionId: 'toss_20260722_0091', paidAt: '2026-07-22' },
-  { id: 'pay-2', linkId: 'parksojin', name: '박소진', amount: 9900, status: '결제완료', pgTransactionId: 'toss_20260630_0042', paidAt: '2026-06-30' },
-  { id: 'pay-3', linkId: 'choisunyoung', name: '최선영', amount: 9900, status: '결제실패', pgTransactionId: 'toss_20260619_0117', paidAt: '2026-06-19' },
-  { id: 'pay-4', linkId: 'hansanghoon', name: '한상훈', amount: 9900, status: '결제완료', pgTransactionId: 'toss_20260619_0055', paidAt: '2026-06-19' },
-  { id: 'pay-5', linkId: 'jungwonho', name: '정원호', amount: 9900, status: '취소', pgTransactionId: 'toss_20260514_0008', paidAt: '2026-05-14' },
+  { id: 'pay-1', linkId: 'mk', name: '강명구', amount: 9900, status: '결제완료', pgTransactionId: 'toss_20260722_0091', paidAt: '2026-07-22', hasUsedProContent: false },
+  { id: 'pay-2', linkId: 'parksojin', name: '박소진', amount: 9900, status: '결제완료', pgTransactionId: 'toss_20260718_0042', paidAt: '2026-07-18', hasUsedProContent: true },
+  { id: 'pay-3', linkId: 'choisunyoung', name: '최선영', amount: 9900, status: '결제실패', pgTransactionId: 'toss_20260619_0117', paidAt: '2026-06-19', hasUsedProContent: false },
+  { id: 'pay-4', linkId: 'hansanghoon', name: '한상훈', amount: 9900, status: '결제완료', pgTransactionId: 'toss_20260619_0055', paidAt: '2026-06-19', hasUsedProContent: false },
+  { id: 'pay-5', linkId: 'jungwonho', name: '정원호', amount: 9900, status: '취소', pgTransactionId: 'toss_20260514_0008', paidAt: '2026-05-14', hasUsedProContent: true },
 ]
 
 export const MOCK_PLAN_GRANTS: ManualPlanGrant[] = [

@@ -85,6 +85,7 @@ interface AdminStore {
   payments: PaymentRecord[]
   planGrants: ManualPlanGrant[]
   grantPlan: (linkId: string, days: number, reason: string) => void
+  withdrawSubscription: (paymentId: string, reason: string) => void
 
   // CS
   tickets: CsTicket[]
@@ -224,6 +225,19 @@ export const useAdminStore = create<AdminStore>()(
           users: s.users.map((u) => (u.linkId === linkId ? { ...u, isPaidUser: true } : u)),
         }))
         get().appendAudit('플랜 수동 부여', `${user?.name ?? linkId} · ${days}일`, reason)
+      },
+      withdrawSubscription: (paymentId, reason) => {
+        const actor = get().adminUser?.name ?? '알수없음'
+        const payment = get().payments.find((p) => p.id === paymentId)
+        if (!payment) return
+        set((s) => ({
+          payments: s.payments.map((p) => (p.id === paymentId ? { ...p, status: '환불' } : p)),
+          subscriptions: s.subscriptions.map((sub) =>
+            sub.linkId === payment.linkId ? { ...sub, status: '청약철회', nextBillingAt: undefined } : sub,
+          ),
+          users: s.users.map((u) => (u.linkId === payment.linkId ? { ...u, isPaidUser: false } : u)),
+        }))
+        get().appendAudit('청약철회 처리(환불)', `결제 ${paymentId} · ${payment.name}`, reason)
       },
 
       tickets: MOCK_TICKETS,
@@ -397,7 +411,7 @@ export const useAdminStore = create<AdminStore>()(
     }),
     {
       name: 'byro-admin-store',
-      version: 7,
+      version: 8,
       partialize: (state) => ({
         adminUser: state.adminUser,
         users: state.users,

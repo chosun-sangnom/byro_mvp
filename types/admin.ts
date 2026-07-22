@@ -118,7 +118,7 @@ export interface FaqItem {
   updatedAt: string
 }
 
-export type SubscriptionStatus = '활성' | '해지 예약' | '만료'
+export type SubscriptionStatus = '활성' | '해지 예약' | '청약철회' | '만료'
 
 export interface Subscription {
   id: string
@@ -130,7 +130,7 @@ export interface Subscription {
   amount: number
 }
 
-export type PaymentStatus = '결제완료' | '결제실패' | '취소'
+export type PaymentStatus = '결제완료' | '결제실패' | '취소' | '환불'
 
 export interface PaymentRecord {
   id: string
@@ -140,6 +140,8 @@ export interface PaymentRecord {
   status: PaymentStatus
   pgTransactionId: string
   paidAt: string
+  // 결제(구독 갱신) 이후 구독전용 콘텐츠를 이용했는지 — 청약철회 가능 여부 판단 기준
+  hasUsedProContent: boolean
 }
 
 export interface ManualPlanGrant {

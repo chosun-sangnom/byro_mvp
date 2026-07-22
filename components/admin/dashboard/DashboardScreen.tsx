@@ -14,7 +14,9 @@ const PERIOD_FACTOR: Record<Period, number> = { day: 1, week: 6.4, month: 24.8 }
 export default function DashboardScreen() {
   const router = useRouter()
   const [period, setPeriod] = useState<Period>('day')
-  const reportsPending = useAdminStore((s) => s.reports.filter((r) => r.status === 'pending').length)
+  const reportsPending = useAdminStore(
+    (s) => s.reports.filter((r) => r.status === 'pending').length + s.profileReports.filter((r) => r.status === 'pending').length,
+  )
   const verificationsPending = useAdminStore((s) => s.verifications.filter((v) => v.status === 'pending').length)
   const ticketsUnanswered = useAdminStore((s) => s.tickets.filter((t) => t.status !== '완료').length)
 

@@ -36,7 +36,10 @@ export interface SanctionRecord {
   suspendUntil?: string
 }
 
-export type ReportReason = '허위 내용' | '명예훼손/모욕' | '스팸/광고' | '개인정보 노출' | '기타'
+// 실제 앱의 "피드백 신고하기" 시트(components/screens/me/support-screens/ReputationManageScreen.tsx) 사유와 동일
+export type FeedbackReportReason = '불쾌한 표현이 있어요' | '허위 사실이에요' | '스팸 · 광고성 내용이에요' | '기타'
+// 실제 앱의 "프로필 신고" 시트(components/screens/profile/PublicProfileHeroSection.tsx) 사유와 동일
+export type ProfileReportReason = '허위 프로필이에요' | '부적절한 사진이 있어요' | '스팸 · 광고성 계정이에요' | '기타'
 export type ReportVerdict = '기각' | '인용'
 
 export interface FeedbackReport {
@@ -47,7 +50,8 @@ export interface FeedbackReport {
   feedbackAuthorName: string | null
   feedbackAuthorLinkId?: string
   isAnonymous: boolean
-  reason: ReportReason
+  reason: FeedbackReportReason
+  detail?: string
   reportedAt: string
   status: 'pending' | 'resolved'
   verdict?: ReportVerdict
@@ -55,6 +59,22 @@ export interface FeedbackReport {
   resolvedAt?: string
   // 관리자 권한에서만 열람 가능한 마스킹된 IP (익명 피드백 IP 차단용)
   ipMasked: string
+}
+
+// 방문자가 상대 프로필 자체를 신고 (피드백 신고와 별개 — 대상이 프로필 소유자 계정)
+export interface ProfileReport {
+  id: string
+  targetLinkId: string
+  targetOwnerName: string
+  reporterName: string
+  reporterLinkId: string
+  reason: ProfileReportReason
+  detail?: string
+  reportedAt: string
+  status: 'pending' | 'resolved'
+  verdict?: ReportVerdict
+  resolvedBy?: string
+  resolvedAt?: string
 }
 
 export type VerificationType = '학력 인증' | '가상 프로필 클레임'

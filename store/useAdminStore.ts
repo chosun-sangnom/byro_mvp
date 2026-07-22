@@ -21,6 +21,7 @@ import type {
   KemiBlockKey,
   ManualPlanGrant,
   PaymentRecord,
+  ProfileReport,
   ReportVerdict,
   SanctionRecord,
   SanctionStatus,
@@ -40,6 +41,7 @@ import {
   MOCK_JOIN_REQUESTS,
   MOCK_PAYMENTS,
   MOCK_PLAN_GRANTS,
+  MOCK_PROFILE_REPORTS,
   MOCK_REPORTS,
   MOCK_SANCTION_HISTORY,
   MOCK_SUBSCRIPTIONS,
@@ -67,9 +69,11 @@ interface AdminStore {
 
   // RPRT
   reports: FeedbackReport[]
+  profileReports: ProfileReport[]
   sanctionHistory: SanctionRecord[]
   resolveReport: (id: string, verdict: ReportVerdict) => void
   blockIp: (reportId: string) => void
+  resolveProfileReport: (id: string, verdict: ReportVerdict) => void
 
   // VRFY
   verifications: VerificationItem[]
@@ -144,6 +148,7 @@ export const useAdminStore = create<AdminStore>()(
       },
 
       reports: MOCK_REPORTS,
+      profileReports: MOCK_PROFILE_REPORTS,
       sanctionHistory: MOCK_SANCTION_HISTORY,
       resolveReport: (id, verdict) => {
         const actor = get().adminUser?.name ?? '알수없음'
@@ -159,6 +164,20 @@ export const useAdminStore = create<AdminStore>()(
           get().appendAudit('신고 처리(인용)', `피드백 ${id} · ${report.targetOwnerName}`, report.reason)
         } else if (report) {
           get().appendAudit(`신고 처리(${verdict})`, `피드백 ${id} · ${report.targetOwnerName}`, report.reason)
+        }
+      },
+      resolveProfileReport: (id, verdict) => {
+        const actor = get().adminUser?.name ?? '알수없음'
+        const report = get().profileReports.find((r) => r.id === id)
+        set((s) => ({
+          profileReports: s.profileReports.map((r) =>
+            r.id === id
+              ? { ...r, status: 'resolved', verdict, resolvedBy: actor, resolvedAt: nowLabel() }
+              : r,
+          ),
+        }))
+        if (report) {
+          get().appendAudit(`프로필 신고 처리(${verdict})`, `프로필 @${report.targetLinkId} · ${report.targetOwnerName}`, report.reason)
         }
       },
       blockIp: (reportId) => {
@@ -378,11 +397,12 @@ export const useAdminStore = create<AdminStore>()(
     }),
     {
       name: 'byro-admin-store',
-      version: 6,
+      version: 7,
       partialize: (state) => ({
         adminUser: state.adminUser,
         users: state.users,
         reports: state.reports,
+        profileReports: state.profileReports,
         sanctionHistory: state.sanctionHistory,
         verifications: state.verifications,
         subscriptions: state.subscriptions,

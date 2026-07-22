@@ -18,6 +18,7 @@ import type {
   InflowChannelStat,
   ManualPlanGrant,
   PaymentRecord,
+  ProfileReport,
   RetentionCohort,
   SanctionRecord,
   Subscription,
@@ -75,6 +76,7 @@ export const MOCK_SANCTION_HISTORY: SanctionRecord[] = [
   },
 ]
 
+// 사유는 실제 앱 "피드백 신고하기" 시트(ReputationManageScreen.tsx REPORT_REASONS)와 동일한 4종만 사용
 export const MOCK_REPORTS: FeedbackReport[] = [
   {
     id: 'rp-1',
@@ -83,7 +85,7 @@ export const MOCK_REPORTS: FeedbackReport[] = [
     feedbackMessage: '이 사람 실제로는 전혀 다르게 행동함. 믿지 마세요.',
     feedbackAuthorName: null,
     isAnonymous: true,
-    reason: '명예훼손/모욕',
+    reason: '불쾌한 표현이 있어요',
     reportedAt: '2026-07-18 14:22',
     status: 'pending',
     ipMasked: '121.***.***.44',
@@ -96,7 +98,7 @@ export const MOCK_REPORTS: FeedbackReport[] = [
     feedbackAuthorName: '이준혁',
     feedbackAuthorLinkId: 'leejunhyuk',
     isAnonymous: false,
-    reason: '스팸/광고',
+    reason: '스팸 · 광고성 내용이에요',
     reportedAt: '2026-07-17 09:05',
     status: 'pending',
     ipMasked: '210.***.***.117',
@@ -108,7 +110,8 @@ export const MOCK_REPORTS: FeedbackReport[] = [
     feedbackMessage: '본명이랑 다니는 회사 여기 다 적어놓을게요: OOO...',
     feedbackAuthorName: null,
     isAnonymous: true,
-    reason: '개인정보 노출',
+    reason: '기타',
+    detail: '개인정보(실명·소속)를 동의 없이 노출하고 있어요.',
     reportedAt: '2026-07-15 21:40',
     status: 'pending',
     ipMasked: '58.***.***.9',
@@ -121,7 +124,7 @@ export const MOCK_REPORTS: FeedbackReport[] = [
     feedbackAuthorName: '윤지수',
     feedbackAuthorLinkId: 'yoonjisoo',
     isAnonymous: false,
-    reason: '명예훼손/모욕',
+    reason: '허위 사실이에요',
     reportedAt: '2026-07-10 11:02',
     status: 'resolved',
     verdict: '인용',
@@ -144,6 +147,44 @@ export const MOCK_REPORTS: FeedbackReport[] = [
     resolvedBy: '박관리',
     resolvedAt: '2026-07-05 10:00',
     ipMasked: '175.***.***.63',
+  },
+]
+
+// 사유는 실제 앱 "프로필 신고" 시트(PublicProfileHeroSection.tsx PROFILE_REPORT_REASONS)와 동일한 4종만 사용
+export const MOCK_PROFILE_REPORTS: ProfileReport[] = [
+  {
+    id: 'ppr-1',
+    targetLinkId: 'sohnminho',
+    targetOwnerName: '손민호',
+    reporterName: '강민준',
+    reporterLinkId: 'gangminjun',
+    reason: '허위 프로필이에요',
+    detail: '재직 중이라는 회사에 실제로 없는 사람이에요.',
+    reportedAt: '2026-07-19 10:30',
+    status: 'pending',
+  },
+  {
+    id: 'ppr-2',
+    targetLinkId: 'jiminlee',
+    targetOwnerName: '이지민',
+    reporterName: '박소진',
+    reporterLinkId: 'parksojin',
+    reason: '스팸 · 광고성 계정이에요',
+    reportedAt: '2026-07-16 18:12',
+    status: 'pending',
+  },
+  {
+    id: 'ppr-3',
+    targetLinkId: 'yoonjisoo',
+    targetOwnerName: '윤지수',
+    reporterName: '권민석',
+    reporterLinkId: 'kwonminseok',
+    reason: '부적절한 사진이 있어요',
+    reportedAt: '2026-07-08 09:50',
+    status: 'resolved',
+    verdict: '기각',
+    resolvedBy: '이서연',
+    resolvedAt: '2026-07-08 14:00',
   },
 ]
 
@@ -300,7 +341,7 @@ export const MOCK_DASH_STATS = {
 }
 
 export const MOCK_PENDING_QUEUES = {
-  reportsPending: MOCK_REPORTS.filter((r) => r.status === 'pending').length,
+  reportsPending: MOCK_REPORTS.filter((r) => r.status === 'pending').length + MOCK_PROFILE_REPORTS.filter((r) => r.status === 'pending').length,
   verificationsPending: MOCK_VERIFICATIONS.filter((v) => v.status === 'pending').length,
   ticketsUnanswered: MOCK_TICKETS.filter((t) => t.status !== '완료').length,
 }

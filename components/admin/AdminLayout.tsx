@@ -36,7 +36,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter()
   const adminUser = useAdminStore((s) => s.adminUser)
   const logout = useAdminStore((s) => s.logout)
-  const reportsPending = useAdminStore((s) => s.reports.filter((r) => r.status === 'pending').length)
+  const reportsPending = useAdminStore(
+    (s) => s.reports.filter((r) => r.status === 'pending').length + s.profileReports.filter((r) => r.status === 'pending').length,
+  )
   const verificationsPending = useAdminStore((s) => s.verifications.filter((v) => v.status === 'pending').length)
   const ticketsUnanswered = useAdminStore((s) => s.tickets.filter((t) => t.status !== '완료').length)
   const joinRequestsPending = useAdminStore((s) => s.joinRequests.filter((r) => r.status === 'pending').length)

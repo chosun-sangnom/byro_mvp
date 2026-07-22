@@ -4,8 +4,8 @@ import { useMemo, useState } from 'react'
 import { Ban, Info } from 'lucide-react'
 import { useAdminStore } from '@/store/useAdminStore'
 import { AdminCard, EmptyState, SectionHeading, StatusBadge, TableShell, Td, Th } from '@/components/admin/ui'
-import { Button } from '@/components/ui'
-import type { FeedbackReport, SanctionStatus } from '@/types/admin'
+import { Button, Chip } from '@/components/ui'
+import type { FeedbackReport, ProfileReport, SanctionStatus } from '@/types/admin'
 
 const NEXT_SANCTION: Record<SanctionStatus, SanctionStatus> = {
   정상: '경고',
@@ -14,7 +14,7 @@ const NEXT_SANCTION: Record<SanctionStatus, SanctionStatus> = {
   영구정지: '영구정지',
 }
 
-function ReportRow({ report }: { report: FeedbackReport }) {
+function FeedbackReportRow({ report }: { report: FeedbackReport }) {
   const resolveReport = useAdminStore((s) => s.resolveReport)
   const blockIp = useAdminStore((s) => s.blockIp)
   const setSanction = useAdminStore((s) => s.setSanction)
@@ -44,6 +44,11 @@ function ReportRow({ report }: { report: FeedbackReport }) {
           <div className="mt-1.5 text-[13.5px]" style={{ color: 'var(--color-text-primary)' }}>
             &ldquo;{report.feedbackMessage}&rdquo;
           </div>
+          {report.detail && (
+            <div className="mt-1 text-[12.5px]" style={{ color: 'var(--color-text-secondary)' }}>
+              신고자 작성: {report.detail}
+            </div>
+          )}
           <div className="mt-1 text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>
             대상: {report.targetOwnerName} · 작성자: {report.isAnonymous ? '식별 불가(익명)' : report.feedbackAuthorName} · 신고일시 {report.reportedAt}
           </div>
@@ -84,42 +89,115 @@ function ReportRow({ report }: { report: FeedbackReport }) {
   )
 }
 
+function ProfileReportRow({ report }: { report: ProfileReport }) {
+  const resolveProfileReport = useAdminStore((s) => s.resolveProfileReport)
+  const setSanction = useAdminStore((s) => s.setSanction)
+  const users = useAdminStore((s) => s.users)
+
+  const targetUser = users.find((u) => u.linkId === report.targetLinkId)
+
+  const handleCite = () => {
+    resolveProfileReport(report.id, '인용')
+    if (targetUser) {
+      const next = NEXT_SANCTION[targetUser.sanctionStatus]
+      setSanction(targetUser.linkId, next, `프로필 신고 인용 (${report.reason}) — 자동 산정`)
+    }
+  }
+
+  return (
+    <AdminCard className="mb-3">
+      <div className="mb-2 flex items-start justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <StatusBadge label={report.reason} tone="warn" />
+            {report.status === 'resolved' && (
+              <StatusBadge label={`처리완료 · ${report.verdict}`} tone={report.verdict === '인용' ? 'danger' : 'neutral'} />
+            )}
+          </div>
+          {report.detail && (
+            <div className="mt-1.5 text-[13.5px]" style={{ color: 'var(--color-text-primary)' }}>
+              &ldquo;{report.detail}&rdquo;
+            </div>
+          )}
+          <div className="mt-1 text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>
+            대상: {report.targetOwnerName}(@{report.targetLinkId}) · 신고자: {report.reporterName}(@{report.reporterLinkId}) · 신고일시 {report.reportedAt}
+          </div>
+        </div>
+      </div>
+
+      {report.status === 'pending' ? (
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" fullWidth={false} onClick={() => resolveProfileReport(report.id, '기각')}>
+            기각
+          </Button>
+          <Button size="sm" variant="danger" fullWidth={false} onClick={handleCite}>
+            인용 (제재)
+          </Button>
+        </div>
+      ) : (
+        <div className="text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>
+          {report.resolvedBy} · {report.resolvedAt} 처리
+        </div>
+      )}
+    </AdminCard>
+  )
+}
+
 export default function ReportsScreen() {
   const reports = useAdminStore((s) => s.reports)
+  const profileReports = useAdminStore((s) => s.profileReports)
   const sanctionHistory = useAdminStore((s) => s.sanctionHistory)
-  const [tab, setTab] = useState<'pending' | 'resolved'>('pending')
+  const [reportType, setReportType] = useState<'feedback' | 'profile'>('feedback')
+  const [statusTab, setStatusTab] = useState<'pending' | 'resolved'>('pending')
 
-  const list = useMemo(() => {
-    const filtered = reports.filter((r) => r.status === tab)
+  const feedbackList = useMemo(() => {
+    const filtered = reports.filter((r) => r.status === statusTab)
     return [...filtered].sort((a, b) => a.reportedAt.localeCompare(b.reportedAt))
-  }, [reports, tab])
+  }, [reports, statusTab])
+
+  const profileList = useMemo(() => {
+    const filtered = profileReports.filter((r) => r.status === statusTab)
+    return [...filtered].sort((a, b) => a.reportedAt.localeCompare(b.reportedAt))
+  }, [profileReports, statusTab])
+
+  const list = reportType === 'feedback' ? feedbackList : profileList
 
   return (
     <div>
-      <SectionHeading title="신고·제재" description="프로필 주인이 신고한 피드백을 검토해 기각 또는 인용 처리합니다. (RPRT-01~03)" />
+      <SectionHeading
+        title="신고·제재"
+        description="피드백 신고(RPRT-01)와 프로필 신고(RPRT-04)를 검토해 기각 또는 인용 처리합니다. (RPRT-01~04)"
+      />
+
+      <div className="mb-3 flex flex-wrap gap-1.5">
+        <Chip label={`피드백 신고 (${reports.filter((r) => r.status === 'pending').length})`} selected={reportType === 'feedback'} onClick={() => setReportType('feedback')} />
+        <Chip label={`프로필 신고 (${profileReports.filter((r) => r.status === 'pending').length})`} selected={reportType === 'profile'} onClick={() => setReportType('profile')} />
+      </div>
 
       <div className="mb-4 flex gap-1 rounded-full border p-1 w-fit" style={{ borderColor: 'var(--color-border-default)' }}>
         {(['pending', 'resolved'] as const).map((t) => (
           <button
             key={t}
-            onClick={() => setTab(t)}
+            onClick={() => setStatusTab(t)}
             className="rounded-full px-4 py-1.5 text-[13px] font-bold"
             style={{
-              backgroundColor: tab === t ? 'var(--color-accent-dark)' : 'transparent',
-              color: tab === t ? '#fff' : 'var(--color-text-secondary)',
+              backgroundColor: statusTab === t ? 'var(--color-accent-dark)' : 'transparent',
+              color: statusTab === t ? '#fff' : 'var(--color-text-secondary)',
             }}
           >
-            {t === 'pending' ? '미처리' : '처리완료'} {t === 'pending' ? `(${reports.filter((r) => r.status === 'pending').length})` : ''}
+            {t === 'pending' ? '미처리' : '처리완료'}
           </button>
         ))}
       </div>
 
       {list.length === 0 ? (
         <AdminCard>
-          <EmptyState title={tab === 'pending' ? '대기 중인 신고가 없어요' : '처리된 신고가 없어요'} />
+          <EmptyState title={statusTab === 'pending' ? '대기 중인 신고가 없어요' : '처리된 신고가 없어요'} />
         </AdminCard>
+      ) : reportType === 'feedback' ? (
+        feedbackList.map((r) => <FeedbackReportRow key={r.id} report={r} />)
       ) : (
-        list.map((r) => <ReportRow key={r.id} report={r} />)
+        profileList.map((r) => <ProfileReportRow key={r.id} report={r} />)
       )}
 
       <div className="mt-8">

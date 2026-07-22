@@ -5,7 +5,7 @@ import { Lock, Search, X } from 'lucide-react'
 import type { ReactNode } from 'react'
 import type { AdminRole } from '@/types/admin'
 
-const ROLE_RANK: Record<AdminRole, number> = { viewer: 0, operator: 1, admin: 2 }
+const ROLE_RANK: Record<AdminRole, number> = { viewer: 0, operator: 1, admin: 2, owner: 3 }
 
 export function hasRole(current: AdminRole | undefined, required: AdminRole) {
   if (!current) return false
@@ -193,8 +193,10 @@ export function ToggleSwitch({
   )
 }
 
+const ROLE_LOCK_LABEL: Record<AdminRole, string> = { viewer: '뷰어', operator: '운영', admin: '관리자', owner: '소유자' }
+
 export function RoleLockNotice({ required }: { required: AdminRole }) {
-  const label = required === 'admin' ? '관리자' : '운영'
+  const label = ROLE_LOCK_LABEL[required]
   return (
     <div
       className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[12px] font-semibold"

@@ -1,22 +1,41 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ShieldCheck } from 'lucide-react'
 import { useAdminStore } from '@/store/useAdminStore'
-import { ADMIN_OPERATORS } from '@/lib/mocks/adminMocks'
+import { Button } from '@/components/ui'
 
-const ROLE_LABEL: Record<string, string> = { viewer: '뷰어 · 조회만', operator: '운영 · 신고/문의/인증 처리', admin: '관리자 · 결제/제재/IP 열람 포함 전체' }
+const ROLE_LABEL: Record<string, string> = {
+  viewer: '뷰어 · 조회만',
+  operator: '운영 · 신고/문의/인증 처리',
+  admin: '관리자 · 결제/제재/IP 열람 포함 전체',
+  owner: '소유자 · 전체 권한 + 운영자 권한 위임',
+}
 
 export default function AdminLoginScreen() {
   const router = useRouter()
+  const operators = useAdminStore((s) => s.operators)
   const login = useAdminStore((s) => s.login)
+  const submitJoinRequest = useAdminStore((s) => s.submitJoinRequest)
+
+  const [mode, setMode] = useState<'login' | 'request' | 'requested'>('login')
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [reason, setReason] = useState('')
 
   // [임시] 실제 로그인 전 목업 — 계정 목록 클릭만으로 세션 발급
   const handleSelect = (operatorId: string) => {
-    const operator = ADMIN_OPERATORS.find((o) => o.id === operatorId)
+    const operator = operators.find((o) => o.id === operatorId)
     if (!operator) return
     login(operator)
     router.replace('/admin/dashboard')
+  }
+
+  const handleSubmitRequest = () => {
+    if (!name.trim() || !email.trim()) return
+    submitJoinRequest(name.trim(), email.trim(), reason.trim() || undefined)
+    setMode('requested')
   }
 
   return (
@@ -35,29 +54,93 @@ export default function AdminLoginScreen() {
           운영자 전용 도구입니다. 일반 사용자는 접근할 수 없습니다.
         </p>
 
-        <div className="space-y-2">
-          {ADMIN_OPERATORS.map((operator) => (
-            <button
-              key={operator.id}
-              onClick={() => handleSelect(operator.id)}
-              className="flex w-full items-center justify-between rounded-2xl border px-4 py-3.5 text-left transition-colors active:opacity-70"
-              style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-surface)' }}
-            >
-              <div>
-                <div className="text-[14px] font-bold" style={{ color: 'var(--color-text-primary)' }}>
-                  {operator.name}
-                </div>
-                <div className="mt-0.5 text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>
-                  {ROLE_LABEL[operator.role]}
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
+        {mode === 'login' && (
+          <>
+            <div className="space-y-2">
+              {operators.map((operator) => (
+                <button
+                  key={operator.id}
+                  onClick={() => handleSelect(operator.id)}
+                  className="flex w-full items-center justify-between rounded-2xl border px-4 py-3.5 text-left transition-colors active:opacity-70"
+                  style={{ borderColor: 'var(--color-border-default)', backgroundColor: 'var(--color-bg-surface)' }}
+                >
+                  <div>
+                    <div className="text-[14px] font-bold" style={{ color: 'var(--color-text-primary)' }}>
+                      {operator.name}
+                    </div>
+                    <div className="mt-0.5 text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>
+                      {ROLE_LABEL[operator.role]}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
 
-        <p className="mt-5 text-[11px]" style={{ color: 'var(--color-text-tertiary)' }}>
-          [임시] 목업 단계 — 비밀번호 없이 역할별 계정을 선택해 로그인합니다.
-        </p>
+            <button
+              onClick={() => setMode('request')}
+              className="mt-4 w-full text-center text-[12.5px] font-semibold underline active:opacity-70"
+              style={{ color: 'var(--color-text-secondary)' }}
+            >
+              운영자 계정이 없으신가요? 가입 신청
+            </button>
+
+            <p className="mt-5 text-[11px]" style={{ color: 'var(--color-text-tertiary)' }}>
+              [임시] 목업 단계 — 비밀번호 없이 역할별 계정을 선택해 로그인합니다.
+            </p>
+          </>
+        )}
+
+        {mode === 'request' && (
+          <div className="space-y-3">
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="이름"
+              className="w-full rounded-xl border px-3.5 py-2.5 text-[14px] outline-none"
+              style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-primary)' }}
+            />
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="이메일"
+              type="email"
+              className="w-full rounded-xl border px-3.5 py-2.5 text-[14px] outline-none"
+              style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-primary)' }}
+            />
+            <textarea
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="신청 사유 (선택)"
+              rows={2}
+              className="w-full rounded-xl border px-3.5 py-2.5 text-[14px] outline-none"
+              style={{ borderColor: 'var(--color-border-default)', color: 'var(--color-text-primary)' }}
+            />
+            <Button variant="primary" size="md" disabled={!name.trim() || !email.trim()} onClick={handleSubmitRequest} className="w-full">
+              가입 신청
+            </Button>
+            <button
+              onClick={() => setMode('login')}
+              className="w-full text-center text-[12.5px] font-semibold underline active:opacity-70"
+              style={{ color: 'var(--color-text-secondary)' }}
+            >
+              로그인으로 돌아가기
+            </button>
+          </div>
+        )}
+
+        {mode === 'requested' && (
+          <div className="space-y-4 py-2 text-center">
+            <div className="text-[14px] font-bold" style={{ color: 'var(--color-text-primary)' }}>
+              가입 신청이 접수되었습니다
+            </div>
+            <p className="text-[12.5px]" style={{ color: 'var(--color-text-tertiary)' }}>
+              소유자 승인 후 운영자 계정으로 로그인할 수 있습니다.
+            </p>
+            <Button variant="outline" size="md" onClick={() => setMode('login')} className="w-full">
+              로그인으로 돌아가기
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   )

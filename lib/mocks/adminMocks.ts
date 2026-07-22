@@ -1,6 +1,7 @@
 // 백오피스 목업 데이터. 실제 Supabase 연동 전까지 사용하는 고정 시드 데이터.
 // linkId/name은 lib/mocks/publicProfiles.ts 의 회원과 맞춰 두어 회원관리↔신고↔인증 화면이 서로 참조 가능하게 함.
 import type {
+  AdminJoinRequest,
   AdminOperator,
   AdminUserRow,
   AiBioConfig,
@@ -27,6 +28,19 @@ export const ADMIN_OPERATORS: AdminOperator[] = [
   { id: 'op-1', name: '김도윤', role: 'viewer', email: 'doyoon.kim@byro.io' },
   { id: 'op-2', name: '이서연', role: 'operator', email: 'seoyeon.lee@byro.io' },
   { id: 'op-3', name: '박관리', role: 'admin', email: 'admin@byro.io' },
+  { id: 'op-owner', name: '오너', role: 'owner', email: 'kj82076@gmail.com' },
+]
+
+// 가입 신청 (ADMN-04) — 소유자 승인 전까지 백오피스 접근 불가
+export const MOCK_JOIN_REQUESTS: AdminJoinRequest[] = [
+  {
+    id: 'jr-1',
+    name: '최유나',
+    email: 'yuna.choi@byro.io',
+    reason: 'CS 문의 대응 인력 합류 요청',
+    requestedAt: '2026-07-20 11:04',
+    status: 'pending',
+  },
 ]
 
 export const MOCK_USER_ROWS: AdminUserRow[] = [

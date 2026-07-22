@@ -29,7 +29,7 @@ const NAV = [
   { href: '/admin/settings', label: '권한·감사', code: 'ADMN', icon: Sliders },
 ] as const
 
-const ROLE_LABEL: Record<string, string> = { viewer: '뷰어', operator: '운영', admin: '관리자' }
+const ROLE_LABEL: Record<string, string> = { viewer: '뷰어', operator: '운영', admin: '관리자', owner: '소유자' }
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname()
@@ -39,11 +39,13 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const reportsPending = useAdminStore((s) => s.reports.filter((r) => r.status === 'pending').length)
   const verificationsPending = useAdminStore((s) => s.verifications.filter((v) => v.status === 'pending').length)
   const ticketsUnanswered = useAdminStore((s) => s.tickets.filter((t) => t.status !== '완료').length)
+  const joinRequestsPending = useAdminStore((s) => s.joinRequests.filter((r) => r.status === 'pending').length)
 
   const badgeFor = (code: string) => {
     if (code === 'RPRT') return reportsPending
     if (code === 'VRFY') return verificationsPending
     if (code === 'CS') return ticketsUnanswered
+    if (code === 'ADMN') return joinRequestsPending
     return 0
   }
 

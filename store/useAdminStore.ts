@@ -4,6 +4,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { v4 as uuidv4 } from 'uuid'
 import type {
+  AdminJoinRequest,
   AdminOperator,
   AdminRole,
   AdminUserRow,
@@ -34,6 +35,7 @@ import {
   MOCK_AI_VIRTUAL_CONFIG,
   MOCK_AUDIT_LOG,
   MOCK_FAQ,
+  MOCK_JOIN_REQUESTS,
   MOCK_PAYMENTS,
   MOCK_PLAN_GRANTS,
   MOCK_REPORTS,
@@ -90,8 +92,13 @@ interface AdminStore {
   // ADMN
   operators: AdminOperator[]
   auditLog: AuditLogEntry[]
+  joinRequests: AdminJoinRequest[]
   setOperatorRole: (id: string, role: AdminRole) => void
   appendAudit: (action: string, target: string, reason?: string) => void
+  submitJoinRequest: (name: string, email: string, reason?: string) => void
+  approveJoinRequest: (id: string, role: AdminRole) => void
+  rejectJoinRequest: (id: string, reason: string) => void
+  transferOwnership: (toOperatorId: string, reason: string) => void
 
   // AI
   aiPersonaConfig: AiPersonaConfig
@@ -228,7 +235,10 @@ export const useAdminStore = create<AdminStore>()(
 
       operators: ADMIN_OPERATORS,
       auditLog: MOCK_AUDIT_LOG,
+      joinRequests: MOCK_JOIN_REQUESTS,
       setOperatorRole: (id, role) => {
+        // 소유자 지정은 위임(transferOwnership) 전용 — 이 함수로는 부여 불가
+        if (role === 'owner') return
         set((s) => ({ operators: s.operators.map((o) => (o.id === id ? { ...o, role } : o)) }))
         get().appendAudit('운영자 역할 변경', `${id} → ${role}`)
       },
@@ -237,6 +247,50 @@ export const useAdminStore = create<AdminStore>()(
         set((s) => ({
           auditLog: [{ id: uuidv4(), actor, action, target, reason, createdAt: nowLabel() }, ...s.auditLog],
         }))
+      },
+      submitJoinRequest: (name, email, reason) => {
+        set((s) => ({
+          joinRequests: [
+            { id: uuidv4(), name, email, reason, requestedAt: nowLabel(), status: 'pending' },
+            ...s.joinRequests,
+          ],
+        }))
+      },
+      approveJoinRequest: (id, role) => {
+        const actor = get().adminUser?.name ?? '알수없음'
+        const request = get().joinRequests.find((r) => r.id === id)
+        if (!request) return
+        set((s) => ({
+          operators: [...s.operators, { id: uuidv4(), name: request.name, role, email: request.email }],
+          joinRequests: s.joinRequests.map((r) =>
+            r.id === id ? { ...r, status: 'approved', reviewedBy: actor, reviewedAt: nowLabel() } : r,
+          ),
+        }))
+        get().appendAudit('가입 신청 승인', `${request.name} (${request.email}) → ${role}`)
+      },
+      rejectJoinRequest: (id, reason) => {
+        const actor = get().adminUser?.name ?? '알수없음'
+        const request = get().joinRequests.find((r) => r.id === id)
+        set((s) => ({
+          joinRequests: s.joinRequests.map((r) =>
+            r.id === id ? { ...r, status: 'rejected', reviewedBy: actor, reviewedAt: nowLabel(), rejectReason: reason } : r,
+          ),
+        }))
+        get().appendAudit('가입 신청 반려', `${request?.name ?? id} (${request?.email ?? ''})`, reason)
+      },
+      transferOwnership: (toOperatorId, reason) => {
+        const current = get().adminUser
+        const target = get().operators.find((o) => o.id === toOperatorId)
+        if (!current || current.role !== 'owner' || !target) return
+        set((s) => ({
+          operators: s.operators.map((o) => {
+            if (o.id === current.id) return { ...o, role: 'admin' }
+            if (o.id === toOperatorId) return { ...o, role: 'owner' }
+            return o
+          }),
+          adminUser: { ...current, role: 'admin' },
+        }))
+        get().appendAudit('소유자 위임', `${current.name} → ${target.name} (${target.email})`, reason)
       },
 
       aiPersonaConfig: MOCK_AI_PERSONA_CONFIG,
@@ -299,7 +353,7 @@ export const useAdminStore = create<AdminStore>()(
     }),
     {
       name: 'byro-admin-store',
-      version: 1,
+      version: 2,
       partialize: (state) => ({
         adminUser: state.adminUser,
         users: state.users,
@@ -313,6 +367,7 @@ export const useAdminStore = create<AdminStore>()(
         faq: state.faq,
         operators: state.operators,
         auditLog: state.auditLog,
+        joinRequests: state.joinRequests,
         aiPersonaConfig: state.aiPersonaConfig,
         aiBioConfig: state.aiBioConfig,
         aiKemiConfig: state.aiKemiConfig,

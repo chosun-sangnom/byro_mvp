@@ -1,13 +1,27 @@
 // Byro 백오피스(어드민) 전용 타입. 일반 사용자 타입(types/index.ts)과 분리 관리.
 // 근거: docs 노션 "백오피스 기획 v1.0"
 
-export type AdminRole = 'viewer' | 'operator' | 'admin'
+export type AdminRole = 'viewer' | 'operator' | 'admin' | 'owner'
 
 export interface AdminOperator {
   id: string
   name: string
   role: AdminRole
   email: string
+}
+
+export type AdminJoinRequestStatus = 'pending' | 'approved' | 'rejected'
+
+export interface AdminJoinRequest {
+  id: string
+  name: string
+  email: string
+  reason?: string
+  requestedAt: string
+  status: AdminJoinRequestStatus
+  reviewedBy?: string
+  reviewedAt?: string
+  rejectReason?: string
 }
 
 export type SanctionStatus = '정상' | '경고' | '일시정지' | '영구정지'

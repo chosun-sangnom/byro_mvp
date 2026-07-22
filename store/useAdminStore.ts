@@ -17,6 +17,8 @@ import type {
   CsTicket,
   FaqItem,
   FeedbackReport,
+  KemiBlockConfig,
+  KemiBlockKey,
   ManualPlanGrant,
   PaymentRecord,
   ReportVerdict,
@@ -108,6 +110,8 @@ interface AdminStore {
   updatePersonaConfig: (patch: Partial<AiPersonaConfig>, changeSummary: string) => void
   updateBioConfig: (patch: Partial<AiBioConfig>, changeSummary: string) => void
   updateKemiConfig: (patch: Partial<AiKemiConfig>, changeSummary: string) => void
+  toggleKemiKeywordCategory: (key: string, allowed: boolean) => void
+  updateKemiBlock: (key: KemiBlockKey, patch: Partial<Pick<KemiBlockConfig, 'enabled' | 'unlockCondition'>>) => void
   updateSearchConfig: (patch: Partial<AiSearchConfig>, changeSummary: string) => void
   toggleSearchCategory: (key: string, enabled: boolean) => void
   updateVirtualConfig: (patch: Partial<AiVirtualProfileConfig>, changeSummary: string) => void
@@ -304,6 +308,33 @@ export const useAdminStore = create<AdminStore>()(
         set((s) => ({ aiKemiConfig: { ...s.aiKemiConfig, ...patch, updatedBy: actor, updatedAt: nowLabel() } }))
         get().appendAudit('케미 리포트 설정 변경', 'AI 관리 · 케미 리포트', changeSummary)
       },
+      toggleKemiKeywordCategory: (key, allowed) => {
+        const actor = get().adminUser?.name ?? '알수없음'
+        const category = get().aiKemiConfig.keywordCategories.find((c) => c.key === key)
+        set((s) => ({
+          aiKemiConfig: {
+            ...s.aiKemiConfig,
+            keywordCategories: s.aiKemiConfig.keywordCategories.map((c) => (c.key === key ? { ...c, allowed } : c)),
+            updatedBy: actor,
+            updatedAt: nowLabel(),
+          },
+        }))
+        get().appendAudit('케미 공통 키워드 카테고리 변경', 'AI 관리 · 케미 리포트', `${category?.label ?? key} ${allowed ? '노출' : '숨김'}`)
+      },
+      updateKemiBlock: (key, patch) => {
+        const actor = get().adminUser?.name ?? '알수없음'
+        const block = get().aiKemiConfig.blocks.find((b) => b.key === key)
+        set((s) => ({
+          aiKemiConfig: {
+            ...s.aiKemiConfig,
+            blocks: s.aiKemiConfig.blocks.map((b) => (b.key === key ? { ...b, ...patch } : b)),
+            updatedBy: actor,
+            updatedAt: nowLabel(),
+          },
+        }))
+        const summary = 'enabled' in patch ? `${patch.enabled ? '활성화' : '비활성화'}` : `잠금 해제 조건 수정: ${patch.unlockCondition}`
+        get().appendAudit('케미 블록 설정 변경', `AI 관리 · 케미 리포트 · ${block?.label ?? key}`, summary)
+      },
 
       aiSearchConfig: MOCK_AI_SEARCH_CONFIG,
       aiVirtualConfig: MOCK_AI_VIRTUAL_CONFIG,
@@ -346,7 +377,7 @@ export const useAdminStore = create<AdminStore>()(
     }),
     {
       name: 'byro-admin-store',
-      version: 3,
+      version: 4,
       partialize: (state) => ({
         adminUser: state.adminUser,
         users: state.users,

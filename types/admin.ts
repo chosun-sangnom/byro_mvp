@@ -212,12 +212,27 @@ export interface AiBioConfig {
   updatedAt?: string
 }
 
+// 케미 리포트 5블록 (Notion "케미 정책" §1~2)
+export type KemiBlockKey = 'commonality' | 'starter' | 'flow' | 'collab' | 'value'
+
+export interface KemiBlockConfig {
+  key: KemiBlockKey
+  label: string
+  description: string
+  enabled: boolean
+  unlockCondition: string
+}
+
 export interface AiKemiConfig {
   enabled: boolean
   status: AiFeatureStatus
   cacheInvalidateOnProfileEdit: boolean
-  weights: AiWeightItem[]
+  completenessWeights: AiWeightItem[]
+  keywordCategories: AiSourceTypeItem[]
+  blocks: KemiBlockConfig[]
   copyPromptTemplate: string
+  dailyLimitFree: number
+  proUnlimited: boolean
   updatedBy?: string
   updatedAt?: string
 }

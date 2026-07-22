@@ -395,16 +395,34 @@ export const MOCK_AI_BIO_CONFIG: AiBioConfig = {
   updatedAt: '2026-07-10 09:40',
 }
 
+// Notion "케미 정책(미완)" 기준 — 완성도 기여도(§3), 공통 키워드 카테고리(§7), 블록 잠금 조건(§1~2)
 export const MOCK_AI_KEMI_CONFIG: AiKemiConfig = {
   enabled: false,
   status: '미구현(목업 고정값)',
   cacheInvalidateOnProfileEdit: true,
-  weights: [
-    { key: 'identity', label: '정체성 (MBTI · 동네 등)', weight: 40 },
-    { key: 'lifestyle', label: '라이프스타일 (운동 · 카페 등)', weight: 35 },
-    { key: 'taste', label: '취향 (음악 · 책 등)', weight: 25 },
+  completenessWeights: [
+    { key: 'mbti', label: 'MBTI 입력', weight: 15 },
+    { key: 'personality', label: '성향(personality) 입력', weight: 15 },
+    { key: 'vibe', label: '바이브 각 종류 1개 이상 (7종 × 5%)', weight: 35 },
+    { key: 'highlight', label: '하이라이트 1개 이상', weight: 20 },
+    { key: 'bio', label: '자기소개(bio) 입력', weight: 15 },
+  ],
+  keywordCategories: [
+    { key: 'taste', label: '취향', allowed: true },
+    { key: 'place', label: '장소', allowed: true },
+    { key: 'lifestyle', label: '라이프스타일', allowed: true },
+    { key: 'identity', label: '정체성', allowed: true },
+  ],
+  blocks: [
+    { key: 'commonality', label: '공통점', description: '상대와의 취향·성향 공통 키워드', enabled: true, unlockCondition: '바이브 1종 이상 OR MBTI 입력' },
+    { key: 'starter', label: '대화스타터', description: 'AI 생성 대화 시작 문장', enabled: true, unlockCondition: 'MBTI 입력 AND 바이브 2종 이상' },
+    { key: 'flow', label: '관계흐름', description: '관계가 이어지는 방식 분석', enabled: true, unlockCondition: '바이브 3종 이상 AND 자기소개 입력' },
+    { key: 'collab', label: '협업결', description: '협업·업무 궁합 분석', enabled: true, unlockCondition: '하이라이트 2개 이상' },
+    { key: 'value', label: '연결가치', description: '장기적 연결 가치 종합', enabled: true, unlockCondition: '성향 입력 AND 바이브 5종 이상' },
   ],
   copyPromptTemplate: '두 프로필의 공통점을 바탕으로 자연스러운 대화 시작 문구를 1문장으로 제안해줘.',
+  dailyLimitFree: 1,
+  proUnlimited: true,
   updatedBy: '박관리',
   updatedAt: '2026-06-25 16:00',
 }

@@ -5,7 +5,7 @@ import { Sparkles } from 'lucide-react'
 import { useAdminStore } from '@/store/useAdminStore'
 import { AdminCard, SectionHeading, ToggleSwitch } from '@/components/admin/ui'
 import { Button, Chip } from '@/components/ui'
-import type { AiFeatureKey, AiWeightItem } from '@/types/admin'
+import type { AiFeatureKey, AiWeightItem, KemiBlockConfig } from '@/types/admin'
 
 const TABS: { key: AiFeatureKey; label: string }[] = [
   { key: 'persona', label: 'AI 페르소나' },
@@ -232,21 +232,56 @@ function BioPanel() {
   )
 }
 
+function KemiBlockCard({ block }: { block: KemiBlockConfig }) {
+  const updateKemiBlock = useAdminStore((s) => s.updateKemiBlock)
+  const [condition, setCondition] = useState(block.unlockCondition)
+  const dirty = condition !== block.unlockCondition
+
+  return (
+    <AdminCard className="mb-3">
+      <div className="mb-2 flex items-center justify-between">
+        <div>
+          <div className="text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>{block.label}</div>
+          <div className="text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>{block.description}</div>
+        </div>
+        <ToggleSwitch checked={block.enabled} onChange={(v) => updateKemiBlock(block.key, { enabled: v })} />
+      </div>
+      <div className="mb-1 text-[12px] font-semibold" style={{ color: 'var(--color-text-tertiary)' }}>잠금 해제 조건</div>
+      <textarea
+        value={condition}
+        onChange={(e) => setCondition(e.target.value)}
+        rows={1}
+        className="w-full rounded-lg border px-3 py-2 text-[13px]"
+        style={{ borderColor: 'var(--color-border-default)' }}
+      />
+      <div className="mt-2 flex justify-end">
+        <Button size="sm" fullWidth={false} disabled={!dirty} onClick={() => updateKemiBlock(block.key, { unlockCondition: condition })}>
+          조건 저장
+        </Button>
+      </div>
+    </AdminCard>
+  )
+}
+
 function KemiPanel() {
   const config = useAdminStore((s) => s.aiKemiConfig)
   const updateKemiConfig = useAdminStore((s) => s.updateKemiConfig)
+  const toggleKemiKeywordCategory = useAdminStore((s) => s.toggleKemiKeywordCategory)
 
-  const [weights, setWeights] = useState<AiWeightItem[]>(config.weights)
+  const [completenessWeights, setCompletenessWeights] = useState<AiWeightItem[]>(config.completenessWeights)
   const [copyPromptTemplate, setCopyPromptTemplate] = useState(config.copyPromptTemplate)
-  const total = weights.reduce((sum, w) => sum + w.weight, 0)
-  const dirty = JSON.stringify(weights) !== JSON.stringify(config.weights) || copyPromptTemplate !== config.copyPromptTemplate
+  const [dailyLimitFree, setDailyLimitFree] = useState(String(config.dailyLimitFree))
+  const total = completenessWeights.reduce((sum, w) => sum + w.weight, 0)
+  const weightsDirty = JSON.stringify(completenessWeights) !== JSON.stringify(config.completenessWeights)
+  const promptDirty = copyPromptTemplate !== config.copyPromptTemplate
+  const limitDirty = dailyLimitFree !== String(config.dailyLimitFree)
 
   return (
     <div>
       <InfoBanner>
         구현 상태: <strong>{config.status}</strong> — 방문자와의 공통점 매칭·점수 산정 로직이 아직 없어 케미 카드의 매칭 수·대화 시작
-        문구(aiCopy)는 목업에 하드코딩되어 있습니다(docs/data-pipeline.md &quot;공통점 감지&quot; 섹션 TODO). 아래 값은 추후 서버 구현 시
-        사용할 매칭 카테고리 가중치·문구 프롬프트 초안입니다.
+        문구(aiCopy)는 목업에 하드코딩되어 있습니다. 블록 구성·잠금 조건·완성도 기준·열람 제한은 Notion &quot;케미 정책(미완)&quot; 문서를
+        기준으로 하며, 아래 값은 그 정책을 반영한 설정 초안입니다.
       </InfoBanner>
 
       <AdminCard className="mb-4">
@@ -260,7 +295,7 @@ function KemiPanel() {
         <div className="flex items-center justify-between">
           <div>
             <div className="text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>프로필 수정 시 캐시 무효화</div>
-            <div className="text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>오너가 프로필을 수정하면 케미 결과를 재계산합니다</div>
+            <div className="text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>오너가 프로필을 수정하면 케미 결과를 재계산합니다 (케미 정책 §6)</div>
           </div>
           <ToggleSwitch
             checked={config.cacheInvalidateOnProfileEdit}
@@ -269,26 +304,76 @@ function KemiPanel() {
         </div>
       </AdminCard>
 
-      <AdminCard>
-        <div className="mb-3 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>매칭 카테고리 가중치</div>
-        <WeightEditor weights={weights} onChange={setWeights} />
+      <AdminCard className="mb-4">
+        <div className="mb-3 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>완성도(%) 계산 기준 (케미 정책 §3)</div>
+        <WeightEditor weights={completenessWeights} onChange={setCompletenessWeights} />
+        <SaveFooter
+          updatedBy={config.updatedBy}
+          updatedAt={config.updatedAt}
+          disabled={!weightsDirty || total !== 100}
+          onSave={() => updateKemiConfig({ completenessWeights }, `완성도 계산 기준 수정 (합계 ${total}%)`)}
+        />
+      </AdminCard>
 
-        <div className="mt-4 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>대화 시작 문구(aiCopy) 프롬프트 템플릿</div>
+      <AdminCard className="mb-4">
+        <div className="mb-3 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>공통점 키워드 카테고리 (케미 정책 §7)</div>
+        <div className="space-y-2">
+          {config.keywordCategories.map((c) => (
+            <div key={c.key} className="flex items-center justify-between rounded-lg border px-3 py-2" style={{ borderColor: 'var(--color-border-soft)' }}>
+              <div className="text-[13px]" style={{ color: 'var(--color-text-primary)' }}>{c.label}</div>
+              <ToggleSwitch checked={c.allowed} onChange={(v) => toggleKemiKeywordCategory(c.key, v)} />
+            </div>
+          ))}
+        </div>
+      </AdminCard>
+
+      <AdminCard className="mb-4">
+        <div className="mb-3 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>대화스타터(aiCopy) 프롬프트 템플릿</div>
         <textarea
           value={copyPromptTemplate}
           onChange={(e) => setCopyPromptTemplate(e.target.value)}
           rows={3}
-          className="mt-2 w-full rounded-lg border px-3 py-2 text-[13px] disabled:opacity-50"
+          className="w-full rounded-lg border px-3 py-2 text-[13px]"
           style={{ borderColor: 'var(--color-border-default)' }}
         />
-
         <SaveFooter
           updatedBy={config.updatedBy}
           updatedAt={config.updatedAt}
-          disabled={!dirty || total !== 100}
-          onSave={() => updateKemiConfig({ weights, copyPromptTemplate }, `가중치·프롬프트 수정 (합계 ${total}%)`)}
+          disabled={!promptDirty}
+          onSave={() => updateKemiConfig({ copyPromptTemplate }, '대화스타터 프롬프트 수정')}
         />
       </AdminCard>
+
+      <AdminCard className="mb-4">
+        <div className="mb-3 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>열람 제한 (케미 정책 §5)</div>
+        <div className="mb-3 flex items-center gap-3">
+          <div className="text-[13px]" style={{ color: 'var(--color-text-secondary)' }}>Free 일일 열람 횟수</div>
+          <input
+            type="number"
+            min={0}
+            value={dailyLimitFree}
+            onChange={(e) => setDailyLimitFree(e.target.value)}
+            className="w-[80px] rounded-lg border px-3 py-1.5 text-[13px]"
+            style={{ borderColor: 'var(--color-border-default)' }}
+          />
+          <div className="text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>매일 자정 초기화</div>
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="text-[13px]" style={{ color: 'var(--color-text-secondary)' }}>Pro 무제한</div>
+          <ToggleSwitch checked={config.proUnlimited} onChange={(v) => updateKemiConfig({ proUnlimited: v }, `Pro 무제한 ${v ? 'ON' : 'OFF'}`)} />
+        </div>
+        <SaveFooter
+          updatedBy={config.updatedBy}
+          updatedAt={config.updatedAt}
+          disabled={!limitDirty}
+          onSave={() => updateKemiConfig({ dailyLimitFree: Number(dailyLimitFree) || 0 }, `Free 일일 열람 횟수 수정 (${dailyLimitFree}회)`)}
+        />
+      </AdminCard>
+
+      <div className="mb-3 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>블록별 설정 (케미 정책 §1~2)</div>
+      {config.blocks.map((block) => (
+        <KemiBlockCard key={block.key} block={block} />
+      ))}
     </div>
   )
 }

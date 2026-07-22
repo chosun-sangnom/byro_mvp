@@ -548,12 +548,12 @@ export const MOCK_AI_VIRTUAL_CONFIG: AiVirtualProfileConfig = {
   enabled: true,
   status: '미구현(목업 고정값)',
   disclaimerText: 'AI가 구조화한 추정 프로필입니다',
-  sourceTypes: [
-    { key: 'news', label: '뉴스 기사', allowed: true },
-    { key: 'org_page', label: '회사·기관 소개 페이지', allowed: true },
-    { key: 'public_sns', label: '공개 SNS 게시물', allowed: true },
-    { key: 'award_db', label: '수상·이력 데이터베이스', allowed: true },
-    { key: 'private_paid', label: '비공개·유료 데이터', allowed: false },
+  // 순서 = 생성 시 조회 우선순위 (1순위부터)
+  sources: [
+    { key: 'google_news', label: '구글 뉴스' },
+    { key: 'naver_news', label: '네이버뉴스' },
+    { key: 'namuwiki', label: '나무위키' },
+    { key: 'naver_people', label: '네이버 인물검색' },
   ],
   updatedBy: '박관리',
   updatedAt: '2026-06-10 10:00',

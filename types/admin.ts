@@ -262,11 +262,17 @@ export interface AiSourceTypeItem {
   allowed: boolean
 }
 
+export interface AiVirtualSourceItem {
+  key: string
+  label: string
+}
+
 export interface AiVirtualProfileConfig {
   enabled: boolean
   status: AiFeatureStatus
   disclaimerText: string
-  sourceTypes: AiSourceTypeItem[]
+  // 생성 근거 출처 우선순위 — 배열 순서가 곧 순위 (0번째 = 1순위)
+  sources: AiVirtualSourceItem[]
   updatedBy?: string
   updatedAt?: string
 }

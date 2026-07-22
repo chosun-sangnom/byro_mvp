@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Sparkles } from 'lucide-react'
+import { ChevronDown, ChevronUp, Sparkles } from 'lucide-react'
 import { useAdminStore } from '@/store/useAdminStore'
 import { AdminCard, SectionHeading, ToggleSwitch } from '@/components/admin/ui'
 import { Button, Chip } from '@/components/ui'
@@ -505,7 +505,7 @@ function SearchPanel() {
 function VirtualPanel() {
   const config = useAdminStore((s) => s.aiVirtualConfig)
   const updateVirtualConfig = useAdminStore((s) => s.updateVirtualConfig)
-  const toggleVirtualSourceType = useAdminStore((s) => s.toggleVirtualSourceType)
+  const moveVirtualSource = useAdminStore((s) => s.moveVirtualSource)
 
   const [disclaimerText, setDisclaimerText] = useState(config.disclaimerText)
   const dirty = disclaimerText !== config.disclaimerText
@@ -529,12 +529,37 @@ function VirtualPanel() {
       </AdminCard>
 
       <AdminCard className="mb-4">
-        <div className="mb-3 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>생성 근거로 허용하는 출처</div>
+        <div className="mb-3 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>생성 근거 출처 우선순위</div>
         <div className="space-y-2">
-          {config.sourceTypes.map((s) => (
+          {config.sources.map((s, i) => (
             <div key={s.key} className="flex items-center justify-between rounded-lg border px-3 py-2" style={{ borderColor: 'var(--color-border-soft)' }}>
-              <div className="text-[13px]" style={{ color: 'var(--color-text-primary)' }}>{s.label}</div>
-              <ToggleSwitch checked={s.allowed} onChange={(v) => toggleVirtualSourceType(s.key, v)} />
+              <div className="flex items-center gap-2.5">
+                <span
+                  className="flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold"
+                  style={{ backgroundColor: 'var(--color-accent-bg)', color: 'var(--color-accent-dark)' }}
+                >
+                  {i + 1}
+                </span>
+                <div className="text-[13px]" style={{ color: 'var(--color-text-primary)' }}>{s.label}</div>
+              </div>
+              <div className="flex gap-1">
+                <button
+                  disabled={i === 0}
+                  onClick={() => moveVirtualSource(s.key, 'up')}
+                  className="icon-button disabled:opacity-30"
+                  aria-label="우선순위 올리기"
+                >
+                  <ChevronUp size={15} color="var(--color-text-secondary)" />
+                </button>
+                <button
+                  disabled={i === config.sources.length - 1}
+                  onClick={() => moveVirtualSource(s.key, 'down')}
+                  className="icon-button disabled:opacity-30"
+                  aria-label="우선순위 내리기"
+                >
+                  <ChevronDown size={15} color="var(--color-text-secondary)" />
+                </button>
+              </div>
             </div>
           ))}
         </div>

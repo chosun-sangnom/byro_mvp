@@ -115,7 +115,7 @@ interface AdminStore {
   updateSearchConfig: (patch: Partial<AiSearchConfig>, changeSummary: string) => void
   toggleSearchCategory: (key: string, enabled: boolean) => void
   updateVirtualConfig: (patch: Partial<AiVirtualProfileConfig>, changeSummary: string) => void
-  toggleVirtualSourceType: (key: string, allowed: boolean) => void
+  moveVirtualSource: (key: string, direction: 'up' | 'down') => void
 }
 
 export const useAdminStore = create<AdminStore>()(
@@ -366,23 +366,27 @@ export const useAdminStore = create<AdminStore>()(
         set((s) => ({ aiVirtualConfig: { ...s.aiVirtualConfig, ...patch, updatedBy: actor, updatedAt: nowLabel() } }))
         get().appendAudit('가상 프로필 설정 변경', 'AI 관리 · 가상 프로필', changeSummary)
       },
-      toggleVirtualSourceType: (key, allowed) => {
+      moveVirtualSource: (key, direction) => {
         const actor = get().adminUser?.name ?? '알수없음'
-        const sourceType = get().aiVirtualConfig.sourceTypes.find((s) => s.key === key)
+        const sources = get().aiVirtualConfig.sources
+        const index = sources.findIndex((s) => s.key === key)
+        const swapWith = direction === 'up' ? index - 1 : index + 1
+        if (index === -1 || swapWith < 0 || swapWith >= sources.length) return
+        const next = [...sources]
+        ;[next[index], next[swapWith]] = [next[swapWith], next[index]]
         set((s) => ({
-          aiVirtualConfig: {
-            ...s.aiVirtualConfig,
-            sourceTypes: s.aiVirtualConfig.sourceTypes.map((st) => (st.key === key ? { ...st, allowed } : st)),
-            updatedBy: actor,
-            updatedAt: nowLabel(),
-          },
+          aiVirtualConfig: { ...s.aiVirtualConfig, sources: next, updatedBy: actor, updatedAt: nowLabel() },
         }))
-        get().appendAudit('가상 프로필 출처 허용 변경', 'AI 관리 · 가상 프로필', `${sourceType?.label ?? key} ${allowed ? '허용' : '금지'}`)
+        get().appendAudit(
+          '가상 프로필 출처 우선순위 변경',
+          'AI 관리 · 가상 프로필',
+          next.map((s, i) => `${i + 1}순위 ${s.label}`).join(' · '),
+        )
       },
     }),
     {
       name: 'byro-admin-store',
-      version: 5,
+      version: 6,
       partialize: (state) => ({
         adminUser: state.adminUser,
         users: state.users,

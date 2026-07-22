@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import { FileText, Info } from 'lucide-react'
 import { useAdminStore } from '@/store/useAdminStore'
-import { AdminCard, EmptyState, RoleLockNotice, SectionHeading, StatusBadge, hasRole } from '@/components/admin/ui'
+import { AdminCard, EmptyState, SectionHeading, StatusBadge } from '@/components/admin/ui'
 import { Button } from '@/components/ui'
 import type { VerificationItem, VerificationType } from '@/types/admin'
 
@@ -11,10 +11,8 @@ const STATUS_TONE = { pending: 'warn', approved: 'success', rejected: 'danger' }
 const STATUS_LABEL = { pending: '검토 대기', approved: '승인', rejected: '반려' } as const
 
 function VerificationRow({ item }: { item: VerificationItem }) {
-  const adminUser = useAdminStore((s) => s.adminUser)
   const approveVerification = useAdminStore((s) => s.approveVerification)
   const rejectVerification = useAdminStore((s) => s.rejectVerification)
-  const canOperate = hasRole(adminUser?.role, 'operator')
   const [rejecting, setRejecting] = useState(false)
   const [reason, setReason] = useState('')
 
@@ -45,44 +43,40 @@ function VerificationRow({ item }: { item: VerificationItem }) {
       </div>
 
       {item.status === 'pending' &&
-        (canOperate ? (
-          rejecting ? (
-            <div className="space-y-2">
-              <textarea
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                placeholder="반려 사유 입력 (필수)"
-                rows={2}
-                className="w-full rounded-lg border px-3 py-2 text-[13px]"
-                style={{ borderColor: 'var(--color-border-default)' }}
-              />
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" fullWidth={false} onClick={() => setRejecting(false)}>
-                  취소
-                </Button>
-                <Button
-                  size="sm"
-                  variant="danger"
-                  fullWidth={false}
-                  disabled={!reason.trim()}
-                  onClick={() => rejectVerification(item.id, reason.trim())}
-                >
-                  반려 확정
-                </Button>
-              </div>
-            </div>
-          ) : (
+        (rejecting ? (
+          <div className="space-y-2">
+            <textarea
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="반려 사유 입력 (필수)"
+              rows={2}
+              className="w-full rounded-lg border px-3 py-2 text-[13px]"
+              style={{ borderColor: 'var(--color-border-default)' }}
+            />
             <div className="flex gap-2">
-              <Button size="sm" fullWidth={false} onClick={() => approveVerification(item.id)}>
-                승인
+              <Button size="sm" variant="outline" fullWidth={false} onClick={() => setRejecting(false)}>
+                취소
               </Button>
-              <Button size="sm" variant="outline" fullWidth={false} onClick={() => setRejecting(true)}>
-                반려
+              <Button
+                size="sm"
+                variant="danger"
+                fullWidth={false}
+                disabled={!reason.trim()}
+                onClick={() => rejectVerification(item.id, reason.trim())}
+              >
+                반려 확정
               </Button>
             </div>
-          )
+          </div>
         ) : (
-          <RoleLockNotice required="operator" />
+          <div className="flex gap-2">
+            <Button size="sm" fullWidth={false} onClick={() => approveVerification(item.id)}>
+              승인
+            </Button>
+            <Button size="sm" variant="outline" fullWidth={false} onClick={() => setRejecting(true)}>
+              반려
+            </Button>
+          </div>
         ))}
     </AdminCard>
   )

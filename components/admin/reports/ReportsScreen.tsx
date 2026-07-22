@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import { Ban, Info } from 'lucide-react'
 import { useAdminStore } from '@/store/useAdminStore'
-import { AdminCard, EmptyState, RoleLockNotice, SectionHeading, StatusBadge, TableShell, Td, Th, hasRole } from '@/components/admin/ui'
+import { AdminCard, EmptyState, SectionHeading, StatusBadge, TableShell, Td, Th } from '@/components/admin/ui'
 import { Button } from '@/components/ui'
 import type { FeedbackReport, SanctionStatus } from '@/types/admin'
 
@@ -15,13 +15,10 @@ const NEXT_SANCTION: Record<SanctionStatus, SanctionStatus> = {
 }
 
 function ReportRow({ report }: { report: FeedbackReport }) {
-  const adminUser = useAdminStore((s) => s.adminUser)
   const resolveReport = useAdminStore((s) => s.resolveReport)
   const blockIp = useAdminStore((s) => s.blockIp)
   const setSanction = useAdminStore((s) => s.setSanction)
   const users = useAdminStore((s) => s.users)
-  const canOperate = hasRole(adminUser?.role, 'operator')
-  const canSeeIp = hasRole(adminUser?.role, 'admin')
 
   const targetUser = users.find((u) => u.linkId === report.feedbackAuthorLinkId)
 
@@ -60,28 +57,24 @@ function ReportRow({ report }: { report: FeedbackReport }) {
         >
           <Info size={13} />
           익명 작성자는 운영자도 식별할 수 없습니다 (평판 리뷰 정책). 계정 제재 불가 — IP 차단만 가능합니다.
-          {canSeeIp ? <span className="ml-1 font-mono">{report.ipMasked}</span> : <RoleLockNotice required="admin" />}
+          <span className="ml-1 font-mono">{report.ipMasked}</span>
         </div>
       )}
 
       {report.status === 'pending' ? (
-        canOperate ? (
-          <div className="flex gap-2">
-            <Button size="sm" variant="outline" fullWidth={false} onClick={() => resolveReport(report.id, '기각')}>
-              기각 (피드백 복구)
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" fullWidth={false} onClick={() => resolveReport(report.id, '기각')}>
+            기각 (피드백 복구)
+          </Button>
+          <Button size="sm" variant="danger" fullWidth={false} onClick={handleCite}>
+            인용 (삭제 확정{!report.isAnonymous ? ' + 제재' : ''})
+          </Button>
+          {report.isAnonymous && (
+            <Button size="sm" variant="outline" fullWidth={false} onClick={() => blockIp(report.id)} className="flex items-center gap-1">
+              <Ban size={13} /> IP 차단
             </Button>
-            <Button size="sm" variant="danger" fullWidth={false} onClick={handleCite}>
-              인용 (삭제 확정{!report.isAnonymous ? ' + 제재' : ''})
-            </Button>
-            {report.isAnonymous && canSeeIp && (
-              <Button size="sm" variant="outline" fullWidth={false} onClick={() => blockIp(report.id)} className="flex items-center gap-1">
-                <Ban size={13} /> IP 차단
-              </Button>
-            )}
-          </div>
-        ) : (
-          <RoleLockNotice required="operator" />
-        )
+          )}
+        </div>
       ) : (
         <div className="text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>
           {report.resolvedBy} · {report.resolvedAt} 처리

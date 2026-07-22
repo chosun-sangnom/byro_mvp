@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useAdminStore } from '@/store/useAdminStore'
-import { Drawer, StatusBadge, RoleLockNotice, hasRole } from '@/components/admin/ui'
+import { Drawer, StatusBadge } from '@/components/admin/ui'
 import { Button } from '@/components/ui'
 import type { AdminUserRow, SanctionStatus } from '@/types/admin'
 
@@ -16,11 +16,9 @@ const SANCTION_TONE: Record<SanctionStatus, 'success' | 'warn' | 'danger'> = {
 const SANCTION_OPTIONS: SanctionStatus[] = ['정상', '경고', '일시정지', '영구정지']
 
 export default function UserDetailDrawer({ user, onClose }: { user: AdminUserRow | null; onClose: () => void }) {
-  const adminUser = useAdminStore((s) => s.adminUser)
   const setSanction = useAdminStore((s) => s.setSanction)
   const forceWithdraw = useAdminStore((s) => s.forceWithdraw)
   const sanctionHistory = useAdminStore((s) => s.sanctionHistory)
-  const canSanction = hasRole(adminUser?.role, 'admin')
 
   const [status, setStatus] = useState<SanctionStatus>('정상')
   const [reason, setReason] = useState('')
@@ -55,14 +53,12 @@ export default function UserDetailDrawer({ user, onClose }: { user: AdminUserRow
           <div className="text-[13px] font-bold" style={{ color: 'var(--color-text-primary)' }}>
             제재 상태 관리 (USER-02)
           </div>
-          {!canSanction && <RoleLockNotice required="admin" />}
         </div>
 
         <div className="mb-2 flex flex-wrap gap-1.5">
           {SANCTION_OPTIONS.map((opt) => (
             <button
               key={opt}
-              disabled={!canSanction}
               onClick={() => setStatus(opt)}
               className="rounded-full border px-3 py-1.5 text-[12px] font-bold disabled:opacity-40"
               style={{
@@ -79,7 +75,6 @@ export default function UserDetailDrawer({ user, onClose }: { user: AdminUserRow
         {status === '일시정지' && (
           <input
             type="date"
-            disabled={!canSanction}
             value={suspendUntil}
             onChange={(e) => setSuspendUntil(e.target.value)}
             className="mb-2 w-full rounded-lg border px-3 py-2 text-[13px] disabled:opacity-50"
@@ -88,7 +83,6 @@ export default function UserDetailDrawer({ user, onClose }: { user: AdminUserRow
         )}
 
         <textarea
-          disabled={!canSanction}
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           placeholder="사유 입력 (필수)"
@@ -99,7 +93,7 @@ export default function UserDetailDrawer({ user, onClose }: { user: AdminUserRow
 
         <Button
           size="sm"
-          disabled={!canSanction || !reason.trim()}
+          disabled={!reason.trim()}
           onClick={() => {
             setSanction(user.linkId, status, reason.trim(), suspendUntil || undefined)
             setReason('')
@@ -124,10 +118,9 @@ export default function UserDetailDrawer({ user, onClose }: { user: AdminUserRow
           <div className="text-[13px] font-bold" style={{ color: 'var(--color-state-danger-text)' }}>
             탈퇴 처리 (USER-03)
           </div>
-          {!canSanction && <RoleLockNotice required="admin" />}
         </div>
         {!showWithdraw ? (
-          <Button variant="danger" size="sm" disabled={!canSanction} onClick={() => setShowWithdraw(true)}>
+          <Button variant="danger" size="sm" onClick={() => setShowWithdraw(true)}>
             운영자 강제 탈퇴
           </Button>
         ) : (

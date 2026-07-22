@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, Trash2, User } from 'lucide-react'
 import { useAdminStore } from '@/store/useAdminStore'
-import { AdminCard, EmptyState, RoleLockNotice, SectionHeading, StatusBadge, hasRole } from '@/components/admin/ui'
+import { AdminCard, EmptyState, SectionHeading, StatusBadge } from '@/components/admin/ui'
 import { Button, Chip } from '@/components/ui'
 import type { CsTicket, TicketCategory, TicketStatus } from '@/types/admin'
 
@@ -13,10 +13,8 @@ const CATEGORIES: TicketCategory[] = ['계정', '결제', '신고', '기타']
 
 function TicketRow({ ticket }: { ticket: CsTicket }) {
   const router = useRouter()
-  const adminUser = useAdminStore((s) => s.adminUser)
   const updateTicketStatus = useAdminStore((s) => s.updateTicketStatus)
   const replyTicket = useAdminStore((s) => s.replyTicket)
-  const canOperate = hasRole(adminUser?.role, 'operator')
   const [reply, setReply] = useState(ticket.reply ?? '')
 
   return (
@@ -44,44 +42,40 @@ function TicketRow({ ticket }: { ticket: CsTicket }) {
         )}
       </div>
 
-      {canOperate ? (
-        <div className="space-y-2">
-          <div className="flex gap-1.5">
-            {(['접수', '처리 중', '완료'] as TicketStatus[]).map((s) => (
-              <button
-                key={s}
-                onClick={() => updateTicketStatus(ticket.id, s)}
-                className="rounded-full border px-3 py-1 text-[12px] font-bold"
-                style={{
-                  borderColor: ticket.status === s ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
-                  backgroundColor: ticket.status === s ? 'var(--color-accent-bg)' : 'transparent',
-                  color: ticket.status === s ? 'var(--color-accent-dark)' : 'var(--color-text-secondary)',
-                }}
-              >
-                {s}
-              </button>
-            ))}
-          </div>
-          <textarea
-            value={reply}
-            onChange={(e) => setReply(e.target.value)}
-            placeholder="답변 작성 (발송 시 이메일로 전달됩니다)"
-            rows={2}
-            className="w-full rounded-lg border px-3 py-2 text-[13px]"
-            style={{ borderColor: 'var(--color-border-default)' }}
-          />
-          <Button size="sm" fullWidth={false} disabled={!reply.trim()} onClick={() => replyTicket(ticket.id, reply.trim())}>
-            답변 발송
-          </Button>
-          {ticket.reply && (
-            <div className="rounded-lg px-3 py-2 text-[12.5px]" style={{ backgroundColor: 'var(--color-bg-soft)', color: 'var(--color-text-secondary)' }}>
-              {ticket.reply} <span style={{ color: 'var(--color-text-tertiary)' }}>· {ticket.repliedAt} 발송</span>
-            </div>
-          )}
+      <div className="space-y-2">
+        <div className="flex gap-1.5">
+          {(['접수', '처리 중', '완료'] as TicketStatus[]).map((s) => (
+            <button
+              key={s}
+              onClick={() => updateTicketStatus(ticket.id, s)}
+              className="rounded-full border px-3 py-1 text-[12px] font-bold"
+              style={{
+                borderColor: ticket.status === s ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
+                backgroundColor: ticket.status === s ? 'var(--color-accent-bg)' : 'transparent',
+                color: ticket.status === s ? 'var(--color-accent-dark)' : 'var(--color-text-secondary)',
+              }}
+            >
+              {s}
+            </button>
+          ))}
         </div>
-      ) : (
-        <RoleLockNotice required="operator" />
-      )}
+        <textarea
+          value={reply}
+          onChange={(e) => setReply(e.target.value)}
+          placeholder="답변 작성 (발송 시 이메일로 전달됩니다)"
+          rows={2}
+          className="w-full rounded-lg border px-3 py-2 text-[13px]"
+          style={{ borderColor: 'var(--color-border-default)' }}
+        />
+        <Button size="sm" fullWidth={false} disabled={!reply.trim()} onClick={() => replyTicket(ticket.id, reply.trim())}>
+          답변 발송
+        </Button>
+        {ticket.reply && (
+          <div className="rounded-lg px-3 py-2 text-[12.5px]" style={{ backgroundColor: 'var(--color-bg-soft)', color: 'var(--color-text-secondary)' }}>
+            {ticket.reply} <span style={{ color: 'var(--color-text-tertiary)' }}>· {ticket.repliedAt} 발송</span>
+          </div>
+        )}
+      </div>
     </AdminCard>
   )
 }

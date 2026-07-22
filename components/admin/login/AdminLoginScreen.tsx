@@ -7,10 +7,8 @@ import { useAdminStore } from '@/store/useAdminStore'
 import { Button } from '@/components/ui'
 
 const ROLE_LABEL: Record<string, string> = {
-  viewer: '뷰어 · 조회만',
-  operator: '운영 · 신고/문의/인증 처리',
-  admin: '관리자 · 결제/제재/IP 열람 포함 전체',
-  owner: '소유자 · 전체 권한 + 운영자 권한 위임',
+  manager: '매니저 · 가입 승인·오너 위임 제외 전체 운영',
+  owner: '오너 · 전체 권한 + 가입 승인 + 위임',
 }
 
 export default function AdminLoginScreen() {
@@ -134,7 +132,7 @@ export default function AdminLoginScreen() {
               가입 신청이 접수되었습니다
             </div>
             <p className="text-[12.5px]" style={{ color: 'var(--color-text-tertiary)' }}>
-              소유자 승인 후 운영자 계정으로 로그인할 수 있습니다.
+              오너 승인 후 운영자 계정으로 로그인할 수 있습니다.
             </p>
             <Button variant="outline" size="md" onClick={() => setMode('login')} className="w-full">
               로그인으로 돌아가기

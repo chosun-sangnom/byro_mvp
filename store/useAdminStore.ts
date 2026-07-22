@@ -93,7 +93,6 @@ interface AdminStore {
   operators: AdminOperator[]
   auditLog: AuditLogEntry[]
   joinRequests: AdminJoinRequest[]
-  setOperatorRole: (id: string, role: AdminRole) => void
   appendAudit: (action: string, target: string, reason?: string) => void
   submitJoinRequest: (name: string, email: string, reason?: string) => void
   approveJoinRequest: (id: string, role: AdminRole) => void
@@ -236,12 +235,6 @@ export const useAdminStore = create<AdminStore>()(
       operators: ADMIN_OPERATORS,
       auditLog: MOCK_AUDIT_LOG,
       joinRequests: MOCK_JOIN_REQUESTS,
-      setOperatorRole: (id, role) => {
-        // 소유자 지정은 위임(transferOwnership) 전용 — 이 함수로는 부여 불가
-        if (role === 'owner') return
-        set((s) => ({ operators: s.operators.map((o) => (o.id === id ? { ...o, role } : o)) }))
-        get().appendAudit('운영자 역할 변경', `${id} → ${role}`)
-      },
       appendAudit: (action, target, reason) => {
         const actor = get().adminUser?.name ?? '시스템'
         set((s) => ({
@@ -284,13 +277,13 @@ export const useAdminStore = create<AdminStore>()(
         if (!current || current.role !== 'owner' || !target) return
         set((s) => ({
           operators: s.operators.map((o) => {
-            if (o.id === current.id) return { ...o, role: 'admin' }
+            if (o.id === current.id) return { ...o, role: 'manager' }
             if (o.id === toOperatorId) return { ...o, role: 'owner' }
             return o
           }),
-          adminUser: { ...current, role: 'admin' },
+          adminUser: { ...current, role: 'manager' },
         }))
-        get().appendAudit('소유자 위임', `${current.name} → ${target.name} (${target.email})`, reason)
+        get().appendAudit('오너 위임', `${current.name} → ${target.name} (${target.email})`, reason)
       },
 
       aiPersonaConfig: MOCK_AI_PERSONA_CONFIG,
@@ -353,7 +346,7 @@ export const useAdminStore = create<AdminStore>()(
     }),
     {
       name: 'byro-admin-store',
-      version: 2,
+      version: 3,
       partialize: (state) => ({
         adminUser: state.adminUser,
         users: state.users,

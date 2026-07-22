@@ -25,13 +25,13 @@ import type {
 } from '@/types/admin'
 
 export const ADMIN_OPERATORS: AdminOperator[] = [
-  { id: 'op-1', name: '김도윤', role: 'viewer', email: 'doyoon.kim@byro.io' },
-  { id: 'op-2', name: '이서연', role: 'operator', email: 'seoyeon.lee@byro.io' },
-  { id: 'op-3', name: '박관리', role: 'admin', email: 'admin@byro.io' },
+  { id: 'op-1', name: '김도윤', role: 'manager', email: 'doyoon.kim@byro.io' },
+  { id: 'op-2', name: '이서연', role: 'manager', email: 'seoyeon.lee@byro.io' },
+  { id: 'op-3', name: '박관리', role: 'manager', email: 'admin@byro.io' },
   { id: 'op-owner', name: '오너', role: 'owner', email: 'kj82076@gmail.com' },
 ]
 
-// 가입 신청 (ADMN-04) — 소유자 승인 전까지 백오피스 접근 불가
+// 가입 신청 (ADMN-04) — 오너 승인 전까지 백오피스 접근 불가
 export const MOCK_JOIN_REQUESTS: AdminJoinRequest[] = [
   {
     id: 'jr-1',

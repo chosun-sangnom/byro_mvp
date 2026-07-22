@@ -29,7 +29,7 @@ const NAV = [
   { href: '/admin/settings', label: '권한·감사', code: 'ADMN', icon: Sliders },
 ] as const
 
-const ROLE_LABEL: Record<string, string> = { viewer: '뷰어', operator: '운영', admin: '관리자', owner: '소유자' }
+const ROLE_LABEL: Record<string, string> = { manager: '매니저', owner: '오너' }
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname()

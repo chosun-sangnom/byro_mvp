@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useAdminStore } from '@/store/useAdminStore'
-import { AdminCard, RoleLockNotice, SectionHeading, StatusBadge, TableShell, Td, Th, hasRole } from '@/components/admin/ui'
+import { AdminCard, SectionHeading, StatusBadge, TableShell, Td, Th } from '@/components/admin/ui'
 import { Button } from '@/components/ui'
 import { MOCK_DASH_STATS } from '@/lib/mocks/adminMocks'
 import type { SubscriptionStatus, PaymentStatus } from '@/types/admin'
@@ -16,13 +16,11 @@ const PAY_TONE: Record<PaymentStatus, 'success' | 'danger' | 'neutral' | 'warn'>
 }
 
 export default function BillingScreen() {
-  const adminUser = useAdminStore((s) => s.adminUser)
   const subscriptions = useAdminStore((s) => s.subscriptions)
   const payments = useAdminStore((s) => s.payments)
   const planGrants = useAdminStore((s) => s.planGrants)
   const refundPayment = useAdminStore((s) => s.refundPayment)
   const grantPlan = useAdminStore((s) => s.grantPlan)
-  const canBill = hasRole(adminUser?.role, 'admin')
 
   const [grantLinkId, setGrantLinkId] = useState('')
   const [grantDays, setGrantDays] = useState('30')
@@ -97,12 +95,11 @@ export default function BillingScreen() {
                 <Td className="font-mono">{p.pgTransactionId}</Td>
                 <Td>{p.paidAt}</Td>
                 <Td>
-                  {p.status === '결제완료' && canBill && (
+                  {p.status === '결제완료' && (
                     <button onClick={() => refundPayment(p.id)} className="text-[12.5px] font-bold" style={{ color: 'var(--color-state-danger-text)' }}>
                       환불 처리
                     </button>
                   )}
-                  {p.status === '결제완료' && !canBill && <RoleLockNotice required="admin" />}
                 </Td>
               </tr>
             ))}
@@ -113,12 +110,10 @@ export default function BillingScreen() {
       <AdminCard>
         <div className="mb-2 flex items-center justify-between">
           <div className="text-[13px] font-bold" style={{ color: 'var(--color-text-primary)' }}>수동 플랜 부여 (BILL-04)</div>
-          {!canBill && <RoleLockNotice required="admin" />}
         </div>
         <p className="mb-3 text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>보상 · CS 대응용으로 Pro 기간을 수동 부여합니다.</p>
         <div className="mb-2 flex gap-2">
           <input
-            disabled={!canBill}
             value={grantLinkId}
             onChange={(e) => setGrantLinkId(e.target.value)}
             placeholder="linkId"
@@ -126,7 +121,6 @@ export default function BillingScreen() {
             style={{ borderColor: 'var(--color-border-default)' }}
           />
           <input
-            disabled={!canBill}
             type="number"
             value={grantDays}
             onChange={(e) => setGrantDays(e.target.value)}
@@ -135,7 +129,6 @@ export default function BillingScreen() {
             style={{ borderColor: 'var(--color-border-default)' }}
           />
           <input
-            disabled={!canBill}
             value={grantReason}
             onChange={(e) => setGrantReason(e.target.value)}
             placeholder="사유 (필수)"
@@ -146,7 +139,7 @@ export default function BillingScreen() {
         <Button
           size="sm"
           fullWidth={false}
-          disabled={!canBill || !grantLinkId.trim() || !grantReason.trim()}
+          disabled={!grantLinkId.trim() || !grantReason.trim()}
           onClick={() => {
             grantPlan(grantLinkId.trim(), Number(grantDays) || 30, grantReason.trim())
             setGrantLinkId('')

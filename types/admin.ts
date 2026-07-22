@@ -1,7 +1,7 @@
 // Byro 백오피스(어드민) 전용 타입. 일반 사용자 타입(types/index.ts)과 분리 관리.
 // 근거: docs 노션 "백오피스 기획 v1.0"
 
-export type AdminRole = 'viewer' | 'operator' | 'admin' | 'owner'
+export type AdminRole = 'manager' | 'owner'
 
 export interface AdminOperator {
   id: string

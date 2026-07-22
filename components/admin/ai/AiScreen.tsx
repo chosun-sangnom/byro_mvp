@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Sparkles } from 'lucide-react'
 import { useAdminStore } from '@/store/useAdminStore'
-import { AdminCard, RoleLockNotice, SectionHeading, ToggleSwitch, hasRole } from '@/components/admin/ui'
+import { AdminCard, SectionHeading, ToggleSwitch } from '@/components/admin/ui'
 import { Button, Chip } from '@/components/ui'
 import type { AiFeatureKey, AiWeightItem } from '@/types/admin'
 
@@ -96,10 +96,8 @@ function SaveFooter({
 }
 
 function PersonaPanel() {
-  const adminUser = useAdminStore((s) => s.adminUser)
   const config = useAdminStore((s) => s.aiPersonaConfig)
   const updatePersonaConfig = useAdminStore((s) => s.updatePersonaConfig)
-  const canEdit = hasRole(adminUser?.role, 'admin')
 
   const [weights, setWeights] = useState<AiWeightItem[]>(config.weights)
   const [emptyStateText, setEmptyStateText] = useState(config.emptyStateText)
@@ -119,26 +117,24 @@ function PersonaPanel() {
             <div className="text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>기능 활성화</div>
             <div className="text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>끄면 프로필에 페르소나 문구가 노출되지 않습니다</div>
           </div>
-          <ToggleSwitch checked={config.enabled} disabled={!canEdit} onChange={(v) => updatePersonaConfig({ enabled: v }, `기능 ${v ? '활성화' : '비활성화'}`)} />
+          <ToggleSwitch checked={config.enabled} onChange={(v) => updatePersonaConfig({ enabled: v }, `기능 ${v ? '활성화' : '비활성화'}`)} />
         </div>
         <div className="mb-3 flex items-center justify-between">
           <div className="text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>매주 자동 갱신</div>
-          <ToggleSwitch checked={config.autoRefreshWeekly} disabled={!canEdit} onChange={(v) => updatePersonaConfig({ autoRefreshWeekly: v }, `자동 갱신 ${v ? 'ON' : 'OFF'}`)} />
+          <ToggleSwitch checked={config.autoRefreshWeekly} onChange={(v) => updatePersonaConfig({ autoRefreshWeekly: v }, `자동 갱신 ${v ? 'ON' : 'OFF'}`)} />
         </div>
         <div className="flex items-center justify-between">
           <div className="text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>수동 편집 허용</div>
-          <ToggleSwitch checked={config.manualEditAllowed} disabled={!canEdit} onChange={(v) => updatePersonaConfig({ manualEditAllowed: v }, `수동 편집 ${v ? '허용' : '금지'}`)} />
+          <ToggleSwitch checked={config.manualEditAllowed} onChange={(v) => updatePersonaConfig({ manualEditAllowed: v }, `수동 편집 ${v ? '허용' : '금지'}`)} />
         </div>
-        {!canEdit && <div className="mt-3"><RoleLockNotice required="admin" /></div>}
       </AdminCard>
 
       <AdminCard>
         <div className="mb-3 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>생성 가중치</div>
-        <WeightEditor weights={weights} onChange={setWeights} disabled={!canEdit} />
+        <WeightEditor weights={weights} onChange={setWeights} />
 
         <div className="mt-4 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>근거 부족 시 노출 문구</div>
         <textarea
-          disabled={!canEdit}
           value={emptyStateText}
           onChange={(e) => setEmptyStateText(e.target.value)}
           rows={2}
@@ -149,7 +145,7 @@ function PersonaPanel() {
         <SaveFooter
           updatedBy={config.updatedBy}
           updatedAt={config.updatedAt}
-          disabled={!canEdit || !dirty || total !== 100}
+          disabled={!dirty || total !== 100}
           onSave={() => updatePersonaConfig({ weights, emptyStateText }, `가중치·문구 수정 (합계 ${total}%)`)}
         />
       </AdminCard>
@@ -158,10 +154,8 @@ function PersonaPanel() {
 }
 
 function BioPanel() {
-  const adminUser = useAdminStore((s) => s.adminUser)
   const config = useAdminStore((s) => s.aiBioConfig)
   const updateBioConfig = useAdminStore((s) => s.updateBioConfig)
-  const canEdit = hasRole(adminUser?.role, 'admin')
 
   const [weights, setWeights] = useState<AiWeightItem[]>(config.weights)
   const [promptTemplate, setPromptTemplate] = useState(config.promptTemplate)
@@ -186,7 +180,7 @@ function BioPanel() {
             <div className="text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>기능 활성화</div>
             <div className="text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>&quot;AI로 채우기&quot; 버튼 노출 여부</div>
           </div>
-          <ToggleSwitch checked={config.enabled} disabled={!canEdit} onChange={(v) => updateBioConfig({ enabled: v }, `기능 ${v ? '활성화' : '비활성화'}`)} />
+          <ToggleSwitch checked={config.enabled} onChange={(v) => updateBioConfig({ enabled: v }, `기능 ${v ? '활성화' : '비활성화'}`)} />
         </div>
         <div className="flex items-center justify-between">
           <div>
@@ -195,21 +189,18 @@ function BioPanel() {
           </div>
           <ToggleSwitch
             checked={config.regenerateOnEveryClick}
-            disabled={!canEdit}
             onChange={(v) => updateBioConfig({ regenerateOnEveryClick: v }, `재생성 정책 ${v ? '탭마다 덮어쓰기' : '확인 후 덮어쓰기'}`)}
           />
         </div>
-        {!canEdit && <div className="mt-3"><RoleLockNotice required="admin" /></div>}
       </AdminCard>
 
       <AdminCard>
         <div className="mb-3 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>생성 가중치</div>
-        <WeightEditor weights={weights} onChange={setWeights} disabled={!canEdit} />
+        <WeightEditor weights={weights} onChange={setWeights} />
 
         <div className="mt-4 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>최대 입력 길이</div>
         <input
           type="number"
-          disabled={!canEdit}
           value={maxLength}
           onChange={(e) => setMaxLength(e.target.value)}
           className="mt-2 w-[100px] rounded-lg border px-3 py-2 text-[13px] disabled:opacity-50"
@@ -218,7 +209,6 @@ function BioPanel() {
 
         <div className="mt-4 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>생성 프롬프트 템플릿</div>
         <textarea
-          disabled={!canEdit}
           value={promptTemplate}
           onChange={(e) => setPromptTemplate(e.target.value)}
           rows={3}
@@ -229,7 +219,7 @@ function BioPanel() {
         <SaveFooter
           updatedBy={config.updatedBy}
           updatedAt={config.updatedAt}
-          disabled={!canEdit || !dirty || total !== 100 || !maxLength.trim()}
+          disabled={!dirty || total !== 100 || !maxLength.trim()}
           onSave={() =>
             updateBioConfig(
               { weights, promptTemplate, maxLength: Number(maxLength) || config.maxLength },
@@ -243,10 +233,8 @@ function BioPanel() {
 }
 
 function KemiPanel() {
-  const adminUser = useAdminStore((s) => s.adminUser)
   const config = useAdminStore((s) => s.aiKemiConfig)
   const updateKemiConfig = useAdminStore((s) => s.updateKemiConfig)
-  const canEdit = hasRole(adminUser?.role, 'admin')
 
   const [weights, setWeights] = useState<AiWeightItem[]>(config.weights)
   const [copyPromptTemplate, setCopyPromptTemplate] = useState(config.copyPromptTemplate)
@@ -267,7 +255,7 @@ function KemiPanel() {
             <div className="text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>기능 활성화</div>
             <div className="text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>끄면 프로필에 케미 카드가 노출되지 않습니다</div>
           </div>
-          <ToggleSwitch checked={config.enabled} disabled={!canEdit} onChange={(v) => updateKemiConfig({ enabled: v }, `기능 ${v ? '활성화' : '비활성화'}`)} />
+          <ToggleSwitch checked={config.enabled} onChange={(v) => updateKemiConfig({ enabled: v }, `기능 ${v ? '활성화' : '비활성화'}`)} />
         </div>
         <div className="flex items-center justify-between">
           <div>
@@ -276,20 +264,17 @@ function KemiPanel() {
           </div>
           <ToggleSwitch
             checked={config.cacheInvalidateOnProfileEdit}
-            disabled={!canEdit}
             onChange={(v) => updateKemiConfig({ cacheInvalidateOnProfileEdit: v }, `캐시 무효화 ${v ? 'ON' : 'OFF'}`)}
           />
         </div>
-        {!canEdit && <div className="mt-3"><RoleLockNotice required="admin" /></div>}
       </AdminCard>
 
       <AdminCard>
         <div className="mb-3 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>매칭 카테고리 가중치</div>
-        <WeightEditor weights={weights} onChange={setWeights} disabled={!canEdit} />
+        <WeightEditor weights={weights} onChange={setWeights} />
 
         <div className="mt-4 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>대화 시작 문구(aiCopy) 프롬프트 템플릿</div>
         <textarea
-          disabled={!canEdit}
           value={copyPromptTemplate}
           onChange={(e) => setCopyPromptTemplate(e.target.value)}
           rows={3}
@@ -300,7 +285,7 @@ function KemiPanel() {
         <SaveFooter
           updatedBy={config.updatedBy}
           updatedAt={config.updatedAt}
-          disabled={!canEdit || !dirty || total !== 100}
+          disabled={!dirty || total !== 100}
           onSave={() => updateKemiConfig({ weights, copyPromptTemplate }, `가중치·프롬프트 수정 (합계 ${total}%)`)}
         />
       </AdminCard>
@@ -309,11 +294,9 @@ function KemiPanel() {
 }
 
 function SearchPanel() {
-  const adminUser = useAdminStore((s) => s.adminUser)
   const config = useAdminStore((s) => s.aiSearchConfig)
   const updateSearchConfig = useAdminStore((s) => s.updateSearchConfig)
   const toggleSearchCategory = useAdminStore((s) => s.toggleSearchCategory)
-  const canEdit = hasRole(adminUser?.role, 'admin')
 
   const [model, setModel] = useState(config.model)
   const [temperature, setTemperature] = useState(String(config.temperature))
@@ -345,13 +328,12 @@ function SearchPanel() {
             <div className="text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>AI 검색 전체 사용</div>
             <div className="text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>끄면 모든 카테고리의 AI 검색을 사용하지 않습니다 (코드 반영 필요)</div>
           </div>
-          <ToggleSwitch checked={config.enabled} disabled={!canEdit} onChange={(v) => updateSearchConfig({ enabled: v }, `전체 사용 ${v ? 'ON' : 'OFF'}`)} />
+          <ToggleSwitch checked={config.enabled} onChange={(v) => updateSearchConfig({ enabled: v }, `전체 사용 ${v ? 'ON' : 'OFF'}`)} />
         </div>
         <div className="grid grid-cols-3 gap-3">
           <div>
             <div className="mb-1 text-[12px] font-semibold" style={{ color: 'var(--color-text-tertiary)' }}>모델</div>
             <input
-              disabled={!canEdit}
               value={model}
               onChange={(e) => setModel(e.target.value)}
               className="w-full rounded-lg border px-3 py-2 text-[13px] disabled:opacity-50"
@@ -365,7 +347,6 @@ function SearchPanel() {
               step="0.1"
               min={0}
               max={2}
-              disabled={!canEdit}
               value={temperature}
               onChange={(e) => setTemperature(e.target.value)}
               className="w-full rounded-lg border px-3 py-2 text-[13px] disabled:opacity-50"
@@ -376,7 +357,6 @@ function SearchPanel() {
             <div className="mb-1 text-[12px] font-semibold" style={{ color: 'var(--color-text-tertiary)' }}>max_tokens</div>
             <input
               type="number"
-              disabled={!canEdit}
               value={maxTokens}
               onChange={(e) => setMaxTokens(e.target.value)}
               className="w-full rounded-lg border px-3 py-2 text-[13px] disabled:opacity-50"
@@ -387,7 +367,7 @@ function SearchPanel() {
         <SaveFooter
           updatedBy={config.updatedBy}
           updatedAt={config.updatedAt}
-          disabled={!canEdit || !globalDirty || !model.trim()}
+          disabled={!globalDirty || !model.trim()}
           onSave={() =>
             updateSearchConfig(
               { model: model.trim(), temperature: Number(temperature) || config.temperature, maxTokens: Number(maxTokens) || config.maxTokens },
@@ -406,11 +386,10 @@ function SearchPanel() {
                 <div className="text-[13px] font-bold" style={{ color: 'var(--color-text-primary)' }}>{c.label}</div>
                 <div className="text-[11.5px]" style={{ color: 'var(--color-text-tertiary)' }}>{c.replacementApi}</div>
               </div>
-              <ToggleSwitch checked={c.enabled} disabled={!canEdit} onChange={(v) => toggleSearchCategory(c.key, v)} />
+              <ToggleSwitch checked={c.enabled} onChange={(v) => toggleSearchCategory(c.key, v)} />
             </div>
           ))}
         </div>
-        {!canEdit && <div className="mt-3"><RoleLockNotice required="admin" /></div>}
       </AdminCard>
 
       <AdminCard>
@@ -421,7 +400,6 @@ function SearchPanel() {
           ))}
         </div>
         <textarea
-          disabled={!canEdit}
           value={promptDraft}
           onChange={(e) => setPromptDraft(e.target.value)}
           rows={6}
@@ -431,7 +409,7 @@ function SearchPanel() {
         <SaveFooter
           updatedBy={config.updatedBy}
           updatedAt={config.updatedAt}
-          disabled={!canEdit || !promptDirty}
+          disabled={!promptDirty}
           onSave={() => {
             const nextCategories = config.categories.map((c) => (c.key === category.key ? { ...c, promptDraft } : c))
             updateSearchConfig({ categories: nextCategories }, `${category.label} 프롬프트 초안 수정`)
@@ -443,11 +421,9 @@ function SearchPanel() {
 }
 
 function VirtualPanel() {
-  const adminUser = useAdminStore((s) => s.adminUser)
   const config = useAdminStore((s) => s.aiVirtualConfig)
   const updateVirtualConfig = useAdminStore((s) => s.updateVirtualConfig)
   const toggleVirtualSourceType = useAdminStore((s) => s.toggleVirtualSourceType)
-  const canEdit = hasRole(adminUser?.role, 'admin')
 
   const [disclaimerText, setDisclaimerText] = useState(config.disclaimerText)
   const dirty = disclaimerText !== config.disclaimerText
@@ -466,9 +442,8 @@ function VirtualPanel() {
             <div className="text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>가상 프로필 노출</div>
             <div className="text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>끄면 검색 결과에 가상 프로필이 노출되지 않습니다</div>
           </div>
-          <ToggleSwitch checked={config.enabled} disabled={!canEdit} onChange={(v) => updateVirtualConfig({ enabled: v }, `노출 ${v ? 'ON' : 'OFF'}`)} />
+          <ToggleSwitch checked={config.enabled} onChange={(v) => updateVirtualConfig({ enabled: v }, `노출 ${v ? 'ON' : 'OFF'}`)} />
         </div>
-        {!canEdit && <div className="mt-3"><RoleLockNotice required="admin" /></div>}
       </AdminCard>
 
       <AdminCard className="mb-4">
@@ -477,7 +452,7 @@ function VirtualPanel() {
           {config.sourceTypes.map((s) => (
             <div key={s.key} className="flex items-center justify-between rounded-lg border px-3 py-2" style={{ borderColor: 'var(--color-border-soft)' }}>
               <div className="text-[13px]" style={{ color: 'var(--color-text-primary)' }}>{s.label}</div>
-              <ToggleSwitch checked={s.allowed} disabled={!canEdit} onChange={(v) => toggleVirtualSourceType(s.key, v)} />
+              <ToggleSwitch checked={s.allowed} onChange={(v) => toggleVirtualSourceType(s.key, v)} />
             </div>
           ))}
         </div>
@@ -486,7 +461,6 @@ function VirtualPanel() {
       <AdminCard>
         <div className="mb-2 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>안내 문구</div>
         <textarea
-          disabled={!canEdit}
           value={disclaimerText}
           onChange={(e) => setDisclaimerText(e.target.value)}
           rows={2}
@@ -496,7 +470,7 @@ function VirtualPanel() {
         <SaveFooter
           updatedBy={config.updatedBy}
           updatedAt={config.updatedAt}
-          disabled={!canEdit || !dirty || !disclaimerText.trim()}
+          disabled={!dirty || !disclaimerText.trim()}
           onSave={() => updateVirtualConfig({ disclaimerText: disclaimerText.trim() }, '안내 문구 수정')}
         />
       </AdminCard>

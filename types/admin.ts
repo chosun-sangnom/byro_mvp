@@ -110,7 +110,7 @@ export interface Subscription {
   amount: number
 }
 
-export type PaymentStatus = '결제완료' | '결제실패' | '취소' | '환불'
+export type PaymentStatus = '결제완료' | '결제실패' | '취소'
 
 export interface PaymentRecord {
   id: string

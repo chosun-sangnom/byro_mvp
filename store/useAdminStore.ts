@@ -80,7 +80,6 @@ interface AdminStore {
   subscriptions: Subscription[]
   payments: PaymentRecord[]
   planGrants: ManualPlanGrant[]
-  refundPayment: (id: string) => void
   grantPlan: (linkId: string, days: number, reason: string) => void
 
   // CS
@@ -195,13 +194,6 @@ export const useAdminStore = create<AdminStore>()(
       subscriptions: MOCK_SUBSCRIPTIONS,
       payments: MOCK_PAYMENTS,
       planGrants: MOCK_PLAN_GRANTS,
-      refundPayment: (id) => {
-        const payment = get().payments.find((p) => p.id === id)
-        set((s) => ({
-          payments: s.payments.map((p) => (p.id === id ? { ...p, status: '환불' } : p)),
-        }))
-        get().appendAudit('환불 처리', `결제 ${id} · ${payment?.name}`, `${payment?.amount.toLocaleString()}원`)
-      },
       grantPlan: (linkId, days, reason) => {
         const actor = get().adminUser?.name ?? '알수없음'
         const user = get().users.find((u) => u.linkId === linkId)

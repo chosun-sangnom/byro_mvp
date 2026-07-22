@@ -15,6 +15,13 @@ const SANCTION_TONE: Record<SanctionStatus, 'success' | 'warn' | 'danger'> = {
 
 const SANCTION_OPTIONS: SanctionStatus[] = ['정상', '경고', '일시정지', '영구정지']
 
+// 일시정지 기본 기간 7일 (조정 가능)
+function defaultSuspendUntil() {
+  const d = new Date()
+  d.setDate(d.getDate() + 7)
+  return d.toISOString().slice(0, 10)
+}
+
 export default function UserDetailDrawer({ user, onClose }: { user: AdminUserRow | null; onClose: () => void }) {
   const setSanction = useAdminStore((s) => s.setSanction)
   const forceWithdraw = useAdminStore((s) => s.forceWithdraw)
@@ -59,7 +66,10 @@ export default function UserDetailDrawer({ user, onClose }: { user: AdminUserRow
           {SANCTION_OPTIONS.map((opt) => (
             <button
               key={opt}
-              onClick={() => setStatus(opt)}
+              onClick={() => {
+                setStatus(opt)
+                if (opt === '일시정지' && !suspendUntil) setSuspendUntil(defaultSuspendUntil())
+              }}
               className="rounded-full border px-3 py-1.5 text-[12px] font-bold disabled:opacity-40"
               style={{
                 borderColor: status === opt ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
@@ -73,13 +83,16 @@ export default function UserDetailDrawer({ user, onClose }: { user: AdminUserRow
         </div>
 
         {status === '일시정지' && (
-          <input
-            type="date"
-            value={suspendUntil}
-            onChange={(e) => setSuspendUntil(e.target.value)}
-            className="mb-2 w-full rounded-lg border px-3 py-2 text-[13px] disabled:opacity-50"
-            style={{ borderColor: 'var(--color-border-default)' }}
-          />
+          <div className="mb-2">
+            <input
+              type="date"
+              value={suspendUntil}
+              onChange={(e) => setSuspendUntil(e.target.value)}
+              className="w-full rounded-lg border px-3 py-2 text-[13px] disabled:opacity-50"
+              style={{ borderColor: 'var(--color-border-default)' }}
+            />
+            <div className="mt-1 text-[11px]" style={{ color: 'var(--color-text-tertiary)' }}>기본 7일 — 필요 시 직접 조정</div>
+          </div>
         )}
 
         <textarea

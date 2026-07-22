@@ -12,14 +12,12 @@ const PAY_TONE: Record<PaymentStatus, 'success' | 'danger' | 'neutral' | 'warn'>
   결제완료: 'success',
   결제실패: 'danger',
   취소: 'neutral',
-  환불: 'warn',
 }
 
 export default function BillingScreen() {
   const subscriptions = useAdminStore((s) => s.subscriptions)
   const payments = useAdminStore((s) => s.payments)
   const planGrants = useAdminStore((s) => s.planGrants)
-  const refundPayment = useAdminStore((s) => s.refundPayment)
   const grantPlan = useAdminStore((s) => s.grantPlan)
 
   const [grantLinkId, setGrantLinkId] = useState('')
@@ -30,7 +28,7 @@ export default function BillingScreen() {
 
   return (
     <div>
-      <SectionHeading title="결제 관리" description="Pro 구독 현황, 결제 내역, 환불·수동 플랜 부여를 처리합니다. (BILL-01~05)" />
+      <SectionHeading title="결제 관리" description="Pro 구독 현황, 결제 내역, 수동 플랜 부여를 처리합니다. 환불은 지원하지 않습니다. (BILL-01~05)" />
 
       <div className="mb-6 grid grid-cols-3 gap-3">
         <AdminCard>
@@ -74,7 +72,7 @@ export default function BillingScreen() {
       </div>
 
       <div className="mb-6">
-        <div className="mb-3 text-[13px] font-bold" style={{ color: 'var(--color-text-secondary)' }}>결제 내역 (BILL-02, BILL-03)</div>
+        <div className="mb-3 text-[13px] font-bold" style={{ color: 'var(--color-text-secondary)' }}>결제 내역 (BILL-02)</div>
         <TableShell>
           <thead>
             <tr className="border-b" style={{ borderColor: 'var(--color-border-soft)' }}>
@@ -83,7 +81,6 @@ export default function BillingScreen() {
               <Th>상태</Th>
               <Th>PG 거래 ID</Th>
               <Th>결제일</Th>
-              <Th></Th>
             </tr>
           </thead>
           <tbody>
@@ -94,13 +91,6 @@ export default function BillingScreen() {
                 <Td><StatusBadge label={p.status} tone={PAY_TONE[p.status]} /></Td>
                 <Td className="font-mono">{p.pgTransactionId}</Td>
                 <Td>{p.paidAt}</Td>
-                <Td>
-                  {p.status === '결제완료' && (
-                    <button onClick={() => refundPayment(p.id)} className="text-[12.5px] font-bold" style={{ color: 'var(--color-state-danger-text)' }}>
-                      환불 처리
-                    </button>
-                  )}
-                </Td>
               </tr>
             ))}
           </tbody>

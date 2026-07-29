@@ -41,7 +41,6 @@ docs/                 기술 문서
 - [상태 전이](docs/state-machines.md)
 - [데이터 파이프라인 & 공통점 감지](docs/data-pipeline.md)
 - [DB 스키마](docs/schema.md)
-- [어드민 ↔ 프론트 데이터 매핑](docs/admin-data-mapping.md)
 - [공개 범위 정책](docs/policy-visibility.md)
 - [하이라이트 항목 설계](docs/policy-highlights.md)
 - [평판 리뷰 정책](docs/policy-reputation.md)

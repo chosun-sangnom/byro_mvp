@@ -90,6 +90,7 @@ interface AdminStore {
   // CS
   tickets: CsTicket[]
   faq: FaqItem[]
+  addTicket: (ticket: { category: CsTicket['category']; content: string; authorName: string; authorEmail: string; linkId?: string }) => void
   updateTicketStatus: (id: string, status: TicketStatus) => void
   replyTicket: (id: string, reply: string) => void
   addFaq: (question: string, answer: string) => void
@@ -242,6 +243,19 @@ export const useAdminStore = create<AdminStore>()(
 
       tickets: MOCK_TICKETS,
       faq: MOCK_FAQ,
+      addTicket: ({ category, content, authorName, authorEmail, linkId }) => {
+        const ticket: CsTicket = {
+          id: uuidv4(),
+          category,
+          linkId,
+          authorName,
+          authorEmail,
+          content,
+          createdAt: nowLabel(),
+          status: '접수',
+        }
+        set((s) => ({ tickets: [ticket, ...s.tickets] }))
+      },
       updateTicketStatus: (id, status) => {
         set((s) => ({ tickets: s.tickets.map((t) => (t.id === id ? { ...t, status } : t)) }))
         get().appendAudit('문의 상태 변경', `티켓 ${id} → ${status}`)

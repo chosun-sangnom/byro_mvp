@@ -2,15 +2,15 @@
 
 import { useState, useEffect } from 'react'
 import { BadgeCheck, Mail, ShieldCheck, Upload, Loader2, ChevronRight } from 'lucide-react'
-import { Button, NavBar } from '@/components/ui'
+import { Button, NavBar, TextArea } from '@/components/ui'
 import type { Highlight, HighlightIconId } from '@/types'
 import type { HighlightManageCategory } from './constants'
 
-// [임시] 건강보험공단 직장 이력 모의 데이터
+// [임시] 건강보험공단 직장 이력 모의 데이터 (직함 정보는 제공되지 않음)
 const MOCK_NHIS_CAREERS = [
-  { company: '위에이아이', role: '프로덕트 매니저', startYear: '2023', endYear: '', status: '재직 중' as const },
-  { company: '크래프톤', role: '프로덕트 디자이너', startYear: '2020', endYear: '2023', status: '종료' as const },
-  { company: '카카오', role: '서비스 기획자', startYear: '2017', endYear: '2020', status: '종료' as const },
+  { company: '위에이아이', startYear: '2023', endYear: '', status: '재직 중' as const },
+  { company: '크래프톤', startYear: '2020', endYear: '2023', status: '종료' as const },
+  { company: '카카오', startYear: '2017', endYear: '2020', status: '종료' as const },
 ]
 
 // [임시] OCR 파싱 모의 데이터
@@ -46,12 +46,18 @@ export function HighlightManageVerifyView(props: VerifyViewProps) {
 
 // ── 경력 인증 플로우 ──────────────────────────────────────────────────────────
 
-type CareerStep = 'identity' | 'loading' | 'select' | 'done'
+type CareerStep = 'identity' | 'loading' | 'select' | 'details' | 'done'
+
+type CareerDetail = { role: string; desc: string; status: '재직 중' | '종료' }
 
 function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewProps) {
   const [step, setStep] = useState<CareerStep>('identity')
   const [selected, setSelected] = useState<Set<number>>(new Set([0, 1, 2]))
+  const [details, setDetails] = useState<Record<number, CareerDetail>>({})
   const [importedCount, setImportedCount] = useState(0)
+
+  // 종료일이 없는 항목 = 가장 최근(현재) 경력. 재직중 여부를 직접 확인받아야 함.
+  const mostRecentIndex = MOCK_NHIS_CAREERS.findIndex((c) => c.endYear === '')
 
   useEffect(() => {
     if (step !== 'loading') return
@@ -66,25 +72,47 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
       return next
     })
 
+  const setDetail = (i: number, patch: Partial<CareerDetail>) =>
+    setDetails((prev) => ({ ...prev, [i]: { ...(prev[i] ?? { role: '', desc: '', status: MOCK_NHIS_CAREERS[i].status }), ...patch } }))
+
+  const goToDetails = () => {
+    setDetails((prev) => {
+      const next = { ...prev }
+      MOCK_NHIS_CAREERS.forEach((c, i) => {
+        if (!selected.has(i) || next[i]) return
+        next[i] = { role: '', desc: '', status: c.status }
+      })
+      return next
+    })
+    setStep('details')
+  }
+
+  const detailsValid = Array.from(selected).every((i) => (details[i]?.role ?? '').trim().length > 0)
+
   const handleConfirm = () => {
     const items = MOCK_NHIS_CAREERS
-      .filter((_, i) => selected.has(i))
-      .map((c) => ({
-        categoryId: 'career-role' as const,
-        icon: selectedCat.icon as HighlightIconId,
-        title: c.company,
-        subtitle: `${selectedCat.label} · 건강보험공단 인증`,
-        description: '',
-        year: c.status === '재직 중' ? `${c.startYear} - 현재` : `${c.startYear} - ${c.endYear}`,
-        verified: true,
-        metadata: {
-          role: c.role,
-          status: c.status,
-          startYear: c.startYear,
-          endYear: c.endYear,
-          isPrimary: false,
-        },
-      }))
+      .map((c, i) => ({ c, i }))
+      .filter(({ i }) => selected.has(i))
+      .map(({ c, i }) => {
+        const detail = details[i] ?? { role: '', desc: '', status: c.status }
+        const status = i === mostRecentIndex ? detail.status : c.status
+        return {
+          categoryId: 'career-role' as const,
+          icon: selectedCat.icon as HighlightIconId,
+          title: c.company,
+          subtitle: `${selectedCat.label} · 건강보험공단 인증`,
+          description: detail.desc,
+          year: status === '재직 중' ? `${c.startYear} - 현재` : `${c.startYear} - ${c.endYear || '종료'}`,
+          verified: true,
+          metadata: {
+            role: detail.role,
+            status,
+            startYear: c.startYear,
+            endYear: c.endYear,
+            isPrimary: false,
+          },
+        }
+      })
     setImportedCount(items.length)
     onImportCareers(items)
     setStep('done')
@@ -166,7 +194,7 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
                 <div className="min-w-0 flex-1">
                   <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{c.company}</div>
                   <div className="mt-0.5 text-[12px] text-[var(--color-text-secondary)]">
-                    {c.role} · {c.status === '재직 중' ? `${c.startYear} - 현재` : `${c.startYear} - ${c.endYear}`}
+                    {c.status === '재직 중' ? `${c.startYear} - 현재` : `${c.startYear} - ${c.endYear}`}
                   </div>
                 </div>
                 {selected.has(i) && <BadgeCheck size={16} className="shrink-0 text-[var(--color-accent)]" />}
@@ -175,7 +203,77 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
           </div>
         </div>
         <div className="border-t border-[var(--color-border-soft)] px-5 py-4">
-          <Button onClick={handleConfirm} disabled={selected.size === 0}>
+          <Button onClick={goToDetails} disabled={selected.size === 0}>
+            다음
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  if (step === 'details') {
+    const items = MOCK_NHIS_CAREERS.map((c, i) => ({ c, i })).filter(({ i }) => selected.has(i))
+    return (
+      <div className="flex flex-col h-full">
+        <NavBar title="경력 인증" onBack={() => setStep('select')} />
+        <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
+          <p className="text-[13px] text-[var(--color-text-secondary)]">
+            건강보험공단 이력에는 직함 정보가 없어요. 각 경력에 직함과 담당 업무를 입력해주세요.
+          </p>
+          {items.map(({ c, i }) => {
+            const detail = details[i] ?? { role: '', desc: '', status: c.status }
+            const isMostRecent = i === mostRecentIndex
+            return (
+              <div key={i} className="surface-card rounded-[22px] p-4 space-y-3">
+                <div>
+                  <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{c.company}</div>
+                  <div className="mt-0.5 text-[12px] text-[var(--color-text-tertiary)]">
+                    {isMostRecent
+                      ? (detail.status === '재직 중' ? `${c.startYear} - 현재` : `${c.startYear} - 종료`)
+                      : `${c.startYear} - ${c.endYear}`}
+                    {' '}· 건강보험공단 조회 결과 (수정 불가)
+                  </div>
+                </div>
+                <input
+                  value={detail.role}
+                  onChange={(e) => setDetail(i, { role: e.target.value })}
+                  placeholder="직함"
+                  className="w-full rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none"
+                />
+                {isMostRecent && (
+                  <div className="space-y-2">
+                    <div className="micro-text">현재 상태</div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(['재직 중', '종료'] as const).map((status) => (
+                        <button
+                          key={status}
+                          onClick={() => setDetail(i, { status })}
+                          className="rounded-2xl border px-4 py-3 text-sm font-semibold"
+                          style={{
+                            borderColor: detail.status === status ? 'var(--color-accent-dark)' : '#E7E2DC',
+                            backgroundColor: detail.status === status ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
+                            color: detail.status === status ? '#fff' : 'var(--color-text-secondary)',
+                          }}
+                        >
+                          {status}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <TextArea
+                  value={detail.desc}
+                  onChange={(value) => setDetail(i, { desc: value })}
+                  placeholder="어떤 일을 했는지 적어주세요"
+                  maxLength={150}
+                  rows={3}
+                />
+              </div>
+            )
+          })}
+        </div>
+        <div className="border-t border-[var(--color-border-soft)] px-5 py-4">
+          <Button onClick={handleConfirm} disabled={!detailsValid}>
             선택한 {selected.size}개 경력 가져오기
           </Button>
         </div>

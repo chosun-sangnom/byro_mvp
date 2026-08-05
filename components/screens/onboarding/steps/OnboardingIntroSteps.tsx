@@ -14,9 +14,11 @@ const GUEST_INQUIRY_CATEGORIES: TicketCategory[] = ['계정', '결제', '신고'
 const GUEST_EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export type Mode = 'choose' | 'signup' | 'login'
-type LoginView = 'main' | 'oauth' | 'phone'
+type LoginView = 'main' | 'oauth' | 'phone' | 'reset'
 type OAuthProvider = 'kakao' | 'naver' | 'google'
 type OAuthStep = 'pending' | 'done'
+type ResetMethod = 'choose' | 'sms' | 'email'
+type ResetStage = 'verify' | 'newPassword' | 'done'
 
 interface OAuthMeta {
   label: string
@@ -97,15 +99,46 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
   const [email, setEmail] = useState('')
+  const [signupSmsSent, setSignupSmsSent] = useState(false)
+  const [signupCode, setSignupCode] = useState('')
+  const [phoneVerified, setPhoneVerified] = useState(false)
 
   // 전화번호 로그인 폼
   const [loginPhone, setLoginPhone] = useState('')
-  const [loginCode, setLoginCode] = useState('')
-  const [loginSmsSent, setLoginSmsSent] = useState(false)
+  const [loginPassword, setLoginPassword] = useState('')
+
+  // 비밀번호 찾기
+  const [resetMethod, setResetMethod] = useState<ResetMethod>('choose')
+  const [resetStage, setResetStage] = useState<ResetStage>('verify')
+  const [resetPhone, setResetPhone] = useState('')
+  const [resetSmsSent, setResetSmsSent] = useState(false)
+  const [resetCode, setResetCode] = useState('')
+  const [resetEmail, setResetEmail] = useState('')
+  const [resetEmailSent, setResetEmailSent] = useState(false)
+  const [newPassword, setNewPassword] = useState('')
+  const [newPasswordConfirm, setNewPasswordConfirm] = useState('')
 
   const passwordShort = password.length > 0 && password.length < 8
   const emailInvalid = email.length > 0 && !isValidEmail(email)
-  const canPhoneSubmit = isValidPhone(phone) && password.length >= 8 && (email === '' || isValidEmail(email))
+  const canPhoneSubmit = phoneVerified && password.length >= 8 && (email === '' || isValidEmail(email))
+  const loginPasswordShort = loginPassword.length > 0 && loginPassword.length < 8
+  const canLoginSubmit = isValidPhone(loginPhone) && loginPassword.length >= 8
+  const newPasswordShort = newPassword.length > 0 && newPassword.length < 8
+  const newPasswordMismatch = newPasswordConfirm.length > 0 && newPasswordConfirm !== newPassword
+  const canResetPassword = newPassword.length >= 8 && newPassword === newPasswordConfirm
+
+  const handleBackToPhoneLogin = () => {
+    setView('phone')
+    setResetMethod('choose')
+    setResetStage('verify')
+    setResetPhone('')
+    setResetSmsSent(false)
+    setResetCode('')
+    setResetEmail('')
+    setResetEmailSent(false)
+    setNewPassword('')
+    setNewPasswordConfirm('')
+  }
 
   const handleOAuthSelect = (provider: OAuthProvider) => {
     setOauthProvider(provider)
@@ -117,6 +150,9 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
     setView('main')
     setOauthProvider(null)
     setOauthStep('pending')
+    setSignupSmsSent(false)
+    setSignupCode('')
+    setPhoneVerified(false)
   }
 
   const handleBackToChoose = () => {
@@ -124,6 +160,9 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
     setView('main')
     setOauthProvider(null)
     setOauthStep('pending')
+    setSignupSmsSent(false)
+    setSignupCode('')
+    setPhoneVerified(false)
   }
 
   // [임시] 로그인 완료 처리
@@ -195,26 +234,75 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
 
   // --- 전화번호 가입 뷰 ---
   if (view === 'phone' && mode === 'signup') {
+    if (!phoneVerified) {
+      return (
+        <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+          <BackButton onClick={handleBackToMain} />
+          <div className="mb-6">
+            <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
+              전화번호로<br />회원가입
+            </div>
+            <p className="meta-text mt-2">본인 명의 전화번호로 인증번호를 받아요.</p>
+          </div>
+          <div className="space-y-3 mb-6">
+            <div className="flex gap-2">
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(formatPhone(e.target.value))}
+                placeholder="010-0000-0000"
+                disabled={signupSmsSent}
+                autoComplete="tel"
+                className="flex-1 border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] disabled:opacity-50"
+              />
+              {/* [임시] SMS 발송 API 미연동 */}
+              <button
+                type="button"
+                disabled={!isValidPhone(phone) || signupSmsSent}
+                onClick={() => setSignupSmsSent(true)}
+                className="flex-shrink-0 rounded-xl px-3 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
+                style={{ backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
+              >
+                {signupSmsSent ? '발송됨' : '발송'}
+              </button>
+            </div>
+            {signupSmsSent && (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={signupCode}
+                  onChange={(e) => setSignupCode(e.target.value)}
+                  placeholder="인증번호 6자리"
+                  maxLength={6}
+                  className="flex-1 border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
+                />
+                {/* [임시] 인증번호 확인 API 미연동 */}
+                <button
+                  type="button"
+                  disabled={signupCode.length < 6}
+                  onClick={() => setPhoneVerified(true)}
+                  className="flex-shrink-0 rounded-xl px-4 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
+                  style={{ backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
+                >
+                  확인
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )
+    }
+
     return (
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <BackButton onClick={handleBackToMain} />
+        <BackButton onClick={() => setPhoneVerified(false)} />
         <div className="mb-6">
           <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
             전화번호로<br />회원가입
           </div>
+          <p className="meta-text mt-2">{phone} 인증 완료 · 로그인에 사용할 비밀번호를 설정해주세요.</p>
         </div>
         <div className="space-y-4 mb-6">
-          <div>
-            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">전화번호 *</label>
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(formatPhone(e.target.value))}
-              placeholder="010-0000-0000"
-              autoComplete="tel"
-              className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
-            />
-          </div>
           <div>
             <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">비밀번호 *</label>
             <input
@@ -233,7 +321,7 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
           </div>
           <div>
             <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">
-              이메일 <span className="text-[10px]">(선택 · 전화번호 변경 시 계정 복구용)</span>
+              이메일 <span className="text-[10px]">(선택 · 비밀번호 재설정용)</span>
             </label>
             <input
               type="email"
@@ -268,51 +356,246 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
             전화번호로<br />로그인
           </div>
         </div>
-        <div className="space-y-3 mb-6">
-          <div className="flex gap-2">
+        <div className="space-y-3 mb-2">
+          <div>
+            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">전화번호</label>
             <input
               type="tel"
               value={loginPhone}
               onChange={(e) => setLoginPhone(formatPhone(e.target.value))}
               placeholder="010-0000-0000"
-              disabled={loginSmsSent}
               autoComplete="tel"
-              className="flex-1 border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] disabled:opacity-50"
+              className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
             />
-            {/* [임시] SMS 발송 API 미연동 */}
-            <button
-              type="button"
-              disabled={!isValidPhone(loginPhone) || loginSmsSent}
-              onClick={() => setLoginSmsSent(true)}
-              className="flex-shrink-0 rounded-xl px-3 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
-              style={{ backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
-            >
-              {loginSmsSent ? '발송됨' : '발송'}
-            </button>
           </div>
-          {loginSmsSent && (
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={loginCode}
-                onChange={(e) => setLoginCode(e.target.value)}
-                placeholder="인증번호 6자리"
-                maxLength={6}
-                className="flex-1 border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
-              />
-              {/* [임시] 인증번호 확인 API 미연동 */}
-              <button
-                type="button"
-                disabled={loginCode.length < 6}
-                onClick={handleLoginComplete}
-                className="flex-shrink-0 rounded-xl px-4 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
-                style={{ backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
-              >
-                확인
-              </button>
-            </div>
-          )}
+          <div>
+            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">비밀번호</label>
+            <input
+              type="password"
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+              placeholder="비밀번호를 입력해주세요"
+              autoComplete="current-password"
+              className={`w-full border rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] ${
+                loginPasswordShort ? 'border-[var(--color-state-danger-text)]' : 'border-[var(--color-border-default)]'
+              }`}
+            />
+            {loginPasswordShort && (
+              <p className="mt-1 text-[11px] text-[var(--color-state-danger-text)]">비밀번호는 8자 이상이어야 해요</p>
+            )}
+          </div>
         </div>
+        <button
+          type="button"
+          onClick={() => setView('reset')}
+          className="self-start mb-6 text-[12px] text-[var(--color-text-tertiary)] underline underline-offset-2"
+        >
+          비밀번호를 잊으셨나요?
+        </button>
+        {/* [임시] 바이로 전화번호 로그인 API 미연동 */}
+        <Button onClick={() => { if (canLoginSubmit) handleLoginComplete() }} disabled={!canLoginSubmit}>
+          로그인
+        </Button>
+      </div>
+    )
+  }
+
+  // --- 비밀번호 찾기 뷰 ---
+  if (view === 'reset') {
+    if (resetMethod === 'choose') {
+      return (
+        <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+          <BackButton onClick={handleBackToPhoneLogin} />
+          <div className="mb-6">
+            <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
+              비밀번호<br />재설정
+            </div>
+            <p className="meta-text mt-2">본인 확인 방법을 선택해주세요.</p>
+          </div>
+          <div className="space-y-3">
+            <Button variant="outline" onClick={() => { setResetMethod('sms'); setResetStage('verify') }}>
+              전화번호 인증번호로 재설정
+            </Button>
+            <Button variant="outline" onClick={() => { setResetMethod('email'); setResetStage('verify') }}>
+              가입 시 등록한 이메일로 재설정
+            </Button>
+          </div>
+        </div>
+      )
+    }
+
+    if (resetMethod === 'sms') {
+      if (resetStage === 'verify') {
+        return (
+          <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+            <BackButton onClick={() => setResetMethod('choose')} />
+            <div className="mb-6">
+              <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
+                전화번호<br />인증
+              </div>
+            </div>
+            <div className="space-y-3 mb-6">
+              <div className="flex gap-2">
+                <input
+                  type="tel"
+                  value={resetPhone}
+                  onChange={(e) => setResetPhone(formatPhone(e.target.value))}
+                  placeholder="010-0000-0000"
+                  disabled={resetSmsSent}
+                  autoComplete="tel"
+                  className="flex-1 border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] disabled:opacity-50"
+                />
+                {/* [임시] SMS 발송 API 미연동 */}
+                <button
+                  type="button"
+                  disabled={!isValidPhone(resetPhone) || resetSmsSent}
+                  onClick={() => setResetSmsSent(true)}
+                  className="flex-shrink-0 rounded-xl px-3 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
+                  style={{ backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
+                >
+                  {resetSmsSent ? '발송됨' : '발송'}
+                </button>
+              </div>
+              {resetSmsSent && (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={resetCode}
+                    onChange={(e) => setResetCode(e.target.value)}
+                    placeholder="인증번호 6자리"
+                    maxLength={6}
+                    className="flex-1 border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
+                  />
+                  {/* [임시] 인증번호 확인 API 미연동 */}
+                  <button
+                    type="button"
+                    disabled={resetCode.length < 6}
+                    onClick={() => setResetStage('newPassword')}
+                    className="flex-shrink-0 rounded-xl px-4 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
+                    style={{ backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
+                  >
+                    확인
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )
+      }
+      if (resetStage === 'done') {
+        return (
+          <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+            <div className="flex-1 flex flex-col items-center justify-center text-center">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mb-5"
+                style={{ backgroundColor: 'var(--color-state-success-bg)' }}>
+                <CheckCircle2 size={32} style={{ color: 'var(--color-state-success-text)' }} />
+              </div>
+              <div className="text-xl font-black text-[var(--color-text-strong)] mb-2">
+                비밀번호가 변경됐어요
+              </div>
+              <p className="meta-text leading-relaxed">새 비밀번호로 다시 로그인해주세요.</p>
+            </div>
+            <Button onClick={handleBackToPhoneLogin}>로그인으로 돌아가기</Button>
+          </div>
+        )
+      }
+
+      // resetStage === 'newPassword'
+      return (
+        <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+          <BackButton onClick={() => setResetStage('verify')} />
+          <div className="mb-6">
+            <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
+              새 비밀번호<br />설정
+            </div>
+            <p className="meta-text mt-2">인증이 완료됐어요. 새 비밀번호를 입력해주세요.</p>
+          </div>
+          <div className="space-y-4 mb-6">
+            <div>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">새 비밀번호</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="8자 이상 입력해주세요"
+                autoComplete="new-password"
+                className={`w-full border rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] ${
+                  newPasswordShort ? 'border-[var(--color-state-danger-text)]' : 'border-[var(--color-border-default)]'
+                }`}
+              />
+              {newPasswordShort && (
+                <p className="mt-1 text-[11px] text-[var(--color-state-danger-text)]">비밀번호는 8자 이상이어야 해요</p>
+              )}
+            </div>
+            <div>
+              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">새 비밀번호 확인</label>
+              <input
+                type="password"
+                value={newPasswordConfirm}
+                onChange={(e) => setNewPasswordConfirm(e.target.value)}
+                placeholder="한 번 더 입력해주세요"
+                autoComplete="new-password"
+                className={`w-full border rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] ${
+                  newPasswordMismatch ? 'border-[var(--color-state-danger-text)]' : 'border-[var(--color-border-default)]'
+                }`}
+              />
+              {newPasswordMismatch && (
+                <p className="mt-1 text-[11px] text-[var(--color-state-danger-text)]">비밀번호가 일치하지 않아요</p>
+              )}
+            </div>
+          </div>
+          {/* [임시] 비밀번호 재설정 API 미연동 */}
+          <Button onClick={() => { if (canResetPassword) setResetStage('done') }} disabled={!canResetPassword}>
+            비밀번호 변경하기
+          </Button>
+        </div>
+      )
+    }
+
+    // resetMethod === 'email'
+    if (!resetEmailSent) {
+      return (
+        <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+          <BackButton onClick={() => setResetMethod('choose')} />
+          <div className="mb-6">
+            <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
+              이메일로<br />재설정
+            </div>
+            <p className="meta-text mt-2">가입 시 등록한 복구용 이메일을 입력해주세요.</p>
+          </div>
+          <div className="mb-6">
+            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">이메일</label>
+            <input
+              type="email"
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+              placeholder="example@email.com"
+              autoComplete="email"
+              className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
+            />
+          </div>
+          {/* [임시] 재설정 이메일 발송 API 미연동 */}
+          <Button onClick={() => { if (isValidEmail(resetEmail)) setResetEmailSent(true) }} disabled={!isValidEmail(resetEmail)}>
+            재설정 링크 보내기
+          </Button>
+        </div>
+      )
+    }
+
+    // 이메일 발송 완료
+    return (
+      <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+        <div className="flex-1 flex flex-col items-center justify-center text-center">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mb-5"
+            style={{ backgroundColor: 'var(--color-state-success-bg)' }}>
+            <CheckCircle2 size={32} style={{ color: 'var(--color-state-success-text)' }} />
+          </div>
+          <div className="text-xl font-black text-[var(--color-text-strong)] mb-2">
+            재설정 링크를 보냈어요
+          </div>
+          <p className="meta-text leading-relaxed">{resetEmail}로 비밀번호 재설정 링크를 보냈어요.<br />메일함을 확인해주세요.</p>
+        </div>
+        <Button onClick={handleBackToPhoneLogin}>로그인으로 돌아가기</Button>
       </div>
     )
   }

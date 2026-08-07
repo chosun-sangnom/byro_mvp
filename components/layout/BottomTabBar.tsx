@@ -31,10 +31,10 @@ export default function BottomTabBar() {
     <div className="fixed inset-x-0 bottom-0 z-40 pointer-events-none">
       <div className="mx-auto w-full max-w-[430px] px-6 pb-[calc(env(safe-area-inset-bottom)+14px)]">
         <div
-          className="flex items-center justify-around gap-1 rounded-full border pointer-events-auto shadow-xl backdrop-blur-2xl backdrop-saturate-150"
+          className="flex items-center justify-around gap-1 rounded-full border pointer-events-auto shadow-xl backdrop-blur-md backdrop-saturate-150"
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.45)',
-            borderColor: 'rgba(255, 255, 255, 0.5)',
+            backgroundColor: 'rgba(255, 255, 255, 0.25)',
+            borderColor: 'rgba(255, 255, 255, 0.45)',
             padding: '8px 10px',
           }}
         >

@@ -36,16 +36,50 @@ export default function AppHeader() {
   return (
     <>
       <div className="bg-[var(--color-bg-page)] flex-shrink-0">
-        {/* 1단: 로고 + 아이콘 */}
-        <header className="flex items-center justify-between px-5 h-14 border-b border-[var(--color-border-soft)]">
+        {/* 1단: 로고 */}
+        <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)]">
           <button
             onClick={() => router.push('/')}
             className="text-[18px] font-black tracking-tight text-[var(--color-text-strong)]"
           >
             Byro
           </button>
+        </div>
+
+        {/* 2단: 아바타/로그인(좌) + 검색·알림·설정(우) */}
+        <header className="flex items-center justify-between px-5 h-14 border-b border-[var(--color-border-soft)]">
+          {/* 아바타 / 로그인 */}
+          {isLoggedIn ? (
+            <motion.button
+              whileTap={{ scale: 0.88 }}
+              onClick={() => setProfileOpen((o) => !o)}
+              aria-label="프로필 메뉴"
+            >
+              <Avatar src={user?.avatarImage} name={user?.name ?? ''} color={user?.avatarColor ?? 'var(--color-accent-dark)'} size={32} />
+            </motion.button>
+          ) : (
+            <motion.button
+              whileTap={{ scale: 0.88 }}
+              onClick={() => router.push('/signup')}
+              className="px-3.5 py-1.5 rounded-full text-[12px] font-bold text-white"
+              style={{ backgroundColor: 'var(--color-accent-dark)' }}
+              aria-label="로그인"
+            >
+              로그인
+            </motion.button>
+          )}
 
           <div className="flex items-center gap-1">
+            {/* 검색 */}
+            <motion.button
+              whileTap={{ scale: 0.88 }}
+              onClick={() => router.push('/search')}
+              className="p-2 text-[var(--color-text-secondary)]"
+              aria-label="검색"
+            >
+              <Search size={20} />
+            </motion.button>
+
             {/* 알림 — 로그인 시에만 표시 */}
             {isLoggedIn && (
               <motion.button
@@ -61,28 +95,6 @@ export default function AppHeader() {
               </motion.button>
             )}
 
-            {/* 아바타 / 로그인 */}
-            {isLoggedIn ? (
-              <motion.button
-                whileTap={{ scale: 0.88 }}
-                onClick={() => setProfileOpen((o) => !o)}
-                className="ml-1"
-                aria-label="프로필 메뉴"
-              >
-                <Avatar src={user?.avatarImage} name={user?.name ?? ''} color={user?.avatarColor ?? 'var(--color-accent-dark)'} size={32} />
-              </motion.button>
-            ) : (
-              <motion.button
-                whileTap={{ scale: 0.88 }}
-                onClick={() => router.push('/signup')}
-                className="ml-1 px-3.5 py-1.5 rounded-full text-[12px] font-bold text-white"
-                style={{ backgroundColor: 'var(--color-accent-dark)' }}
-                aria-label="로그인"
-              >
-                로그인
-              </motion.button>
-            )}
-
             {/* 설정 — 로그인 여부 무관 동일 UI */}
             <motion.button
               whileTap={{ scale: 0.88 }}
@@ -94,16 +106,6 @@ export default function AppHeader() {
             </motion.button>
           </div>
         </header>
-
-        {/* 2단: 검색창 — 프로필 카드와 동일한 폭 */}
-        <button
-          onClick={() => router.push('/search')}
-          className="flex items-center gap-2 mx-4 mt-3 mb-3 px-3.5 h-10 rounded-xl bg-[var(--color-bg-soft)] w-[calc(100%-2rem)] text-left"
-          aria-label="검색"
-        >
-          <Search size={16} className="text-[var(--color-text-tertiary)] flex-shrink-0" />
-          <span className="text-[13px] text-[var(--color-text-tertiary)]">이름, 직함, 회사로 검색</span>
-        </button>
       </div>
 
       {/* 프로필 패널 */}
@@ -116,7 +118,7 @@ export default function AppHeader() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className="absolute inset-0 top-[120px] z-30"
+              className="absolute inset-0 top-[104px] z-30"
               onClick={() => setProfileOpen(false)}
             />
             <motion.div
@@ -125,7 +127,7 @@ export default function AppHeader() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.18, ease: 'easeOut' }}
-              className="absolute right-0 top-[120px] z-40 w-56 bg-[var(--color-bg-page)] border border-[var(--color-border-soft)] rounded-xl shadow-xl mx-3 overflow-hidden"
+              className="absolute left-0 top-[104px] z-40 w-56 bg-[var(--color-bg-page)] border border-[var(--color-border-soft)] rounded-xl shadow-xl mx-3 overflow-hidden"
             >
               {/* 프로필 정보 */}
               <div className="flex flex-col items-center gap-2 px-5 pt-5 pb-4 w-full">
@@ -171,7 +173,7 @@ export default function AppHeader() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className="absolute inset-0 top-[120px] z-30"
+              className="absolute inset-0 top-[104px] z-30"
               onClick={() => setNotiOpen(false)}
             />
             <motion.div
@@ -180,7 +182,7 @@ export default function AppHeader() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.18, ease: 'easeOut' }}
-              className="absolute left-0 right-0 top-[120px] z-40 bg-[var(--color-bg-page)] border-b border-[var(--color-border-soft)] shadow-xl max-h-[70vh] overflow-y-auto"
+              className="absolute left-0 right-0 top-[104px] z-40 bg-[var(--color-bg-page)] border-b border-[var(--color-border-soft)] shadow-xl max-h-[70vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--color-border-soft)]">
                 <span className="text-[14px] font-bold text-[var(--color-text-primary)]">알림</span>

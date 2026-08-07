@@ -2,22 +2,11 @@
 
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import {
-  Bell, BookOpen, ChevronRight, FileText, Globe, HelpCircle,
-  Info, Megaphone, Menu, Search, Shield, Sparkles, Star, X,
-} from 'lucide-react'
+import { Bell, BookOpen, Menu, Search, Star, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
-import { Avatar, BottomSheet, InquirySheet, showToast } from '@/components/ui'
+import { Avatar } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
-
-type SettingsItem = {
-  id: string
-  icon: React.ElementType
-  label: string
-  trailing?: string
-  onClick?: () => void
-}
 
 // [임시] 방명록·피드백 알림 목업 — API 연동 후 교체
 const MOCK_NOTIFS = [
@@ -39,22 +28,10 @@ export default function AppHeader() {
   const { user, isLoggedIn, logout } = useAuth()
   const [notiOpen, setNotiOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
-  const [settingsOpen, setSettingsOpen] = useState(false)
-  const [inquiryOpen, setInquiryOpen] = useState(false)
 
   const hasUnread = MOCK_NOTIFS.length > 0
 
   const allNotifs = MOCK_NOTIFS
-
-  const settingsItems: SettingsItem[] = [
-    { id: 'lang', icon: Globe, label: '언어 전환', onClick: () => showToast('준비 중이에요') },
-    { id: 'inquiry', icon: HelpCircle, label: '문의하기', onClick: () => { setSettingsOpen(false); setInquiryOpen(true) } },
-    { id: 'terms', icon: FileText, label: '이용약관', onClick: () => showToast('준비 중이에요') },
-    { id: 'privacy', icon: Shield, label: '개인정보 처리방침', onClick: () => showToast('준비 중이에요') },
-    { id: 'notice', icon: Megaphone, label: '공지사항', onClick: () => showToast('준비 중이에요') },
-    { id: 'release', icon: Sparkles, label: '릴리즈노트', onClick: () => showToast('준비 중이에요') },
-    { id: 'version', icon: Info, label: '버전정보', trailing: 'v1.0.0' },
-  ]
 
   return (
     <>
@@ -109,7 +86,7 @@ export default function AppHeader() {
             {/* 설정 — 로그인 여부 무관 동일 UI */}
             <motion.button
               whileTap={{ scale: 0.88 }}
-              onClick={() => setSettingsOpen(true)}
+              onClick={() => router.push('/settings')}
               className="p-2 text-[var(--color-text-secondary)]"
               aria-label="설정"
             >
@@ -257,42 +234,6 @@ export default function AppHeader() {
           </>
         )}
       </AnimatePresence>
-
-      {/* 설정 — 로그인 여부 무관 동일 메뉴 */}
-      <BottomSheet open={settingsOpen} onClose={() => setSettingsOpen(false)}>
-        <div className="px-5 pb-8">
-          <p className="text-[16px] font-black text-[var(--color-text-strong)] mb-4">설정</p>
-          <div className="rounded-2xl overflow-hidden border border-[var(--color-border-soft)] divide-y divide-[var(--color-border-soft)]">
-            {settingsItems.map((item) => {
-              const Icon = item.icon
-              return (
-                <button
-                  key={item.id}
-                  onClick={item.onClick}
-                  disabled={!item.onClick}
-                  className="flex items-center gap-3.5 w-full px-4 py-3.5 text-left active:bg-[var(--color-bg-muted)] transition-colors disabled:active:bg-transparent"
-                >
-                  <div
-                    className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: 'var(--color-bg-muted)' }}
-                  >
-                    <Icon size={15} className="text-[var(--color-text-secondary)]" />
-                  </div>
-                  <span className="flex-1 text-[14px] font-semibold text-[var(--color-text-primary)]">{item.label}</span>
-                  {item.trailing ? (
-                    <span className="text-[12px] text-[var(--color-text-tertiary)]">{item.trailing}</span>
-                  ) : (
-                    <ChevronRight size={14} className="text-[var(--color-text-tertiary)] flex-shrink-0 opacity-50" />
-                  )}
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      </BottomSheet>
-
-      {/* 문의하기 — 로그인 여부 무관 */}
-      <InquirySheet open={inquiryOpen} onClose={() => setInquiryOpen(false)} />
     </>
   )
 }

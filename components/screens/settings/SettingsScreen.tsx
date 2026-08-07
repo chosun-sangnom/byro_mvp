@@ -737,16 +737,24 @@ export default function SettingsScreen() {
       <NavBar title="설정" onBack={() => router.back()} />
 
       {isLoggedIn ? (
-        <button
-          onClick={() => router.push('/me')}
-          className="flex items-center gap-4 mx-4 mt-6 mb-2 px-4 py-4 rounded-2xl bg-[var(--color-bg-surface)] border border-[var(--color-border-soft)] w-[calc(100%-2rem)] text-left active:opacity-80 transition-opacity"
-        >
-          <Avatar src={user?.avatarImage} name={user?.name ?? ''} color={user?.avatarColor ?? 'var(--color-accent-dark)'} size={56} />
-          <div className="flex-1 min-w-0">
-            <p className="text-[16px] font-black text-[var(--color-text-primary)] truncate">{user?.name}</p>
-            <p className="text-[12px] text-[var(--color-accent-dark)] mt-0.5 font-medium">내 프로필 보기 →</p>
-          </div>
-        </button>
+        <div className="mx-4 mt-6 mb-2 px-4 py-4 rounded-2xl bg-[var(--color-bg-surface)] border border-[var(--color-border-soft)] w-[calc(100%-2rem)]">
+          <button
+            onClick={() => router.push('/me')}
+            className="flex items-center gap-4 w-full text-left active:opacity-80 transition-opacity"
+          >
+            <Avatar src={user?.avatarImage} name={user?.name ?? ''} color={user?.avatarColor ?? 'var(--color-accent-dark)'} size={56} />
+            <div className="flex-1 min-w-0">
+              <p className="text-[16px] font-black text-[var(--color-text-primary)] truncate">{user?.name}</p>
+              <p className="text-[12px] text-[var(--color-accent-dark)] mt-0.5 font-medium">내 프로필 보기 →</p>
+            </div>
+          </button>
+          <button
+            onClick={() => { store.logout(); router.push('/') }}
+            className="mt-3 text-[12px] font-medium text-[var(--color-text-tertiary)] underline underline-offset-2"
+          >
+            로그아웃
+          </button>
+        </div>
       ) : (
         <div className="mx-4 mt-6 mb-2 px-4 py-5 rounded-2xl bg-[var(--color-bg-surface)] border border-[var(--color-border-soft)] w-[calc(100%-2rem)]">
           <p className="text-[15px] font-black text-[var(--color-text-primary)] mb-1">게스트로 둘러보는 중이에요</p>
@@ -766,16 +774,18 @@ export default function SettingsScreen() {
       <div className="flex flex-col mt-4 pb-[calc(env(safe-area-inset-bottom)+32px)]">
         {sections.map(renderSection)}
 
-        {isLoggedIn && (
-          <div className="px-5 flex gap-2 mb-6">
-            <Button variant="outline" size="sm" onClick={() => { store.logout(); router.push('/') }}>로그아웃</Button>
-            <Button variant="danger" size="sm" onClick={() => setWithdrawOpen(true)} style={{ backgroundColor: 'transparent' }}>회원탈퇴</Button>
-          </div>
-        )}
-
         {renderSection(appSection)}
 
         <p className="text-center text-[11px] text-[var(--color-text-tertiary)] mt-2">버전 정보 · v1.0.0</p>
+
+        {isLoggedIn && (
+          <button
+            onClick={() => setWithdrawOpen(true)}
+            className="text-center text-[11px] text-[var(--color-text-tertiary)] mt-3 underline underline-offset-2"
+          >
+            회원탈퇴
+          </button>
+        )}
       </div>
 
       {/* 탈퇴 확인 모달 */}

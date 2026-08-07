@@ -1,7 +1,14 @@
 'use client'
 
+import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { ReactNode } from 'react'
+import { useByroStore } from '@/store/useByroStore'
+import { useAdminStore } from '@/store/useAdminStore'
+import type { TicketCategory } from '@/types/admin'
+import { Button } from './buttons'
+import { TextArea } from './forms'
+import { showToast } from './toast'
 
 interface BottomSheetProps {
   open: boolean
@@ -191,5 +198,95 @@ export function Modal({ open, onClose, children }: ModalProps) {
         </div>
       )}
     </AnimatePresence>
+  )
+}
+
+const INQUIRY_CATEGORIES: TicketCategory[] = ['계정', '결제', '신고', '기타']
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+interface InquirySheetProps {
+  open: boolean
+  onClose: () => void
+}
+
+export function InquirySheet({ open, onClose }: InquirySheetProps) {
+  const user = useByroStore((s) => s.user)
+  const isLoggedIn = useByroStore((s) => s.isLoggedIn)
+  const addTicket = useAdminStore((s) => s.addTicket)
+
+  const [category, setCategory] = useState<TicketCategory | null>(null)
+  const [email, setEmail] = useState('')
+  const [content, setContent] = useState('')
+  const valid = category !== null && EMAIL_REGEX.test(email) && content.trim().length > 0
+
+  const handleClose = () => {
+    setCategory(null)
+    setEmail('')
+    setContent('')
+    onClose()
+  }
+
+  const handleSubmit = () => {
+    if (!category || !valid) return
+    addTicket({
+      category,
+      content: content.trim(),
+      authorName: isLoggedIn && user?.name ? user.name : '비회원',
+      authorEmail: email.trim(),
+    })
+    showToast('문의가 접수됐어요')
+    handleClose()
+  }
+
+  return (
+    <BottomSheet open={open} onClose={handleClose}>
+      <div className="px-5 pb-8">
+        <p className="text-[18px] font-black text-[var(--color-text-strong)] mb-1">문의하기</p>
+        <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed mb-5">
+          궁금한 점이나 불편한 점을 남겨주시면 답변을 이메일로 보내드려요.
+        </p>
+
+        <p className="text-[11px] font-bold text-[var(--color-text-tertiary)] mb-2 uppercase tracking-[0.08em]">문의 유형</p>
+        <div className="grid grid-cols-4 gap-1.5 mb-4">
+          {INQUIRY_CATEGORIES.map((c) => (
+            <button
+              key={c}
+              type="button"
+              onClick={() => setCategory(c)}
+              className="rounded-xl py-2.5 text-[13px] font-semibold border transition-colors"
+              style={{
+                borderColor: category === c ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
+                backgroundColor: category === c ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
+                color: category === c ? '#fff' : 'var(--color-text-secondary)',
+              }}
+            >
+              {c}
+            </button>
+          ))}
+        </div>
+
+        <p className="text-[11px] font-bold text-[var(--color-text-tertiary)] mb-2 uppercase tracking-[0.08em]">답변받을 이메일</p>
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="example@byro.io"
+          className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-[14px] outline-none mb-4"
+        />
+
+        <p className="text-[11px] font-bold text-[var(--color-text-tertiary)] mb-2 uppercase tracking-[0.08em]">문의 내용</p>
+        <TextArea
+          value={content}
+          onChange={setContent}
+          placeholder="무엇을 도와드릴까요?"
+          maxLength={1000}
+          rows={5}
+        />
+
+        <div className="mt-5">
+          <Button onClick={handleSubmit} disabled={!valid}>문의 접수하기</Button>
+        </div>
+      </div>
+    </BottomSheet>
   )
 }

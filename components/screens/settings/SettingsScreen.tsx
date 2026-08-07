@@ -7,7 +7,7 @@ import {
   ChevronRight, Link, Lock, Pencil, BookmarkCheck, CreditCard, Eye, Check, CheckCircle2, BadgeCheck,
   Globe, FileText, HelpCircle,
 } from 'lucide-react'
-import { Avatar, NavBar, BottomSheet, Modal, Button, showToast } from '@/components/ui'
+import { Avatar, NavBar, BottomSheet, showToast } from '@/components/ui'
 
 const CUSTOM_LINK_ID_REGEX = /^[a-z0-9_]{2,20}$/
 
@@ -47,7 +47,6 @@ type MenuItem = {
   description?: string
   href?: string
   onClick?: () => void
-  requiresAuth?: boolean
 }
 
 type Section = {
@@ -86,7 +85,6 @@ export default function SettingsScreen() {
   const [verifyPhone, setVerifyPhone] = useState('')
   const [verifyCode, setVerifyCode] = useState('')
   const [verifySmsSent, setVerifySmsSent] = useState(false)
-  const [withdrawOpen, setWithdrawOpen] = useState(false)
 
   const handleSaveCustomLinkId = () => {
     const trimmed = customLinkInput.trim().toLowerCase()
@@ -642,7 +640,6 @@ export default function SettingsScreen() {
           label: '바이로 편집',
           description: '프로필·하이라이트·라이프스타일',
           href: '/me?edit=true',
-          requiresAuth: true,
         },
         {
           id: 'visibility',
@@ -650,7 +647,6 @@ export default function SettingsScreen() {
           label: '공개 설정',
           description: visibilitySummary,
           href: '/me?section=visibility&returnTo=%2Fsettings',
-          requiresAuth: true,
         },
         {
           id: 'archive',
@@ -658,7 +654,6 @@ export default function SettingsScreen() {
           label: '저장한 프로필',
           description: '저장한 프로필 · 최근 본',
           href: '/archive',
-          requiresAuth: true,
         },
       ],
     },
@@ -671,7 +666,6 @@ export default function SettingsScreen() {
           label: '본인인증',
           description: user?.isVerified ? '인증 완료 · 프로필에 뱃지가 표시돼요' : '미인증 · 인증하면 프로필에 뱃지가 표시돼요',
           onClick: () => setScreen('verify'),
-          requiresAuth: true,
         },
         {
           id: 'billing',
@@ -679,7 +673,6 @@ export default function SettingsScreen() {
           label: '유료 결제',
           description: isPaid ? 'PRO · 프리미엄 기능 이용 중' : '내 링크 커스터마이징 · 프리미엄 기능',
           onClick: () => setScreen('billing'),
-          requiresAuth: true,
         },
       ],
     },
@@ -689,7 +682,7 @@ export default function SettingsScreen() {
     title: '앱 설정',
     items: [
       { id: 'lang', icon: Globe, label: '언어', description: '한국어', href: '/settings/language' },
-      { id: 'policies', icon: FileText, label: '약관 및 정책', href: '/settings/policies' },
+      { id: 'account', icon: FileText, label: '약관 및 계정', href: '/settings/account' },
       { id: 'inquiry', icon: HelpCircle, label: '문의하기', description: '궁금한 점이나 불편한 점을 남겨주세요', href: '/settings/inquiry' },
     ],
   }
@@ -706,11 +699,6 @@ export default function SettingsScreen() {
             <button
               key={item.id}
               onClick={() => {
-                if (item.requiresAuth && !isLoggedIn) {
-                  showToast('로그인이 필요한 기능이에요')
-                  setTimeout(() => router.push('/signup'), 500)
-                  return
-                }
                 if (item.onClick) { item.onClick(); return }
                 if (!item.href) { showToast('준비 중이에요'); return }
                 router.push(item.href)
@@ -737,24 +725,16 @@ export default function SettingsScreen() {
       <NavBar title="설정" onBack={() => router.back()} />
 
       {isLoggedIn ? (
-        <div className="relative mx-4 mt-6 mb-2 px-4 py-4 rounded-2xl bg-[var(--color-bg-surface)] border border-[var(--color-border-soft)] w-[calc(100%-2rem)]">
-          <button
-            onClick={() => router.push('/me')}
-            className="flex items-center gap-4 w-full text-left active:opacity-80 transition-opacity"
-          >
-            <Avatar src={user?.avatarImage} name={user?.name ?? ''} color={user?.avatarColor ?? 'var(--color-accent-dark)'} size={56} />
-            <div className="flex-1 min-w-0">
-              <p className="text-[16px] font-black text-[var(--color-text-primary)] truncate">{user?.name}</p>
-              <p className="text-[12px] text-[var(--color-accent-dark)] mt-0.5 font-medium">내 프로필 보기 →</p>
-            </div>
-          </button>
-          <button
-            onClick={() => { store.logout(); router.push('/') }}
-            className="absolute right-4 bottom-3 text-[12px] font-medium text-[var(--color-text-tertiary)] underline underline-offset-2"
-          >
-            로그아웃
-          </button>
-        </div>
+        <button
+          onClick={() => router.push('/me')}
+          className="flex items-center gap-4 mx-4 mt-6 mb-2 px-4 py-4 rounded-2xl bg-[var(--color-bg-surface)] border border-[var(--color-border-soft)] w-[calc(100%-2rem)] text-left active:opacity-80 transition-opacity"
+        >
+          <Avatar src={user?.avatarImage} name={user?.name ?? ''} color={user?.avatarColor ?? 'var(--color-accent-dark)'} size={56} />
+          <div className="flex-1 min-w-0">
+            <p className="text-[16px] font-black text-[var(--color-text-primary)] truncate">{user?.name}</p>
+            <p className="text-[12px] text-[var(--color-accent-dark)] mt-0.5 font-medium">내 프로필 보기 →</p>
+          </div>
+        </button>
       ) : (
         <div className="mx-4 mt-6 mb-2 px-4 py-5 rounded-2xl bg-[var(--color-bg-surface)] border border-[var(--color-border-soft)] w-[calc(100%-2rem)]">
           <p className="text-[15px] font-black text-[var(--color-text-primary)] mb-1">게스트로 둘러보는 중이에요</p>
@@ -772,7 +752,7 @@ export default function SettingsScreen() {
       )}
 
       <div className="flex flex-col mt-4 pb-[calc(env(safe-area-inset-bottom)+32px)]">
-        {sections.map(renderSection)}
+        {isLoggedIn && sections.map(renderSection)}
 
         {renderSection(appSection)}
 
@@ -780,54 +760,13 @@ export default function SettingsScreen() {
 
         {isLoggedIn && (
           <button
-            onClick={() => setWithdrawOpen(true)}
+            onClick={() => { store.logout(); router.push('/') }}
             className="text-center text-[11px] text-[var(--color-text-tertiary)] mt-3 underline underline-offset-2"
           >
-            회원탈퇴
+            로그아웃
           </button>
         )}
       </div>
-
-      {/* 탈퇴 확인 모달 */}
-      <Modal open={withdrawOpen} onClose={() => setWithdrawOpen(false)}>
-        <div className="text-center">
-          <div className="text-base font-black mb-1" style={{ color: 'var(--color-state-danger-text)' }}>
-            정말 탈퇴하시겠습니까?
-          </div>
-          <p className="text-[12px] text-[var(--color-text-tertiary)] mb-4 leading-relaxed">
-            탈퇴 즉시 아래 데이터가 <span className="font-bold text-[var(--color-text-secondary)]">영구 삭제</span>되며 복구할 수 없어요.
-          </p>
-          <ul className="text-left rounded-xl bg-[var(--color-bg-muted)] px-4 py-3 mb-4 space-y-1.5">
-            {[
-              '내 프로필 정보',
-              '연결 관계',
-              '내가 남긴 리뷰 · 방명록',
-              '받은 리뷰 · 방명록',
-            ].map((item) => (
-              <li key={item} className="flex items-start gap-2 text-[12px] text-[var(--color-text-secondary)]">
-                <span className="mt-0.5 flex-shrink-0 text-[var(--color-state-danger-text)]">✕</span>
-                {item}
-              </li>
-            ))}
-          </ul>
-          <p className="text-[11px] text-[var(--color-text-tertiary)] mb-5 leading-relaxed">
-            탈퇴 후 동일 전화번호로 재가입은 가능하지만,<br />이전 데이터는 복구되지 않습니다.
-          </p>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => setWithdrawOpen(false)}>취소</Button>
-            <Button
-              variant="danger"
-              size="sm"
-              onClick={() => {
-                setWithdrawOpen(false)
-                store.resetAll()
-              }}
-            >
-              탈퇴하기
-            </Button>
-          </div>
-        </div>
-      </Modal>
     </div>
   )
 }

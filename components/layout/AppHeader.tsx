@@ -76,19 +76,6 @@ export default function AppHeader() {
           >
             <Menu size={20} />
           </motion.button>
-
-          {/* 로그인 — 비로그인 시에만 표시 */}
-          {!isLoggedIn && (
-            <motion.button
-              whileTap={{ scale: 0.88 }}
-              onClick={() => router.push('/signup')}
-              className="ml-1 px-3.5 py-1.5 rounded-full text-[12px] font-bold text-white"
-              style={{ backgroundColor: 'var(--color-accent-dark)' }}
-              aria-label="로그인"
-            >
-              로그인
-            </motion.button>
-          )}
         </div>
       </header>
 

@@ -516,7 +516,7 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
 
   const handleUpgrade = () => {
     store.updateUserLife(life)
-    router.push('/mypage?screen=upgrade')
+    router.push('/settings?screen=upgrade')
   }
 
   if (view === 'pet')

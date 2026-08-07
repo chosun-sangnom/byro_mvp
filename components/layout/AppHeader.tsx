@@ -2,10 +2,9 @@
 
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bell, BookOpen, Star, X } from 'lucide-react'
+import { Bell, BookOpen, Menu, Search, Star, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
-import { Avatar } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
 // [임시] 방명록·피드백 알림 목업 — API 연동 후 교체
@@ -25,9 +24,8 @@ const NOTIF_META = {
 
 export default function AppHeader() {
   const router = useRouter()
-  const { user, isLoggedIn, logout } = useAuth()
+  const { isLoggedIn } = useAuth()
   const [notiOpen, setNotiOpen] = useState(false)
-  const [profileOpen, setProfileOpen] = useState(false)
 
   const hasUnread = MOCK_NOTIFS.length > 0
 
@@ -44,6 +42,16 @@ export default function AppHeader() {
         </button>
 
         <div className="flex items-center gap-1">
+          {/* 검색 */}
+          <motion.button
+            whileTap={{ scale: 0.88 }}
+            onClick={() => router.push('/search')}
+            className="p-2 text-[var(--color-text-secondary)]"
+            aria-label="검색"
+          >
+            <Search size={20} />
+          </motion.button>
+
           {/* 알림 — 로그인 시에만 표시 */}
           {isLoggedIn && (
             <motion.button
@@ -59,17 +67,18 @@ export default function AppHeader() {
             </motion.button>
           )}
 
-          {/* 아바타 / 로그인 */}
-          {isLoggedIn ? (
-            <motion.button
-              whileTap={{ scale: 0.88 }}
-              onClick={() => setProfileOpen((o) => !o)}
-              className="ml-1"
-              aria-label="프로필 메뉴"
-            >
-              <Avatar src={user?.avatarImage} name={user?.name ?? ''} color={user?.avatarColor ?? 'var(--color-accent-dark)'} size={32} />
-            </motion.button>
-          ) : (
+          {/* 설정 — 로그인 여부 무관 동일 UI */}
+          <motion.button
+            whileTap={{ scale: 0.88 }}
+            onClick={() => router.push('/settings')}
+            className="p-2 text-[var(--color-text-secondary)]"
+            aria-label="설정"
+          >
+            <Menu size={20} />
+          </motion.button>
+
+          {/* 로그인 — 비로그인 시에만 표시 */}
+          {!isLoggedIn && (
             <motion.button
               whileTap={{ scale: 0.88 }}
               onClick={() => router.push('/signup')}
@@ -82,61 +91,6 @@ export default function AppHeader() {
           )}
         </div>
       </header>
-
-      {/* 프로필 패널 */}
-      <AnimatePresence>
-        {profileOpen && (
-          <>
-            <motion.div
-              key="profile-backdrop"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.15 }}
-              className="absolute inset-0 top-14 z-30"
-              onClick={() => setProfileOpen(false)}
-            />
-            <motion.div
-              key="profile-panel"
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.18, ease: 'easeOut' }}
-              className="absolute right-0 top-14 z-40 w-56 bg-[var(--color-bg-page)] border border-[var(--color-border-soft)] rounded-xl shadow-xl mx-3 overflow-hidden"
-            >
-              {/* 프로필 정보 */}
-              <div className="flex flex-col items-center gap-2 px-5 pt-5 pb-4 w-full">
-                <button onClick={() => { setProfileOpen(false); router.push('/me') }}>
-                  <Avatar src={user?.avatarImage} name={user?.name ?? ''} color={user?.avatarColor ?? 'var(--color-accent-dark)'} size={64} />
-                </button>
-                <span className="text-[15px] font-semibold text-[var(--color-text-primary)]">{user?.name}</span>
-                <button
-                  onClick={() => { setProfileOpen(false); router.push('/me') }}
-                  className="text-[11px] font-semibold text-[var(--color-accent-dark)]"
-                >
-                  내 Byro 보기
-                </button>
-              </div>
-
-              {/* 버튼 */}
-              <div className="flex border-t border-[var(--color-border-soft)]">
-                <button
-                  onClick={() => { setProfileOpen(false); router.push('/mypage') }}
-                  className="flex-1 py-3 text-[13px] font-medium text-[var(--color-text-primary)] hover:bg-[var(--color-bg-soft)] transition-colors border-r border-[var(--color-border-soft)]"
-                >
-                  마이페이지
-                </button>
-                <button
-                  onClick={() => { setProfileOpen(false); logout() }}
-                  className="flex-1 py-3 text-[13px] font-medium text-red-500 hover:bg-red-50 transition-colors"
-                >
-                  로그아웃
-                </button>
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
 
       {/* 알림 드롭다운 */}
       <AnimatePresence>

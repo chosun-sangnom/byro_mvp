@@ -6,7 +6,7 @@ import { RequireAuth } from '@/components/auth/RequireAuth'
 
 export default function ArchivePage() {
   return (
-    <AppShell showHeader showTabBar>
+    <AppShell showHeader>
       <RequireAuth>
         <Archive />
       </RequireAuth>

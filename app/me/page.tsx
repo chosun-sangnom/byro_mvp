@@ -7,7 +7,7 @@ import { RequireAuth } from '@/components/auth/RequireAuth'
 
 export default function MePage() {
   return (
-    <AppShell showHeader showTabBar>
+    <AppShell showHeader>
       <RequireAuth>
         <Suspense>
           <MyByro />

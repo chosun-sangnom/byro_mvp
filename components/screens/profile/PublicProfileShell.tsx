@@ -153,7 +153,7 @@ export function PublicProfileShell({
       </div>
 
       {/* ── 고정 푸터 ── */}
-      <div className="flex-shrink-0 border-t border-[var(--color-border-soft)] bg-[var(--color-glass-strong)] px-5 pt-4 pb-[calc(env(safe-area-inset-bottom)+96px)] backdrop-blur-md">
+      <div className="flex-shrink-0 border-t border-[var(--color-border-soft)] bg-[var(--color-glass-strong)] px-5 pt-4 pb-[calc(env(safe-area-inset-bottom)+16px)] backdrop-blur-md">
 
         {/* 평판 탭 visitor 전용 액션 */}
         {showReputationActions && (

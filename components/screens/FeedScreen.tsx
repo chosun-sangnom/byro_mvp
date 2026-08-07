@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation'
 import { ChevronRight } from 'lucide-react'
 import { Avatar, ToastSingleton, showToast } from '@/components/ui'
 import AppHeader from '@/components/layout/AppHeader'
-import BottomTabBar from '@/components/layout/BottomTabBar'
 
 type FeedProfile = {
   linkId: string | null
@@ -131,12 +130,8 @@ export default function FeedScreen() {
             </button>
           </div>
 
-          <div className="pb-24" />
-
         </div>
       </div>
-
-      <BottomTabBar />
     </ToastSingleton>
   )
 }

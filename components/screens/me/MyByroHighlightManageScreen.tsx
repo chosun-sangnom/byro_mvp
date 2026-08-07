@@ -116,7 +116,7 @@ export function HighlightManageScreen({
   }
 
   const handleUpgrade = () => {
-    router.push('/mypage?screen=upgrade')
+    router.push('/settings?screen=upgrade')
   }
 
   const openAddForm = () => {

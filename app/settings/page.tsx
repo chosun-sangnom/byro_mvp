@@ -5,7 +5,7 @@ import SettingsScreen from '@/components/screens/settings/SettingsScreen'
 
 export default function SettingsPage() {
   return (
-    <AppShell showHeader>
+    <AppShell showHeader showTabBar>
       <SettingsScreen />
     </AppShell>
   )

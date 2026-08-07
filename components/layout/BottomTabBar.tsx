@@ -3,17 +3,29 @@
 import { Archive, Home, Search, Settings } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { usePathname, useRouter } from 'next/navigation'
+import { useAuth } from '@/hooks/useAuth'
+import { showToast } from '@/components/ui'
 
 const TABS = [
-  { id: 'home', icon: Home, label: '홈', href: '/', match: (p: string) => p === '/' },
-  { id: 'search', icon: Search, label: '검색', href: '/search', match: (p: string) => p.startsWith('/search') },
-  { id: 'archive', icon: Archive, label: '아카이브', href: '/archive', match: (p: string) => p.startsWith('/archive') },
-  { id: 'settings', icon: Settings, label: '설정', href: '/settings', match: (p: string) => p.startsWith('/settings') },
+  { id: 'home', icon: Home, label: '홈', href: '/', match: (p: string) => p === '/', requiresAuth: false },
+  { id: 'search', icon: Search, label: '검색', href: '/search', match: (p: string) => p.startsWith('/search'), requiresAuth: false },
+  { id: 'archive', icon: Archive, label: '아카이브', href: '/archive', match: (p: string) => p.startsWith('/archive'), requiresAuth: true },
+  { id: 'settings', icon: Settings, label: '설정', href: '/settings', match: (p: string) => p.startsWith('/settings'), requiresAuth: false },
 ]
 
 export default function BottomTabBar() {
   const router = useRouter()
   const pathname = usePathname() ?? '/'
+  const { isLoggedIn } = useAuth()
+
+  const handleTabClick = (tab: (typeof TABS)[number]) => {
+    if (tab.requiresAuth && !isLoggedIn) {
+      showToast('로그인이 필요한 기능이에요')
+      setTimeout(() => router.push('/signup'), 500)
+      return
+    }
+    router.push(tab.href)
+  }
 
   return (
     <div className="fixed inset-x-0 bottom-0 z-40 pointer-events-none">
@@ -33,7 +45,7 @@ export default function BottomTabBar() {
               <motion.button
                 key={tab.id}
                 whileTap={{ scale: 0.9 }}
-                onClick={() => router.push(tab.href)}
+                onClick={() => handleTabClick(tab)}
                 aria-label={tab.label}
                 className="flex items-center justify-center rounded-full transition-colors"
                 style={{

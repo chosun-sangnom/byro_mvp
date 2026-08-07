@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Search, X } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { showToast } from '@/components/ui'
 import {
   SAMPLE_PROFILE, MK_PROFILE, JIMIN_PROFILE,
@@ -66,11 +66,7 @@ function matchesVirtualQuery(profile: VirtualSearchResult, q: string) {
   return q.split(',').map((k) => k.trim()).filter(Boolean).every((k) => text.includes(k.toLowerCase()))
 }
 
-interface SearchScreenProps {
-  onClose?: () => void
-}
-
-export default function SearchScreen({ onClose }: SearchScreenProps) {
+export default function SearchScreen() {
   const router = useRouter()
   const [query, setQuery] = useState('')
   const [selectedChips, setSelectedChips] = useState<string[]>([])
@@ -84,11 +80,6 @@ export default function SearchScreen({ onClose }: SearchScreenProps) {
   useEffect(() => {
     setSelectedChips([])
   }, [query])
-
-  const handleClose = () => {
-    if (onClose) onClose()
-    else router.back()
-  }
 
   const toggleChip = (chip: string) => {
     setSelectedChips((prev) =>
@@ -131,13 +122,6 @@ export default function SearchScreen({ onClose }: SearchScreenProps) {
     >
       {/* 검색 바 */}
       <div className="flex items-center gap-2 px-4 h-14 border-b border-[var(--color-border-soft)] flex-shrink-0">
-        <button
-          onClick={handleClose}
-          className="p-1 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
-          aria-label="뒤로"
-        >
-          <ArrowLeft size={20} />
-        </button>
         <div className="flex-1 flex items-center gap-2 px-3 h-9 rounded-xl bg-[var(--color-bg-soft)]">
           <Search size={15} className="text-[var(--color-text-tertiary)] flex-shrink-0" />
           <input
@@ -217,7 +201,7 @@ export default function SearchScreen({ onClose }: SearchScreenProps) {
                         <button
                           onClick={() => {
                             if (extraLinkIds.has(p.linkId)) { showToast('준비 중인 프로필이에요'); return }
-                            onClose?.(); router.push(`/${p.linkId}`)
+                            router.push(`/${p.linkId}`)
                           }}
                           className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[var(--color-bg-soft)] transition-colors text-left"
                         >
@@ -279,7 +263,7 @@ export default function SearchScreen({ onClose }: SearchScreenProps) {
                         transition={{ delay: i * 0.06, duration: 0.15 }}
                       >
                         <button
-                          onClick={() => { onClose?.(); router.push(`/virtual/${p.id}`) }}
+                          onClick={() => router.push(`/virtual/${p.id}`)}
                           className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[var(--color-bg-soft)] transition-colors text-left"
                         >
                           <div

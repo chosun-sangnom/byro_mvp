@@ -4,14 +4,9 @@ import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { Camera, CheckCircle2 } from 'lucide-react'
 import { useByroStore } from '@/store/useByroStore'
-import { useAdminStore } from '@/store/useAdminStore'
-import { Button, BottomSheet, CheckRow, TextArea, showToast } from '@/components/ui'
+import { Button, CheckRow, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
-import type { TicketCategory } from '@/types/admin'
-
-const GUEST_INQUIRY_CATEGORIES: TicketCategory[] = ['계정', '결제', '신고', '기타']
-const GUEST_EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export type Mode = 'choose' | 'signup' | 'login'
 type LoginView = 'main' | 'oauth' | 'phone' | 'reset'
@@ -65,31 +60,10 @@ function BackButton({ onClick }: { onClick: () => void }) {
 export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => void } = {}) {
   const store = useByroStore()
   const router = useRouter()
-  const addTicket = useAdminStore((s) => s.addTicket)
   const [mode, setMode] = useState<Mode>('choose')
   const [view, setView] = useState<LoginView>('main')
   const [oauthProvider, setOauthProvider] = useState<OAuthProvider | null>(null)
   const [oauthStep, setOauthStep] = useState<OAuthStep>('pending')
-  const [guestInquiryOpen, setGuestInquiryOpen] = useState(false)
-  const [guestCategory, setGuestCategory] = useState<TicketCategory | null>(null)
-  const [guestEmail, setGuestEmail] = useState('')
-  const [guestContent, setGuestContent] = useState('')
-  const guestInquiryValid = guestCategory !== null && GUEST_EMAIL_REGEX.test(guestEmail) && guestContent.trim().length > 0
-
-  const handleSubmitGuestInquiry = () => {
-    if (!guestCategory || !guestInquiryValid) return
-    addTicket({
-      category: guestCategory,
-      content: guestContent.trim(),
-      authorName: '비회원',
-      authorEmail: guestEmail.trim(),
-    })
-    setGuestCategory(null)
-    setGuestEmail('')
-    setGuestContent('')
-    setGuestInquiryOpen(false)
-    showToast('문의가 접수됐어요')
-  }
 
   useEffect(() => {
     onModeChange?.(mode)
@@ -668,63 +642,6 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
         <Button onClick={() => setMode('signup')}>처음이신가요? 회원가입</Button>
         <Button variant="outline" onClick={() => setMode('login')}>이미 계정이 있어요</Button>
       </div>
-      <button
-        type="button"
-        onClick={() => setGuestInquiryOpen(true)}
-        className="mt-5 text-[12px] text-[var(--color-text-tertiary)] underline underline-offset-2"
-      >
-        문의하기
-      </button>
-
-      <BottomSheet open={guestInquiryOpen} onClose={() => setGuestInquiryOpen(false)}>
-        <div className="px-5 pb-8">
-          <p className="text-[18px] font-black text-[var(--color-text-strong)] mb-1">문의하기</p>
-          <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed mb-5">
-            궁금한 점이나 불편한 점을 남겨주시면 답변을 이메일로 보내드려요.
-          </p>
-
-          <p className="text-[11px] font-bold text-[var(--color-text-tertiary)] mb-2 uppercase tracking-[0.08em]">문의 유형</p>
-          <div className="grid grid-cols-4 gap-1.5 mb-4">
-            {GUEST_INQUIRY_CATEGORIES.map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => setGuestCategory(c)}
-                className="rounded-xl py-2.5 text-[13px] font-semibold border transition-colors"
-                style={{
-                  borderColor: guestCategory === c ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
-                  backgroundColor: guestCategory === c ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
-                  color: guestCategory === c ? '#fff' : 'var(--color-text-secondary)',
-                }}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-
-          <p className="text-[11px] font-bold text-[var(--color-text-tertiary)] mb-2 uppercase tracking-[0.08em]">답변받을 이메일</p>
-          <input
-            type="email"
-            value={guestEmail}
-            onChange={(e) => setGuestEmail(e.target.value)}
-            placeholder="example@byro.io"
-            className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-[14px] outline-none mb-4"
-          />
-
-          <p className="text-[11px] font-bold text-[var(--color-text-tertiary)] mb-2 uppercase tracking-[0.08em]">문의 내용</p>
-          <TextArea
-            value={guestContent}
-            onChange={setGuestContent}
-            placeholder="무엇을 도와드릴까요?"
-            maxLength={1000}
-            rows={5}
-          />
-
-          <div className="mt-5">
-            <Button onClick={handleSubmitGuestInquiry} disabled={!guestInquiryValid}>문의 접수하기</Button>
-          </div>
-        </div>
-      </BottomSheet>
     </div>
   )
 }

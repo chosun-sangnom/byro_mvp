@@ -3,19 +3,14 @@
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useByroStore } from '@/store/useByroStore'
-import { useAdminStore } from '@/store/useAdminStore'
-import { ChevronRight, Link, Lock, Pencil, BookmarkCheck, CreditCard, Eye, Check, CheckCircle2, BadgeCheck, HelpCircle } from 'lucide-react'
-import { Avatar, NavBar, BottomSheet, Modal, Button, TextArea, showToast } from '@/components/ui'
-import type { TicketCategory } from '@/types/admin'
+import { ChevronRight, Link, Lock, Pencil, BookmarkCheck, CreditCard, Eye, Check, CheckCircle2, BadgeCheck } from 'lucide-react'
+import { Avatar, NavBar, BottomSheet, Modal, Button, showToast } from '@/components/ui'
 
 const CUSTOM_LINK_ID_REGEX = /^[a-z0-9_]{2,20}$/
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-type Screen = 'main' | 'billing' | 'upgrade' | 'payment' | 'success' | 'verify' | 'inquiry'
+type Screen = 'main' | 'billing' | 'upgrade' | 'payment' | 'success' | 'verify'
 type BillingCycle = 'monthly' | 'yearly'
 type VerifyTab = 'kakao' | 'sms'
-
-const INQUIRY_CATEGORIES: TicketCategory[] = ['계정', '결제', '신고', '기타']
 
 function formatPhone(value: string) {
   const digits = value.replace(/\D/g, '').slice(0, 11)
@@ -68,7 +63,7 @@ export default function MyPageScreen() {
   const tabVisibility = store.tabVisibility ?? { who: 'public', vibe: 'public', network: 'public' }
 
   const screenParam = searchParams.get('screen')
-  const validScreens: Screen[] = ['main', 'billing', 'upgrade', 'payment', 'success', 'verify', 'inquiry']
+  const validScreens: Screen[] = ['main', 'billing', 'upgrade', 'payment', 'success', 'verify']
   const initialScreen = validScreens.includes(screenParam as Screen) ? (screenParam as Screen) : 'main'
 
   const [screen, setScreen] = useState<Screen>(initialScreen)
@@ -85,10 +80,6 @@ export default function MyPageScreen() {
   const [verifyCode, setVerifyCode] = useState('')
   const [verifySmsSent, setVerifySmsSent] = useState(false)
   const [withdrawOpen, setWithdrawOpen] = useState(false)
-  const [inquiryCategory, setInquiryCategory] = useState<TicketCategory | null>(null)
-  const [inquiryEmail, setInquiryEmail] = useState('')
-  const [inquiryContent, setInquiryContent] = useState('')
-  const addTicket = useAdminStore((s) => s.addTicket)
 
   const handleSaveCustomLinkId = () => {
     const trimmed = customLinkInput.trim().toLowerCase()
@@ -116,24 +107,6 @@ export default function MyPageScreen() {
     }
     store.setPaidUser(true)
     setScreen('success')
-  }
-
-  const inquiryValid = inquiryCategory !== null && EMAIL_REGEX.test(inquiryEmail) && inquiryContent.trim().length > 0
-
-  const handleSubmitInquiry = () => {
-    if (!inquiryCategory || !inquiryValid) return
-    addTicket({
-      category: inquiryCategory,
-      content: inquiryContent.trim(),
-      authorName: user?.name ?? '',
-      authorEmail: inquiryEmail.trim(),
-      linkId: user?.linkId,
-    })
-    setInquiryCategory(null)
-    setInquiryEmail('')
-    setInquiryContent('')
-    showToast('문의가 접수됐어요')
-    setScreen('main')
   }
 
   const VISIBILITY_LABEL: Record<string, string> = { public: '전체공개', private: '비공개' }
@@ -505,70 +478,6 @@ export default function MyPageScreen() {
     )
   }
 
-  // ── 문의하기 서브스크린 ──────────────────────────────────────────
-  if (screen === 'inquiry') {
-    return (
-      <div className="flex h-full flex-col bg-[var(--color-bg-page)]">
-        <NavBar title="문의하기" onBack={() => setScreen('main')} />
-
-        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
-          <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed">
-            궁금한 점이나 불편한 점을 남겨주시면 답변을 이메일로 보내드려요.
-          </p>
-
-          <div>
-            <p className="text-[11px] font-bold text-[var(--color-text-tertiary)] mb-2 uppercase tracking-[0.08em]">문의 유형</p>
-            <div className="grid grid-cols-4 gap-1.5">
-              {INQUIRY_CATEGORIES.map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setInquiryCategory(c)}
-                  className="rounded-xl py-2.5 text-[13px] font-semibold border transition-colors"
-                  style={{
-                    borderColor: inquiryCategory === c ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
-                    backgroundColor: inquiryCategory === c ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
-                    color: inquiryCategory === c ? '#fff' : 'var(--color-text-secondary)',
-                  }}
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <p className="text-[11px] font-bold text-[var(--color-text-tertiary)] mb-2 uppercase tracking-[0.08em]">답변받을 이메일</p>
-            <input
-              type="email"
-              value={inquiryEmail}
-              onChange={(e) => setInquiryEmail(e.target.value)}
-              placeholder="example@byro.io"
-              className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-[14px] outline-none"
-            />
-          </div>
-
-          <div>
-            <p className="text-[11px] font-bold text-[var(--color-text-tertiary)] mb-2 uppercase tracking-[0.08em]">문의 내용</p>
-            <TextArea
-              value={inquiryContent}
-              onChange={setInquiryContent}
-              placeholder="무엇을 도와드릴까요?"
-              maxLength={1000}
-              rows={6}
-            />
-          </div>
-        </div>
-
-        <div className="px-5 pb-[calc(env(safe-area-inset-bottom)+20px)] pt-4 bg-[var(--color-bg-page)] border-t border-[var(--color-border-soft)]">
-          <Button onClick={handleSubmitInquiry} disabled={!inquiryValid}>
-            문의 접수하기
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
   // ── 유료결제 서브스크린 ──────────────────────────────────────────
   if (screen === 'billing') {
     return (
@@ -762,18 +671,6 @@ export default function MyPageScreen() {
         },
       ],
     },
-    {
-      title: '고객센터',
-      items: [
-        {
-          id: 'inquiry',
-          icon: HelpCircle,
-          label: '문의하기',
-          description: '궁금한 점이나 불편한 점을 남겨주세요',
-          onClick: () => setScreen('inquiry'),
-        },
-      ],
-    },
   ]
 
   return (
@@ -793,13 +690,13 @@ export default function MyPageScreen() {
       </button>
 
       {/* 메뉴 섹션 */}
-      <div className="flex flex-col gap-5 px-4 mt-4 pb-[calc(env(safe-area-inset-bottom)+32px)]">
+      <div className="flex flex-col mt-4 pb-[calc(env(safe-area-inset-bottom)+32px)]">
         {sections.map((section) => (
-          <div key={section.title}>
-            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)] px-1 mb-2">
+          <div key={section.title} className="mb-6">
+            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)] px-5 mb-1">
               {section.title}
             </p>
-            <div className="rounded-2xl overflow-hidden border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] divide-y divide-[var(--color-border-soft)]">
+            <div className="flex flex-col">
               {section.items.map((item) => {
                 const Icon = item.icon
                 return (
@@ -810,21 +707,16 @@ export default function MyPageScreen() {
                       if (!item.href) { showToast('준비 중이에요'); return }
                       router.push(item.href)
                     }}
-                    className="flex items-center gap-3.5 w-full px-4 py-4 text-left active:bg-[var(--color-bg-muted)] transition-colors"
+                    className="flex items-center gap-3.5 w-full px-5 py-4 text-left border-b border-[var(--color-border-soft)] active:bg-[var(--color-bg-muted)] transition-colors"
                   >
-                    <div
-                      className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                      style={{ background: 'var(--color-bg-muted)' }}
-                    >
-                      <Icon size={16} className="text-[var(--color-text-secondary)]" />
-                    </div>
+                    <Icon size={20} className="text-[var(--color-text-secondary)] flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-[14px] font-semibold text-[var(--color-text-primary)]">{item.label}</p>
                       {item.description && (
-                        <p className="text-[12px] text-[var(--color-text-secondary)] mt-0.5 truncate">{item.description}</p>
+                        <p className="text-[12px] text-[var(--color-text-tertiary)] mt-0.5 truncate">{item.description}</p>
                       )}
                     </div>
-                    <ChevronRight size={14} className="text-[var(--color-text-tertiary)] flex-shrink-0 opacity-50" />
+                    <ChevronRight size={16} className="text-[var(--color-text-tertiary)] flex-shrink-0 opacity-60" />
                   </button>
                 )
               })}
@@ -833,7 +725,7 @@ export default function MyPageScreen() {
         ))}
 
         {/* 회원탈퇴 */}
-        <div>
+        <div className="px-5">
           <Button variant="danger" size="sm" onClick={() => setWithdrawOpen(true)} style={{ backgroundColor: 'transparent' }}>회원탈퇴</Button>
         </div>
       </div>

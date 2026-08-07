@@ -58,9 +58,9 @@ export default function AppHeader() {
 
   return (
     <>
-      <div className="bg-[var(--color-bg-page)] border-b border-[var(--color-border-soft)] flex-shrink-0">
+      <div className="bg-[var(--color-bg-page)] flex-shrink-0">
         {/* 1단: 로고 + 아이콘 */}
-        <header className="flex items-center justify-between px-5 h-14">
+        <header className="flex items-center justify-between px-5 h-14 border-b border-[var(--color-border-soft)]">
           <button
             onClick={() => router.push('/')}
             className="text-[18px] font-black tracking-tight text-[var(--color-text-strong)]"
@@ -84,16 +84,6 @@ export default function AppHeader() {
               </motion.button>
             )}
 
-            {/* 설정 — 로그인 여부 무관 동일 UI */}
-            <motion.button
-              whileTap={{ scale: 0.88 }}
-              onClick={() => setSettingsOpen(true)}
-              className="p-2 text-[var(--color-text-secondary)]"
-              aria-label="설정"
-            >
-              <Menu size={20} />
-            </motion.button>
-
             {/* 아바타 / 로그인 */}
             {isLoggedIn ? (
               <motion.button
@@ -115,13 +105,23 @@ export default function AppHeader() {
                 로그인
               </motion.button>
             )}
+
+            {/* 설정 — 로그인 여부 무관 동일 UI */}
+            <motion.button
+              whileTap={{ scale: 0.88 }}
+              onClick={() => setSettingsOpen(true)}
+              className="p-2 text-[var(--color-text-secondary)]"
+              aria-label="설정"
+            >
+              <Menu size={20} />
+            </motion.button>
           </div>
         </header>
 
-        {/* 2단: 검색창 */}
+        {/* 2단: 검색창 — 프로필 카드와 동일한 폭 */}
         <button
           onClick={() => router.push('/search')}
-          className="flex items-center gap-2 mx-5 mb-3 px-3.5 h-10 rounded-xl bg-[var(--color-bg-soft)] text-left"
+          className="flex items-center gap-2 mx-4 mt-3 mb-3 px-3.5 h-10 rounded-xl bg-[var(--color-bg-soft)] w-[calc(100%-2rem)] text-left"
           aria-label="검색"
         >
           <Search size={16} className="text-[var(--color-text-tertiary)] flex-shrink-0" />
@@ -139,7 +139,7 @@ export default function AppHeader() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className="absolute inset-0 top-[108px] z-30"
+              className="absolute inset-0 top-[120px] z-30"
               onClick={() => setProfileOpen(false)}
             />
             <motion.div
@@ -148,7 +148,7 @@ export default function AppHeader() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.18, ease: 'easeOut' }}
-              className="absolute right-0 top-[108px] z-40 w-56 bg-[var(--color-bg-page)] border border-[var(--color-border-soft)] rounded-xl shadow-xl mx-3 overflow-hidden"
+              className="absolute right-0 top-[120px] z-40 w-56 bg-[var(--color-bg-page)] border border-[var(--color-border-soft)] rounded-xl shadow-xl mx-3 overflow-hidden"
             >
               {/* 프로필 정보 */}
               <div className="flex flex-col items-center gap-2 px-5 pt-5 pb-4 w-full">
@@ -194,7 +194,7 @@ export default function AppHeader() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
-              className="absolute inset-0 top-[108px] z-30"
+              className="absolute inset-0 top-[120px] z-30"
               onClick={() => setNotiOpen(false)}
             />
             <motion.div
@@ -203,7 +203,7 @@ export default function AppHeader() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.18, ease: 'easeOut' }}
-              className="absolute left-0 right-0 top-[108px] z-40 bg-[var(--color-bg-page)] border-b border-[var(--color-border-soft)] shadow-xl max-h-[70vh] overflow-y-auto"
+              className="absolute left-0 right-0 top-[120px] z-40 bg-[var(--color-bg-page)] border-b border-[var(--color-border-soft)] shadow-xl max-h-[70vh] overflow-y-auto"
             >
               <div className="flex items-center justify-between px-5 py-3 border-b border-[var(--color-border-soft)]">
                 <span className="text-[14px] font-bold text-[var(--color-text-primary)]">알림</span>

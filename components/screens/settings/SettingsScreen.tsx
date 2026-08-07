@@ -737,7 +737,7 @@ export default function SettingsScreen() {
       <NavBar title="설정" onBack={() => router.back()} />
 
       {isLoggedIn ? (
-        <div className="mx-4 mt-6 mb-2 px-4 py-4 rounded-2xl bg-[var(--color-bg-surface)] border border-[var(--color-border-soft)] w-[calc(100%-2rem)]">
+        <div className="relative mx-4 mt-6 mb-2 px-4 py-4 rounded-2xl bg-[var(--color-bg-surface)] border border-[var(--color-border-soft)] w-[calc(100%-2rem)]">
           <button
             onClick={() => router.push('/me')}
             className="flex items-center gap-4 w-full text-left active:opacity-80 transition-opacity"
@@ -750,7 +750,7 @@ export default function SettingsScreen() {
           </button>
           <button
             onClick={() => { store.logout(); router.push('/') }}
-            className="mt-3 text-[12px] font-medium text-[var(--color-text-tertiary)] underline underline-offset-2"
+            className="absolute right-4 bottom-3 text-[12px] font-medium text-[var(--color-text-tertiary)] underline underline-offset-2"
           >
             로그아웃
           </button>

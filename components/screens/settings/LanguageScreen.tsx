@@ -7,7 +7,6 @@ import { NavBar, showToast } from '@/components/ui'
 const LANGUAGES = [
   { id: 'ko', label: '한국어' },
   { id: 'en', label: 'English' },
-  { id: 'ja', label: '日本語' },
 ]
 
 export default function LanguageScreen() {

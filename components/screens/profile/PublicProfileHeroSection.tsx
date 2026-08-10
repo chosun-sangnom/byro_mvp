@@ -289,8 +289,7 @@ export function ProfileHeroCard({
   }
 
   return (
-    <div className="hero-card border border-[var(--color-border-default)] bg-[var(--color-glass-strong)] p-[8px] backdrop-blur-sm">
-      <div className="relative h-[452px] overflow-hidden rounded-[30px] bg-[#121212] text-white ring-1 ring-black/4">
+    <div className="relative h-[468px] overflow-hidden rounded-[var(--radius-hero)] bg-[#121212] text-white">
 
 
         {/* AI 페르소나 바텀시트 — createPortal로 transform 컨텍스트 탈출 */}
@@ -581,7 +580,7 @@ export function ProfileHeroCard({
           </div>
         </div>
       </div>
-    </div>
   )
 }
+
 

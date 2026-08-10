@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { Check, ChevronDown, ChevronUp, ShieldCheck } from 'lucide-react'
+import { BadgeCheck, ChevronDown, ChevronUp, ShieldCheck } from 'lucide-react'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { AnimatedSection, SectionTitle } from '@/components/screens/profile/PublicProfileSections'
 import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
@@ -9,25 +9,29 @@ import { getGroupedHighlightPreview, getHighlightDetailFootnote, getHighlightMet
 import type { Highlight, HighlightIconId } from '@/types'
 
 
-function VerifiedBadge({ size, shape = 'circle' }: { size: number; shape?: 'circle' | 'shield' }) {
-  if (shape === 'shield') {
-    return (
-      <ShieldCheck
-        size={Math.round(size * 1.35)}
-        className="shrink-0"
-        fill="#34C759"
-        stroke="white"
-        strokeWidth={2.5}
-      />
-    )
-  }
+function VerifiedBadgeGradientDefs() {
   return (
-    <span
-      className="flex shrink-0 items-center justify-center rounded-full bg-[#34C759]"
-      style={{ width: size, height: size }}
-    >
-      <Check size={Math.round(size * 0.62)} strokeWidth={2.5} className="text-white" />
-    </span>
+    <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
+      <defs>
+        <linearGradient id="verified-badge-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#22D3A6" />
+          <stop offset="100%" stopColor="#0EA968" />
+        </linearGradient>
+      </defs>
+    </svg>
+  )
+}
+
+function VerifiedBadge({ size, shape = 'circle' }: { size: number; shape?: 'circle' | 'shield' }) {
+  const Icon = shape === 'shield' ? ShieldCheck : BadgeCheck
+  return (
+    <Icon
+      size={Math.round(size * (shape === 'shield' ? 1.35 : 1.15))}
+      className="shrink-0"
+      fill="url(#verified-badge-gradient)"
+      stroke="white"
+      strokeWidth={2}
+    />
   )
 }
 
@@ -56,6 +60,7 @@ export function ProfileHighlightsSection({
 
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06}>
+      <VerifiedBadgeGradientDefs />
       <SectionTitle title="하이라이트" />
       <div className="space-y-5">
         {groupedHighlights.map((group) => (

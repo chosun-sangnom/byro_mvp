@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { BadgeCheck, ShieldCheck, ChevronDown, ChevronUp } from 'lucide-react'
+import { BadgeCheck, ChevronDown, ChevronUp } from 'lucide-react'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { AnimatedSection, SectionTitle } from '@/components/screens/profile/PublicProfileSections'
 import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
@@ -65,9 +65,7 @@ export function ProfileHighlightsSection({
                     )}
                   </div>
                   {entry.items.some((h) => h.verified) && !isGroupOpen && (
-                    entry.categoryId === 'career-role'
-                      ? <ShieldCheck size={20} className="shrink-0 text-[var(--color-accent)]" />
-                      : <BadgeCheck size={20} className="shrink-0 text-[var(--color-accent)]" />
+                    <BadgeCheck size={20} className="shrink-0" style={{ color: 'var(--color-accent-dark)' }} />
                   )}
                   {isGroupOpen ? <ChevronUp size={14} color="var(--color-text-tertiary)" /> : <ChevronDown size={14} color="var(--color-text-tertiary)" />}
                 </button>
@@ -80,7 +78,7 @@ export function ProfileHighlightsSection({
                       transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
                       className="overflow-hidden"
                     >
-                      <div className="pb-4 pl-8">
+                      <div className="pb-4 pl-14">
                         <div className="divide-y divide-[var(--color-border-soft)]">
                           {entry.items.map((hl) => {
                             const metaParts = getHighlightMetaParts(hl)
@@ -89,12 +87,9 @@ export function ProfileHighlightsSection({
                                 <div className="flex items-center gap-1.5">
                                   <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{hl.title}</div>
                                   {hl.verified && (
-                                    <span className="flex items-center gap-0.5">
-                                      {hl.categoryId === 'career-role'
-                                        ? <ShieldCheck size={12} className="shrink-0 text-[var(--color-accent)]" />
-                                        : <BadgeCheck size={12} className="shrink-0 text-[var(--color-accent)]" />
-                                      }
-                                      <span className="text-[10px] font-semibold text-[var(--color-accent)]">
+                                    <span className="flex items-center gap-1">
+                                      <BadgeCheck size={16} className="shrink-0" style={{ color: 'var(--color-accent-dark)' }} />
+                                      <span className="text-[13px] font-bold" style={{ color: 'var(--color-accent-dark)' }}>
                                         {hl.categoryId === 'career-role' ? '검증됨' : '확인됨'}
                                       </span>
                                     </span>

@@ -23,7 +23,7 @@ export function PublicProfileTabBar({
 }) {
   return (
     <div className="px-5 pt-3 pb-3">
-      <div className="glass-card rounded-[20px] p-1.5">
+      <div className="rounded-[20px] bg-[var(--color-bg-soft)] p-1.5">
         <div className="grid grid-cols-3 gap-1">
           {TABS.map((tab) => {
             const selected = tab.id === activeTab
@@ -39,11 +39,11 @@ export function PublicProfileTabBar({
                 {selected && (
                   <motion.div
                     layoutId="public-profile-tab-indicator"
-                    className="absolute inset-0 rounded-[14px] bg-[var(--color-accent-dark)]"
+                    className="absolute inset-0 rounded-[14px] bg-[var(--color-bg-page)] shadow-[0_1px_4px_rgba(0,0,0,0.08)]"
                     transition={{ type: 'spring', stiffness: 420, damping: 34 }}
                   />
                 )}
-                <span className={`relative z-10 flex items-center justify-center gap-1 ${selected ? 'text-white' : 'text-[var(--color-text-secondary)]'}`}>
+                <span className={`relative z-10 flex items-center justify-center gap-1 ${selected ? 'text-[var(--color-text-primary)]' : 'text-[var(--color-text-secondary)]'}`}>
                   {tab.label}
                   {isLocked && <Lock size={10} className="opacity-60" />}
                 </span>

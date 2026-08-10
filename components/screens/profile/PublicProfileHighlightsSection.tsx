@@ -13,7 +13,7 @@ function VerifiedBadge({ size, shape = 'circle' }: { size: number; shape?: 'circ
   if (shape === 'shield') {
     return (
       <ShieldCheck
-        size={Math.round(size * 1.15)}
+        size={Math.round(size * 1.35)}
         className="shrink-0"
         fill="#34C759"
         stroke="white"
@@ -84,7 +84,7 @@ export function ProfileHighlightsSection({
                     <div className="flex items-center gap-1">
                       <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{preview.title}</div>
                       {entry.items.some((h) => h.verified) && !isGroupOpen && (
-                        <VerifiedBadge size={16} />
+                        <VerifiedBadge size={16} shape={entry.categoryId === 'career-role' ? 'shield' : 'circle'} />
                       )}
                     </div>
                     {preview.meta && (

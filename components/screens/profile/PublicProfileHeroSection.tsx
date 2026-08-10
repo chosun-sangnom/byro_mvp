@@ -535,18 +535,21 @@ export function ProfileHeroCard({
           </div>
 
           {(showAge || profile.mbti) && (
-            <div className="mt-0.5 text-[13px] font-semibold text-white/50">
-              {profile.mbti}
-              {profile.mbti && showAge && <span className="mx-1 font-normal">·</span>}
+            <div className="mt-1 flex items-center gap-1">
+              {profile.mbti && (
+                <span className="flex h-[21px] items-center rounded-full bg-[rgba(102,102,102,0.4)] px-2 text-[14px] text-white/85 backdrop-blur-[10px]">
+                  {profile.mbti}
+                </span>
+              )}
               {showAge && (
-                <>
+                <span className="text-[14px] text-white/85">
                   {profile.age}세
                   {profile.birthDate && (
-                    <span className="ml-1 font-normal">
+                    <span className="ml-1">
                       ({profile.birthDate.replace(/-/g, '.')})
                     </span>
                   )}
-                </>
+                </span>
               )}
             </div>
           )}

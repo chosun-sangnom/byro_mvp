@@ -52,8 +52,8 @@ export function ProfileHighlightsSection({
                   onClick={() => onToggleHighlight(groupToggleKey)}
                   className="flex w-full items-center gap-3.5 py-3.5 text-left"
                 >
-                  <span className="flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center text-[var(--color-text-secondary)]">
-                    <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={16} />
+                  <span className="flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[12px] bg-[var(--color-bg-soft)] text-[var(--color-text-secondary)]">
+                    <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={20} />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="mb-0.5 text-[11px] text-[var(--color-text-tertiary)]">
@@ -78,7 +78,7 @@ export function ProfileHighlightsSection({
                       transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
                       className="overflow-hidden"
                     >
-                      <div className="pb-4 pl-14">
+                      <div className="pb-4 pl-[54px]">
                         <div className="divide-y divide-[var(--color-border-soft)]">
                           {entry.items.map((hl) => {
                             const metaParts = getHighlightMetaParts(hl)

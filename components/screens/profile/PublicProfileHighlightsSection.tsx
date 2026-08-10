@@ -52,8 +52,8 @@ export function ProfileHighlightsSection({
                   onClick={() => onToggleHighlight(groupToggleKey)}
                   className="flex w-full items-center gap-3.5 py-3.5 text-left"
                 >
-                  <span className="flex h-[40px] w-[40px] flex-shrink-0 items-center justify-center rounded-[12px] bg-[var(--color-bg-soft)] text-[var(--color-text-secondary)]">
-                    <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={20} />
+                  <span className="flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center text-[var(--color-text-secondary)]">
+                    <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={16} />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="mb-0.5 text-[11px] text-[var(--color-text-tertiary)]">
@@ -65,7 +65,7 @@ export function ProfileHighlightsSection({
                     )}
                   </div>
                   {entry.items.some((h) => h.verified) && !isGroupOpen && (
-                    <BadgeCheck size={20} className="shrink-0" style={{ color: 'var(--color-accent-dark)' }} />
+                    <BadgeCheck size={20} className="shrink-0" style={{ color: '#34C759' }} />
                   )}
                   {isGroupOpen ? <ChevronUp size={14} color="var(--color-text-tertiary)" /> : <ChevronDown size={14} color="var(--color-text-tertiary)" />}
                 </button>
@@ -78,7 +78,7 @@ export function ProfileHighlightsSection({
                       transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
                       className="overflow-hidden"
                     >
-                      <div className="pb-4 pl-[54px]">
+                      <div className="pb-4 pl-14">
                         <div className="divide-y divide-[var(--color-border-soft)]">
                           {entry.items.map((hl) => {
                             const metaParts = getHighlightMetaParts(hl)
@@ -88,7 +88,7 @@ export function ProfileHighlightsSection({
                                   <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{hl.title}</div>
                                   {hl.verified && (
                                     <span className="flex items-center gap-1">
-                                      <BadgeCheck size={16} className="shrink-0" style={{ color: 'var(--color-accent-dark)' }} />
+                                      <BadgeCheck size={16} className="shrink-0" style={{ color: '#34C759' }} />
                                       <span className="text-[13px] font-bold" style={{ color: 'var(--color-accent-dark)' }}>
                                         {hl.categoryId === 'career-role' ? '검증됨' : '확인됨'}
                                       </span>

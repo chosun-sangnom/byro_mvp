@@ -556,13 +556,14 @@ export function ProfileHeroCard({
               <button
                 type="button"
                 onClick={() => setPersonaSheetOpen(true)}
-                className="mt-2 flex w-full items-center gap-2 rounded-[12px] bg-white/95 py-3 pl-3 pr-4 backdrop-blur-[10px]"
+                className="mt-2 flex w-full items-center gap-2 rounded-[12px] border border-white/40 bg-[var(--color-glass-strong)] py-3 pl-3 pr-4 backdrop-blur-[10px]"
               >
                 <Sparkles size={16} className="shrink-0 text-[#0D0D0D]/70" />
                 <span className="flex-1 text-left text-[14px] font-semibold leading-[1.35] text-[#0D0D0D]">{personaText}</span>
+                <span className="ml-1 shrink-0 rounded-full bg-[var(--color-accent-dark)] px-2 py-0.5 text-[10px] font-bold text-white">AI</span>
               </button>
             ) : (
-              <div className="mt-2 flex w-full items-center gap-2 rounded-[12px] bg-white/70 py-3 pl-3 pr-4 backdrop-blur-[10px]">
+              <div className="mt-2 flex w-full items-center gap-2 rounded-[12px] border border-white/30 bg-[var(--color-glass-mid)] py-3 pl-3 pr-4 backdrop-blur-[10px]">
                 <Sparkles size={16} className="shrink-0 text-[#0D0D0D]/30" />
                 <span className="flex-1 text-left text-[14px] font-medium text-[#0D0D0D]/40">{personaText}</span>
               </div>

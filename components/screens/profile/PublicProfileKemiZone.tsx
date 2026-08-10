@@ -251,14 +251,14 @@ export function PublicProfileOwnerMatchZone({
           className="rounded-[20px] px-4 py-4"
           style={{
             border: '1px solid var(--color-accent-border-soft)',
-            background: 'linear-gradient(135deg, var(--color-accent-bg-subtle) 0%, transparent 100%)',
+            background: 'var(--color-accent-soft)',
           }}
         >
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-1.5">
                 <Sparkles size={13} style={{ color: 'var(--color-accent-dark)' }} />
-                <span className="text-[15px] font-semibold text-[var(--color-text-primary)]">
+                <span className="text-[15px] font-semibold" style={{ color: 'var(--color-accent-dark)' }}>
                   케미 리포트
                 </span>
               </div>

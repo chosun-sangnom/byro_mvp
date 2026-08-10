@@ -1,37 +1,37 @@
 'use client'
 
-import { Plus } from 'lucide-react'
+import { Sparkles } from 'lucide-react'
 import type { PublicProfileWhoIAm } from '@/types'
 import { SectionTitle } from '@/components/screens/profile/PublicProfileSections'
 
 function AiBadge() {
   return (
     <span
-      className="flex shrink-0 items-center gap-0.5 rounded-full px-2 py-0.5 text-[9px] font-bold text-white"
-      style={{ background: 'linear-gradient(90deg, #2DD4BF 0%, #3B82F6 100%)' }}
+      className="flex shrink-0 items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium text-white"
+      style={{ backgroundImage: 'linear-gradient(110deg, #0088FF 0%, #34C759 100%)' }}
     >
-      <Plus size={8} strokeWidth={3} />AI
+      <Sparkles size={10} />AI
     </span>
   )
 }
 
 function BioBlock({ text }: { text: string }) {
   return (
-    <div className="rounded-[18px] border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-4 py-3">
-      <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">자기소개</div>
-      <p className="mt-1.5 text-[14px] leading-[1.65] text-[var(--color-text-primary)]">{text}</p>
+    <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3">
+      <div className="text-[12px] font-semibold text-[#6C7786]">자기 소개</div>
+      <p className="mt-1 text-[14px] leading-[1.5] text-[#25313D]">{text}</p>
     </div>
   )
 }
 
 function PersonalityBlock({ text }: { text: string }) {
   return (
-    <div className="rounded-[18px] border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-4 py-3">
+    <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3">
       <div className="flex items-center justify-between">
-        <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">성향</div>
+        <div className="text-[12px] font-semibold text-[#6C7786]">성향</div>
         <AiBadge />
       </div>
-      <p className="mt-1.5 text-[14px] leading-[1.65] text-[var(--color-text-primary)]">{text}</p>
+      <p className="mt-1 text-[14px] leading-[1.5] text-[#25313D]">{text}</p>
     </div>
   )
 }

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { BadgeCheck, Bookmark, BookmarkCheck, Download, Pencil, Plus, Share2, Sparkles, X } from 'lucide-react'
+import { BadgeCheck, Bookmark, BookmarkCheck, Download, Pencil, Share2, Sparkles, X } from 'lucide-react'
 import { ActionMenu, ActionMenuItem, BottomSheet, Button, CheckRow, TextArea, showToast } from '@/components/ui'
 import { shareOrCopy } from '@/lib/share'
 import type { PersonaReason } from '@/lib/personaGen'
@@ -556,21 +556,19 @@ export function ProfileHeroCard({
               <button
                 type="button"
                 onClick={() => setPersonaSheetOpen(true)}
-                className="mt-2 flex items-center gap-2 rounded-[14px] border border-white/14 bg-black/32 px-3 py-2.5 backdrop-blur-sm"
+                className="mt-2 flex items-center gap-2 rounded-[16px] border border-white/80 bg-[rgba(102,102,102,0.4)] py-3 pl-3 pr-4 backdrop-blur-[10px]"
               >
-                <Sparkles size={13} className="shrink-0 text-white/60" />
-                <span className="flex-1 text-left text-[12px] font-medium leading-[1.5] text-white/85">{personaText}</span>
+                <span className="flex-1 text-left text-[14px] font-medium leading-[1.35] text-white">{personaText}</span>
                 <span
-                  className="ml-1 flex shrink-0 items-center gap-0.5 rounded-full px-2 py-1 text-[10px] font-bold text-white"
-                  style={{ background: 'linear-gradient(90deg, #2DD4BF 0%, #3B82F6 100%)' }}
+                  className="ml-1 flex shrink-0 items-center gap-0.5 rounded-full px-1.5 py-1 text-[13px] font-medium text-white"
+                  style={{ backgroundImage: 'linear-gradient(110deg, #0088FF 0%, #34C759 100%)' }}
                 >
-                  <Plus size={9} strokeWidth={3} />AI
+                  <Sparkles size={12} />AI
                 </span>
               </button>
             ) : (
-              <div className="mt-2 flex items-center gap-2 rounded-[14px] border border-white/10 bg-black/15 px-3 py-2.5">
-                <Sparkles size={13} className="shrink-0 text-white/30" />
-                <span className="flex-1 text-left text-[12px] font-medium text-white/40">{personaText}</span>
+              <div className="mt-2 flex items-center gap-2 rounded-[16px] border border-white/20 bg-[rgba(102,102,102,0.25)] py-3 pl-3 pr-4 backdrop-blur-[10px]">
+                <span className="flex-1 text-left text-[14px] font-medium text-white/40">{personaText}</span>
               </div>
             )
           )}

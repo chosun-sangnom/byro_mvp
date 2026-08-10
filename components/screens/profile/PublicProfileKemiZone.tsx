@@ -247,29 +247,21 @@ export function PublicProfileOwnerMatchZone({
   return (
     <>
       <div className="px-5 pb-3">
-        <div
-          className="rounded-[20px] px-4 py-4"
-          style={{
-            border: '1px solid var(--color-accent-border-soft)',
-            background: 'var(--color-bg-page)',
-          }}
-        >
-          <div className="flex items-start gap-3">
-            <div className="relative mt-0.5 h-[18px] w-[20px] shrink-0">
-              <Sparkles size={11} className="absolute left-0 top-1" style={{ color: '#2DD4BF' }} />
-              <Sparkles size={15} className="absolute right-0 top-0" style={{ color: 'var(--color-accent-dark)' }} />
-            </div>
+        <div className="rounded-[16px] p-4">
+          <div className="flex items-start gap-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/kemi-report-icon.svg" alt="" className="size-[48px] shrink-0" />
             <div>
-              <span className="text-[14px] font-bold text-[var(--color-text-primary)]">
+              <span className="text-[14px] font-bold text-[#0D0D0D]">
                 케미 리포트
               </span>
-              <p className="mt-1 text-[12px] leading-[1.6] text-[var(--color-text-secondary)]">
-                라이프스타일을 바탕으로 내가 어떤 유형과 잘 맞는지 읽어줍니다.
+              <p className="mt-1 text-[12px] leading-[1.5] text-[#475058]">
+                라이프스타일을 바탕으로 내가 어떤 유형의 사람과 잘 맞는지 읽어줍니다.
               </p>
               <button
                 type="button"
                 onClick={() => setReportOpen(true)}
-                className="mt-3 shrink-0 rounded-full bg-[var(--color-accent-dark)] px-4 py-2 text-[12px] font-semibold text-white"
+                className="mt-3 shrink-0 rounded-full bg-[var(--color-accent-dark)] px-3 py-1 text-[13px] font-medium text-white"
               >
                 리포트 보기
               </button>

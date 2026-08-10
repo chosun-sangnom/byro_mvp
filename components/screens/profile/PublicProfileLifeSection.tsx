@@ -566,7 +566,7 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
         onEnded={() => { setIsPlaying(false); setProgress(1) }}
       />
 
-      <BlockHeader label="바이브보드" />
+      <BlockHeader label="무드보드" />
       <VibeBoard
         items={vibeItems}
         layout={vibeLayout}
@@ -592,7 +592,7 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
 
       {hasActivity && (
         <>
-          <BlockHeader label="활동" />
+          <BlockHeader label="취미" />
           <div>
             <SubHeader label="운동" />
             <SquareScroll items={exercise} />
@@ -602,7 +602,7 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
 
       {hasCulture && (
         <>
-          <BlockHeader label="문화" />
+          <BlockHeader label="취향" />
           {life.tastes.movies.length > 0 && (
             <div className="mb-4">
               <SubHeader label="영화" />

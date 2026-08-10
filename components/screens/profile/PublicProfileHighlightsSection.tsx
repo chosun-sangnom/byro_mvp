@@ -34,14 +34,10 @@ export function ProfileHighlightsSection({
 
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06}>
-      <SectionTitle title="하이라이트" />
+      <SectionTitle title="커리어" />
       <div>
         {groupedHighlights.map((group) => (
-          <div key={group.id} className="mb-4">
-            <div className="mb-2 flex items-center gap-3">
-              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)]">{group.label}</span>
-              <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
-            </div>
+          <div key={group.id}>
             <div className="divide-y divide-[var(--color-border-soft)]">
               {group.items.map((entry) => {
             const category = HIGHLIGHT_CATEGORIES.find((item) => item.id === entry.categoryId)

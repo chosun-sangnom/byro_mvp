@@ -257,19 +257,13 @@ export function PublicProfileOwnerMatchZone({
           <div className="flex items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-1.5">
-                <Sparkles size={12} style={{ color: 'var(--color-accent-dark)' }} />
-                <span
-                  className="text-[11px] font-bold uppercase tracking-[0.08em]"
-                  style={{ color: 'var(--color-accent-dark)' }}
-                >
-                  내 케미 리포트
+                <Sparkles size={13} style={{ color: 'var(--color-accent-dark)' }} />
+                <span className="text-[15px] font-semibold text-[var(--color-text-primary)]">
+                  케미 리포트
                 </span>
               </div>
-              <div className="mt-1 text-[15px] font-semibold text-[var(--color-text-primary)]">
-                나와 잘 맞는 사람
-              </div>
               <p className="mt-2 text-[12px] leading-[1.6] text-[var(--color-text-secondary)]">
-                라이프스타일을 바탕으로 어떤 유형의 사람과 잘 맞는지 읽어줍니다.
+                라이프스타일을 바탕으로 내가 어떤 유형과 잘 맞는지 읽어줍니다.
               </p>
             </div>
             <button

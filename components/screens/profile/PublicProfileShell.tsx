@@ -109,7 +109,7 @@ export function PublicProfileShell({
       <div className="flex-shrink-0">
         <div className="relative pb-1">
           <ProfileHeroSection
-            profile={profile}
+            profile={{ ...profile, mbti: profile.whoIAm?.mbti }}
             heroTheme={profile.heroTheme}
             personaText={persona?.text}
             personaReasons={persona?.reasons}

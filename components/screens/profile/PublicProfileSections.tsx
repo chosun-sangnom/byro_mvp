@@ -1,8 +1,8 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { motion } from 'framer-motion'
-import { ChevronRight, Lock, Mail, MessageCircle, Phone, Sparkles } from 'lucide-react'
+import { ChevronDown, ChevronRight, ChevronUp, Lock, Mail, MessageCircle, Phone, Sparkles } from 'lucide-react'
 import type { ContactChannel, Experience, RememberIndustry } from '@/types'
 import { generateNetworkInsight } from '@/lib/networkInsight'
 
@@ -225,6 +225,8 @@ export function ProfileRememberSection({
   const viewerDomainCount = viewerDomainEntry?.count ?? Math.round(total * viewerDomainRatio / 100)
 
   const isEmpty = total === 0
+  const hasBreakdown = (topIndustryRoles && topIndustryRoles.length > 0) || (topIndustryRanks && topIndustryRanks.length > 0)
+  const [expanded, setExpanded] = useState(true)
 
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.02}>
@@ -238,7 +240,10 @@ export function ProfileRememberSection({
             <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Remember</div>
             <div className="mt-0.5 text-[16px] font-black tracking-[-0.02em] text-[var(--color-text-strong)]">명함 기반 관계 네트워크</div>
           </div>
-          <div className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)] shrink-0">
+          <div
+            className="rounded-full px-2.5 py-1 text-[10px] font-bold shrink-0"
+            style={{ background: 'var(--color-accent-bg)', color: 'var(--color-accent-dark)' }}
+          >
             총 {total}명
           </div>
         </div>
@@ -270,7 +275,7 @@ export function ProfileRememberSection({
             )}
 
             {/* 직무 분포 (직급보다 위) */}
-            {topIndustryRoles && topIndustryRoles.length > 0 && (
+            {expanded && topIndustryRoles && topIndustryRoles.length > 0 && (
               <div>
                 <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">{topIndustry?.name} · 직무</p>
                 <BreakdownList items={topIndustryRoles} total={topIndustryCount} />
@@ -278,11 +283,23 @@ export function ProfileRememberSection({
             )}
 
             {/* 직급 분포 */}
-            {topIndustryRanks && topIndustryRanks.length > 0 && (
+            {expanded && topIndustryRanks && topIndustryRanks.length > 0 && (
               <div>
                 <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">{topIndustry?.name} · 직급</p>
                 <BreakdownList items={topIndustryRanks} total={topIndustryCount} />
               </div>
+            )}
+
+            {/* 접기 / 더보기 */}
+            {hasBreakdown && (
+              <button
+                type="button"
+                onClick={() => setExpanded((v) => !v)}
+                className="flex w-full items-center justify-center gap-1 pt-1 text-[12px] font-semibold text-[var(--color-text-tertiary)]"
+              >
+                {expanded ? '접기' : '더보기'}
+                {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </button>
             )}
           </>
         )}

@@ -3,21 +3,6 @@
 import type { PublicProfileWhoIAm } from '@/types'
 import { SectionTitle } from '@/components/screens/profile/PublicProfileSections'
 
-function IdentityRow({
-  label,
-  value,
-}: {
-  label: string
-  value: string
-}) {
-  return (
-    <div className="rounded-[18px] border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-4 py-3">
-      <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">{label}</div>
-      <div className="mt-1 text-[15px] font-semibold text-[var(--color-text-primary)]">{value}</div>
-    </div>
-  )
-}
-
 function BioBlock({ text }: { text: string }) {
   return (
     <div className="rounded-[18px] border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-4 py-3">
@@ -53,7 +38,6 @@ export function PublicProfileWhoIAmSection({
       />
       <div className="grid grid-cols-1 gap-3">
         {bio && <BioBlock text={bio} />}
-        {whoIAm && <IdentityRow label="MBTI" value={whoIAm.mbti} />}
         {whoIAm?.personality && <PersonalityBlock text={whoIAm.personality} />}
       </div>
     </div>

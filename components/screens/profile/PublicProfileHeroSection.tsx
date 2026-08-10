@@ -43,6 +43,9 @@ export function ProfileHeroSection({
     linkId?: string
     headline?: string
     age?: number
+    birthDate?: string
+    showAge?: boolean
+    mbti?: string
     avatarColor?: string
     avatarImage?: string
     profileImages?: string[]
@@ -212,6 +215,7 @@ export function ProfileHeroCard({
     birthDate?: string
     showAge?: boolean
     headline?: string
+    mbti?: string
     avatarColor?: string
     avatarImage?: string
     profileImages?: string[]
@@ -476,15 +480,28 @@ export function ProfileHeroCard({
             </>
           )}
 
+          {/* 공유 — 오너 전용, 카드 좌상단 */}
+          {isOwner && activeImage && (
+            <button
+              type="button"
+              onClick={async (e) => {
+                e.stopPropagation()
+                await shareOrCopy({ title: `${profile.name}의 바이로`, url: window.location.href })
+              }}
+              className="absolute left-4 top-4 z-10 rounded-full border border-white/14 bg-black/38 p-2 backdrop-blur-sm"
+            >
+              <Share2 size={16} className="text-white/88" />
+            </button>
+          )}
+
           {/* 편집 아이콘 — 오너 전용, 카드 우상단 */}
           {isOwner && onOwnerEdit && (
             <button
               type="button"
               onClick={onOwnerEdit}
-              className="absolute right-4 top-4 z-10 flex flex-col items-center gap-1 rounded-[14px] border border-white/14 bg-black/38 px-2.5 py-2 backdrop-blur-sm"
+              className="absolute right-4 top-4 z-10 rounded-full border border-white/14 bg-black/38 p-2 backdrop-blur-sm"
             >
               <Pencil size={16} className="text-white/88" />
-              <span className="text-[10px] font-semibold text-white/72 leading-none">편집</span>
             </button>
           )}
         </div>
@@ -517,13 +534,19 @@ export function ProfileHeroCard({
             )}
           </div>
 
-          {showAge && (
+          {(showAge || profile.mbti) && (
             <div className="mt-0.5 text-[13px] font-semibold text-white/50">
-              {profile.age}세
-              {profile.birthDate && (
-                <span className="ml-1 font-normal">
-                  ({profile.birthDate.replace(/-/g, '.')})
-                </span>
+              {profile.mbti}
+              {profile.mbti && showAge && <span className="mx-1 font-normal">·</span>}
+              {showAge && (
+                <>
+                  {profile.age}세
+                  {profile.birthDate && (
+                    <span className="ml-1 font-normal">
+                      ({profile.birthDate.replace(/-/g, '.')})
+                    </span>
+                  )}
+                </>
               )}
             </div>
           )}

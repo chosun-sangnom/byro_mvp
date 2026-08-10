@@ -556,16 +556,15 @@ export function ProfileHeroCard({
               <button
                 type="button"
                 onClick={() => setPersonaSheetOpen(true)}
-                className="mt-2 flex items-center gap-1.5 rounded-full border border-white/14 bg-black/28 px-3 py-1.5 backdrop-blur-sm"
+                className="mt-2 flex w-full items-center gap-2 rounded-[12px] bg-white/95 py-3 pl-3 pr-4 backdrop-blur-[10px]"
               >
-                <Sparkles size={11} className="text-white/60 shrink-0" />
-                <span className="text-[12px] font-medium italic text-white/80">{personaText}</span>
-                <span className="ml-1 rounded-full bg-white/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white/50">AI</span>
+                <Sparkles size={16} className="shrink-0 text-[#0D0D0D]/70" />
+                <span className="flex-1 text-left text-[14px] font-semibold leading-[1.35] text-[#0D0D0D]">{personaText}</span>
               </button>
             ) : (
-              <div className="mt-2 flex items-center gap-1.5 rounded-full border border-white/10 bg-black/15 px-3 py-1.5">
-                <Sparkles size={11} className="text-white/30 shrink-0" />
-                <span className="text-[12px] font-medium text-white/40">{personaText}</span>
+              <div className="mt-2 flex w-full items-center gap-2 rounded-[12px] bg-white/70 py-3 pl-3 pr-4 backdrop-blur-[10px]">
+                <Sparkles size={16} className="shrink-0 text-[#0D0D0D]/30" />
+                <span className="flex-1 text-left text-[14px] font-medium text-[#0D0D0D]/40">{personaText}</span>
               </div>
             )
           )}

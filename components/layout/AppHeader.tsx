@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bell, BookOpen, Search, Star, User, X } from 'lucide-react'
+import { Bell, BookOpen, Menu, Search, Star, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
@@ -24,7 +24,7 @@ const NOTIF_META = {
 
 export default function AppHeader() {
   const router = useRouter()
-  const { isLoggedIn, user } = useAuth()
+  const { isLoggedIn } = useAuth()
   const [notiOpen, setNotiOpen] = useState(false)
 
   const hasUnread = MOCK_NOTIFS.length > 0
@@ -67,19 +67,14 @@ export default function AppHeader() {
             </motion.button>
           )}
 
-          {/* 아바타 — 클릭 시 설정으로 이동, 로그인 여부 무관 동일 UI */}
+          {/* 설정 — 로그인 여부 무관 동일 UI */}
           <motion.button
             whileTap={{ scale: 0.88 }}
             onClick={() => router.push('/settings')}
-            className="ml-1 flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-[var(--color-bg-muted)] border border-[var(--color-border-default)]"
+            className="p-2 text-[var(--color-text-secondary)]"
             aria-label="설정"
           >
-            {isLoggedIn && user?.avatarImage ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={user.avatarImage} alt="내 프로필" className="h-full w-full object-cover" />
-            ) : (
-              <User size={16} className="text-[var(--color-text-tertiary)]" />
-            )}
+            <Menu size={20} />
           </motion.button>
         </div>
       </header>

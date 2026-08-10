@@ -2,7 +2,7 @@
 
 import { type ReactNode } from 'react'
 import { motion } from 'framer-motion'
-import { ChevronRight, Lock, Mail, MessageCircle, Phone, Sparkles } from 'lucide-react'
+import { ChevronRight, Lock, Mail, MessageCircle, Phone } from 'lucide-react'
 import type { CareerTimeline, ContactChannel, Experience, RememberIndustry } from '@/types'
 import { generateNetworkInsight } from '@/lib/networkInsight'
 
@@ -157,21 +157,6 @@ export function ProfileFeedbackSection({
 
 // ─── ProfileRememberSection ────────────────────────────────────────────────────
 
-function MiniBar({ ratio, accent }: { ratio: number; accent?: boolean }) {
-  return (
-    <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--color-bg-muted)]">
-      <div
-        className="h-full rounded-full transition-all"
-        style={{
-          width: `${Math.min(ratio, 100)}%`,
-          background: accent ? 'var(--color-accent-dark)' : 'var(--color-text-tertiary)',
-          opacity: accent ? 1 : 0.5,
-        }}
-      />
-    </div>
-  )
-}
-
 function MutualCompaniesCard({ companies }: { companies: string[] }) {
   if (companies.length === 0) return null
   const visible = companies.slice(0, 5)
@@ -268,9 +253,11 @@ export function ProfileRememberSection({
   topIndustryRoles,
   isLoggedIn,
   viewerNetworkDomain,
+  viewerName,
   isOwner = false,
   mutualCompanies,
   careerTimeline,
+  insightPercentile,
 }: {
   profileName: string
   total: number
@@ -279,9 +266,11 @@ export function ProfileRememberSection({
   topIndustryRoles?: RememberIndustry[]
   isLoggedIn: boolean
   viewerNetworkDomain?: string
+  viewerName?: string
   isOwner?: boolean
   mutualCompanies?: string[]
   careerTimeline?: CareerTimeline
+  insightPercentile?: number
 }) {
   const showPersonalized = isLoggedIn && !!viewerNetworkDomain
 
@@ -289,9 +278,10 @@ export function ProfileRememberSection({
     ? generateNetworkInsight({ profileName, total, industries, topIndustryRanks, topIndustryRoles, viewerDomain: viewerNetworkDomain! })
     : null
 
-  const viewerDomainEntry = showPersonalized ? industries.find((i) => i.name === viewerNetworkDomain) : undefined
-  const viewerDomainRatio = viewerDomainEntry?.ratio ?? 0
-  const viewerDomainCount = viewerDomainEntry?.count ?? Math.round(total * viewerDomainRatio / 100)
+  const topIndustry = industries[0]
+  const topIndustryCount = topIndustry?.count ?? Math.round(total * (topIndustry?.ratio ?? 0) / 100)
+  const topRank = topIndustryRanks?.[0]
+  const topRankCount = topRank ? Math.round(topIndustryCount * topRank.ratio / 100) : 0
 
   const isEmpty = total === 0
 
@@ -316,33 +306,21 @@ export function ProfileRememberSection({
 
           {insight && !isOwner ? (
             /* 타인 프로필 — 관심 도메인 인사이트 */
-            <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3">
-              <div className="mb-2 flex items-center gap-1.5">
-                <Sparkles size={13} style={{ color: insight.isMatch ? 'var(--color-accent-dark)' : '#6C7786' }} />
-                <span
-                  className="text-[12px] font-bold"
-                  style={{ color: insight.isMatch ? 'var(--color-accent-dark)' : '#6C7786' }}
-                >
-                  {insight.isMatch ? '관심 도메인 매치' : '내 관심 도메인 인사이트'}
-                </span>
-              </div>
-              {/* 뷰어 관심 도메인 비율 미니바 */}
-              <div className="mb-3 flex items-center gap-2">
-                <span
-                  className="shrink-0 text-[12px] font-semibold"
-                  style={{ color: insight.isMatch ? 'var(--color-accent-dark)' : '#25313D' }}
-                >
-                  {viewerNetworkDomain}
-                </span>
-                <MiniBar ratio={viewerDomainRatio} accent={insight.isMatch} />
-                <span className="shrink-0 text-[12px] font-semibold text-[#25313D]">
-                  {viewerDomainRatio}%
-                </span>
-                <span className="shrink-0 text-[11px] text-[#6C7786]">
-                  {viewerDomainCount}명
-                </span>
-              </div>
-              <p className="text-[13px] leading-[1.65] text-[#25313D]">{insight.text}</p>
+            <div className="rounded-[16px] px-4 py-3.5" style={{ background: 'var(--color-accent-soft)' }}>
+              <p className="text-[15px] font-bold leading-[1.5] text-[#0D0D0D]">
+                {topIndustry ? (
+                  <>
+                    {topIndustry.name} 쪽에 {topIndustryCount}명
+                    {topRank && <>, 그중 {topRank.name}이 {topRankCount}명입니다.</>}
+                    {!topRank && '이에요.'}
+                  </>
+                ) : insight.text}
+              </p>
+              {typeof insightPercentile === 'number' && (
+                <p className="mt-1.5 text-[13px] font-semibold" style={{ color: 'var(--color-accent-dark)' }}>
+                  {viewerName ? `${viewerName}님 ` : ''}관심 분야에서 상위 {insightPercentile}% 수준의 인맥 밀도예요.
+                </p>
+              )}
             </div>
           ) : !isOwner ? (
             /* 블러 넛지 — 비로그인 or 관심 도메인 미설정 (본인 프로필 제외) */

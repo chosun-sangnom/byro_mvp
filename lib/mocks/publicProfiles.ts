@@ -147,6 +147,7 @@ export const SAMPLE_PROFILE = {
       growthFrom: 14,
       growthTo: 22,
       growthPeriodLabel: '최근 6개월',
+      percentile: 12,
     },
   },
   manualHighlights: [
@@ -403,6 +404,30 @@ export const MK_PROFILE = {
   linkedin: MK_LINKEDIN_PROFILE,
   rememberHighlight: {
     total: 1691,
+    mutualCompanies: ['카카오뱅크', 'NAVER', '두나무', 'KRAFTON', 'MOLOCO', '토스', '당근마켓'],
+    careerTimeline: {
+      years: 13,
+      eras: [
+        { yearRange: '2013 - 2017', domainLabel: '게임 · 글로벌 IT', count: 475, breakdown: '게임사 16명, IT/테크 127명', color: '#2563EB' },
+        { yearRange: '2017 - 2022', domainLabel: '금융 · 블록체인', count: 633, breakdown: '크립토 59명, 금융/투자 109명', color: '#0E8F50' },
+        { yearRange: '2022 - 2026', domainLabel: '창업 · 법률 · 대기업', count: 583, breakdown: '법률/회계 53명, 대기업 46명', color: '#D95F00' },
+      ],
+      yearly: [
+        { year: 2013, count: 62, eraIndex: 0 },
+        { year: 2014, count: 78, eraIndex: 0 },
+        { year: 2015, count: 55, eraIndex: 0 },
+        { year: 2016, count: 90, eraIndex: 0 },
+        { year: 2017, count: 68, eraIndex: 1 },
+        { year: 2018, count: 100, eraIndex: 1 },
+        { year: 2019, count: 145, eraIndex: 1 },
+        { year: 2020, count: 88, eraIndex: 1 },
+        { year: 2021, count: 132, eraIndex: 1 },
+        { year: 2022, count: 96, eraIndex: 2 },
+        { year: 2023, count: 118, eraIndex: 2 },
+        { year: 2024, count: 84, eraIndex: 2 },
+        { year: 2025, count: 150, eraIndex: 2 },
+      ],
+    },
     industries: [
       { name: 'IT/테크', ratio: 17, count: 286 },
       { name: '금융/투자', ratio: 16, count: 263 },
@@ -434,6 +459,7 @@ export const MK_PROFILE = {
       growthFrom: 9,
       growthTo: 27,
       growthPeriodLabel: '최근 6개월',
+      percentile: 12,
     },
   },
   manualHighlights: [

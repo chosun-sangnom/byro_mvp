@@ -210,6 +210,7 @@ export interface RememberInsight {
   growthFrom: number
   growthTo: number
   growthPeriodLabel: string
+  percentile?: number
 }
 
 export interface RememberHighlight {

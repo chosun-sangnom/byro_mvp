@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { motion } from 'framer-motion'
-import { ChevronDown, ChevronRight, ChevronUp, Lock, Mail, MessageCircle, Phone, Sparkles } from 'lucide-react'
+import { ChevronRight, Lock, Mail, MessageCircle, Phone, Sparkles } from 'lucide-react'
 import type { CareerTimeline, ContactChannel, Experience, RememberIndustry } from '@/types'
 import { generateNetworkInsight } from '@/lib/networkInsight'
 
@@ -172,37 +172,17 @@ function MiniBar({ ratio, accent }: { ratio: number; accent?: boolean }) {
   )
 }
 
-function BreakdownList({ items, accent, total }: { items: RememberIndustry[]; accent?: boolean; total?: number }) {
-  return (
-    <div className="space-y-2">
-      {items.map((item) => {
-        const count = item.count ?? (total ? Math.round(total * item.ratio / 100) : undefined)
-        return (
-          <div key={item.name} className="flex items-center gap-2">
-            <span className="w-[80px] shrink-0 truncate text-[11px] text-[var(--color-text-secondary)]">{item.name}</span>
-            <MiniBar ratio={item.ratio} accent={accent} />
-            <span className="w-7 shrink-0 text-right text-[11px] font-semibold text-[var(--color-text-secondary)]">{item.ratio}%</span>
-            {count !== undefined && (
-              <span className="w-8 shrink-0 text-right text-[10px] text-[var(--color-text-tertiary)]">{count}명</span>
-            )}
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
 function MutualCompaniesCard({ companies }: { companies: string[] }) {
   if (companies.length === 0) return null
   const visible = companies.slice(0, 5)
   const remaining = companies.length - visible.length
 
   return (
-    <div className="mb-3 rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-4">
-      <p className="text-[15px] font-bold text-[var(--color-text-primary)]">
+    <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3">
+      <p className="text-[14px] font-bold text-[#0D0D0D]">
         두 분 모두 연결된 회사 {companies.length}곳
       </p>
-      <p className="mt-1 text-[12px] text-[var(--color-text-tertiary)]">
+      <p className="mt-1 text-[12px] text-[#6C7786]">
         서로 다른 사람일 수도, 같은 사람일 수도 있어요
       </p>
       <div className="mt-3 flex flex-wrap gap-1.5">
@@ -216,7 +196,7 @@ function MutualCompaniesCard({ companies }: { companies: string[] }) {
           </span>
         ))}
         {remaining > 0 && (
-          <span className="rounded-full bg-[var(--color-bg-muted)] px-3 py-1.5 text-[13px] font-semibold text-[var(--color-text-tertiary)]">
+          <span className="rounded-full bg-[var(--color-bg-muted)] px-3 py-1.5 text-[13px] font-semibold text-[#6C7786]">
             +{remaining}곳
           </span>
         )}
@@ -234,23 +214,23 @@ function CareerTimelineCard({ timeline }: { timeline: CareerTimeline }) {
   const midYear = timeline.yearly[Math.floor(timeline.yearly.length / 2)]?.year
 
   return (
-    <div className="mt-3 rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-4">
-      <p className="text-[15px] font-bold text-[var(--color-text-primary)]">
+    <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3">
+      <p className="text-[14px] font-bold text-[#0D0D0D]">
         명함이 기록한 {timeline.years}년의 커리어
       </p>
-      <p className="mt-1 text-[12px] text-[var(--color-text-tertiary)]">
+      <p className="mt-1 text-[12px] text-[#6C7786]">
         누구를 만났는지가 어디에 있었는지를 말해줘요
       </p>
 
-      <div className="mt-4 space-y-3">
+      <div className="mt-3 space-y-2.5">
         {timeline.eras.map((era) => (
           <div key={era.yearRange} className="flex gap-2.5">
             <div className="mt-0.5 w-[3px] shrink-0 rounded-full" style={{ backgroundColor: era.color }} />
             <div className="min-w-0">
-              <p className="text-[13px] font-bold text-[var(--color-text-primary)]">
+              <p className="text-[13px] font-bold text-[#0D0D0D]">
                 {era.yearRange} · {era.domainLabel}
               </p>
-              <p className="mt-0.5 text-[12px] text-[var(--color-text-tertiary)]">
+              <p className="mt-0.5 text-[12px] text-[#6C7786]">
                 {era.count}명 수집 · {era.breakdown}
               </p>
             </div>
@@ -260,7 +240,7 @@ function CareerTimelineCard({ timeline }: { timeline: CareerTimeline }) {
 
       <div className="mt-4 flex items-end gap-[2px]" style={{ height: barAreaHeight }}>
         {timeline.yearly.map((y) => {
-          const color = timeline.eras[y.eraIndex]?.color ?? 'var(--color-text-tertiary)'
+          const color = timeline.eras[y.eraIndex]?.color ?? '#6C7786'
           const barHeight = maxCount > 0 ? Math.max(Math.round((y.count / maxCount) * barAreaHeight), 6) : 6
           return (
             <div
@@ -271,7 +251,7 @@ function CareerTimelineCard({ timeline }: { timeline: CareerTimeline }) {
           )
         })}
       </div>
-      <div className="mt-1.5 flex justify-between text-[11px] text-[var(--color-text-tertiary)]">
+      <div className="mt-1.5 flex justify-between text-[11px] text-[#6C7786]">
         <span>{firstYear}</span>
         <span>{midYear}</span>
         <span>{lastYear}</span>
@@ -303,163 +283,85 @@ export function ProfileRememberSection({
   mutualCompanies?: string[]
   careerTimeline?: CareerTimeline
 }) {
-  const topIndustry = industries[0]
   const showPersonalized = isLoggedIn && !!viewerNetworkDomain
 
   const insight = showPersonalized
     ? generateNetworkInsight({ profileName, total, industries, topIndustryRanks, topIndustryRoles, viewerDomain: viewerNetworkDomain! })
     : null
 
-  const topIndustryCount = topIndustry?.count ?? Math.round(total * (topIndustry?.ratio ?? 0) / 100)
-
   const viewerDomainEntry = showPersonalized ? industries.find((i) => i.name === viewerNetworkDomain) : undefined
   const viewerDomainRatio = viewerDomainEntry?.ratio ?? 0
   const viewerDomainCount = viewerDomainEntry?.count ?? Math.round(total * viewerDomainRatio / 100)
 
   const isEmpty = total === 0
-  const hasBreakdown = (topIndustryRoles && topIndustryRoles.length > 0) || (topIndustryRanks && topIndustryRanks.length > 0)
-  const [expanded, setExpanded] = useState(true)
 
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.02}>
-      <SectionTitle title="리멤버 네트워크" />
+      <SectionTitle
+        title="리멤버 네트워크"
+        subtitle={isEmpty ? undefined : `지금까지 명함 ${total}명을 리멤버했어요`}
+      />
 
-      {!isOwner && mutualCompanies && mutualCompanies.length > 0 && (
-        <MutualCompaniesCard companies={mutualCompanies} />
-      )}
+      {isEmpty ? (
+        <p className="rounded-[16px] border border-[#DEE4EC] py-6 text-center text-[13px] text-[#6C7786]">
+          아직 리멤버 활동이 없어요
+        </p>
+      ) : (
+        <div className="space-y-3">
+          {!isOwner && mutualCompanies && mutualCompanies.length > 0 && (
+            <MutualCompaniesCard companies={mutualCompanies} />
+          )}
 
-      {/* 고정 섹션 — 항상 노출 */}
-      <div className="rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-4 space-y-4">
-        {/* 헤더 */}
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Remember</div>
-            <div className="mt-0.5 text-[16px] font-black tracking-[-0.02em] text-[var(--color-text-strong)]">명함 기반 관계 네트워크</div>
-          </div>
-          <div
-            className="rounded-full px-2.5 py-1 text-[10px] font-bold shrink-0"
-            style={{ background: 'var(--color-accent-bg)', color: 'var(--color-accent-dark)' }}
-          >
-            총 {total}명
-          </div>
+          {careerTimeline && <CareerTimelineCard timeline={careerTimeline} />}
+
+          {insight && !isOwner ? (
+            /* 타인 프로필 — 관심 도메인 인사이트 */
+            <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3">
+              <div className="mb-2 flex items-center gap-1.5">
+                <Sparkles size={13} style={{ color: insight.isMatch ? 'var(--color-accent-dark)' : '#6C7786' }} />
+                <span
+                  className="text-[12px] font-bold"
+                  style={{ color: insight.isMatch ? 'var(--color-accent-dark)' : '#6C7786' }}
+                >
+                  {insight.isMatch ? '관심 도메인 매치' : '내 관심 도메인 인사이트'}
+                </span>
+              </div>
+              {/* 뷰어 관심 도메인 비율 미니바 */}
+              <div className="mb-3 flex items-center gap-2">
+                <span
+                  className="shrink-0 text-[12px] font-semibold"
+                  style={{ color: insight.isMatch ? 'var(--color-accent-dark)' : '#25313D' }}
+                >
+                  {viewerNetworkDomain}
+                </span>
+                <MiniBar ratio={viewerDomainRatio} accent={insight.isMatch} />
+                <span className="shrink-0 text-[12px] font-semibold text-[#25313D]">
+                  {viewerDomainRatio}%
+                </span>
+                <span className="shrink-0 text-[11px] text-[#6C7786]">
+                  {viewerDomainCount}명
+                </span>
+              </div>
+              <p className="text-[13px] leading-[1.65] text-[#25313D]">{insight.text}</p>
+            </div>
+          ) : !isOwner ? (
+            /* 블러 넛지 — 비로그인 or 관심 도메인 미설정 (본인 프로필 제외) */
+            <div className="relative overflow-hidden rounded-[16px]" style={{ minHeight: 80 }}>
+              <div className="px-4 py-4 space-y-2 select-none pointer-events-none" aria-hidden>
+                <div className="h-3 rounded-full bg-[var(--color-bg-muted)]" style={{ width: '85%' }} />
+                <div className="h-3 rounded-full bg-[var(--color-bg-muted)]" style={{ width: '60%' }} />
+              </div>
+              <div className="absolute inset-0 backdrop-blur-md bg-[var(--color-bg-page)]/60 rounded-[16px]" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center px-5 text-center">
+                <Lock size={15} className="mb-1.5 text-[#6C7786]" />
+                <p className="text-[12px] font-semibold text-[#25313D]">
+                  {isLoggedIn ? '관심 도메인을 설정하면 맞춤 인사이트를 볼 수 있어요' : '로그인하면 맞춤 네트워크 인사이트를 볼 수 있어요'}
+                </p>
+              </div>
+            </div>
+          ) : null}
         </div>
-
-        {isEmpty ? (
-          <p className="py-1 text-center text-[13px] text-[var(--color-text-tertiary)]">아직 리멤버 활동이 없어요</p>
-        ) : (
-          <>
-            {/* 관심 도메인 */}
-            {viewerNetworkDomain && (
-              <div className="flex items-center gap-1.5 -mt-1">
-                <span className="text-[11px] text-[var(--color-text-tertiary)]">관심 도메인</span>
-                <span className="text-[11px] text-[var(--color-text-tertiary)]">:</span>
-                <span className="text-[11px] font-bold" style={{ color: 'var(--color-accent-dark)' }}>{viewerNetworkDomain}</span>
-              </div>
-            )}
-
-            {/* 1위 산업 */}
-            {topIndustry && (
-              <div>
-                <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">주요 산업</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-[13px] font-bold text-[var(--color-text-primary)]">{topIndustry.name}</span>
-                  <MiniBar ratio={topIndustry.ratio} accent />
-                  <span className="shrink-0 text-[13px] font-black" style={{ color: 'var(--color-accent-dark)' }}>{topIndustry.ratio}%</span>
-                </div>
-                <p className="mt-0.5 text-[11px] text-[var(--color-text-tertiary)]">전체 {total}명 중 {topIndustryCount}명</p>
-              </div>
-            )}
-
-            {/* 직무 분포 (직급보다 위) */}
-            {expanded && topIndustryRoles && topIndustryRoles.length > 0 && (
-              <div>
-                <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">{topIndustry?.name} · 직무</p>
-                <BreakdownList items={topIndustryRoles} total={topIndustryCount} />
-              </div>
-            )}
-
-            {/* 직급 분포 */}
-            {expanded && topIndustryRanks && topIndustryRanks.length > 0 && (
-              <div>
-                <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">{topIndustry?.name} · 직급</p>
-                <BreakdownList items={topIndustryRanks} total={topIndustryCount} />
-              </div>
-            )}
-
-            {/* 접기 / 더보기 */}
-            {hasBreakdown && (
-              <button
-                type="button"
-                onClick={() => setExpanded((v) => !v)}
-                className="flex w-full items-center justify-center gap-1 pt-1 text-[12px] font-semibold text-[var(--color-text-tertiary)]"
-              >
-                {expanded ? '접기' : '더보기'}
-                {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-              </button>
-            )}
-          </>
-        )}
-      </div>
-
-      {/* 개인화 인사이트 — 조건부 */}
-      {!isEmpty && (
-      <div className="mt-3">
-        {insight && !isOwner ? (
-          /* 타인 프로필 — 관심 도메인 인사이트 */
-          <div
-            className="rounded-[18px] px-4 py-4"
-            style={insight.isMatch
-              ? { background: 'linear-gradient(135deg, var(--color-accent-bg), var(--color-bg-surface))', border: '1px solid color-mix(in srgb, var(--color-accent-dark) 40%, transparent)' }
-              : { background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-default)' }
-            }
-          >
-            <div className="mb-2 flex items-center gap-1.5">
-              <Sparkles size={13} style={{ color: insight.isMatch ? 'var(--color-accent-dark)' : 'var(--color-text-tertiary)' }} />
-              <span
-                className="text-[11px] font-bold"
-                style={{ color: insight.isMatch ? 'var(--color-accent-dark)' : 'var(--color-text-tertiary)' }}
-              >
-                {insight.isMatch ? '관심 도메인 매치' : '내 관심 도메인 인사이트'}
-              </span>
-            </div>
-            {/* 뷰어 관심 도메인 비율 미니바 */}
-            <div className="mb-3 flex items-center gap-2">
-              <span
-                className="shrink-0 text-[11px] font-semibold"
-                style={{ color: insight.isMatch ? 'var(--color-accent-dark)' : 'var(--color-text-secondary)' }}
-              >
-                {viewerNetworkDomain}
-              </span>
-              <MiniBar ratio={viewerDomainRatio} accent={insight.isMatch} />
-              <span className="shrink-0 text-[11px] font-semibold text-[var(--color-text-secondary)]">
-                {viewerDomainRatio}%
-              </span>
-              <span className="shrink-0 text-[10px] text-[var(--color-text-tertiary)]">
-                {viewerDomainCount}명
-              </span>
-            </div>
-            <p className="text-[13px] leading-[1.65] text-[var(--color-text-primary)]">{insight.text}</p>
-          </div>
-        ) : !isOwner ? (
-          /* 블러 넛지 — 비로그인 or 관심 도메인 미설정 (본인 프로필 제외) */
-          <div className="relative overflow-hidden rounded-[18px]" style={{ minHeight: 80 }}>
-            <div className="px-4 py-4 space-y-2 select-none pointer-events-none" aria-hidden>
-              <div className="h-3 rounded-full bg-[var(--color-bg-muted)]" style={{ width: '85%' }} />
-              <div className="h-3 rounded-full bg-[var(--color-bg-muted)]" style={{ width: '60%' }} />
-            </div>
-            <div className="absolute inset-0 backdrop-blur-md bg-[var(--color-bg-page)]/60 rounded-[18px]" />
-            <div className="absolute inset-0 flex flex-col items-center justify-center px-5 text-center">
-              <Lock size={15} className="mb-1.5 text-[var(--color-text-tertiary)]" />
-              <p className="text-[12px] font-semibold text-[var(--color-text-secondary)]">
-                {isLoggedIn ? '관심 도메인을 설정하면 맞춤 인사이트를 볼 수 있어요' : '로그인하면 맞춤 네트워크 인사이트를 볼 수 있어요'}
-              </p>
-            </div>
-          </div>
-        ) : null}
-      </div>
       )}
-
-      {careerTimeline && <CareerTimelineCard timeline={careerTimeline} />}
     </AnimatedSection>
   )
 }

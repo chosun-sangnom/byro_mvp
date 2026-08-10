@@ -247,7 +247,15 @@ export function PublicProfileOwnerMatchZone({
   return (
     <>
       <div className="px-5 pb-3">
-        <div className="rounded-[20px] border border-[var(--color-accent-dark)] p-4">
+        <div
+          className="rounded-[20px] p-4"
+          style={{
+            border: '1.5px solid transparent',
+            backgroundImage: 'linear-gradient(var(--color-bg-page), var(--color-bg-page)), linear-gradient(135deg, #BFDBFE 0%, #3B82F6 55%, #2563EB 100%)',
+            backgroundOrigin: 'border-box',
+            backgroundClip: 'padding-box, border-box',
+          }}
+        >
           <div className="flex items-start gap-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/kemi-report-icon.svg" alt="" className="size-[40px] shrink-0" />

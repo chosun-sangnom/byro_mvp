@@ -97,6 +97,29 @@ export const SAMPLE_PROFILE = {
   },
   rememberHighlight: {
     total: 247,
+    mutualCompanies: ['카카오뱅크', 'NAVER', '두나무', 'KRAFTON', 'MOLOCO', '토스', '당근마켓', '컬리'],
+    careerTimeline: {
+      years: 12,
+      eras: [
+        { yearRange: '2015 - 2018', domainLabel: '스타트업 · 커머스', count: 195, breakdown: '커머스 18명, 스타트업 134명', color: '#2563EB' },
+        { yearRange: '2018 - 2022', domainLabel: '플랫폼 · 핀테크', count: 357, breakdown: '핀테크 52명, 플랫폼 121명', color: '#0E8F50' },
+        { yearRange: '2022 - 2026', domainLabel: 'B2B SaaS · 파트너십', count: 591, breakdown: '파트너십 61명, SaaS 118명', color: '#D95F00' },
+      ],
+      yearly: [
+        { year: 2015, count: 58, eraIndex: 0 },
+        { year: 2016, count: 72, eraIndex: 0 },
+        { year: 2017, count: 65, eraIndex: 0 },
+        { year: 2018, count: 44, eraIndex: 1 },
+        { year: 2019, count: 80, eraIndex: 1 },
+        { year: 2020, count: 135, eraIndex: 1 },
+        { year: 2021, count: 98, eraIndex: 1 },
+        { year: 2022, count: 110, eraIndex: 2 },
+        { year: 2023, count: 88, eraIndex: 2 },
+        { year: 2024, count: 140, eraIndex: 2 },
+        { year: 2025, count: 105, eraIndex: 2 },
+        { year: 2026, count: 148, eraIndex: 2 },
+      ],
+    },
     industries: [
       { name: '스타트업', ratio: 38, count: 94 },
       { name: '마케팅', ratio: 24, count: 59 },

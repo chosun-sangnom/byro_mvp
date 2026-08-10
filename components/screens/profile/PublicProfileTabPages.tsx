@@ -178,6 +178,8 @@ export function PublicProfileReputationTabPage({
         isLoggedIn={store.isLoggedIn}
         viewerNetworkDomain={store.user?.networkDomain}
         isOwner={isOwner}
+        mutualCompanies={profile.rememberHighlight.mutualCompanies}
+        careerTimeline={profile.rememberHighlight.careerTimeline}
       />
       <ProfileReputationSummarySection
         keywordCounts={keywordCounts}

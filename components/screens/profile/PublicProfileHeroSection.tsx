@@ -558,9 +558,9 @@ export function ProfileHeroCard({
               <button
                 type="button"
                 onClick={() => setPersonaSheetOpen(true)}
-                className="border-beam mt-2 flex items-center gap-2 rounded-[16px] border border-white/50 bg-[rgba(102,102,102,0.4)] py-3 pl-3 pr-4 backdrop-blur-[10px]"
+                className="border-beam mt-2 flex w-full items-center gap-2 rounded-[16px] border border-white/50 bg-[rgba(102,102,102,0.4)] py-3 pl-3 pr-4 backdrop-blur-[10px]"
               >
-                <span className="flex-1 text-left text-[14px] font-medium leading-[1.35] text-white">{personaText}</span>
+                <span className="min-w-0 flex-1 text-left text-[14px] font-medium leading-[1.35] text-white">{personaText}</span>
                 <span
                   className="ml-1 flex shrink-0 items-center gap-0.5 rounded-full px-1.5 py-1 text-[13px] font-medium text-white"
                   style={{ backgroundImage: 'linear-gradient(110deg, #0088FF 0%, #34C759 100%)' }}
@@ -569,8 +569,8 @@ export function ProfileHeroCard({
                 </span>
               </button>
             ) : (
-              <div className="mt-2 flex items-center gap-2 rounded-[16px] border border-white/20 bg-[rgba(102,102,102,0.25)] py-3 pl-3 pr-4 backdrop-blur-[10px]">
-                <span className="flex-1 text-left text-[14px] font-medium text-white/40">{personaText}</span>
+              <div className="mt-2 flex w-full items-center gap-2 rounded-[16px] border border-white/20 bg-[rgba(102,102,102,0.25)] py-3 pl-3 pr-4 backdrop-blur-[10px]">
+                <span className="min-w-0 flex-1 text-left text-[14px] font-medium text-white/40">{personaText}</span>
               </div>
             )
           )}

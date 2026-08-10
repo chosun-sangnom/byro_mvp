@@ -13,11 +13,11 @@ function VerifiedBadge({ size, shape = 'circle' }: { size: number; shape?: 'circ
   if (shape === 'shield') {
     return (
       <ShieldCheck
-        size={size}
+        size={Math.round(size * 1.15)}
         className="shrink-0"
         fill="#34C759"
         stroke="white"
-        strokeWidth={2}
+        strokeWidth={2.5}
       />
     )
   }
@@ -26,7 +26,7 @@ function VerifiedBadge({ size, shape = 'circle' }: { size: number; shape?: 'circ
       className="flex shrink-0 items-center justify-center rounded-full bg-[#34C759]"
       style={{ width: size, height: size }}
     >
-      <Check size={Math.round(size * 0.62)} strokeWidth={3} className="text-white" />
+      <Check size={Math.round(size * 0.62)} strokeWidth={2.5} className="text-white" />
     </span>
   )
 }

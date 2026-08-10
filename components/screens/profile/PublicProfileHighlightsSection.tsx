@@ -26,7 +26,7 @@ function VerifiedBadge({ size, shape = 'circle' }: { size: number; shape?: 'circ
   const Icon = shape === 'shield' ? ShieldCheck : BadgeCheck
   return (
     <Icon
-      size={Math.round(size * (shape === 'shield' ? 1.35 : 1.15))}
+      size={size}
       className="shrink-0"
       fill="url(#verified-badge-gradient)"
       stroke="white"
@@ -89,7 +89,7 @@ export function ProfileHighlightsSection({
                     <div className="flex items-center gap-1">
                       <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{preview.title}</div>
                       {entry.items.some((h) => h.verified) && !isGroupOpen && (
-                        <VerifiedBadge size={16} shape={entry.categoryId === 'career-role' ? 'shield' : 'circle'} />
+                        <VerifiedBadge size={20} shape={entry.categoryId === 'career-role' ? 'shield' : 'circle'} />
                       )}
                     </div>
                     {preview.meta && (
@@ -117,7 +117,7 @@ export function ProfileHighlightsSection({
                                   <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{hl.title}</div>
                                   {hl.verified && (
                                     <span className="flex items-center gap-1">
-                                      <VerifiedBadge size={16} shape={hl.categoryId === 'career-role' ? 'shield' : 'circle'} />
+                                      <VerifiedBadge size={20} shape={hl.categoryId === 'career-role' ? 'shield' : 'circle'} />
                                       <span className="text-[13px] font-bold" style={{ color: 'var(--color-accent-dark)' }}>
                                         {hl.categoryId === 'career-role' ? '검증됨' : '확인됨'}
                                       </span>

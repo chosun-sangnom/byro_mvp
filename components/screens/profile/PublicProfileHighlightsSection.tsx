@@ -81,14 +81,16 @@ export function ProfileHighlightsSection({
                     <div className="mb-0.5 text-[11px] text-[var(--color-text-tertiary)]">
                       {category?.label ?? '직접 입력'}
                     </div>
-                    <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{preview.title}</div>
+                    <div className="flex items-center gap-1">
+                      <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{preview.title}</div>
+                      {entry.items.some((h) => h.verified) && !isGroupOpen && (
+                        <VerifiedBadge size={16} />
+                      )}
+                    </div>
                     {preview.meta && (
                       <div className="mt-0.5 text-[12px] text-[var(--color-text-tertiary)]">{preview.meta}</div>
                     )}
                   </div>
-                  {entry.items.some((h) => h.verified) && !isGroupOpen && (
-                    <VerifiedBadge size={20} shape={entry.categoryId === 'career-role' ? 'shield' : 'circle'} />
-                  )}
                   {isGroupOpen ? <ChevronUp size={14} color="var(--color-text-tertiary)" /> : <ChevronDown size={14} color="var(--color-text-tertiary)" />}
                 </button>
                 <AnimatePresence initial={false}>

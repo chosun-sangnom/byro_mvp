@@ -181,8 +181,8 @@ export function PublicProfileShell({
 
         {/* 연락처 채널 */}
         <div>
-          <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">
-            Contact
+          <div className="mb-3 text-[18px] font-bold text-[#0D0D0D]">
+            연락처
           </div>
           <div className="flex justify-around">
             {profile.contactChannels.map((channel) => (

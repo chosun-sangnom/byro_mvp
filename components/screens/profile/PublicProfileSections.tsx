@@ -31,8 +31,8 @@ export function SectionTitle({
 }) {
   return (
     <div className="mb-4">
-      <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">{title}</div>
-      {subtitle && <div className="mt-1 text-[12px] text-[var(--color-text-tertiary)]">{subtitle}</div>}
+      <div className="text-[18px] font-bold text-[#0D0D0D]">{title}</div>
+      {subtitle && <div className="mt-1 text-[14px] text-[#6C7786]">{subtitle}</div>}
     </div>
   )
 }

@@ -34,10 +34,11 @@ export function ProfileHighlightsSection({
 
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06}>
-      <SectionTitle title="커리어" />
-      <div>
+      <SectionTitle title="하이라이트" />
+      <div className="space-y-5">
         {groupedHighlights.map((group) => (
           <div key={group.id}>
+            <div className="mb-2 text-[15px] font-bold text-[#0D0D0D]">{group.label}</div>
             <div className="divide-y divide-[var(--color-border-soft)]">
               {group.items.map((entry) => {
             const category = HIGHLIGHT_CATEGORIES.find((item) => item.id === entry.categoryId)

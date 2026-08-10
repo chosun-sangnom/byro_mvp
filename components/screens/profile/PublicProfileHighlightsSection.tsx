@@ -1,13 +1,24 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { BadgeCheck, ChevronDown, ChevronUp } from 'lucide-react'
+import { Check, ChevronDown, ChevronUp } from 'lucide-react'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { AnimatedSection, SectionTitle } from '@/components/screens/profile/PublicProfileSections'
 import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
 import { getGroupedHighlightPreview, getHighlightDetailFootnote, getHighlightMetaParts } from '@/lib/highlightMeta'
 import type { Highlight, HighlightIconId } from '@/types'
 
+
+function VerifiedBadge({ size }: { size: number }) {
+  return (
+    <span
+      className="flex shrink-0 items-center justify-center rounded-full bg-[#34C759]"
+      style={{ width: size, height: size }}
+    >
+      <Check size={Math.round(size * 0.62)} strokeWidth={3} className="text-white" />
+    </span>
+  )
+}
 
 type HighlightGroupEntry = { kind: 'manual-group'; categoryId: string; items: Highlight[] }
 
@@ -65,7 +76,7 @@ export function ProfileHighlightsSection({
                     )}
                   </div>
                   {entry.items.some((h) => h.verified) && !isGroupOpen && (
-                    <BadgeCheck size={20} className="shrink-0" style={{ color: '#34C759' }} />
+                    <VerifiedBadge size={20} />
                   )}
                   {isGroupOpen ? <ChevronUp size={14} color="var(--color-text-tertiary)" /> : <ChevronDown size={14} color="var(--color-text-tertiary)" />}
                 </button>
@@ -88,7 +99,7 @@ export function ProfileHighlightsSection({
                                   <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{hl.title}</div>
                                   {hl.verified && (
                                     <span className="flex items-center gap-1">
-                                      <BadgeCheck size={16} className="shrink-0" style={{ color: '#34C759' }} />
+                                      <VerifiedBadge size={16} />
                                       <span className="text-[13px] font-bold" style={{ color: 'var(--color-accent-dark)' }}>
                                         {hl.categoryId === 'career-role' ? '검증됨' : '확인됨'}
                                       </span>

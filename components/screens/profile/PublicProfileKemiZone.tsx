@@ -251,31 +251,29 @@ export function PublicProfileOwnerMatchZone({
           className="rounded-[20px] px-4 py-4"
           style={{
             border: '1px solid var(--color-accent-border-soft)',
-            background: 'var(--color-accent-soft)',
+            background: 'var(--color-bg-page)',
           }}
         >
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-1.5">
-                <Sparkles size={12} style={{ color: 'var(--color-accent-dark)' }} />
-                <span className="text-[12px] font-bold" style={{ color: 'var(--color-accent-dark)' }}>
-                  내 케미 리포트
-                </span>
-              </div>
-              <p className="mt-1.5 text-[14px] font-bold text-[var(--color-text-primary)]">
-                나와 잘 맞는 사람의 결
-              </p>
-              <p className="mt-1 text-[12px] leading-[1.6] text-[var(--color-text-secondary)]">
-                라이프스타일을 바탕으로 어떤 유형의 사람과 잘 맞는지 읽어줍니다.
-              </p>
+          <div className="flex items-start gap-3">
+            <div className="relative mt-0.5 h-[18px] w-[20px] shrink-0">
+              <Sparkles size={11} className="absolute left-0 top-1" style={{ color: '#2DD4BF' }} />
+              <Sparkles size={15} className="absolute right-0 top-0" style={{ color: 'var(--color-accent-dark)' }} />
             </div>
-            <button
-              type="button"
-              onClick={() => setReportOpen(true)}
-              className="shrink-0 rounded-full bg-[var(--color-accent-dark)] px-3 py-2 text-[12px] font-semibold text-white"
-            >
-              리포트 보기
-            </button>
+            <div>
+              <span className="text-[14px] font-bold text-[var(--color-text-primary)]">
+                케미 리포트
+              </span>
+              <p className="mt-1 text-[12px] leading-[1.6] text-[var(--color-text-secondary)]">
+                라이프스타일을 바탕으로 내가 어떤 유형과 잘 맞는지 읽어줍니다.
+              </p>
+              <button
+                type="button"
+                onClick={() => setReportOpen(true)}
+                className="mt-3 shrink-0 rounded-full bg-[var(--color-accent-dark)] px-4 py-2 text-[12px] font-semibold text-white"
+              >
+                리포트 보기
+              </button>
+            </div>
           </div>
         </div>
       </div>

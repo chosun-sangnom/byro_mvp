@@ -48,30 +48,25 @@ export function ProfileReputationSummarySection({
 
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.04}>
-      <SectionTitle title="평판" />
-      <div className="rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-4">
+      <SectionTitle
+        title="평판"
+        subtitle={isEmpty ? undefined : `키워드 ${totalKeywordCount}개가 모였어요`}
+      />
+      <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3">
         {isEmpty ? (
-          <p className="py-1 text-center text-[13px] text-[var(--color-text-tertiary)]">아직 받은 평판이 없어요</p>
+          <p className="py-1 text-center text-[13px] text-[#6C7786]">아직 받은 평판이 없어요</p>
         ) : (
-          <>
-            <div className="flex items-center justify-between gap-3">
-              <div>
-                <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Reputation</div>
-                <div className="mt-0.5 text-[22px] font-black tracking-[-0.04em] text-[var(--color-text-strong)]">누적 평판</div>
-              </div>
-              <div className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
-                총 {totalKeywordCount}
-              </div>
-            </div>
-
-            <div className="mt-3 flex flex-wrap gap-2">
-              {keywordCounts.map((item) => (
-                <span key={item.keyword} className="chip-metric">
-                  {item.keyword} <span className="ml-1 font-black text-[var(--color-text-strong)]">{item.count}</span>
-                </span>
-              ))}
-            </div>
-          </>
+          <div className="flex flex-wrap gap-2">
+            {keywordCounts.map((item) => (
+              <span
+                key={item.keyword}
+                className="rounded-full px-3 py-1.5 text-[13px] font-semibold"
+                style={{ background: 'var(--color-accent-soft)', color: 'var(--color-accent-dark)' }}
+              >
+                {item.keyword} <span className="ml-1 font-bold text-[#0D0D0D]">{item.count}</span>
+              </span>
+            ))}
+          </div>
         )}
       </div>
     </AnimatedSection>
@@ -95,20 +90,13 @@ export function ProfileFeedbackSection({
 }) {
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06}>
-      <SectionTitle title="피드백" />
-      <div className="rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-4">
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <div>
-            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Feedback</div>
-            <div className="mt-0.5 text-[18px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">함께한 사람들이 남긴 메모</div>
-          </div>
-          <div className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
-            {profile.guestbook.length}개
-          </div>
-        </div>
-
+      <SectionTitle
+        title="피드백"
+        subtitle={profile.guestbook.length > 0 ? `함께한 사람들이 남긴 메모 ${profile.guestbook.length}개` : undefined}
+      />
+      <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3">
         {profile.guestbook.length === 0 ? (
-          <p className="py-1 text-center text-[13px] text-[var(--color-text-tertiary)]">아직 방명록이 없어요</p>
+          <p className="py-1 text-center text-[13px] text-[#6C7786]">아직 방명록이 없어요</p>
         ) : (
           <div className="divide-y divide-[var(--color-border-soft)]">
             {featuredGuestbook.map((entry) => (
@@ -123,16 +111,16 @@ export function ProfileFeedbackSection({
                     <img src={getProfileAvatar(entry.linkId)} alt={`${entry.authorName} 프로필 사진`} className="h-full w-full object-cover" />
                   </div>
                 ) : (
-                  <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-xs font-bold text-[var(--color-text-secondary)]">
+                  <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-xs font-bold text-[#6C7786]">
                     {entry.authorName.charAt(0)}
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
-                    <div className="text-[12px] font-semibold text-[var(--color-text-primary)]">{entry.authorName}</div>
-                    <div className="text-[10px] text-[var(--color-text-tertiary)]">{entry.date}</div>
+                    <div className="text-[12px] font-semibold text-[#0D0D0D]">{entry.authorName}</div>
+                    <div className="text-[10px] text-[#6C7786]">{entry.date}</div>
                   </div>
-                  <div className="mt-1 text-[13px] leading-6 text-[var(--color-text-secondary)] line-clamp-2">{entry.message}</div>
+                  <div className="mt-1 text-[13px] leading-6 text-[#475058] line-clamp-2">{entry.message}</div>
                 </div>
               </button>
             ))}
@@ -142,12 +130,12 @@ export function ProfileFeedbackSection({
         {profile.guestbook.length > 0 && (
           <button
             onClick={onOpenGuestbook}
-            className="mt-4 flex w-full items-center justify-between rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-left active:opacity-70"
+            className="mt-3 flex w-full items-center justify-between rounded-[12px] border border-[#DEE4EC] px-4 py-3 text-left active:opacity-70"
           >
-            <span className="text-[12px] font-semibold text-[var(--color-text-secondary)]">
+            <span className="text-[12px] font-semibold text-[#475058]">
               피드백 전체보기
             </span>
-            <ChevronRight className="h-4 w-4 text-[var(--color-text-tertiary)]" />
+            <ChevronRight className="h-4 w-4 text-[#6C7786]" />
           </button>
         )}
       </div>

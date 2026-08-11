@@ -145,6 +145,7 @@ export const SAMPLE_PROFILE = {
   rememberHighlight: {
     total: 247,
     mutualCompanies: ['카카오뱅크', 'NAVER', '두나무', 'KRAFTON', 'MOLOCO', '토스', '당근마켓', '컬리'],
+    percentile: 12,
     careerTimeline: {
       years: 12,
       eras: [
@@ -452,6 +453,7 @@ export const MK_PROFILE = {
   rememberHighlight: {
     total: 1691,
     mutualCompanies: ['카카오뱅크', 'NAVER', '두나무', 'KRAFTON', 'MOLOCO', '토스', '당근마켓'],
+    percentile: 12,
     careerTimeline: {
       years: 13,
       eras: [
@@ -680,6 +682,7 @@ export const JIMIN_PROFILE = {
   rememberHighlight: {
     total: 183,
     mutualCompanies: buildMutualCompanies(11),
+    percentile: 16,
     careerTimeline: buildCareerTimeline(11, ['브랜드 · 콘텐츠', '스타트업 · 마케팅', '그로스 · PR']),
     industries: [
       { name: '스타트업', ratio: 38, count: 70 },
@@ -777,6 +780,7 @@ export const PARKSOJIN_PROFILE = {
   rememberHighlight: {
     total: 312,
     mutualCompanies: buildMutualCompanies(12),
+    percentile: 9,
     careerTimeline: buildCareerTimeline(12, ['UX · 리서치', '핀테크 · 프로덕트', '디자인 시스템']),
     industries: [
       { name: 'IT/테크', ratio: 40, count: 125 },
@@ -862,6 +866,7 @@ export const LEEJUNHYUK_PROFILE = {
   rememberHighlight: {
     total: 428,
     mutualCompanies: buildMutualCompanies(13),
+    percentile: 23,
     careerTimeline: buildCareerTimeline(13, ['개발 · 엔지니어링', '스타트업 · 테크리드', 'CTO · 조직관리']),
     industries: [
       { name: '스타트업', ratio: 45, count: 193 },
@@ -934,6 +939,7 @@ export const CHOISUNYOUNG_PROFILE = {
   rememberHighlight: {
     total: 589,
     mutualCompanies: buildMutualCompanies(14),
+    percentile: 11,
     careerTimeline: buildCareerTimeline(14, ['스타트업 · 투자', 'VC · 심사역', '포트폴리오 · 그로스']),
     industries: [
       { name: '투자/VC', ratio: 42, count: 247 },
@@ -1006,6 +1012,7 @@ export const YOONJISOO_PROFILE = {
   rememberHighlight: {
     total: 276,
     mutualCompanies: buildMutualCompanies(15),
+    percentile: 28,
     careerTimeline: buildCareerTimeline(15, ['뷰티 · 유통', '브랜드 · MD', '컬래버 · 마케팅']),
     industries: [
       { name: '마케팅/PR', ratio: 35, count: 97 },
@@ -1091,6 +1098,7 @@ export const KWONMINSEOK_PROFILE = {
   rememberHighlight: {
     total: 203,
     mutualCompanies: buildMutualCompanies(16),
+    percentile: 14,
     careerTimeline: buildCareerTimeline(16, ['데이터 · 분석', 'IT · 플랫폼', 'AI · 머신러닝']),
     industries: [
       { name: 'IT/테크', ratio: 35, count: 71 },
@@ -1175,6 +1183,7 @@ export const LIMJIYEON_PROFILE = {
   rememberHighlight: {
     total: 47,
     mutualCompanies: buildMutualCompanies(17),
+    percentile: 6,
     careerTimeline: buildCareerTimeline(17, ['조직 · 인사', '채용 · HR', '컨설팅 · 전략']),
     industries: [
       { name: '컨설팅', ratio: 30, count: 14 },
@@ -1234,6 +1243,7 @@ export const HANSANGHOON_PROFILE = {
   rememberHighlight: {
     total: 534,
     mutualCompanies: buildMutualCompanies(18),
+    percentile: 19,
     careerTimeline: buildCareerTimeline(18, ['세일즈 · B2B', '글로벌 · 파트너십', 'SaaS · 엔터프라이즈']),
     industries: [
       { name: 'IT/테크', ratio: 38, count: 203 },
@@ -1316,6 +1326,7 @@ export const OHYERIM_PROFILE = {
   rememberHighlight: {
     total: 138,
     mutualCompanies: buildMutualCompanies(19),
+    percentile: 13,
     careerTimeline: buildCareerTimeline(19, ['콘텐츠 · 크리에이티브', '유튜브 · 미디어', '브랜드 협업']),
     industries: [
       { name: '미디어/콘텐츠', ratio: 42, count: 58 },
@@ -1404,6 +1415,7 @@ export const JUNGWONHO_PROFILE = {
   rememberHighlight: {
     total: 364,
     mutualCompanies: buildMutualCompanies(20),
+    percentile: 25,
     careerTimeline: buildCareerTimeline(20, ['의료 · 헬스케어', 'AI · 스타트업', '창업 · 경영']),
     industries: [
       { name: '의료/바이오', ratio: 40, count: 146 },
@@ -1478,6 +1490,7 @@ export const BAEKHYUNJIN_PROFILE = {
   rememberHighlight: {
     total: 872,
     mutualCompanies: buildMutualCompanies(21),
+    percentile: 17,
     careerTimeline: buildCareerTimeline(21, ['전략 · 컨설팅', '디지털 트랜스포메이션', '경영 · 자문']),
     industries: [
       { name: '컨설팅', ratio: 35, count: 305 },

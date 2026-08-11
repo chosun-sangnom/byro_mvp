@@ -221,6 +221,7 @@ export interface RememberHighlight {
   insight?: RememberInsight
   mutualCompanies?: string[]
   careerTimeline?: CareerTimeline
+  percentile?: number
 }
 
 export interface ReputationKeyword {

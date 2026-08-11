@@ -181,7 +181,7 @@ export function PublicProfileReputationTabPage({
         isOwner={isOwner}
         mutualCompanies={profile.rememberHighlight.mutualCompanies}
         careerTimeline={profile.rememberHighlight.careerTimeline}
-        insightPercentile={profile.rememberHighlight.insight?.percentile}
+        insightPercentile={profile.rememberHighlight.percentile}
       />
       <ProfileReputationSummarySection
         keywordCounts={keywordCounts}

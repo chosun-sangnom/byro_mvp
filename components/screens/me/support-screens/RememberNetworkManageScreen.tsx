@@ -13,6 +13,9 @@ const DOMAIN_OPTIONS = [
   '의료/바이오', '유통/물류', '건설/부동산', '에너지',
 ]
 
+// 그래프/범례에 한 번에 보여줄 수 있는 개수가 최대 3개라, 관심 도메인도 직접입력 포함 최대 3개로 제한
+const MAX_DOMAINS = 3
+
 type ImportStep = 'idle' | 'analyzing' | 'imported'
 
 // [임시] 명함 인식 결과 목업 — 개인별 명함 데이터는 저장하지 않으므로
@@ -51,12 +54,23 @@ export function RememberNetworkManageScreen({
   }
 
   const toggleDomain = (domain: string) => {
-    setSelectedDomains((prev) => (prev.includes(domain) ? prev.filter((d) => d !== domain) : [...prev, domain]))
+    setSelectedDomains((prev) => {
+      if (prev.includes(domain)) return prev.filter((d) => d !== domain)
+      if (prev.length >= MAX_DOMAINS) {
+        showToast(`관심 도메인은 최대 ${MAX_DOMAINS}개까지 선택할 수 있어요`)
+        return prev
+      }
+      return [...prev, domain]
+    })
   }
 
   const handleAddCustomDomain = () => {
     const trimmed = customInput.trim()
     if (!trimmed) return
+    if (selectedDomains.length >= MAX_DOMAINS && !selectedDomains.includes(trimmed)) {
+      showToast(`관심 도메인은 최대 ${MAX_DOMAINS}개까지 선택할 수 있어요`)
+      return
+    }
     setSelectedDomains((prev) => (prev.includes(trimmed) ? prev : [...prev, trimmed]))
     setCustomInput('')
   }
@@ -158,16 +172,18 @@ export function RememberNetworkManageScreen({
             관심 도메인
           </p>
           <p className="mb-3 text-[12px] leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
-            설정하면 다른 사람의 네트워크 탭에서 내 관심 분야와 얼마나 겹치는지 인사이트를 볼 수 있어요. 여러 개 선택할 수 있어요.
+            설정하면 다른 사람의 네트워크 탭에서 내 관심 분야와 얼마나 겹치는지 인사이트를 볼 수 있어요. 직접 입력 포함 최대 {MAX_DOMAINS}개까지 선택할 수 있어요.
           </p>
           <div className="flex flex-wrap gap-2">
             {DOMAIN_OPTIONS.map((domain) => {
               const selected = selectedDomains.includes(domain)
+              const disabled = !selected && selectedDomains.length >= MAX_DOMAINS
               return (
                 <button
                   key={domain}
                   onClick={() => toggleDomain(domain)}
-                  className="rounded-full border px-3.5 py-1.5 text-[12px] font-semibold transition-colors"
+                  disabled={disabled}
+                  className="rounded-full border px-3.5 py-1.5 text-[12px] font-semibold transition-colors disabled:opacity-40"
                   style={{
                     borderColor: selected ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
                     background: selected ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
@@ -210,7 +226,7 @@ export function RememberNetworkManageScreen({
             />
             <button
               onClick={handleAddCustomDomain}
-              disabled={!customInput.trim()}
+              disabled={!customInput.trim() || selectedDomains.length >= MAX_DOMAINS}
               className="shrink-0 rounded-[14px] px-4 text-[13px] font-bold text-white disabled:opacity-40"
               style={{ background: 'var(--color-accent-dark)' }}
             >
@@ -218,7 +234,9 @@ export function RememberNetworkManageScreen({
             </button>
           </div>
           <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'var(--color-text-tertiary)' }}>
-            특정 기업·분야 등 더 세부적인 도메인을 입력하면 더 정밀한 인사이트를 받을 수 있어요.
+            {selectedDomains.length >= MAX_DOMAINS
+              ? `최대 ${MAX_DOMAINS}개까지 선택했어요. 다른 도메인을 추가하려면 하나를 해제해주세요.`
+              : '특정 기업·분야 등 더 세부적인 도메인을 입력하면 더 정밀한 인사이트를 받을 수 있어요.'}
           </p>
 
           <button

@@ -219,11 +219,16 @@ function CareerTimelineCard({ timeline }: { timeline: CareerTimeline }) {
         ))}
       </div>
 
-      <div className="mt-2 flex gap-2.5">
-        {eraGroups.map(({ era }) => (
-          <div key={era.yearRange} className="min-w-0 flex-1">
-            <p className="truncate text-[11px] font-bold text-[#0D0D0D]">{era.yearRange}</p>
-            <p className="truncate text-[10px] text-[#6C7786]">{era.domainLabel} · {era.count}명</p>
+      <div className="mt-3 space-y-2">
+        {eraGroups.map(({ era }, eraIndex) => (
+          <div key={era.yearRange} className="flex items-start gap-2">
+            <div
+              className="mt-1 h-2 w-2 shrink-0 rounded-full"
+              style={{ backgroundColor: `color-mix(in srgb, var(--color-accent-dark) ${ERA_TONE_OPACITY[eraIndex] * 100}%, transparent)` }}
+            />
+            <p className="text-[12px] leading-[1.5] text-[#475058]">
+              <span className="font-bold text-[#0D0D0D]">{era.yearRange}</span> · {era.domainLabel} · {era.count}명
+            </p>
           </div>
         ))}
       </div>

@@ -1,13 +1,39 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { BadgeCheck, ShieldCheck, ChevronDown, ChevronUp } from 'lucide-react'
+import { BadgeCheck, ChevronDown, ChevronUp, ShieldCheck } from 'lucide-react'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { AnimatedSection, SectionTitle } from '@/components/screens/profile/PublicProfileSections'
 import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
 import { getGroupedHighlightPreview, getHighlightDetailFootnote, getHighlightMetaParts } from '@/lib/highlightMeta'
 import type { Highlight, HighlightIconId } from '@/types'
 
+
+function VerifiedBadgeGradientDefs() {
+  return (
+    <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
+      <defs>
+        <linearGradient id="verified-badge-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#22D3A6" />
+          <stop offset="100%" stopColor="#0EA968" />
+        </linearGradient>
+      </defs>
+    </svg>
+  )
+}
+
+function VerifiedBadge({ size, shape = 'circle' }: { size: number; shape?: 'circle' | 'shield' }) {
+  const Icon = shape === 'shield' ? ShieldCheck : BadgeCheck
+  return (
+    <Icon
+      size={size}
+      className="shrink-0"
+      fill="url(#verified-badge-gradient)"
+      stroke="white"
+      strokeWidth={2}
+    />
+  )
+}
 
 type HighlightGroupEntry = { kind: 'manual-group'; categoryId: string; items: Highlight[] }
 
@@ -34,14 +60,12 @@ export function ProfileHighlightsSection({
 
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06}>
+      <VerifiedBadgeGradientDefs />
       <SectionTitle title="하이라이트" />
-      <div>
+      <div className="space-y-5">
         {groupedHighlights.map((group) => (
-          <div key={group.id} className="mb-4">
-            <div className="mb-2 flex items-center gap-3">
-              <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)]">{group.label}</span>
-              <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
-            </div>
+          <div key={group.id}>
+            <div className="mb-2 text-[15px] font-bold text-[#0D0D0D]">{group.label}</div>
             <div className="divide-y divide-[var(--color-border-soft)]">
               {group.items.map((entry) => {
             const category = HIGHLIGHT_CATEGORIES.find((item) => item.id === entry.categoryId)
@@ -62,16 +86,16 @@ export function ProfileHighlightsSection({
                     <div className="mb-0.5 text-[11px] text-[var(--color-text-tertiary)]">
                       {category?.label ?? '직접 입력'}
                     </div>
-                    <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{preview.title}</div>
+                    <div className="flex items-center gap-1">
+                      <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{preview.title}</div>
+                      {entry.items.some((h) => h.verified) && !isGroupOpen && (
+                        <VerifiedBadge size={20} shape={entry.categoryId === 'career-role' ? 'shield' : 'circle'} />
+                      )}
+                    </div>
                     {preview.meta && (
                       <div className="mt-0.5 text-[12px] text-[var(--color-text-tertiary)]">{preview.meta}</div>
                     )}
                   </div>
-                  {entry.items.some((h) => h.verified) && !isGroupOpen && (
-                    entry.categoryId === 'career-role'
-                      ? <ShieldCheck size={20} className="shrink-0 text-[var(--color-accent)]" />
-                      : <BadgeCheck size={20} className="shrink-0 text-[var(--color-accent)]" />
-                  )}
                   {isGroupOpen ? <ChevronUp size={14} color="var(--color-text-tertiary)" /> : <ChevronDown size={14} color="var(--color-text-tertiary)" />}
                 </button>
                 <AnimatePresence initial={false}>
@@ -83,7 +107,7 @@ export function ProfileHighlightsSection({
                       transition={{ duration: 0.22, ease: [0.4, 0, 0.2, 1] }}
                       className="overflow-hidden"
                     >
-                      <div className="pb-4 pl-8">
+                      <div className="pb-4 pl-14">
                         <div className="divide-y divide-[var(--color-border-soft)]">
                           {entry.items.map((hl) => {
                             const metaParts = getHighlightMetaParts(hl)
@@ -92,12 +116,9 @@ export function ProfileHighlightsSection({
                                 <div className="flex items-center gap-1.5">
                                   <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{hl.title}</div>
                                   {hl.verified && (
-                                    <span className="flex items-center gap-0.5">
-                                      {hl.categoryId === 'career-role'
-                                        ? <ShieldCheck size={12} className="shrink-0 text-[var(--color-accent)]" />
-                                        : <BadgeCheck size={12} className="shrink-0 text-[var(--color-accent)]" />
-                                      }
-                                      <span className="text-[10px] font-semibold text-[var(--color-accent)]">
+                                    <span className="flex items-center gap-1">
+                                      <VerifiedBadge size={20} shape={hl.categoryId === 'career-role' ? 'shield' : 'circle'} />
+                                      <span className="text-[13px] font-bold" style={{ color: 'var(--color-accent-dark)' }}>
                                         {hl.categoryId === 'career-role' ? '검증됨' : '확인됨'}
                                       </span>
                                     </span>

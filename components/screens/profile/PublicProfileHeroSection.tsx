@@ -43,6 +43,9 @@ export function ProfileHeroSection({
     linkId?: string
     headline?: string
     age?: number
+    birthDate?: string
+    showAge?: boolean
+    mbti?: string
     avatarColor?: string
     avatarImage?: string
     profileImages?: string[]
@@ -212,6 +215,7 @@ export function ProfileHeroCard({
     birthDate?: string
     showAge?: boolean
     headline?: string
+    mbti?: string
     avatarColor?: string
     avatarImage?: string
     profileImages?: string[]
@@ -285,8 +289,7 @@ export function ProfileHeroCard({
   }
 
   return (
-    <div className="hero-card border border-[var(--color-border-default)] bg-[var(--color-glass-strong)] p-[8px] backdrop-blur-sm">
-      <div className="relative h-[452px] overflow-hidden rounded-[30px] bg-[#121212] text-white ring-1 ring-black/4">
+    <div className="relative h-[468px] overflow-hidden rounded-[var(--radius-hero)] bg-[#121212] text-white">
 
 
         {/* AI 페르소나 바텀시트 — createPortal로 transform 컨텍스트 탈출 */}
@@ -476,15 +479,28 @@ export function ProfileHeroCard({
             </>
           )}
 
+          {/* 공유 — 오너 전용, 카드 좌상단 */}
+          {isOwner && activeImage && (
+            <button
+              type="button"
+              onClick={async (e) => {
+                e.stopPropagation()
+                await shareOrCopy({ title: `${profile.name}의 바이로`, url: window.location.href })
+              }}
+              className="absolute left-4 top-4 z-10 rounded-full border border-white/14 bg-black/38 p-2 backdrop-blur-sm"
+            >
+              <Share2 size={16} className="text-white/88" />
+            </button>
+          )}
+
           {/* 편집 아이콘 — 오너 전용, 카드 우상단 */}
           {isOwner && onOwnerEdit && (
             <button
               type="button"
               onClick={onOwnerEdit}
-              className="absolute right-4 top-4 z-10 flex flex-col items-center gap-1 rounded-[14px] border border-white/14 bg-black/38 px-2.5 py-2 backdrop-blur-sm"
+              className="absolute right-4 top-4 z-10 rounded-full border border-white/14 bg-black/38 p-2 backdrop-blur-sm"
             >
               <Pencil size={16} className="text-white/88" />
-              <span className="text-[10px] font-semibold text-white/72 leading-none">편집</span>
             </button>
           )}
         </div>
@@ -517,12 +533,21 @@ export function ProfileHeroCard({
             )}
           </div>
 
-          {showAge && (
-            <div className="mt-0.5 text-[13px] font-semibold text-white/50">
-              {profile.age}세
-              {profile.birthDate && (
-                <span className="ml-1 font-normal">
-                  ({profile.birthDate.replace(/-/g, '.')})
+          {(showAge || profile.mbti) && (
+            <div className="mt-1 flex items-center gap-1">
+              {profile.mbti && (
+                <span className="flex h-[21px] items-center rounded-full bg-[rgba(102,102,102,0.4)] px-2 text-[14px] text-white/85 backdrop-blur-[10px]">
+                  {profile.mbti}
+                </span>
+              )}
+              {showAge && (
+                <span className="text-[14px] text-white/85">
+                  {profile.age}세
+                  {profile.birthDate && (
+                    <span className="ml-1">
+                      ({profile.birthDate.replace(/-/g, '.')})
+                    </span>
+                  )}
                 </span>
               )}
             </div>
@@ -533,16 +558,19 @@ export function ProfileHeroCard({
               <button
                 type="button"
                 onClick={() => setPersonaSheetOpen(true)}
-                className="mt-2 flex items-center gap-1.5 rounded-full border border-white/14 bg-black/28 px-3 py-1.5 backdrop-blur-sm"
+                className="border-beam mt-2 flex w-full items-center gap-2 rounded-[16px] border border-white/50 bg-[rgba(102,102,102,0.4)] py-3 pl-3 pr-4 backdrop-blur-[10px]"
               >
-                <Sparkles size={11} className="text-white/60 shrink-0" />
-                <span className="text-[12px] font-medium italic text-white/80">{personaText}</span>
-                <span className="ml-1 rounded-full bg-white/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white/50">AI</span>
+                <span className="min-w-0 flex-1 text-left text-[14px] font-medium leading-[1.35] text-white">{personaText}</span>
+                <span
+                  className="ml-1 flex shrink-0 items-center gap-0.5 rounded-full px-1.5 py-1 text-[13px] font-medium text-white"
+                  style={{ backgroundImage: 'linear-gradient(110deg, #0088FF 0%, #34C759 100%)' }}
+                >
+                  <Sparkles size={12} />AI
+                </span>
               </button>
             ) : (
-              <div className="mt-2 flex items-center gap-1.5 rounded-full border border-white/10 bg-black/15 px-3 py-1.5">
-                <Sparkles size={11} className="text-white/30 shrink-0" />
-                <span className="text-[12px] font-medium text-white/40">{personaText}</span>
+              <div className="mt-2 flex w-full items-center gap-2 rounded-[16px] border border-white/20 bg-[rgba(102,102,102,0.25)] py-3 pl-3 pr-4 backdrop-blur-[10px]">
+                <span className="min-w-0 flex-1 text-left text-[14px] font-medium text-white/40">{personaText}</span>
               </div>
             )
           )}
@@ -552,7 +580,7 @@ export function ProfileHeroCard({
           </div>
         </div>
       </div>
-    </div>
   )
 }
+
 

@@ -23,7 +23,7 @@ export function PublicProfileTabBar({
 }) {
   return (
     <div className="px-5 pt-3 pb-3">
-      <div className="glass-card rounded-[20px] p-1.5">
+      <div className="rounded-full bg-[#F5F6F7] p-1">
         <div className="grid grid-cols-3 gap-1">
           {TABS.map((tab) => {
             const selected = tab.id === activeTab
@@ -34,12 +34,12 @@ export function PublicProfileTabBar({
                 key={tab.id}
                 type="button"
                 onClick={() => onTabChange(tab.id)}
-                className="relative overflow-hidden rounded-[16px] px-3 py-3 text-center text-[13px] font-semibold"
+                className="relative overflow-hidden rounded-full px-6 py-2 text-center text-[14px] font-semibold"
               >
                 {selected && (
                   <motion.div
                     layoutId="public-profile-tab-indicator"
-                    className="absolute inset-0 rounded-[14px] bg-[var(--color-accent-dark)]"
+                    className="absolute inset-0 rounded-full bg-black"
                     transition={{ type: 'spring', stiffness: 420, damping: 34 }}
                   />
                 )}

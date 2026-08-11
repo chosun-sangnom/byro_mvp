@@ -1,37 +1,37 @@
 'use client'
 
+import { Sparkles } from 'lucide-react'
 import type { PublicProfileWhoIAm } from '@/types'
 import { SectionTitle } from '@/components/screens/profile/PublicProfileSections'
 
-function IdentityRow({
-  label,
-  value,
-}: {
-  label: string
-  value: string
-}) {
+function AiBadge() {
   return (
-    <div className="rounded-[18px] border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-4 py-3">
-      <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">{label}</div>
-      <div className="mt-1 text-[15px] font-semibold text-[var(--color-text-primary)]">{value}</div>
-    </div>
+    <span
+      className="flex shrink-0 items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium text-white"
+      style={{ backgroundImage: 'linear-gradient(110deg, #0088FF 0%, #34C759 100%)' }}
+    >
+      <Sparkles size={10} />AI
+    </span>
   )
 }
 
 function BioBlock({ text }: { text: string }) {
   return (
-    <div className="rounded-[18px] border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-4 py-3">
-      <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">자기소개</div>
-      <p className="mt-1.5 text-[14px] leading-[1.65] text-[var(--color-text-primary)]">{text}</p>
+    <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3">
+      <div className="text-[12px] font-semibold text-[#6C7786]">자기 소개</div>
+      <p className="mt-1 text-[14px] leading-[1.5] text-[#25313D]">{text}</p>
     </div>
   )
 }
 
 function PersonalityBlock({ text }: { text: string }) {
   return (
-    <div className="rounded-[18px] border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-4 py-3">
-      <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)]">성향</div>
-      <p className="mt-1.5 text-[14px] leading-[1.65] text-[var(--color-text-primary)]">{text}</p>
+    <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3">
+      <div className="flex items-center justify-between">
+        <div className="text-[12px] font-semibold text-[#6C7786]">성향</div>
+        <AiBadge />
+      </div>
+      <p className="mt-1 text-[14px] leading-[1.5] text-[#25313D]">{text}</p>
     </div>
   )
 }
@@ -53,7 +53,6 @@ export function PublicProfileWhoIAmSection({
       />
       <div className="grid grid-cols-1 gap-3">
         {bio && <BioBlock text={bio} />}
-        {whoIAm && <IdentityRow label="MBTI" value={whoIAm.mbti} />}
         {whoIAm?.personality && <PersonalityBlock text={whoIAm.personality} />}
       </div>
     </div>

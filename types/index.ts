@@ -181,6 +181,26 @@ export interface RememberIndustry {
   count?: number
 }
 
+export interface CareerTimelineEra {
+  yearRange: string
+  domainLabel: string
+  count: number
+  breakdown: string
+  color: string
+}
+
+export interface CareerTimelineYear {
+  year: number
+  count: number
+  eraIndex: number
+}
+
+export interface CareerTimeline {
+  years: number
+  eras: CareerTimelineEra[]
+  yearly: CareerTimelineYear[]
+}
+
 export interface RememberInsight {
   recentMeetings: number
   recentMonths: number
@@ -190,6 +210,7 @@ export interface RememberInsight {
   growthFrom: number
   growthTo: number
   growthPeriodLabel: string
+  percentile?: number
 }
 
 export interface RememberHighlight {
@@ -198,6 +219,9 @@ export interface RememberHighlight {
   topIndustryRanks?: RememberIndustry[]
   topIndustryRoles?: RememberIndustry[]
   insight?: RememberInsight
+  mutualCompanies?: string[]
+  careerTimeline?: CareerTimeline
+  percentile?: number
 }
 
 export interface ReputationKeyword {

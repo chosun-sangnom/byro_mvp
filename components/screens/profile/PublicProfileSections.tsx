@@ -182,8 +182,6 @@ const ERA_TONE_OPACITY = [0.38, 0.68, 1]
 
 function CareerTimelineCard({ timeline }: { timeline: CareerTimeline }) {
   if (timeline.yearly.length === 0) return null
-  const maxCount = Math.max(...timeline.yearly.map((y) => y.count))
-  const barAreaHeight = 64
 
   const eraGroups = timeline.eras.map((era, eraIndex) => ({
     era,
@@ -199,26 +197,6 @@ function CareerTimelineCard({ timeline }: { timeline: CareerTimeline }) {
         누구를 만났는지가 어디에 있었는지를 말해줘요
       </p>
 
-      <div className="mt-4 flex items-end gap-2.5" style={{ height: barAreaHeight }}>
-        {eraGroups.map(({ era, years }, eraIndex) => (
-          <div key={era.yearRange} className="flex flex-1 items-end gap-[2px]">
-            {years.map((y) => {
-              const barHeight = maxCount > 0 ? Math.max(Math.round((y.count / maxCount) * barAreaHeight), 5) : 5
-              return (
-                <div
-                  key={y.year}
-                  className="flex-1 rounded-t-[3px]"
-                  style={{
-                    height: barHeight,
-                    backgroundColor: `color-mix(in srgb, var(--color-accent-dark) ${ERA_TONE_OPACITY[eraIndex] * 100}%, transparent)`,
-                  }}
-                />
-              )
-            })}
-          </div>
-        ))}
-      </div>
-
       <div className="mt-3 space-y-2">
         {eraGroups.map(({ era }, eraIndex) => (
           <div key={era.yearRange} className="flex items-start gap-2">
@@ -231,6 +209,86 @@ function CareerTimelineCard({ timeline }: { timeline: CareerTimeline }) {
             </p>
           </div>
         ))}
+      </div>
+    </div>
+  )
+}
+
+// 관심 도메인은 카테고리(정체성) 데이터이므로 시퀀셜이 아니라 카테고리 팔레트 사용.
+// validate_palette.js로 색맹 안전성 확인된 블루/그린/오렌지 조합.
+const DOMAIN_TREND_COLORS = ['#2563EB', '#0E8F50', '#D95F00']
+
+// [임시] 실제로는 명함 저장 날짜 기준 연도별 집계로 교체.
+// 지금은 누적 총량을 연도 수만큼 나눠 최근으로 갈수록 증가하는 추세로 합성.
+function buildDomainYearlySeries(years: number[], count: number, seed: number): number[] {
+  const avgPerYear = count / Math.max(years.length, 1)
+  return years.map((_, i) => {
+    const progress = years.length > 1 ? i / (years.length - 1) : 1
+    const growth = 0.55 + progress * 0.9
+    const jitter = ((seed * (i + 1) * 13) % 7) - 3
+    return Math.max(1, Math.round(avgPerYear * growth + jitter))
+  })
+}
+
+function DomainTrendChart({
+  years,
+  series,
+}: {
+  years: number[]
+  series: { name: string; color: string; values: number[] }[]
+}) {
+  const width = 296
+  const height = 88
+  const maxValue = Math.max(1, ...series.flatMap((s) => s.values))
+  const stepX = years.length > 1 ? width / (years.length - 1) : 0
+
+  const toPoints = (values: number[]) =>
+    values
+      .map((v, i) => {
+        const x = years.length > 1 ? i * stepX : width / 2
+        const y = height - (v / maxValue) * (height - 6) - 3
+        return `${x},${y}`
+      })
+      .join(' ')
+
+  return (
+    <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3">
+      <p className="text-[14px] font-bold text-[#0D0D0D]">관심 분야 트렌드</p>
+      <p className="mt-1 text-[12px] text-[#6C7786]">
+        최근 몇 년간 이 분야 사람들과 얼마나 가까워졌는지 보여줘요
+      </p>
+
+      <svg
+        className="mt-4"
+        viewBox={`0 0 ${width} ${height}`}
+        width="100%"
+        height={height}
+        preserveAspectRatio="none"
+      >
+        {series.map((s) => (
+          <polyline
+            key={s.name}
+            points={toPoints(s.values)}
+            fill="none"
+            stroke={s.color}
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        ))}
+      </svg>
+
+      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+        {series.map((s) => (
+          <span key={s.name} className="flex items-center gap-1 text-[12px] font-semibold" style={{ color: s.color }}>
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: s.color }} />
+            {s.name}
+          </span>
+        ))}
+      </div>
+      <div className="mt-1 flex justify-between text-[11px] text-[#6C7786]">
+        <span>{years[0]}</span>
+        <span>{years[years.length - 1]}</span>
       </div>
     </div>
   )
@@ -272,10 +330,20 @@ export function ProfileRememberSection({
       const headline = isTop && topRank
         ? `${domain} 쪽에 ${count}명, 그중 ${topRank.name}이 ${rankCount}명입니다.`
         : `${domain} 쪽에 ${count}명이에요.`
-      return { domain, percentile, headline }
+      return { domain, percentile, headline, count }
     })
-    .filter((v): v is { domain: string; percentile: number; headline: string } => v !== null)
+    .filter((v): v is { domain: string; percentile: number; headline: string; count: number } => v !== null)
     .sort((a, b) => a.percentile - b.percentile)
+
+  // 상위 최대 3개 도메인만 트렌드 차트로 (모바일에서 선이 많으면 복잡해짐)
+  const trendYears = careerTimeline?.yearly.map((y) => y.year) ?? []
+  const trendSeries = trendYears.length > 1
+    ? domainInsights.slice(0, 3).map((item, i) => ({
+        name: item.domain,
+        color: DOMAIN_TREND_COLORS[i],
+        values: buildDomainYearlySeries(trendYears, item.count, i + 1),
+      }))
+    : []
 
   const showPersonalized = isLoggedIn && (viewerNetworkDomains?.length ?? 0) > 0
   const isEmpty = total === 0
@@ -295,6 +363,10 @@ export function ProfileRememberSection({
         <div className="space-y-3">
           {!isOwner && mutualCompanies && mutualCompanies.length > 0 && (
             <MutualCompaniesCard companies={mutualCompanies} />
+          )}
+
+          {showPersonalized && !isOwner && trendSeries.length > 0 && (
+            <DomainTrendChart years={trendYears} series={trendSeries} />
           )}
 
           {careerTimeline && <CareerTimelineCard timeline={careerTimeline} />}

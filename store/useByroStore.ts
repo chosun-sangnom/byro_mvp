@@ -117,7 +117,7 @@ interface ByroStore {
   updateUserContactChannels(channels: ContactChannel[]): void
   updateUserWhoIAm(whoIAm: PublicProfileWhoIAm): void
   updateUserLife(life: PublicProfileLife): void
-  updateNetworkDomain(domain: string | undefined): void
+  updateNetworkDomains(domains: string[]): void
   deleteGuestbookEntry(id: string): void
   updateTabVisibility(tab: keyof TabVisibility, level: TabVisibilityLevel): void
   saveProfile(linkId: string, name: string, title: string, memo?: string): void
@@ -541,9 +541,9 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     }))
   },
 
-  updateNetworkDomain(domain) {
+  updateNetworkDomains(domains) {
     set((state) => ({
-      user: state.user ? { ...state.user, networkDomain: domain } : null,
+      user: state.user ? { ...state.user, networkDomains: domains } : null,
     }))
   },
 

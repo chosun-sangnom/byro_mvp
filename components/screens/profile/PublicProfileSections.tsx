@@ -4,7 +4,6 @@ import { type ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronRight, Lock, Mail, MessageCircle, Phone } from 'lucide-react'
 import type { CareerTimeline, ContactChannel, Experience, RememberIndustry } from '@/types'
-import { generateNetworkInsight } from '@/lib/networkInsight'
 
 const SECTION_EASE = [0.22, 1, 0.36, 1] as const
 
@@ -233,43 +232,47 @@ function CareerTimelineCard({ timeline }: { timeline: CareerTimeline }) {
 }
 
 export function ProfileRememberSection({
-  profileName,
   total,
   industries,
   topIndustryRanks,
-  topIndustryRoles,
   isLoggedIn,
-  viewerNetworkDomain,
+  viewerNetworkDomains,
   viewerName,
   isOwner = false,
   mutualCompanies,
   careerTimeline,
-  insightPercentile,
 }: {
-  profileName: string
   total: number
   industries: Array<{ name: string; ratio: number; count?: number }>
   topIndustryRanks?: RememberIndustry[]
-  topIndustryRoles?: RememberIndustry[]
   isLoggedIn: boolean
-  viewerNetworkDomain?: string
+  viewerNetworkDomains?: string[]
   viewerName?: string
   isOwner?: boolean
   mutualCompanies?: string[]
   careerTimeline?: CareerTimeline
-  insightPercentile?: number
 }) {
-  const showPersonalized = isLoggedIn && !!viewerNetworkDomain
-
-  const insight = showPersonalized
-    ? generateNetworkInsight({ profileName, total, industries, topIndustryRanks, topIndustryRoles, viewerDomain: viewerNetworkDomain! })
-    : null
-
   const topIndustry = industries[0]
-  const topIndustryCount = topIndustry?.count ?? Math.round(total * (topIndustry?.ratio ?? 0) / 100)
   const topRank = topIndustryRanks?.[0]
-  const topRankCount = topRank ? Math.round(topIndustryCount * topRank.ratio / 100) : 0
 
+  // 도메인별 인사이트 — 겹치는 업종이 있는 관심 도메인만, 밀도 좋은 순으로
+  const domainInsights = (viewerNetworkDomains ?? [])
+    .map((domain) => {
+      const entry = industries.find((i) => i.name === domain)
+      if (!entry) return null
+      const count = entry.count ?? Math.round(total * entry.ratio / 100)
+      const percentile = Math.max(3, Math.round(35 - entry.ratio * 0.6))
+      const isTop = domain === topIndustry?.name
+      const rankCount = isTop && topRank ? Math.round(count * topRank.ratio / 100) : 0
+      const headline = isTop && topRank
+        ? `${domain} 쪽에 ${count}명, 그중 ${topRank.name}이 ${rankCount}명입니다.`
+        : `${domain} 쪽에 ${count}명이에요.`
+      return { domain, percentile, headline }
+    })
+    .filter((v): v is { domain: string; percentile: number; headline: string } => v !== null)
+    .sort((a, b) => a.percentile - b.percentile)
+
+  const showPersonalized = isLoggedIn && (viewerNetworkDomains?.length ?? 0) > 0
   const isEmpty = total === 0
 
   return (
@@ -291,23 +294,30 @@ export function ProfileRememberSection({
 
           {careerTimeline && <CareerTimelineCard timeline={careerTimeline} />}
 
-          {insight && !isOwner ? (
-            /* 타인 프로필 — 관심 도메인 인사이트 */
+          {showPersonalized && !isOwner && domainInsights.length > 0 ? (
+            /* 타인 프로필 — 관심 도메인별 인사이트 (밀도 좋은 순, 구분선으로 쌓음) */
             <div className="rounded-[16px] px-4 py-3.5" style={{ background: 'var(--color-accent-soft)' }}>
-              <p className="text-[15px] font-bold leading-[1.5] text-[#0D0D0D]">
-                {topIndustry ? (
-                  <>
-                    {topIndustry.name} 쪽에 {topIndustryCount}명
-                    {topRank && <>, 그중 {topRank.name}이 {topRankCount}명입니다.</>}
-                    {!topRank && '이에요.'}
-                  </>
-                ) : insight.text}
+              {domainInsights.map((item, i) => (
+                <div
+                  key={item.domain}
+                  className={i > 0 ? 'mt-3 border-t pt-3' : undefined}
+                  style={i > 0 ? { borderColor: 'var(--color-accent-border-soft)' } : undefined}
+                >
+                  <p className="text-[15px] font-bold leading-[1.5] text-[#0D0D0D]">
+                    {item.headline}
+                  </p>
+                  <p className="mt-1.5 text-[13px] font-semibold" style={{ color: 'var(--color-accent-dark)' }}>
+                    {viewerName ? `${viewerName}님 ` : ''}관심 분야에서 상위 {item.percentile}% 수준의 인맥 밀도예요.
+                  </p>
+                </div>
+              ))}
+            </div>
+          ) : showPersonalized && !isOwner ? (
+            /* 관심 도메인은 있지만 이 프로필과 겹치는 업종이 없는 경우 */
+            <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3.5">
+              <p className="text-[13px] text-[#6C7786]">
+                설정한 관심 분야와 겹치는 인맥 정보가 아직 없어요.
               </p>
-              {typeof insightPercentile === 'number' && (
-                <p className="mt-1.5 text-[13px] font-semibold" style={{ color: 'var(--color-accent-dark)' }}>
-                  {viewerName ? `${viewerName}님 ` : ''}관심 분야에서 상위 {insightPercentile}% 수준의 인맥 밀도예요.
-                </p>
-              )}
             </div>
           ) : !isOwner ? (
             /* 블러 넛지 — 비로그인 or 관심 도메인 미설정 (본인 프로필 제외) */

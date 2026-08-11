@@ -289,9 +289,10 @@ function CareerTimelineCard({
               </g>
             ))}
           </svg>
-          <p className="mt-2 text-[11px] text-[#6C7786]">
-            {years[0]} - {years[years.length - 1]}
-          </p>
+          <div className="mt-2 flex justify-between text-[11px] text-[#6C7786]">
+            <span>{years[0]}</span>
+            <span>{years[years.length - 1]}</span>
+          </div>
           <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1">
             {trendSeries.map((s) => (
               <span key={s.name} className="flex items-center gap-1.5 text-[12px] font-bold text-[#0D0D0D]">

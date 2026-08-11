@@ -688,7 +688,7 @@ export const JIMIN_PROFILE = {
       { name: '투자', ratio: 16, count: 29 },
     ],
     topIndustryRanks: [
-      { name: '대표/공동창업자', ratio: 40 },
+      { name: '대표/CEO', ratio: 40 },
       { name: '팀장', ratio: 30 },
       { name: '팀원', ratio: 20 },
       { name: '인턴', ratio: 10 },

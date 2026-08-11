@@ -204,11 +204,6 @@ function CareerTimelineCard({
 }) {
   if (timeline.yearly.length === 0) return null
 
-  const eraGroups = timeline.eras.map((era, eraIndex) => ({
-    era,
-    years: timeline.yearly.filter((y) => y.eraIndex === eraIndex),
-  }))
-
   const years = timeline.yearly.map((y) => y.year)
   const hasTrend = trendSeries && trendSeries.length > 0
   const chartWidth = 296
@@ -280,23 +275,8 @@ function CareerTimelineCard({
               </div>
             ))}
           </div>
-          <div className="my-3 border-t border-[#DEE4EC]" />
         </>
       )}
-
-      <div className="space-y-2">
-        {eraGroups.map(({ era }, eraIndex) => (
-          <div key={era.yearRange} className="flex items-start gap-2">
-            <div
-              className="mt-1 h-2 w-2 shrink-0 rounded-full"
-              style={{ backgroundColor: `color-mix(in srgb, var(--color-accent-dark) ${[38, 68, 100][eraIndex] ?? 100}%, transparent)` }}
-            />
-            <p className="text-[12px] leading-[1.5] text-[#475058]">
-              <span className="font-bold text-[#0D0D0D]">{era.domainLabel}</span> · {era.count}명
-            </p>
-          </div>
-        ))}
-      </div>
     </div>
   )
 }
@@ -341,7 +321,7 @@ export function ProfileRememberSection({
       const rankCount = isTop && topRank ? Math.round(count * topRank.ratio / 100) : 0
       const headline = isTop && topRank
         ? `${domain} 쪽에 ${count}명, 그중 ${topRank.name}이 ${rankCount}명입니다.`
-        : `${domain} 쪽에 ${count}명이에요.`
+        : `${domain} 쪽에 ${count}명입니다.`
       return { domain, entryName: entry.name, percentile, headline, count }
     })
     .filter((v): v is { domain: string; entryName: string; percentile: number; headline: string; count: number } => v !== null)

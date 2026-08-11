@@ -682,10 +682,10 @@ export const JIMIN_PROFILE = {
     mutualCompanies: buildMutualCompanies(11),
     careerTimeline: buildCareerTimeline(11, ['브랜드 · 콘텐츠', '스타트업 · 마케팅', '그로스 · PR']),
     industries: [
-      { name: '스타트업', ratio: 38, count: 70 },
-      { name: '마케팅', ratio: 24, count: 44 },
-      { name: 'IT', ratio: 22, count: 40 },
-      { name: '투자', ratio: 16, count: 29 },
+      { name: '스타트업', ratio: 38, count: 70, topRole: { name: '대표/CEO', count: 28 } },
+      { name: '마케팅', ratio: 24, count: 44, topRole: { name: '브랜드', count: 13 } },
+      { name: 'IT', ratio: 22, count: 40, topRole: { name: 'Product', count: 11 } },
+      { name: '투자', ratio: 16, count: 29, topRole: { name: '심사역', count: 10 } },
     ],
     topIndustryRanks: [
       { name: '대표/CEO', ratio: 40 },

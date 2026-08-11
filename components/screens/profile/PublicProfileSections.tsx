@@ -293,7 +293,7 @@ export function ProfileRememberSection({
   careerTimeline,
 }: {
   total: number
-  industries: Array<{ name: string; ratio: number; count?: number }>
+  industries: Array<{ name: string; ratio: number; count?: number; topRole?: { name: string; count: number } }>
   topIndustryRanks?: RememberIndustry[]
   isLoggedIn: boolean
   viewerNetworkDomains?: string[]
@@ -319,9 +319,11 @@ export function ProfileRememberSection({
       const percentile = Math.max(3, Math.round(35 - entry.ratio * 0.6))
       const isTop = entry.name === topIndustry?.name
       const rankCount = isTop && topRank ? Math.round(count * topRank.ratio / 100) : 0
-      const headline = isTop && topRank
-        ? `${domain} 쪽에 ${count}명, 그중 ${topRank.name}이 ${rankCount}명입니다.`
-        : `${domain} 쪽에 ${count}명입니다.`
+      const headline = entry.topRole
+        ? `${domain} 쪽에 ${count}명, 그중 ${entry.topRole.name}이 ${entry.topRole.count}명입니다.`
+        : isTop && topRank
+          ? `${domain} 쪽에 ${count}명, 그중 ${topRank.name}이 ${rankCount}명입니다.`
+          : `${domain} 쪽에 ${count}명입니다.`
       return { domain, entryName: entry.name, percentile, headline, count }
     })
     .filter((v): v is { domain: string; entryName: string; percentile: number; headline: string; count: number } => v !== null)

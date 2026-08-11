@@ -179,6 +179,7 @@ export interface RememberIndustry {
   name: string
   ratio: number
   count?: number
+  topRole?: { name: string; count: number }
 }
 
 export interface CareerTimelineEra {

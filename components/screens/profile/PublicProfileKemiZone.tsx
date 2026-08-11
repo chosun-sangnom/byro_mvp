@@ -46,35 +46,27 @@ export function PublicProfileKemiZone({
 }) {
   if (!kemi && !isLoading) return null
 
+  const cardBorderStyle = {
+    border: '1.5px solid transparent',
+    backgroundImage: 'linear-gradient(var(--color-bg-page), var(--color-bg-page)), linear-gradient(135deg, #BFDBFE 0%, #3B82F6 55%, #2563EB 100%)',
+    backgroundOrigin: 'border-box',
+    backgroundClip: 'padding-box, border-box',
+  } as const
+
   if (isLoading) {
     return (
       <div className="px-5 pb-3">
-        <div
-          className="rounded-[20px] px-4 py-4"
-          style={{
-            border: '1px solid var(--color-accent-border-soft)',
-            background: 'linear-gradient(135deg, var(--color-accent-bg-subtle) 0%, transparent 100%)',
-          }}
-        >
+        <div className="rounded-[16px] p-4" style={cardBorderStyle}>
           <div className="mb-3 flex items-center gap-1.5">
-            <Sparkles size={12} style={{ color: 'var(--color-accent-dark)' }} className="animate-pulse" />
-            <span
-              className="text-[11px] font-bold uppercase tracking-[0.08em] animate-pulse"
-              style={{ color: 'var(--color-accent-dark)' }}
-            >
-              케미 분석 중...
-            </span>
+            <Sparkles size={13} style={{ color: 'var(--color-accent-dark)' }} className="animate-pulse" />
+            <span className="text-[13px] font-bold animate-pulse text-[#0D0D0D]">케미 분석 중...</span>
           </div>
           <div className="flex flex-wrap gap-1.5 mb-3">
             {[64, 80, 52].map((w) => (
               <span
                 key={w}
                 className="animate-pulse rounded-full h-7"
-                style={{
-                  width: w,
-                  backgroundColor: 'var(--color-accent-bg)',
-                  border: '1px solid var(--color-accent-border-soft)',
-                }}
+                style={{ width: w, backgroundColor: 'var(--color-accent-bg)' }}
               />
             ))}
           </div>
@@ -88,37 +80,24 @@ export function PublicProfileKemiZone({
   }
 
   return (
-    <div className="px-5 pb-3">
-      <div
-        className="rounded-[20px] px-4 py-4"
-        style={{
-          border: '1px solid var(--color-accent-border-soft)',
-          background: 'linear-gradient(135deg, var(--color-accent-bg-subtle) 0%, transparent 100%)',
-        }}
-      >
-        {/* Header */}
+    <div className="px-5 pb-3 space-y-3">
+      {/* 케미(공통점) — 케미 리포트와 별개 카드로 분리 노출 */}
+      <div className="rounded-[16px] p-4" style={cardBorderStyle}>
         <div className="mb-3 flex items-center gap-1.5">
-          <Sparkles size={12} style={{ color: 'var(--color-accent-dark)' }} />
-          <span
-            className="text-[11px] font-bold uppercase tracking-[0.08em]"
-            style={{ color: 'var(--color-accent-dark)' }}
-          >
+          <Sparkles size={13} style={{ color: 'var(--color-accent-dark)' }} />
+          <span className="text-[13px] font-bold text-[#0D0D0D]">
             {kemi!.matchCount}가지 케미
           </span>
         </div>
 
         {isLoggedIn ? (
           <>
-            {/* Match chips with Kemi Glow */}
             <div className="flex flex-wrap gap-1.5">
               {kemi!.matchItems.map((item) => (
                 <span
                   key={item.label}
-                  className="chip-metric"
-                  style={{
-                    boxShadow:
-                      '0 0 0 1px var(--color-accent-border), 0 0 12px var(--color-accent-bg), inset 0 1px 0 rgba(255,255,255,0.06)',
-                  }}
+                  className="rounded-full px-3 py-1.5 text-[13px] font-semibold"
+                  style={{ background: 'var(--color-accent-soft)', color: 'var(--color-accent-dark)' }}
                 >
                   {item.label}
                 </span>
@@ -127,49 +106,25 @@ export function PublicProfileKemiZone({
 
             {/* AI copy — conversation starter */}
             {/* TODO(AI): Stream this from LLM; for now static mock text */}
-            <p className="mt-3 text-[13px] leading-[1.65] text-[var(--color-text-secondary)]">
+            <p className="mt-3 text-[13px] leading-[1.65] text-[#475058]">
               {kemi!.aiCopy}
             </p>
-
-            <div className="mt-5 border-t border-[var(--color-accent-border-soft)] pt-4">
-              <div className="mb-1.5 flex items-center gap-1.5">
-                <Sparkles size={11} style={{ color: 'var(--color-accent-dark)' }} />
-                <span
-                  className="text-[11px] font-bold uppercase tracking-[0.08em]"
-                  style={{ color: 'var(--color-accent-dark)' }}
-                >
-                  케미 리포트
-                </span>
-              </div>
-              <p className="mb-3 text-[12px] leading-[1.65] text-[var(--color-text-secondary)]">
-                두 사람이 나눈 경험과 공통점을 바탕으로 나와의 관계 흐름을 분석해줘요.
-              </p>
-              <button
-                type="button"
-                onClick={onCompatibilityOpen}
-                className="w-full rounded-full py-3 text-[13px] font-semibold text-white transition-opacity active:opacity-80"
-                style={{
-                  backgroundColor: 'var(--color-accent-dark)',
-                  boxShadow: '0 0 0 1px var(--color-accent-border), 0 0 20px var(--color-accent-bg)',
-                }}
-              >
-                케미 리포트 보기
-              </button>
-            </div>
           </>
         ) : (
           /* Non-logged-in: blurred nudge */
-          <button
-            type="button"
-            onClick={onLoginRequest}
-            className="relative w-full text-left"
-          >
+          <button type="button" onClick={onLoginRequest} className="relative w-full text-left">
             <div
               className="pointer-events-none flex flex-wrap gap-1.5"
               style={{ filter: 'blur(5px)', opacity: 0.5 }}
             >
               {['●●●●', '●●●', '●●●●●'].map((s, i) => (
-                <span key={i} className="chip-metric">{s}</span>
+                <span
+                  key={i}
+                  className="rounded-full px-3 py-1.5 text-[13px] font-semibold"
+                  style={{ background: 'var(--color-accent-soft)', color: 'var(--color-accent-dark)' }}
+                >
+                  {s}
+                </span>
               ))}
             </div>
             <div className="absolute inset-0 flex items-center justify-center">
@@ -183,6 +138,29 @@ export function PublicProfileKemiZone({
           </button>
         )}
       </div>
+
+      {/* 케미 리포트 CTA — 내 바이로(WHO 탭)와 동일한 카드 디자인 */}
+      {isLoggedIn && (
+        <div className="rounded-[16px] p-4" style={cardBorderStyle}>
+          <div className="flex items-start gap-4">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/kemi-report-icon.svg" alt="" className="size-[40px] shrink-0" />
+            <div>
+              <span className="text-[15px] font-bold text-[#0D0D0D]">케미 리포트</span>
+              <p className="mt-1 text-[13px] leading-[1.5] text-[#475058]">
+                두 사람이 나눈 경험과 공통점을 바탕으로 나와의 관계 흐름을 분석해줘요.
+              </p>
+              <button
+                type="button"
+                onClick={onCompatibilityOpen}
+                className="mt-3 shrink-0 rounded-full bg-[var(--color-accent-dark)] px-5 py-2.5 text-[13px] font-semibold text-white"
+              >
+                리포트 보기
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

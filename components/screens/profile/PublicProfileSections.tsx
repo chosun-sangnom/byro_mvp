@@ -315,14 +315,19 @@ export function ProfileRememberSection({
   const topIndustry = industries[0]
   const topRank = topIndustryRanks?.[0]
 
-  // 도메인별 인사이트 — 겹치는 업종이 있는 관심 도메인만, 밀도 좋은 순으로
+  // 도메인별 인사이트 — 겹치는 업종이 있는 관심 도메인만, 밀도 좋은 순으로.
+  // "IT" vs "IT/테크", "투자" vs "금융/투자"처럼 표기가 완전히 같진 않아도
+  // '/'로 나눈 토큰이 하나라도 겹치면 같은 업종으로 인정.
   const domainInsights = (viewerNetworkDomains ?? [])
     .map((domain) => {
-      const entry = industries.find((i) => i.name === domain)
+      const domainTokens = domain.split('/')
+      const entry = industries.find(
+        (i) => i.name === domain || i.name.split('/').some((t) => domainTokens.includes(t))
+      )
       if (!entry) return null
       const count = entry.count ?? Math.round(total * entry.ratio / 100)
       const percentile = Math.max(3, Math.round(35 - entry.ratio * 0.6))
-      const isTop = domain === topIndustry?.name
+      const isTop = entry.name === topIndustry?.name
       const rankCount = isTop && topRank ? Math.round(count * topRank.ratio / 100) : 0
       const headline = isTop && topRank
         ? `${domain} 쪽에 ${count}명, 그중 ${topRank.name}이 ${rankCount}명입니다.`

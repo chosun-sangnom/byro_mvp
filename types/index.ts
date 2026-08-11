@@ -221,7 +221,6 @@ export interface RememberHighlight {
   insight?: RememberInsight
   mutualCompanies?: string[]
   careerTimeline?: CareerTimeline
-  percentile?: number
 }
 
 export interface ReputationKeyword {
@@ -308,7 +307,7 @@ export interface UserState {
   calendarType?: 'solar' | 'lunar'
   showAge?: boolean
   life?: PublicProfileLife
-  networkDomain?: string
+  networkDomains?: string[]
   contactChannels?: ContactChannel[]
   tabVisibility?: TabVisibility
   isVerified?: boolean

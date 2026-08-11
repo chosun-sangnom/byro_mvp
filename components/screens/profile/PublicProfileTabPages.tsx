@@ -170,18 +170,15 @@ export function PublicProfileReputationTabPage({
   return (
     <div className="pb-6">
       <ProfileRememberSection
-        profileName={profile.name}
         total={profile.rememberHighlight.total}
         industries={profile.rememberHighlight.industries}
         topIndustryRanks={profile.rememberHighlight.topIndustryRanks}
-        topIndustryRoles={profile.rememberHighlight.topIndustryRoles}
         isLoggedIn={store.isLoggedIn}
-        viewerNetworkDomain={store.user?.networkDomain}
+        viewerNetworkDomains={store.user?.networkDomains}
         viewerName={store.user?.name}
         isOwner={isOwner}
         mutualCompanies={profile.rememberHighlight.mutualCompanies}
         careerTimeline={profile.rememberHighlight.careerTimeline}
-        insightPercentile={profile.rememberHighlight.percentile}
       />
       <ProfileReputationSummarySection
         keywordCounts={keywordCounts}

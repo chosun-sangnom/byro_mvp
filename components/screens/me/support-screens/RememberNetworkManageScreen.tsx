@@ -38,13 +38,10 @@ export function RememberNetworkManageScreen({
     }
   }, [])
 
-  const currentDomain = store.user?.networkDomain
-  const isCustom = currentDomain ? !DOMAIN_OPTIONS.includes(currentDomain) : false
+  const [selectedDomains, setSelectedDomains] = useState<string[]>(store.user?.networkDomains ?? [])
+  const [customInput, setCustomInput] = useState('')
 
-  const [selectedDomain, setSelectedDomain] = useState<string | undefined>(isCustom ? 'custom' : currentDomain)
-  const [customDomain, setCustomDomain] = useState(isCustom ? (currentDomain ?? '') : '')
-
-  const effectiveDomain = selectedDomain === 'custom' ? (customDomain.trim() || undefined) : selectedDomain
+  const customDomains = selectedDomains.filter((d) => !DOMAIN_OPTIONS.includes(d))
 
   const email = `${userLinkId}@data.byro.io`
 
@@ -53,14 +50,24 @@ export function RememberNetworkManageScreen({
     showToast('이메일 주소가 복사됐어요!')
   }
 
-  const handleChipSelect = (domain: string) => {
-    setSelectedDomain((prev) => (prev === domain ? undefined : domain))
-    if (domain !== 'custom') setCustomDomain('')
+  const toggleDomain = (domain: string) => {
+    setSelectedDomains((prev) => (prev.includes(domain) ? prev.filter((d) => d !== domain) : [...prev, domain]))
   }
 
-  const handleSaveDomain = () => {
-    store.updateNetworkDomain(effectiveDomain)
-    showToast(effectiveDomain ? `'${effectiveDomain}' 도메인으로 설정됐어요` : '관심 도메인이 해제됐어요')
+  const handleAddCustomDomain = () => {
+    const trimmed = customInput.trim()
+    if (!trimmed) return
+    setSelectedDomains((prev) => (prev.includes(trimmed) ? prev : [...prev, trimmed]))
+    setCustomInput('')
+  }
+
+  const handleSaveDomains = () => {
+    store.updateNetworkDomains(selectedDomains)
+    showToast(
+      selectedDomains.length > 0
+        ? `관심 도메인 ${selectedDomains.length}개로 설정됐어요`
+        : '관심 도메인이 해제됐어요'
+    )
   }
 
   const handleConfirm = () => {
@@ -117,11 +124,9 @@ export function RememberNetworkManageScreen({
           </div>
 
           <ProfileRememberSection
-            profileName={store.user?.name ?? '나'}
             total={MOCK_IMPORTED_NETWORK.total}
             industries={MOCK_IMPORTED_NETWORK.industries}
             topIndustryRanks={MOCK_IMPORTED_NETWORK.topIndustryRanks}
-            topIndustryRoles={MOCK_IMPORTED_NETWORK.topIndustryRoles}
             isLoggedIn={false}
             isOwner
           />
@@ -153,15 +158,15 @@ export function RememberNetworkManageScreen({
             관심 도메인
           </p>
           <p className="mb-3 text-[12px] leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>
-            설정하면 다른 사람의 네트워크 탭에서 내 관심 분야와 얼마나 겹치는지 인사이트를 볼 수 있어요.
+            설정하면 다른 사람의 네트워크 탭에서 내 관심 분야와 얼마나 겹치는지 인사이트를 볼 수 있어요. 여러 개 선택할 수 있어요.
           </p>
           <div className="flex flex-wrap gap-2">
             {DOMAIN_OPTIONS.map((domain) => {
-              const selected = domain === selectedDomain
+              const selected = selectedDomains.includes(domain)
               return (
                 <button
                   key={domain}
-                  onClick={() => handleChipSelect(domain)}
+                  onClick={() => toggleDomain(domain)}
                   className="rounded-full border px-3.5 py-1.5 text-[12px] font-semibold transition-colors"
                   style={{
                     borderColor: selected ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
@@ -173,49 +178,55 @@ export function RememberNetworkManageScreen({
                 </button>
               )
             })}
-            {/* 직접입력 칩 */}
-            <button
-              onClick={() => handleChipSelect('custom')}
-              className="rounded-full border px-3.5 py-1.5 text-[12px] font-semibold transition-colors"
-              style={{
-                borderColor: selectedDomain === 'custom' ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
-                background: selectedDomain === 'custom' ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
-                color: selectedDomain === 'custom' ? '#fff' : 'var(--color-text-secondary)',
-              }}
-            >
-              직접입력
-            </button>
+            {/* 직접 추가한 도메인 칩 */}
+            {customDomains.map((domain) => (
+              <button
+                key={domain}
+                onClick={() => toggleDomain(domain)}
+                className="flex items-center gap-1 rounded-full px-3.5 py-1.5 text-[12px] font-semibold text-white"
+                style={{ background: 'var(--color-accent-dark)' }}
+              >
+                {domain}
+                <span aria-hidden>×</span>
+              </button>
+            ))}
           </div>
 
-          {/* 직접입력 선택 시 텍스트 필드 */}
-          {selectedDomain === 'custom' && (
-            <div className="mt-3">
-              <input
-                type="text"
-                value={customDomain}
-                onChange={(e) => setCustomDomain(e.target.value)}
-                placeholder="예) 카카오"
-                maxLength={30}
-                autoFocus
-                className="w-full rounded-[14px] border px-4 py-3 text-[13px] outline-none"
-                style={{
-                  borderColor: customDomain.trim() ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
-                  background: 'var(--color-bg-soft)',
-                  color: 'var(--color-text-primary)',
-                }}
-              />
-              <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'var(--color-text-tertiary)' }}>
-                특정 기업·분야 등 더 세부적인 도메인을 입력하면 더 정밀한 인사이트를 받을 수 있어요.
-              </p>
-            </div>
-          )}
+          {/* 직접입력 */}
+          <div className="mt-3 flex gap-2">
+            <input
+              type="text"
+              value={customInput}
+              onChange={(e) => setCustomInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddCustomDomain() } }}
+              placeholder="예) 카카오"
+              maxLength={30}
+              className="flex-1 rounded-[14px] border px-4 py-3 text-[13px] outline-none"
+              style={{
+                borderColor: customInput.trim() ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
+                background: 'var(--color-bg-soft)',
+                color: 'var(--color-text-primary)',
+              }}
+            />
+            <button
+              onClick={handleAddCustomDomain}
+              disabled={!customInput.trim()}
+              className="shrink-0 rounded-[14px] px-4 text-[13px] font-bold text-white disabled:opacity-40"
+              style={{ background: 'var(--color-accent-dark)' }}
+            >
+              추가
+            </button>
+          </div>
+          <p className="mt-1.5 text-[11px] leading-relaxed" style={{ color: 'var(--color-text-tertiary)' }}>
+            특정 기업·분야 등 더 세부적인 도메인을 입력하면 더 정밀한 인사이트를 받을 수 있어요.
+          </p>
 
           <button
-            onClick={handleSaveDomain}
+            onClick={handleSaveDomains}
             className="mt-4 w-full rounded-full py-2.5 text-[13px] font-bold text-white"
             style={{ background: 'var(--color-accent-dark)' }}
           >
-            저장
+            저장{selectedDomains.length > 0 ? ` (${selectedDomains.length})` : ''}
           </button>
         </div>
 

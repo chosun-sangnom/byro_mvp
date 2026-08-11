@@ -196,7 +196,7 @@ function buildDomainYearlySeries(years: number[], count: number, seed: number): 
   })
 }
 
-type TrendSeries = { name: string; color: string; values: number[] }
+type TrendSeries = { name: string; color: string; values: number[]; total: number }
 
 function CareerTimelineCard({
   timeline,
@@ -216,17 +216,36 @@ function CareerTimelineCard({
   const hasTrend = trendSeries && trendSeries.length > 0
   const chartWidth = 296
   const chartHeight = 88
+  // 끝점 인원수 라벨을 위한 오른쪽 여백
+  const labelReserve = 40
+  const plotWidth = chartWidth - labelReserve
   const maxValue = hasTrend ? Math.max(1, ...trendSeries.flatMap((s) => s.values)) : 1
-  const stepX = years.length > 1 ? chartWidth / (years.length - 1) : 0
+  const stepX = years.length > 1 ? plotWidth / (years.length - 1) : 0
+  const valueToY = (v: number) => chartHeight - (v / maxValue) * (chartHeight - 6) - 3
 
   const toPoints = (values: number[]) =>
     values
       .map((v, i) => {
-        const x = years.length > 1 ? i * stepX : chartWidth / 2
-        const y = chartHeight - (v / maxValue) * (chartHeight - 6) - 3
-        return `${x},${y}`
+        const x = years.length > 1 ? i * stepX : plotWidth / 2
+        return `${x},${valueToY(v)}`
       })
       .join(' ')
+
+  // 최근 연도(끝점) 인원수만 라벨로 표시 — 겹치지 않도록 최소 간격 확보
+  const endpoints = hasTrend
+    ? trendSeries.map((s) => {
+        const value = s.values[s.values.length - 1]
+        const rawY = valueToY(value)
+        return { name: s.name, color: s.color, value, rawY, labelY: rawY }
+      })
+    : []
+  const minLabelGap = 11
+  const sortedByY = [...endpoints].sort((a, b) => a.rawY - b.rawY)
+  for (let i = 1; i < sortedByY.length; i++) {
+    if (sortedByY[i].labelY - sortedByY[i - 1].labelY < minLabelGap) {
+      sortedByY[i].labelY = sortedByY[i - 1].labelY + minLabelGap
+    }
+  }
 
   return (
     <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3">
@@ -257,18 +276,34 @@ function CareerTimelineCard({
                 strokeLinejoin="round"
               />
             ))}
-          </svg>
-          <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
-            {trendSeries.map((s) => (
-              <span key={s.name} className="flex items-center gap-1 text-[12px] font-semibold" style={{ color: s.color }}>
-                <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: s.color }} />
-                {s.name}
-              </span>
+            {endpoints.map((ep) => (
+              <g key={ep.name}>
+                <circle cx={plotWidth} cy={ep.rawY} r={2.5} fill={ep.color} />
+                <text
+                  x={plotWidth + 6}
+                  y={ep.labelY}
+                  dominantBaseline="middle"
+                  fontSize={10}
+                  fontWeight={700}
+                  fill={ep.color}
+                >
+                  {ep.value}명
+                </text>
+              </g>
             ))}
-          </div>
-          <div className="mt-1 flex justify-between text-[11px] text-[#6C7786]">
-            <span>{years[0]}</span>
-            <span>{years[years.length - 1]}</span>
+          </svg>
+          <p className="mt-2 text-[11px] text-[#6C7786]">
+            {years[0]} - {years[years.length - 1]}
+          </p>
+          <div className="mt-3 space-y-1.5">
+            {trendSeries.map((s) => (
+              <div key={s.name} className="flex items-center gap-2">
+                <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: s.color }} />
+                <p className="text-[12px] text-[#475058]">
+                  <span className="font-bold text-[#0D0D0D]">{s.name}</span> · {s.total}명
+                </p>
+              </div>
+            ))}
           </div>
           <div className="my-3 border-t border-[#DEE4EC]" />
         </>
@@ -344,6 +379,7 @@ export function ProfileRememberSection({
         name: item.domain,
         color: DOMAIN_TREND_COLORS[i],
         values: buildDomainYearlySeries(trendYears, item.count, i + 1),
+        total: item.count,
       }))
     : []
 

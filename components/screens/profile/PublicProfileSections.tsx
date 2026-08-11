@@ -213,9 +213,8 @@ function CareerTimelineCard({
   const hasTrend = trendSeries && trendSeries.length > 0
   const chartWidth = 296
   const chartHeight = 88
-  // 끝점 인원수 라벨을 위한 오른쪽 여백
-  const labelReserve = 40
-  const plotWidth = chartWidth - labelReserve
+  // 끝점에 작은 원 마커를 그릴 여백만 확보 (숫자 라벨은 범례에서 보여주므로 넓은 여백 불필요)
+  const plotWidth = chartWidth - 4
   const maxValue = hasTrend ? Math.max(1, ...trendSeries.flatMap((s) => s.values)) : 1
   const stepX = years.length > 1 ? plotWidth / (years.length - 1) : 0
   const valueToY = (v: number) => chartHeight - (v / maxValue) * (chartHeight - 6) - 3
@@ -227,22 +226,6 @@ function CareerTimelineCard({
         return `${x},${valueToY(v)}`
       })
       .join(' ')
-
-  // 최근 연도(끝점) 인원수만 라벨로 표시 — 겹치지 않도록 최소 간격 확보
-  const endpoints = hasTrend
-    ? trendSeries.map((s) => {
-        const value = s.values[s.values.length - 1]
-        const rawY = valueToY(value)
-        return { name: s.name, color: s.color, value, rawY, labelY: rawY }
-      })
-    : []
-  const minLabelGap = 11
-  const sortedByY = [...endpoints].sort((a, b) => a.rawY - b.rawY)
-  for (let i = 1; i < sortedByY.length; i++) {
-    if (sortedByY[i].labelY - sortedByY[i - 1].labelY < minLabelGap) {
-      sortedByY[i].labelY = sortedByY[i - 1].labelY + minLabelGap
-    }
-  }
 
   return (
     <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3">
@@ -273,34 +256,41 @@ function CareerTimelineCard({
                 strokeLinejoin="round"
               />
             ))}
-            {endpoints.map((ep) => (
-              <g key={ep.name}>
-                <circle cx={plotWidth} cy={ep.rawY} r={2.5} fill={ep.color} />
-                <text
-                  x={plotWidth + 6}
-                  y={ep.labelY}
-                  dominantBaseline="middle"
-                  fontSize={10}
-                  fontWeight={700}
-                  fill={ep.color}
-                >
-                  {ep.value}명
-                </text>
-              </g>
+            {trendSeries.map((s) => (
+              <circle
+                key={s.name}
+                cx={plotWidth}
+                cy={valueToY(s.values[s.values.length - 1])}
+                r={2.5}
+                fill={s.color}
+              />
             ))}
           </svg>
           <div className="mt-2 flex justify-between text-[11px] text-[#6C7786]">
             <span>{years[0]}</span>
             <span>{years[years.length - 1]}</span>
           </div>
+          <div className="mt-3 space-y-1.5">
+            {trendSeries.map((s) => (
+              <div key={s.name} className="flex items-center gap-2">
+                <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: s.color }} />
+                <p className="text-[12px] text-[#475058]">
+                  <span className="font-bold text-[#0D0D0D]">{s.name}</span> · {s.total}명
+                </p>
+              </div>
+            ))}
+          </div>
           <div className="my-3 border-t border-[#DEE4EC]" />
         </>
       )}
 
       <div className="space-y-2">
-        {eraGroups.map(({ era }) => (
+        {eraGroups.map(({ era }, eraIndex) => (
           <div key={era.yearRange} className="flex items-start gap-2">
-            <div className="mt-1 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: era.color }} />
+            <div
+              className="mt-1 h-2 w-2 shrink-0 rounded-full"
+              style={{ backgroundColor: `color-mix(in srgb, var(--color-accent-dark) ${[38, 68, 100][eraIndex] ?? 100}%, transparent)` }}
+            />
             <p className="text-[12px] leading-[1.5] text-[#475058]">
               <span className="font-bold text-[#0D0D0D]">{era.domainLabel}</span> · {era.count}명
             </p>
@@ -359,15 +349,19 @@ export function ProfileRememberSection({
     .filter((item, i, arr) => arr.findIndex((x) => x.entryName === item.entryName) === i)
     .sort((a, b) => a.percentile - b.percentile)
 
-  // 상위 최대 3개 도메인만 트렌드 차트로 (모바일에서 선이 많으면 복잡해짐)
+  // 커리어 그래프 — 뷰어의 관심 도메인이 아니라 이 사람 명함의 실제 업종 Top3
+  const topIndustries = [...industries].sort((a, b) => b.ratio - a.ratio).slice(0, 3)
   const trendYears = careerTimeline?.yearly.map((y) => y.year) ?? []
   const trendSeries = trendYears.length > 1
-    ? domainInsights.slice(0, 3).map((item, i) => ({
-        name: item.domain,
-        color: DOMAIN_TREND_COLORS[i],
-        values: buildDomainYearlySeries(trendYears, item.count, i + 1),
-        total: item.count,
-      }))
+    ? topIndustries.map((item, i) => {
+        const count = item.count ?? Math.round(total * item.ratio / 100)
+        return {
+          name: item.name,
+          color: DOMAIN_TREND_COLORS[i],
+          values: buildDomainYearlySeries(trendYears, count, i + 1),
+          total: count,
+        }
+      })
     : []
 
   const showPersonalized = isLoggedIn && (viewerNetworkDomains?.length ?? 0) > 0
@@ -393,7 +387,7 @@ export function ProfileRememberSection({
           {careerTimeline && (
             <CareerTimelineCard
               timeline={careerTimeline}
-              trendSeries={showPersonalized && !isOwner ? trendSeries : undefined}
+              trendSeries={!isOwner ? trendSeries : undefined}
             />
           )}
 

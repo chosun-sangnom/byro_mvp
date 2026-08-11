@@ -367,9 +367,11 @@ export function ProfileRememberSection({
       const headline = isTop && topRank
         ? `${domain} 쪽에 ${count}명, 그중 ${topRank.name}이 ${rankCount}명입니다.`
         : `${domain} 쪽에 ${count}명이에요.`
-      return { domain, percentile, headline, count }
+      return { domain, entryName: entry.name, percentile, headline, count }
     })
-    .filter((v): v is { domain: string; percentile: number; headline: string; count: number } => v !== null)
+    .filter((v): v is { domain: string; entryName: string; percentile: number; headline: string; count: number } => v !== null)
+    // 프리셋 + 직접입력이 같은 업종에 겹치는 경우(예: "IT/테크"와 직접 추가한 "테크"가 같은 업종에 매칭) 중복 제거
+    .filter((item, i, arr) => arr.findIndex((x) => x.entryName === item.entryName) === i)
     .sort((a, b) => a.percentile - b.percentile)
 
   // 상위 최대 3개 도메인만 트렌드 차트로 (모바일에서 선이 많으면 복잡해짐)

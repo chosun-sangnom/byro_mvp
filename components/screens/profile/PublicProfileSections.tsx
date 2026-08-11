@@ -293,14 +293,6 @@ function CareerTimelineCard({
             <span>{years[0]}</span>
             <span>{years[years.length - 1]}</span>
           </div>
-          <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1">
-            {trendSeries.map((s) => (
-              <span key={s.name} className="flex items-center gap-1.5 text-[12px] font-bold text-[#0D0D0D]">
-                <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: s.color }} />
-                {s.name}
-              </span>
-            ))}
-          </div>
           <div className="my-3 border-t border-[#DEE4EC]" />
         </>
       )}

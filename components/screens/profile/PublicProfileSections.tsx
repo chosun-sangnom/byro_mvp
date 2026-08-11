@@ -177,42 +177,8 @@ function MutualCompaniesCard({ companies }: { companies: string[] }) {
   )
 }
 
-// 시간순 데이터이므로 카테고리 다색이 아니라 단일 톤(연함→진함) 시퀀셜 컬러 사용
+// 시간순 데이터이므로 카테고리 다색이 아니라 단일 톤(연함→진함) 시퀀셜 컬러 사용 (era 리스트 점 색상용)
 const ERA_TONE_OPACITY = [0.38, 0.68, 1]
-
-function CareerTimelineCard({ timeline }: { timeline: CareerTimeline }) {
-  if (timeline.yearly.length === 0) return null
-
-  const eraGroups = timeline.eras.map((era, eraIndex) => ({
-    era,
-    years: timeline.yearly.filter((y) => y.eraIndex === eraIndex),
-  }))
-
-  return (
-    <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3">
-      <p className="text-[14px] font-bold text-[#0D0D0D]">
-        명함이 기록한 {timeline.years}년의 커리어
-      </p>
-      <p className="mt-1 text-[12px] text-[#6C7786]">
-        누구를 만났는지가 어디에 있었는지를 말해줘요
-      </p>
-
-      <div className="mt-3 space-y-2">
-        {eraGroups.map(({ era }, eraIndex) => (
-          <div key={era.yearRange} className="flex items-start gap-2">
-            <div
-              className="mt-1 h-2 w-2 shrink-0 rounded-full"
-              style={{ backgroundColor: `color-mix(in srgb, var(--color-accent-dark) ${ERA_TONE_OPACITY[eraIndex] * 100}%, transparent)` }}
-            />
-            <p className="text-[12px] leading-[1.5] text-[#475058]">
-              <span className="font-bold text-[#0D0D0D]">{era.yearRange}</span> · {era.domainLabel} · {era.count}명
-            </p>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
 
 // 관심 도메인은 카테고리(정체성) 데이터이므로 시퀀셜이 아니라 카테고리 팔레트 사용.
 // validate_palette.js로 색맹 안전성 확인된 블루/그린/오렌지 조합.
@@ -230,65 +196,96 @@ function buildDomainYearlySeries(years: number[], count: number, seed: number): 
   })
 }
 
-function DomainTrendChart({
-  years,
-  series,
+type TrendSeries = { name: string; color: string; values: number[] }
+
+function CareerTimelineCard({
+  timeline,
+  trendSeries,
 }: {
-  years: number[]
-  series: { name: string; color: string; values: number[] }[]
+  timeline: CareerTimeline
+  trendSeries?: TrendSeries[]
 }) {
-  const width = 296
-  const height = 88
-  const maxValue = Math.max(1, ...series.flatMap((s) => s.values))
-  const stepX = years.length > 1 ? width / (years.length - 1) : 0
+  if (timeline.yearly.length === 0) return null
+
+  const eraGroups = timeline.eras.map((era, eraIndex) => ({
+    era,
+    years: timeline.yearly.filter((y) => y.eraIndex === eraIndex),
+  }))
+
+  const years = timeline.yearly.map((y) => y.year)
+  const hasTrend = trendSeries && trendSeries.length > 0
+  const chartWidth = 296
+  const chartHeight = 88
+  const maxValue = hasTrend ? Math.max(1, ...trendSeries.flatMap((s) => s.values)) : 1
+  const stepX = years.length > 1 ? chartWidth / (years.length - 1) : 0
 
   const toPoints = (values: number[]) =>
     values
       .map((v, i) => {
-        const x = years.length > 1 ? i * stepX : width / 2
-        const y = height - (v / maxValue) * (height - 6) - 3
+        const x = years.length > 1 ? i * stepX : chartWidth / 2
+        const y = chartHeight - (v / maxValue) * (chartHeight - 6) - 3
         return `${x},${y}`
       })
       .join(' ')
 
   return (
     <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3">
-      <p className="text-[14px] font-bold text-[#0D0D0D]">관심 분야 트렌드</p>
+      <p className="text-[14px] font-bold text-[#0D0D0D]">
+        명함이 기록한 {timeline.years}년의 커리어
+      </p>
       <p className="mt-1 text-[12px] text-[#6C7786]">
-        최근 몇 년간 이 분야 사람들과 얼마나 가까워졌는지 보여줘요
+        누구를 만났는지가 어디에 있었는지를 말해줘요
       </p>
 
-      <svg
-        className="mt-4"
-        viewBox={`0 0 ${width} ${height}`}
-        width="100%"
-        height={height}
-        preserveAspectRatio="none"
-      >
-        {series.map((s) => (
-          <polyline
-            key={s.name}
-            points={toPoints(s.values)}
-            fill="none"
-            stroke={s.color}
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        ))}
-      </svg>
+      {hasTrend && (
+        <>
+          <svg
+            className="mt-4"
+            viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+            width="100%"
+            height={chartHeight}
+            preserveAspectRatio="none"
+          >
+            {trendSeries.map((s) => (
+              <polyline
+                key={s.name}
+                points={toPoints(s.values)}
+                fill="none"
+                stroke={s.color}
+                strokeWidth={2}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            ))}
+          </svg>
+          <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+            {trendSeries.map((s) => (
+              <span key={s.name} className="flex items-center gap-1 text-[12px] font-semibold" style={{ color: s.color }}>
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: s.color }} />
+                {s.name}
+              </span>
+            ))}
+          </div>
+          <div className="mt-1 flex justify-between text-[11px] text-[#6C7786]">
+            <span>{years[0]}</span>
+            <span>{years[years.length - 1]}</span>
+          </div>
+          <div className="my-3 border-t border-[#DEE4EC]" />
+        </>
+      )}
 
-      <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
-        {series.map((s) => (
-          <span key={s.name} className="flex items-center gap-1 text-[12px] font-semibold" style={{ color: s.color }}>
-            <span className="h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: s.color }} />
-            {s.name}
-          </span>
+      <div className="space-y-2">
+        {eraGroups.map(({ era }, eraIndex) => (
+          <div key={era.yearRange} className="flex items-start gap-2">
+            <div
+              className="mt-1 h-2 w-2 shrink-0 rounded-full"
+              style={{ backgroundColor: `color-mix(in srgb, var(--color-accent-dark) ${ERA_TONE_OPACITY[eraIndex] * 100}%, transparent)` }}
+            />
+            <p className="text-[12px] leading-[1.5] text-[#475058]">
+              <span className="font-bold text-[#0D0D0D]">{era.yearRange}</span> · {era.domainLabel} · {era.count}명
+            </p>
+          </div>
         ))}
-      </div>
-      <div className="mt-1 flex justify-between text-[11px] text-[#6C7786]">
-        <span>{years[0]}</span>
-        <span>{years[years.length - 1]}</span>
       </div>
     </div>
   )
@@ -365,29 +362,43 @@ export function ProfileRememberSection({
             <MutualCompaniesCard companies={mutualCompanies} />
           )}
 
-          {showPersonalized && !isOwner && trendSeries.length > 0 && (
-            <DomainTrendChart years={trendYears} series={trendSeries} />
+          {careerTimeline && (
+            <CareerTimelineCard
+              timeline={careerTimeline}
+              trendSeries={showPersonalized && !isOwner ? trendSeries : undefined}
+            />
           )}
 
-          {careerTimeline && <CareerTimelineCard timeline={careerTimeline} />}
-
           {showPersonalized && !isOwner && domainInsights.length > 0 ? (
-            /* 타인 프로필 — 관심 도메인별 인사이트 (밀도 좋은 순, 구분선으로 쌓음) */
+            /* 타인 프로필 — 관심 도메인별 인사이트 (밀도 좋은 순, 막대+문장으로 전부 표시) */
             <div className="rounded-[16px] px-4 py-3.5" style={{ background: 'var(--color-accent-soft)' }}>
-              {domainInsights.map((item, i) => (
-                <div
-                  key={item.domain}
-                  className={i > 0 ? 'mt-3 border-t pt-3' : undefined}
-                  style={i > 0 ? { borderColor: 'var(--color-accent-border-soft)' } : undefined}
-                >
-                  <p className="text-[15px] font-bold leading-[1.5] text-[#0D0D0D]">
-                    {item.headline}
-                  </p>
-                  <p className="mt-1.5 text-[13px] font-semibold" style={{ color: 'var(--color-accent-dark)' }}>
-                    {viewerName ? `${viewerName}님 ` : ''}관심 분야에서 상위 {item.percentile}% 수준의 인맥 밀도예요.
-                  </p>
-                </div>
-              ))}
+              {domainInsights.map((item, i) => {
+                const barWidth = Math.max(12, Math.min(100, 100 - item.percentile * 2))
+                return (
+                  <div
+                    key={item.domain}
+                    className={i > 0 ? 'mt-3 border-t pt-3' : undefined}
+                    style={i > 0 ? { borderColor: 'var(--color-accent-border-soft)' } : undefined}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-[13px] font-bold text-[#0D0D0D]">{item.domain}</span>
+                      <span className="shrink-0 text-[12px] font-semibold" style={{ color: 'var(--color-accent-dark)' }}>
+                        상위 {item.percentile}%
+                      </span>
+                    </div>
+                    <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/70">
+                      <div
+                        className="h-full rounded-full"
+                        style={{ width: `${barWidth}%`, background: 'var(--color-accent-dark)' }}
+                      />
+                    </div>
+                    <p className="mt-2 text-[13px] leading-[1.5] text-[#475058]">
+                      {item.headline}
+                      {viewerName ? ` ${viewerName}님 관심 분야에서 상위 ${item.percentile}% 수준의 인맥 밀도예요.` : ''}
+                    </p>
+                  </div>
+                )
+              })}
             </div>
           ) : showPersonalized && !isOwner ? (
             /* 관심 도메인은 있지만 이 프로필과 겹치는 업종이 없는 경우 */

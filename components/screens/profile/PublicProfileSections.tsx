@@ -168,7 +168,7 @@ function MutualCompaniesCard({ companies }: { companies: string[] }) {
         두 분 모두 연결된 회사 {companies.length}곳
       </p>
       <p className="mt-1 text-[12px] text-[#6C7786]">
-        서로 다른 사람일 수도, 같은 사람일 수도 있어요
+        이 회사들에서 만난 사람 이야기로 대화를 시작해보세요
       </p>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {visible.map((name) => (
@@ -190,13 +190,18 @@ function MutualCompaniesCard({ companies }: { companies: string[] }) {
   )
 }
 
+// 시간순 데이터이므로 카테고리 다색이 아니라 단일 톤(연함→진함) 시퀀셜 컬러 사용
+const ERA_TONE_OPACITY = [0.38, 0.68, 1]
+
 function CareerTimelineCard({ timeline }: { timeline: CareerTimeline }) {
   if (timeline.yearly.length === 0) return null
   const maxCount = Math.max(...timeline.yearly.map((y) => y.count))
-  const barAreaHeight = 72
-  const firstYear = timeline.yearly[0]?.year
-  const lastYear = timeline.yearly[timeline.yearly.length - 1]?.year
-  const midYear = timeline.yearly[Math.floor(timeline.yearly.length / 2)]?.year
+  const barAreaHeight = 64
+
+  const eraGroups = timeline.eras.map((era, eraIndex) => ({
+    era,
+    years: timeline.yearly.filter((y) => y.eraIndex === eraIndex),
+  }))
 
   return (
     <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3">
@@ -207,39 +212,33 @@ function CareerTimelineCard({ timeline }: { timeline: CareerTimeline }) {
         누구를 만났는지가 어디에 있었는지를 말해줘요
       </p>
 
-      <div className="mt-3 space-y-2.5">
-        {timeline.eras.map((era) => (
-          <div key={era.yearRange} className="flex gap-2.5">
-            <div className="mt-0.5 w-[3px] shrink-0 rounded-full" style={{ backgroundColor: era.color }} />
-            <div className="min-w-0">
-              <p className="text-[13px] font-bold text-[#0D0D0D]">
-                {era.yearRange} · {era.domainLabel}
-              </p>
-              <p className="mt-0.5 text-[12px] text-[#6C7786]">
-                {era.count}명 수집 · {era.breakdown}
-              </p>
-            </div>
+      <div className="mt-4 flex items-end gap-2.5" style={{ height: barAreaHeight }}>
+        {eraGroups.map(({ era, years }, eraIndex) => (
+          <div key={era.yearRange} className="flex flex-1 items-end gap-[2px]">
+            {years.map((y) => {
+              const barHeight = maxCount > 0 ? Math.max(Math.round((y.count / maxCount) * barAreaHeight), 5) : 5
+              return (
+                <div
+                  key={y.year}
+                  className="flex-1 rounded-t-[3px]"
+                  style={{
+                    height: barHeight,
+                    backgroundColor: `color-mix(in srgb, var(--color-accent-dark) ${ERA_TONE_OPACITY[eraIndex] * 100}%, transparent)`,
+                  }}
+                />
+              )
+            })}
           </div>
         ))}
       </div>
 
-      <div className="mt-4 flex items-end gap-[2px]" style={{ height: barAreaHeight }}>
-        {timeline.yearly.map((y) => {
-          const color = timeline.eras[y.eraIndex]?.color ?? '#6C7786'
-          const barHeight = maxCount > 0 ? Math.max(Math.round((y.count / maxCount) * barAreaHeight), 6) : 6
-          return (
-            <div
-              key={y.year}
-              className="flex-1 rounded-t-[4px]"
-              style={{ height: barHeight, backgroundColor: color }}
-            />
-          )
-        })}
-      </div>
-      <div className="mt-1.5 flex justify-between text-[11px] text-[#6C7786]">
-        <span>{firstYear}</span>
-        <span>{midYear}</span>
-        <span>{lastYear}</span>
+      <div className="mt-2 flex gap-2.5">
+        {eraGroups.map(({ era }) => (
+          <div key={era.yearRange} className="min-w-0 flex-1">
+            <p className="truncate text-[11px] font-bold text-[#0D0D0D]">{era.yearRange}</p>
+            <p className="truncate text-[10px] text-[#6C7786]">{era.domainLabel} · {era.count}명</p>
+          </div>
+        ))}
       </div>
     </div>
   )

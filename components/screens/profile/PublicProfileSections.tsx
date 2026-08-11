@@ -177,9 +177,6 @@ function MutualCompaniesCard({ companies }: { companies: string[] }) {
   )
 }
 
-// 시간순 데이터이므로 카테고리 다색이 아니라 단일 톤(연함→진함) 시퀀셜 컬러 사용 (era 리스트 점 색상용)
-const ERA_TONE_OPACITY = [0.38, 0.68, 1]
-
 // 관심 도메인은 카테고리(정체성) 데이터이므로 시퀀셜이 아니라 카테고리 팔레트 사용.
 // validate_palette.js로 색맹 안전성 확인된 블루/그린/오렌지 조합.
 const DOMAIN_TREND_COLORS = ['#2563EB', '#0E8F50', '#D95F00']
@@ -295,14 +292,12 @@ function CareerTimelineCard({
           <p className="mt-2 text-[11px] text-[#6C7786]">
             {years[0]} - {years[years.length - 1]}
           </p>
-          <div className="mt-3 space-y-1.5">
+          <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1">
             {trendSeries.map((s) => (
-              <div key={s.name} className="flex items-center gap-2">
+              <span key={s.name} className="flex items-center gap-1.5 text-[12px] font-bold text-[#0D0D0D]">
                 <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: s.color }} />
-                <p className="text-[12px] text-[#475058]">
-                  <span className="font-bold text-[#0D0D0D]">{s.name}</span> · {s.total}명
-                </p>
-              </div>
+                {s.name}
+              </span>
             ))}
           </div>
           <div className="my-3 border-t border-[#DEE4EC]" />
@@ -310,14 +305,11 @@ function CareerTimelineCard({
       )}
 
       <div className="space-y-2">
-        {eraGroups.map(({ era }, eraIndex) => (
+        {eraGroups.map(({ era }) => (
           <div key={era.yearRange} className="flex items-start gap-2">
-            <div
-              className="mt-1 h-2 w-2 shrink-0 rounded-full"
-              style={{ backgroundColor: `color-mix(in srgb, var(--color-accent-dark) ${ERA_TONE_OPACITY[eraIndex] * 100}%, transparent)` }}
-            />
+            <div className="mt-1 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: era.color }} />
             <p className="text-[12px] leading-[1.5] text-[#475058]">
-              <span className="font-bold text-[#0D0D0D]">{era.yearRange}</span> · {era.domainLabel} · {era.count}명
+              <span className="font-bold text-[#0D0D0D]">{era.domainLabel}</span> · {era.count}명
             </p>
           </div>
         ))}
@@ -437,8 +429,12 @@ export function ProfileRememberSection({
                     </div>
                     <p className="mt-2 text-[13px] leading-[1.5] text-[#475058]">
                       {item.headline}
-                      {viewerName ? ` ${viewerName}님 관심 분야에서 상위 ${item.percentile}% 수준의 인맥 밀도예요.` : ''}
                     </p>
+                    {viewerName && (
+                      <p className="mt-0.5 text-[11px] leading-[1.5] text-[#8A93A3]">
+                        {viewerName}님 관심 분야에서 상위 {item.percentile}% 수준의 인맥 밀도예요.
+                      </p>
+                    )}
                   </div>
                 )
               })}

@@ -120,7 +120,6 @@ export default function MyByro() {
   if (screen === 'editNetwork') {
     return (
       <RememberNetworkManageScreen
-        userLinkId={user.linkId}
         onBack={handleBackToManage}
       />
     )

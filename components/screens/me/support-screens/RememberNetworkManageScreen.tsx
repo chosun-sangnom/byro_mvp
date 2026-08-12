@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Mail, Copy, ScanLine, Sparkles } from 'lucide-react'
+import { FileSpreadsheet, Upload, ScanLine, Sparkles, X } from 'lucide-react'
 import { NavBar, showToast } from '@/components/ui'
 import { useByroStore } from '@/store/useByroStore'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
@@ -24,16 +24,15 @@ const MOCK_IMPORTED_NETWORK = SAMPLE_PROFILE.rememberHighlight
 
 
 export function RememberNetworkManageScreen({
-  userLinkId,
   onBack,
 }: {
-  userLinkId: string
   onBack: () => void
 }) {
   const store = useByroStore()
 
   const [importStep, setImportStep] = useState<ImportStep>('idle')
   const analyzeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
     return () => {
@@ -43,14 +42,16 @@ export function RememberNetworkManageScreen({
 
   const [selectedDomains, setSelectedDomains] = useState<string[]>(store.user?.networkDomains ?? [])
   const [customInput, setCustomInput] = useState('')
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   const customDomains = selectedDomains.filter((d) => !DOMAIN_OPTIONS.includes(d))
 
-  const email = `${userLinkId}@data.byro.io`
+  const handleSelectFile = () => fileInputRef.current?.click()
 
-  const handleCopyEmail = () => {
-    navigator.clipboard.writeText(email).catch(() => {})
-    showToast('이메일 주소가 복사됐어요!')
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) setSelectedFile(file)
+    e.target.value = ''
   }
 
   const toggleDomain = (domain: string) => {
@@ -85,8 +86,9 @@ export function RememberNetworkManageScreen({
   }
 
   const handleConfirm = () => {
+    if (!selectedFile) return
     setImportStep('analyzing')
-    // [임시] 실제 명함 확인 대신 1.2초 딜레이 후 목업 결과 표시
+    // [임시] 실제 엑셀 파싱 대신 1.2초 딜레이 후 목업 결과 표시
     analyzeTimeoutRef.current = setTimeout(() => {
       setImportStep('imported')
     }, 1200)
@@ -110,7 +112,7 @@ export function RememberNetworkManageScreen({
           </div>
           <div className="text-center">
             <p className="text-[15px] font-bold" style={{ color: 'var(--color-text-primary)' }}>명함을 확인하고 있어요</p>
-            <p className="mt-1 text-[13px]" style={{ color: 'var(--color-text-tertiary)' }}>보내주신 파일을 분석하고 있어요</p>
+            <p className="mt-1 text-[13px]" style={{ color: 'var(--color-text-tertiary)' }}>업로드하신 엑셀 파일을 분석하고 있어요</p>
           </div>
         </div>
       </div>
@@ -120,7 +122,7 @@ export function RememberNetworkManageScreen({
   if (importStep === 'imported') {
     return (
       <div className="flex flex-col h-full">
-        <NavBar title="네트워크 업데이트" onBack={() => setImportStep('idle')} />
+        <NavBar title="네트워크 업데이트" onBack={() => { setImportStep('idle'); setSelectedFile(null) }} />
         <div className="flex-1 overflow-y-auto pb-6">
           <div className="flex flex-col items-center text-center px-5 pt-6 pb-2">
             <div
@@ -252,43 +254,23 @@ export function RememberNetworkManageScreen({
         <div className="rounded-[22px] border border-[var(--color-border-soft)] overflow-hidden">
           <div className="px-5 pt-5 pb-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-[14px] mb-3" style={{ background: 'var(--color-accent-bg)', color: 'var(--color-accent-dark)' }}>
-              <Mail size={18} />
+              <FileSpreadsheet size={18} />
             </div>
             <p className="text-[16px] font-black tracking-[-0.02em]" style={{ color: 'var(--color-text-primary)' }}>
               네트워크 업데이트
             </p>
             <p className="mt-1.5 text-[13px] leading-[1.65]" style={{ color: 'var(--color-text-secondary)' }}>
-              리멤버 앱에서 명함을 내보내기 한 뒤, 아래 이메일로 파일을 보내주세요.
-              확인 후 1-2 영업일 내에 반영돼요.
+              리멤버 앱에서 명함을 엑셀로 내보내기 한 뒤, 아래에서 파일을 업로드해주세요.
+              업로드하면 바로 반영돼요.
             </p>
-          </div>
-
-          <div className="mx-5 mb-5 rounded-[16px] px-4 py-3.5" style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-default)' }}>
-            <p className="mb-1.5 text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: 'var(--color-text-tertiary)' }}>
-              나의 Byro 인증 이메일
-            </p>
-            <div className="flex items-center gap-2">
-              <p className="flex-1 truncate text-[13px] font-mono font-bold" style={{ color: 'var(--color-text-primary)' }}>
-                {email}
-              </p>
-              <button
-                type="button"
-                onClick={handleCopyEmail}
-                className="flex items-center gap-1 rounded-full px-3 py-1.5 text-[12px] font-semibold text-white"
-                style={{ background: 'var(--color-accent-dark)' }}
-              >
-                <Copy size={11} />
-                복사
-              </button>
-            </div>
           </div>
 
           {/* 단계별 안내 */}
           <div className="px-5 pb-5 space-y-2">
             {[
-              '리멤버 앱 → 명함첩 → 우측 상단 메뉴 → 내보내기',
-              '내보낸 파일을 위 이메일로 첨부해서 보내기',
-              '확인 후 네트워크 데이터가 업데이트돼요',
+              '리멤버 앱 → 명함첩 → 우측 상단 메뉴 → 엑셀로 내보내기',
+              '아래에서 내보낸 엑셀 파일을 업로드',
+              '업로드하면 바로 네트워크 데이터가 업데이트돼요',
             ].map((step, i) => (
               <div key={i} className="flex items-start gap-3">
                 <span
@@ -304,14 +286,66 @@ export function RememberNetworkManageScreen({
             ))}
           </div>
 
+          {/* 파일 업로드 */}
           <div className="px-5 pb-5">
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".xlsx,.xls,.csv"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+            {selectedFile ? (
+              <div
+                className="flex items-center gap-3 rounded-[16px] px-4 py-3.5"
+                style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-default)' }}
+              >
+                <div
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px]"
+                  style={{ background: 'var(--color-accent-bg)', color: 'var(--color-accent-dark)' }}
+                >
+                  <FileSpreadsheet size={16} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[13px] font-bold" style={{ color: 'var(--color-text-primary)' }}>
+                    {selectedFile.name}
+                  </p>
+                  <p className="text-[11px]" style={{ color: 'var(--color-text-tertiary)' }}>
+                    {(selectedFile.size / 1024).toFixed(0)}KB
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedFile(null)}
+                  className="shrink-0 rounded-full p-1.5"
+                  style={{ color: 'var(--color-text-tertiary)' }}
+                  aria-label="파일 선택 취소"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={handleSelectFile}
+                className="flex w-full flex-col items-center justify-center gap-2 rounded-[16px] py-6"
+                style={{ border: '1.5px dashed var(--color-border-default)', background: 'var(--color-bg-soft)' }}
+              >
+                <Upload size={20} style={{ color: 'var(--color-text-tertiary)' }} />
+                <span className="text-[13px] font-semibold" style={{ color: 'var(--color-text-secondary)' }}>
+                  엑셀 파일 선택 (.xlsx, .csv)
+                </span>
+              </button>
+            )}
+
             <button
               type="button"
               onClick={handleConfirm}
-              className="w-full rounded-full py-3.5 text-[14px] font-bold text-white"
+              disabled={!selectedFile}
+              className="mt-3 w-full rounded-full py-3.5 text-[14px] font-bold text-white disabled:opacity-40"
               style={{ background: 'linear-gradient(135deg, var(--color-accent-light), var(--color-accent-dark))' }}
             >
-              메일 보냈어요
+              업로드하기
             </button>
           </div>
         </div>

@@ -538,23 +538,16 @@ export function ProfileExperienceSection({
 
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.08}>
-      <SectionTitle title="경험" />
+      <SectionTitle
+        title="경험"
+        subtitle={isEmpty ? undefined : `함께한 사람들의 경험 ${experiences.length}개`}
+      />
       <div className="rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] overflow-hidden">
-        <div className="flex items-center justify-between px-4 pt-4 pb-3">
-          <div>
-            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Experience</div>
-            <div className="mt-0.5 text-[18px] font-black tracking-[-0.03em] text-[var(--color-text-strong)]">함께한 사람들의 경험</div>
-          </div>
-          <div className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">
-            {experiences.length}개
-          </div>
-        </div>
-
         {isEmpty ? (
-          <p className="px-4 pb-4 text-center text-[13px] text-[var(--color-text-tertiary)]">아직 남겨진 경험이 없어요</p>
+          <p className="px-4 py-6 text-center text-[13px] text-[var(--color-text-tertiary)]">아직 남겨진 경험이 없어요</p>
         ) : (
           <>
-            <div className="divide-y divide-[var(--color-border-soft)] px-4">
+            <div className="divide-y divide-[var(--color-border-soft)] px-4 pt-2">
               {preview.map((exp) => (
                 <ExperienceCard key={exp.id} experience={exp} />
               ))}

@@ -161,7 +161,7 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
               <div className="text-xl font-black text-[var(--color-text-strong)] mb-2">
                 {meta.label} 로그인 완료
               </div>
-              <p className="meta-text leading-relaxed">바이로에 오신 걸 환영해요!</p>
+              <p className="meta-text leading-relaxed">펠로어에 오신 걸 환영해요!</p>
             </div>
             {/* [임시] 실제 로그인 API 미연동 */}
             <Button onClick={handleLoginComplete}>내 FELORE 보기</Button>
@@ -194,7 +194,7 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
             {meta.label} 계정으로<br />{mode === 'login' ? '로그인' : '시작하기'}
           </div>
           <p className="meta-text leading-relaxed">
-            {meta.label} 계정을 바이로에 연결합니다.<br />
+            {meta.label} 계정을 펠로어에 연결합니다.<br />
             아래 버튼을 누르면 {meta.label} 인증을 진행해요.
           </p>
         </div>
@@ -312,7 +312,7 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
             )}
           </div>
         </div>
-        {/* [임시] 바이로 전화번호 회원가입 API 미연동 */}
+        {/* [임시] 펠로어 전화번호 회원가입 API 미연동 */}
         <Button onClick={() => { if (canPhoneSubmit) store.nextStep() }} disabled={!canPhoneSubmit}>
           가입하기
         </Button>
@@ -366,7 +366,7 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
         >
           비밀번호를 잊으셨나요?
         </button>
-        {/* [임시] 바이로 전화번호 로그인 API 미연동 */}
+        {/* [임시] 펠로어 전화번호 로그인 API 미연동 */}
         <Button onClick={() => { if (canLoginSubmit) handleLoginComplete() }} disabled={!canLoginSubmit}>
           로그인
         </Button>

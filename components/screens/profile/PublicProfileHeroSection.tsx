@@ -465,7 +465,7 @@ export function ProfileHeroCard({
                   <ActionMenuItem
                     label="공유하기"
                     onClick={async () => {
-                      await shareOrCopy({ title: `${profile.name}의 바이로`, url: window.location.href })
+                      await shareOrCopy({ title: `${profile.name}의 펠로어`, url: window.location.href })
                       setMoreSheetOpen(false)
                     }}
                   />
@@ -485,7 +485,7 @@ export function ProfileHeroCard({
               type="button"
               onClick={async (e) => {
                 e.stopPropagation()
-                await shareOrCopy({ title: `${profile.name}의 바이로`, url: window.location.href })
+                await shareOrCopy({ title: `${profile.name}의 펠로어`, url: window.location.href })
               }}
               className="absolute left-4 top-4 z-10 rounded-full border border-white/14 bg-black/38 p-2 backdrop-blur-sm"
             >

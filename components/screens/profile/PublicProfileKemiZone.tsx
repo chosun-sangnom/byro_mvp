@@ -139,7 +139,7 @@ export function PublicProfileKemiZone({
         )}
       </div>
 
-      {/* 케미 리포트 CTA — 내 바이로(WHO 탭)와 동일한 카드 디자인 */}
+      {/* 케미 리포트 CTA — 내 펠로어(WHO 탭)와 동일한 카드 디자인 */}
       {isLoggedIn && (
         <div className="rounded-[16px] p-4" style={cardBorderStyle}>
           <div className="flex items-start gap-4">

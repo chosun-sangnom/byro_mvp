@@ -294,7 +294,7 @@ export const MOCK_TICKETS: CsTicket[] = [
 ]
 
 export const MOCK_FAQ: FaqItem[] = [
-  { id: 'faq-1', question: '피드백을 삭제하고 싶어요', answer: '내 바이로 > 피드백 관리에서 개별 삭제하거나 신고할 수 있습니다.', updatedAt: '2026-06-20' },
+  { id: 'faq-1', question: '피드백을 삭제하고 싶어요', answer: '내 펠로어 > 피드백 관리에서 개별 삭제하거나 신고할 수 있습니다.', updatedAt: '2026-06-20' },
   { id: 'faq-2', question: '공개 범위는 어떻게 설정하나요', answer: 'WHO/VIBE/NETWORK 탭별로 공개/비공개 2단계로 설정할 수 있습니다.', updatedAt: '2026-06-11' },
   { id: 'faq-3', question: '익명으로 피드백을 남겼는데 상대가 알 수 있나요', answer: '아니오. 운영자를 포함해 누구도 익명 작성자를 식별할 수 없습니다.', updatedAt: '2026-05-30' },
 ]
@@ -512,7 +512,7 @@ export const MOCK_AI_KEMI_CONFIG: AiKemiConfig = {
   updatedAt: '2026-06-25 16:00',
 }
 
-// AI 검색(app/api/ai-search/route.ts) — 실제 OpenAI(gpt-4o-mini) 연동. 마이 바이로 편집의
+// AI 검색(app/api/ai-search/route.ts) — 실제 OpenAI(gpt-4o-mini) 연동. 마이 펠로어 편집의
 // 장소·미디어·음악 검색 피커(PlacePicker/MediaSearchPicker/MusicSearchPicker)에서 사용.
 // promptDraft는 route.ts의 SYSTEM_PROMPTS를 그대로 옮긴 참고용 초안 — 여기서 수정해도 코드 배포 전까진 실제 반영되지 않음.
 export const MOCK_AI_SEARCH_CONFIG: AiSearchConfig = {

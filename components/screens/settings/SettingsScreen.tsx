@@ -632,12 +632,12 @@ export default function SettingsScreen() {
   // ── 메인 화면 ────────────────────────────────────────────────────
   const sections: Section[] = [
     {
-      title: '내 바이로',
+      title: '내 펠로어',
       items: [
         {
           id: 'edit',
           icon: Pencil,
-          label: '바이로 편집',
+          label: '펠로어 편집',
           description: '프로필·하이라이트·라이프스타일',
           href: '/me?edit=true',
         },
@@ -739,7 +739,7 @@ export default function SettingsScreen() {
         <div className="mx-4 mt-6 mb-2 px-4 py-5 rounded-2xl bg-[var(--color-bg-surface)] border border-[var(--color-border-soft)] w-[calc(100%-2rem)]">
           <p className="text-[15px] font-black text-[var(--color-text-primary)] mb-1">게스트로 둘러보는 중이에요</p>
           <p className="text-[12px] text-[var(--color-text-secondary)] leading-relaxed mb-4">
-            로그인하면 내 바이로를 만들고, 프로필을 저장하고, 인증 뱃지도 받을 수 있어요.
+            로그인하면 내 펠로어를 만들고, 프로필을 저장하고, 인증 뱃지도 받을 수 있어요.
           </p>
           <button
             onClick={() => router.push('/signup')}

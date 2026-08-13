@@ -16,7 +16,7 @@
 /                          홈 (로그인/회원가입 진입)
 /landing                   랜딩 페이지
 /signup                    온보딩 (4단계)
-/me                        내 바이로
+/me                        내 펠로어
   ?edit=true               → 편집 모드(manage 화면)로 진입
 /mypage                    마이페이지 (플랜·설정)
 /search                    검색
@@ -36,7 +36,7 @@
 | 컴포넌트 | 경로 | 역할 |
 |----------|------|------|
 | `PublicProfileShell` | `components/screens/profile/PublicProfileShell.tsx` | 공개 프로필 전체 레이아웃 (탭바 + CTA + 케미) |
-| `MyFelore` | `components/screens/me/MyFelore.tsx` | 내 바이로 화면 분기 |
+| `MyFelore` | `components/screens/me/MyFelore.tsx` | 내 펠로어 화면 분기 |
 | `OnboardingScreen` | `components/screens/onboarding/OnboardingScreen.tsx` | 온보딩 오케스트레이터 |
 | `Archive` | `components/screens/archive/Archive.tsx` | 아카이브 (저장됨 / 최근 본) |
 

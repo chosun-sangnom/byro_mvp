@@ -21,7 +21,7 @@ components/
   screens/
     onboarding/       온보딩 4단계 플로우
     profile/          공개 프로필 (PublicProfileShell 중심)
-    me/               내 바이로 (MyFelore 중심)
+    me/               내 펠로어 (MyFelore 중심)
     archive/          아카이브 (저장됨 / 최근 본)
   ui/                 공통 컴포넌트 (Button, BottomSheet, NavBar 등)
 lib/

@@ -15,7 +15,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import { BottomSheet, TextArea, showToast } from '@/components/ui'
 import { getNormalizedPublicProfile, computeTabAccess } from '@/components/screens/profile/publicProfileData'
 import { generatePersona } from '@/lib/personaGen'
@@ -44,7 +44,7 @@ export function PublicProfileShell({
   children: ReactNode
 }) {
   const router = useRouter()
-  const store = useByroStore()
+  const store = useFeloreStore()
   const profile = getNormalizedPublicProfile({
     username,
     user: store.user,
@@ -359,7 +359,7 @@ export function PublicProfileShell({
         profileName={profile.name}
         isLoggedIn={store.isLoggedIn}
         onRequestExperience={() => { setExpDoneModal(false); setFeedbackRequestOpen(true) }}
-        onCreateByro={() => { setExpDoneModal(false); router.push('/signup') }}
+        onCreateFelore={() => { setExpDoneModal(false); router.push('/signup') }}
         onLogin={() => { setExpDoneModal(false); store.login() }}
         onClose={() => setExpDoneModal(false)}
       />

@@ -11,7 +11,7 @@ export function buildContactHref(id: ContactChannel['id'], value: string) {
 
 export function contactPlaceholder(id?: ContactChannel['id']) {
   if (id === 'phone') return '010-1234-5678'
-  if (id === 'email') return 'name@byro.io'
+  if (id === 'email') return 'name@felore.io'
   if (id === 'kakao') return 'openchat 코드 또는 URL'
   return ''
 }

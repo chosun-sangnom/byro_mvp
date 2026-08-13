@@ -26,9 +26,9 @@ import type {
 } from '@/types/admin'
 
 export const ADMIN_OPERATORS: AdminOperator[] = [
-  { id: 'op-1', name: '김도윤', role: 'manager', email: 'doyoon.kim@byro.io' },
-  { id: 'op-2', name: '이서연', role: 'manager', email: 'seoyeon.lee@byro.io' },
-  { id: 'op-3', name: '박관리', role: 'manager', email: 'admin@byro.io' },
+  { id: 'op-1', name: '김도윤', role: 'manager', email: 'doyoon.kim@felore.io' },
+  { id: 'op-2', name: '이서연', role: 'manager', email: 'seoyeon.lee@felore.io' },
+  { id: 'op-3', name: '박관리', role: 'manager', email: 'admin@felore.io' },
   { id: 'op-owner', name: '오너', role: 'owner', email: 'kj82076@gmail.com' },
 ]
 
@@ -37,7 +37,7 @@ export const MOCK_JOIN_REQUESTS: AdminJoinRequest[] = [
   {
     id: 'jr-1',
     name: '최유나',
-    email: 'yuna.choi@byro.io',
+    email: 'yuna.choi@felore.io',
     reason: 'CS 문의 대응 인력 합류 요청',
     requestedAt: '2026-07-20 11:04',
     status: 'pending',
@@ -45,21 +45,21 @@ export const MOCK_JOIN_REQUESTS: AdminJoinRequest[] = [
 ]
 
 export const MOCK_USER_ROWS: AdminUserRow[] = [
-  { linkId: 'gangminjun', name: '강민준', email: 'gangminjun@byro.io', joinedAt: '2026-01-08', isPaidUser: false, isVerified: true, sanctionStatus: '정상', reportCount: 0 },
-  { linkId: 'mk', name: '강명구', email: 'mk@byro.io', joinedAt: '2025-11-22', isPaidUser: true, isVerified: true, sanctionStatus: '정상', reportCount: 0 },
-  { linkId: 'jiminlee', name: '이지민', email: 'jiminlee@byro.io', joinedAt: '2026-02-14', isPaidUser: false, isVerified: false, sanctionStatus: '정상', reportCount: 1 },
-  { linkId: 'parksojin', name: '박소진', email: 'parksojin@byro.io', joinedAt: '2025-09-30', isPaidUser: true, isVerified: true, sanctionStatus: '정상', reportCount: 0 },
-  { linkId: 'leejunhyuk', name: '이준혁', email: 'leejunhyuk@byro.io', joinedAt: '2026-03-02', isPaidUser: false, isVerified: false, sanctionStatus: '경고', reportCount: 2 },
-  { linkId: 'choisunyoung', name: '최선영', email: 'choisunyoung@byro.io', joinedAt: '2025-12-19', isPaidUser: true, isVerified: true, sanctionStatus: '정상', reportCount: 0 },
-  { linkId: 'yoonjisoo', name: '윤지수', email: 'yoonjisoo@byro.io', joinedAt: '2026-04-05', isPaidUser: false, isVerified: false, sanctionStatus: '정상', reportCount: 0 },
-  { linkId: 'kwonminseok', name: '권민석', email: 'kwonminseok@byro.io', joinedAt: '2026-01-27', isPaidUser: false, isVerified: true, sanctionStatus: '정상', reportCount: 0 },
-  { linkId: 'limjiyeon', name: '임지연', email: 'limjiyeon@byro.io', joinedAt: '2025-10-11', isPaidUser: false, isVerified: false, sanctionStatus: '정상', reportCount: 0 },
-  { linkId: 'hansanghoon', name: '한상훈', email: 'hansanghoon@byro.io', joinedAt: '2026-05-19', isPaidUser: true, isVerified: false, sanctionStatus: '정상', reportCount: 0 },
-  { linkId: 'ohyerim', name: '오예림', email: 'ohyerim@byro.io', joinedAt: '2026-06-01', isPaidUser: false, isVerified: false, sanctionStatus: '정상', reportCount: 0 },
-  { linkId: 'jungwonho', name: '정원호', email: 'jungwonho@byro.io', joinedAt: '2025-08-14', isPaidUser: true, isVerified: true, sanctionStatus: '정상', reportCount: 0 },
-  { linkId: 'baekhyunjin', name: '백현진', email: 'baekhyunjin@byro.io', joinedAt: '2025-07-02', isPaidUser: true, isVerified: true, sanctionStatus: '정상', reportCount: 0 },
-  { linkId: 'sohnminho', name: '손민호', email: 'sohnminho@byro.io', joinedAt: '2026-06-28', isPaidUser: false, isVerified: false, sanctionStatus: '일시정지', reportCount: 4 },
-  { linkId: 'honggildong', name: '홍길동', email: 'honggildong@byro.io', joinedAt: '2026-07-15', isPaidUser: false, isVerified: false, sanctionStatus: '정상', reportCount: 0 },
+  { linkId: 'gangminjun', name: '강민준', email: 'gangminjun@felore.io', joinedAt: '2026-01-08', isPaidUser: false, isVerified: true, sanctionStatus: '정상', reportCount: 0 },
+  { linkId: 'mk', name: '강명구', email: 'mk@felore.io', joinedAt: '2025-11-22', isPaidUser: true, isVerified: true, sanctionStatus: '정상', reportCount: 0 },
+  { linkId: 'jiminlee', name: '이지민', email: 'jiminlee@felore.io', joinedAt: '2026-02-14', isPaidUser: false, isVerified: false, sanctionStatus: '정상', reportCount: 1 },
+  { linkId: 'parksojin', name: '박소진', email: 'parksojin@felore.io', joinedAt: '2025-09-30', isPaidUser: true, isVerified: true, sanctionStatus: '정상', reportCount: 0 },
+  { linkId: 'leejunhyuk', name: '이준혁', email: 'leejunhyuk@felore.io', joinedAt: '2026-03-02', isPaidUser: false, isVerified: false, sanctionStatus: '경고', reportCount: 2 },
+  { linkId: 'choisunyoung', name: '최선영', email: 'choisunyoung@felore.io', joinedAt: '2025-12-19', isPaidUser: true, isVerified: true, sanctionStatus: '정상', reportCount: 0 },
+  { linkId: 'yoonjisoo', name: '윤지수', email: 'yoonjisoo@felore.io', joinedAt: '2026-04-05', isPaidUser: false, isVerified: false, sanctionStatus: '정상', reportCount: 0 },
+  { linkId: 'kwonminseok', name: '권민석', email: 'kwonminseok@felore.io', joinedAt: '2026-01-27', isPaidUser: false, isVerified: true, sanctionStatus: '정상', reportCount: 0 },
+  { linkId: 'limjiyeon', name: '임지연', email: 'limjiyeon@felore.io', joinedAt: '2025-10-11', isPaidUser: false, isVerified: false, sanctionStatus: '정상', reportCount: 0 },
+  { linkId: 'hansanghoon', name: '한상훈', email: 'hansanghoon@felore.io', joinedAt: '2026-05-19', isPaidUser: true, isVerified: false, sanctionStatus: '정상', reportCount: 0 },
+  { linkId: 'ohyerim', name: '오예림', email: 'ohyerim@felore.io', joinedAt: '2026-06-01', isPaidUser: false, isVerified: false, sanctionStatus: '정상', reportCount: 0 },
+  { linkId: 'jungwonho', name: '정원호', email: 'jungwonho@felore.io', joinedAt: '2025-08-14', isPaidUser: true, isVerified: true, sanctionStatus: '정상', reportCount: 0 },
+  { linkId: 'baekhyunjin', name: '백현진', email: 'baekhyunjin@felore.io', joinedAt: '2025-07-02', isPaidUser: true, isVerified: true, sanctionStatus: '정상', reportCount: 0 },
+  { linkId: 'sohnminho', name: '손민호', email: 'sohnminho@felore.io', joinedAt: '2026-06-28', isPaidUser: false, isVerified: false, sanctionStatus: '일시정지', reportCount: 4 },
+  { linkId: 'honggildong', name: '홍길동', email: 'honggildong@felore.io', joinedAt: '2026-07-15', isPaidUser: false, isVerified: false, sanctionStatus: '정상', reportCount: 0 },
 ]
 
 export const MOCK_SANCTION_HISTORY: SanctionRecord[] = [
@@ -252,7 +252,7 @@ export const MOCK_TICKETS: CsTicket[] = [
     category: '결제',
     linkId: 'mk',
     authorName: '강명구',
-    authorEmail: 'mk@byro.io',
+    authorEmail: 'mk@felore.io',
     content: 'Pro 결제가 중복으로 2번 청구됐어요. 확인 부탁드립니다.',
     createdAt: '2026-07-19 18:20',
     status: '접수',
@@ -261,7 +261,7 @@ export const MOCK_TICKETS: CsTicket[] = [
     id: 'cs-2',
     category: '신고',
     authorName: '박소진',
-    authorEmail: 'parksojin@byro.io',
+    authorEmail: 'parksojin@felore.io',
     content: '제 프로필에 개인정보가 노출된 피드백을 신고했는데 아직도 안 지워졌어요.',
     createdAt: '2026-07-18 12:03',
     status: '처리 중',
@@ -271,7 +271,7 @@ export const MOCK_TICKETS: CsTicket[] = [
     id: 'cs-3',
     category: '계정',
     authorName: '정원호',
-    authorEmail: 'jungwonho@byro.io',
+    authorEmail: 'jungwonho@felore.io',
     content: 'linkId를 변경하고 싶은데 방법을 모르겠어요.',
     createdAt: '2026-07-16 09:55',
     status: '완료',
@@ -283,7 +283,7 @@ export const MOCK_TICKETS: CsTicket[] = [
     id: 'cs-4',
     category: '기타',
     authorName: '임지연',
-    authorEmail: 'limjiyeon@byro.io',
+    authorEmail: 'limjiyeon@felore.io',
     content: '앱 다크모드 지원 계획 있나요?',
     createdAt: '2026-07-12 20:11',
     status: '완료',
@@ -294,7 +294,7 @@ export const MOCK_TICKETS: CsTicket[] = [
 ]
 
 export const MOCK_FAQ: FaqItem[] = [
-  { id: 'faq-1', question: '피드백을 삭제하고 싶어요', answer: '내 바이로 > 피드백 관리에서 개별 삭제하거나 신고할 수 있습니다.', updatedAt: '2026-06-20' },
+  { id: 'faq-1', question: '피드백을 삭제하고 싶어요', answer: '내 펠로어 > 피드백 관리에서 개별 삭제하거나 신고할 수 있습니다.', updatedAt: '2026-06-20' },
   { id: 'faq-2', question: '공개 범위는 어떻게 설정하나요', answer: 'WHO/VIBE/NETWORK 탭별로 공개/비공개 2단계로 설정할 수 있습니다.', updatedAt: '2026-06-11' },
   { id: 'faq-3', question: '익명으로 피드백을 남겼는데 상대가 알 수 있나요', answer: '아니오. 운영자를 포함해 누구도 익명 작성자를 식별할 수 없습니다.', updatedAt: '2026-05-30' },
 ]
@@ -512,7 +512,7 @@ export const MOCK_AI_KEMI_CONFIG: AiKemiConfig = {
   updatedAt: '2026-06-25 16:00',
 }
 
-// AI 검색(app/api/ai-search/route.ts) — 실제 OpenAI(gpt-4o-mini) 연동. 마이 바이로 편집의
+// AI 검색(app/api/ai-search/route.ts) — 실제 OpenAI(gpt-4o-mini) 연동. 마이 펠로어 편집의
 // 장소·미디어·음악 검색 피커(PlacePicker/MediaSearchPicker/MusicSearchPicker)에서 사용.
 // promptDraft는 route.ts의 SYSTEM_PROMPTS를 그대로 옮긴 참고용 초안 — 여기서 수정해도 코드 배포 전까진 실제 반영되지 않음.
 export const MOCK_AI_SEARCH_CONFIG: AiSearchConfig = {

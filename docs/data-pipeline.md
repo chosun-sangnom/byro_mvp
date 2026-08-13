@@ -63,7 +63,7 @@ lib/mocks/publicProfiles.ts
       └─ store.highlights가 비어있지 않으면 목업 대신 스토어 하이라이트 사용
 ```
 
-**편집 가능 여부 판단** (`MyByroHighlightManageScreen`):
+**편집 가능 여부 판단** (`MyFeloreHighlightManageScreen`):
 ```typescript
 const allManualHighlights = store.highlightsInitialized
   ? store.highlights
@@ -158,7 +158,7 @@ const keywordCounts = [...profile.reputationKeywords]
 
 ```typescript
 persist(store, {
-  name: 'byro-store',
+  name: 'felore-store',
   version: 16,
   migrate: (persistedState) => { /* 버전 마이그레이션 */ },
   partialize: (state) => ({

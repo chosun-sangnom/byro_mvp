@@ -189,12 +189,12 @@ export default function SearchScreen() {
           ) : (
             <motion.div key="results" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}>
 
-              {/* 바이로 회원 섹션 */}
+              {/* 펠로어 회원 섹션 */}
               {results.length > 0 && (
                 <div>
                   <div className="px-5 pt-4 pb-1">
                     <span className="text-[11px] font-semibold text-[var(--color-text-tertiary)]">
-                      바이로 회원 {results.length}명
+                      펠로어 회원 {results.length}명
                     </span>
                   </div>
                   <ul>
@@ -353,7 +353,7 @@ function EmptyPrompt() {
       </div>
       <div>
         <p className="text-[15px] font-semibold text-[var(--color-text-primary)] mb-1">
-          바이로에서 사람을 찾아보세요
+          펠로어에서 사람을 찾아보세요
         </p>
         <p className="text-[13px] text-[var(--color-text-secondary)]">
           이름·직함·회사·학교로 검색할 수 있어요

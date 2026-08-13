@@ -169,8 +169,8 @@ function BioPanel() {
   return (
     <div>
       <InfoBanner>
-        구현 상태: <strong>{config.status}</strong> — 내 바이로 &gt; 기본정보 편집의 &quot;AI로 채우기&quot; 버튼은 현재 토스트만 노출하는
-        스텁이며(components/screens/me/MyByroBasicInfoScreen.tsx) 실제 생성 로직과 연결되어 있지 않습니다. 아래 값은 추후 서버 사이드
+        구현 상태: <strong>{config.status}</strong> — 내 펠로어 &gt; 기본정보 편집의 &quot;AI로 채우기&quot; 버튼은 현재 토스트만 노출하는
+        스텁이며(components/screens/me/MyFeloreBasicInfoScreen.tsx) 실제 생성 로직과 연결되어 있지 않습니다. 아래 값은 추후 서버 사이드
         LLM 연동 시 사용할 가중치·프롬프트 초안입니다.
       </InfoBanner>
 
@@ -399,7 +399,7 @@ function SearchPanel() {
   return (
     <div>
       <InfoBanner>
-        구현 상태: <strong>{config.status}</strong> — 마이 바이로 편집의 장소·미디어·음악 검색 피커(PlacePicker, MediaSearchPicker,
+        구현 상태: <strong>{config.status}</strong> — 마이 펠로어 편집의 장소·미디어·음악 검색 피커(PlacePicker, MediaSearchPicker,
         MusicSearchPicker)에서 실제로 OpenAI API를 호출합니다(app/api/ai-search/route.ts). 카테고리별 전용 API(TMDB·Spotify·알라딘·Kakao
         Local) 연동 전까지의 폴백입니다. 아래 값은 참고·요청용 설정이며, 실제 반영에는 코드 배포가 필요합니다.
       </InfoBanner>

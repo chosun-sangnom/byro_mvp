@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Download, Lock, MessageCircle, Share2, Sparkles, Star, Users, Handshake } from 'lucide-react'
 import { BottomSheet, showToast } from '@/components/ui'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import type { KemiData, PublicProfileLife, PublicProfileWhoIAm } from '@/types'
 import {
   getLifestyleSignals,
@@ -172,7 +172,7 @@ function PolaroidCard({
           }}>
             <span style={{ color: '#fff', fontSize: '10px', fontWeight: 900, lineHeight: 1 }}>B</span>
           </div>
-          <span style={{ fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.9)', letterSpacing: '0.06em' }}>byro</span>
+          <span style={{ fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.9)', letterSpacing: '0.06em' }}>felore</span>
           <span style={{ marginLeft: 'auto', fontSize: '10px', color: 'rgba(255,255,255,0.55)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Kemi Report</span>
         </div>
 
@@ -277,7 +277,7 @@ function PolaroidCard({
           alignItems: 'center',
           justifyContent: 'space-between',
         }}>
-          <span style={{ fontSize: '11px', color: '#98989D' }}>byro.app에서 나도 확인하기</span>
+          <span style={{ fontSize: '11px', color: '#98989D' }}>felore.app에서 나도 확인하기</span>
           <div style={{ background: '#EFF6FF', borderRadius: '8px', padding: '4px 10px' }}>
             <span style={{ fontSize: '11px', fontWeight: 700, color: '#2563EB' }}>→</span>
           </div>
@@ -318,7 +318,7 @@ function PolaroidPreviewCard({
           <div className="flex h-5 w-5 items-center justify-center rounded-[5px] bg-white/25">
             <span className="text-[10px] font-black leading-none text-white">B</span>
           </div>
-          <span className="text-[12px] font-bold tracking-[0.06em] text-white/90">byro</span>
+          <span className="text-[12px] font-bold tracking-[0.06em] text-white/90">felore</span>
           <span className="ml-auto text-[10px] uppercase tracking-[0.08em] text-white/50">Kemi Report</span>
         </div>
 
@@ -421,7 +421,7 @@ export function PublicProfileCompatibilitySheet({
   life?: PublicProfileLife
   kemi?: KemiData
 }) {
-  const store = useByroStore()
+  const store = useFeloreStore()
   const viewerName = store.user?.name ?? '나'
   const viewerAvatar = store.user?.profileImages?.[0] ?? store.user?.avatarImage
 
@@ -471,19 +471,19 @@ export function PublicProfileCompatibilitySheet({
       await new Promise<void>((resolve, reject) => {
         canvas.toBlob(async (blob) => {
           if (!blob) { reject(new Error('캡처 실패')); return }
-          const file = new File([blob], `byro-kemi-${profileName}.png`, { type: 'image/png' })
+          const file = new File([blob], `felore-kemi-${profileName}.png`, { type: 'image/png' })
           try {
             if (navigator.canShare?.({ files: [file] })) {
               await navigator.share({
                 files: [file],
                 title: `${profileName}님과의 케미 리포트`,
-                text: `byro에서 ${profileName}님과의 공통점을 발견했어요!`,
+                text: `felore에서 ${profileName}님과의 공통점을 발견했어요!`,
               })
             } else {
               const url = URL.createObjectURL(blob)
               const a = document.createElement('a')
               a.href = url
-              a.download = `byro-kemi-${profileName}.png`
+              a.download = `felore-kemi-${profileName}.png`
               a.click()
               URL.revokeObjectURL(url)
               showToast('이미지가 저장됐어요')

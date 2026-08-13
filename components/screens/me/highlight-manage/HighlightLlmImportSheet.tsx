@@ -1,12 +1,12 @@
 'use client'
 
-// [임시] OCR 목업 — 실제 구현 시 이미지를 Byro OCR 모델에 전달하고 JSON 슬롯필링 결과를 받아야 함
+// [임시] OCR 목업 — 실제 구현 시 이미지를 FELORE OCR 모델에 전달하고 JSON 슬롯필링 결과를 받아야 함
 
 import { useEffect, useRef, useState } from 'react'
 import { CheckCircle, Circle, Briefcase, BookOpen, ImagePlus, ScanLine } from 'lucide-react'
 import { BottomSheet, showToast } from '@/components/ui'
 import type { OcrCareer, OcrEducation } from '@/types'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 
 type Step = 'upload' | 'analyzing' | 'preview'
 
@@ -39,7 +39,7 @@ export function HighlightLlmImportSheet({
   isPro: boolean
   freeRemaining: number
 }) {
-  const store = useByroStore()
+  const store = useFeloreStore()
   const [step, setStep] = useState<Step>('upload')
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [items, setItems] = useState<PreviewItem[]>([])

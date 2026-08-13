@@ -49,7 +49,7 @@ export const solutionSteps: Array<{
   {
     icon: Sparkles,
     title: '상대방과 겹치는 것이 바로 드러난다',
-    description: '상대의 Byro를 열면 공통점이 자동으로 표시된다. 같은 업계, 같은 취향, 같은 MBTI — 대화 소재가 먼저 보인다.',
+    description: '상대의 Felore를 열면 공통점이 자동으로 표시된다. 같은 업계, 같은 취향, 같은 MBTI — 대화 소재가 먼저 보인다.',
   },
   {
     icon: MessageCircle,
@@ -68,19 +68,19 @@ export const useCases: Array<{
     icon: Users,
     title: '네트워킹 행사',
     scenario: '명함을 건네고, SNS를 교환하고, 링크드인까지 공유한다. 상대방은 어디를 봐야 할지 모른다.',
-    highlight: 'Byro 링크 하나면 끝이에요. 인스타, 리멤버, 링크드인 — 다 필요 없어요.',
+    highlight: 'FELORE 링크 하나면 끝이에요. 인스타, 리멤버, 링크드인 — 다 필요 없어요.',
   },
   {
     icon: Building2,
     title: '커뮤니티 모임',
     scenario: '어떤 사람이 올지 모른다. 분위기를 망치는 사람이 오면 어떡하지? 모임장 입장에서 미리 걸러낼 방법이 없다.',
-    highlight: '참가 신청 전에 Byro를 공유받으면 돼요. 믿을 만한 사람인지 미리 확인할 수 있어요.',
+    highlight: '참가 신청 전에 Felore를 공유받으면 돼요. 믿을 만한 사람인지 미리 확인할 수 있어요.',
   },
   {
     icon: Briefcase,
     title: '비즈니스 미팅',
     scenario: '처음 만나는 사람과 미팅이 잡혔다. 스몰토크로 뭘 꺼내야 하나 — 어색한 침묵이 떠오른다.',
-    highlight: '미팅 전에 상대 Byro를 열었더니 같은 회사 출신이었다. 첫 마디부터 한결 편해졌다.',
+    highlight: '미팅 전에 상대 Felore를 열었더니 같은 회사 출신이었다. 첫 마디부터 한결 편해졌다.',
   },
 ]
 
@@ -109,7 +109,7 @@ export const comparisons: Array<{
   },
   {
     icon: Sparkles,
-    name: 'Byro',
+    name: 'FELORE',
     color: 'from-[#3B82F6] to-[#2563EB]',
     isHighlight: true,
     description: '커리어 + 라이프스타일 + 검증된 평판',

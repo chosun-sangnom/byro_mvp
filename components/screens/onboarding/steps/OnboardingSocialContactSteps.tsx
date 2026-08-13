@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import { BottomSheet, Button, InfoBox, showToast } from '@/components/ui'
 import { ContactTypeIcon } from '@/components/contact/ContactTypeIcon'
 import { StepFooter, StepIntro, SelectionCard } from '@/components/screens/onboarding/OnboardingShared'
@@ -11,7 +11,7 @@ import { INSTAGRAM_PROFILE, LINKEDIN_PROFILE } from '@/lib/mocks/socialProfiles'
 import { buildContactHref, contactPlaceholder, contactPreview } from '@/lib/contactChannels'
 
 export function Step5SNS() {
-  const store = useByroStore()
+  const store = useFeloreStore()
 
   const handleConnectInstagram = () => {
     window.open(INSTAGRAM_PROFILE.profileUrl, '_blank')
@@ -87,7 +87,7 @@ export function Step5SNS() {
 }
 
 export function Step6Contact() {
-  const store = useByroStore()
+  const store = useFeloreStore()
   const [sheetOpen, setSheetOpen] = useState(false)
   const [selectedChannel, setSelectedChannel] = useState<ContactChannel | null>(null)
   const [inputValue, setInputValue] = useState('')
@@ -147,7 +147,7 @@ export function Step6Contact() {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm font-black text-[var(--color-text-strong)]">연결된 연락 수단</div>
-              <div className="meta-text mt-1">나중에 Byro 편집에서 언제든 바꿀 수 있어요.</div>
+              <div className="meta-text mt-1">나중에 FELORE 편집에서 언제든 바꿀 수 있어요.</div>
             </div>
             <div className="rounded-full bg-[var(--color-bg-muted)] px-3 py-1 text-xs font-semibold text-[var(--color-text-secondary)]">
               {activeCount}/4

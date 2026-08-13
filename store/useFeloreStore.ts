@@ -24,7 +24,7 @@ function generateRandomLinkId(): string {
 
 const STEP_ORDER: OnboardingStep[] = ['login', 'terms', 'verify', 'basicinfo', 'profile', 'complete']
 
-interface ByroStore {
+interface FeloreStore {
   // 인증
   isLoggedIn: boolean
   user: UserState | null
@@ -155,7 +155,7 @@ const normalizeSampleUser = (user: UserState | null): UserState | null => {
   }
 }
 
-export const useByroStore = create<ByroStore>()(persist((set, get) => ({
+export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
   // 인증
   isLoggedIn: false,
   user: null,
@@ -678,10 +678,10 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
     }))
   },
 }), {
-  name: 'byro-store',
+  name: 'felore-store',
   version: 19,
   migrate: (persistedState: unknown) => {
-    const state = persistedState as ByroStore | undefined
+    const state = persistedState as FeloreStore | undefined
     if (!state) return persistedState
     const persistedStep = state.step as string
     const validSteps: OnboardingStep[] = ['login', 'terms', 'verify', 'basicinfo', 'profile', 'complete']
@@ -692,11 +692,11 @@ export const useByroStore = create<ByroStore>()(persist((set, get) => ({
       ...state,
       user: normalizeSampleUser(state.user),
       step: migratedStep,
-      onboardingName: (state as ByroStore & { onboardingName?: string }).onboardingName ?? '',
-      onboardingNickname: (state as ByroStore & { onboardingNickname?: string }).onboardingNickname ?? '',
-      onboardingBirthDate: (state as ByroStore & { onboardingBirthDate?: string }).onboardingBirthDate ?? '',
-      onboardingShowAge: (state as ByroStore & { onboardingShowAge?: boolean }).onboardingShowAge ?? true,
-      isVerified: (state as ByroStore & { isVerified?: boolean }).isVerified ?? false,
+      onboardingName: (state as FeloreStore & { onboardingName?: string }).onboardingName ?? '',
+      onboardingNickname: (state as FeloreStore & { onboardingNickname?: string }).onboardingNickname ?? '',
+      onboardingBirthDate: (state as FeloreStore & { onboardingBirthDate?: string }).onboardingBirthDate ?? '',
+      onboardingShowAge: (state as FeloreStore & { onboardingShowAge?: boolean }).onboardingShowAge ?? true,
+      isVerified: (state as FeloreStore & { isVerified?: boolean }).isVerified ?? false,
       savedProfiles: SAMPLE_PROFILE.savedProfiles,
     }
   },

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { FileSpreadsheet, Upload, ScanLine, Sparkles, X } from 'lucide-react'
 import { NavBar, showToast } from '@/components/ui'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { ProfileRememberSection } from '@/components/screens/profile/PublicProfileSections'
 
@@ -28,7 +28,7 @@ export function RememberNetworkManageScreen({
 }: {
   onBack: () => void
 }) {
-  const store = useByroStore()
+  const store = useFeloreStore()
 
   const [importStep, setImportStep] = useState<ImportStep>('idle')
   const analyzeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)

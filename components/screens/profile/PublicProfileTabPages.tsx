@@ -2,7 +2,7 @@
 
 import { Lock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
 
 
@@ -20,7 +20,7 @@ import { PublicProfileLifeSection } from '@/components/screens/profile/PublicPro
 import { PublicProfileWhoIAmSection } from '@/components/screens/profile/PublicProfileWhoIAmSection'
 
 function usePublicProfileTabData(username: string) {
-  const store = useByroStore()
+  const store = useFeloreStore()
   const { isOwner: isOwnerMode, isLoggedIn } = useProfileOwner(username)
   const profile = getNormalizedPublicProfile({
     username,

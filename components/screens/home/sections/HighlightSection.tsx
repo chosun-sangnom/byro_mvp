@@ -25,7 +25,7 @@ export function HighlightSection() {
             Wow Moment
           </div>
           <h2 className="text-3xl tracking-tight mb-3 text-[var(--color-text-strong)]">
-            Byro가<br />세 가지를 바꿔요
+            Felore가<br />세 가지를 바꿔요
           </h2>
           <p className="text-sm text-[var(--color-text-secondary)]">
             명함이 해결 못 했던 문제들을 정면으로 풀어요
@@ -118,12 +118,12 @@ export function HighlightSection() {
             <div className="text-[10px] font-bold uppercase tracking-[0.15em] text-[var(--color-accent-dark)] mb-1">Chemistry</div>
             <h3 className="text-lg text-[var(--color-text-strong)] mb-2">열어보는 순간 공통점이 보여요</h3>
             <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-5">
-              상대 Byro를 열면 나와 겹치는 항목이 자동으로 표시돼요. 어색한 첫 마디 없이 바로 통하는 얘기부터 시작할 수 있어요.
+              상대 Felore를 열면 나와 겹치는 항목이 자동으로 표시돼요. 어색한 첫 마디 없이 바로 통하는 얘기부터 시작할 수 있어요.
             </p>
 
             <div className="rounded-xl p-4" style={{ backgroundColor: 'var(--color-bg-soft)' }}>
               <div className="text-[11px] text-[var(--color-text-tertiary)] mb-3 italic">
-                행사에서 명함을 받았다. Byro 링크를 열었더니 —
+                행사에서 명함을 받았다. FELORE 링크를 열었더니 —
               </div>
               <div className="space-y-2">
                 {[

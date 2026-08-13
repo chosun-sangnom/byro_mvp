@@ -238,6 +238,6 @@ interface Experience {
 | 파일 | 교체 대상 | 교체 방향 |
 |------|----------|----------|
 | `publicProfileData.ts` | `getPublicProfileByUsername()` | `supabase.from('users').select()` |
-| `useByroStore.ts` | `login()`, `completeOnboarding()` | Supabase Auth |
-| `useByroStore.ts` | `submitExperience()` | `supabase.from('experiences').insert()` |
-| `useByroStore.ts` | `highlights` CRUD | `supabase.from('highlights')` |
+| `useFeloreStore.ts` | `login()`, `completeOnboarding()` | Supabase Auth |
+| `useFeloreStore.ts` | `submitExperience()` | `supabase.from('experiences').insert()` |
+| `useFeloreStore.ts` | `highlights` CRUD | `supabase.from('highlights')` |

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
 import { PublicProfileShell } from '@/components/screens/profile/PublicProfileShell'
 import { type PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
@@ -11,17 +11,17 @@ import {
   PublicProfileReputationTabPage,
   PublicProfileWhoTabPage,
 } from '@/components/screens/profile/PublicProfileTabPages'
-import { BasicInfoEditScreen, WhoIAmEditScreen } from '@/components/screens/me/MyByroBasicInfoScreen'
-import { HighlightManageScreen } from '@/components/screens/me/MyByroHighlightManageScreen'
+import { BasicInfoEditScreen, WhoIAmEditScreen } from '@/components/screens/me/MyFeloreBasicInfoScreen'
+import { HighlightManageScreen } from '@/components/screens/me/MyFeloreHighlightManageScreen'
 import {
   ContactManageScreen,
   LifeManageScreen,
-  ManageByroScreen,
+  ManageFeloreScreen,
   RememberNetworkManageScreen,
   ReputationManageScreen,
   SNSManageScreen,
   VisibilitySettingScreen,
-} from '@/components/screens/me/MyByroSupportScreens'
+} from '@/components/screens/me/MyFeloreSupportScreens'
 
 type Screen =
   | 'preview'
@@ -37,10 +37,10 @@ type Screen =
   | 'editVisibility'
 
 // ─────────────────────────────────────────────────────────────────────────────
-export default function MyByro() {
+export default function MyFelore() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const store = useByroStore()
+  const store = useFeloreStore()
   const returnTo = searchParams.get('returnTo')
   const handleBackToManage = () => {
     if (returnTo) {
@@ -85,7 +85,7 @@ export default function MyByro() {
 
   if (screen === 'manage') {
     return (
-      <ManageByroScreen
+      <ManageFeloreScreen
         allHighlights={allHighlights}
         profile={profile}
         instagramConnected={store.instagramConnected}

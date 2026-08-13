@@ -191,7 +191,7 @@ export function VirtualProfilePage({ profile }: { profile: VirtualProfile }) {
               이 프로필의 주인공이신가요?
             </p>
             <p className="text-[12px] leading-[1.65] text-[var(--color-text-secondary)] mb-4">
-              공개된 정보를 직접 수정하고<br />바이로 정식 프로필로 관리하세요
+              공개된 정보를 직접 수정하고<br />펠로어 정식 프로필로 관리하세요
             </p>
             <button
               onClick={() => showToast('본인 인증 기능을 준비 중이에요')}

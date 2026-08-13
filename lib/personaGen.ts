@@ -52,7 +52,7 @@ export function generatePersona(profile: PublicProfile): PersonaResult {
 }
 
 function extractTitleCore(title: string): string {
-  // "Product Owner · Byro 팀" → "Product Owner"
+  // "Product Owner · FELORE 팀" → "Product Owner"
   // "스타트업 마케터 4년 경력" → "스타트업 마케터"
   return title.split(/[·,]/)[0].replace(/\d+년.*/, '').trim()
 }

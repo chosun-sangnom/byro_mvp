@@ -1,5 +1,5 @@
 -- ─────────────────────────────────────────────────────────────────────────────
--- Byro initial schema
+-- FELORE initial schema
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- Enable UUID generation
@@ -9,7 +9,7 @@ create extension if not exists "pgcrypto";
 -- 기본 공개 정보. id = auth.uid(). 항상 전체 공개.
 create table public.users (
   id              uuid primary key references auth.users(id) on delete cascade,
-  link_id         text not null unique,                -- @username (byro.io/@link_id)
+  link_id         text not null unique,                -- @username (felore.io/@link_id)
   name            text not null default '',
   title           text not null default '',
   headline        text,

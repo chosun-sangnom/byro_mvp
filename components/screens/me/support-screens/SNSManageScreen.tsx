@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from 'react'
 import { ChevronRight } from 'lucide-react'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import { BottomSheet, Button, NavBar, showToast } from '@/components/ui'
 import { INSTAGRAM_PROFILE } from '@/lib/mocks/socialProfiles'
 
@@ -72,7 +72,7 @@ const DEFAULT_INPUT: Record<SnsId, string> = {
 }
 
 export function SNSManageScreen({ onBack }: { onBack: () => void }) {
-  const store = useByroStore()
+  const store = useFeloreStore()
   const [sheetOpen, setSheetOpen] = useState(false)
   const [selectedSns, setSelectedSns] = useState<SnsId | null>(null)
   const [inputValue, setInputValue] = useState('')

@@ -1,14 +1,14 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import { useProfileOwner } from '@/hooks/useProfileOwner'
 import { getPublicProfileByUsername } from '@/lib/mocks/publicProfiles'
 import type { Experience, PublicProfile } from '@/types'
 
 export default function FeedbackScreen({ username }: { username: string }) {
   const router = useRouter()
-  const store = useByroStore()
+  const store = useFeloreStore()
   const { isOwner: isOwnProfile } = useProfileOwner(username)
   const baseProfile = getPublicProfileByUsername(username)
   const profile = isOwnProfile && store.user
@@ -53,7 +53,7 @@ export default function FeedbackScreen({ username }: { username: string }) {
                       {exp.isAnonymous ? 'B' : (exp.authorName?.charAt(0) ?? '?')}
                     </div>
                     <span className="text-[14px] font-semibold text-[var(--color-text-primary)]">
-                      {exp.isAnonymous ? 'Byro사용자' : (exp.authorName ?? 'Byro사용자')}
+                      {exp.isAnonymous ? 'Felore사용자' : (exp.authorName ?? 'Felore사용자')}
                     </span>
                   </div>
                   <span className="text-[11px] text-[var(--color-text-tertiary)]">{exp.date}</span>

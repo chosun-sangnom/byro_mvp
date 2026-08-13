@@ -38,7 +38,7 @@ export default function AppHeader() {
           onClick={() => router.push('/')}
           className="text-[18px] font-black tracking-tight text-[var(--color-text-strong)]"
         >
-          Byro
+          FELORE
         </button>
 
         <div className="flex items-center gap-1">

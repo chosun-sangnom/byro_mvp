@@ -1,13 +1,13 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import { NavBar } from '@/components/ui'
 
 export default function MarketingConsentScreen() {
   const router = useRouter()
-  const agreedMarketing = useByroStore((s) => s.agreedMarketing)
-  const setAgreedMarketing = useByroStore((s) => s.setAgreedMarketing)
+  const agreedMarketing = useFeloreStore((s) => s.agreedMarketing)
+  const setAgreedMarketing = useFeloreStore((s) => s.setAgreedMarketing)
 
   return (
     <div className="flex flex-col bg-[var(--color-bg-page)] min-h-full">
@@ -16,7 +16,7 @@ export default function MarketingConsentScreen() {
       <div className="px-5 pt-5 pb-[calc(env(safe-area-inset-bottom)+32px)]">
         <div className="rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] p-4 text-[13px] leading-relaxed text-[var(--color-text-secondary)] mb-6">
           <p className="mb-3">
-            (예시) Byro는 신규 기능 안내, 이벤트·프로모션 정보를 이메일 또는 앱 알림으로 보내드릴 수 있어요.
+            (예시) Felore는 신규 기능 안내, 이벤트·프로모션 정보를 이메일 또는 앱 알림으로 보내드릴 수 있어요.
           </p>
           <p>
             수신에 동의하지 않아도 서비스 이용에는 아무런 제한이 없으며, 언제든 이 화면에서 동의를 철회할 수 있어요.

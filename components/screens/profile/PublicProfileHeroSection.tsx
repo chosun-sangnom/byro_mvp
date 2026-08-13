@@ -189,7 +189,7 @@ export function ProfileHeroSection({
  * - 하단: 이름 + 인증 뱃지 + bio 글래스 카드
  *
  * owner 전용 편집/아카이브 버튼은 제거됨.
- * → 편집: 푸터 "Byro 편집" 버튼 (PublicProfileShell)
+ * → 편집: 푸터 "FELORE 편집" 버튼 (PublicProfileShell)
  * → 소셜 관리: /me 페이지
  *
  * TODO(profile-image): 프로필 사진 업로드/크롭 플로우 연동
@@ -246,14 +246,14 @@ export function ProfileHeroCard({
       await new Promise<void>((resolve) => {
         canvas.toBlob(async (blob) => {
           if (!blob) { resolve(); return }
-          const file = new File([blob], `byro-persona-${profile.name}.png`, { type: 'image/png' })
+          const file = new File([blob], `felore-persona-${profile.name}.png`, { type: 'image/png' })
           try {
             if (navigator.canShare?.({ files: [file] })) {
-              await navigator.share({ files: [file], title: `${profile.name}님의 AI 페르소나`, text: `byro에서 ${profile.name}님의 AI 페르소나를 확인했어요!` })
+              await navigator.share({ files: [file], title: `${profile.name}님의 AI 페르소나`, text: `felore에서 ${profile.name}님의 AI 페르소나를 확인했어요!` })
             } else {
               const url = URL.createObjectURL(blob)
               const a = document.createElement('a')
-              a.href = url; a.download = `byro-persona-${profile.name}.png`; a.click()
+              a.href = url; a.download = `felore-persona-${profile.name}.png`; a.click()
               URL.revokeObjectURL(url)
               showToast('이미지가 저장됐어요')
             }
@@ -319,7 +319,7 @@ export function ProfileHeroCard({
                       <span className="rounded-full px-2 py-0.5 text-[9px]" style={{ background: '#F3F4F6' }}>매주 업데이트됨</span>
                     </div>
                     <p className="mt-3 text-[22px] font-black leading-[1.2]" style={{ color: '#111827' }}>{personaText}</p>
-                    <p className="mt-1.5 text-[12px]" style={{ color: '#6B7280' }}>{profile.name} · byro.io</p>
+                    <p className="mt-1.5 text-[12px]" style={{ color: '#6B7280' }}>{profile.name} · felore.io</p>
                   </div>
                 </div>
               </div>
@@ -576,7 +576,7 @@ export function ProfileHeroCard({
           )}
 
           <div className="mt-2.5 text-[11px] font-semibold text-white/38">
-            byro.io/{profile.linkId}
+            felore.io/{profile.linkId}
           </div>
         </div>
       </div>

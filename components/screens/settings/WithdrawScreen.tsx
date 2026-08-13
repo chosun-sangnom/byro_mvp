@@ -1,12 +1,12 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import { NavBar, Button } from '@/components/ui'
 
 export default function WithdrawScreen() {
   const router = useRouter()
-  const store = useByroStore()
+  const store = useFeloreStore()
 
   return (
     <div className="flex flex-col bg-[var(--color-bg-page)] min-h-full">

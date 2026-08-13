@@ -1,6 +1,6 @@
-# Byro
+# FELORE
 
-Byro is a mobile-first Next.js prototype for managing and sharing an offline trust profile.
+FELORE is a mobile-first Next.js prototype for managing and sharing an offline trust profile.
 
 ## Local Development
 

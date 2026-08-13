@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { BadgeCheck } from 'lucide-react'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import { Button } from '@/components/ui'
 
 // ─── Mini preview components ──────────────────────────────────────────────────
@@ -167,7 +167,7 @@ function PreviewContact() {
       {[
         { label: '010-1234-5678' },
         { label: 'kakao_myongkoo' },
-        { label: 'hello@byro.io' },
+        { label: 'hello@felore.io' },
       ].map(({ label }) => (
         <div key={label} className="flex items-center gap-3 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-3">
           <span className="text-[13px] font-semibold text-[var(--color-text-primary)]">{label}</span>
@@ -177,7 +177,7 @@ function PreviewContact() {
   )
 }
 
-function PreviewByroIntro() {
+function PreviewFeloreIntro() {
   return (
     <div className="rounded-[26px] border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] p-4 shadow-[0_16px_40px_rgba(17,17,17,0.06)]">
       <div className="rounded-[18px] bg-[var(--color-bg-muted)] p-3 mb-3">
@@ -284,7 +284,7 @@ const TOTAL = GUIDE_SLIDES.length + 1
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function Step9Complete() {
-  const store = useByroStore()
+  const store = useFeloreStore()
   const router = useRouter()
   const searchParams = useSearchParams()
   const linkId = store.user?.linkId || store.linkId || 'myongkoo'
@@ -340,17 +340,17 @@ export function Step9Complete() {
               <p className="text-[22px] font-black leading-[1.22] mb-3" style={{ color: 'var(--color-accent-dark)' }}>
                 이제 자유롭게 나를 표현하는
                 <br />
-                Byro를 만들어보세요!
+                Felore를 만들어보세요!
               </p>
               <p className="text-[14px] text-[var(--color-text-secondary)] leading-relaxed mb-8">
                 어떤 사람인지, 어떤 취향을 가졌는지, 어떤 관계를 맺고 있는지
                 <br />
-                Byro 안에서 한눈에 보여줄 수 있어요.
+                FELORE 안에서 한눈에 보여줄 수 있어요.
               </p>
             </div>
 
             <div className={`transition-all duration-500 ${showIntroPreview ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'}`}>
-              <PreviewByroIntro />
+              <PreviewFeloreIntro />
             </div>
           </div>
         ) : guide ? (

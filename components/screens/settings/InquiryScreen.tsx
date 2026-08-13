@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { NavBar, Button, TextArea, showToast } from '@/components/ui'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import { useAdminStore } from '@/store/useAdminStore'
 import type { TicketCategory } from '@/types/admin'
 
@@ -12,8 +12,8 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 export default function InquiryScreen() {
   const router = useRouter()
-  const user = useByroStore((s) => s.user)
-  const isLoggedIn = useByroStore((s) => s.isLoggedIn)
+  const user = useFeloreStore((s) => s.user)
+  const isLoggedIn = useFeloreStore((s) => s.isLoggedIn)
   const addTicket = useAdminStore((s) => s.addTicket)
 
   const [category, setCategory] = useState<TicketCategory | null>(null)
@@ -66,7 +66,7 @@ export default function InquiryScreen() {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="example@byro.io"
+          placeholder="example@felore.io"
           className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-[14px] outline-none mb-4"
         />
 

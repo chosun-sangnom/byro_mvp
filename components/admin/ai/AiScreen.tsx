@@ -170,7 +170,7 @@ function BioPanel() {
     <div>
       <InfoBanner>
         구현 상태: <strong>{config.status}</strong> — 내 바이로 &gt; 기본정보 편집의 &quot;AI로 채우기&quot; 버튼은 현재 토스트만 노출하는
-        스텁이며(components/screens/me/MyByroBasicInfoScreen.tsx) 실제 생성 로직과 연결되어 있지 않습니다. 아래 값은 추후 서버 사이드
+        스텁이며(components/screens/me/MyFeloreBasicInfoScreen.tsx) 실제 생성 로직과 연결되어 있지 않습니다. 아래 값은 추후 서버 사이드
         LLM 연동 시 사용할 가중치·프롬프트 초안입니다.
       </InfoBanner>
 

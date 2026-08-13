@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { BottomSheet, Button, TextArea, YearPickerSheet, showToast } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import type { Highlight, HighlightIconId } from '@/types'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
 import { getHighlightMetaParts, isPrimaryHighlight, sortHighlightsByPrimary } from '@/lib/highlightMeta'
@@ -15,7 +15,7 @@ interface HighlightOnboardingSheetProps {
 }
 
 export function HighlightOnboardingSheet({ open, onClose }: HighlightOnboardingSheetProps) {
-  const store = useByroStore()
+  const store = useFeloreStore()
   const [sheetMode, setSheetMode] = useState<'picker' | 'group' | 'form'>('picker')
   const [editingHighlightId, setEditingHighlightId] = useState<string | null>(null)
 

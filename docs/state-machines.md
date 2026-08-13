@@ -27,7 +27,7 @@ login → terms → verify → basicinfo → profile → complete
 
 ---
 
-## 2. MyByro 화면 전환
+## 2. MyFelore 화면 전환
 
 **초기 화면**: URL에 `?edit=true`이면 `manage`, 아니면 `preview`
 

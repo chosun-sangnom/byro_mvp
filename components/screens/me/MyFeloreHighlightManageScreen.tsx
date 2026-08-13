@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { showToast } from '@/components/ui'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import type { Highlight, HighlightIconId } from '@/types'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
@@ -31,7 +31,7 @@ export function HighlightManageScreen({
   onBack,
 }: HighlightManageScreenProps) {
   const router = useRouter()
-  const store = useByroStore()
+  const store = useFeloreStore()
   const isPro = store.user?.isPaidUser ?? false
   const [mode, setMode] = useState<HighlightManageMode>('list')
   const [editingHl, setEditingHl] = useState<Highlight | null>(null)

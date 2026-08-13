@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
 import { InfoBox, showToast } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
 import type { HighlightIconId } from '@/types'
 import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
@@ -12,7 +12,7 @@ import { getHighlightMetaParts } from '@/lib/highlightMeta'
 import { HighlightOnboardingSheet } from '@/components/screens/onboarding/steps/HighlightOnboardingSheet'
 
 export function Step7Highlight() {
-  const store = useByroStore()
+  const store = useFeloreStore()
   const [sheetOpen, setSheetOpen] = useState(false)
 
   const highlightLimitReached = store.highlights.length >= 5

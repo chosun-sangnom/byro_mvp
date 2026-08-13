@@ -14,7 +14,7 @@ export function SolutionSection() {
           transition={{ duration: 0.5 }}
           className="text-3xl tracking-tight text-center mb-3 text-[var(--color-text-strong)]"
         >
-          Byro가 해결합니다
+          Felore가 해결합니다
         </motion.h2>
 
         <motion.p

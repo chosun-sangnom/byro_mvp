@@ -3,7 +3,7 @@
 import { ChevronLeft, RotateCcw, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import type { ReactNode } from 'react'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 
 interface NavBarProps {
   title?: string
@@ -13,7 +13,7 @@ interface NavBarProps {
 }
 
 export function NavBar({ title, onBack, onClose, right }: NavBarProps) {
-  const store = useByroStore()
+  const store = useFeloreStore()
   const router = useRouter()
 
   // [임시] 전체 초기화 버튼 — API 연동 후 제거 예정

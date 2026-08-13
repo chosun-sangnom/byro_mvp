@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { Copy, Share2 } from 'lucide-react'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import { showToast } from '@/components/ui'
 import { shareOrCopy } from '@/lib/share'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
@@ -23,7 +23,7 @@ export default function PublicProfile({
   mode = 'public',
 }: PublicProfileProps) {
   const router = useRouter()
-  const store = useByroStore()
+  const store = useFeloreStore()
   const isOwnerMode = mode === 'owner'
   const profile = getNormalizedPublicProfile({
     username,
@@ -54,7 +54,7 @@ export default function PublicProfile({
     }
   }).filter((group) => group.items.length > 0)
 
-  const publicProfileUrl = `https://byro.io/${profile.linkId}`
+  const publicProfileUrl = `https://felore.io/${profile.linkId}`
 
   const handleCopyProfileLink = async () => {
     try {
@@ -66,8 +66,8 @@ export default function PublicProfile({
   }
 
   const handleShareProfile = () => shareOrCopy({
-    title: `${profile.name}의 Byro`,
-    text: `${profile.name}의 Byro 프로필을 확인해보세요.`,
+    title: `${profile.name}의 FELORE`,
+    text: `${profile.name}의 FELORE 프로필을 확인해보세요.`,
     url: publicProfileUrl,
   })
 
@@ -82,8 +82,8 @@ export default function PublicProfile({
       <div className="flex items-center px-4 h-12 border-b border-[var(--color-border-soft)] bg-[var(--color-glass-mid)] backdrop-blur-md flex-shrink-0">
         <button onClick={() => router.back()} className="text-sm text-[var(--color-text-secondary)] mr-2">‹</button>
         <div className="flex-1 min-w-0">
-          <div className="text-[11px] text-[var(--color-text-tertiary)] uppercase tracking-[0.18em]">{isOwnerMode ? 'My Byro' : 'Public Profile'}</div>
-          <div className="text-xs text-[var(--color-text-secondary)] truncate">byro.io/{profile.linkId}</div>
+          <div className="text-[11px] text-[var(--color-text-tertiary)] uppercase tracking-[0.18em]">{isOwnerMode ? 'My FELORE' : 'Public Profile'}</div>
+          <div className="text-xs text-[var(--color-text-secondary)] truncate">felore.io/{profile.linkId}</div>
         </div>
         {!isOwnerMode ? (
           <div className="flex items-center gap-3">
@@ -151,7 +151,7 @@ export default function PublicProfile({
           onRequestFeedback={() => showToast('피드백 요청을 보냈어요!')}
           onChannelClick={(channel) => {
             if (!channel.enabled) {
-              showToast(isOwnerMode ? 'Byro 편집에서 연동을 활성화해 주세요' : '비활성화된 연락 수단이에요')
+              showToast(isOwnerMode ? 'FELORE 편집에서 연동을 활성화해 주세요' : '비활성화된 연락 수단이에요')
               return
             }
             if (!channel.href) {

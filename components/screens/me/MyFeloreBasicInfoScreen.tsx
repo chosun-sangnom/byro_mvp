@@ -4,7 +4,7 @@ import { useRef, useState, type ChangeEvent, type PointerEvent } from 'react'
 import { Camera, Copy, Check, Info, Sparkles } from 'lucide-react'
 import { BottomSheet, Button, NavBar, showToast, TextArea } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import type { PublicProfileWhoIAm, UserState } from '@/types'
 
 // ── AI 도구 정의 ─────────────────────────────────────────────────────────────
@@ -201,7 +201,7 @@ export function WhoIAmEditScreen({
   user: Pick<UserState, 'whoIAm' | 'life'>
   onBack: () => void
 }) {
-  const store = useByroStore()
+  const store = useFeloreStore()
   const initialWhoIAm: PublicProfileWhoIAm = user.whoIAm ?? SAMPLE_PROFILE.whoIAm
   const [mbti, setMbti] = useState(initialWhoIAm.mbti)
   const [personality, setPersonality] = useState(initialWhoIAm.personality ?? '')
@@ -402,7 +402,7 @@ export function BasicInfoEditScreen({
   user,
   onBack,
 }: BasicInfoEditScreenProps) {
-  const store = useByroStore()
+  const store = useFeloreStore()
   const [bio, setBio] = useState(user.bio)
 
   const [useActivityName, setUseActivityName] = useState(!!user.activityName)

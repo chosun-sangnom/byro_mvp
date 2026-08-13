@@ -75,5 +75,5 @@
 |------|------|
 | 경험 제출 UI | `components/screens/profile/PublicProfileOverlays.tsx` — `ExperienceBottomSheet` (호출부: `PublicProfileShell.tsx`, 키워드 최대 3개 제한) |
 | 경험 데이터 흐름 | `docs/data-pipeline.md` 4절 참조 |
-| 스토어 액션 | `store/useByroStore.ts` — `submitExperience()`, `markExpSubmitted()` |
+| 스토어 액션 | `store/useFeloreStore.ts` — `submitExperience()`, `markExpSubmitted()` |
 | 1일 1회 제한 | `docs/state-machines.md` 3절 참조 |

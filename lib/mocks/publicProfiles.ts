@@ -126,7 +126,7 @@ export const SAMPLE_PROFILE = {
   },
   contactChannels: [
     { id: 'phone', label: '전화', value: '010-9482-1158', href: 'tel:01094821158', enabled: true },
-    { id: 'email', label: '이메일', value: 'gangminjun@byro.io', href: 'mailto:gangminjun@byro.io', enabled: true },
+    { id: 'email', label: '이메일', value: 'gangminjun@felore.io', href: 'mailto:gangminjun@felore.io', enabled: true },
     { id: 'kakao', label: '카카오', value: 'gangminjun.kakao', href: 'https://open.kakao.com/o/sgangminjun', enabled: true },
   ] as ContactChannel[],
   instagramConnected: true,
@@ -202,7 +202,7 @@ export const SAMPLE_PROFILE = {
       id: 'mh0',
       categoryId: 'career-role',
       icon: 'briefcase',
-      title: 'Byro',
+      title: 'FELORE',
       subtitle: '경력 · 재직 중',
       description: '스타트업 제품 전략과 파트너십 기반 성장을 설계하고 있습니다.',
       year: '2022 - 현재',
@@ -356,7 +356,7 @@ export const MK_PROFILE = {
   ],
   headline: 'Entrepreneur, Writer, Connector',
   school: '',
-  bio: 'Entrepreneur, Writer, Connector. Byth에서 Byro 만들고 운영하고 있어요.',
+  bio: 'Entrepreneur, Writer, Connector. Byth에서 FELORE 만들고 운영하고 있어요.',
   whoIAm: {
     mbti: 'ENTP',
   },
@@ -659,7 +659,7 @@ export const JIMIN_PROFILE = {
   },
   contactChannels: [
     { id: 'phone', label: '전화', value: '010-2437-1022', href: 'tel:01024371022', enabled: true },
-    { id: 'email', label: '이메일', value: 'jimin@byro.io', href: 'mailto:jimin@byro.io', enabled: true },
+    { id: 'email', label: '이메일', value: 'jimin@felore.io', href: 'mailto:jimin@felore.io', enabled: true },
     { id: 'kakao', label: '카카오', value: 'jimin.marketer', href: 'https://open.kakao.com/o/sjimin', enabled: true },
   ] as ContactChannel[],
   instagramConnected: true,

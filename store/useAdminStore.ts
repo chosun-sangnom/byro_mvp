@@ -424,7 +424,7 @@ export const useAdminStore = create<AdminStore>()(
       },
     }),
     {
-      name: 'byro-admin-store',
+      name: 'felore-admin-store',
       version: 8,
       partialize: (state) => ({
         adminUser: state.adminUser,

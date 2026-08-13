@@ -2,7 +2,7 @@
 
 import { Suspense } from 'react'
 import AppShell from '@/components/layout/AppShell'
-import MyByro from '@/components/screens/me/MyByro'
+import MyFelore from '@/components/screens/me/MyFelore'
 import { RequireAuth } from '@/components/auth/RequireAuth'
 
 export default function MePage() {
@@ -10,7 +10,7 @@ export default function MePage() {
     <AppShell showHeader>
       <RequireAuth>
         <Suspense>
-          <MyByro />
+          <MyFelore />
         </Suspense>
       </RequireAuth>
     </AppShell>

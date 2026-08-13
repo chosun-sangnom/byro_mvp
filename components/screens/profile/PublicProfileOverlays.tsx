@@ -106,7 +106,7 @@ export function ExperienceDoneModal({
   profileName,
   isLoggedIn,
   onRequestExperience,
-  onCreateByro,
+  onCreateFelore,
   onLogin,
   onClose,
 }: {
@@ -114,7 +114,7 @@ export function ExperienceDoneModal({
   profileName: string
   isLoggedIn: boolean
   onRequestExperience: () => void
-  onCreateByro: () => void
+  onCreateFelore: () => void
   onLogin: () => void
   onClose: () => void
 }) {
@@ -156,11 +156,11 @@ export function ExperienceDoneModal({
             <div className="mb-5 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3.5 text-left">
               <div className="mb-1 text-[13px] font-bold text-[var(--color-text-primary)]">나도 평판을 받고 싶다면?</div>
               <div className="text-[12px] leading-relaxed text-[var(--color-text-secondary)]">
-                Byro를 만들면 {profileName} 님에게 경험 요청을 보내고,<br />평판을 쌓을 수 있어요.
+                Felore를 만들면 {profileName} 님에게 경험 요청을 보내고,<br />평판을 쌓을 수 있어요.
               </div>
             </div>
             <div className="space-y-2">
-              <Button onClick={onCreateByro}>내 Byro 만들기</Button>
+              <Button onClick={onCreateFelore}>내 FELORE 만들기</Button>
               <Button variant="outline" onClick={onLogin}>로그인하기</Button>
               <Button variant="ghost" onClick={onClose}>프로필로 돌아가기</Button>
             </div>

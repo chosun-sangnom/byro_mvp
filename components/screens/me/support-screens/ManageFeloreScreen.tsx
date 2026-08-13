@@ -5,7 +5,7 @@ import { NavBar } from '@/components/ui'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import type { Highlight, PublicProfile, PublicProfileLife, PublicProfileWhoIAm, UserState } from '@/types'
 
-interface ManageByroScreenProps {
+interface ManageFeloreScreenProps {
   allHighlights: Highlight[]
   profile: PublicProfile
   instagramConnected: boolean
@@ -32,7 +32,7 @@ interface EditRow {
   onClick: () => void
 }
 
-export function ManageByroScreen({
+export function ManageFeloreScreen({
   allHighlights,
   profile,
   instagramConnected,
@@ -48,7 +48,7 @@ export function ManageByroScreen({
   onEditContact,
   user,
   onResetMockData,
-}: ManageByroScreenProps) {
+}: ManageFeloreScreenProps) {
   const whoIAm = (profile.whoIAm ?? user.whoIAm) as PublicProfileWhoIAm
   const life = (profile.life ?? user.life) as PublicProfileLife
   const activityCount = life.daily.exercise.length

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import { Button, Modal, NavBar, StepBar } from '@/components/ui'
 import type { OnboardingStep } from '@/types'
 import { Step1Login, StepTermsAgreement, Step2Verify, Step2BasicInfo, Step4Profile, type Mode } from '@/components/screens/onboarding/steps/OnboardingIntroSteps'
@@ -28,7 +28,7 @@ const STEP_COMPONENTS: Record<OnboardingStep, () => JSX.Element> = {
 
 export default function OnboardingScreen() {
   const router = useRouter()
-  const store = useByroStore()
+  const store = useFeloreStore()
   const [showExitModal, setShowExitModal] = useState(false)
   const [loginFlowMode, setLoginFlowMode] = useState<Mode>('choose')
 

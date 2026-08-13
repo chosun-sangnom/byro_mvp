@@ -2,7 +2,7 @@
 
 import { ChevronRight, FileText, Megaphone, Shield, UserX } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import { NavBar, showToast } from '@/components/ui'
 
 type AccountItem = {
@@ -15,8 +15,8 @@ type AccountItem = {
 
 export default function AccountScreen() {
   const router = useRouter()
-  const isLoggedIn = useByroStore((s) => s.isLoggedIn)
-  const agreedMarketing = useByroStore((s) => s.agreedMarketing)
+  const isLoggedIn = useFeloreStore((s) => s.isLoggedIn)
+  const agreedMarketing = useFeloreStore((s) => s.agreedMarketing)
 
   const items: AccountItem[] = [
     { id: 'terms', icon: FileText, label: '이용약관', onClick: () => showToast('준비 중이에요') },

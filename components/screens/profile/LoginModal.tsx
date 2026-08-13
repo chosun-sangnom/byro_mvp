@@ -1,11 +1,11 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import { Button, Modal } from '@/components/ui'
 
 export function LoginModal({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const store = useByroStore()
+  const store = useFeloreStore()
   const router = useRouter()
 
   // [임시] 실제 OAuth 미연동 — 클릭 시 mock 로그인 처리

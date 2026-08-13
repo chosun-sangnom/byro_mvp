@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import { BottomSheet, Button, NavBar, showToast } from '@/components/ui'
 import { ContactTypeIcon } from '@/components/contact/ContactTypeIcon'
 import type { ContactChannel } from '@/types'
@@ -9,7 +9,7 @@ import { buildContactHref, contactPlaceholder, contactPreview } from '@/lib/cont
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
 export function ContactManageScreen({ onBack }: { onBack: () => void }) {
-  const store = useByroStore()
+  const store = useFeloreStore()
   const initialChannels: ContactChannel[] = (store.user?.contactChannels ?? SAMPLE_PROFILE.contactChannels) as ContactChannel[]
   const [channels, setChannels] = useState<ContactChannel[]>(initialChannels)
   const [sheetOpen, setSheetOpen] = useState(false)

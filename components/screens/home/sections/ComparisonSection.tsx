@@ -51,7 +51,7 @@ export function ComparisonSection() {
               {item.isHighlight && (
                 <div className="absolute -top-3 left-5">
                   <div className="bg-[var(--color-accent-dark)] text-white text-[10px] px-3 py-1 rounded-full shadow-md">
-                    Byro만의 차이
+                    Felore만의 차이
                   </div>
                 </div>
               )}

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { MoreHorizontal, Search, X } from 'lucide-react'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import { ActionMenu, ActionMenuItem, Modal, showToast } from '@/components/ui'
 import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mocks/publicProfiles'
 import type { SavedProfile } from '@/types'
@@ -14,7 +14,7 @@ const SAVED_PAGE_SIZE = 10
 
 export default function Archive() {
   const router = useRouter()
-  const store = useByroStore()
+  const store = useFeloreStore()
 
   const [searchQuery, setSearchQuery] = useState('')
   const [sort, setSort] = useState<SortKey>('recent')

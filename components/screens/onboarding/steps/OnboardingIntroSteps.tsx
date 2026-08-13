@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { Camera, CheckCircle2 } from 'lucide-react'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import { Button, CheckRow, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
@@ -58,7 +58,7 @@ function BackButton({ onClick }: { onClick: () => void }) {
 }
 
 export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => void } = {}) {
-  const store = useByroStore()
+  const store = useFeloreStore()
   const router = useRouter()
   const [mode, setMode] = useState<Mode>('choose')
   const [view, setView] = useState<LoginView>('main')
@@ -164,7 +164,7 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
               <p className="meta-text leading-relaxed">바이로에 오신 걸 환영해요!</p>
             </div>
             {/* [임시] 실제 로그인 API 미연동 */}
-            <Button onClick={handleLoginComplete}>내 Byro 보기</Button>
+            <Button onClick={handleLoginComplete}>내 FELORE 보기</Button>
           </div>
         )
       }
@@ -631,7 +631,7 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
     <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
       <div className="surface-card rounded-[32px] px-5 py-6 text-center mb-6">
         <div className="micro-text uppercase tracking-[0.18em] mb-2">Branding Profile</div>
-        <div className="text-3xl font-black mb-2">Byro</div>
+        <div className="text-3xl font-black mb-2">FELORE</div>
         <div className="meta-text mt-3 leading-relaxed">
           진짜 나를 보여주는 프로필.
           <br />
@@ -647,7 +647,7 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
 }
 
 export function StepTermsAgreement() {
-  const store = useByroStore()
+  const store = useFeloreStore()
   const allAgreed = store.agreedTerms && store.agreedPrivacy && store.agreedMarketing
   const canProceed = store.agreedTerms && store.agreedPrivacy
 
@@ -702,7 +702,7 @@ export function StepTermsAgreement() {
 type VerifyTab = 'kakao' | 'sms'
 
 export function Step2Verify() {
-  const store = useByroStore()
+  const store = useFeloreStore()
   const [tab, setTab] = useState<VerifyTab>('kakao')
   const [phone, setPhone] = useState('')
   const [code, setCode] = useState('')
@@ -807,7 +807,7 @@ export function Step2Verify() {
 }
 
 export function Step2BasicInfo() {
-  const store = useByroStore()
+  const store = useFeloreStore()
   const [name, setName] = useState(store.onboardingName)
   const [nickname, setNickname] = useState(store.onboardingNickname)
   const [useActivityName, setUseActivityName] = useState(false)
@@ -958,7 +958,7 @@ function OnboardingPhotoSlot({
 }
 
 export function Step4Profile() {
-  const store = useByroStore()
+  const store = useFeloreStore()
   const mainPhotoInputRef = useRef<HTMLInputElement>(null)
   const subPhotoInputRef = useRef<HTMLInputElement>(null)
   const pendingSubIndexRef = useRef<number | null>(null)

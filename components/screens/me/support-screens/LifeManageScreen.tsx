@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Camera, ChevronRight, Plus, X, Zap } from 'lucide-react'
 import { Button, NavBar, showToast } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import type { LifeMediaItem, PublicProfileLife } from '@/types'
 import { ExercisePicker } from './ExercisePicker'
 import { MusicSearchPicker } from './MusicSearchPicker'
@@ -478,7 +478,7 @@ function LifeHub({
 
 export function LifeManageScreen({ onBack }: { onBack: () => void }) {
   const router = useRouter()
-  const store = useByroStore()
+  const store = useFeloreStore()
   const isPro = store.user?.isPaidUser ?? false
   const [view, setView] = useState<LifeView>('hub')
   const [life, setLife] = useState<PublicProfileLife>(store.user?.life ?? SAMPLE_PROFILE.life)

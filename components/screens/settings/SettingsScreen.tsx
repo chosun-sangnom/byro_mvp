@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useByroStore } from '@/store/useByroStore'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import {
   ChevronRight, Link, Lock, Pencil, BookmarkCheck, CreditCard, Eye, Check, CheckCircle2, BadgeCheck,
   Globe, FileText, HelpCircle,
@@ -57,7 +57,7 @@ type Section = {
 export default function SettingsScreen() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const store = useByroStore()
+  const store = useFeloreStore()
   const user = store.user
   const isLoggedIn = store.isLoggedIn
 
@@ -128,7 +128,7 @@ export default function SettingsScreen() {
           {/* 헤더 */}
           <div className="px-5 pt-6 pb-5 text-center">
             <div className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-accent-soft)] px-3 py-1 mb-3">
-              <span className="text-[11px] font-black text-[var(--color-accent-dark)] tracking-wide">BYRO PRO</span>
+              <span className="text-[11px] font-black text-[var(--color-accent-dark)] tracking-wide">FELORE PRO</span>
             </div>
             <p className="text-[22px] font-black text-[var(--color-text-primary)] leading-tight">
               더 넓게, 더 자유롭게
@@ -541,7 +541,7 @@ export default function SettingsScreen() {
                     <span className="rounded-full bg-[var(--color-accent-soft)] px-2 py-0.5 text-[10px] font-bold text-[var(--color-accent-dark)]">PRO</span>
                   )}
                 </div>
-                <p className="text-[12px] text-[var(--color-text-secondary)] mt-0.5">byro.io/{currentLinkId}</p>
+                <p className="text-[12px] text-[var(--color-text-secondary)] mt-0.5">felore.io/{currentLinkId}</p>
                 {!isPaid && (
                   <p className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5">유료 플랜으로 나만의 링크를 설정할 수 있어요</p>
                 )}
@@ -585,18 +585,18 @@ export default function SettingsScreen() {
           <div className="px-5 pb-6">
             <p className="text-[18px] font-black text-[var(--color-text-strong)] mb-1">내 링크 설정</p>
             <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed mb-5">
-              나만의 링크를 설정하면 <span className="font-semibold">byro.io/내이름</span> 형태로 프로필을 공유할 수 있어요. 유료 이용 종료 시 기본 링크로 자동 복원돼요.
+              나만의 링크를 설정하면 <span className="font-semibold">felore.io/내이름</span> 형태로 프로필을 공유할 수 있어요. 유료 이용 종료 시 기본 링크로 자동 복원돼요.
             </p>
 
             <p className="text-[11px] font-bold text-[var(--color-text-tertiary)] mb-1.5 uppercase tracking-[0.08em]">기본 링크 (변경 불가)</p>
             <div className="flex items-center gap-1.5 mb-4 px-4 py-2.5 rounded-xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)]">
-              <span className="text-[13px] text-[var(--color-text-tertiary)]">byro.io/</span>
+              <span className="text-[13px] text-[var(--color-text-tertiary)]">felore.io/</span>
               <span className="text-[13px] font-semibold text-[var(--color-text-tertiary)]">{randomLinkId}</span>
             </div>
 
             <p className="text-[11px] font-bold text-[var(--color-text-tertiary)] mb-1.5 uppercase tracking-[0.08em]">커스텀 링크</p>
             <div className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] mb-1.5">
-              <span className="text-[13px] text-[var(--color-text-tertiary)] flex-shrink-0">byro.io/</span>
+              <span className="text-[13px] text-[var(--color-text-tertiary)] flex-shrink-0">felore.io/</span>
               <input
                 type="text"
                 value={customLinkInput}

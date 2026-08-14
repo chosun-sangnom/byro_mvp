@@ -415,6 +415,7 @@ export function BasicInfoEditScreen({
   const activityNameDaysRemaining = isActivityNameLocked ? 30 - daysSinceChange! : 0
 
   const [birthDate, setBirthDate] = useState(user.birthDate ?? SAMPLE_PROFILE.birthDate ?? '')
+  const todayDateString = new Date().toISOString().slice(0, 10)
   const [birthTime, setBirthTime] = useState(user.birthTime ?? SAMPLE_PROFILE.birthTime ?? '')
   const [calendarType, setCalendarType] = useState<'solar' | 'lunar'>(user.calendarType ?? SAMPLE_PROFILE.calendarType ?? 'solar')
   const [showAge, setShowAge] = useState(user.showAge ?? SAMPLE_PROFILE.showAge ?? true)
@@ -706,7 +707,8 @@ export function BasicInfoEditScreen({
                 <input
                   type="date"
                   value={birthDate}
-                  onChange={(event) => setBirthDate(event.target.value)}
+                  max={todayDateString}
+                  onChange={(event) => setBirthDate(event.target.value > todayDateString ? todayDateString : event.target.value)}
                   className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
                 />
               </div>

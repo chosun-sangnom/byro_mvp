@@ -85,6 +85,22 @@ export function HighlightManageFormView({
     saveDisabled,
   } = values
 
+  const filteredYearOptions = (() => {
+    if (yearPickerTarget === 'career-end' && hlStartYear) {
+      return yearOptions.filter((year) => Number(year) >= Number(hlStartYear))
+    }
+    if (yearPickerTarget === 'career-start' && hlEndYear) {
+      return yearOptions.filter((year) => Number(year) <= Number(hlEndYear))
+    }
+    if (yearPickerTarget === 'education-end' && hlEducationStartYear) {
+      return yearOptions.filter((year) => Number(year) >= Number(hlEducationStartYear))
+    }
+    if (yearPickerTarget === 'education-start' && hlEducationEndYear) {
+      return yearOptions.filter((year) => Number(year) <= Number(hlEducationEndYear))
+    }
+    return yearOptions
+  })()
+
   const {
     onBack,
     onSave,
@@ -337,7 +353,7 @@ export function HighlightManageFormView({
                 : yearPickerTarget === 'education-end' ? hlEducationEndYear
                   : hlEducationYear
         }
-        options={yearOptions}
+        options={filteredYearOptions}
         onSelect={(value) => {
           if (yearPickerTarget === 'career-start') setHlStartYear(value)
           if (yearPickerTarget === 'career-end') setHlEndYear(value)

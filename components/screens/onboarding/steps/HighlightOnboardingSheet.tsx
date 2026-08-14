@@ -40,6 +40,21 @@ export function HighlightOnboardingSheet({ open, onClose }: HighlightOnboardingS
   const educationNeedsMajor = hlSchoolType !== '고등학교'
   const currentYear = new Date().getFullYear()
   const yearOptions = Array.from({ length: currentYear - 1979 }, (_, index) => String(currentYear - index))
+  const filteredYearOptions = (() => {
+    if (yearPickerTarget === 'career-end' && hlStartYear) {
+      return yearOptions.filter((year) => Number(year) >= Number(hlStartYear))
+    }
+    if (yearPickerTarget === 'career-start' && hlEndYear) {
+      return yearOptions.filter((year) => Number(year) <= Number(hlEndYear))
+    }
+    if (yearPickerTarget === 'education-end' && hlEducationStartYear) {
+      return yearOptions.filter((year) => Number(year) >= Number(hlEducationStartYear))
+    }
+    if (yearPickerTarget === 'education-start' && hlEducationEndYear) {
+      return yearOptions.filter((year) => Number(year) <= Number(hlEducationEndYear))
+    }
+    return yearOptions
+  })()
   const selectedCategoryHighlights = selectedCat
     ? sortHighlightsByPrimary(
         store.highlights.filter((item) => item.categoryId === selectedCat.id),
@@ -571,7 +586,7 @@ export function HighlightOnboardingSheet({ open, onClose }: HighlightOnboardingS
                 : yearPickerTarget === 'education-end' ? hlEducationEndYear
                   : hlEducationYear
         }
-        options={yearOptions}
+        options={filteredYearOptions}
         onSelect={(value) => {
           if (yearPickerTarget === 'career-start') setHlStartYear(value)
           if (yearPickerTarget === 'career-end') setHlEndYear(value)

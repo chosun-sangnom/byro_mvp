@@ -813,6 +813,7 @@ export function Step2BasicInfo() {
   const [useActivityName, setUseActivityName] = useState(false)
   const [birthDate, setBirthDate] = useState(store.onboardingBirthDate)
   const [showAge, setShowAge] = useState(store.onboardingShowAge)
+  const todayDateString = new Date().toISOString().slice(0, 10)
 
   const canProceed = name.trim().length > 0
 
@@ -898,7 +899,8 @@ export function Step2BasicInfo() {
         <input
           type="date"
           value={birthDate}
-          onChange={(e) => setBirthDate(e.target.value)}
+          max={todayDateString}
+          onChange={(e) => setBirthDate(e.target.value > todayDateString ? todayDateString : e.target.value)}
           className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
         />
       </div>

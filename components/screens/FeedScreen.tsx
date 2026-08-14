@@ -2,8 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { ChevronRight } from 'lucide-react'
-import { Avatar, ToastSingleton, showToast } from '@/components/ui'
-import AppHeader from '@/components/layout/AppHeader'
+import { Avatar, showToast } from '@/components/ui'
 
 type FeedProfile = {
   linkId: string | null
@@ -47,91 +46,84 @@ export default function FeedScreen() {
   }
 
   return (
-    <ToastSingleton>
-      <div className="relative mx-auto w-full max-w-[430px] min-h-dvh flex flex-col bg-[var(--color-bg-page)]">
+    <div className="flex-1 overflow-y-auto">
 
-        <AppHeader />
-
-        <div className="flex-1 overflow-y-auto">
-
-          {/* 새로 가입했어요 */}
-          <section className="pt-5 pb-4">
-            <h2 className="px-5 text-[15px] font-black text-[var(--color-text-strong)] mb-3">새로 가입했어요</h2>
-            <div className="flex gap-4 px-5 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
-              {NEW_PROFILES.map((p, i) => (
-                <button
-                  key={i}
-                  onClick={() => handleProfileClick(p.linkId)}
-                  className="flex-shrink-0 flex flex-col items-center gap-2"
-                  style={{ width: 72 }}
-                >
-                  <Avatar src={p.avatarImage} name={p.name} color={p.avatarColor} size={60} />
-                  <div className="text-center w-full">
-                    <p className="text-[12px] font-semibold text-[var(--color-text-primary)] truncate">{p.name}</p>
-                    <p className="text-[10px] text-[var(--color-text-tertiary)] truncate">{p.title.split(' · ')[0]}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </section>
-
-          <div className="h-px mx-5 bg-[var(--color-border-soft)]" />
-
-          {/* 활발하게 활동 중 */}
-          <section className="pt-5 pb-4">
-            <h2 className="px-5 text-[15px] font-black text-[var(--color-text-strong)] mb-3">활발하게 활동 중</h2>
-            <div className="flex gap-4 px-5 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
-              {ACTIVE_PROFILES.map((p, i) => (
-                <button
-                  key={i}
-                  onClick={() => handleProfileClick(p.linkId)}
-                  className="flex-shrink-0 flex flex-col items-center gap-2"
-                  style={{ width: 72 }}
-                >
-                  <Avatar src={p.avatarImage} name={p.name} color={p.avatarColor} size={60} />
-                  <div className="text-center w-full">
-                    <p className="text-[12px] font-semibold text-[var(--color-text-primary)] truncate">{p.name}</p>
-                    <p className="text-[10px] text-[var(--color-text-tertiary)] truncate">{p.title.split(' · ')[0]}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </section>
-
-          <div className="h-px mx-5 bg-[var(--color-border-soft)]" />
-
-          {/* 추천 프로필 */}
-          <section className="pt-5 pb-8">
-            <h2 className="px-5 text-[15px] font-black text-[var(--color-text-strong)] mb-1">추천 프로필</h2>
-            {RECOMMENDED_PROFILES.map((p, i) => (
-              <button
-                key={i}
-                onClick={() => handleProfileClick(p.linkId)}
-                className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[var(--color-bg-soft)] transition-colors text-left"
-              >
-                <Avatar src={p.avatarImage} name={p.name} color={p.avatarColor} size={44} />
-                <div className="min-w-0 flex-1">
-                  <p className="text-[14px] font-semibold text-[var(--color-text-primary)] truncate">{p.name}</p>
-                  <p className="text-[12px] text-[var(--color-text-secondary)] truncate">{p.title}</p>
-                </div>
-                <ChevronRight size={16} className="text-[var(--color-text-tertiary)] flex-shrink-0" />
-              </button>
-            ))}
-          </section>
-
-          {/* 랜딩 페이지 링크 */}
-          <div className="px-5 pb-10 pt-2 border-t border-[var(--color-border-soft)]">
+      {/* 새로 가입했어요 */}
+      <section className="pt-5 pb-4">
+        <h2 className="px-5 text-[15px] font-black text-[var(--color-text-strong)] mb-3">새로 가입했어요</h2>
+        <div className="flex gap-4 px-5 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+          {NEW_PROFILES.map((p, i) => (
             <button
-              onClick={() => router.push('/landing')}
-              className="w-full flex items-center justify-center gap-1.5 py-3 text-[13px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
+              key={i}
+              onClick={() => handleProfileClick(p.linkId)}
+              className="flex-shrink-0 flex flex-col items-center gap-2"
+              style={{ width: 72 }}
             >
-              <span>FELORE 서비스 소개 보기</span>
-              <ChevronRight size={14} />
+              <Avatar src={p.avatarImage} name={p.name} color={p.avatarColor} size={60} />
+              <div className="text-center w-full">
+                <p className="text-[12px] font-semibold text-[var(--color-text-primary)] truncate">{p.name}</p>
+                <p className="text-[10px] text-[var(--color-text-tertiary)] truncate">{p.title.split(' · ')[0]}</p>
+              </div>
             </button>
-          </div>
-
+          ))}
         </div>
+      </section>
+
+      <div className="h-px mx-5 bg-[var(--color-border-soft)]" />
+
+      {/* 활발하게 활동 중 */}
+      <section className="pt-5 pb-4">
+        <h2 className="px-5 text-[15px] font-black text-[var(--color-text-strong)] mb-3">활발하게 활동 중</h2>
+        <div className="flex gap-4 px-5 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+          {ACTIVE_PROFILES.map((p, i) => (
+            <button
+              key={i}
+              onClick={() => handleProfileClick(p.linkId)}
+              className="flex-shrink-0 flex flex-col items-center gap-2"
+              style={{ width: 72 }}
+            >
+              <Avatar src={p.avatarImage} name={p.name} color={p.avatarColor} size={60} />
+              <div className="text-center w-full">
+                <p className="text-[12px] font-semibold text-[var(--color-text-primary)] truncate">{p.name}</p>
+                <p className="text-[10px] text-[var(--color-text-tertiary)] truncate">{p.title.split(' · ')[0]}</p>
+              </div>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <div className="h-px mx-5 bg-[var(--color-border-soft)]" />
+
+      {/* 추천 프로필 */}
+      <section className="pt-5 pb-8">
+        <h2 className="px-5 text-[15px] font-black text-[var(--color-text-strong)] mb-1">추천 프로필</h2>
+        {RECOMMENDED_PROFILES.map((p, i) => (
+          <button
+            key={i}
+            onClick={() => handleProfileClick(p.linkId)}
+            className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[var(--color-bg-soft)] transition-colors text-left"
+          >
+            <Avatar src={p.avatarImage} name={p.name} color={p.avatarColor} size={44} />
+            <div className="min-w-0 flex-1">
+              <p className="text-[14px] font-semibold text-[var(--color-text-primary)] truncate">{p.name}</p>
+              <p className="text-[12px] text-[var(--color-text-secondary)] truncate">{p.title}</p>
+            </div>
+            <ChevronRight size={16} className="text-[var(--color-text-tertiary)] flex-shrink-0" />
+          </button>
+        ))}
+      </section>
+
+      {/* 랜딩 페이지 링크 */}
+      <div className="px-5 pb-10 pt-2 border-t border-[var(--color-border-soft)]">
+        <button
+          onClick={() => router.push('/landing')}
+          className="w-full flex items-center justify-center gap-1.5 py-3 text-[13px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
+        >
+          <span>FELORE 서비스 소개 보기</span>
+          <ChevronRight size={14} />
+        </button>
       </div>
-    </ToastSingleton>
+
+    </div>
   )
 }

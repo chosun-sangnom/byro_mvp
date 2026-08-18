@@ -13,7 +13,7 @@ export default function HomeScreen() {
   const router = useRouter()
 
   return (
-    <div className="min-h-full bg-[var(--color-bg-page)] text-[var(--color-text-strong)] antialiased">
+    <div className="theme-brand-blue min-h-full bg-[var(--color-bg-page)] text-[var(--color-text-strong)] antialiased">
       <div className="sticky top-0 z-50 flex items-center justify-between px-5 h-14 bg-[var(--color-bg-page)] border-b border-[var(--color-border-soft)]">
         <span className="text-[18px] font-black tracking-tight text-[var(--color-text-strong)]">FELORE</span>
         <button

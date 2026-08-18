@@ -52,7 +52,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-dvh flex" style={{ backgroundColor: 'var(--color-bg-surface)' }}>
+    <div className="theme-brand-blue min-h-dvh flex" style={{ backgroundColor: 'var(--color-bg-surface)' }}>
       <aside
         className="sticky top-0 flex h-dvh w-[240px] shrink-0 flex-col border-r px-4 py-5"
         style={{ backgroundColor: '#FFFFFF', borderColor: 'var(--color-border-default)' }}

@@ -37,7 +37,7 @@ export default function AdminLoginScreen() {
   }
 
   return (
-    <div className="flex min-h-dvh items-center justify-center" style={{ backgroundColor: 'var(--color-bg-surface)' }}>
+    <div className="theme-brand-blue flex min-h-dvh items-center justify-center" style={{ backgroundColor: 'var(--color-bg-surface)' }}>
       <div
         className="w-full max-w-[380px] rounded-3xl border p-7"
         style={{ backgroundColor: '#FFFFFF', borderColor: 'var(--color-border-default)', boxShadow: 'var(--shadow-hero)' }}

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { Calendar, Camera, CheckCircle2, ChevronRight, Eye, EyeOff, Info, MessageCircle } from 'lucide-react'
+import { Calendar, Camera, CheckCircle2, ChevronLeft, ChevronRight, Eye, EyeOff, Info, MessageCircle } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { BottomSheet, Button, GoogleIcon, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
@@ -1014,6 +1014,103 @@ function CheckboxDot({ checked }: { checked: boolean }) {
   )
 }
 
+const CALENDAR_WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토']
+
+function BirthDateCalendar({
+  digits,
+  onSelect,
+  onClose,
+}: {
+  digits: string
+  onSelect: (digits: string) => void
+  onClose: () => void
+}) {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const [viewDate, setViewDate] = useState(() =>
+    digits.length === 8
+      ? new Date(Number(digits.slice(0, 4)), Number(digits.slice(4, 6)) - 1, 1)
+      : new Date(today.getFullYear(), today.getMonth(), 1)
+  )
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleOutside(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) onClose()
+    }
+    document.addEventListener('mousedown', handleOutside)
+    return () => document.removeEventListener('mousedown', handleOutside)
+  }, [onClose])
+
+  const year = viewDate.getFullYear()
+  const month = viewDate.getMonth()
+  const firstWeekday = new Date(year, month, 1).getDay()
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  const selectedDay =
+    digits.length === 8 && Number(digits.slice(0, 4)) === year && Number(digits.slice(4, 6)) === month + 1
+      ? Number(digits.slice(6, 8))
+      : null
+
+  const cells: Array<number | null> = [
+    ...Array(firstWeekday).fill(null),
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+  ]
+
+  const handlePick = (day: number) => {
+    const picked = new Date(year, month, day)
+    if (picked.getTime() > today.getTime()) return
+    onSelect(`${year}${String(month + 1).padStart(2, '0')}${String(day).padStart(2, '0')}`)
+    onClose()
+  }
+
+  return (
+    <div
+      ref={containerRef}
+      className="absolute left-0 top-[calc(100%+8px)] z-20 w-full rounded-2xl bg-white p-4"
+      style={{ boxShadow: '0 8px 28px rgba(0,0,0,0.14)' }}
+    >
+      <div className="mb-3 flex items-center justify-between">
+        <span className="text-[15px] font-bold text-[#0D0D0D]">{year}년 {month + 1}월</span>
+        <div className="flex items-center gap-3">
+          <button type="button" onClick={() => setViewDate(new Date(year, month - 1, 1))} className="text-[#0D0D0D]">
+            <ChevronLeft size={18} />
+          </button>
+          <button type="button" onClick={() => setViewDate(new Date(year, month + 1, 1))} className="text-[#0D0D0D]">
+            <ChevronRight size={18} />
+          </button>
+        </div>
+      </div>
+      <div className="mb-1 grid grid-cols-7">
+        {CALENDAR_WEEKDAYS.map((w) => (
+          <div key={w} className="py-1 text-center text-[11px] font-medium text-[#A8B1BD]">{w}</div>
+        ))}
+      </div>
+      <div className="grid grid-cols-7 gap-y-1">
+        {cells.map((day, idx) => {
+          if (day === null) return <div key={idx} />
+          const isFuture = new Date(year, month, day).getTime() > today.getTime()
+          const isSelected = selectedDay === day
+          const isToday = year === today.getFullYear() && month === today.getMonth() && day === today.getDate()
+          return (
+            <button key={idx} type="button" disabled={isFuture} onClick={() => handlePick(day)} className="flex h-9 items-center justify-center">
+              <span
+                className="flex h-8 w-8 items-center justify-center rounded-full text-sm"
+                style={{
+                  backgroundColor: isSelected ? '#25313D' : 'transparent',
+                  color: isFuture ? '#DEE4EC' : isSelected ? '#FFFFFF' : '#0D0D0D',
+                  fontWeight: isToday && !isSelected ? 700 : 400,
+                }}
+              >
+                {day}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 export function Step2BasicInfo() {
   const store = useFeloreStore()
   const [name, setName] = useState(store.onboardingName)
@@ -1021,8 +1118,7 @@ export function Step2BasicInfo() {
   const [useActivityName, setUseActivityName] = useState(false)
   const [birthDigits, setBirthDigits] = useState(() => store.onboardingBirthDate.replace(/\D/g, '').slice(0, 8))
   const [showAge, setShowAge] = useState(store.onboardingShowAge)
-  const birthPickerRef = useRef<HTMLInputElement>(null)
-  const todayDateString = new Date().toISOString().slice(0, 10)
+  const [showCalendar, setShowCalendar] = useState(false)
 
   const nameError = name.length > 20
   const nicknameError = useActivityName && nickname.length > 30
@@ -1049,9 +1145,9 @@ export function Step2BasicInfo() {
 
         {/* 이름 (필수) */}
         <div className="mb-6">
-          <div className="mb-2 flex items-center">
+          <div className="mb-2 flex items-start">
             <span className="text-sm font-semibold text-[#0D0D0D]">이름</span>
-            <span className="ml-0.5 h-3 w-[3px] rounded-full bg-[#FF4242]" />
+            <span className="ml-0.5 mt-0.5 h-[3px] w-[3px] shrink-0 rounded-full bg-[#FF4242]" />
           </div>
           <input
             type="text"
@@ -1112,25 +1208,18 @@ export function Step2BasicInfo() {
             />
             <button
               type="button"
-              onClick={() => {
-                const el = birthPickerRef.current
-                if (!el) return
-                if (typeof el.showPicker === 'function') el.showPicker()
-                else el.click()
-              }}
+              onClick={() => setShowCalendar((prev) => !prev)}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A8B1BD]"
             >
               <Calendar size={16} />
             </button>
-            <input
-              ref={birthPickerRef}
-              type="date"
-              value={birthComplete ? isoFromBirthDigits(birthDigits) : ''}
-              max={todayDateString}
-              onChange={(e) => setBirthDigits(e.target.value ? e.target.value.replace(/\D/g, '') : '')}
-              className="pointer-events-none absolute inset-0 opacity-0"
-              tabIndex={-1}
-            />
+            {showCalendar && (
+              <BirthDateCalendar
+                digits={birthDigits}
+                onSelect={setBirthDigits}
+                onClose={() => setShowCalendar(false)}
+              />
+            )}
           </div>
           {birthDateError && <p className="mt-1.5 text-xs text-[#FF4242]">올바른 날짜 형식을 입력해주세요.</p>}
 

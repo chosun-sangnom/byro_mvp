@@ -6,7 +6,7 @@ import { useFeloreStore } from '@/store/useFeloreStore'
 import { BottomSheet, Button, NavBar, showToast } from '@/components/ui'
 import { ContactTypeIcon } from '@/components/contact/ContactTypeIcon'
 import type { ContactChannel, MessengerApp } from '@/types'
-import { buildContactHref, contactChannelValueDisplay, contactPlaceholder, contactPreview, MESSENGER_APP_LABELS } from '@/lib/contactChannels'
+import { buildContactHref, contactChannelValueDisplay, contactPlaceholder, contactPreview, messengerUsesCountryCode, MESSENGER_APP_LABELS } from '@/lib/contactChannels'
 import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from '@/lib/countryCodes'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
@@ -55,8 +55,8 @@ export function ContactManageScreen({ onBack }: { onBack: () => void }) {
     updateChannel(selectedChannel.id, {
       value: trimmed,
       enabled: trimmed.length > 0,
-      href: buildContactHref(selectedChannel.id, trimmed, isMessenger ? messengerApp : undefined, isMessenger && messengerApp === 'whatsapp' ? countryCode : undefined),
-      ...(isMessenger ? { messengerApp, label: MESSENGER_APP_LABELS[messengerApp], countryCode: messengerApp === 'whatsapp' ? countryCode : undefined } : {}),
+      href: buildContactHref(selectedChannel.id, trimmed, isMessenger ? messengerApp : undefined, isMessenger && messengerUsesCountryCode(messengerApp) ? countryCode : undefined),
+      ...(isMessenger ? { messengerApp, label: MESSENGER_APP_LABELS[messengerApp], countryCode: messengerUsesCountryCode(messengerApp) ? countryCode : undefined } : {}),
     })
     setSheetOpen(false)
     showToast('연락 수단이 저장됐어요')
@@ -76,7 +76,7 @@ export function ContactManageScreen({ onBack }: { onBack: () => void }) {
   }
 
   const isMessengerSheet = selectedChannel?.id === 'messenger'
-  const isWhatsapp = isMessengerSheet && messengerApp === 'whatsapp'
+  const showCountryCode = isMessengerSheet && messengerUsesCountryCode(messengerApp)
 
   return (
     <div className="flex flex-col h-full">
@@ -146,7 +146,7 @@ export function ContactManageScreen({ onBack }: { onBack: () => void }) {
           <div className="text-xs text-[var(--color-text-secondary)] mb-1">
             {isMessengerSheet ? MESSENGER_APP_LABELS[messengerApp] : selectedChannel?.label}
           </div>
-          {isWhatsapp ? (
+          {showCountryCode ? (
             <div className="flex gap-2 mb-2">
               <div className="relative flex-shrink-0">
                 <select
@@ -176,7 +176,7 @@ export function ContactManageScreen({ onBack }: { onBack: () => void }) {
             />
           )}
           <div className="text-[11px] text-[var(--color-text-tertiary)] mb-4">
-            {contactPreview(selectedChannel?.id, inputValue, isMessengerSheet ? messengerApp : undefined, isWhatsapp ? countryCode : undefined)}
+            {contactPreview(selectedChannel?.id, inputValue, isMessengerSheet ? messengerApp : undefined, showCountryCode ? countryCode : undefined)}
           </div>
           <div className="space-y-2">
             <Button onClick={handleSaveChannel}>저장하기</Button>

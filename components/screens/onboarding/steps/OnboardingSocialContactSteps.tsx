@@ -9,7 +9,7 @@ import { ContactTypeIcon } from '@/components/contact/ContactTypeIcon'
 import { StepFooter, StepIntro, SelectionCard } from '@/components/screens/onboarding/OnboardingShared'
 import type { ContactChannel, MessengerApp } from '@/types'
 import { INSTAGRAM_PROFILE, LINKEDIN_PROFILE } from '@/lib/mocks/socialProfiles'
-import { buildContactHref, contactChannelValueDisplay, contactPlaceholder, contactPreview, MESSENGER_APP_LABELS } from '@/lib/contactChannels'
+import { buildContactHref, contactChannelValueDisplay, contactPlaceholder, contactPreview, messengerUsesCountryCode, MESSENGER_APP_LABELS } from '@/lib/contactChannels'
 import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from '@/lib/countryCodes'
 
 const MESSENGER_APPS: MessengerApp[] = ['kakao', 'telegram', 'whatsapp']
@@ -109,7 +109,7 @@ export function Step6Contact() {
   }
 
   const isMessengerSheet = selectedChannel?.id === 'messenger'
-  const isWhatsapp = isMessengerSheet && messengerApp === 'whatsapp'
+  const showCountryCode = isMessengerSheet && messengerUsesCountryCode(messengerApp)
 
   const handleSaveChannel = () => {
     if (!selectedChannel) return
@@ -121,8 +121,8 @@ export function Step6Contact() {
           ...channel,
           value: trimmed,
           enabled: Boolean(trimmed),
-          href: trimmed ? buildContactHref(selectedChannel.id, trimmed, isMessenger ? messengerApp : undefined, isMessenger && messengerApp === 'whatsapp' ? countryCode : undefined) : '',
-          ...(isMessenger ? { messengerApp, label: MESSENGER_APP_LABELS[messengerApp], countryCode: messengerApp === 'whatsapp' ? countryCode : undefined } : {}),
+          href: trimmed ? buildContactHref(selectedChannel.id, trimmed, isMessenger ? messengerApp : undefined, isMessenger && messengerUsesCountryCode(messengerApp) ? countryCode : undefined) : '',
+          ...(isMessenger ? { messengerApp, label: MESSENGER_APP_LABELS[messengerApp], countryCode: messengerUsesCountryCode(messengerApp) ? countryCode : undefined } : {}),
         }
         : channel
     ))
@@ -256,7 +256,7 @@ export function Step6Contact() {
                 </div>
               )}
 
-              {isWhatsapp ? (
+              {showCountryCode ? (
                 <div className="flex gap-2 mb-2">
                   <div className="relative flex-shrink-0">
                     <select
@@ -288,7 +288,7 @@ export function Step6Contact() {
                   style={{ borderColor: 'var(--color-border-default)' }}
                 />
               )}
-              <div className="micro-text mb-4">{contactPreview(selectedChannel.id, inputValue, isMessengerSheet ? messengerApp : undefined, isWhatsapp ? countryCode : undefined)}</div>
+              <div className="micro-text mb-4">{contactPreview(selectedChannel.id, inputValue, isMessengerSheet ? messengerApp : undefined, showCountryCode ? countryCode : undefined)}</div>
 
               <div className="space-y-2">
                 <Button onClick={handleSaveChannel}>저장하기</Button>

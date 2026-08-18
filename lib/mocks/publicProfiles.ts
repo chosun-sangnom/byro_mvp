@@ -127,7 +127,7 @@ export const SAMPLE_PROFILE = {
   contactChannels: [
     { id: 'phone', label: '전화', value: '010-9482-1158', href: 'tel:01094821158', enabled: true },
     { id: 'email', label: '이메일', value: 'gangminjun@felore.io', href: 'mailto:gangminjun@felore.io', enabled: true },
-    { id: 'messenger', label: '카카오', messengerApp: 'kakao', value: 'gangminjun.kakao', href: 'https://open.kakao.com/o/sgangminjun', enabled: true },
+    { id: 'messenger', label: '카카오', messengerApp: 'kakao', value: 'gangminjun.kakao', href: 'https://open.kakao.com/me/gangminjun.kakao', enabled: true },
   ] as ContactChannel[],
   instagramConnected: true,
   linkedinConnected: true,
@@ -417,7 +417,7 @@ export const MK_PROFILE = {
   contactChannels: [
     { id: 'phone', label: '전화', value: '010-3221-1042', href: 'tel:01032211042', enabled: true },
     { id: 'email', label: '이메일', value: 'mk@byth.io', href: 'mailto:mk@byth.io', enabled: true },
-    { id: 'messenger', label: '카카오', messengerApp: 'kakao', value: 'epicmkk', href: 'https://open.kakao.com/o/smkbyth', enabled: true },
+    { id: 'messenger', label: '카카오', messengerApp: 'kakao', value: 'epicmkk', href: 'https://open.kakao.com/me/epicmkk', enabled: true },
   ] as ContactChannel[],
   instagramConnected: true,
   linkedinConnected: true,
@@ -660,7 +660,7 @@ export const JIMIN_PROFILE = {
   contactChannels: [
     { id: 'phone', label: '전화', value: '010-2437-1022', href: 'tel:01024371022', enabled: true },
     { id: 'email', label: '이메일', value: 'jimin@felore.io', href: 'mailto:jimin@felore.io', enabled: true },
-    { id: 'messenger', label: '카카오', messengerApp: 'kakao', value: 'jimin.marketer', href: 'https://open.kakao.com/o/sjimin', enabled: true },
+    { id: 'messenger', label: '카카오', messengerApp: 'kakao', value: 'jimin.marketer', href: 'https://open.kakao.com/me/jimin.marketer', enabled: true },
   ] as ContactChannel[],
   instagramConnected: true,
   linkedinConnected: false,

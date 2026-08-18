@@ -65,12 +65,7 @@ function AccountCard() {
               <p className="text-[14px] font-bold text-[var(--color-text-primary)]">로그인이 필요해요</p>
               <p className="text-[12px] leading-relaxed break-keep text-[var(--color-text-secondary)]">로그인하고 펠로어를 더 이용해보세요</p>
             </div>
-            <Button
-              size="sm"
-              fullWidth={false}
-              onClick={() => setLoginModalOpen(true)}
-              style={{ backgroundColor: BLACK, boxShadow: 'none' }}
-            >
+            <Button size="sm" fullWidth={false} onClick={() => setLoginModalOpen(true)}>
               로그인하기
             </Button>
           </div>

@@ -47,14 +47,14 @@ export function Button({
         'rounded-xl font-semibold select-none whitespace-nowrap',
         size === 'md' ? 'px-5 py-3 text-[14px]' : 'px-3.5 py-2 text-[13px]',
         fullWidth ? 'w-full' : '',
-        disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer',
+        disabled ? (variant === 'primary' ? 'cursor-not-allowed' : 'opacity-40 cursor-not-allowed') : 'cursor-pointer',
         BUTTON_VARIANTS[variant] ?? BUTTON_VARIANTS.primary,
         className,
       ].join(' ')}
       style={{
         backgroundColor:
           variant === 'primary'
-            ? 'var(--color-accent-dark)'
+            ? (disabled ? 'var(--color-text-tertiary)' : '#0D0D0D')
             : variant === 'outline'
               ? 'transparent'
               : variant === 'google'
@@ -84,11 +84,7 @@ export function Button({
               : variant === 'danger'
                 ? 'rgba(198,40,40,0.28)'
                 : undefined,
-        boxShadow:
-          variant === 'primary' && !disabled
-            ? '0 0 18px rgba(29,200,160,0.30), 0 2px 8px rgba(29,200,160,0.18)'
-            : undefined,
-        borderRadius: variant === 'google' ? 20 : undefined,
+        borderRadius: variant === 'primary' ? 9999 : variant === 'google' ? 20 : undefined,
         ...style,
       }}
     >

@@ -1,11 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import { ChevronDown } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { BottomSheet, Button, NavBar, showToast } from '@/components/ui'
 import { ContactTypeIcon } from '@/components/contact/ContactTypeIcon'
 import type { ContactChannel, MessengerApp } from '@/types'
-import { buildContactHref, contactPlaceholder, contactPreview, MESSENGER_APP_LABELS } from '@/lib/contactChannels'
+import { buildContactHref, contactChannelValueDisplay, contactPlaceholder, contactPreview, MESSENGER_APP_LABELS } from '@/lib/contactChannels'
+import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from '@/lib/countryCodes'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
 const MESSENGER_APPS: MessengerApp[] = ['kakao', 'telegram', 'whatsapp']
@@ -19,7 +21,7 @@ function channelRowSubtitle(channel: ContactChannel) {
   if (!channel.enabled) return '비활성화됨'
   if (channel.id === 'messenger') {
     const appLabel = MESSENGER_APP_LABELS[channel.messengerApp ?? 'kakao']
-    return channel.value ? `${appLabel} · ${channel.value}` : appLabel
+    return channel.value ? `${appLabel} · ${contactChannelValueDisplay(channel)}` : appLabel
   }
   return channel.value || '연결됨'
 }
@@ -32,11 +34,13 @@ export function ContactManageScreen({ onBack }: { onBack: () => void }) {
   const [selectedChannel, setSelectedChannel] = useState<ContactChannel | null>(null)
   const [inputValue, setInputValue] = useState('')
   const [messengerApp, setMessengerApp] = useState<MessengerApp>('kakao')
+  const [countryCode, setCountryCode] = useState(DEFAULT_COUNTRY_CODE)
 
   const openSheet = (channel: ContactChannel) => {
     setSelectedChannel(channel)
     setInputValue(channel.value)
     setMessengerApp(channel.messengerApp ?? 'kakao')
+    setCountryCode(channel.countryCode ?? DEFAULT_COUNTRY_CODE)
     setSheetOpen(true)
   }
 
@@ -51,8 +55,8 @@ export function ContactManageScreen({ onBack }: { onBack: () => void }) {
     updateChannel(selectedChannel.id, {
       value: trimmed,
       enabled: trimmed.length > 0,
-      href: buildContactHref(selectedChannel.id, trimmed, isMessenger ? messengerApp : undefined),
-      ...(isMessenger ? { messengerApp, label: MESSENGER_APP_LABELS[messengerApp] } : {}),
+      href: buildContactHref(selectedChannel.id, trimmed, isMessenger ? messengerApp : undefined, isMessenger && messengerApp === 'whatsapp' ? countryCode : undefined),
+      ...(isMessenger ? { messengerApp, label: MESSENGER_APP_LABELS[messengerApp], countryCode: messengerApp === 'whatsapp' ? countryCode : undefined } : {}),
     })
     setSheetOpen(false)
     showToast('연락 수단이 저장됐어요')
@@ -72,6 +76,7 @@ export function ContactManageScreen({ onBack }: { onBack: () => void }) {
   }
 
   const isMessengerSheet = selectedChannel?.id === 'messenger'
+  const isWhatsapp = isMessengerSheet && messengerApp === 'whatsapp'
 
   return (
     <div className="flex flex-col h-full">
@@ -141,14 +146,37 @@ export function ContactManageScreen({ onBack }: { onBack: () => void }) {
           <div className="text-xs text-[var(--color-text-secondary)] mb-1">
             {isMessengerSheet ? MESSENGER_APP_LABELS[messengerApp] : selectedChannel?.label}
           </div>
-          <input
-            value={inputValue}
-            onChange={(event) => setInputValue(event.target.value)}
-            placeholder={contactPlaceholder(selectedChannel?.id, isMessengerSheet ? messengerApp : undefined)}
-            className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-3 text-sm outline-none mb-2 bg-[var(--color-bg-muted)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)]"
-          />
+          {isWhatsapp ? (
+            <div className="flex gap-2 mb-2">
+              <div className="relative flex-shrink-0">
+                <select
+                  value={countryCode}
+                  onChange={(event) => setCountryCode(event.target.value)}
+                  className="h-full appearance-none rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-muted)] pl-3 pr-7 py-3 text-sm text-[var(--color-text-primary)] outline-none"
+                >
+                  {COUNTRY_CODES.map((country) => (
+                    <option key={country.code} value={country.code}>{country.code} {country.name}</option>
+                  ))}
+                </select>
+                <ChevronDown size={14} className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]" />
+              </div>
+              <input
+                value={inputValue}
+                onChange={(event) => setInputValue(event.target.value)}
+                placeholder={contactPlaceholder(selectedChannel?.id, messengerApp)}
+                className="min-w-0 flex-1 border border-[var(--color-border-default)] rounded-xl px-4 py-3 text-sm outline-none bg-[var(--color-bg-muted)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)]"
+              />
+            </div>
+          ) : (
+            <input
+              value={inputValue}
+              onChange={(event) => setInputValue(event.target.value)}
+              placeholder={contactPlaceholder(selectedChannel?.id, isMessengerSheet ? messengerApp : undefined)}
+              className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-3 text-sm outline-none mb-2 bg-[var(--color-bg-muted)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)]"
+            />
+          )}
           <div className="text-[11px] text-[var(--color-text-tertiary)] mb-4">
-            {contactPreview(selectedChannel?.id, inputValue, isMessengerSheet ? messengerApp : undefined)}
+            {contactPreview(selectedChannel?.id, inputValue, isMessengerSheet ? messengerApp : undefined, isWhatsapp ? countryCode : undefined)}
           </div>
           <div className="space-y-2">
             <Button onClick={handleSaveChannel}>저장하기</Button>

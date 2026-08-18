@@ -2,13 +2,15 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
+import { ChevronDown } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { BottomSheet, Button, InfoBox, showToast } from '@/components/ui'
 import { ContactTypeIcon } from '@/components/contact/ContactTypeIcon'
 import { StepFooter, StepIntro, SelectionCard } from '@/components/screens/onboarding/OnboardingShared'
 import type { ContactChannel, MessengerApp } from '@/types'
 import { INSTAGRAM_PROFILE, LINKEDIN_PROFILE } from '@/lib/mocks/socialProfiles'
-import { buildContactHref, contactPlaceholder, contactPreview, MESSENGER_APP_LABELS } from '@/lib/contactChannels'
+import { buildContactHref, contactChannelValueDisplay, contactPlaceholder, contactPreview, MESSENGER_APP_LABELS } from '@/lib/contactChannels'
+import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from '@/lib/countryCodes'
 
 const MESSENGER_APPS: MessengerApp[] = ['kakao', 'telegram', 'whatsapp']
 
@@ -94,6 +96,7 @@ export function Step6Contact() {
   const [selectedChannel, setSelectedChannel] = useState<ContactChannel | null>(null)
   const [inputValue, setInputValue] = useState('')
   const [messengerApp, setMessengerApp] = useState<MessengerApp>('kakao')
+  const [countryCode, setCountryCode] = useState(DEFAULT_COUNTRY_CODE)
   const channels = store.onboardingContactChannels
   const activeCount = channels.filter((channel) => channel.enabled && channel.value.trim()).length
 
@@ -101,10 +104,12 @@ export function Step6Contact() {
     setSelectedChannel(channel)
     setInputValue(channel.value)
     setMessengerApp(channel.messengerApp ?? 'kakao')
+    setCountryCode(channel.countryCode ?? DEFAULT_COUNTRY_CODE)
     setSheetOpen(true)
   }
 
   const isMessengerSheet = selectedChannel?.id === 'messenger'
+  const isWhatsapp = isMessengerSheet && messengerApp === 'whatsapp'
 
   const handleSaveChannel = () => {
     if (!selectedChannel) return
@@ -116,8 +121,8 @@ export function Step6Contact() {
           ...channel,
           value: trimmed,
           enabled: Boolean(trimmed),
-          href: trimmed ? buildContactHref(selectedChannel.id, trimmed, isMessenger ? messengerApp : undefined) : '',
-          ...(isMessenger ? { messengerApp, label: MESSENGER_APP_LABELS[messengerApp] } : {}),
+          href: trimmed ? buildContactHref(selectedChannel.id, trimmed, isMessenger ? messengerApp : undefined, isMessenger && messengerApp === 'whatsapp' ? countryCode : undefined) : '',
+          ...(isMessenger ? { messengerApp, label: MESSENGER_APP_LABELS[messengerApp], countryCode: messengerApp === 'whatsapp' ? countryCode : undefined } : {}),
         }
         : channel
     ))
@@ -189,7 +194,7 @@ export function Step6Contact() {
                 </div>
                 <div className="meta-text mt-1 truncate">
                   {channel.id === 'messenger'
-                    ? (channel.value?.trim() ? `${MESSENGER_APP_LABELS[channel.messengerApp ?? 'kakao']} · ${channel.value}` : `${MESSENGER_APP_LABELS[channel.messengerApp ?? 'kakao']}을 연결해보세요`)
+                    ? (channel.value?.trim() ? `${MESSENGER_APP_LABELS[channel.messengerApp ?? 'kakao']} · ${contactChannelValueDisplay(channel)}` : `${MESSENGER_APP_LABELS[channel.messengerApp ?? 'kakao']}을 연결해보세요`)
                     : (channel.value?.trim() ? channel.value : `${channel.label}을 연결해보세요`)}
                 </div>
               </div>
@@ -251,14 +256,39 @@ export function Step6Contact() {
                 </div>
               )}
 
-              <input
-                value={inputValue}
-                onChange={(event) => setInputValue(event.target.value)}
-                placeholder={contactPlaceholder(selectedChannel.id, isMessengerSheet ? messengerApp : undefined)}
-                className="w-full border rounded-xl px-4 py-3 text-sm outline-none mb-2"
-                style={{ borderColor: 'var(--color-border-default)' }}
-              />
-              <div className="micro-text mb-4">{contactPreview(selectedChannel.id, inputValue, isMessengerSheet ? messengerApp : undefined)}</div>
+              {isWhatsapp ? (
+                <div className="flex gap-2 mb-2">
+                  <div className="relative flex-shrink-0">
+                    <select
+                      value={countryCode}
+                      onChange={(event) => setCountryCode(event.target.value)}
+                      className="h-full appearance-none rounded-xl border pl-3 pr-7 py-3 text-sm outline-none"
+                      style={{ borderColor: 'var(--color-border-default)' }}
+                    >
+                      {COUNTRY_CODES.map((country) => (
+                        <option key={country.code} value={country.code}>{country.code} {country.name}</option>
+                      ))}
+                    </select>
+                    <ChevronDown size={14} className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]" />
+                  </div>
+                  <input
+                    value={inputValue}
+                    onChange={(event) => setInputValue(event.target.value)}
+                    placeholder={contactPlaceholder(selectedChannel.id, messengerApp)}
+                    className="min-w-0 flex-1 border rounded-xl px-4 py-3 text-sm outline-none"
+                    style={{ borderColor: 'var(--color-border-default)' }}
+                  />
+                </div>
+              ) : (
+                <input
+                  value={inputValue}
+                  onChange={(event) => setInputValue(event.target.value)}
+                  placeholder={contactPlaceholder(selectedChannel.id, isMessengerSheet ? messengerApp : undefined)}
+                  className="w-full border rounded-xl px-4 py-3 text-sm outline-none mb-2"
+                  style={{ borderColor: 'var(--color-border-default)' }}
+                />
+              )}
+              <div className="micro-text mb-4">{contactPreview(selectedChannel.id, inputValue, isMessengerSheet ? messengerApp : undefined, isWhatsapp ? countryCode : undefined)}</div>
 
               <div className="space-y-2">
                 <Button onClick={handleSaveChannel}>저장하기</Button>

@@ -89,6 +89,8 @@ export interface ContactChannel {
   enabled: boolean
   /** id가 'messenger'일 때만 사용 — 텔레그램/왓츠앱/카카오 중 선택된 앱 */
   messengerApp?: MessengerApp
+  /** messengerApp이 'whatsapp'일 때만 사용 — 국가번호 (예: '+82') */
+  countryCode?: string
 }
 
 export interface InstagramPost {

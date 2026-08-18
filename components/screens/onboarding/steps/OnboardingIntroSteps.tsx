@@ -242,7 +242,7 @@ export function Step1Login({
           </div>
           <div className="space-y-4 mb-6">
             <div>
-              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">
+              <label className="text-xs text-[var(--color-text-strong)] mb-1 block">
                 전화번호<span className="text-[var(--color-state-danger-text)]">*</span>
               </label>
               <div className="flex gap-2">
@@ -261,6 +261,7 @@ export function Step1Login({
                 <Button
                   size="sm"
                   fullWidth={false}
+                  className="w-28 flex-shrink-0"
                   disabled={!isValidPhone(phone) || signupSmsSent}
                   onClick={() => setSignupSmsSent(true)}
                 >
@@ -284,6 +285,7 @@ export function Step1Login({
                   <Button
                     size="sm"
                     fullWidth={false}
+                    className="w-28 flex-shrink-0"
                     disabled={signupCode.length < 6}
                     onClick={() => setPhoneVerified(true)}
                   >
@@ -307,7 +309,7 @@ export function Step1Login({
         </div>
         <div className="space-y-4 mb-6">
           <div>
-            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">
+            <label className="text-xs text-[var(--color-text-strong)] mb-1 block">
               비밀번호<span className="text-[var(--color-state-danger-text)]">*</span>
             </label>
             <div className="relative">
@@ -335,7 +337,7 @@ export function Step1Login({
             )}
           </div>
           <div>
-            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">
+            <label className="text-xs text-[var(--color-text-strong)] mb-1 block">
               비밀번호 확인<span className="text-[var(--color-state-danger-text)]">*</span>
             </label>
             <div className="relative">
@@ -363,7 +365,7 @@ export function Step1Login({
             )}
           </div>
           <div>
-            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">이메일</label>
+            <label className="text-xs text-[var(--color-text-strong)] mb-1 block">이메일</label>
             <p className="text-[11px] text-[var(--color-text-tertiary)] mb-1.5">전화번호 변경 시 계정 복구용</p>
             <input
               type="email"

@@ -11,11 +11,13 @@ export function Avatar({
   name,
   src,
   color,
+  textColor,
   size = 40,
 }: {
   name: string
   src?: string
   color?: string
+  textColor?: string
   size?: number
 }) {
   const fontSize = Math.round(size * 0.28)
@@ -37,7 +39,7 @@ export function Avatar({
         // eslint-disable-next-line @next/next/no-img-element
         <img src={src} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
       ) : (
-        <span style={{ color: color ? '#fff' : 'var(--color-text-secondary)', fontSize, fontWeight: 700 }}>
+        <span style={{ color: textColor ?? (color ? '#fff' : 'var(--color-text-secondary)'), fontSize, fontWeight: 700 }}>
           {name.slice(0, 2)}
         </span>
       )}

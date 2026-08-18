@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { ChevronRight } from 'lucide-react'
+import { BadgeCheck, ChevronRight, Flame, PartyPopper, ThumbsUp } from 'lucide-react'
 import { Avatar, showToast } from '@/components/ui'
 
 type FeedProfile = {
@@ -9,30 +9,35 @@ type FeedProfile = {
   name: string
   title: string
   avatarImage?: string
-  avatarColor?: string
+  fallbackColor?: string
 }
 
+const FALLBACK_TEXT_COLOR = '#6C7786'
+
 const NEW_PROFILES: FeedProfile[] = [
-  { linkId: 'jiminlee', name: '이지민', title: '스타트업 마케터', avatarImage: '/images/jimin-profile-5x4.jpg', avatarColor: '#D8C4B2' },
-  { linkId: 'mk', name: '강명구', title: 'Byth CEO', avatarImage: '/images/MK_img.jpeg', avatarColor: '#D4CABF' },
-  { linkId: null, name: '박서연', title: 'UX 디자이너', avatarColor: '#9BADD0' },
-  { linkId: null, name: '최유진', title: 'AI 연구원', avatarColor: '#8BA89B' },
-  { linkId: null, name: '한다은', title: '투자심사역', avatarColor: '#C4A8C0' },
+  { linkId: 'jiminlee', name: '이지민', title: '스타트업 마케터', avatarImage: '/images/jimin-profile-5x4.jpg' },
+  { linkId: 'mk', name: '강명구', title: 'Byth CEO', avatarImage: '/images/MK_img.jpeg' },
+  { linkId: null, name: '박서연', title: 'UX 디자이너', fallbackColor: '#F0F5FF' },
+  { linkId: null, name: '최유진', title: 'AI 연구원', fallbackColor: '#F4F2FE' },
+  { linkId: null, name: '한다은', title: '투자심사역', fallbackColor: '#EFF9FF' },
 ]
 
 const ACTIVE_PROFILES: FeedProfile[] = [
-  { linkId: 'gangminjun', name: '강민준', title: 'Product Owner', avatarImage: '/images/mj1.jpg', avatarColor: '#DCC5B6' },
-  { linkId: 'jiminlee', name: '이지민', title: '스타트업 마케터', avatarImage: '/images/jimin-profile-5x4.jpg', avatarColor: '#D8C4B2' },
-  { linkId: null, name: '홍준표', title: 'VC 파트너', avatarColor: '#A8B8A0' },
-  { linkId: null, name: '백승우', title: 'PM', avatarColor: '#C4B89A' },
+  { linkId: 'gangminjun', name: '강민준', title: 'Product Owner', avatarImage: '/images/mj1.jpg' },
+  { linkId: 'jiminlee', name: '이지민', title: '스타트업 마케터', avatarImage: '/images/jimin-profile-5x4.jpg' },
+  { linkId: null, name: '백승우', title: 'PM', fallbackColor: '#FEF3EA' },
 ]
 
 const RECOMMENDED_PROFILES: FeedProfile[] = [
-  { linkId: 'mk', name: '강명구', title: 'Byth CEO', avatarImage: '/images/MK_img.jpeg', avatarColor: '#D4CABF' },
-  { linkId: 'gangminjun', name: '강민준', title: 'B2B SaaS Product Owner · 스타트업 공동창업자', avatarImage: '/images/mj1.jpg', avatarColor: '#DCC5B6' },
-  { linkId: null, name: '김영선', title: 'CMO · 패션 이커머스', avatarColor: '#C4A89A' },
-  { linkId: null, name: '이준혁', title: '변호사 · 스타트업 전문', avatarColor: '#9AACC4' },
+  { linkId: 'mk', name: '강명구', title: 'Byth CEO', avatarImage: '/images/MK_img.jpeg' },
+  { linkId: 'gangminjun', name: '강민준', title: 'B2B SaaS Product Owner · 스타트업 공동창업자', avatarImage: '/images/mj1.jpg' },
+  { linkId: null, name: '김영선', title: 'CMO · 패션 이커머스', fallbackColor: '#F0F5FF' },
+  { linkId: null, name: '이준혁', title: '변호사 · 스타트업 전문', fallbackColor: '#F4F2FE' },
 ]
+
+function VerifiedBadge() {
+  return <BadgeCheck size={12} className="shrink-0 fill-[#3B82F6] text-white" strokeWidth={2.5} />
+}
 
 export default function FeedScreen() {
   const router = useRouter()
@@ -47,74 +52,106 @@ export default function FeedScreen() {
 
   return (
     <div className="flex-1 overflow-y-auto">
+      <div className="flex flex-col gap-10 px-4 pt-6 pb-2">
 
-      {/* 새로 가입했어요 */}
-      <section className="pt-5 pb-4">
-        <h2 className="px-5 text-[15px] font-black text-[var(--color-text-strong)] mb-3">새로 가입했어요</h2>
-        <div className="flex gap-4 px-5 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
-          {NEW_PROFILES.map((p, i) => (
-            <button
-              key={i}
-              onClick={() => handleProfileClick(p.linkId)}
-              className="flex-shrink-0 flex flex-col items-center gap-2"
-              style={{ width: 72 }}
-            >
-              <Avatar src={p.avatarImage} name={p.name} color={p.avatarColor} size={60} />
-              <div className="text-center w-full">
-                <p className="text-[12px] font-semibold text-[var(--color-text-primary)] truncate">{p.name}</p>
-                <p className="text-[10px] text-[var(--color-text-tertiary)] truncate">{p.title.split(' · ')[0]}</p>
-              </div>
-            </button>
-          ))}
-        </div>
-      </section>
+        {/* 새로 가입했어요 */}
+        <section className="flex flex-col gap-4">
+          <div className="flex items-center gap-1">
+            <PartyPopper size={18} className="text-[#0088FF]" />
+            <h2 className="text-[17px] font-black tracking-[-0.03em] text-[#0088FF]">새로 가입했어요</h2>
+          </div>
+          <div className="flex gap-5 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+            {NEW_PROFILES.map((p, i) => (
+              <button
+                key={i}
+                onClick={() => handleProfileClick(p.linkId)}
+                className="flex-shrink-0 flex flex-col items-center gap-2.5"
+                style={{ width: 74 }}
+              >
+                <Avatar src={p.avatarImage} name={p.name} color={p.fallbackColor} textColor={FALLBACK_TEXT_COLOR} size={56} />
+                <div className="text-center w-full">
+                  <div className="flex items-center justify-center gap-0.5">
+                    <p className="text-[12px] font-semibold text-[var(--color-text-primary)] whitespace-nowrap">{p.name}</p>
+                    {p.avatarImage && <VerifiedBadge />}
+                  </div>
+                  <p className="text-[12px] text-[var(--color-text-secondary)] whitespace-nowrap">{p.title}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
 
-      <div className="h-px mx-5 bg-[var(--color-border-soft)]" />
+        {/* 활발하게 활동중 */}
+        <section className="flex flex-col gap-4">
+          <div className="flex items-center gap-1">
+            <Flame size={18} className="text-[#FF523E]" />
+            <h2 className="text-[17px] font-black tracking-[-0.03em] text-[#FF523E]">활발하게 활동중</h2>
+          </div>
+          <div className="flex gap-2">
+            {ACTIVE_PROFILES.map((p, i) => (
+              <button
+                key={i}
+                onClick={() => handleProfileClick(p.linkId)}
+                className="flex-1 min-w-0 flex flex-col items-start gap-2 text-left"
+              >
+                {p.avatarImage ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={p.avatarImage}
+                    alt={p.name}
+                    className="w-full aspect-[3/4] rounded-2xl object-cover"
+                  />
+                ) : (
+                  <div
+                    className="w-full aspect-[3/4] rounded-2xl flex items-center justify-center"
+                    style={{ backgroundColor: p.fallbackColor }}
+                  >
+                    <span className="text-[16px] font-semibold" style={{ color: FALLBACK_TEXT_COLOR }}>{p.name}</span>
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <div className="flex items-center gap-0.5">
+                    <p className="text-[12px] font-semibold text-[var(--color-text-primary)] truncate">{p.name}</p>
+                    {p.avatarImage && <VerifiedBadge />}
+                  </div>
+                  <p className="text-[12px] text-[var(--color-text-secondary)] truncate">{p.title}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
 
-      {/* 활발하게 활동 중 */}
-      <section className="pt-5 pb-4">
-        <h2 className="px-5 text-[15px] font-black text-[var(--color-text-strong)] mb-3">활발하게 활동 중</h2>
-        <div className="flex gap-4 px-5 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
-          {ACTIVE_PROFILES.map((p, i) => (
-            <button
-              key={i}
-              onClick={() => handleProfileClick(p.linkId)}
-              className="flex-shrink-0 flex flex-col items-center gap-2"
-              style={{ width: 72 }}
-            >
-              <Avatar src={p.avatarImage} name={p.name} color={p.avatarColor} size={60} />
-              <div className="text-center w-full">
-                <p className="text-[12px] font-semibold text-[var(--color-text-primary)] truncate">{p.name}</p>
-                <p className="text-[10px] text-[var(--color-text-tertiary)] truncate">{p.title.split(' · ')[0]}</p>
-              </div>
-            </button>
-          ))}
-        </div>
-      </section>
+        {/* 추천 프로필 */}
+        <section className="flex flex-col gap-4">
+          <div className="flex items-center gap-1">
+            <ThumbsUp size={18} className="text-[#6155F5]" />
+            <h2 className="text-[17px] font-black tracking-[-0.03em] text-[#6155F5]">추천 프로필</h2>
+          </div>
+          <div className="flex flex-col gap-5">
+            {RECOMMENDED_PROFILES.map((p, i) => (
+              <button
+                key={i}
+                onClick={() => handleProfileClick(p.linkId)}
+                className="w-full flex items-center gap-2.5 text-left"
+              >
+                <Avatar src={p.avatarImage} name={p.name} color={p.fallbackColor} textColor={FALLBACK_TEXT_COLOR} size={48} />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-0.5">
+                    <p className="text-[14px] font-semibold text-[var(--color-text-primary)] truncate">{p.name}</p>
+                    {p.avatarImage && <VerifiedBadge />}
+                  </div>
+                  <p className="text-[12px] text-[var(--color-text-secondary)] truncate">{p.title}</p>
+                </div>
+                <ChevronRight size={16} className="text-[var(--color-text-tertiary)] flex-shrink-0" />
+              </button>
+            ))}
+          </div>
+        </section>
 
-      <div className="h-px mx-5 bg-[var(--color-border-soft)]" />
-
-      {/* 추천 프로필 */}
-      <section className="pt-5 pb-8">
-        <h2 className="px-5 text-[15px] font-black text-[var(--color-text-strong)] mb-1">추천 프로필</h2>
-        {RECOMMENDED_PROFILES.map((p, i) => (
-          <button
-            key={i}
-            onClick={() => handleProfileClick(p.linkId)}
-            className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[var(--color-bg-soft)] transition-colors text-left"
-          >
-            <Avatar src={p.avatarImage} name={p.name} color={p.avatarColor} size={44} />
-            <div className="min-w-0 flex-1">
-              <p className="text-[14px] font-semibold text-[var(--color-text-primary)] truncate">{p.name}</p>
-              <p className="text-[12px] text-[var(--color-text-secondary)] truncate">{p.title}</p>
-            </div>
-            <ChevronRight size={16} className="text-[var(--color-text-tertiary)] flex-shrink-0" />
-          </button>
-        ))}
-      </section>
+      </div>
 
       {/* 랜딩 페이지 링크 */}
-      <div className="px-5 pb-10 pt-2 border-t border-[var(--color-border-soft)]">
+      <div className="px-4 pb-10 pt-2 border-t border-[var(--color-border-soft)]">
         <button
           onClick={() => router.push('/landing')}
           className="w-full flex items-center justify-center gap-1.5 py-3 text-[13px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"

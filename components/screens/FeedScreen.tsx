@@ -4,9 +4,12 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { BadgeCheck, ChevronRight, Flame, PartyPopper, ThumbsUp, UserRound } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { Avatar, Button, showToast } from '@/components/ui'
+import { useProfileCompletion } from '@/hooks/useProfileCompletion'
+import { Avatar, Button, ProgressBar, showToast } from '@/components/ui'
 import { LoginModal } from '@/components/screens/profile/LoginModal'
 import { NEW_PROFILES, ACTIVE_PROFILES, RECOMMENDED_PREVIEW } from '@/lib/mocks/feedProfiles'
+
+const BLACK = '#0D0D0D'
 
 export function VerifiedBadge() {
   return <BadgeCheck size={12} className="shrink-0 fill-[#3B82F6] text-white" strokeWidth={2.5} />
@@ -15,38 +18,62 @@ export function VerifiedBadge() {
 function AccountCard() {
   const router = useRouter()
   const { isLoggedIn, user } = useAuth()
+  const completion = useProfileCompletion()
   const [loginModalOpen, setLoginModalOpen] = useState(false)
 
   return (
     <>
-      <div className="mx-4 mt-4 surface-card flex items-center gap-3 rounded-[22px] px-4 py-4">
+      <div className="mx-4 mt-4 surface-card rounded-[22px] px-4 py-4">
         {isLoggedIn && user ? (
-          <>
-            <Avatar src={user.avatarImage} name={user.name} color={user.avatarColor} size={48} />
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1">
-                <p className="text-[15px] font-bold text-[var(--color-text-primary)] truncate">{user.name}</p>
-                {user.isVerified && <VerifiedBadge />}
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center gap-3">
+              <Avatar src={user.avatarImage} name={user.name} color={user.avatarColor} size={48} />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1">
+                  <p className="text-[15px] font-bold text-[var(--color-text-primary)]">{user.name}</p>
+                  {user.isVerified && <VerifiedBadge />}
+                </div>
+                <p className="text-[12px] leading-relaxed break-keep text-[var(--color-text-secondary)]">{user.title}</p>
               </div>
-              <p className="text-[12px] text-[var(--color-text-secondary)] truncate">{user.title}</p>
             </div>
-            <Button variant="outline" size="sm" fullWidth={false} onClick={() => router.push('/me')}>
+
+            {completion && (
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[11px] font-semibold text-[var(--color-text-tertiary)]">프로필 완성도</span>
+                  <span className="text-[11px] font-bold text-[var(--color-text-primary)]">{completion.percent}%</span>
+                </div>
+                <ProgressBar value={completion.percent} />
+              </div>
+            )}
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => router.push('/me')}
+              style={{ borderColor: BLACK, color: BLACK }}
+            >
               내 프로필 보기
             </Button>
-          </>
+          </div>
         ) : (
-          <>
+          <div className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-full bg-[var(--color-bg-muted)] flex items-center justify-center flex-shrink-0">
               <UserRound size={22} className="text-[var(--color-text-tertiary)]" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-[14px] font-bold text-[var(--color-text-primary)]">로그인이 필요해요</p>
-              <p className="text-[12px] text-[var(--color-text-secondary)]">로그인하고 펠로어를 더 이용해보세요</p>
+              <p className="text-[12px] leading-relaxed break-keep text-[var(--color-text-secondary)]">로그인하고 펠로어를 더 이용해보세요</p>
             </div>
-            <Button variant="primary" size="sm" fullWidth={false} onClick={() => setLoginModalOpen(true)}>
+            <Button
+              size="sm"
+              fullWidth={false}
+              onClick={() => setLoginModalOpen(true)}
+              style={{ backgroundColor: BLACK, boxShadow: 'none' }}
+            >
               로그인하기
             </Button>
-          </>
+          </div>
         )}
       </div>
       <LoginModal open={loginModalOpen} onClose={() => setLoginModalOpen(false)} />

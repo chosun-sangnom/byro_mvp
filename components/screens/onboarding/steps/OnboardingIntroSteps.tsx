@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { Camera, CheckCircle2, ChevronRight, Eye, EyeOff, Info, MessageCircle } from 'lucide-react'
+import { Calendar, Camera, CheckCircle2, ChevronRight, Eye, EyeOff, Info, MessageCircle } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { BottomSheet, Button, GoogleIcon, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
@@ -34,6 +34,32 @@ function formatPhone(value: string) {
 function isValidPhone(phone: string) {
   const digits = phone.replace(/\D/g, '')
   return digits.length === 11 && digits.startsWith('010')
+}
+
+function formatBirthDigits(digits: string) {
+  const y = digits.slice(0, 4)
+  const m = digits.slice(4, 6)
+  const d = digits.slice(6, 8)
+  let out = y
+  if (digits.length > 4) out += `. ${m}`
+  if (digits.length > 6) out += `. ${d}`
+  if (digits.length >= 8) out += '.'
+  return out
+}
+
+function isoFromBirthDigits(digits: string) {
+  return `${digits.slice(0, 4)}-${digits.slice(4, 6)}-${digits.slice(6, 8)}`
+}
+
+function isValidBirthDigits(digits: string) {
+  if (digits.length !== 8) return false
+  const year = Number(digits.slice(0, 4))
+  const month = Number(digits.slice(4, 6))
+  const day = Number(digits.slice(6, 8))
+  if (year < 1900 || month < 1 || month > 12 || day < 1 || day > 31) return false
+  const date = new Date(year, month - 1, day)
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return false
+  return date.getTime() <= Date.now()
 }
 
 function isValidEmail(email: string) {
@@ -973,103 +999,146 @@ export function Step2Verify() {
   )
 }
 
+function CheckboxDot({ checked }: { checked: boolean }) {
+  return (
+    <span
+      className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full"
+      style={{ backgroundColor: checked ? '#25313D' : '#F5F6F7' }}
+    >
+      {checked && (
+        <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+          <path d="M1 3.5L3.2 5.7L8 1" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      )}
+    </span>
+  )
+}
+
 export function Step2BasicInfo() {
   const store = useFeloreStore()
   const [name, setName] = useState(store.onboardingName)
   const [nickname, setNickname] = useState(store.onboardingNickname)
   const [useActivityName, setUseActivityName] = useState(false)
-  const [birthDate, setBirthDate] = useState(store.onboardingBirthDate)
+  const [birthDigits, setBirthDigits] = useState(() => store.onboardingBirthDate.replace(/\D/g, '').slice(0, 8))
   const [showAge, setShowAge] = useState(store.onboardingShowAge)
+  const birthPickerRef = useRef<HTMLInputElement>(null)
   const todayDateString = new Date().toISOString().slice(0, 10)
 
-  const canProceed = name.trim().length > 0
+  const nameError = name.length > 20
+  const nicknameError = useActivityName && nickname.length > 30
+  const birthComplete = birthDigits.length === 8
+  const birthValid = !birthComplete || isValidBirthDigits(birthDigits)
+  const birthDateError = birthComplete && !birthValid
+
+  const canProceed = name.trim().length > 0 && !nameError && !nicknameError && (birthDigits.length === 0 || (birthComplete && birthValid))
 
   const handleNext = () => {
     if (!canProceed) return
+    const birthDate = birthComplete && birthValid ? isoFromBirthDigits(birthDigits) : ''
     store.setOnboardingNameAndBirth({ name: name.trim(), nickname: useActivityName ? nickname.trim() : '', birthDate, showAge })
     store.nextStep()
   }
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto px-5 py-4">
-      <StepIntro
-        eyebrow="Profile"
-        title={'이름을\n알려주세요'}
-        description={'나중에 기본정보 편집에서 바꿀 수 있어요.'}
-      />
+    <div className="flex flex-1 flex-col min-h-0">
+      <div className="flex-1 overflow-y-auto px-5 pt-6 pb-4">
+        <div className="mb-6">
+          <h2 className="text-[22px] font-bold leading-[1.35] tracking-[-0.03em] text-[#0D0D0D]">기본정보 입력</h2>
+          <p className="mt-2 text-[15px] font-medium leading-[1.5] tracking-[-0.02em] text-[#475058]">언제든지 설정에서 바꿀 수 있어요</p>
+        </div>
 
-      {/* 이름 (필수) */}
-      <div className="mb-4">
-        <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">이름 *</label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="실명을 입력해주세요"
-          maxLength={20}
-          className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
-        />
-      </div>
-
-      {/* 활동명 (선택) */}
-      <div className="mb-5">
-        <button
-          type="button"
-          onClick={() => {
-            setUseActivityName((prev) => !prev)
-            if (useActivityName) setNickname('')
-          }}
-          className="flex items-center gap-2 mb-3"
-        >
-          <div className={`w-4 h-4 rounded flex items-center justify-center border transition-colors flex-shrink-0 ${useActivityName ? 'border-[var(--color-accent-dark)] bg-[var(--color-accent-dark)]' : 'border-[var(--color-border-default)] bg-[var(--color-bg-soft)]'}`}>
-            {useActivityName && (
-              <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            )}
+        {/* 이름 (필수) */}
+        <div className="mb-6">
+          <div className="mb-2 flex items-center">
+            <span className="text-sm font-semibold text-[#0D0D0D]">이름</span>
+            <span className="ml-0.5 h-3 w-[3px] rounded-full bg-[#FF4242]" />
           </div>
-          <span className="text-[13px] font-medium text-[var(--color-text-primary)]">활동명 사용</span>
-        </button>
-
-        {useActivityName && (
           <input
             type="text"
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            placeholder="예: 크리에이터K, Alex, 디에디트"
-            maxLength={30}
-            className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
-            autoFocus
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="실명을 입력해주세요."
+            className="w-full truncate rounded-full border bg-white px-4 py-3 text-sm outline-none"
+            style={{ borderColor: nameError ? '#FF4242' : '#DEE4EC', color: '#0D0D0D' }}
           />
-        )}
+          {nameError && <p className="mt-1.5 text-xs text-[#FF4242]">20자 이내로 입력해주세요.</p>}
 
-        <p className="mt-2 text-[11px] text-[var(--color-text-tertiary)] leading-relaxed">
-          유튜버·크리에이터 등 활동명으로 활동하시는 분들을 위한 선택 기능이에요. 활동명을 설정하면 실명 대신 활동명으로 프로필에 노출돼요.
-        </p>
-      </div>
-
-      {/* 생년월일 */}
-      <div className="mb-5">
-        <div className="flex items-center justify-between mb-1">
-          <label className="text-xs text-[var(--color-text-tertiary)]">생년월일 (선택)</label>
           <button
             type="button"
-            onClick={() => setShowAge((prev) => !prev)}
-            className="flex items-center gap-1.5"
+            onClick={() => {
+              setUseActivityName((prev) => !prev)
+              if (useActivityName) setNickname('')
+            }}
+            className="mt-2 flex items-center gap-2"
           >
-            <div className={`relative w-7 h-4 rounded-full transition-colors ${showAge ? 'bg-[var(--color-accent-dark)]' : 'bg-[var(--color-border-default)]'}`}>
-              <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white shadow transition-transform ${showAge ? 'translate-x-3.5' : 'translate-x-0.5'}`} />
+            <CheckboxDot checked={useActivityName} />
+            <span className="text-sm font-medium text-[#25313D]">활동명 사용</span>
+          </button>
+
+          {useActivityName && (
+            <div className="mt-2">
+              <input
+                type="text"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                placeholder="예: 크리에이터K, Alex, 디에디트"
+                className="w-full truncate rounded-full border bg-white px-4 py-3 text-sm outline-none"
+                style={{ borderColor: nicknameError ? '#FF4242' : '#DEE4EC', color: '#0D0D0D' }}
+                autoFocus
+              />
+              {nicknameError && <p className="mt-1.5 text-xs text-[#FF4242]">30자 이내로 입력해주세요.</p>}
             </div>
-            <span className="text-[11px] text-[var(--color-text-tertiary)]">나이 공개</span>
+          )}
+
+          <p className="mt-2 text-xs leading-relaxed text-[#6C7786]">
+            유튜버·크리에이터 등 활동명으로 활동하시는 분들을 위한 선택 기능이에요. 활동명을 설정하면 실명 대신 활동명으로 프로필에 노출돼요.
+          </p>
+        </div>
+
+        {/* 생년월일 */}
+        <div className="mb-6">
+          <div className="mb-2">
+            <span className="text-sm font-semibold text-[#0D0D0D]">생년월일</span>
+          </div>
+          <div className="relative">
+            <input
+              type="text"
+              inputMode="numeric"
+              value={formatBirthDigits(birthDigits)}
+              onChange={(e) => setBirthDigits(e.target.value.replace(/\D/g, '').slice(0, 8))}
+              placeholder="YYYY. MM. DD."
+              className="w-full truncate rounded-full border bg-white px-4 py-3 pr-11 text-sm outline-none"
+              style={{ borderColor: birthDateError ? '#FF4242' : '#DEE4EC', color: '#0D0D0D' }}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const el = birthPickerRef.current
+                if (!el) return
+                if (typeof el.showPicker === 'function') el.showPicker()
+                else el.click()
+              }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A8B1BD]"
+            >
+              <Calendar size={16} />
+            </button>
+            <input
+              ref={birthPickerRef}
+              type="date"
+              value={birthComplete ? isoFromBirthDigits(birthDigits) : ''}
+              max={todayDateString}
+              onChange={(e) => setBirthDigits(e.target.value ? e.target.value.replace(/\D/g, '') : '')}
+              className="pointer-events-none absolute inset-0 opacity-0"
+              tabIndex={-1}
+            />
+          </div>
+          {birthDateError && <p className="mt-1.5 text-xs text-[#FF4242]">올바른 날짜 형식을 입력해주세요.</p>}
+
+          <button type="button" onClick={() => setShowAge((prev) => !prev)} className="mt-2 flex items-center gap-2">
+            <CheckboxDot checked={showAge} />
+            <span className="text-sm font-medium text-[#25313D]">나이 공개</span>
           </button>
         </div>
-        <input
-          type="date"
-          value={birthDate}
-          max={todayDateString}
-          onChange={(e) => setBirthDate(e.target.value > todayDateString ? todayDateString : e.target.value)}
-          className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
-        />
       </div>
 
       <StepFooter canNext={canProceed} onNext={handleNext} onPrev={() => store.prevStep()} />

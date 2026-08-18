@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { Camera, CheckCircle2, ChevronRight } from 'lucide-react'
+import { Camera, CheckCircle2, ChevronRight, Eye, EyeOff } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { BottomSheet, Button, GoogleIcon, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
@@ -66,6 +66,7 @@ export function Step1Login({
   const [signupSmsSent, setSignupSmsSent] = useState(false)
   const [signupCode, setSignupCode] = useState('')
   const [phoneVerified, setPhoneVerified] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   // 전화번호 로그인 폼
   const [loginPhone, setLoginPhone] = useState('')
@@ -82,6 +83,7 @@ export function Step1Login({
   const [newPassword, setNewPassword] = useState('')
   const [newPasswordConfirm, setNewPasswordConfirm] = useState('')
 
+  const phoneInvalid = phone.length > 0 && !isValidPhone(phone)
   const passwordShort = password.length > 0 && password.length < 8
   const emailInvalid = email.length > 0 && !isValidEmail(email)
   const canPhoneSubmit = phoneVerified && password.length >= 8 && (email === '' || isValidEmail(email))
@@ -140,8 +142,7 @@ export function Step1Login({
   const backHandlerRef = useRef<(() => void) | null>(null)
   backHandlerRef.current =
     view === 'oauth' && oauthProvider && oauthStep === 'pending' ? handleBackToMain :
-    view === 'phone' && mode === 'signup' && !phoneVerified ? handleBackToMain :
-    view === 'phone' && mode === 'signup' && phoneVerified ? () => setPhoneVerified(false) :
+    view === 'phone' && mode === 'signup' ? handleBackToMain :
     view === 'phone' && mode === 'login' ? handleBackToMain :
     view === 'reset' && resetMethod === 'choose' ? handleBackToPhoneLogin :
     view === 'reset' && resetMethod === 'sms' && resetStage === 'verify' ? () => setResetMethod('choose') :
@@ -223,16 +224,18 @@ export function Step1Login({
 
   // --- 전화번호 가입 뷰 ---
   if (view === 'phone' && mode === 'signup') {
-    if (!phoneVerified) {
-      return (
-        <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-          <div className="mb-6">
-            <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
-              전화번호로<br />회원가입
-            </div>
-            <p className="meta-text mt-2">본인 명의 전화번호로 인증번호를 받아요.</p>
+    return (
+      <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+        <div className="mb-6">
+          <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
+            전화번호로 회원가입
           </div>
-          <div className="space-y-3 mb-6">
+        </div>
+        <div className="space-y-4 mb-6">
+          <div>
+            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">
+              전화번호<span className="text-[var(--color-state-danger-text)]">*</span>
+            </label>
             <div className="flex gap-2">
               <input
                 type="tel"
@@ -241,21 +244,25 @@ export function Step1Login({
                 placeholder="010-0000-0000"
                 disabled={signupSmsSent}
                 autoComplete="tel"
-                className="flex-1 border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] disabled:opacity-50"
+                className={`flex-1 border rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] disabled:opacity-50 ${
+                  phoneInvalid ? 'border-[var(--color-state-danger-text)]' : 'border-[var(--color-border-default)]'
+                }`}
               />
               {/* [임시] SMS 발송 API 미연동 */}
-              <button
-                type="button"
+              <Button
+                size="sm"
+                fullWidth={false}
                 disabled={!isValidPhone(phone) || signupSmsSent}
                 onClick={() => setSignupSmsSent(true)}
-                className="flex-shrink-0 rounded-xl px-3 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
-                style={{ backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
               >
-                {signupSmsSent ? '발송됨' : '발송'}
-              </button>
+                {signupSmsSent ? '발송됨' : '인증번호 발송'}
+              </Button>
             </div>
-            {signupSmsSent && (
-              <div className="flex gap-2">
+            {phoneInvalid && (
+              <p className="mt-1 text-[11px] text-[var(--color-state-danger-text)]">올바른 전화번호 형식을 입력해주세요.</p>
+            )}
+            {signupSmsSent && !phoneVerified && (
+              <div className="flex gap-2 mt-2">
                 <input
                   type="text"
                   value={signupCode}
@@ -265,63 +272,65 @@ export function Step1Login({
                   className="flex-1 border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
                 />
                 {/* [임시] 인증번호 확인 API 미연동 */}
-                <button
-                  type="button"
+                <Button
+                  size="sm"
+                  fullWidth={false}
                   disabled={signupCode.length < 6}
                   onClick={() => setPhoneVerified(true)}
-                  className="flex-shrink-0 rounded-xl px-4 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
-                  style={{ backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
                 >
                   확인
-                </button>
+                </Button>
               </div>
             )}
+            {phoneVerified && (
+              <p className="mt-1.5 flex items-center gap-1 text-[11px]" style={{ color: 'var(--color-state-success-text)' }}>
+                <CheckCircle2 size={12} /> 인증 완료
+              </p>
+            )}
           </div>
-        </div>
-      )
-    }
-
-    return (
-      <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <div className="mb-6">
-          <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
-            전화번호로<br />회원가입
-          </div>
-          <p className="meta-text mt-2">{phone} 인증 완료 · 로그인에 사용할 비밀번호를 설정해주세요.</p>
-        </div>
-        <div className="space-y-4 mb-6">
           <div>
-            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">비밀번호 *</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="8자 이상 입력해주세요"
-              autoComplete="new-password"
-              className={`w-full border rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] ${
-                passwordShort ? 'border-[var(--color-state-danger-text)]' : 'border-[var(--color-border-default)]'
-              }`}
-            />
+            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">
+              비밀번호<span className="text-[var(--color-state-danger-text)]">*</span>
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="8자 이상 입력해주세요"
+                autoComplete="new-password"
+                className={`w-full border rounded-xl pl-4 pr-11 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] ${
+                  passwordShort ? 'border-[var(--color-state-danger-text)]' : 'border-[var(--color-border-default)]'
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-tertiary)]"
+                aria-label={showPassword ? '비밀번호 숨기기' : '비밀번호 표시'}
+              >
+                {showPassword ? <Eye size={16} /> : <EyeOff size={16} />}
+              </button>
+            </div>
             {passwordShort && (
               <p className="mt-1 text-[11px] text-[var(--color-state-danger-text)]">비밀번호는 8자 이상이어야 해요</p>
             )}
           </div>
           <div>
-            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">
-              이메일 <span className="text-[10px]">(선택 · 비밀번호 재설정용)</span>
-            </label>
+            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">이메일</label>
+            <p className="text-[11px] text-[var(--color-text-tertiary)] mb-1.5">전화번호 변경 시 계정 복구용</p>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="example@email.com"
+              placeholder="example@gmail.com"
               autoComplete="email"
               className={`w-full border rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] ${
                 emailInvalid ? 'border-[var(--color-state-danger-text)]' : 'border-[var(--color-border-default)]'
               }`}
             />
             {emailInvalid && (
-              <p className="mt-1 text-[11px] text-[var(--color-state-danger-text)]">올바른 이메일 형식을 입력해주세요</p>
+              <p className="mt-1 text-[11px] text-[var(--color-state-danger-text)]">올바른 이메일 형식을 입력해주세요.</p>
             )}
           </div>
         </div>

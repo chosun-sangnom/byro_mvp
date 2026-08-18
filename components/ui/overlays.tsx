@@ -158,9 +158,10 @@ interface ModalProps {
   open: boolean
   onClose: () => void
   children: ReactNode
+  widthClassName?: string
 }
 
-export function Modal({ open, onClose, children }: ModalProps) {
+export function Modal({ open, onClose, children, widthClassName = 'w-[272px]' }: ModalProps) {
   return (
     <AnimatePresence>
       {open && (
@@ -178,7 +179,7 @@ export function Modal({ open, onClose, children }: ModalProps) {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.94, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="relative rounded-2xl p-5 w-[272px] z-10 border"
+            className={`relative rounded-2xl p-5 z-10 border ${widthClassName}`}
             style={{
               backgroundColor: 'var(--color-bg-surface)',
               borderColor: 'var(--color-border-default)',

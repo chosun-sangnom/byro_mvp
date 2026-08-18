@@ -64,15 +64,21 @@ export default function OnboardingScreen() {
         {store.step === 'login' ? <Step1Login onModeChange={setLoginFlowMode} /> : <CurrentStep />}
       </div>
 
-      <Modal open={showExitModal} onClose={() => setShowExitModal(false)}>
-        <div className="text-center">
-          <div className="text-base font-black mb-2">회원가입을 종료할까요?</div>
+      <Modal open={showExitModal} onClose={() => setShowExitModal(false)} widthClassName="w-[calc(100%-40px)]">
+        <div className="text-left">
+          <div className="text-lg font-black mb-2">회원가입을 종료할까요?</div>
           <div className="meta-text mb-5 leading-relaxed">
-            지금 나가면 입력한 정보가<br />저장되지 않아요.
+            지금 나가면 입력된 정보가 저장되지 않아요.
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => setShowExitModal(false)}>계속 작성하기</Button>
-            <Button variant="danger" size="sm" onClick={handleExitConfirm}>종료하기</Button>
+            <Button variant="outline" onClick={() => setShowExitModal(false)}>계속 작성</Button>
+            <Button
+              variant="danger"
+              onClick={handleExitConfirm}
+              style={{ backgroundColor: '#EF4444', borderColor: 'transparent', color: '#fff' }}
+            >
+              종료하기
+            </Button>
           </div>
         </div>
       </Modal>

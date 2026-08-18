@@ -645,9 +645,8 @@ export function Step1Login({
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
         <div className="mb-6">
           <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
-            다시 오셨군요!
+            로그인 방법을 선택해주세요
           </div>
-          <p className="meta-text mt-1">연결했던 계정으로 로그인하세요.</p>
         </div>
         <div className="space-y-3">
           <Button variant="google" onClick={() => handleOAuthSelect('google')}>
@@ -655,13 +654,15 @@ export function Step1Login({
               <GoogleIcon /> 구글로 로그인
             </span>
           </Button>
+          <Button variant="outline" onClick={() => setView('phone')} style={{ borderRadius: 20 }}>전화번호로 로그인</Button>
         </div>
-        <div className="flex items-center gap-3 my-4">
-          <div className="flex-1 h-px bg-[var(--color-border-default)]" />
-          <span className="text-[11px] text-[var(--color-text-tertiary)]">또는</span>
-          <div className="flex-1 h-px bg-[var(--color-border-default)]" />
+        <div className="mt-4 text-center meta-text">
+          계정이 기억나지 않나요?{' '}
+          {/* [임시] 계정 찾기 플로우 미구현 */}
+          <button type="button" onClick={() => showToast('준비 중인 기능이에요')} className="font-semibold text-[var(--color-text-primary)] underline">
+            계정 찾기
+          </button>
         </div>
-        <Button variant="outline" onClick={() => setView('phone')} style={{ borderRadius: 20 }}>전화번호로 로그인</Button>
       </div>
     )
   }
@@ -828,26 +829,32 @@ export function Step2Verify() {
     store.nextStep()
   }
 
+  const handleSmsSend = () => {
+    if (smsSent) {
+      showToast('인증번호를 다시 보냈어요')
+      return
+    }
+    setSmsSent(true)
+  }
+
   return (
-    <div className="flex flex-col h-full overflow-y-auto px-5 py-4">
-      <StepIntro
-        eyebrow="Security"
-        title={'본인인증을\n진행해요'}
-        description={'인증하면 프로필에 인증 뱃지가 표시돼요. 필수는 아니에요.'}
-      />
+    <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+      <div className="mb-6">
+        <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">본인인증</div>
+        <p className="meta-text mt-2">인증하면 프로필에 인증 뱃지가 표시돼요.</p>
+      </div>
 
       {/* 탭 */}
-      <div className="flex border-b mb-5" style={{ borderColor: 'var(--color-border-default)' }}>
+      <div className="mb-5 flex gap-1 rounded-full p-1" style={{ backgroundColor: 'var(--color-bg-soft)' }}>
         {(['kakao', 'sms'] as VerifyTab[]).map((t) => (
           <button
             key={t}
             type="button"
             onClick={() => setTab(t)}
-            className="flex-1 py-2 text-[12px] font-bold transition-colors"
+            className="flex-1 rounded-full py-2 text-[13px] font-bold transition-colors"
             style={{
-              color: tab === t ? 'var(--color-accent-dark)' : 'var(--color-text-tertiary)',
-              borderBottom: tab === t ? '2px solid var(--color-accent-dark)' : '2px solid transparent',
-              marginBottom: -1,
+              backgroundColor: tab === t ? '#0D0D0D' : 'transparent',
+              color: tab === t ? '#fff' : 'var(--color-text-secondary)',
             }}
           >
             {t === 'kakao' ? '카카오 인증' : 'SMS 인증'}
@@ -864,7 +871,7 @@ export function Step2Verify() {
           <Button variant="kakao" onClick={handleVerified}>카카오로 본인인증하기</Button>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="flex gap-2">
             <input
               type="tel"
@@ -872,18 +879,18 @@ export function Step2Verify() {
               onChange={(e) => setPhone(formatPhone(e.target.value))}
               placeholder="010-0000-0000"
               disabled={smsSent}
-              className="flex-1 border border-[var(--color-border-default)] rounded-xl px-3 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none disabled:opacity-50"
+              className="flex-1 border border-[var(--color-border-default)] rounded-full px-4 py-2.5 text-sm bg-white text-[var(--color-text-primary)] outline-none disabled:opacity-50"
             />
             {/* [임시] SMS 발송 API 미연동 */}
-            <button
-              type="button"
-              disabled={!isValidPhone(phone) || smsSent}
-              onClick={() => setSmsSent(true)}
-              className="flex-shrink-0 rounded-xl px-3 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
-              style={{ backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
+            <Button
+              size="sm"
+              fullWidth={false}
+              className="w-24 flex-shrink-0"
+              disabled={!isValidPhone(phone)}
+              onClick={handleSmsSend}
             >
-              {smsSent ? '발송됨' : '발송'}
-            </button>
+              {smsSent ? '재발송' : '발송'}
+            </Button>
           </div>
           {smsSent && (
             <div className="flex gap-2">
@@ -893,30 +900,26 @@ export function Step2Verify() {
                 onChange={(e) => setCode(e.target.value)}
                 placeholder="인증번호 6자리"
                 maxLength={6}
-                className="flex-1 border border-[var(--color-border-default)] rounded-xl px-3 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
+                className="flex-1 border border-[var(--color-border-default)] rounded-full px-4 py-2.5 text-sm bg-white text-[var(--color-text-primary)] outline-none"
               />
               {/* [임시] 인증번호 확인 API 미연동 */}
-              <button
-                type="button"
+              <Button
+                size="sm"
+                fullWidth={false}
+                className="w-24 flex-shrink-0"
                 disabled={code.length < 6}
                 onClick={handleVerified}
-                className="flex-shrink-0 rounded-xl px-4 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
-                style={{ backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
               >
                 확인
-              </button>
+              </Button>
             </div>
           )}
         </div>
       )}
 
       <div className="flex-1" />
-      <button
-        onClick={() => store.nextStep()}
-        className="mt-6 text-center text-[12px] font-medium text-[var(--color-text-tertiary)] underline underline-offset-2"
-      >
-        건너뛰기
-      </button>
+      {/* 본인인증은 필수가 아니므로 텍스트 링크 대신 스트로크 버튼으로 건너뛰기를 제공 */}
+      <Button variant="outline" onClick={() => store.nextStep()}>다음</Button>
     </div>
   )
 }

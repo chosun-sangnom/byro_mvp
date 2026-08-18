@@ -832,7 +832,7 @@ export function Step2Verify() {
   }
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+    <div className="flex flex-1 flex-col min-h-0 overflow-y-auto px-5 py-6">
       <div className="mb-6">
         <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">본인인증</div>
         <p className="meta-text mt-2">인증하면 프로필에 인증 뱃지가 표시돼요</p>

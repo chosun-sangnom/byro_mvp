@@ -639,34 +639,6 @@ export function Step1Login({
     )
   }
 
-  // --- 로그인 메인 뷰 ---
-  if (mode === 'login') {
-    return (
-      <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <div className="mb-6">
-          <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
-            로그인 방법을 선택해주세요
-          </div>
-        </div>
-        <div className="space-y-3">
-          <Button variant="google" onClick={() => handleOAuthSelect('google')}>
-            <span className="inline-flex w-full items-center justify-center gap-2">
-              <GoogleIcon /> 구글로 로그인
-            </span>
-          </Button>
-          <Button variant="outline" onClick={() => setView('phone')} style={{ borderRadius: 20 }}>전화번호로 로그인</Button>
-        </div>
-        <div className="mt-4 text-center meta-text">
-          계정이 기억나지 않나요?{' '}
-          {/* [임시] 계정 찾기 플로우 미구현 */}
-          <button type="button" onClick={() => showToast('준비 중인 기능이에요')} className="font-semibold text-[var(--color-text-primary)] underline">
-            계정 찾기
-          </button>
-        </div>
-      </div>
-    )
-  }
-
   // --- 회원가입 메인 뷰 ---
   if (mode === 'signup') {
     return (
@@ -713,6 +685,28 @@ export function Step1Login({
         onClose={() => setShowTermsSheet(false)}
         onAgree={() => { setShowTermsSheet(false); setMode('signup') }}
       />
+      <BottomSheet open={mode === 'login'} onClose={handleBackToChoose}>
+        <div className="px-5 pb-6">
+          <div className="mb-6 text-xl font-black leading-tight text-[var(--color-text-strong)]">
+            로그인 방법을 선택해주세요
+          </div>
+          <div className="space-y-3">
+            <Button variant="google" onClick={() => handleOAuthSelect('google')}>
+              <span className="inline-flex w-full items-center justify-center gap-2">
+                <GoogleIcon /> 구글로 로그인
+              </span>
+            </Button>
+            <Button variant="outline" onClick={() => setView('phone')} style={{ borderRadius: 20 }}>전화번호로 로그인</Button>
+          </div>
+          <div className="mt-4 text-center meta-text">
+            계정이 기억나지 않나요?{' '}
+            {/* [임시] 계정 찾기 플로우 미구현 */}
+            <button type="button" onClick={() => showToast('준비 중인 기능이에요')} className="font-semibold text-[var(--color-text-primary)] underline">
+              계정 찾기
+            </button>
+          </div>
+        </div>
+      </BottomSheet>
     </>
   )
 }

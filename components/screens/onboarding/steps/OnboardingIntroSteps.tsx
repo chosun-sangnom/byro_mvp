@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { Calendar, Camera, CheckCircle2, ChevronLeft, ChevronRight, Eye, EyeOff, Info, MessageCircle } from 'lucide-react'
+import { Calendar, Camera, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Eye, EyeOff, Info, MessageCircle } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { BottomSheet, Button, GoogleIcon, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
@@ -61,6 +61,22 @@ function isValidBirthDigits(digits: string) {
   if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return false
   return date.getTime() <= Date.now()
 }
+
+const BIRTH_TIME_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: '', label: '모름' },
+  { value: '23:00', label: '23:00 ~ 01:00' },
+  { value: '01:00', label: '01:00 ~ 03:00' },
+  { value: '03:00', label: '03:00 ~ 05:00' },
+  { value: '05:00', label: '05:00 ~ 07:00' },
+  { value: '07:00', label: '07:00 ~ 09:00' },
+  { value: '09:00', label: '09:00 ~ 11:00' },
+  { value: '11:00', label: '11:00 ~ 13:00' },
+  { value: '13:00', label: '13:00 ~ 15:00' },
+  { value: '15:00', label: '15:00 ~ 17:00' },
+  { value: '17:00', label: '17:00 ~ 19:00' },
+  { value: '19:00', label: '19:00 ~ 21:00' },
+  { value: '21:00', label: '21:00 ~ 23:00' },
+]
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -1015,14 +1031,19 @@ function CheckboxDot({ checked }: { checked: boolean }) {
 }
 
 const CALENDAR_WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토']
+const CALENDAR_MIN_YEAR = new Date().getFullYear() - 99
 
 function BirthDateCalendar({
   digits,
+  time,
   onSelect,
+  onSelectTime,
   onClose,
 }: {
   digits: string
+  time: string
   onSelect: (digits: string) => void
+  onSelectTime: (time: string) => void
   onClose: () => void
 }) {
   const today = new Date()
@@ -1032,6 +1053,7 @@ function BirthDateCalendar({
       ? new Date(Number(digits.slice(0, 4)), Number(digits.slice(4, 6)) - 1, 1)
       : new Date(today.getFullYear(), today.getMonth(), 1)
   )
+  const [viewMode, setViewMode] = useState<'days' | 'years'>('days')
   const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -1056,6 +1078,11 @@ function BirthDateCalendar({
     ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
   ]
 
+  const yearOptions = Array.from(
+    { length: today.getFullYear() - CALENDAR_MIN_YEAR + 1 },
+    (_, i) => today.getFullYear() - i
+  )
+
   const handlePick = (day: number) => {
     const picked = new Date(year, month, day)
     if (picked.getTime() > today.getTime()) return
@@ -1063,50 +1090,95 @@ function BirthDateCalendar({
     onClose()
   }
 
+  const handlePickYear = (y: number) => {
+    setViewDate(new Date(y, month, 1))
+    setViewMode('days')
+  }
+
   return (
     <div
       ref={containerRef}
-      className="absolute left-0 top-[calc(100%+8px)] z-20 w-full rounded-2xl bg-white p-4"
-      style={{ boxShadow: '0 8px 28px rgba(0,0,0,0.14)' }}
+      className="glass-card absolute left-0 top-[calc(100%+8px)] z-20 w-full rounded-2xl p-4"
     >
       <div className="mb-3 flex items-center justify-between">
-        <span className="text-[15px] font-bold text-[#0D0D0D]">{year}년 {month + 1}월</span>
-        <div className="flex items-center gap-3">
-          <button type="button" onClick={() => setViewDate(new Date(year, month - 1, 1))} className="text-[#0D0D0D]">
-            <ChevronLeft size={18} />
-          </button>
-          <button type="button" onClick={() => setViewDate(new Date(year, month + 1, 1))} className="text-[#0D0D0D]">
-            <ChevronRight size={18} />
-          </button>
-        </div>
-      </div>
-      <div className="mb-1 grid grid-cols-7">
-        {CALENDAR_WEEKDAYS.map((w) => (
-          <div key={w} className="py-1 text-center text-[11px] font-medium text-[#A8B1BD]">{w}</div>
-        ))}
-      </div>
-      <div className="grid grid-cols-7 gap-y-1">
-        {cells.map((day, idx) => {
-          if (day === null) return <div key={idx} />
-          const isFuture = new Date(year, month, day).getTime() > today.getTime()
-          const isSelected = selectedDay === day
-          const isToday = year === today.getFullYear() && month === today.getMonth() && day === today.getDate()
-          return (
-            <button key={idx} type="button" disabled={isFuture} onClick={() => handlePick(day)} className="flex h-9 items-center justify-center">
-              <span
-                className="flex h-8 w-8 items-center justify-center rounded-full text-sm"
-                style={{
-                  backgroundColor: isSelected ? '#25313D' : 'transparent',
-                  color: isFuture ? '#DEE4EC' : isSelected ? '#FFFFFF' : '#0D0D0D',
-                  fontWeight: isToday && !isSelected ? 700 : 400,
-                }}
-              >
-                {day}
-              </span>
+        <button
+          type="button"
+          onClick={() => setViewMode((prev) => (prev === 'days' ? 'years' : 'days'))}
+          className="flex items-center gap-1 text-[15px] font-bold text-[#0D0D0D]"
+        >
+          {viewMode === 'days' ? `${year}년 ${month + 1}월` : '연도 선택'}
+          <ChevronDown size={14} className={viewMode === 'years' ? 'rotate-180' : ''} />
+        </button>
+        {viewMode === 'days' && (
+          <div className="flex items-center gap-3">
+            <button type="button" onClick={() => setViewDate(new Date(year, month - 1, 1))} className="text-[#0D0D0D]">
+              <ChevronLeft size={18} />
             </button>
-          )
-        })}
+            <button type="button" onClick={() => setViewDate(new Date(year, month + 1, 1))} className="text-[#0D0D0D]">
+              <ChevronRight size={18} />
+            </button>
+          </div>
+        )}
       </div>
+
+      {viewMode === 'years' ? (
+        <div className="grid max-h-64 grid-cols-4 gap-2 overflow-y-auto">
+          {yearOptions.map((y) => (
+            <button
+              key={y}
+              type="button"
+              onClick={() => handlePickYear(y)}
+              className="flex h-9 items-center justify-center rounded-full text-sm"
+              style={{ backgroundColor: y === year ? '#25313D' : 'transparent', color: y === year ? '#FFFFFF' : '#0D0D0D' }}
+            >
+              {y}
+            </button>
+          ))}
+        </div>
+      ) : (
+        <>
+          <div className="mb-1 grid grid-cols-7">
+            {CALENDAR_WEEKDAYS.map((w) => (
+              <div key={w} className="py-1 text-center text-[11px] font-medium text-[#A8B1BD]">{w}</div>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-y-1">
+            {cells.map((day, idx) => {
+              if (day === null) return <div key={idx} />
+              const isFuture = new Date(year, month, day).getTime() > today.getTime()
+              const isSelected = selectedDay === day
+              const isToday = year === today.getFullYear() && month === today.getMonth() && day === today.getDate()
+              return (
+                <button key={idx} type="button" disabled={isFuture} onClick={() => handlePick(day)} className="flex h-9 items-center justify-center">
+                  <span
+                    className="flex h-8 w-8 items-center justify-center rounded-full text-sm"
+                    style={{
+                      backgroundColor: isSelected ? '#25313D' : 'transparent',
+                      color: isFuture ? '#DEE4EC' : isSelected ? '#FFFFFF' : '#0D0D0D',
+                      fontWeight: isToday && !isSelected ? 700 : 400,
+                    }}
+                  >
+                    {day}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+
+          <div className="mt-3 flex items-center justify-between border-t border-[#DEE4EC] pt-3">
+            <span className="text-sm font-medium text-[#25313D]">시간</span>
+            <select
+              value={time}
+              onChange={(e) => onSelectTime(e.target.value)}
+              className="appearance-none rounded-full bg-[rgba(255,255,255,0.7)] px-3 py-1.5 text-sm text-[#0D0D0D] outline-none"
+            >
+              {BIRTH_TIME_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          </div>
+        </>
+      )}
     </div>
   )
 }
@@ -1117,6 +1189,7 @@ export function Step2BasicInfo() {
   const [nickname, setNickname] = useState(store.onboardingNickname)
   const [useActivityName, setUseActivityName] = useState(false)
   const [birthDigits, setBirthDigits] = useState(() => store.onboardingBirthDate.replace(/\D/g, '').slice(0, 8))
+  const [birthTime, setBirthTime] = useState(store.onboardingBirthTime)
   const [showAge, setShowAge] = useState(store.onboardingShowAge)
   const [showCalendar, setShowCalendar] = useState(false)
 
@@ -1131,7 +1204,7 @@ export function Step2BasicInfo() {
   const handleNext = () => {
     if (!canProceed) return
     const birthDate = birthComplete && birthValid ? isoFromBirthDigits(birthDigits) : ''
-    store.setOnboardingNameAndBirth({ name: name.trim(), nickname: useActivityName ? nickname.trim() : '', birthDate, showAge })
+    store.setOnboardingNameAndBirth({ name: name.trim(), nickname: useActivityName ? nickname.trim() : '', birthDate, birthTime: birthDate ? birthTime : '', showAge })
     store.nextStep()
   }
 
@@ -1216,12 +1289,19 @@ export function Step2BasicInfo() {
             {showCalendar && (
               <BirthDateCalendar
                 digits={birthDigits}
+                time={birthTime}
                 onSelect={setBirthDigits}
+                onSelectTime={setBirthTime}
                 onClose={() => setShowCalendar(false)}
               />
             )}
           </div>
           {birthDateError && <p className="mt-1.5 text-xs text-[#FF4242]">올바른 날짜 형식을 입력해주세요.</p>}
+          {birthTime && !birthDateError && (
+            <p className="mt-1.5 text-xs text-[#6C7786]">
+              생시 {BIRTH_TIME_OPTIONS.find((opt) => opt.value === birthTime)?.label}
+            </p>
+          )}
 
           <button type="button" onClick={() => setShowAge((prev) => !prev)} className="mt-2 flex items-center gap-2">
             <CheckboxDot checked={showAge} />

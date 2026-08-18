@@ -37,6 +37,7 @@ interface FeloreStore {
   onboardingName: string
   onboardingNickname: string
   onboardingBirthDate: string
+  onboardingBirthTime: string
   onboardingShowAge: boolean
   isVerified: boolean
   onboardingTitle: string
@@ -82,7 +83,7 @@ interface FeloreStore {
   setAgreedMarketing(v: boolean): void
   toggleAllAgreed(): void
   setOnboardingBasicInfo(info: { title?: string; school?: string }): void
-  setOnboardingNameAndBirth(info: { name: string; nickname: string; birthDate: string; showAge: boolean }): void
+  setOnboardingNameAndBirth(info: { name: string; nickname: string; birthDate: string; birthTime: string; showAge: boolean }): void
   setVerified(v: boolean): void
   setLinkId(id: string): void
   setCustomLinkId(customId: string | null): void
@@ -168,6 +169,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
   onboardingName: '',
   onboardingNickname: '',
   onboardingBirthDate: '',
+  onboardingBirthTime: '',
   onboardingShowAge: true,
   isVerified: false,
   onboardingTitle: SAMPLE_PROFILE.title,
@@ -254,8 +256,8 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
     }))
   },
 
-  setOnboardingNameAndBirth({ name, nickname, birthDate, showAge }) {
-    set({ onboardingName: name, onboardingNickname: nickname, onboardingBirthDate: birthDate, onboardingShowAge: showAge })
+  setOnboardingNameAndBirth({ name, nickname, birthDate, birthTime, showAge }) {
+    set({ onboardingName: name, onboardingNickname: nickname, onboardingBirthDate: birthDate, onboardingBirthTime: birthTime, onboardingShowAge: showAge })
   },
 
   setVerified(v) {
@@ -382,7 +384,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
     const {
       linkId, bio, instagramConnected, linkedinConnected,
       onboardingContactChannels, highlights, onboardingTitle, onboardingSchool,
-      highlightsInitialized, onboardingName, onboardingNickname, onboardingBirthDate, onboardingShowAge, isVerified,
+      highlightsInitialized, onboardingName, onboardingNickname, onboardingBirthDate, onboardingBirthTime, onboardingShowAge, isVerified,
     } = get()
     set({
       isLoggedIn: true,
@@ -405,7 +407,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
         whoIAm: SAMPLE_PROFILE.whoIAm,
         life: SAMPLE_PROFILE.life,
         birthDate: onboardingBirthDate || SAMPLE_PROFILE.birthDate,
-        birthTime: SAMPLE_PROFILE.birthTime,
+        birthTime: onboardingBirthDate ? onboardingBirthTime : SAMPLE_PROFILE.birthTime,
         calendarType: SAMPLE_PROFILE.calendarType,
         showAge: onboardingBirthDate ? onboardingShowAge : SAMPLE_PROFILE.showAge,
         isVerified,
@@ -634,6 +636,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
       onboardingName: '',
       onboardingNickname: '',
       onboardingBirthDate: '',
+      onboardingBirthTime: '',
       onboardingShowAge: true,
       isVerified: false,
       onboardingTitle: SAMPLE_PROFILE.title,
@@ -697,6 +700,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
       onboardingName: (state as FeloreStore & { onboardingName?: string }).onboardingName ?? '',
       onboardingNickname: (state as FeloreStore & { onboardingNickname?: string }).onboardingNickname ?? '',
       onboardingBirthDate: (state as FeloreStore & { onboardingBirthDate?: string }).onboardingBirthDate ?? '',
+      onboardingBirthTime: (state as FeloreStore & { onboardingBirthTime?: string }).onboardingBirthTime ?? '',
       onboardingShowAge: (state as FeloreStore & { onboardingShowAge?: boolean }).onboardingShowAge ?? true,
       isVerified: (state as FeloreStore & { isVerified?: boolean }).isVerified ?? false,
       savedProfiles: SAMPLE_PROFILE.savedProfiles,
@@ -712,6 +716,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
     onboardingName: state.onboardingName,
     onboardingNickname: state.onboardingNickname,
     onboardingBirthDate: state.onboardingBirthDate,
+    onboardingBirthTime: state.onboardingBirthTime,
     onboardingShowAge: state.onboardingShowAge,
     isVerified: state.isVerified,
     onboardingTitle: state.onboardingTitle,

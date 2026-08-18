@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { Calendar, Camera, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Eye, EyeOff, Info, MessageCircle } from 'lucide-react'
+import { Calendar, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Eye, EyeOff, Image as ImageIcon, Info, MessageCircle, Sparkles } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
-import { BottomSheet, Button, GoogleIcon, TextArea, showToast } from '@/components/ui'
-import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
+import { BottomSheet, Button, GoogleIcon, showToast } from '@/components/ui'
+import { StepFooter } from '@/components/screens/onboarding/OnboardingShared'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
 export type Mode = 'choose' | 'signup' | 'login'
@@ -1316,48 +1316,54 @@ export function Step2BasicInfo() {
 }
 
 
-const MBTI_DIMS = [
-  { options: ['E', 'I'] as const, labels: ['외향', '내향'] },
-  { options: ['N', 'S'] as const, labels: ['직관', '감각'] },
-  { options: ['T', 'F'] as const, labels: ['사고', '감정'] },
-  { options: ['J', 'P'] as const, labels: ['판단', '인식'] },
-]
-
-function OnboardingPhotoSlot({
-  image,
-  label,
-  compact = false,
-  onClick,
-}: {
-  image: string
-  label: string
-  compact?: boolean
-  onClick: () => void
-}) {
+function MainPhotoSlot({ image, onClick }: { image: string; onClick: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="group relative h-full w-full overflow-hidden rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)]"
+      className="relative flex h-[325px] w-[244px] shrink-0 flex-col items-center justify-end overflow-hidden rounded-[24px] px-2.5 py-6"
+      style={{ backgroundColor: image ? undefined : '#F5F6F7' }}
     >
-      {image ? (
+      {image && (
         <>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={image} alt={label} className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-active:scale-[1.02]" />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.04)_0%,rgba(0,0,0,0.10)_100%)]" />
+          <img src={image} alt="대표" className="absolute inset-0 h-full w-full object-cover" />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0) 70%, rgba(0,0,0,0.7) 90%)' }} />
         </>
+      )}
+      <div
+        className="absolute left-4 top-4 flex h-5 items-center justify-center rounded-full px-2 text-xs font-bold text-white"
+        style={{ backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)' }}
+      >
+        대표
+      </div>
+      {image ? (
+        <span className="relative text-sm font-bold text-white">탭하여 변경</span>
       ) : (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-[var(--color-text-tertiary)]">
-          <Camera size={compact ? 18 : 22} />
-          <span className="text-[11px] font-semibold">{label}</span>
+        <div className="relative flex flex-col items-center gap-2">
+          <ImageIcon size={24} className="text-[#A8B1BD]" />
+          <span className="text-sm font-bold text-[#A8B1BD]">탭하여 추가</span>
         </div>
       )}
-      <div className="absolute left-2.5 top-2.5 rounded-full border border-white/15 bg-black/50 px-2 py-1 text-[10px] font-semibold text-white/92 backdrop-blur-sm">
-        {label}
-      </div>
-      {image && (
-        <div className="absolute inset-x-0 bottom-0 flex items-center justify-center bg-[linear-gradient(180deg,transparent_0%,rgba(0,0,0,0.42)_100%)] px-3 py-2 text-[11px] font-semibold text-white/92">
-          눌러서 변경
+    </button>
+  )
+}
+
+function SubPhotoSlot({ image, radius, onClick }: { image: string; radius: number; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="relative flex flex-1 items-center justify-center overflow-hidden"
+      style={{ backgroundColor: image ? undefined : '#F5F6F7', borderRadius: radius }}
+    >
+      {image ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={image} alt="서브 사진" className="absolute inset-0 h-full w-full object-cover" />
+      ) : (
+        <div className="flex flex-col items-center gap-1">
+          <ImageIcon size={18} className="text-[#A8B1BD]" />
+          <span className="text-[10px] font-semibold text-[#A8B1BD]">탭하여 추가</span>
         </div>
       )}
     </button>
@@ -1370,8 +1376,14 @@ export function Step4Profile() {
   const subPhotoInputRef = useRef<HTMLInputElement>(null)
   const pendingSubIndexRef = useRef<number | null>(null)
   const [profileImages, setProfileImages] = useState(['', '', '', ''])
-  const [mbti, setMbti] = useState('')
   const [bio, setBio] = useState('')
+
+  const handleAiFillBio = () => {
+    showToast('AI 자기소개 생성 중...', 'loading')
+    setTimeout(() => {
+      showToast('AI 자기소개 생성이 완료됐어요')
+    }, 1200)
+  }
 
   const handleMainFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -1421,106 +1433,84 @@ export function Step4Profile() {
     const filledImages = profileImages.filter(Boolean)
     if (filledImages.length > 0) store.updateUserInfo({ avatarImage: profileImages[0], profileImages: filledImages })
     if (bio.trim()) store.updateUserInfo({ bio: bio.trim() })
-    if (mbti.length === 4) store.updateUserWhoIAm({ ...SAMPLE_PROFILE.whoIAm, mbti })
     store.goToStep('complete')
   }
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto px-5 py-4">
-      <StepIntro
-        eyebrow="Profile"
-        title={'프로필을\n채워볼까요?'}
-        description={'나중에 편집에서 언제든 바꿀 수 있어요.'}
-      />
-
-      {/* 프로필 사진 */}
-      <input ref={mainPhotoInputRef} type="file" accept="image/*" className="sr-only" onChange={handleMainFileChange} />
-      <input ref={subPhotoInputRef} type="file" accept="image/*" className="sr-only" onChange={handleSubFileChange} />
-      <div className="mb-5">
-        <div className="text-xs text-[var(--color-text-tertiary)] mb-2">
-          얼굴이 나온 대표 사진 1장과 분위기를 보여주는 서브 사진 3장을 넣어주세요.
+    <div className="flex flex-1 flex-col min-h-0">
+      <div className="flex-1 overflow-y-auto px-5 pt-6 pb-4">
+        <div className="mb-6">
+          <h2 className="text-[22px] font-bold leading-[1.35] tracking-[-0.03em] text-[#0D0D0D]">프로필을 채워볼까요?</h2>
+          <p className="mt-2 text-[15px] font-medium leading-[1.5] tracking-[-0.02em] text-[#475058]">언제든지 설정에서 바꿀 수 있어요</p>
         </div>
-        <div className="grid h-[300px] grid-cols-[minmax(0,1fr)_86px] items-stretch gap-3">
-          <OnboardingPhotoSlot
-            image={profileImages[0]}
-            label="메인"
-            onClick={() => mainPhotoInputRef.current?.click()}
-          />
-          <div className="grid h-full grid-rows-3 gap-3">
-            {[1, 2, 3].map((index) => (
-              <OnboardingPhotoSlot
-                key={index}
-                image={profileImages[index]}
-                label={`서브 ${index}`}
-                compact
-                onClick={() => {
-                  pendingSubIndexRef.current = index
-                  subPhotoInputRef.current?.click()
-                }}
-              />
-            ))}
+
+        <input ref={mainPhotoInputRef} type="file" accept="image/*" className="sr-only" onChange={handleMainFileChange} />
+        <input ref={subPhotoInputRef} type="file" accept="image/*" className="sr-only" onChange={handleSubFileChange} />
+
+        {/* 프로필 사진 */}
+        <div className="mb-9">
+          <div className="flex items-start gap-2">
+            <MainPhotoSlot image={profileImages[0]} onClick={() => mainPhotoInputRef.current?.click()} />
+            <div className="flex flex-1 flex-col gap-2 self-stretch">
+              {[16, 8, 16].map((radius, i) => (
+                <SubPhotoSlot
+                  key={i}
+                  image={profileImages[i + 1]}
+                  radius={radius}
+                  onClick={() => {
+                    pendingSubIndexRef.current = i + 1
+                    subPhotoInputRef.current?.click()
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+          <p className="mt-2 text-xs leading-relaxed text-[#6C7786]">
+            얼굴이 나온 대표 사진 1장, 나만의 분위기를 담은 사진을 추가해보세요
+          </p>
+        </div>
+
+        {/* 자기소개 */}
+        <div>
+          <div className="flex h-[19px] items-center justify-between">
+            <span className="text-sm font-semibold text-[#0D0D0D]">자기소개</span>
+            <button
+              type="button"
+              onClick={handleAiFillBio}
+              className="flex items-center gap-1 rounded-full px-1.5 py-0.5 text-xs font-semibold text-white"
+              style={{ backgroundImage: 'linear-gradient(133deg, #00C8B3 0%, #00ADFF 30%, #0657FF 59%)' }}
+            >
+              <Sparkles size={12} />
+              AI로 채우기
+            </button>
+          </div>
+          <div className="mt-2">
+            <textarea
+              value={bio}
+              onChange={(e) => setBio(e.target.value.slice(0, 200))}
+              placeholder="예: 창업 3년차. 사람을 만나고 연결하는 걸 좋아합니다."
+              rows={4}
+              className="w-full resize-none rounded-[24px] border bg-white p-3 text-sm outline-none"
+              style={{ borderColor: '#DEE4EC', color: '#0D0D0D' }}
+            />
+            <p className="mt-2 text-right text-xs text-[#6C7786]">{bio.length}/200</p>
           </div>
         </div>
       </div>
 
-      {/* MBTI */}
-      <div className="mb-5">
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-xs text-[var(--color-text-tertiary)]">MBTI</label>
-          {mbti && <span className="text-sm font-bold text-[var(--color-text-primary)]">{mbti}</span>}
-        </div>
-        <div className="space-y-2">
-          {MBTI_DIMS.map((dim, dimIndex) => {
-            const selectedLetter = mbti[dimIndex] ?? ''
-            return (
-              <div key={dimIndex} className="flex overflow-hidden rounded-xl border border-[var(--color-border-default)]">
-                {dim.options.map((letter, optIndex) => {
-                  const isSelected = selectedLetter === letter
-                  return (
-                    <button
-                      key={letter}
-                      type="button"
-                      onClick={() => {
-                        const parts = (mbti || '    ').split('')
-                        parts[dimIndex] = letter
-                        setMbti(parts.join('').trimEnd())
-                      }}
-                      className="flex-1 py-2.5 px-4 text-left transition-colors"
-                      style={{
-                        background: isSelected ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
-                        borderRight: optIndex === 0 ? '1px solid var(--color-border-default)' : undefined,
-                      }}
-                    >
-                      <span className={`text-[13px] font-black ${isSelected ? 'text-white' : 'text-[var(--color-text-secondary)]'}`}>{letter}</span>
-                      <span className={`ml-1.5 text-[11px] ${isSelected ? 'text-white/80' : 'text-[var(--color-text-tertiary)]'}`}>{dim.labels[optIndex]}</span>
-                    </button>
-                  )
-                })}
-              </div>
-            )
-          })}
-        </div>
+      <div className="flex flex-col items-center gap-2 px-4 pb-10 pt-4">
+        <button
+          type="button"
+          onClick={handleNext}
+          className="w-full rounded-full py-4 text-[16px] font-semibold text-white"
+          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+        >
+          완료
+        </button>
+        <button type="button" onClick={handleNext} className="text-xs text-[#6C7786] underline">
+          건너뛰기
+        </button>
       </div>
-
-      {/* 자기소개 */}
-      <div className="mb-5">
-        <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">자기소개</label>
-        <TextArea
-          value={bio}
-          onChange={setBio}
-          placeholder="예: 창업 3년차. 사람을 만나고 연결하는 걸 좋아합니다."
-          rows={3}
-          maxLength={200}
-        />
-      </div>
-
-      <StepFooter
-        canNext
-        onNext={handleNext}
-        onPrev={() => store.prevStep()}
-        onSkip={handleNext}
-        skipLabel="건너뛰기"
-      />
     </div>
   )
 }

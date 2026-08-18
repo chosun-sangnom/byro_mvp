@@ -89,7 +89,7 @@ export default function SettingsScreen() {
   const handleSaveCustomLinkId = () => {
     const trimmed = customLinkInput.trim().toLowerCase()
     if (trimmed && !CUSTOM_LINK_ID_REGEX.test(trimmed)) {
-      showToast('영문 소문자·숫자·_만 사용할 수 있어요 (2~20자)')
+      showToast('영문 소문자·숫자·_만 사용할 수 있어요 (2~20자)', 'error')
       return
     }
     store.setCustomLinkId(trimmed || null)
@@ -107,7 +107,7 @@ export default function SettingsScreen() {
 
   const handlePay = () => {
     if (!cardNumber || !cardExpiry || !cardCvc || !cardName.trim()) {
-      showToast('카드 정보를 모두 입력해주세요')
+      showToast('카드 정보를 모두 입력해주세요', 'error')
       return
     }
     store.setPaidUser(true)

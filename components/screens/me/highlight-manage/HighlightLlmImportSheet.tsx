@@ -78,7 +78,7 @@ export function HighlightLlmImportSheet({
     const selected = items.filter((i) => i.selected)
     if (selected.length === 0) return
     if (!isPro && selected.length > freeRemaining) {
-      showToast('Free 플랜은 하이라이트를 최대 3개까지 추가할 수 있어요')
+      showToast('Free 플랜은 하이라이트를 최대 3개까지 추가할 수 있어요', 'error')
       return
     }
 

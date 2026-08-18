@@ -1139,7 +1139,7 @@ export function Step4Profile() {
     const file = event.target.files?.[0]
     if (!file) return
     if (!file.type.startsWith('image/')) {
-      showToast('이미지 파일만 업로드할 수 있어요')
+      showToast('이미지 파일만 업로드할 수 있어요', 'error')
       event.target.value = ''
       return
     }
@@ -1160,7 +1160,7 @@ export function Step4Profile() {
     const targetIndex = pendingSubIndexRef.current
     if (!file || targetIndex === null) return
     if (!file.type.startsWith('image/')) {
-      showToast('이미지 파일만 업로드할 수 있어요')
+      showToast('이미지 파일만 업로드할 수 있어요', 'error')
       event.target.value = ''
       pendingSubIndexRef.current = null
       return

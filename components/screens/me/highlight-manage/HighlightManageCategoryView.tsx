@@ -129,7 +129,7 @@ export function HighlightManageCategoryView({
                           onEdit(item)
                           return
                         }
-                        showToast('기본 목업 항목은 수정하지 않습니다')
+                        showToast('기본 목업 항목은 수정하지 않습니다', 'error')
                       }}
                       className="rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-muted)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)]"
                     >
@@ -141,7 +141,7 @@ export function HighlightManageCategoryView({
                           onDelete(item)
                           return
                         }
-                        showToast('기본 목업 항목은 삭제하지 않습니다')
+                        showToast('기본 목업 항목은 삭제하지 않습니다', 'error')
                       }}
                       className="rounded-lg border border-[var(--color-state-danger-bg)] px-3 py-1.5 text-xs font-medium text-[var(--color-state-danger-text)]"
                     >

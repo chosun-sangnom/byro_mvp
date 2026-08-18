@@ -239,7 +239,7 @@ export function ExercisePicker({
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file || !editingLabel) return
-    if (!file.type.startsWith('image/')) { showToast('이미지 파일만 업로드할 수 있어요'); return }
+    if (!file.type.startsWith('image/')) { showToast('이미지 파일만 업로드할 수 있어요', 'error'); return }
     const reader = new FileReader()
     reader.onload = () => {
       if (typeof reader.result === 'string') {

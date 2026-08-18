@@ -58,7 +58,7 @@ export function RememberNetworkManageScreen({
     setSelectedDomains((prev) => {
       if (prev.includes(domain)) return prev.filter((d) => d !== domain)
       if (prev.length >= MAX_DOMAINS) {
-        showToast(`관심 도메인은 최대 ${MAX_DOMAINS}개까지 선택할 수 있어요`)
+        showToast(`관심 도메인은 최대 ${MAX_DOMAINS}개까지 선택할 수 있어요`, 'error')
         return prev
       }
       return [...prev, domain]
@@ -69,7 +69,7 @@ export function RememberNetworkManageScreen({
     const trimmed = customInput.trim()
     if (!trimmed) return
     if (selectedDomains.length >= MAX_DOMAINS && !selectedDomains.includes(trimmed)) {
-      showToast(`관심 도메인은 최대 ${MAX_DOMAINS}개까지 선택할 수 있어요`)
+      showToast(`관심 도메인은 최대 ${MAX_DOMAINS}개까지 선택할 수 있어요`, 'error')
       return
     }
     setSelectedDomains((prev) => (prev.includes(trimmed) ? prev : [...prev, trimmed]))

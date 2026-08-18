@@ -331,14 +331,14 @@ export function PublicProfileShell({
         experienceMessage={store.experienceMessage}
         onToggleKeyword={(keyword) => {
           if (!store.experienceKeywords.includes(keyword) && store.experienceKeywords.length >= 3) {
-            showToast('키워드는 최대 3개까지 선택할 수 있어요')
+            showToast('키워드는 최대 3개까지 선택할 수 있어요', 'error')
             return
           }
           store.setExperienceKeyword(keyword)
         }}
         onMessageChange={store.setExperienceMessage}
         onSubmit={(isAnonymous) => {
-          if (store.experienceKeywords.length === 0) { showToast('키워드를 하나 이상 선택해주세요'); return }
+          if (store.experienceKeywords.length === 0) { showToast('키워드를 하나 이상 선택해주세요', 'error'); return }
           store.submitExperience(profile.linkId, {
             authorName: isAnonymous ? null : (store.user?.name ?? null),
             isAnonymous: isAnonymous || !store.isLoggedIn,

@@ -66,7 +66,7 @@ export function Step7Highlight() {
         <button
           onClick={() => {
             if (highlightLimitReached) {
-              showToast('하이라이트는 최대 5개까지 추가할 수 있어요')
+              showToast('하이라이트는 최대 5개까지 추가할 수 있어요', 'error')
               return
             }
             setSheetOpen(true)

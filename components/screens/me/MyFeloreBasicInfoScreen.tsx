@@ -466,7 +466,7 @@ export function BasicInfoEditScreen({
     const file = event.target.files?.[0]
     if (!file) return
     if (!file.type.startsWith('image/')) {
-      showToast('이미지 파일만 업로드할 수 있어요')
+      showToast('이미지 파일만 업로드할 수 있어요', 'error')
       event.target.value = ''
       return
     }
@@ -495,7 +495,7 @@ export function BasicInfoEditScreen({
 
     if (!file || targetIndex === null) return
     if (!file.type.startsWith('image/')) {
-      showToast('이미지 파일만 업로드할 수 있어요')
+      showToast('이미지 파일만 업로드할 수 있어요', 'error')
       event.target.value = ''
       pendingSubIndexRef.current = null
       return
@@ -762,7 +762,7 @@ export function BasicInfoEditScreen({
               <div className="flex items-center gap-2 mb-1">
                 <label className="text-xs text-[var(--color-text-tertiary)]">자기소개</label>
                 <button
-                  onClick={() => showToast('AI 자기소개 생성 중...')}
+                  onClick={() => showToast('AI 자기소개 생성 중...', 'loading')}
                   className="text-xs text-[var(--color-accent-dark)] font-bold"
                 >
                   → AI로 채우기

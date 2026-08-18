@@ -495,7 +495,7 @@ export function PublicProfileCompatibilitySheet({
         }, 'image/png')
       })
     } catch {
-      showToast('공유에 실패했어요')
+      showToast('공유에 실패했어요', 'error')
     } finally {
       setSharing(false)
     }

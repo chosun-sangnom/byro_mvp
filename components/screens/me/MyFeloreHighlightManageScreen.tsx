@@ -121,7 +121,7 @@ export function HighlightManageScreen({
 
   const openAddForm = () => {
     if (!isPro && freeRemaining <= 0) {
-      showToast('Free 플랜은 하이라이트를 최대 3개까지 추가할 수 있어요')
+      showToast('Free 플랜은 하이라이트를 최대 3개까지 추가할 수 있어요', 'error')
       return
     }
     resetFormFields()
@@ -159,47 +159,47 @@ export function HighlightManageScreen({
 
   const handleSave = () => {
     if (!selectedCat || !hlTitle.trim()) {
-      showToast('필수 항목을 입력해주세요')
+      showToast('필수 항목을 입력해주세요', 'error')
       return
     }
     if (isCareerRole && !hlRole.trim()) {
-      showToast('직함을 입력해주세요')
+      showToast('직함을 입력해주세요', 'error')
       return
     }
     if (isCareerRole && !hlStatus) {
-      showToast('상태를 선택해주세요')
+      showToast('상태를 선택해주세요', 'error')
       return
     }
     if (isCareerRole && !hlStartYear) {
-      showToast('시작 연도를 선택해주세요')
+      showToast('시작 연도를 선택해주세요', 'error')
       return
     }
     if (isCareerRole && hlStatus === '종료' && !hlEndYear) {
-      showToast('종료 연도를 선택해주세요')
+      showToast('종료 연도를 선택해주세요', 'error')
       return
     }
     if (isEducationHistory && !hlSchoolType) {
-      showToast('학교 유형을 선택해주세요')
+      showToast('학교 유형을 선택해주세요', 'error')
       return
     }
     if (isEducationHistory && educationNeedsDegree && !hlDegree) {
-      showToast('세부 학위를 선택해주세요')
+      showToast('세부 학위를 선택해주세요', 'error')
       return
     }
     if (isEducationHistory && educationNeedsMajor && !hlRole.trim()) {
-      showToast('전공을 입력해주세요')
+      showToast('전공을 입력해주세요', 'error')
       return
     }
     if (isEducationHistory && !hlStatus) {
-      showToast('상태를 선택해주세요')
+      showToast('상태를 선택해주세요', 'error')
       return
     }
     if (isEducationHistory && !hlEducationStartYear) {
-      showToast('입학 연도를 선택해주세요')
+      showToast('입학 연도를 선택해주세요', 'error')
       return
     }
     if (isEducationHistory && hlStatus !== '재학' && !hlEducationEndYear) {
-      showToast(hlStatus === '중퇴' ? '중퇴 연도를 선택해주세요' : '졸업 연도를 선택해주세요')
+      showToast(hlStatus === '중퇴' ? '중퇴 연도를 선택해주세요' : '졸업 연도를 선택해주세요', 'error')
       return
     }
 

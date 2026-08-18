@@ -61,7 +61,7 @@ export default function PublicProfile({
       await navigator.clipboard.writeText(publicProfileUrl)
       showToast('프로필 링크를 복사했어요')
     } catch {
-      showToast('링크 복사에 실패했어요')
+      showToast('링크 복사에 실패했어요', 'error')
     }
   }
 
@@ -151,7 +151,7 @@ export default function PublicProfile({
           onRequestFeedback={() => showToast('피드백 요청을 보냈어요!')}
           onChannelClick={(channel) => {
             if (!channel.enabled) {
-              showToast(isOwnerMode ? 'FELORE 편집에서 연동을 활성화해 주세요' : '비활성화된 연락 수단이에요')
+              showToast(isOwnerMode ? 'FELORE 편집에서 연동을 활성화해 주세요' : '비활성화된 연락 수단이에요', 'error')
               return
             }
             if (!channel.href) {

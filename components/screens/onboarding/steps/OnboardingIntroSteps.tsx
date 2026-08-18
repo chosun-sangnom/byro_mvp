@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'reac
 import { useRouter } from 'next/navigation'
 import { Camera, CheckCircle2, ChevronRight } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
-import { Button, GoogleIcon, TextArea, showToast } from '@/components/ui'
+import { BottomSheet, Button, GoogleIcon, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
@@ -53,6 +53,7 @@ export function Step1Login({
   const [view, setView] = useState<LoginView>('main')
   const [oauthProvider, setOauthProvider] = useState<OAuthProvider | null>(null)
   const [oauthStep, setOauthStep] = useState<OAuthStep>('pending')
+  const [showTermsSheet, setShowTermsSheet] = useState(false)
 
   useEffect(() => {
     onModeChange?.(mode)
@@ -183,19 +184,26 @@ export function Step1Login({
       }
 
       return (
-        <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-          <div className="flex-1 flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 rounded-full flex items-center justify-center mb-5"
-              style={{ backgroundColor: 'var(--color-state-success-bg)' }}>
-              <CheckCircle2 size={32} style={{ color: 'var(--color-state-success-text)' }} />
+        <>
+          <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+            <div className="flex-1 flex flex-col items-center justify-center text-center">
+              <div className="w-16 h-16 rounded-full flex items-center justify-center mb-5"
+                style={{ backgroundColor: 'var(--color-state-success-bg)' }}>
+                <CheckCircle2 size={32} style={{ color: 'var(--color-state-success-text)' }} />
+              </div>
+              <div className="text-xl font-black text-[var(--color-text-strong)] mb-2">
+                {meta.label} 연결 완료
+              </div>
+              <p className="meta-text leading-relaxed">이제 프로필을 만들어볼게요.</p>
             </div>
-            <div className="text-xl font-black text-[var(--color-text-strong)] mb-2">
-              {meta.label} 연결 완료
-            </div>
-            <p className="meta-text leading-relaxed">이제 프로필을 만들어볼게요.</p>
+            <Button onClick={() => setShowTermsSheet(true)}>계속하기</Button>
           </div>
-          <Button onClick={() => store.nextStep()}>계속하기</Button>
-        </div>
+          <TermsAgreementSheet
+            open={showTermsSheet}
+            onClose={() => setShowTermsSheet(false)}
+            onAgree={() => { setShowTermsSheet(false); store.nextStep() }}
+          />
+        </>
       )
     }
 
@@ -281,6 +289,7 @@ export function Step1Login({
     }
 
     return (
+      <>
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
         <div className="mb-6">
           <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
@@ -325,10 +334,16 @@ export function Step1Login({
           </div>
         </div>
         {/* [임시] 펠로어 전화번호 회원가입 API 미연동 */}
-        <Button onClick={() => { if (canPhoneSubmit) store.nextStep() }} disabled={!canPhoneSubmit}>
+        <Button onClick={() => { if (canPhoneSubmit) setShowTermsSheet(true) }} disabled={!canPhoneSubmit}>
           가입하기
         </Button>
       </div>
+      <TermsAgreementSheet
+        open={showTermsSheet}
+        onClose={() => setShowTermsSheet(false)}
+        onAgree={() => { setShowTermsSheet(false); store.nextStep() }}
+      />
+      </>
     )
   }
 
@@ -693,58 +708,63 @@ function TermsCheckRow({ badge, label, checked, onToggle, onDetail }: {
   )
 }
 
-export function StepTermsAgreement() {
+function TermsAgreementSheet({
+  open,
+  onClose,
+  onAgree,
+}: {
+  open: boolean
+  onClose: () => void
+  onAgree: () => void
+}) {
   const store = useFeloreStore()
   const allAgreed = store.agreedTerms && store.agreedPrivacy && store.agreedMarketing
   const canProceed = store.agreedTerms && store.agreedPrivacy
 
   return (
-    <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-      <div className="mb-8">
-        <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
-          펠로어에 가입하려면
-          <br />
-          <span style={{ color: 'var(--color-accent-dark)' }}>이용약관 동의</span>가 필요해요
+    <BottomSheet open={open} onClose={onClose}>
+      <div className="px-5 pb-6">
+        <div className="text-lg font-black text-[var(--color-text-strong)] mb-4">
+          이용약관에 동의해주세요
         </div>
-      </div>
 
-      <div className="pb-4 mb-2 border-b border-[var(--color-border-default)]">
+        <div className="pb-4 mb-2 border-b border-[var(--color-border-default)]">
+          <TermsCheckRow
+            label="전체 동의"
+            checked={allAgreed}
+            onToggle={() => store.toggleAllAgreed()}
+          />
+        </div>
+
         <TermsCheckRow
-          label="전체 동의"
-          checked={allAgreed}
-          onToggle={() => store.toggleAllAgreed()}
+          badge="필수"
+          label="이용약관"
+          checked={store.agreedTerms}
+          onToggle={() => store.setAgreedTerms(!store.agreedTerms)}
+          onDetail={() => showToast('준비 중인 페이지예요')}
         />
-      </div>
+        <TermsCheckRow
+          badge="필수"
+          label="개인정보 수집 및 이용"
+          checked={store.agreedPrivacy}
+          onToggle={() => store.setAgreedPrivacy(!store.agreedPrivacy)}
+          onDetail={() => showToast('준비 중인 페이지예요')}
+        />
+        <TermsCheckRow
+          badge="선택"
+          label="마케팅 정보 수신 동의"
+          checked={store.agreedMarketing}
+          onToggle={() => store.setAgreedMarketing(!store.agreedMarketing)}
+        />
+        <div className="flex items-center gap-3 mt-1 mb-6 pl-8 text-[11px] text-[var(--color-text-tertiary)]">
+          <span>✓ 앱 푸시</span>
+          <span>✓ 문자</span>
+          <span>✓ 이메일</span>
+        </div>
 
-      <TermsCheckRow
-        badge="필수"
-        label="이용약관"
-        checked={store.agreedTerms}
-        onToggle={() => store.setAgreedTerms(!store.agreedTerms)}
-        onDetail={() => showToast('준비 중인 페이지예요')}
-      />
-      <TermsCheckRow
-        badge="필수"
-        label="개인정보 수집 및 이용"
-        checked={store.agreedPrivacy}
-        onToggle={() => store.setAgreedPrivacy(!store.agreedPrivacy)}
-        onDetail={() => showToast('준비 중인 페이지예요')}
-      />
-      <TermsCheckRow
-        badge="선택"
-        label="마케팅 정보 수신 동의"
-        checked={store.agreedMarketing}
-        onToggle={() => store.setAgreedMarketing(!store.agreedMarketing)}
-      />
-      <div className="flex items-center gap-3 mt-1 mb-8 pl-8 text-[11px] text-[var(--color-text-tertiary)]">
-        <span>✓ 앱 푸시</span>
-        <span>✓ 문자</span>
-        <span>✓ 이메일</span>
+        <Button disabled={!canProceed} onClick={onAgree}>다음</Button>
       </div>
-
-      <div className="flex-1" />
-      <Button disabled={!canProceed} onClick={() => store.nextStep()}>다음</Button>
-    </div>
+    </BottomSheet>
   )
 }
 

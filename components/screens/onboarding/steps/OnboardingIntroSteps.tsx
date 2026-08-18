@@ -633,8 +633,8 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
         </div>
       </div>
       <div className="space-y-3">
-        <Button onClick={() => setMode('signup')} style={{ backgroundColor: '#0D0D0D', boxShadow: 'none' }}>회원가입</Button>
-        <Button variant="outline" onClick={() => setMode('login')}>이미 계정이 있어요</Button>
+        <Button onClick={() => setMode('signup')} style={{ backgroundColor: '#0D0D0D', boxShadow: 'none', borderRadius: 9999 }}>회원가입</Button>
+        <Button variant="outline" onClick={() => setMode('login')} style={{ borderRadius: 9999 }}>이미 계정이 있어요</Button>
       </div>
     </div>
   )

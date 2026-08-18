@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { Button, Modal, NavBar, StepBar } from '@/components/ui'
@@ -31,6 +31,10 @@ export default function OnboardingScreen() {
   const store = useFeloreStore()
   const [showExitModal, setShowExitModal] = useState(false)
   const [loginFlowMode, setLoginFlowMode] = useState<Mode>('choose')
+  const [loginBackHandler, setLoginBackHandler] = useState<(() => void) | null>(null)
+  const handleLoginBackHandlerChange = useCallback((handler: (() => void) | null) => {
+    setLoginBackHandler(() => handler)
+  }, [])
 
   const stepNum = STEP_NUMS[store.step]
   const CurrentStep = STEP_COMPONENTS[store.step]
@@ -52,7 +56,7 @@ export default function OnboardingScreen() {
   return (
     <div className="flex flex-col h-full">
       <NavBar
-        onBack={hasBack ? () => store.prevStep() : undefined}
+        onBack={hasBack ? () => store.prevStep() : (store.step === 'login' ? loginBackHandler ?? undefined : undefined)}
         onClose={stepNum < 5 ? handleClose : undefined}
       />
 
@@ -61,7 +65,14 @@ export default function OnboardingScreen() {
       )}
 
       <div className="flex-1 overflow-hidden">
-        {store.step === 'login' ? <Step1Login onModeChange={setLoginFlowMode} /> : <CurrentStep />}
+        {store.step === 'login'
+          ? (
+            <Step1Login
+              onModeChange={setLoginFlowMode}
+              onBackHandlerChange={handleLoginBackHandlerChange}
+            />
+          )
+          : <CurrentStep />}
       </div>
 
       <Modal open={showExitModal} onClose={() => setShowExitModal(false)} widthClassName="w-[calc(100%-40px)]">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { Camera, CheckCircle2 } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
@@ -40,21 +40,13 @@ function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
-function BackButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex items-center gap-1 text-[13px] text-[var(--color-text-tertiary)] mb-6 -ml-0.5 self-start"
-    >
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M10 3L5 8L10 13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/>
-      </svg>
-    </button>
-  )
-}
-
-export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => void } = {}) {
+export function Step1Login({
+  onModeChange,
+  onBackHandlerChange,
+}: {
+  onModeChange?: (mode: Mode) => void
+  onBackHandlerChange?: (handler: (() => void) | null) => void
+} = {}) {
   const store = useFeloreStore()
   const router = useRouter()
   const [mode, setMode] = useState<Mode>('choose')
@@ -142,6 +134,30 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
     router.push(`/${SAMPLE_PROFILE.linkId}`)
   }
 
+  // 헤더 뒤로가기 버튼 — 현재 뷰에 맞는 핸들러를 ref에 최신 상태로 유지하고,
+  // 상위(OnboardingScreen)에는 참조가 변하지 않는 wrapper만 전달해 불필요한 재렌더를 막는다.
+  const backHandlerRef = useRef<(() => void) | null>(null)
+  backHandlerRef.current =
+    view === 'oauth' && oauthProvider && oauthStep === 'pending' ? handleBackToMain :
+    view === 'phone' && mode === 'signup' && !phoneVerified ? handleBackToMain :
+    view === 'phone' && mode === 'signup' && phoneVerified ? () => setPhoneVerified(false) :
+    view === 'phone' && mode === 'login' ? handleBackToMain :
+    view === 'reset' && resetMethod === 'choose' ? handleBackToPhoneLogin :
+    view === 'reset' && resetMethod === 'sms' && resetStage === 'verify' ? () => setResetMethod('choose') :
+    view === 'reset' && resetMethod === 'sms' && resetStage === 'newPassword' ? () => setResetStage('verify') :
+    view === 'reset' && resetMethod === 'email' && !resetEmailSent ? () => setResetMethod('choose') :
+    (mode === 'login' || mode === 'signup') && view === 'main' ? handleBackToChoose :
+    null
+
+  const handleHeaderBack = useCallback(() => {
+    backHandlerRef.current?.()
+  }, [])
+
+  const hasHeaderBack = backHandlerRef.current !== null
+  useEffect(() => {
+    onBackHandlerChange?.(hasHeaderBack ? handleHeaderBack : null)
+  }, [hasHeaderBack, handleHeaderBack, onBackHandlerChange])
+
   // --- OAuth 뷰 ---
   if (view === 'oauth' && oauthProvider) {
     const meta = OAUTH_META[oauthProvider]
@@ -185,7 +201,6 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
 
     return (
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <BackButton onClick={handleBackToMain} />
         <div className="mb-8">
           <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight mb-2">
             {meta.label} 계정으로<br />{mode === 'login' ? '로그인' : '시작하기'}
@@ -210,7 +225,6 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
     if (!phoneVerified) {
       return (
         <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-          <BackButton onClick={handleBackToMain} />
           <div className="mb-6">
             <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
               전화번호로<br />회원가입
@@ -268,7 +282,6 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
 
     return (
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <BackButton onClick={() => setPhoneVerified(false)} />
         <div className="mb-6">
           <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
             전화번호로<br />회원가입
@@ -323,7 +336,6 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
   if (view === 'phone' && mode === 'login') {
     return (
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <BackButton onClick={handleBackToMain} />
         <div className="mb-6">
           <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
             전화번호로<br />로그인
@@ -378,7 +390,6 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
     if (resetMethod === 'choose') {
       return (
         <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-          <BackButton onClick={handleBackToPhoneLogin} />
           <div className="mb-6">
             <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
               비밀번호<br />재설정
@@ -401,7 +412,6 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
       if (resetStage === 'verify') {
         return (
           <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-            <BackButton onClick={() => setResetMethod('choose')} />
             <div className="mb-6">
               <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
                 전화번호<br />인증
@@ -476,7 +486,6 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
       // resetStage === 'newPassword'
       return (
         <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-          <BackButton onClick={() => setResetStage('verify')} />
           <div className="mb-6">
             <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
               새 비밀번호<br />설정
@@ -529,7 +538,6 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
     if (!resetEmailSent) {
       return (
         <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-          <BackButton onClick={() => setResetMethod('choose')} />
           <div className="mb-6">
             <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
               이메일로<br />재설정
@@ -577,7 +585,6 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
   if (mode === 'login') {
     return (
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <BackButton onClick={handleBackToChoose} />
         <div className="mb-6">
           <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
             다시 오셨군요!
@@ -605,7 +612,6 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
   if (mode === 'signup') {
     return (
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <BackButton onClick={handleBackToChoose} />
         <div className="mb-6">
           <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
             처음 오셨군요!

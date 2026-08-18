@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { Camera, CheckCircle2, ChevronRight, Eye, EyeOff } from 'lucide-react'
+import { Camera, CheckCircle2, ChevronRight, Eye, EyeOff, Info, MessageCircle } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { BottomSheet, Button, GoogleIcon, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
@@ -835,7 +835,7 @@ export function Step2Verify() {
     <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
       <div className="mb-6">
         <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">본인인증</div>
-        <p className="meta-text mt-2">인증하면 프로필에 인증 뱃지가 표시돼요.</p>
+        <p className="meta-text mt-2">인증하면 프로필에 인증 뱃지가 표시돼요</p>
       </div>
 
       {/* 탭 */}
@@ -845,10 +845,10 @@ export function Step2Verify() {
             key={t}
             type="button"
             onClick={() => setTab(t)}
-            className="flex-1 rounded-full py-2 text-[13px] font-bold transition-colors"
+            className={`flex-1 rounded-full py-2 text-[13px] font-bold transition-colors ${tab === t ? 'shadow-sm' : ''}`}
             style={{
-              backgroundColor: tab === t ? '#0D0D0D' : 'transparent',
-              color: tab === t ? '#fff' : 'var(--color-text-secondary)',
+              backgroundColor: tab === t ? '#fff' : 'transparent',
+              color: tab === t ? 'var(--color-text-strong)' : 'var(--color-text-secondary)',
             }}
           >
             {t === 'kakao' ? '카카오 인증' : 'SMS 인증'}
@@ -858,11 +858,19 @@ export function Step2Verify() {
 
       {tab === 'kakao' ? (
         <div>
-          <p className="text-[13px] text-[var(--color-text-secondary)] mb-4 leading-relaxed">
-            카카오페이 인증 또는 카카오 본인인증 서비스를 통해 인증해요.
-          </p>
+          <div
+            className="mb-4 flex items-center gap-2 rounded-xl px-3 py-2.5"
+            style={{ backgroundColor: 'var(--color-state-info-bg)' }}
+          >
+            <Info size={16} style={{ color: 'var(--color-state-info-text)' }} className="flex-shrink-0" />
+            <p className="text-[13px] text-[var(--color-text-secondary)]">카카오 본인인증 서비스를 통해 인증해요</p>
+          </div>
           {/* [임시] 카카오 본인인증 API 미연동 */}
-          <Button variant="kakao" onClick={handleVerified}>카카오로 본인인증하기</Button>
+          <Button variant="kakao" onClick={handleVerified}>
+            <span className="inline-flex w-full items-center justify-center gap-2">
+              <MessageCircle size={16} fill="#333" stroke="none" /> 카카오로 본인인증하기
+            </span>
+          </Button>
         </div>
       ) : (
         <div className="space-y-2">
@@ -882,6 +890,7 @@ export function Step2Verify() {
               className="w-24 flex-shrink-0"
               disabled={!isValidPhone(phone)}
               onClick={handleSmsSend}
+              style={smsSent ? { backgroundColor: 'var(--color-text-tertiary)' } : undefined}
             >
               {smsSent ? '재발송' : '발송'}
             </Button>
@@ -912,8 +921,10 @@ export function Step2Verify() {
       )}
 
       <div className="flex-1" />
-      {/* 본인인증은 필수가 아니므로 텍스트 링크 대신 스트로크 버튼으로 건너뛰기를 제공 */}
-      <Button variant="outline" onClick={() => store.nextStep()}>다음</Button>
+      {/* 본인인증은 필수가 아니므로 항상 클릭 가능한 회색 버튼으로 건너뛰기를 제공 */}
+      <Button onClick={() => store.nextStep()} style={{ backgroundColor: 'var(--color-text-tertiary)' }}>
+        건너뛰기
+      </Button>
     </div>
   )
 }

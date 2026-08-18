@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { Camera, CheckCircle2 } from 'lucide-react'
+import { Camera, CheckCircle2, ChevronRight } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
-import { Button, CheckRow, GoogleIcon, TextArea, showToast } from '@/components/ui'
+import { Button, GoogleIcon, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
@@ -655,6 +655,47 @@ export function Step1Login({
   )
 }
 
+function TermsCheckRow({ badge, label, checked, onToggle, onDetail }: {
+  badge?: string
+  label: string
+  checked: boolean
+  onToggle: () => void
+  onDetail?: () => void
+}) {
+  return (
+    <div className="flex items-center gap-2.5 py-2.5">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-5 h-5 rounded-[6px] flex items-center justify-center flex-shrink-0 transition-colors"
+        style={{ backgroundColor: checked ? 'var(--color-accent-dark)' : 'transparent' }}
+      >
+        <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
+          <path
+            d="M1 5L4.2 8L11 1"
+            stroke={checked ? '#fff' : 'var(--color-border-default)'}
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
+      </button>
+      <span
+        className="flex-1 text-sm"
+        style={{ color: checked ? 'var(--color-accent-dark)' : 'var(--color-text-primary)' }}
+      >
+        {badge && <span className="font-bold">{badge} </span>}
+        {label}
+      </span>
+      {onDetail && (
+        <button type="button" onClick={onDetail} className="text-[var(--color-text-tertiary)]">
+          <ChevronRight size={16} />
+        </button>
+      )}
+    </div>
+  )
+}
+
 export function StepTermsAgreement() {
   const store = useFeloreStore()
   const allAgreed = store.agreedTerms && store.agreedPrivacy && store.agreedMarketing
@@ -671,30 +712,32 @@ export function StepTermsAgreement() {
       </div>
 
       <div className="pb-4 mb-2 border-b border-[var(--color-border-default)]">
-        <CheckRow
+        <TermsCheckRow
           label="전체 동의"
           checked={allAgreed}
           onToggle={() => store.toggleAllAgreed()}
         />
       </div>
 
-      <CheckRow
-        label="이용약관 (필수)"
+      <TermsCheckRow
+        badge="필수"
+        label="이용약관"
         checked={store.agreedTerms}
         onToggle={() => store.setAgreedTerms(!store.agreedTerms)}
         onDetail={() => showToast('준비 중인 페이지예요')}
       />
-      <CheckRow
-        label="개인정보 수집 및 이용 (필수)"
+      <TermsCheckRow
+        badge="필수"
+        label="개인정보 수집 및 이용"
         checked={store.agreedPrivacy}
         onToggle={() => store.setAgreedPrivacy(!store.agreedPrivacy)}
         onDetail={() => showToast('준비 중인 페이지예요')}
       />
-      <CheckRow
-        label="마케팅 정보 수신 동의 (선택)"
+      <TermsCheckRow
+        badge="선택"
+        label="마케팅 정보 수신 동의"
         checked={store.agreedMarketing}
         onToggle={() => store.setAgreedMarketing(!store.agreedMarketing)}
-        onDetail={() => showToast('준비 중인 페이지예요')}
       />
       <div className="flex items-center gap-3 mt-1 mb-8 pl-8 text-[11px] text-[var(--color-text-tertiary)]">
         <span>✓ 앱 푸시</span>
@@ -703,7 +746,7 @@ export function StepTermsAgreement() {
       </div>
 
       <div className="flex-1" />
-      <Button disabled={!canProceed} onClick={() => store.nextStep()}>인증하기</Button>
+      <Button disabled={!canProceed} onClick={() => store.nextStep()}>다음</Button>
     </div>
   )
 }

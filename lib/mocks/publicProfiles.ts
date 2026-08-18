@@ -127,7 +127,7 @@ export const SAMPLE_PROFILE = {
   contactChannels: [
     { id: 'phone', label: '전화', value: '010-9482-1158', href: 'tel:01094821158', enabled: true },
     { id: 'email', label: '이메일', value: 'gangminjun@felore.io', href: 'mailto:gangminjun@felore.io', enabled: true },
-    { id: 'kakao', label: '카카오', value: 'gangminjun.kakao', href: 'https://open.kakao.com/o/sgangminjun', enabled: true },
+    { id: 'messenger', label: '카카오', messengerApp: 'kakao', value: 'gangminjun.kakao', href: 'https://open.kakao.com/o/sgangminjun', enabled: true },
   ] as ContactChannel[],
   instagramConnected: true,
   linkedinConnected: true,
@@ -417,7 +417,7 @@ export const MK_PROFILE = {
   contactChannels: [
     { id: 'phone', label: '전화', value: '010-3221-1042', href: 'tel:01032211042', enabled: true },
     { id: 'email', label: '이메일', value: 'mk@byth.io', href: 'mailto:mk@byth.io', enabled: true },
-    { id: 'kakao', label: '카카오', value: 'epicmkk', href: 'https://open.kakao.com/o/smkbyth', enabled: true },
+    { id: 'messenger', label: '카카오', messengerApp: 'kakao', value: 'epicmkk', href: 'https://open.kakao.com/o/smkbyth', enabled: true },
   ] as ContactChannel[],
   instagramConnected: true,
   linkedinConnected: true,
@@ -660,7 +660,7 @@ export const JIMIN_PROFILE = {
   contactChannels: [
     { id: 'phone', label: '전화', value: '010-2437-1022', href: 'tel:01024371022', enabled: true },
     { id: 'email', label: '이메일', value: 'jimin@felore.io', href: 'mailto:jimin@felore.io', enabled: true },
-    { id: 'kakao', label: '카카오', value: 'jimin.marketer', href: 'https://open.kakao.com/o/sjimin', enabled: true },
+    { id: 'messenger', label: '카카오', messengerApp: 'kakao', value: 'jimin.marketer', href: 'https://open.kakao.com/o/sjimin', enabled: true },
   ] as ContactChannel[],
   instagramConnected: true,
   linkedinConnected: false,
@@ -840,7 +840,7 @@ export const PARKSOJIN_PROFILE = {
   rememberHighlight_ref: '',
   contactChannels: [
     { id: 'email', label: '이메일', value: 'sojin@toss.im', href: 'mailto:sojin@toss.im', enabled: true },
-    { id: 'kakao', label: '카카오', value: 'sojin_design', enabled: false },
+    { id: 'messenger', label: '카카오', messengerApp: 'kakao', value: 'sojin_design', enabled: false },
     { id: 'phone', label: '전화', value: '', enabled: false },
   ] as ContactChannel[],
   tabVisibility: { who: 'public' as const, vibe: 'public' as const, network: 'public' as const },
@@ -912,7 +912,7 @@ export const LEEJUNHYUK_PROFILE = {
   ],
   contactChannels: [
     { id: 'email', label: '이메일', value: 'jh@flexi.io', href: 'mailto:jh@flexi.io', enabled: true },
-    { id: 'kakao', label: '카카오', value: '', enabled: false },
+    { id: 'messenger', label: '카카오', messengerApp: 'kakao', value: '', enabled: false },
     { id: 'phone', label: '전화', value: '', enabled: false },
   ] as ContactChannel[],
   tabVisibility: { who: 'public' as const, vibe: 'private' as const, network: 'public' as const },
@@ -984,7 +984,7 @@ export const CHOISUNYOUNG_PROFILE = {
   ],
   contactChannels: [
     { id: 'email', label: '이메일', value: 'sy@primer.vc', href: 'mailto:sy@primer.vc', enabled: true },
-    { id: 'kakao', label: '카카오', value: '', enabled: false },
+    { id: 'messenger', label: '카카오', messengerApp: 'kakao', value: '', enabled: false },
     { id: 'phone', label: '전화', value: '', enabled: false },
   ] as ContactChannel[],
   tabVisibility: { who: 'public' as const, vibe: 'public' as const, network: 'private' as const },
@@ -1069,7 +1069,7 @@ export const YOONJISOO_PROFILE = {
   guestbook: [],
   contactChannels: [
     { id: 'email', label: '이메일', value: 'jisoo.yoon@cj.net', href: 'mailto:jisoo.yoon@cj.net', enabled: true },
-    { id: 'kakao', label: '카카오', value: 'jisoo_brand', enabled: true },
+    { id: 'messenger', label: '카카오', messengerApp: 'kakao', value: 'jisoo_brand', enabled: true },
     { id: 'phone', label: '전화', value: '', enabled: false },
   ] as ContactChannel[],
   tabVisibility: { who: 'private' as const, vibe: 'public' as const, network: 'public' as const },
@@ -1153,7 +1153,7 @@ export const KWONMINSEOK_PROFILE = {
   ],
   contactChannels: [
     { id: 'email', label: '이메일', value: 'minseok.kwon@kakao.com', href: 'mailto:minseok.kwon@kakao.com', enabled: true },
-    { id: 'kakao', label: '카카오', value: '', enabled: false },
+    { id: 'messenger', label: '카카오', messengerApp: 'kakao', value: '', enabled: false },
     { id: 'phone', label: '전화', value: '', enabled: false },
   ] as ContactChannel[],
   tabVisibility: { who: 'public' as const, vibe: 'public' as const, network: 'public' as const },
@@ -1212,7 +1212,7 @@ export const LIMJIYEON_PROFILE = {
   guestbook: [],
   contactChannels: [
     { id: 'email', label: '이메일', value: 'jiyeon.lim@gmail.com', href: 'mailto:jiyeon.lim@gmail.com', enabled: true },
-    { id: 'kakao', label: '카카오', value: '', enabled: false },
+    { id: 'messenger', label: '카카오', messengerApp: 'kakao', value: '', enabled: false },
     { id: 'phone', label: '전화', value: '', enabled: false },
   ] as ContactChannel[],
   tabVisibility: { who: 'public' as const, vibe: 'public' as const, network: 'public' as const },
@@ -1294,7 +1294,7 @@ export const HANSANGHOON_PROFILE = {
   ],
   contactChannels: [
     { id: 'email', label: '이메일', value: 'sanghoon.han@adobe.com', href: 'mailto:sanghoon.han@adobe.com', enabled: true },
-    { id: 'kakao', label: '카카오', value: 'sanghoon_sales', enabled: true },
+    { id: 'messenger', label: '카카오', messengerApp: 'kakao', value: 'sanghoon_sales', enabled: true },
     { id: 'phone', label: '전화', value: '', enabled: false },
   ] as ContactChannel[],
   tabVisibility: { who: 'public' as const, vibe: 'public' as const, network: 'public' as const },
@@ -1382,7 +1382,7 @@ export const OHYERIM_PROFILE = {
   ],
   contactChannels: [
     { id: 'email', label: '이메일', value: 'yerim@creator.io', href: 'mailto:yerim@creator.io', enabled: true },
-    { id: 'kakao', label: '카카오', value: 'yerim_creates', enabled: true },
+    { id: 'messenger', label: '카카오', messengerApp: 'kakao', value: 'yerim_creates', enabled: true },
     { id: 'phone', label: '전화', value: '', enabled: false },
   ] as ContactChannel[],
   tabVisibility: { who: 'public' as const, vibe: 'public' as const, network: 'private' as const },
@@ -1455,7 +1455,7 @@ export const JUNGWONHO_PROFILE = {
   ],
   contactChannels: [
     { id: 'email', label: '이메일', value: 'wonho@medai.kr', href: 'mailto:wonho@medai.kr', enabled: true },
-    { id: 'kakao', label: '카카오', value: '', enabled: false },
+    { id: 'messenger', label: '카카오', messengerApp: 'kakao', value: '', enabled: false },
     { id: 'phone', label: '전화', value: '', enabled: false },
   ] as ContactChannel[],
   tabVisibility: { who: 'private' as const, vibe: 'private' as const, network: 'public' as const },
@@ -1546,7 +1546,7 @@ export const BAEKHYUNJIN_PROFILE = {
   ],
   contactChannels: [
     { id: 'email', label: '이메일', value: 'hyunjin.baek@mckinsey.com', href: 'mailto:hyunjin.baek@mckinsey.com', enabled: true },
-    { id: 'kakao', label: '카카오', value: '', enabled: false },
+    { id: 'messenger', label: '카카오', messengerApp: 'kakao', value: '', enabled: false },
     { id: 'phone', label: '전화', value: '', enabled: false },
   ] as ContactChannel[],
   tabVisibility: { who: 'public' as const, vibe: 'public' as const, network: 'public' as const },
@@ -1587,7 +1587,7 @@ export const HONGGILDONG_PROFILE = {
   contactChannels: [
     { id: 'phone', label: '전화', value: '', enabled: false },
     { id: 'email', label: '이메일', value: '', enabled: false },
-    { id: 'kakao', label: '카카오', value: '', enabled: false },
+    { id: 'messenger', label: '카카오', messengerApp: 'kakao', value: '', enabled: false },
   ] as ContactChannel[],
   tabVisibility: { who: 'public' as const, vibe: 'public' as const, network: 'public' as const },
 }

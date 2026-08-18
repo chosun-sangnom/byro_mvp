@@ -79,12 +79,16 @@ export interface ReceivedRequest {
   requestedAt: string
 }
 
+export type MessengerApp = 'kakao' | 'telegram' | 'whatsapp'
+
 export interface ContactChannel {
-  id: 'phone' | 'email' | 'kakao'
+  id: 'phone' | 'email' | 'messenger'
   label: string
   value: string
   href?: string
   enabled: boolean
+  /** id가 'messenger'일 때만 사용 — 텔레그램/왓츠앱/카카오 중 선택된 앱 */
+  messengerApp?: MessengerApp
 }
 
 export interface InstagramPost {

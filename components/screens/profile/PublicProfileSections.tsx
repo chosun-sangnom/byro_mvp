@@ -506,7 +506,7 @@ export function ContactActionButton({
   const iconMap = {
     phone: Phone,
     email: Mail,
-    kakao: MessageCircle,
+    messenger: MessageCircle,
   }
   const Icon = iconMap[channel.id] ?? MessageCircle
 

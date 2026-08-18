@@ -97,7 +97,7 @@ export function ManageFeloreScreen({
         },
         {
           title: '연락수단',
-          hint: '전화 · 이메일 · 카카오 · 링크',
+          hint: '전화 · 이메일 · 메신저 · 링크',
           nudge: '연락 수단이 없으면 만남으로 이어지기 어려워요',
           meta: activeContactCount > 0 ? `${activeContactCount}개 연결` : undefined,
           onClick: onEditContact,

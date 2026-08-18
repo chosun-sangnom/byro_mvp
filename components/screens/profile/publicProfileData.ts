@@ -31,7 +31,7 @@ export function computeTabAccess(
 
 export { DEFAULT_TAB_VISIBILITY }
 
-const CONTACT_CHANNEL_ORDER: ContactChannel['id'][] = ['phone', 'email', 'kakao']
+const CONTACT_CHANNEL_ORDER: ContactChannel['id'][] = ['phone', 'email', 'messenger']
 
 function sortContactChannels(channels: ContactChannel[]): ContactChannel[] {
   return [...channels].sort(

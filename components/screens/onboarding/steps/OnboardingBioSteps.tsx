@@ -254,7 +254,7 @@ const GUIDE_SLIDES: GuideSlide[] = [
   {
     Preview: PreviewContact,
     title: '연락수단',
-    tags: ['전화', '이메일', '카카오'],
+    tags: ['전화', '이메일', '메신저'],
     value: '연락 가능한 수단을 남겨두면 실제 만남으로 이어져요',
     ctaLabel: '연락처 추가하러 가기',
     ctaRoute: '/me?section=contact',

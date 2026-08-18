@@ -4,9 +4,25 @@ import { useState } from 'react'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { BottomSheet, Button, NavBar, showToast } from '@/components/ui'
 import { ContactTypeIcon } from '@/components/contact/ContactTypeIcon'
-import type { ContactChannel } from '@/types'
-import { buildContactHref, contactPlaceholder, contactPreview } from '@/lib/contactChannels'
+import type { ContactChannel, MessengerApp } from '@/types'
+import { buildContactHref, contactPlaceholder, contactPreview, MESSENGER_APP_LABELS } from '@/lib/contactChannels'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
+
+const MESSENGER_APPS: MessengerApp[] = ['kakao', 'telegram', 'whatsapp']
+
+function channelRowLabel(channel: ContactChannel) {
+  if (channel.id === 'messenger') return '메신저'
+  return channel.label
+}
+
+function channelRowSubtitle(channel: ContactChannel) {
+  if (!channel.enabled) return '비활성화됨'
+  if (channel.id === 'messenger') {
+    const appLabel = MESSENGER_APP_LABELS[channel.messengerApp ?? 'kakao']
+    return channel.value ? `${appLabel} · ${channel.value}` : appLabel
+  }
+  return channel.value || '연결됨'
+}
 
 export function ContactManageScreen({ onBack }: { onBack: () => void }) {
   const store = useFeloreStore()
@@ -15,10 +31,12 @@ export function ContactManageScreen({ onBack }: { onBack: () => void }) {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [selectedChannel, setSelectedChannel] = useState<ContactChannel | null>(null)
   const [inputValue, setInputValue] = useState('')
+  const [messengerApp, setMessengerApp] = useState<MessengerApp>('kakao')
 
   const openSheet = (channel: ContactChannel) => {
     setSelectedChannel(channel)
     setInputValue(channel.value)
+    setMessengerApp(channel.messengerApp ?? 'kakao')
     setSheetOpen(true)
   }
 
@@ -29,10 +47,12 @@ export function ContactManageScreen({ onBack }: { onBack: () => void }) {
   const handleSaveChannel = () => {
     if (!selectedChannel) return
     const trimmed = inputValue.trim()
+    const isMessenger = selectedChannel.id === 'messenger'
     updateChannel(selectedChannel.id, {
       value: trimmed,
       enabled: trimmed.length > 0,
-      href: buildContactHref(selectedChannel.id, trimmed),
+      href: buildContactHref(selectedChannel.id, trimmed, isMessenger ? messengerApp : undefined),
+      ...(isMessenger ? { messengerApp, label: MESSENGER_APP_LABELS[messengerApp] } : {}),
     })
     setSheetOpen(false)
     showToast('연락 수단이 저장됐어요')
@@ -51,6 +71,8 @@ export function ContactManageScreen({ onBack }: { onBack: () => void }) {
     onBack()
   }
 
+  const isMessengerSheet = selectedChannel?.id === 'messenger'
+
   return (
     <div className="flex flex-col h-full">
       <NavBar title="연락 수단 관리" onBack={onBack} />
@@ -68,10 +90,8 @@ export function ContactManageScreen({ onBack }: { onBack: () => void }) {
                 <ContactTypeIcon channelId={channel.id} enabled={channel.enabled} variant="mono" />
               </div>
               <div className="flex-1">
-                <div className="text-sm font-bold text-[var(--color-text-primary)]">{channel.label}</div>
-                <div className="text-xs text-[var(--color-text-tertiary)]">
-                  {channel.enabled ? channel.value || '연결됨' : '비활성화됨'}
-                </div>
+                <div className="text-sm font-bold text-[var(--color-text-primary)]">{channelRowLabel(channel)}</div>
+                <div className="text-xs text-[var(--color-text-tertiary)]">{channelRowSubtitle(channel)}</div>
               </div>
               <span className={['text-[11px] font-semibold rounded-full px-2 py-1', channel.enabled ? 'bg-[var(--color-state-success-bg)] text-[var(--color-state-success-text)]' : 'bg-[var(--color-bg-muted)] text-[var(--color-text-tertiary)]'].join(' ')}>
                 {channel.enabled ? '활성' : '비활성'}
@@ -90,18 +110,46 @@ export function ContactManageScreen({ onBack }: { onBack: () => void }) {
           <div className="flex items-center gap-3 mb-4">
             {selectedChannel && <ContactTypeIcon channelId={selectedChannel.id} enabled={selectedChannel.enabled} variant="mono" />}
             <div>
-              <div className="text-sm font-black">{selectedChannel?.label} 연동</div>
+              <div className="text-sm font-black">{isMessengerSheet ? '메신저' : selectedChannel?.label} 연동</div>
               <div className="text-xs text-[var(--color-text-tertiary)]">값이 있으면 활성화되고, 비우면 버튼만 비활성화됩니다.</div>
             </div>
           </div>
-          <div className="text-xs text-[var(--color-text-secondary)] mb-1">{selectedChannel?.label}</div>
+
+          {isMessengerSheet && (
+            <div className="mb-4">
+              <div className="text-xs text-[var(--color-text-secondary)] mb-2">앱 선택</div>
+              <div className="flex gap-2">
+                {MESSENGER_APPS.map((app) => (
+                  <button
+                    key={app}
+                    type="button"
+                    onClick={() => setMessengerApp(app)}
+                    className={[
+                      'flex-1 rounded-xl border py-2.5 text-[13px] font-semibold transition-colors',
+                      messengerApp === app
+                        ? 'border-[var(--color-text-strong)] bg-[var(--color-text-strong)] text-white'
+                        : 'border-[var(--color-border-default)] text-[var(--color-text-secondary)]',
+                    ].join(' ')}
+                  >
+                    {MESSENGER_APP_LABELS[app]}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="text-xs text-[var(--color-text-secondary)] mb-1">
+            {isMessengerSheet ? MESSENGER_APP_LABELS[messengerApp] : selectedChannel?.label}
+          </div>
           <input
             value={inputValue}
             onChange={(event) => setInputValue(event.target.value)}
-            placeholder={contactPlaceholder(selectedChannel?.id)}
+            placeholder={contactPlaceholder(selectedChannel?.id, isMessengerSheet ? messengerApp : undefined)}
             className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-3 text-sm outline-none mb-2 bg-[var(--color-bg-muted)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-tertiary)]"
           />
-          <div className="text-[11px] text-[var(--color-text-tertiary)] mb-4">{contactPreview(selectedChannel?.id, inputValue)}</div>
+          <div className="text-[11px] text-[var(--color-text-tertiary)] mb-4">
+            {contactPreview(selectedChannel?.id, inputValue, isMessengerSheet ? messengerApp : undefined)}
+          </div>
           <div className="space-y-2">
             <Button onClick={handleSaveChannel}>저장하기</Button>
             <Button variant="outline" onClick={handleDisableChannel}>비활성화</Button>

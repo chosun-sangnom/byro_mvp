@@ -8,7 +8,7 @@ type ContactTypeIconVariant = 'themed' | 'mono'
 const ICON_MAP = {
   phone: Phone,
   email: Mail,
-  kakao: MessageCircle,
+  messenger: MessageCircle,
 } as const
 
 export function ContactTypeIcon({

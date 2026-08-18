@@ -6,9 +6,11 @@ import { useFeloreStore } from '@/store/useFeloreStore'
 import { BottomSheet, Button, InfoBox, showToast } from '@/components/ui'
 import { ContactTypeIcon } from '@/components/contact/ContactTypeIcon'
 import { StepFooter, StepIntro, SelectionCard } from '@/components/screens/onboarding/OnboardingShared'
-import type { ContactChannel } from '@/types'
+import type { ContactChannel, MessengerApp } from '@/types'
 import { INSTAGRAM_PROFILE, LINKEDIN_PROFILE } from '@/lib/mocks/socialProfiles'
-import { buildContactHref, contactPlaceholder, contactPreview } from '@/lib/contactChannels'
+import { buildContactHref, contactPlaceholder, contactPreview, MESSENGER_APP_LABELS } from '@/lib/contactChannels'
+
+const MESSENGER_APPS: MessengerApp[] = ['kakao', 'telegram', 'whatsapp']
 
 export function Step5SNS() {
   const store = useFeloreStore()
@@ -91,25 +93,31 @@ export function Step6Contact() {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [selectedChannel, setSelectedChannel] = useState<ContactChannel | null>(null)
   const [inputValue, setInputValue] = useState('')
+  const [messengerApp, setMessengerApp] = useState<MessengerApp>('kakao')
   const channels = store.onboardingContactChannels
   const activeCount = channels.filter((channel) => channel.enabled && channel.value.trim()).length
 
   const openChannel = (channel: ContactChannel) => {
     setSelectedChannel(channel)
     setInputValue(channel.value)
+    setMessengerApp(channel.messengerApp ?? 'kakao')
     setSheetOpen(true)
   }
+
+  const isMessengerSheet = selectedChannel?.id === 'messenger'
 
   const handleSaveChannel = () => {
     if (!selectedChannel) return
     const trimmed = inputValue.trim()
+    const isMessenger = selectedChannel.id === 'messenger'
     const next = channels.map((channel) => (
       channel.id === selectedChannel.id
         ? {
           ...channel,
           value: trimmed,
           enabled: Boolean(trimmed),
-          href: trimmed ? buildContactHref(selectedChannel.id, trimmed) : '',
+          href: trimmed ? buildContactHref(selectedChannel.id, trimmed, isMessenger ? messengerApp : undefined) : '',
+          ...(isMessenger ? { messengerApp, label: MESSENGER_APP_LABELS[messengerApp] } : {}),
         }
         : channel
     ))
@@ -140,7 +148,7 @@ export function Step6Contact() {
         <StepIntro
           eyebrow="Contact"
           title={'연락 수단을\n연결해보세요'}
-          description={'프로필을 본 사람이 바로 연락할 수 있어요.\n전화, 이메일, 카카오 중에서 연결할 수 있어요.'}
+          description={'프로필을 본 사람이 바로 연락할 수 있어요.\n전화, 이메일, 메신저 중에서 연결할 수 있어요.'}
         />
 
         <div className="surface-card-soft p-4 mb-4">
@@ -165,7 +173,9 @@ export function Step6Contact() {
               <ContactTypeIcon channelId={channel.id} enabled={channel.enabled} />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <div className="text-sm font-black text-[var(--color-text-strong)]">{channel.label}</div>
+                  <div className="text-sm font-black text-[var(--color-text-strong)]">
+                    {channel.id === 'messenger' ? '메신저' : channel.label}
+                  </div>
                   <span
                     className={[
                       'rounded-full px-2 py-0.5 text-[10px] font-bold',
@@ -178,7 +188,9 @@ export function Step6Contact() {
                   </span>
                 </div>
                 <div className="meta-text mt-1 truncate">
-                  {channel.value?.trim() ? channel.value : `${channel.label}을 연결해보세요`}
+                  {channel.id === 'messenger'
+                    ? (channel.value?.trim() ? `${MESSENGER_APP_LABELS[channel.messengerApp ?? 'kakao']} · ${channel.value}` : `${MESSENGER_APP_LABELS[channel.messengerApp ?? 'kakao']}을 연결해보세요`)
+                    : (channel.value?.trim() ? channel.value : `${channel.label}을 연결해보세요`)}
                 </div>
               </div>
               <span className="text-sm text-[var(--color-text-tertiary)]">›</span>
@@ -197,25 +209,56 @@ export function Step6Contact() {
 
       <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
         <div className="px-5 pb-6">
-          <div className="text-sm font-black mb-4">{selectedChannel?.label ?? '연락 수단'} 설정</div>
+          <div className="text-sm font-black mb-4">{isMessengerSheet ? '메신저' : selectedChannel?.label ?? '연락 수단'} 설정</div>
           {selectedChannel && (
             <>
               <div className="flex items-center gap-3 mb-4">
                 <ContactTypeIcon channelId={selectedChannel.id} enabled={Boolean(inputValue.trim())} />
                 <div className="min-w-0">
-                  <div className="text-sm font-bold text-[var(--color-text-strong)]">{selectedChannel.label}</div>
-                  <div className="meta-text">{selectedChannel.id === 'phone' ? '전화번호를 입력하면 바로 걸 수 있어요.' : selectedChannel.id === 'email' ? '이메일 주소를 입력하면 메일로 연결돼요.' : '오픈채팅 링크나 코드를 입력해 주세요.'}</div>
+                  <div className="text-sm font-bold text-[var(--color-text-strong)]">
+                    {isMessengerSheet ? MESSENGER_APP_LABELS[messengerApp] : selectedChannel.label}
+                  </div>
+                  <div className="meta-text">
+                    {selectedChannel.id === 'phone'
+                      ? '전화번호를 입력하면 바로 걸 수 있어요.'
+                      : selectedChannel.id === 'email'
+                        ? '이메일 주소를 입력하면 메일로 연결돼요.'
+                        : '오픈채팅 링크나 아이디/번호를 입력해 주세요.'}
+                  </div>
                 </div>
               </div>
+
+              {isMessengerSheet && (
+                <div className="mb-4">
+                  <div className="text-xs text-[var(--color-text-secondary)] mb-2">앱 선택</div>
+                  <div className="flex gap-2">
+                    {MESSENGER_APPS.map((app) => (
+                      <button
+                        key={app}
+                        type="button"
+                        onClick={() => setMessengerApp(app)}
+                        className={[
+                          'flex-1 rounded-xl border py-2.5 text-[13px] font-semibold transition-colors',
+                          messengerApp === app
+                            ? 'border-[var(--color-text-strong)] bg-[var(--color-text-strong)] text-white'
+                            : 'border-[var(--color-border-default)] text-[var(--color-text-secondary)]',
+                        ].join(' ')}
+                      >
+                        {MESSENGER_APP_LABELS[app]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <input
                 value={inputValue}
                 onChange={(event) => setInputValue(event.target.value)}
-                placeholder={contactPlaceholder(selectedChannel.id)}
+                placeholder={contactPlaceholder(selectedChannel.id, isMessengerSheet ? messengerApp : undefined)}
                 className="w-full border rounded-xl px-4 py-3 text-sm outline-none mb-2"
                 style={{ borderColor: 'var(--color-border-default)' }}
               />
-              <div className="micro-text mb-4">{contactPreview(selectedChannel.id, inputValue)}</div>
+              <div className="micro-text mb-4">{contactPreview(selectedChannel.id, inputValue, isMessengerSheet ? messengerApp : undefined)}</div>
 
               <div className="space-y-2">
                 <Button onClick={handleSaveChannel}>저장하기</Button>

@@ -921,10 +921,14 @@ export function Step2Verify() {
       )}
 
       <div className="flex-1" />
-      {/* 본인인증은 필수가 아니므로 항상 클릭 가능한 회색 버튼으로 건너뛰기를 제공 */}
-      <Button onClick={() => store.nextStep()} style={{ backgroundColor: 'var(--color-text-tertiary)' }}>
+      {/* 본인인증은 필수가 아니므로 항상 클릭 가능한 텍스트 버튼으로 건너뛰기를 제공 */}
+      <button
+        type="button"
+        onClick={() => store.nextStep()}
+        className="w-full text-center text-sm text-[var(--color-text-secondary)]"
+      >
         건너뛰기
-      </Button>
+      </button>
     </div>
   )
 }

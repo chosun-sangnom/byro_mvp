@@ -696,18 +696,14 @@ export function Step1Login({
   // --- 초기 선택 뷰 ---
   return (
     <>
-      <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-        <div className="surface-card rounded-[32px] px-5 py-6 text-center mb-6">
-          <div className="micro-text uppercase tracking-[0.18em] mb-2">Branding Profile</div>
-          <div className="text-3xl font-black mb-2">FELORE</div>
-          <div className="meta-text mt-3 leading-relaxed">
-            진짜 나를 보여주는 프로필.
-            <br />
-            만난 사람에게 바로 공유할 수 있어요.
-          </div>
+      <div className="flex flex-1 flex-col min-h-0 px-5">
+        <div className="flex flex-col items-center pt-16 text-center">
+          <div className="text-4xl font-black tracking-tight">FELORE</div>
+          <div className="meta-text mt-3">가장 나다운 네트워킹의 시작, 펠로어</div>
         </div>
-        <div className="space-y-3">
-          <Button onClick={() => setShowTermsSheet(true)}>회원가입</Button>
+        <div className="flex-1" />
+        <div className="space-y-3 pb-6">
+          <Button onClick={() => setShowTermsSheet(true)} style={{ borderRadius: 9999 }}>회원가입</Button>
           <Button variant="outline" onClick={() => setMode('login')} style={{ borderRadius: 9999 }}>이미 계정이 있어요</Button>
         </div>
       </div>

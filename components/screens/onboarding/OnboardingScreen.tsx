@@ -52,7 +52,7 @@ export default function OnboardingScreen() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-1 flex-col min-h-0">
       <NavBar
         onBack={hasBack ? () => store.prevStep() : (store.step === 'login' ? loginBackHandler ?? undefined : undefined)}
         onClose={stepNum < 4 ? handleClose : undefined}
@@ -62,7 +62,7 @@ export default function OnboardingScreen() {
         <StepBar current={stepNum} total={3} />
       )}
 
-      <div className="flex-1 overflow-hidden">
+      <div className="flex flex-1 flex-col overflow-hidden">
         {store.step === 'login'
           ? (
             <Step1Login

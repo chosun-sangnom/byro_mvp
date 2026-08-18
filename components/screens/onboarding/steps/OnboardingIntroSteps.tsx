@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { Camera, CheckCircle2 } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
-import { Button, CheckRow, TextArea, showToast } from '@/components/ui'
+import { Button, CheckRow, GoogleIcon, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
@@ -18,11 +18,10 @@ type ResetStage = 'verify' | 'newPassword' | 'done'
 interface OAuthMeta {
   label: string
   variant: 'google'
-  prefix: string
 }
 
 const OAUTH_META: Record<OAuthProvider, OAuthMeta> = {
-  google: { label: '구글', variant: 'google', prefix: 'G  ' },
+  google: { label: '구글', variant: 'google' },
 }
 
 function formatPhone(value: string) {
@@ -198,7 +197,9 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
         </div>
         {/* [임시] 실제 OAuth 리다이렉트 미연동 — 버튼 클릭으로 완료 시뮬레이션 */}
         <Button variant={meta.variant} onClick={() => setOauthStep('done')}>
-          {meta.prefix}{meta.label}로 {mode === 'login' ? '로그인' : '연결하기'}
+          <span className="inline-flex w-full items-center justify-center gap-2">
+            <GoogleIcon /> {meta.label}로 {mode === 'login' ? '로그인' : '연결하기'}
+          </span>
         </Button>
       </div>
     )
@@ -584,7 +585,11 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
           <p className="meta-text mt-1">연결했던 계정으로 로그인하세요.</p>
         </div>
         <div className="space-y-3">
-          <Button variant="google" onClick={() => handleOAuthSelect('google')}>G  구글로 로그인</Button>
+          <Button variant="google" onClick={() => handleOAuthSelect('google')}>
+            <span className="inline-flex w-full items-center justify-center gap-2">
+              <GoogleIcon /> 구글로 로그인
+            </span>
+          </Button>
         </div>
         <div className="flex items-center gap-3 my-4">
           <div className="flex-1 h-px bg-[var(--color-border-default)]" />
@@ -608,7 +613,11 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
           <p className="meta-text mt-1">가입 방법을 선택해주세요.</p>
         </div>
         <div className="space-y-3">
-          <Button variant="google" onClick={() => handleOAuthSelect('google')}>G  구글로 시작하기</Button>
+          <Button variant="google" onClick={() => handleOAuthSelect('google')}>
+            <span className="inline-flex w-full items-center justify-center gap-2">
+              <GoogleIcon /> 구글로 시작하기
+            </span>
+          </Button>
         </div>
         <div className="flex items-center gap-3 my-4">
           <div className="flex-1 h-px bg-[var(--color-border-default)]" />

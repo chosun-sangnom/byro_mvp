@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useFeloreStore } from '@/store/useFeloreStore'
-import { Button, Modal } from '@/components/ui'
+import { Button, GoogleIcon, Modal } from '@/components/ui'
 
 export function LoginModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const store = useFeloreStore()
@@ -21,7 +21,11 @@ export function LoginModal({ open, onClose }: { open: boolean; onClose: () => vo
         펠로어 계정으로 로그인하면 이용할 수 있어요.
       </p>
       <div className="space-y-2 mb-4">
-        <Button variant="google" onClick={handleLogin}>G  구글로 로그인</Button>
+        <Button variant="google" onClick={handleLogin}>
+          <span className="inline-flex w-full items-center justify-center gap-2">
+            <GoogleIcon /> 구글로 로그인
+          </span>
+        </Button>
       </div>
       <button
         type="button"

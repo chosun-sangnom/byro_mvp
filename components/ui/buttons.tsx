@@ -58,7 +58,7 @@ export function Button({
             : variant === 'outline'
               ? 'transparent'
               : variant === 'google'
-                ? 'var(--color-bg-surface)'
+                ? '#FFFFFF'
                 : variant === 'danger'
                   ? 'var(--color-state-danger-bg)'
                   : variant === 'ghost'
@@ -88,6 +88,7 @@ export function Button({
           variant === 'primary' && !disabled
             ? '0 0 18px rgba(29,200,160,0.30), 0 2px 8px rgba(29,200,160,0.18)'
             : undefined,
+        borderRadius: variant === 'google' ? 20 : undefined,
         ...style,
       }}
     >

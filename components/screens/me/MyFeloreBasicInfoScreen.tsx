@@ -462,6 +462,14 @@ export function BasicInfoEditScreen({
     onBack()
   }
 
+  // [임시] 실제 AI 생성 API 미연동 — 로딩 토스트만 보여주고 1.2초 후 완료 처리
+  const handleAiFillBio = () => {
+    showToast('AI 자기소개 생성 중...', 'loading')
+    setTimeout(() => {
+      showToast('AI 자기소개 생성이 완료됐어요')
+    }, 1200)
+  }
+
   const handleAvatarFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
@@ -762,7 +770,7 @@ export function BasicInfoEditScreen({
               <div className="flex items-center gap-2 mb-1">
                 <label className="text-xs text-[var(--color-text-tertiary)]">자기소개</label>
                 <button
-                  onClick={() => showToast('AI 자기소개 생성 중...', 'loading')}
+                  onClick={handleAiFillBio}
                   className="text-xs text-[var(--color-accent-dark)] font-bold"
                 >
                   → AI로 채우기

@@ -901,11 +901,13 @@ export function Step2Verify() {
               />
               {/* [임시] SMS 발송 API 미연동 */}
               <Button
+                variant={smsSent ? 'outline' : 'primary'}
                 size="sm"
                 fullWidth={false}
                 className="w-24 flex-shrink-0"
                 disabled={smsSent ? false : !isValidPhone(phone)}
                 onClick={handleSmsSend}
+                style={smsSent ? { borderRadius: 9999, color: 'var(--color-text-strong)' } : undefined}
               >
                 {smsSent ? '재발송' : '발송'}
               </Button>

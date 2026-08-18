@@ -184,26 +184,19 @@ export function Step1Login({
       }
 
       return (
-        <>
-          <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-            <div className="flex-1 flex flex-col items-center justify-center text-center">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mb-5"
-                style={{ backgroundColor: 'var(--color-state-success-bg)' }}>
-                <CheckCircle2 size={32} style={{ color: 'var(--color-state-success-text)' }} />
-              </div>
-              <div className="text-xl font-black text-[var(--color-text-strong)] mb-2">
-                {meta.label} 연결 완료
-              </div>
-              <p className="meta-text leading-relaxed">이제 프로필을 만들어볼게요.</p>
+        <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+          <div className="flex-1 flex flex-col items-center justify-center text-center">
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mb-5"
+              style={{ backgroundColor: 'var(--color-state-success-bg)' }}>
+              <CheckCircle2 size={32} style={{ color: 'var(--color-state-success-text)' }} />
             </div>
-            <Button onClick={() => setShowTermsSheet(true)}>계속하기</Button>
+            <div className="text-xl font-black text-[var(--color-text-strong)] mb-2">
+              {meta.label} 연결 완료
+            </div>
+            <p className="meta-text leading-relaxed">이제 프로필을 만들어볼게요.</p>
           </div>
-          <TermsAgreementSheet
-            open={showTermsSheet}
-            onClose={() => setShowTermsSheet(false)}
-            onAgree={() => { setShowTermsSheet(false); store.nextStep() }}
-          />
-        </>
+          <Button onClick={() => store.nextStep()}>계속하기</Button>
+        </div>
       )
     }
 
@@ -289,7 +282,6 @@ export function Step1Login({
     }
 
     return (
-      <>
       <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
         <div className="mb-6">
           <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
@@ -334,16 +326,10 @@ export function Step1Login({
           </div>
         </div>
         {/* [임시] 펠로어 전화번호 회원가입 API 미연동 */}
-        <Button onClick={() => { if (canPhoneSubmit) setShowTermsSheet(true) }} disabled={!canPhoneSubmit}>
+        <Button onClick={() => { if (canPhoneSubmit) store.nextStep() }} disabled={!canPhoneSubmit}>
           가입하기
         </Button>
       </div>
-      <TermsAgreementSheet
-        open={showTermsSheet}
-        onClose={() => setShowTermsSheet(false)}
-        onAgree={() => { setShowTermsSheet(false); store.nextStep() }}
-      />
-      </>
     )
   }
 
@@ -652,21 +638,28 @@ export function Step1Login({
 
   // --- 초기 선택 뷰 ---
   return (
-    <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-      <div className="surface-card rounded-[32px] px-5 py-6 text-center mb-6">
-        <div className="micro-text uppercase tracking-[0.18em] mb-2">Branding Profile</div>
-        <div className="text-3xl font-black mb-2">FELORE</div>
-        <div className="meta-text mt-3 leading-relaxed">
-          진짜 나를 보여주는 프로필.
-          <br />
-          만난 사람에게 바로 공유할 수 있어요.
+    <>
+      <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+        <div className="surface-card rounded-[32px] px-5 py-6 text-center mb-6">
+          <div className="micro-text uppercase tracking-[0.18em] mb-2">Branding Profile</div>
+          <div className="text-3xl font-black mb-2">FELORE</div>
+          <div className="meta-text mt-3 leading-relaxed">
+            진짜 나를 보여주는 프로필.
+            <br />
+            만난 사람에게 바로 공유할 수 있어요.
+          </div>
+        </div>
+        <div className="space-y-3">
+          <Button onClick={() => setShowTermsSheet(true)}>회원가입</Button>
+          <Button variant="outline" onClick={() => setMode('login')} style={{ borderRadius: 9999 }}>이미 계정이 있어요</Button>
         </div>
       </div>
-      <div className="space-y-3">
-        <Button onClick={() => setMode('signup')}>회원가입</Button>
-        <Button variant="outline" onClick={() => setMode('login')} style={{ borderRadius: 9999 }}>이미 계정이 있어요</Button>
-      </div>
-    </div>
+      <TermsAgreementSheet
+        open={showTermsSheet}
+        onClose={() => setShowTermsSheet(false)}
+        onAgree={() => { setShowTermsSheet(false); setMode('signup') }}
+      />
+    </>
   )
 }
 

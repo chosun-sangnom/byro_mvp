@@ -8,7 +8,7 @@ export function LoginModal({ open, onClose }: { open: boolean; onClose: () => vo
   const store = useFeloreStore()
   const router = useRouter()
 
-  // [임시] 실제 OAuth 미연동 — 클릭 시 mock 로그인 처리
+  // [임시] 실제 OAuth 미연동 - 클릭 시 mock 로그인 처리
   const handleLogin = () => {
     store.login()
     onClose()
@@ -21,8 +21,6 @@ export function LoginModal({ open, onClose }: { open: boolean; onClose: () => vo
         펠로어 계정으로 로그인하면 이용할 수 있어요.
       </p>
       <div className="space-y-2 mb-4">
-        <Button variant="kakao" onClick={handleLogin}>카카오로 로그인</Button>
-        <Button variant="naver" onClick={handleLogin}>N  네이버로 로그인</Button>
         <Button variant="google" onClick={handleLogin}>G  구글로 로그인</Button>
       </div>
       <button

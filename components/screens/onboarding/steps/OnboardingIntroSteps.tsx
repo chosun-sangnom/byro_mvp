@@ -10,20 +10,18 @@ import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
 export type Mode = 'choose' | 'signup' | 'login'
 type LoginView = 'main' | 'oauth' | 'phone' | 'reset'
-type OAuthProvider = 'kakao' | 'naver' | 'google'
+type OAuthProvider = 'google'
 type OAuthStep = 'pending' | 'done'
 type ResetMethod = 'choose' | 'sms' | 'email'
 type ResetStage = 'verify' | 'newPassword' | 'done'
 
 interface OAuthMeta {
   label: string
-  variant: 'kakao' | 'naver' | 'google'
+  variant: 'google'
   prefix: string
 }
 
 const OAUTH_META: Record<OAuthProvider, OAuthMeta> = {
-  kakao: { label: '카카오', variant: 'kakao', prefix: '' },
-  naver: { label: '네이버', variant: 'naver', prefix: 'N  ' },
   google: { label: '구글', variant: 'google', prefix: 'G  ' },
 }
 
@@ -586,8 +584,6 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
           <p className="meta-text mt-1">연결했던 계정으로 로그인하세요.</p>
         </div>
         <div className="space-y-3">
-          <Button variant="kakao" onClick={() => handleOAuthSelect('kakao')}>카카오로 로그인</Button>
-          <Button variant="naver" onClick={() => handleOAuthSelect('naver')}>N  네이버로 로그인</Button>
           <Button variant="google" onClick={() => handleOAuthSelect('google')}>G  구글로 로그인</Button>
         </div>
         <div className="flex items-center gap-3 my-4">
@@ -612,8 +608,6 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
           <p className="meta-text mt-1">가입 방법을 선택해주세요.</p>
         </div>
         <div className="space-y-3">
-          <Button variant="kakao" onClick={() => handleOAuthSelect('kakao')}>카카오로 시작하기</Button>
-          <Button variant="naver" onClick={() => handleOAuthSelect('naver')}>N  네이버로 시작하기</Button>
           <Button variant="google" onClick={() => handleOAuthSelect('google')}>G  구글로 시작하기</Button>
         </div>
         <div className="flex items-center gap-3 my-4">

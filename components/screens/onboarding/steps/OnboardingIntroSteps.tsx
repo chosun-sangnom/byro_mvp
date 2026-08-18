@@ -244,7 +244,7 @@ export function Step1Login({
                 placeholder="010-0000-0000"
                 disabled={signupSmsSent}
                 autoComplete="tel"
-                className={`flex-1 border rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] disabled:opacity-50 ${
+                className={`flex-1 border rounded-full px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] disabled:opacity-50 ${
                   phoneInvalid ? 'border-[var(--color-state-danger-text)]' : 'border-[var(--color-border-default)]'
                 }`}
               />
@@ -269,7 +269,7 @@ export function Step1Login({
                   onChange={(e) => setSignupCode(e.target.value)}
                   placeholder="인증번호 6자리"
                   maxLength={6}
-                  className="flex-1 border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
+                  className="flex-1 border border-[var(--color-border-default)] rounded-full px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
                 />
                 {/* [임시] 인증번호 확인 API 미연동 */}
                 <Button
@@ -299,7 +299,7 @@ export function Step1Login({
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="8자 이상 입력해주세요"
                 autoComplete="new-password"
-                className={`w-full border rounded-xl pl-4 pr-11 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] ${
+                className={`w-full border rounded-full pl-4 pr-11 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] ${
                   passwordShort ? 'border-[var(--color-state-danger-text)]' : 'border-[var(--color-border-default)]'
                 }`}
               />
@@ -325,7 +325,7 @@ export function Step1Login({
               onChange={(e) => setEmail(e.target.value)}
               placeholder="example@gmail.com"
               autoComplete="email"
-              className={`w-full border rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] ${
+              className={`w-full border rounded-full px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] ${
                 emailInvalid ? 'border-[var(--color-state-danger-text)]' : 'border-[var(--color-border-default)]'
               }`}
             />

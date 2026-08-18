@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { Camera, CheckCircle2, ChevronLeft, X } from 'lucide-react'
+import { Camera, CheckCircle2 } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { Button, CheckRow, TextArea, showToast } from '@/components/ui'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
@@ -14,9 +14,6 @@ type OAuthProvider = 'google'
 type OAuthStep = 'pending' | 'done'
 type ResetMethod = 'choose' | 'sms' | 'email'
 type ResetStage = 'verify' | 'newPassword' | 'done'
-type LoginValidation = 'idle' | 'success' | 'error'
-
-const MOCK_LOGIN_CODE = '123456'
 
 interface OAuthMeta {
   label: string
@@ -58,19 +55,6 @@ function BackButton({ onClick }: { onClick: () => void }) {
   )
 }
 
-function CloseButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label="닫기"
-      className="flex h-7 w-7 items-center justify-center text-[#9AA4B2]"
-    >
-      <X size={18} strokeWidth={1.7} />
-    </button>
-  )
-}
-
 export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => void } = {}) {
   const store = useFeloreStore()
   const router = useRouter()
@@ -93,9 +77,7 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
 
   // 전화번호 로그인 폼
   const [loginPhone, setLoginPhone] = useState('')
-  const [loginCode, setLoginCode] = useState('')
-  const [loginValidation, setLoginValidation] = useState<LoginValidation>('idle')
-  const [loginPhoneTouched, setLoginPhoneTouched] = useState(false)
+  const [loginPassword, setLoginPassword] = useState('')
 
   // 비밀번호 찾기
   const [resetMethod, setResetMethod] = useState<ResetMethod>('choose')
@@ -111,6 +93,8 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
   const passwordShort = password.length > 0 && password.length < 8
   const emailInvalid = email.length > 0 && !isValidEmail(email)
   const canPhoneSubmit = phoneVerified && password.length >= 8 && (email === '' || isValidEmail(email))
+  const loginPasswordShort = loginPassword.length > 0 && loginPassword.length < 8
+  const canLoginSubmit = isValidPhone(loginPhone) && loginPassword.length >= 8
   const newPasswordShort = newPassword.length > 0 && newPassword.length < 8
   const newPasswordMismatch = newPasswordConfirm.length > 0 && newPasswordConfirm !== newPassword
   const canResetPassword = newPassword.length >= 8 && newPassword === newPasswordConfirm
@@ -128,13 +112,6 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
     setNewPasswordConfirm('')
   }
 
-  const resetPhoneLogin = () => {
-    setLoginPhone('')
-    setLoginCode('')
-    setLoginValidation('idle')
-    setLoginPhoneTouched(false)
-  }
-
   const handleOAuthSelect = (provider: OAuthProvider) => {
     setOauthProvider(provider)
     setOauthStep('pending')
@@ -148,7 +125,6 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
     setSignupSmsSent(false)
     setSignupCode('')
     setPhoneVerified(false)
-    resetPhoneLogin()
   }
 
   const handleBackToChoose = () => {
@@ -159,7 +135,6 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
     setSignupSmsSent(false)
     setSignupCode('')
     setPhoneVerified(false)
-    resetPhoneLogin()
   }
 
   // [임시] 로그인 완료 처리
@@ -345,119 +320,54 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
 
   // --- 전화번호 로그인 뷰 ---
   if (view === 'phone' && mode === 'login') {
-    const loginPhoneInvalid = loginPhoneTouched && loginPhone.length > 0 && !isValidPhone(loginPhone)
-    const loginCodeInvalid = loginValidation === 'error'
-    const loginCodeSuccess = loginValidation === 'success'
-
-    const handleLoginCodeCheck = () => {
-      setLoginPhoneTouched(true)
-      if (!isValidPhone(loginPhone) || loginCode !== MOCK_LOGIN_CODE) {
-        setLoginValidation('error')
-        return
-      }
-
-      setLoginValidation('success')
-      showToast('전화번호 인증이 완료되었어요.')
-    }
-
-    const handleLoginCodeResend = () => {
-      setLoginPhoneTouched(true)
-      if (!isValidPhone(loginPhone)) {
-        return
-      }
-
-      setLoginValidation('idle')
-      showToast('입력하신 번호로 인증문자를 재발송했어요.')
-    }
-
     return (
-      <div className="flex h-full flex-col overflow-y-auto px-3.5 py-6">
-        <div className="mb-7 flex items-center justify-between">
-          <button
-            type="button"
-            onClick={handleBackToMain}
-            aria-label="뒤로가기"
-            className="flex h-7 w-7 items-center justify-center text-[#9AA4B2]"
-          >
-            <ChevronLeft size={18} strokeWidth={1.7} />
-          </button>
-          <CloseButton onClick={handleBackToMain} />
-        </div>
-        <div className="mb-4">
-          <div className="text-[15px] font-black leading-[21px] text-[var(--color-text-strong)]">
-            전화번호로 로그인
+      <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+        <BackButton onClick={handleBackToMain} />
+        <div className="mb-6">
+          <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
+            전화번호로<br />로그인
           </div>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-3 mb-2">
           <div>
-            <div className="flex items-start gap-1.5">
-              <input
-                type="tel"
-                value={loginPhone}
-                onBlur={() => setLoginPhoneTouched(true)}
-                onChange={(e) => {
-                  setLoginPhone(formatPhone(e.target.value))
-                  setLoginValidation('idle')
-                }}
-                placeholder="010-1234-5678"
-                autoComplete="tel"
-                className={[
-                  'h-[30px] min-w-0 flex-1 rounded-[15px] border bg-white px-3 text-[10px] text-[var(--color-text-primary)] outline-none transition-colors placeholder:text-[var(--color-text-tertiary)]',
-                  loginPhoneInvalid
-                    ? 'border-[#FF3B30] focus:border-[#FF3B30]'
-                    : 'border-[#DDE3EA] focus:border-[var(--color-accent-dark)]',
-                ].join(' ')}
-              />
-              <button
-                type="button"
-                onClick={handleLoginCodeResend}
-                className="h-[30px] w-[58px] flex-shrink-0 rounded-[15px] border border-[#DDE3EA] bg-white text-[10px] font-bold text-[#2563EB]"
-              >
-                재발송
-              </button>
-            </div>
-            {loginPhoneInvalid && (
-              <p className="mt-1 pl-2 text-[9px] leading-[13px] text-[#FF3B30]">
-                올바른 전화번호 형식을 입력해주세요.
-              </p>
-            )}
+            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">전화번호</label>
+            <input
+              type="tel"
+              value={loginPhone}
+              onChange={(e) => setLoginPhone(formatPhone(e.target.value))}
+              placeholder="010-0000-0000"
+              autoComplete="tel"
+              className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)]"
+            />
           </div>
           <div>
-            <div className="flex items-start gap-1.5">
-              <input
-                type="text"
-                inputMode="numeric"
-                value={loginCode}
-                onChange={(e) => {
-                  setLoginCode(e.target.value.replace(/\D/g, '').slice(0, 6))
-                  setLoginValidation('idle')
-                }}
-                placeholder="123456"
-                maxLength={6}
-                autoComplete="one-time-code"
-                className={[
-                  'h-[30px] min-w-0 flex-1 rounded-[15px] border bg-white px-3 text-[10px] text-[var(--color-text-primary)] outline-none transition-colors placeholder:text-[var(--color-text-tertiary)]',
-                  loginCodeInvalid
-                    ? 'border-[#FF3B30] focus:border-[#FF3B30]'
-                    : 'border-[#DDE3EA] focus:border-[var(--color-accent-dark)]',
-                ].join(' ')}
-              />
-              <button
-                type="button"
-                onClick={handleLoginCodeCheck}
-                className="h-[30px] w-[58px] flex-shrink-0 rounded-[15px] bg-black text-[10px] font-bold text-white"
-              >
-                확인
-              </button>
-            </div>
-            {loginCodeSuccess && (
-              <p className="mt-1 pl-2 text-[9px] leading-[13px] text-[#2563EB]">인증 완료</p>
-            )}
-            {loginCodeInvalid && (
-              <p className="mt-1 pl-2 text-[9px] leading-[13px] text-[#FF3B30]">인증번호가 일치하지 않아요</p>
+            <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">비밀번호</label>
+            <input
+              type="password"
+              value={loginPassword}
+              onChange={(e) => setLoginPassword(e.target.value)}
+              placeholder="비밀번호를 입력해주세요"
+              autoComplete="current-password"
+              className={`w-full border rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none focus:border-[var(--color-accent-dark)] ${
+                loginPasswordShort ? 'border-[var(--color-state-danger-text)]' : 'border-[var(--color-border-default)]'
+              }`}
+            />
+            {loginPasswordShort && (
+              <p className="mt-1 text-[11px] text-[var(--color-state-danger-text)]">비밀번호는 8자 이상이어야 해요</p>
             )}
           </div>
         </div>
+        <button
+          type="button"
+          onClick={() => setView('reset')}
+          className="self-start mb-6 text-[12px] text-[var(--color-text-tertiary)] underline underline-offset-2"
+        >
+          비밀번호를 잊으셨나요?
+        </button>
+        {/* [임시] 펠로어 전화번호 로그인 API 미연동 */}
+        <Button onClick={() => { if (canLoginSubmit) handleLoginComplete() }} disabled={!canLoginSubmit}>
+          로그인
+        </Button>
       </div>
     )
   }

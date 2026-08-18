@@ -11,7 +11,7 @@ const ToastContext = createContext<ToastCtx>({ showToast: () => {} })
 
 function ToastViewport({ messages }: { messages: Array<{ id: number; msg: string }> }) {
   return (
-    <div className="absolute bottom-5 left-0 right-0 z-50 flex flex-col items-center gap-2 px-3.5 pointer-events-none">
+    <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-2 z-50 pointer-events-none px-4">
       <AnimatePresence>
         {messages.map(({ id, msg }) => (
           <motion.div
@@ -20,18 +20,14 @@ function ToastViewport({ messages }: { messages: Array<{ id: number; msg: string
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.2 }}
-            className="flex min-h-8 w-full max-w-[220px] items-center gap-2 rounded-full px-3 py-2 text-left text-[10px] font-medium leading-[14px] shadow-lg"
+            className="text-sm px-4 py-2 rounded-full shadow-lg max-w-[300px] text-center border"
             style={{
-              backgroundColor: '#303030',
-              color: '#FFFFFF',
+              backgroundColor: 'var(--color-bg-soft)',
+              color: 'var(--color-text-strong)',
+              borderColor: 'var(--color-border-default)',
             }}
           >
-            <span className="flex h-3.5 w-3.5 flex-shrink-0 items-center justify-center rounded-full bg-[#26C65A]">
-              <svg width="8" height="6" viewBox="0 0 8 6" fill="none" aria-hidden="true">
-                <path d="M1 3L3 5L7 1" stroke="#FFFFFF" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </span>
-            <span className="min-w-0">{msg}</span>
+            {msg}
           </motion.div>
         ))}
       </AnimatePresence>

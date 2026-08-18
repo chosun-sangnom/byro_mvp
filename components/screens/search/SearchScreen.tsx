@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { ArrowLeft, Search, X } from 'lucide-react'
 import { showToast } from '@/components/ui'
+import { VerifiedBadge } from '@/components/screens/FeedScreen'
 import {
   SAMPLE_PROFILE, MK_PROFILE, JIMIN_PROFILE,
   PARKSOJIN_PROFILE, LEEJUNHYUK_PROFILE, CHOISUNYOUNG_PROFILE,
@@ -25,7 +26,7 @@ const SEARCHABLE_PROFILES = [
 
 // [임시] 동명이인 시연용 가입자 김영석
 const EXTRA_MOCK_MEMBERS: SearchResult[] = [
-  { linkId: 'kimyoungseok-bonanza-po', name: '김영석', title: 'Product Owner · 보난자팩토리', school: '', avatarColor: '#5B8FA8', connectionStatus: 'connected' },
+  { linkId: 'kimyoungseok-bonanza-po', name: '김영석', title: 'Product Owner · 보난자팩토리', school: '', avatarColor: '#5B8FA8', connectionStatus: 'connected', isVerified: true },
   { linkId: 'kimyoungseok-coinone', name: '김영석', title: '마케팅 팀장 · 코인원', school: '', avatarColor: '#7B6F9A' },
 ]
 
@@ -45,6 +46,7 @@ type SearchResult = {
   avatarColor?: string
   avatarImage?: string
   connectionStatus?: 'connected' | 'none'
+  isVerified?: boolean
 }
 
 type VirtualSearchResult = {
@@ -224,7 +226,10 @@ export default function SearchScreen() {
                             )}
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="text-[14px] font-semibold text-[var(--color-text-primary)] truncate">{p.name}</p>
+                            <div className="flex items-center gap-1">
+                              <p className="text-[14px] font-semibold text-[var(--color-text-primary)] truncate">{p.name}</p>
+                              {p.isVerified && <VerifiedBadge />}
+                            </div>
                             <p className="text-[12px] text-[var(--color-text-secondary)] truncate">{p.title}</p>
                           </div>
                           {p.connectionStatus === 'connected' && (
@@ -284,14 +289,14 @@ export default function SearchScreen() {
                             <p className="text-[12px] text-[var(--color-text-secondary)] truncate">{p.title}</p>
                           </div>
                           <span
-                            className="flex-shrink-0 self-start mt-1 rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                            className="flex-shrink-0 rounded-full px-3 py-1.5 text-[12px] font-semibold"
                             style={{
-                              background: 'var(--color-bg-muted)',
-                              color: 'var(--color-text-tertiary)',
-                              border: '1px solid var(--color-border-soft)',
+                              background: 'var(--color-bg-soft)',
+                              color: 'var(--color-text-secondary)',
+                              border: '1px solid var(--color-border-default)',
                             }}
                           >
-                            공개정보
+                            공개 정보
                           </span>
                         </button>
                       </motion.li>

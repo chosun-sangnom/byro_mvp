@@ -163,7 +163,7 @@ export default function SearchScreen() {
                     className="flex-shrink-0 flex items-center gap-1 rounded-full px-3 py-1 text-[12px] font-medium transition-colors"
                     style={
                       active
-                        ? { background: 'var(--color-accent-dark)', color: '#fff', border: '1px solid var(--color-accent-dark)' }
+                        ? { background: 'var(--color-text-strong)', color: '#fff', border: '1px solid var(--color-text-strong)' }
                         : { background: 'var(--color-bg-soft)', color: 'var(--color-text-secondary)', border: '1px solid var(--color-border-default)' }
                     }
                   >

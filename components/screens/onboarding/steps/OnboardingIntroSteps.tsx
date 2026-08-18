@@ -680,10 +680,7 @@ function TermsCheckRow({ badge, label, checked, onToggle, onDetail }: {
           />
         </svg>
       </button>
-      <span
-        className="flex-1 text-sm"
-        style={{ color: checked ? 'var(--color-accent-dark)' : 'var(--color-text-primary)' }}
-      >
+      <span className="flex-1 text-sm text-[var(--color-text-primary)]">
         {badge && <span className="font-bold">{badge} </span>}
         {label}
       </span>
@@ -705,9 +702,9 @@ export function StepTermsAgreement() {
     <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
       <div className="mb-8">
         <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">
-          본인인증 하기 전
+          펠로어에 가입하려면
           <br />
-          <span style={{ color: 'var(--color-accent-dark)' }}>이용약관 동의</span>해 주세요
+          <span style={{ color: 'var(--color-accent-dark)' }}>이용약관 동의</span>가 필요해요
         </div>
       </div>
 

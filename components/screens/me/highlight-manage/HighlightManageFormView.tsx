@@ -330,7 +330,7 @@ export function HighlightManageFormView({
             )}
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={onBack}>이전</Button>
+            <Button variant="outline" onClick={onBack} style={{ borderRadius: 9999 }}>이전</Button>
             <Button onClick={onSave} disabled={saveDisabled}>{isEditing ? '수정하기' : '저장하기'}</Button>
           </div>
         </div>

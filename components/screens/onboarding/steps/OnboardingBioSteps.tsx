@@ -394,7 +394,7 @@ export function Step9Complete() {
             </Button>
           )}
           <div className="flex gap-3">
-            <Button variant="outline" onClick={goPrev}>이전</Button>
+            <Button variant="outline" onClick={goPrev} style={{ borderRadius: 9999 }}>이전</Button>
             <Button onClick={() => router.replace(`/${linkId}`)}>완료</Button>
           </div>
         </div>
@@ -406,7 +406,7 @@ export function Step9Complete() {
             </Button>
           )}
           <div className="flex gap-3">
-            <Button variant="outline" onClick={goPrev}>이전</Button>
+            <Button variant="outline" onClick={goPrev} style={{ borderRadius: 9999 }}>이전</Button>
             <Button onClick={goNext}>다음</Button>
           </div>
         </div>

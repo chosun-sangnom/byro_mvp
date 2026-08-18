@@ -85,7 +85,7 @@ export function HighlightManageCertificationView({
           )}
 
           <div className="mt-5 flex gap-2">
-            <Button variant="outline" onClick={onBack}>이전</Button>
+            <Button variant="outline" onClick={onBack} style={{ borderRadius: 9999 }}>이전</Button>
             <Button onClick={onConfirm}>확인</Button>
           </div>
         </div>

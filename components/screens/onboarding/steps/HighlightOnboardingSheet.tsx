@@ -555,7 +555,7 @@ export function HighlightOnboardingSheet({ open, onClose }: HighlightOnboardingS
                 )}
               </div>
               <div className="mt-4 flex gap-2">
-                <Button variant="outline" onClick={() => setSheetMode(selectedCat ? 'group' : 'picker')}>이전</Button>
+                <Button variant="outline" onClick={() => setSheetMode(selectedCat ? 'group' : 'picker')} style={{ borderRadius: 9999 }}>이전</Button>
                 <Button
                   onClick={handleAddHighlight}
                   disabled={!selectedCat || !hlTitle.trim() || (isCareerRole && (!hlRole.trim() || !hlStatus || !hlStartYear || (hlStatus === '종료' && !hlEndYear))) || (isEducationHistory && (!hlSchoolType || (educationNeedsDegree && !hlDegree) || (educationNeedsMajor && !hlRole.trim()) || !hlStatus || !hlEducationStartYear || (hlStatus !== '재학' && !hlEducationEndYear)))}

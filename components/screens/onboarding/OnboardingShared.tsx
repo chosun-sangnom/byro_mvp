@@ -89,7 +89,7 @@ export function StepFooter({
   return (
     <div className="px-5 pb-5 pt-3 border-t border-[var(--color-border-soft)] bg-[var(--color-glass-strong)] backdrop-blur-md space-y-2">
       <div className="grid grid-cols-2 gap-2">
-        <Button variant="outline" onClick={onPrev} disabled={!onPrev}>{prevLabel}</Button>
+        <Button variant="outline" onClick={onPrev} disabled={!onPrev} style={{ borderRadius: 9999 }}>{prevLabel}</Button>
         <Button onClick={onNext} disabled={!canNext}>{nextLabel}</Button>
       </div>
       {onSkip && (

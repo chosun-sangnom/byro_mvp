@@ -26,7 +26,7 @@ const SEARCHABLE_PROFILES = [
 
 // [임시] 동명이인 시연용 가입자 김영석
 const EXTRA_MOCK_MEMBERS: SearchResult[] = [
-  { linkId: 'kimyoungseok-bonanza-po', name: '김영석', title: 'Product Owner · 보난자팩토리', school: '', avatarColor: '#5B8FA8', connectionStatus: 'connected', isVerified: true },
+  { linkId: 'kimyoungseok-bonanza-po', name: '김영석', title: 'Product Owner · 보난자팩토리', school: '', avatarColor: '#5B8FA8', isVerified: true },
   { linkId: 'kimyoungseok-coinone', name: '김영석', title: '마케팅 팀장 · 코인원', school: '', avatarColor: '#7B6F9A' },
 ]
 
@@ -45,7 +45,6 @@ type SearchResult = {
   school: string
   avatarColor?: string
   avatarImage?: string
-  connectionStatus?: 'connected' | 'none'
   isVerified?: boolean
 }
 
@@ -232,18 +231,6 @@ export default function SearchScreen() {
                             </div>
                             <p className="text-[12px] text-[var(--color-text-secondary)] truncate">{p.title}</p>
                           </div>
-                          {p.connectionStatus === 'connected' && (
-                            <span
-                              className="flex-shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold"
-                              style={{
-                                background: 'var(--color-bg-muted)',
-                                color: 'var(--color-text-secondary)',
-                                border: '1px solid var(--color-border-default)',
-                              }}
-                            >
-                              연결됨
-                            </span>
-                          )}
                         </button>
                       </motion.li>
                     ))}

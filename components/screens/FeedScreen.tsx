@@ -1,12 +1,57 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { BadgeCheck, ChevronRight, Flame, PartyPopper, ThumbsUp } from 'lucide-react'
-import { Avatar, showToast } from '@/components/ui'
+import { BadgeCheck, ChevronRight, Flame, PartyPopper, ThumbsUp, UserRound } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
+import { Avatar, Button, showToast } from '@/components/ui'
+import { LoginModal } from '@/components/screens/profile/LoginModal'
 import { NEW_PROFILES, ACTIVE_PROFILES, RECOMMENDED_PREVIEW } from '@/lib/mocks/feedProfiles'
 
 export function VerifiedBadge() {
   return <BadgeCheck size={12} className="shrink-0 fill-[#3B82F6] text-white" strokeWidth={2.5} />
+}
+
+function AccountCard() {
+  const router = useRouter()
+  const { isLoggedIn, user } = useAuth()
+  const [loginModalOpen, setLoginModalOpen] = useState(false)
+
+  return (
+    <>
+      <div className="mx-4 mt-4 surface-card flex items-center gap-3 rounded-[22px] px-4 py-4">
+        {isLoggedIn && user ? (
+          <>
+            <Avatar src={user.avatarImage} name={user.name} color={user.avatarColor} size={48} />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1">
+                <p className="text-[15px] font-bold text-[var(--color-text-primary)] truncate">{user.name}</p>
+                {user.isVerified && <VerifiedBadge />}
+              </div>
+              <p className="text-[12px] text-[var(--color-text-secondary)] truncate">{user.title}</p>
+            </div>
+            <Button variant="outline" size="sm" fullWidth={false} onClick={() => router.push('/me')}>
+              내 프로필 보기
+            </Button>
+          </>
+        ) : (
+          <>
+            <div className="w-12 h-12 rounded-full bg-[var(--color-bg-muted)] flex items-center justify-center flex-shrink-0">
+              <UserRound size={22} className="text-[var(--color-text-tertiary)]" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[14px] font-bold text-[var(--color-text-primary)]">로그인이 필요해요</p>
+              <p className="text-[12px] text-[var(--color-text-secondary)]">로그인하고 펠로어를 더 이용해보세요</p>
+            </div>
+            <Button variant="primary" size="sm" fullWidth={false} onClick={() => setLoginModalOpen(true)}>
+              로그인하기
+            </Button>
+          </>
+        )}
+      </div>
+      <LoginModal open={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
+    </>
+  )
 }
 
 export default function FeedScreen() {
@@ -22,6 +67,7 @@ export default function FeedScreen() {
 
   return (
     <div className="flex-1 overflow-y-auto">
+      <AccountCard />
       <div className="flex flex-col gap-10 px-4 pt-6 pb-2">
 
         {/* 새로 가입했어요 */}

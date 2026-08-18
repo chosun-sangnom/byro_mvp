@@ -6,7 +6,7 @@ import { useFeloreStore } from '@/store/useFeloreStore'
 import { BottomSheet, Button, NavBar, showToast } from '@/components/ui'
 import { ContactTypeIcon } from '@/components/contact/ContactTypeIcon'
 import type { ContactChannel, MessengerApp } from '@/types'
-import { buildContactHref, contactChannelValueDisplay, contactPlaceholder, contactPreview, messengerUsesCountryCode, MESSENGER_APP_LABELS } from '@/lib/contactChannels'
+import { buildContactHref, contactChannelValueDisplay, contactFieldLabel, contactPlaceholder, contactPreview, messengerUsesCountryCode, MESSENGER_APP_LABELS } from '@/lib/contactChannels'
 import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from '@/lib/countryCodes'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 
@@ -144,7 +144,7 @@ export function ContactManageScreen({ onBack }: { onBack: () => void }) {
           )}
 
           <div className="text-xs text-[var(--color-text-secondary)] mb-1">
-            {isMessengerSheet ? MESSENGER_APP_LABELS[messengerApp] : selectedChannel?.label}
+            {isMessengerSheet ? contactFieldLabel(messengerApp) : selectedChannel?.label}
           </div>
           {showCountryCode ? (
             <div className="flex gap-2 mb-2">

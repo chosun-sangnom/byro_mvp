@@ -26,9 +26,14 @@ export function contactPlaceholder(id?: ContactChannel['id'], messengerApp?: Mes
   if (id === 'email') return 'name@felore.io'
   if (id === 'messenger') {
     if (messengerUsesCountryCode(messengerApp)) return '10-1234-5678'
-    return '카카오 아이디'
+    return '카카오톡 아이디'
   }
   return ''
+}
+
+export function contactFieldLabel(messengerApp: MessengerApp) {
+  if (messengerApp === 'kakao') return '카카오톡 ID'
+  return MESSENGER_APP_LABELS[messengerApp]
 }
 
 export function contactPreview(id?: ContactChannel['id'], value?: string, messengerApp?: MessengerApp, countryCode?: string) {

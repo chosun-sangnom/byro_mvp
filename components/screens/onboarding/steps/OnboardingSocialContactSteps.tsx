@@ -9,7 +9,7 @@ import { ContactTypeIcon } from '@/components/contact/ContactTypeIcon'
 import { StepFooter, StepIntro, SelectionCard } from '@/components/screens/onboarding/OnboardingShared'
 import type { ContactChannel, MessengerApp } from '@/types'
 import { INSTAGRAM_PROFILE, LINKEDIN_PROFILE } from '@/lib/mocks/socialProfiles'
-import { buildContactHref, contactChannelValueDisplay, contactPlaceholder, contactPreview, messengerUsesCountryCode, MESSENGER_APP_LABELS } from '@/lib/contactChannels'
+import { buildContactHref, contactChannelValueDisplay, contactFieldLabel, contactPlaceholder, contactPreview, messengerUsesCountryCode, MESSENGER_APP_LABELS } from '@/lib/contactChannels'
 import { COUNTRY_CODES, DEFAULT_COUNTRY_CODE } from '@/lib/countryCodes'
 
 const MESSENGER_APPS: MessengerApp[] = ['kakao', 'telegram', 'whatsapp']
@@ -221,7 +221,7 @@ export function Step6Contact() {
                 <ContactTypeIcon channelId={selectedChannel.id} enabled={Boolean(inputValue.trim())} />
                 <div className="min-w-0">
                   <div className="text-sm font-bold text-[var(--color-text-strong)]">
-                    {isMessengerSheet ? MESSENGER_APP_LABELS[messengerApp] : selectedChannel.label}
+                    {isMessengerSheet ? contactFieldLabel(messengerApp) : selectedChannel.label}
                   </div>
                   <div className="meta-text">
                     {selectedChannel.id === 'phone'

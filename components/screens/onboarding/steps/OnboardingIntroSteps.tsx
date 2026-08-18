@@ -818,6 +818,8 @@ export function Step2Verify() {
   const [code, setCode] = useState('')
   const [smsSent, setSmsSent] = useState(false)
   const [smsVerified, setSmsVerified] = useState(false)
+  const [codeError, setCodeError] = useState(false)
+  const phoneInvalid = phone.length > 0 && !isValidPhone(phone)
 
   const handleVerified = () => {
     store.setVerified(true)
@@ -832,7 +834,13 @@ export function Step2Verify() {
     setSmsSent(true)
   }
 
+  // [임시] 인증번호 확인 API 미연동 — 목업 정답 코드 123456과만 비교
   const handleSmsCodeConfirm = () => {
+    if (code !== '123456') {
+      setCodeError(true)
+      return
+    }
+    setCodeError(false)
     store.setVerified(true)
     setSmsVerified(true)
     showToast('인증이 완료됐어요')
@@ -881,26 +889,30 @@ export function Step2Verify() {
         </div>
       ) : (
         <div className="space-y-2">
-          <div className="flex gap-2">
-            <input
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(formatPhone(e.target.value))}
-              placeholder="010-0000-0000"
-              disabled={smsSent}
-              className="flex-1 border border-[var(--color-border-default)] rounded-full px-4 py-2.5 text-sm bg-white text-[var(--color-text-primary)] outline-none disabled:opacity-50"
-            />
-            {/* [임시] SMS 발송 API 미연동 */}
-            <Button
-              size="sm"
-              fullWidth={false}
-              className="w-24 flex-shrink-0"
-              disabled={!isValidPhone(phone)}
-              onClick={handleSmsSend}
-              style={smsSent ? { backgroundColor: 'var(--color-text-tertiary)' } : undefined}
-            >
-              {smsSent ? '재발송' : '발송'}
-            </Button>
+          <div>
+            <div className="flex gap-2">
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(formatPhone(e.target.value))}
+                placeholder="010-0000-0000"
+                className="flex-1 rounded-full border px-4 py-2.5 text-sm bg-white text-[var(--color-text-primary)] outline-none"
+                style={{ borderColor: phoneInvalid ? 'var(--color-state-danger-text)' : 'var(--color-border-default)' }}
+              />
+              {/* [임시] SMS 발송 API 미연동 */}
+              <Button
+                size="sm"
+                fullWidth={false}
+                className="w-24 flex-shrink-0"
+                disabled={smsSent ? false : !isValidPhone(phone)}
+                onClick={handleSmsSend}
+              >
+                {smsSent ? '재발송' : '발송'}
+              </Button>
+            </div>
+            {phoneInvalid && (
+              <p className="mt-1 px-1 text-[12px]" style={{ color: 'var(--color-state-danger-text)' }}>올바른 전화번호 형식을 입력해주세요</p>
+            )}
           </div>
           {smsSent && (
             smsVerified ? (
@@ -909,25 +921,30 @@ export function Step2Verify() {
                 인증 완료
               </div>
             ) : (
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                  placeholder="인증번호 6자리"
-                  maxLength={6}
-                  className="flex-1 border border-[var(--color-border-default)] rounded-full px-4 py-2.5 text-sm bg-white text-[var(--color-text-primary)] outline-none"
-                />
-                {/* [임시] 인증번호 확인 API 미연동 */}
-                <Button
-                  size="sm"
-                  fullWidth={false}
-                  className="w-24 flex-shrink-0"
-                  disabled={code.length < 6}
-                  onClick={handleSmsCodeConfirm}
-                >
-                  확인
-                </Button>
+              <div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={code}
+                    onChange={(e) => { setCode(e.target.value); setCodeError(false) }}
+                    placeholder="인증번호 6자리"
+                    maxLength={6}
+                    className="flex-1 rounded-full border px-4 py-2.5 text-sm bg-white text-[var(--color-text-primary)] outline-none"
+                    style={{ borderColor: codeError ? 'var(--color-state-danger-text)' : 'var(--color-border-default)' }}
+                  />
+                  <Button
+                    size="sm"
+                    fullWidth={false}
+                    className="w-24 flex-shrink-0"
+                    disabled={code.length < 6}
+                    onClick={handleSmsCodeConfirm}
+                  >
+                    확인
+                  </Button>
+                </div>
+                {codeError && (
+                  <p className="mt-1 px-1 text-[12px]" style={{ color: 'var(--color-state-danger-text)' }}>인증번호가 일치하지 않아요</p>
+                )}
               </div>
             )
           )}

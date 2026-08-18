@@ -817,6 +817,7 @@ export function Step2Verify() {
   const [phone, setPhone] = useState('')
   const [code, setCode] = useState('')
   const [smsSent, setSmsSent] = useState(false)
+  const [smsVerified, setSmsVerified] = useState(false)
 
   const handleVerified = () => {
     store.setVerified(true)
@@ -829,6 +830,12 @@ export function Step2Verify() {
       return
     }
     setSmsSent(true)
+  }
+
+  const handleSmsCodeConfirm = () => {
+    store.setVerified(true)
+    setSmsVerified(true)
+    showToast('인증이 완료됐어요')
   }
 
   return (
@@ -896,36 +903,50 @@ export function Step2Verify() {
             </Button>
           </div>
           {smsSent && (
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder="인증번호 6자리"
-                maxLength={6}
-                className="flex-1 border border-[var(--color-border-default)] rounded-full px-4 py-2.5 text-sm bg-white text-[var(--color-text-primary)] outline-none"
-              />
-              {/* [임시] 인증번호 확인 API 미연동 */}
-              <Button
-                size="sm"
-                fullWidth={false}
-                className="w-24 flex-shrink-0"
-                disabled={code.length < 6}
-                onClick={handleVerified}
-              >
-                확인
-              </Button>
-            </div>
+            smsVerified ? (
+              <div className="flex items-center gap-1.5 px-1 text-[13px] font-semibold" style={{ color: 'var(--color-state-success-text)' }}>
+                <CheckCircle2 size={16} />
+                인증 완료
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder="인증번호 6자리"
+                  maxLength={6}
+                  className="flex-1 border border-[var(--color-border-default)] rounded-full px-4 py-2.5 text-sm bg-white text-[var(--color-text-primary)] outline-none"
+                />
+                {/* [임시] 인증번호 확인 API 미연동 */}
+                <Button
+                  size="sm"
+                  fullWidth={false}
+                  className="w-24 flex-shrink-0"
+                  disabled={code.length < 6}
+                  onClick={handleSmsCodeConfirm}
+                >
+                  확인
+                </Button>
+              </div>
+            )
           )}
         </div>
       )}
 
       <div className="flex-1" />
+      <Button
+        disabled={!smsVerified}
+        onClick={() => store.nextStep()}
+        className={tab === 'kakao' ? 'invisible' : ''}
+      >
+        다음
+      </Button>
       {/* 본인인증은 필수가 아니므로 항상 클릭 가능한 텍스트 버튼으로 건너뛰기를 제공 */}
       <button
         type="button"
         onClick={() => store.nextStep()}
-        className="w-full text-center text-sm text-[var(--color-text-secondary)]"
+        className="mt-2 w-full text-center text-sm text-[var(--color-text-secondary)]"
       >
         건너뛰기
       </button>

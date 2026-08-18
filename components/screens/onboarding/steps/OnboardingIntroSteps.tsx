@@ -596,7 +596,7 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
           <span className="text-[11px] text-[var(--color-text-tertiary)]">또는</span>
           <div className="flex-1 h-px bg-[var(--color-border-default)]" />
         </div>
-        <Button variant="outline" onClick={() => setView('phone')}>전화번호로 로그인</Button>
+        <Button variant="outline" onClick={() => setView('phone')} style={{ borderRadius: 20 }}>전화번호로 로그인</Button>
       </div>
     )
   }
@@ -624,7 +624,7 @@ export function Step1Login({ onModeChange }: { onModeChange?: (mode: Mode) => vo
           <span className="text-[11px] text-[var(--color-text-tertiary)]">또는</span>
           <div className="flex-1 h-px bg-[var(--color-border-default)]" />
         </div>
-        <Button variant="outline" onClick={() => setView('phone')}>전화번호로 회원가입</Button>
+        <Button variant="outline" onClick={() => setView('phone')} style={{ borderRadius: 20 }}>전화번호로 회원가입</Button>
       </div>
     )
   }

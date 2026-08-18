@@ -1428,6 +1428,8 @@ export function Step4Profile() {
     pendingSubIndexRef.current = null
   }
 
+  const canComplete = bio.trim().length > 0 || profileImages.some(Boolean)
+
   const handleNext = () => {
     store.completeOnboarding()
     const filledImages = profileImages.filter(Boolean)
@@ -1502,8 +1504,9 @@ export function Step4Profile() {
         <button
           type="button"
           onClick={handleNext}
-          className="w-full rounded-full py-4 text-[16px] font-semibold text-white"
-          style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}
+          disabled={!canComplete}
+          className="w-full rounded-full py-4 text-[16px] font-semibold text-white disabled:cursor-not-allowed"
+          style={{ backgroundColor: canComplete ? '#0D0D0D' : 'rgba(0,0,0,0.5)' }}
         >
           완료
         </button>

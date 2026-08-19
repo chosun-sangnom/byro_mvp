@@ -386,7 +386,7 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
 
   return (
     <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
-      <NavBar title="" onBack={onBack} onClose={onBack} />
+      <NavBar title="" />
       <div className="flex flex-1 flex-col items-center justify-center gap-6 px-5 text-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/images/ai-tools/verify-done-icon.svg" alt="" className="h-12 w-12" />

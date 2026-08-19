@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Download, Lock, MessageCircle, Share2, Sparkles, Star, Users, Handshake } from 'lucide-react'
+import { ChevronLeft, Download, Share2, Sparkles } from 'lucide-react'
 import { BottomSheet, showToast } from '@/components/ui'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import type { KemiData, PublicProfileLife, PublicProfileWhoIAm } from '@/types'
@@ -52,14 +52,10 @@ function LockedBlockOverlay({ missingItems }: { missingItems: string[] }) {
     : '프로필을 더 채우면 열려요'
 
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-[22px] backdrop-blur-[2px]">
-      <div
-        className="flex h-8 w-8 items-center justify-center rounded-full"
-        style={{ background: 'var(--color-bg-muted)', border: '1px solid var(--color-border-default)' }}
-      >
-        <Lock size={14} style={{ color: 'var(--color-text-tertiary)' }} />
-      </div>
-      <p className="text-center text-[12px] font-semibold px-6" style={{ color: 'var(--color-text-secondary)' }}>
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2.5 px-6">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/images/kemi/locked-alert.svg" alt="" className="size-9" />
+      <p className="text-center text-[14px] font-semibold leading-[1.35]" style={{ color: '#0D0D0D' }}>
         {hint}
       </p>
     </div>
@@ -67,14 +63,14 @@ function LockedBlockOverlay({ missingItems }: { missingItems: string[] }) {
 }
 
 const BLOCK_META = [
-  { index: 1, label: '공통점', Icon: Sparkles },
-  { index: 2, label: '대화스타터', Icon: MessageCircle },
-  { index: 3, label: '관계흐름', Icon: Users },
-  { index: 4, label: '협업결', Icon: Handshake },
-  { index: 5, label: '연결가치', Icon: Star },
+  { index: 1, label: '공통점' },
+  { index: 2, label: '대화 스타터' },
+  { index: 3, label: '관계 흐름' },
+  { index: 4, label: '협업결' },
+  { index: 5, label: '연결 가치' },
 ]
 
-// ── 폴라로이드 카드 (인라인 표시 + html2canvas 캡처용) ─────────────────────────
+// ── 케미 리포트 카드 (인라인 표시 + html2canvas 캡처용) ─────────────────────────
 
 function AvatarCircle({
   src,
@@ -97,8 +93,7 @@ function AvatarCircle({
           width: size, height: size,
           borderRadius: '50%',
           objectFit: 'cover',
-          border: '3px solid #FFFFFF',
-          boxShadow: '0 2px 10px rgba(0,0,0,0.14)',
+          border: '0.66px solid rgba(255,255,255,0.85)',
           flexShrink: 0,
         }}
       />
@@ -110,8 +105,7 @@ function AvatarCircle({
       borderRadius: '50%',
       background: 'linear-gradient(135deg, #BFDBFE, #2563EB)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      border: '3px solid #FFFFFF',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.14)',
+      border: '0.66px solid rgba(255,255,255,0.85)',
       flexShrink: 0,
     }}>
       <span style={{ fontSize, fontWeight: 900, color: '#fff', lineHeight: 1 }}>
@@ -121,7 +115,7 @@ function AvatarCircle({
   )
 }
 
-// [임시] 폴라로이드 카드 — html2canvas 캡처용. CSS 변수 미사용(캡처 시 미지원)
+// [임시] 리포트 카드 — html2canvas 캡처용. CSS 변수·blend-mode 미사용(캡처 시 미지원)
 function PolaroidCard({
   cardRef,
   viewerName,
@@ -139,8 +133,6 @@ function PolaroidCard({
   chemistryScore: number
   matchItems: { label: string; category: string }[]
 }) {
-  const filledDots = Math.round(chemistryScore / 10)
-
   return (
     <div
       ref={cardRef}
@@ -148,146 +140,81 @@ function PolaroidCard({
         position: 'fixed',
         left: '-9999px',
         top: 0,
-        width: '320px',
+        width: '328px',
         background: '#FFFFFF',
-        borderRadius: '18px',
-        paddingBottom: '32px',
-        fontFamily: "'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif",
-        boxShadow: '0 8px 32px rgba(0,0,0,0.15)',
+        borderRadius: '12px',
+        fontFamily: "'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif",
         overflow: 'hidden',
       }}
     >
       {/* 상단 그라디언트 배너 */}
       <div style={{
-        background: 'linear-gradient(135deg, #1D4ED8 0%, #7C3AED 100%)',
-        padding: '24px 24px 28px',
+        position: 'relative',
+        background: 'radial-gradient(circle at 28% 8%, #73B9FF 0%, #57ABFF 22%, #3A9DFF 38%, #1D8EFF 52%, #0E87FF 62%, #0080FF 72%, #0657FF 100%)',
+        padding: '24px',
       }}>
-        {/* 브랜딩 */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '20px' }}>
-          <div style={{
-            width: '20px', height: '20px',
-            background: 'rgba(255,255,255,0.25)',
-            borderRadius: '6px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <span style={{ color: '#fff', fontSize: '10px', fontWeight: 900, lineHeight: 1 }}>B</span>
-          </div>
-          <span style={{ fontSize: '12px', fontWeight: 700, color: 'rgba(255,255,255,0.9)', letterSpacing: '0.06em' }}>felore</span>
-          <span style={{ marginLeft: 'auto', fontSize: '10px', color: 'rgba(255,255,255,0.55)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Kemi Report</span>
+        <div style={{
+          position: 'absolute', left: 0, top: 0,
+          background: '#FFFFFF', borderBottomLeftRadius: '6px', borderBottomRightRadius: '6px',
+          padding: '4px 6px', display: 'flex', alignItems: 'center', gap: '2px',
+        }}>
+          <span style={{ fontSize: '12px', fontWeight: 700, color: '#25313D' }}>Kemi Report</span>
         </div>
 
         {/* 양쪽 아바타 */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0px' }}>
-          <AvatarCircle src={viewerAvatar} name={viewerName} size={72} fontSize={26} />
-          {/* 스파크 배지 */}
-          <div style={{
-            width: '32px', height: '32px',
-            background: '#FFFFFF',
-            borderRadius: '50%',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            margin: '0 -8px',
-            zIndex: 1,
-            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-            flexShrink: 0,
-          }}>
-            <span style={{ fontSize: '14px', lineHeight: 1 }}>✦</span>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', gap: '16px', marginTop: '12px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+            <AvatarCircle src={viewerAvatar} name={viewerName} size={64} fontSize={22} />
+            <span style={{ fontSize: '12px', fontWeight: 700, color: '#fff' }}>{viewerName}</span>
           </div>
-          <AvatarCircle src={profileAvatar} name={profileName} size={72} fontSize={26} />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+            <AvatarCircle src={profileAvatar} name={profileName} size={64} fontSize={22} />
+            <span style={{ fontSize: '12px', fontWeight: 700, color: '#fff' }}>{profileName}</span>
+          </div>
         </div>
-
-        {/* 이름 */}
-        <p style={{
-          marginTop: '14px',
-          textAlign: 'center',
-          fontSize: '15px',
-          fontWeight: 800,
-          color: '#FFFFFF',
-          lineHeight: 1.3,
-        }}>
-          {viewerName} × {profileName}
-        </p>
       </div>
 
       {/* 하단 흰색 영역 */}
-      <div style={{ padding: '20px 22px 0' }}>
+      <div style={{ padding: '16px 20px 20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
         {/* 케미 점수 */}
-        <div style={{ marginBottom: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#636366', letterSpacing: '0.06em', textTransform: 'uppercase' }}>케미 점수</span>
-            <span style={{ fontSize: '18px', fontWeight: 900, color: '#2563EB' }}>{chemistryScore}%</span>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: '#6C7786' }}>케미 점수</span>
+            <span style={{ fontSize: '18px', fontWeight: 700, color: '#0D0D0D' }}>{chemistryScore}%</span>
           </div>
-          {/* 도트 바 */}
-          <div style={{ display: 'flex', gap: '4px' }}>
-            {Array.from({ length: 10 }).map((_, i) => (
-              <div
-                key={i}
-                style={{
-                  flex: 1, height: '6px', borderRadius: '3px',
-                  background: i < filledDots
-                    ? `linear-gradient(90deg, #2563EB ${(i / 10) * 100}%, #7C3AED 100%)`
-                    : '#E5E7EB',
-                }}
-              />
-            ))}
+          <div style={{ height: '4px', borderRadius: '100px', background: '#DEE4EC', width: '100%' }}>
+            <div style={{ height: '100%', borderRadius: '100px', background: '#25313D', width: `${chemistryScore}%` }} />
           </div>
         </div>
 
         {/* 공통점 태그 */}
         {matchItems.length > 0 && (
           <div>
-            <p style={{ fontSize: '11px', fontWeight: 700, color: '#636366', letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: '8px' }}>
+            <p style={{ fontSize: '12px', fontWeight: 700, color: '#6C7786', marginBottom: '12px' }}>
               공통점
             </p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
               {matchItems.slice(0, 6).map((item) => (
                 <span key={item.label} style={{
-                  background: '#EFF6FF',
-                  color: '#2563EB',
-                  border: '1px solid rgba(37,99,235,0.18)',
-                  borderRadius: '9999px',
-                  padding: '4px 11px',
-                  fontSize: '12px',
-                  fontWeight: 600,
+                  background: '#F0F5FF',
+                  color: '#25313D',
+                  borderRadius: '8px',
+                  padding: '6px 10px',
+                  fontSize: '14px',
+                  fontWeight: 700,
                 }}>
                   {item.label}
                 </span>
               ))}
-              {matchItems.length > 6 && (
-                <span style={{
-                  background: '#F3F4F6',
-                  color: '#6B7280',
-                  borderRadius: '9999px',
-                  padding: '4px 11px',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                }}>
-                  +{matchItems.length - 6}
-                </span>
-              )}
             </div>
           </div>
         )}
-
-        {/* 구분선 + 하단 CTA */}
-        <div style={{
-          marginTop: '18px',
-          paddingTop: '14px',
-          borderTop: '1px solid #F0F0F2',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}>
-          <span style={{ fontSize: '11px', color: '#98989D' }}>felore.app에서 나도 확인하기</span>
-          <div style={{ background: '#EFF6FF', borderRadius: '8px', padding: '4px 10px' }}>
-            <span style={{ fontSize: '11px', fontWeight: 700, color: '#2563EB' }}>→</span>
-          </div>
-        </div>
       </div>
     </div>
   )
 }
 
-// ── 화면에 보이는 폴라로이드 미리보기 카드 ────────────────────────────────────
+// ── 화면에 보이는 리포트 미리보기 카드 ────────────────────────────────────
 
 function PolaroidPreviewCard({
   viewerName,
@@ -304,97 +231,71 @@ function PolaroidPreviewCard({
   chemistryScore: number
   matchItems: { label: string; category: string }[]
 }) {
-  const filledDots = Math.round(chemistryScore / 10)
-
   return (
     <div
-      className="overflow-hidden rounded-[18px]"
-      style={{ border: '1px solid var(--color-border-default)', background: 'var(--color-bg-surface)', boxShadow: '0 4px 20px rgba(0,0,0,0.10)' }}
+      className="overflow-hidden rounded-[12px]"
+      style={{ border: '0.66px solid #DEE4EC' }}
     >
       {/* 그라디언트 배너 */}
-      <div style={{ background: 'linear-gradient(135deg, #1D4ED8 0%, #7C3AED 100%)', padding: '20px 20px 24px' }}>
-        {/* 브랜딩 */}
-        <div className="mb-4 flex items-center gap-1.5">
-          <div className="flex h-5 w-5 items-center justify-center rounded-[5px] bg-white/25">
-            <span className="text-[10px] font-black leading-none text-white">B</span>
-          </div>
-          <span className="text-[12px] font-bold tracking-[0.06em] text-white/90">felore</span>
-          <span className="ml-auto text-[10px] uppercase tracking-[0.08em] text-white/50">Kemi Report</span>
+      <div
+        className="relative px-6 pb-6 pt-4"
+        style={{
+          background: 'radial-gradient(circle at 28% 8%, #73B9FF 0%, #57ABFF 22%, #3A9DFF 38%, #1D8EFF 52%, #0E87FF 62%, #0080FF 72%, #0657FF 100%)',
+        }}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/kemi/report-card-texture.png"
+          alt=""
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-25"
+          style={{ mixBlendMode: 'color-dodge' }}
+        />
+        <div className="absolute left-0 top-0 flex items-center gap-0.5 rounded-bl-[6px] rounded-br-[6px] bg-white px-1.5 py-1">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/kemi/report-badge-icon.svg" alt="" className="size-3" />
+          <span className="text-[12px] font-bold" style={{ color: '#25313D' }}>Kemi Report</span>
         </div>
 
         {/* 양쪽 아바타 */}
-        <div className="flex items-center justify-center">
-          {/* 내 아바타 */}
-          <div className="relative">
-            {viewerAvatar ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={viewerAvatar} alt={viewerName} className="h-[68px] w-[68px] rounded-full object-cover" style={{ border: '3px solid #fff', boxShadow: '0 2px 10px rgba(0,0,0,0.14)' }} />
-            ) : (
-              <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full text-[24px] font-black text-white" style={{ background: 'linear-gradient(135deg, #93C5FD, #1D4ED8)', border: '3px solid #fff', boxShadow: '0 2px 10px rgba(0,0,0,0.14)' }}>
-                {viewerName.charAt(0)}
-              </div>
-            )}
-            <div className="absolute -bottom-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-white text-[10px]" style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}>나</div>
+        <div className="relative mt-3 flex items-start justify-center gap-4">
+          <div className="flex flex-col items-center gap-2.5">
+            <AvatarCircle src={viewerAvatar} name={viewerName} size={64} fontSize={22} />
+            <span className="text-[12px] font-bold text-white">{viewerName}</span>
           </div>
-
-          {/* 중앙 스파크 */}
-          <div className="z-10 mx-[-6px] flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-[14px]" style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
-            ✦
-          </div>
-
-          {/* 상대 아바타 */}
-          <div className="relative">
-            {profileAvatar ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={profileAvatar} alt={profileName} className="h-[68px] w-[68px] rounded-full object-cover" style={{ border: '3px solid #fff', boxShadow: '0 2px 10px rgba(0,0,0,0.14)' }} />
-            ) : (
-              <div className="flex h-[68px] w-[68px] items-center justify-center rounded-full text-[24px] font-black text-white" style={{ background: 'linear-gradient(135deg, #C4B5FD, #7C3AED)', border: '3px solid #fff', boxShadow: '0 2px 10px rgba(0,0,0,0.14)' }}>
-                {profileName.charAt(0)}
-              </div>
-            )}
+          <div className="flex flex-col items-center gap-2.5">
+            <AvatarCircle src={profileAvatar} name={profileName} size={64} fontSize={22} />
+            <span className="text-[12px] font-bold text-white">{profileName}</span>
           </div>
         </div>
-
-        {/* 이름 */}
-        <p className="mt-3 text-center text-[14px] font-black text-white">
-          {viewerName} × {profileName}
-        </p>
       </div>
 
       {/* 하단 흰색 영역 */}
-      <div className="px-5 py-4">
+      <div className="flex flex-col gap-5 px-5 pb-5 pt-4">
         {/* 케미 점수 */}
-        <div className="mb-4">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-[11px] font-bold uppercase tracking-[0.08em]" style={{ color: 'var(--color-text-tertiary)' }}>케미 점수</span>
-            <span className="text-[18px] font-black" style={{ color: 'var(--color-accent-dark)' }}>{chemistryScore}%</span>
+        <div>
+          <div className="mb-3 flex items-center justify-between">
+            <span className="text-[12px] font-bold" style={{ color: '#6C7786' }}>케미 점수</span>
+            <span className="text-[18px] font-bold" style={{ color: '#0D0D0D' }}>{chemistryScore}%</span>
           </div>
-          <div className="flex gap-1">
-            {Array.from({ length: 10 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-1.5 flex-1 rounded-full transition-all"
-                style={{
-                  background: i < filledDots
-                    ? 'linear-gradient(90deg, #2563EB, #7C3AED)'
-                    : 'var(--color-border-default)',
-                }}
-              />
-            ))}
+          <div className="h-1 w-full overflow-hidden rounded-full" style={{ background: '#DEE4EC' }}>
+            <div className="h-full rounded-full" style={{ width: `${chemistryScore}%`, background: '#25313D' }} />
           </div>
         </div>
 
         {/* 공통점 태그 */}
         {matchItems.length > 0 && (
           <div>
-            <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.08em]" style={{ color: 'var(--color-text-tertiary)' }}>공통점</p>
+            <p className="mb-3 text-[12px] font-bold" style={{ color: '#6C7786' }}>공통점</p>
             <div className="flex flex-wrap gap-1.5">
               {matchItems.slice(0, 6).map((item) => (
-                <span key={item.label} className="chip-metric">{item.label}</span>
+                <span
+                  key={item.label}
+                  className="rounded-[8px] px-2.5 py-1.5 text-[14px] font-bold"
+                  style={{ background: '#F0F5FF', color: '#25313D' }}
+                >
+                  {item.label}
+                </span>
               ))}
-              {matchItems.length > 6 && (
-                <span className="chip-metric">+{matchItems.length - 6}</span>
-              )}
             </div>
           </div>
         )}
@@ -456,7 +357,7 @@ export function PublicProfileCompatibilitySheet({
   // 케미 점수: matchItems 수 기반 목업 계산
   const chemistryScore = Math.min(52 + matchItems.length * 7 + Math.round(completenessPercent / 8), 98)
 
-  // [임시] 폴라로이드 이미지 캡처 후 공유 (html2canvas + Web Share API)
+  // [임시] 카드 이미지 캡처 후 공유 (html2canvas + Web Share API)
   const handleShare = async () => {
     if (!polaroidRef.current || sharing) return
     setSharing(true)
@@ -506,16 +407,21 @@ export function PublicProfileCompatibilitySheet({
       index: 1,
       content: (
         <>
-          {/* 요약 텍스트 */}
-          <p className="mb-3 text-[13px] leading-[1.7]" style={{ color: 'var(--color-text-secondary)' }}>
+          <p className="text-[14px] font-medium leading-[1.5]" style={{ color: '#25313D' }}>
             {report.summary}
           </p>
 
           {/* 공통점 태그 */}
           {matchItems.length > 0 && (
-            <div className="mb-3 flex flex-wrap gap-1.5">
+            <div className="mt-4 flex flex-wrap gap-1.5">
               {matchItems.map((item) => (
-                <span key={item.label} className="chip-metric">{item.label}</span>
+                <span
+                  key={item.label}
+                  className="rounded-[8px] border px-2.5 py-1.5 text-[14px] font-medium"
+                  style={{ borderColor: '#DEE4EC', background: '#fff', color: '#25313D' }}
+                >
+                  {item.label}
+                </span>
               ))}
             </div>
           )}
@@ -525,13 +431,10 @@ export function PublicProfileCompatibilitySheet({
             <button
               type="button"
               onClick={handleGenerateCard}
-              className="flex w-full items-center justify-center gap-2 rounded-[14px] py-3 text-[13px] font-bold transition-opacity active:opacity-70"
-              style={{
-                background: 'linear-gradient(135deg, #1D4ED8, #7C3AED)',
-                color: '#fff',
-              }}
+              className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-full py-3 pl-3 pr-4 text-[14px] font-bold transition-opacity active:opacity-70"
+              style={{ background: '#F5F6F7', color: '#0D0D0D' }}
             >
-              <Sparkles size={14} />
+              <Sparkles size={16} style={{ color: '#25313D' }} />
               케미카드 만들기
             </button>
           )}
@@ -539,17 +442,17 @@ export function PublicProfileCompatibilitySheet({
           {/* 생성 중 */}
           {cardGenerating && (
             <div
-              className="flex w-full items-center justify-center gap-2.5 rounded-[14px] py-3"
-              style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-default)' }}
+              className="mt-4 flex w-full items-center justify-center gap-2.5 rounded-full py-3"
+              style={{ background: '#F5F6F7' }}
             >
-              <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-[var(--color-accent-dark)] border-t-transparent" />
-              <span className="text-[13px] font-semibold" style={{ color: 'var(--color-text-secondary)' }}>케미카드 생성 중…</span>
+              <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#25313D] border-t-transparent" />
+              <span className="text-[14px] font-bold" style={{ color: '#0D0D0D' }}>케미카드 생성 중…</span>
             </div>
           )}
 
           {/* 생성된 카드 */}
           {cardGenerated && (
-            <>
+            <div className="mt-4 flex flex-col gap-2">
               <PolaroidPreviewCard
                 viewerName={viewerName}
                 viewerAvatar={viewerAvatar}
@@ -558,33 +461,28 @@ export function PublicProfileCompatibilitySheet({
                 chemistryScore={chemistryScore}
                 matchItems={matchItems}
               />
-              <div className="mt-3 flex gap-2">
+              <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={handleShare}
                   disabled={sharing}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-[14px] py-2.5 text-[13px] font-semibold transition-opacity active:opacity-70 disabled:opacity-50"
-                  style={{
-                    background: 'var(--color-accent-bg-subtle)',
-                    border: '1px solid var(--color-accent-border-soft)',
-                    color: 'var(--color-accent-dark)',
-                  }}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-full border py-3 text-[14px] font-bold transition-opacity active:opacity-70 disabled:opacity-50"
+                  style={{ borderColor: '#DEE4EC', color: '#25313D' }}
                 >
-                  <Download size={13} />
+                  <Download size={16} />
                   {sharing ? '저장 중…' : '저장'}
                 </button>
                 <button
                   type="button"
                   onClick={handleShare}
                   disabled={sharing}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-[14px] py-2.5 text-[13px] font-semibold text-white transition-opacity active:opacity-70 disabled:opacity-50"
-                  style={{ background: 'linear-gradient(135deg, #1D4ED8, #7C3AED)' }}
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-black py-3 text-[14px] font-bold text-white transition-opacity active:opacity-70 disabled:opacity-50"
                 >
-                  <Share2 size={13} />
+                  <Share2 size={16} />
                   {sharing ? '공유 중…' : '공유'}
                 </button>
               </div>
-            </>
+            </div>
           )}
         </>
       ),
@@ -592,7 +490,7 @@ export function PublicProfileCompatibilitySheet({
     {
       index: 2,
       content: (
-        <p className="text-[14px] font-semibold leading-[1.6]" style={{ color: 'var(--color-text-primary)' }}>
+        <p className="text-[14px] font-medium leading-[1.5]" style={{ color: '#25313D' }}>
           {report.opener}
         </p>
       ),
@@ -600,7 +498,7 @@ export function PublicProfileCompatibilitySheet({
     {
       index: 3,
       content: (
-        <p className="text-[13px] leading-[1.7]" style={{ color: 'var(--color-text-secondary)' }}>
+        <p className="text-[14px] font-medium leading-[1.5]" style={{ color: '#25313D' }}>
           {report.chemistry}
         </p>
       ),
@@ -608,7 +506,7 @@ export function PublicProfileCompatibilitySheet({
     {
       index: 4,
       content: (
-        <p className="text-[13px] leading-[1.7]" style={{ color: 'var(--color-text-secondary)' }}>
+        <p className="text-[14px] font-medium leading-[1.5]" style={{ color: '#25313D' }}>
           {report.fit}
         </p>
       ),
@@ -616,7 +514,7 @@ export function PublicProfileCompatibilitySheet({
     {
       index: 5,
       content: (
-        <p className="text-[13px] leading-[1.7]" style={{ color: 'var(--color-text-secondary)' }}>
+        <p className="text-[14px] font-medium leading-[1.5]" style={{ color: '#25313D' }}>
           {report.caution}
         </p>
       ),
@@ -625,48 +523,44 @@ export function PublicProfileCompatibilitySheet({
 
   return (
     <BottomSheet open={open} onClose={onClose}>
-      <div className="px-5 pb-6">
+      <div className="px-4 pb-6">
 
         {/* 헤더 */}
-        <div className="mb-4">
-          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color: 'var(--color-text-tertiary)' }}>
-            <Sparkles size={14} />
-            <span>Compatibility Report</span>
-          </div>
-          <h3 className="mt-2 text-[24px] font-black leading-[1.2]" style={{ color: 'var(--color-text-primary)' }}>
+        <div className="mb-6 flex items-center gap-1">
+          <button type="button" onClick={onClose} className="-ml-1 flex items-center justify-center p-1" style={{ color: '#0D0D0D' }}>
+            <ChevronLeft size={20} />
+          </button>
+          <h3 className="text-[22px] font-bold tracking-[-0.03em]" style={{ color: '#0D0D0D' }}>
             케미 리포트
           </h3>
         </div>
 
         {/* 분석 완성도 */}
-        <div className="mb-5 rounded-[16px] px-4 py-3.5" style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-default)' }}>
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-[13px] font-bold" style={{ color: 'var(--color-text-primary)' }}>
-              케미가 {completenessPercent}%만 분석됐어요
-            </span>
+        <div className="mb-6 rounded-[12px] p-4" style={{ background: '#F0F5FF', border: '1px solid #CCDDFF' }}>
+          <p className="text-[14px] font-bold" style={{ color: '#0D0D0D' }}>
+            캐미가 <span style={{ color: '#25313D' }}>{completenessPercent}%</span> 분석됐어요
+          </p>
+          <div className="mt-4 h-1 w-full overflow-hidden rounded-full" style={{ background: completenessPercent > 0 ? '#DEE4EC' : '#CCDDFF' }}>
+            {completenessPercent > 0 && (
+              <div
+                className="h-full rounded-full transition-all duration-700"
+                style={{ width: `${completenessPercent}%`, background: '#25313D' }}
+              />
+            )}
           </div>
-          <div className="h-1.5 w-full overflow-hidden rounded-full" style={{ background: 'var(--color-border-default)' }}>
-            <div
-              className="h-full rounded-full transition-all duration-700"
-              style={{
-                width: `${completenessPercent}%`,
-                background: 'linear-gradient(90deg, var(--color-accent-light), var(--color-accent-dark))',
-              }}
-            />
-          </div>
-          {missingItems.length > 0 && (
+          {report && missingItems.length > 0 && (
             <>
-              <p className="mt-2.5 text-[11px] leading-relaxed" style={{ color: 'var(--color-text-tertiary)' }}>
+              <p className="mt-4 text-[14px] font-medium leading-[1.5]" style={{ color: '#25313D' }}>
                 아래 정보가 부족해서 일부 케미를 분석하지 못했어요. 채우면 더 정확한 결과를 볼 수 있어요.
               </p>
-              <div className="mt-2 flex flex-wrap gap-1.5">
+              <div className="mt-3 flex flex-wrap gap-1.5">
                 {missingItems.map((item) => (
                   <span
                     key={item}
-                    className="rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
-                    style={{ background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)' }}
+                    className="rounded-[8px] border px-2.5 py-1.5 text-[14px] font-medium"
+                    style={{ background: '#fff', borderColor: '#DEE4EC', color: '#25313D' }}
                   >
-                    + {item}
+                    {item}
                   </span>
                 ))}
               </div>
@@ -681,22 +575,23 @@ export function PublicProfileCompatibilitySheet({
               const meta = BLOCK_META[index - 1]
               const blockMissing = lockedBlockMap[index]
               const isLocked = blockMissing !== undefined
-              const Icon = meta.Icon
 
               return (
                 <div
                   key={index}
-                  className="relative overflow-hidden rounded-[22px] px-4 py-4"
-                  style={{ border: '1px solid var(--color-border-default)', background: 'var(--color-bg-surface)' }}
+                  className="relative overflow-hidden rounded-[12px] px-4"
+                  style={{ border: '0.66px solid #DEE4EC' }}
                 >
-                  <div
-                    className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.1em]"
-                    style={{ color: 'var(--color-text-tertiary)' }}
-                  >
-                    <Icon size={12} />
-                    <span>{meta.label}</span>
-                  </div>
-                  <div style={isLocked ? { filter: 'blur(4px)', userSelect: 'none', pointerEvents: 'none' } : {}}>
+                  <div className="py-4" style={isLocked ? { filter: 'blur(8px)', userSelect: 'none', pointerEvents: 'none' } : undefined}>
+                    <div className="mb-1 flex items-center gap-1">
+                      <span
+                        className="flex h-4 w-4 items-center justify-center rounded-[4px] text-[10px] font-semibold"
+                        style={{ background: '#F0F5FF', color: '#25313D' }}
+                      >
+                        {index}
+                      </span>
+                      <span className="text-[14px] font-bold" style={{ color: '#0D0D0D' }}>{meta.label}</span>
+                    </div>
                     {content}
                   </div>
                   {isLocked && <LockedBlockOverlay missingItems={blockMissing} />}
@@ -705,17 +600,16 @@ export function PublicProfileCompatibilitySheet({
             })}
           </div>
         ) : (
-          <div
-            className="rounded-[22px] px-5 py-8 text-center"
-            style={{ border: '1px solid var(--color-border-default)', background: 'var(--color-bg-surface)' }}
-          >
-            <p className="text-[13px] leading-[1.7]" style={{ color: 'var(--color-text-secondary)' }}>
-              {profileName}님의 프로필 정보가 아직 부족해서 케미를 분석할 수 없어요.
+          <div className="flex flex-col items-center gap-3 py-8">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/kemi/empty-state-icon.svg" alt="" className="size-12" />
+            <p className="text-center text-[14px] font-semibold leading-[1.35]" style={{ color: '#6C7786' }}>
+              {profileName}님의 프로필 정보가 아직 부족해서<br />케미를 분석할 수 없어요
             </p>
           </div>
         )}
 
-        {/* [임시] 폴라로이드 캡처용 오프스크린 카드 */}
+        {/* [임시] 카드 캡처용 오프스크린 카드 */}
         <PolaroidCard
           cardRef={polaroidRef}
           viewerName={viewerName}

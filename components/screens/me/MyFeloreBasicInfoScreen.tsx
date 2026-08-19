@@ -481,10 +481,16 @@ export function BasicInfoEditScreen({
     }
 
     const reader = new FileReader()
+    reader.onerror = () => showToast('사진을 불러오지 못했어요', 'error')
     reader.onload = () => {
       if (typeof reader.result === 'string') {
         const img = new Image()
+        img.onerror = () => showToast('사진을 불러오지 못했어요', 'error')
         img.onload = () => {
+          if (!img.width || !img.height) {
+            showToast('사진을 불러오지 못했어요', 'error')
+            return
+          }
           setCropNaturalSize({ width: img.width, height: img.height })
           const initialLayout = getCropImageLayout(img.width, img.height, cropStage)
           const initialFrame = getDefaultCropFrame(initialLayout)
@@ -583,14 +589,18 @@ export function BasicInfoEditScreen({
 
   const handleApplyCrop = async () => {
     if (!cropSource) return
-    const cropped = await renderCroppedImage(cropSource, cropNaturalSize, cropImageLayout, cropFrame)
-    setProfileImages((prev) => {
-      const next = [...prev]
-      next[0] = cropped
-      return next
-    })
-    setCropOpen(false)
-    showToast('사진이 적용됐어요')
+    try {
+      const cropped = await renderCroppedImage(cropSource, cropNaturalSize, cropImageLayout, cropFrame)
+      setProfileImages((prev) => {
+        const next = [...prev]
+        next[0] = cropped
+        return next
+      })
+      setCropOpen(false)
+      showToast('사진이 적용됐어요')
+    } catch {
+      showToast('사진을 적용하지 못했어요. 다시 시도해주세요', 'error')
+    }
   }
 
   return (
@@ -795,7 +805,7 @@ export function BasicInfoEditScreen({
       </div>
 
       {cropOpen && (
-        <div className="absolute inset-0 z-50 bg-black text-white">
+        <div className="fixed inset-0 z-50 bg-black text-white">
           <div className="flex h-full flex-col">
             <div className="flex items-center justify-between px-5 pt-5 pb-3">
               <button onClick={() => setCropOpen(false)} className="text-[15px] font-medium text-white/86">취소</button>

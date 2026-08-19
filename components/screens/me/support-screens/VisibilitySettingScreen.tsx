@@ -1,5 +1,6 @@
 'use client'
 
+import { motion } from 'framer-motion'
 import { NavBar, showToast } from '@/components/ui'
 import type { TabVisibility, TabVisibilityLevel } from '@/types'
 
@@ -11,23 +12,28 @@ const SECTIONS: Array<{ id: keyof TabVisibility; label: string; desc: string }> 
 
 function VisibilityToggle({ checked, onClick }: { checked: boolean; onClick: () => void }) {
   return (
-    <button
+    <motion.button
       type="button"
       role="switch"
       aria-checked={checked}
       onClick={onClick}
-      className={[
-        'relative flex h-[28px] w-[68px] flex-shrink-0 items-center rounded-full p-[2px] transition-colors',
-        checked ? 'justify-end bg-black' : 'justify-start bg-[#dee4ec]',
-      ].join(' ')}
+      className="relative h-[28px] w-[68px] flex-shrink-0 overflow-hidden rounded-full p-[2px]"
+      animate={{ backgroundColor: checked ? '#000000' : '#dee4ec' }}
+      transition={{ duration: 0.15 }}
     >
-      {checked && (
-        <span className="pointer-events-none absolute left-[2px] flex h-[24px] w-[32px] items-center justify-center text-[12px] font-medium tracking-[-0.24px] text-white">
-          공개
-        </span>
-      )}
-      <span className="h-[24px] w-[32px] rounded-full bg-white" />
-    </button>
+      <motion.span
+        className="pointer-events-none absolute left-[2px] top-1/2 flex h-[24px] w-[32px] -translate-y-1/2 items-center justify-center text-[12px] font-medium tracking-[-0.24px] text-white"
+        animate={{ opacity: checked ? 1 : 0 }}
+        transition={{ duration: 0.15 }}
+      >
+        공개
+      </motion.span>
+      <motion.span
+        className="absolute top-1/2 h-[24px] w-[32px] -translate-y-1/2 rounded-full bg-white"
+        animate={{ left: checked ? 34 : 2 }}
+        transition={{ type: 'spring', stiffness: 500, damping: 34 }}
+      />
+    </motion.button>
   )
 }
 

@@ -425,11 +425,17 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
   const [codeError, setCodeError] = useState(false)
   const ocrResult = MOCK_OCR_EDUCATION
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     e.target.value = ''
     if (!file) return
+    setSelectedFile(file)
+  }
+
+  const handleStartOcr = () => {
+    if (!selectedFile) return
     setStep('loading-ocr')
   }
 
@@ -582,20 +588,15 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/images/ai-tools/edu-photo-dropzone.svg" alt="" className="h-6 w-[30.667px]" />
               <div className="flex flex-col items-center gap-1 text-center text-[14px]">
-                <p className="font-bold text-[#475058]">졸업증명서 업로드</p>
-                <p className="font-medium text-[#6C7786]">PDF / JPG / PNG</p>
+                <p className="font-bold text-[#475058]">{selectedFile ? selectedFile.name : '졸업증명서 업로드'}</p>
+                <p className="font-medium text-[#6C7786]">{selectedFile ? '다른 파일을 선택하려면 탭하세요' : 'PDF / JPG / PNG'}</p>
+                {!selectedFile && <p className="font-medium text-[#A8B1BD]">탭하여 업로드</p>}
               </div>
             </button>
           </div>
 
           <div className="mt-8 pb-2">
-            <Button onClick={() => fileInputRef.current?.click()}>
-              <span className="flex items-center justify-center gap-1.5">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/ai-tools/edu-plus-icon.svg" alt="" className="h-[14.5px] w-[14.5px]" />
-                학력 추가
-              </span>
-            </Button>
+            <Button onClick={handleStartOcr} disabled={!selectedFile}>업로드하기</Button>
           </div>
         </div>
       </div>
@@ -638,7 +639,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
           </div>
         </div>
         <div className="px-5 pb-6">
-          <Button onClick={() => setStep('upload')}>다시 업로드</Button>
+          <Button onClick={() => { setSelectedFile(null); setStep('upload') }}>다시 업로드</Button>
         </div>
       </div>
     )

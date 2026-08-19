@@ -109,7 +109,7 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
 
   if (step === 'identity') {
     return (
-      <div className="flex flex-col h-full">
+      <div className="fixed inset-0 z-[100] flex flex-col bg-white">
         <NavBar title="" onBack={onBack} onClose={onBack} />
         <div className="flex-1 overflow-y-auto px-5 py-6">
           <div className="mb-10 flex flex-col gap-2">
@@ -124,7 +124,7 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
             <div className="flex flex-col gap-3 rounded-[24px] border border-[#DEE4EC] p-4">
               {NHIS_INTRO_STEPS.map((label, i) => (
                 <div key={label} className="flex items-center gap-1.5">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#F0F5FF] text-[12.5px] font-semibold text-[#0657FF]">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#0D0D0D] text-[12.5px] font-semibold text-white">
                     {i + 1}
                   </span>
                   <p className="text-[14px] font-medium text-[#475058]">{label}</p>
@@ -157,7 +157,7 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
 
   if (step === 'loading') {
     return (
-      <div className="flex flex-col h-full">
+      <div className="fixed inset-0 z-[100] flex flex-col bg-white">
         <NavBar title="" onBack={onBack} onClose={onBack} />
         <div className="px-5 pt-2">
           <h1 className="text-[22px] font-bold text-[#0D0D0D]">경력 인증</h1>
@@ -173,7 +173,7 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
 
   if (step === 'select') {
     return (
-      <div className="flex flex-col h-full">
+      <div className="fixed inset-0 z-[100] flex flex-col bg-white">
         <NavBar title="" onBack={() => setStep('identity')} onClose={onBack} />
         <div className="px-5 pt-2 pb-5">
           <h1 className="text-[22px] font-bold text-[#0D0D0D]">경력 인증</h1>
@@ -226,7 +226,7 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
         </div>
         <div className="px-5 pb-6">
           <Button onClick={foundCareers.length === 0 ? onBack : handleConfirm}>
-            {foundCareers.length === 0 ? '확인' : `선택한 ${foundCareers.length}개 경력 가져오기`}
+            {foundCareers.length === 0 ? '확인' : `선택한 ${selected.size}개 경력 가져오기`}
           </Button>
         </div>
       </div>
@@ -234,7 +234,7 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="fixed inset-0 z-[100] flex flex-col bg-white">
       <NavBar title="" onBack={onBack} onClose={onBack} />
       <div className="flex flex-1 flex-col items-center justify-center gap-6 px-5 text-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}

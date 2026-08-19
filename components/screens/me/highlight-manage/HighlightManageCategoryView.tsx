@@ -1,4 +1,4 @@
-import { BadgeCheck, Mail, Upload } from 'lucide-react'
+import { Mail, Plus, Upload } from 'lucide-react'
 import { Button, NavBar, showToast } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { getHighlightMetaParts, isPrimaryHighlight } from '@/lib/highlightMeta'
@@ -6,6 +6,25 @@ import type { Highlight, HighlightIconId } from '@/types'
 import type { HighlightManageCategory } from './constants'
 
 const VERIFIABLE_CATEGORIES = new Set(['career-role', 'education-history'])
+
+function VerifyButton({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex w-full items-center justify-center gap-2.5 rounded-[10px] bg-white py-3 pl-3 pr-4"
+      style={{
+        border: '1px solid transparent',
+        backgroundImage: 'linear-gradient(#fff, #fff), linear-gradient(90deg, #00ADFF, #0657FF)',
+        backgroundOrigin: 'border-box',
+        backgroundClip: 'padding-box, border-box',
+      }}
+    >
+      {icon}
+      <span className="text-[14px] font-bold text-[#0D0D0D]">{label}</span>
+    </button>
+  )
+}
 
 interface HighlightManageCategoryViewProps {
   selectedCat: HighlightManageCategory
@@ -39,90 +58,74 @@ export function HighlightManageCategoryView({
       <NavBar title={`${selectedCat.label} 관리`} onBack={onBack} />
 
       <div className="flex-1 overflow-y-auto px-5 py-5">
-        <div className="surface-card mb-4 rounded-[26px] px-4 py-4">
-          <div className="flex items-center gap-3">
-            <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--color-bg-muted)] text-[var(--color-text-strong)]">
-              <HighlightIcon id={selectedCat.icon as HighlightIconId} size={16} />
+        <div className="mb-6 flex flex-col gap-5 rounded-[24px] border border-[#DEE4EC] p-4">
+          <div className="flex items-start gap-3">
+            <span className="flex size-10 shrink-0 items-center justify-center text-[#25313D]">
+              <HighlightIcon id={selectedCat.icon as HighlightIconId} size={24} />
             </span>
             <div className="flex-1 min-w-0">
-              <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{selectedCat.label}</div>
-              <div className="micro-text">여러 항목을 추가하고 메인으로 보여줄 항목을 선택할 수 있어요</div>
+              <p className="text-[14px] font-semibold text-[#0D0D0D]">{selectedCat.label}</p>
+              <p className="mt-1 text-[12px] font-medium text-[#475058]">여러 항목을 추가하고 메인으로 보여줄 항목을 선택할 수 있어요.</p>
             </div>
           </div>
           {isVerifiable && onVerify && selectedCat.id === 'career-role' && (
-            <button
+            <VerifyButton
               onClick={() => onVerify()}
-              className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-[14px] py-2.5 text-[13px] font-semibold"
-              style={{ background: 'var(--color-accent-bg-subtle)', border: '1px solid var(--color-accent-border-soft)', color: 'var(--color-accent-dark)' }}
-            >
-              <BadgeCheck size={14} />
-              건강보험공단으로 경력 인증
-            </button>
+              icon={<img src="/images/ai-tools/exp-security.svg" alt="" className="h-4 w-[13px]" />}
+              label="건강보험 공단으로 경력 인증"
+            />
           )}
           {isVerifiable && onVerify && selectedCat.id === 'education-history' && (
-            <div className="mt-3 flex flex-col gap-2">
-              <button
-                onClick={() => onVerify('ocr')}
-                className="flex w-full items-center justify-center gap-1.5 rounded-[14px] py-2.5 text-[13px] font-semibold"
-                style={{ background: 'var(--color-accent-bg-subtle)', border: '1px solid var(--color-accent-border-soft)', color: 'var(--color-accent-dark)' }}
-              >
-                <Upload size={14} />
-                졸업증명서로 학력 확인
-              </button>
-              <button
-                onClick={() => onVerify('email')}
-                className="flex w-full items-center justify-center gap-1.5 rounded-[14px] py-2.5 text-[13px] font-semibold"
-                style={{ background: 'var(--color-accent-bg-subtle)', border: '1px solid var(--color-accent-border-soft)', color: 'var(--color-accent-dark)' }}
-              >
-                <Mail size={14} />
-                학교 이메일로 학력 확인
-              </button>
+            <div className="flex flex-col gap-2">
+              <VerifyButton onClick={() => onVerify('ocr')} icon={<Upload size={16} className="text-[#0657FF]" />} label="졸업증명서로 학력 확인" />
+              <VerifyButton onClick={() => onVerify('email')} icon={<Mail size={16} className="text-[#0657FF]" />} label="학교 이메일로 학력 확인" />
             </div>
           )}
         </div>
 
+        <p className="mb-3 text-[16px] font-bold text-[#0D0D0D]">전체 {selectedCat.label}</p>
+
         {selectedCategoryHighlights.length > 0 ? (
-          <div className="space-y-3">
-            {selectedCategoryHighlights.map((item) => {
+          <div className="rounded-[24px] border border-[#DEE4EC] px-4">
+            {selectedCategoryHighlights.map((item, index) => {
               const isEditable = editableHighlightIds.has(item.id)
               const metaParts = getHighlightMetaParts(item)
+              const isPrimary = isPrimaryHighlight(item, primaryHighlightId)
 
               return (
-                <div key={item.id} className="surface-card rounded-[24px] p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5">
-                        <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{item.title}</div>
-                        {item.verified && <BadgeCheck size={14} className="shrink-0 text-[var(--color-accent)]" />}
+                <div
+                  key={item.id}
+                  className={[
+                    'flex flex-col gap-3 py-4',
+                    index < selectedCategoryHighlights.length - 1 ? 'border-b border-[#DEE4EC]' : '',
+                  ].join(' ')}
+                >
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex min-w-0 items-center gap-1">
+                        <p className="truncate text-[14px] font-semibold text-[#0D0D0D]">{item.title}</p>
+                        {item.verified && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src="/images/ai-tools/exp-verified-badge.svg" alt="" className="h-3 w-3 shrink-0" />
+                        )}
                       </div>
-                      {metaParts.length > 0 && (
-                        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
-                          {metaParts.map((part, partIndex) => (
-                            <span
-                              key={`${item.id}-group-meta-${partIndex}`}
-                              className={`text-[11px] ${partIndex === 0 ? 'font-semibold text-[var(--color-text-secondary)]' : 'text-[var(--color-text-tertiary)]'}`}
-                            >
-                              {part}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                      {item.description?.trim() && (
-                        <p className="mt-3 text-[14px] leading-7 text-[var(--color-text-secondary)]">{item.description}</p>
+                      {isPrimary ? (
+                        <span className="shrink-0 rounded-[6px] bg-[#F0F5FF] px-1.5 py-1 text-[12px] font-bold text-[#25313D]">메인 노출 중</span>
+                      ) : (
+                        <button
+                          onClick={() => onSetPrimary(item.id)}
+                          className="shrink-0 rounded-[6px] border border-[#DEE4EC] bg-white px-1.5 py-1 text-[12px] font-medium text-[#25313D]"
+                        >
+                          메인으로 설정
+                        </button>
                       )}
                     </div>
-                    {isPrimaryHighlight(item, primaryHighlightId) ? (
-                      <span className="rounded-full bg-[var(--color-state-success-bg)] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-state-success-text)]">메인 노출 중</span>
-                    ) : (
-                      <button
-                        onClick={() => onSetPrimary(item.id)}
-                        className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[11px] font-semibold text-[var(--color-text-secondary)]"
-                      >
-                        메인으로 설정
-                      </button>
+                    {metaParts.length > 0 && <p className="text-[12px] font-semibold text-[#6C7786]">{metaParts.join(' · ')}</p>}
+                    {item.description?.trim() && (
+                      <p className="mt-1 text-[14px] leading-[1.6] text-[#475058]">{item.description}</p>
                     )}
                   </div>
-                  <div className="mt-4 flex gap-2">
+                  <div className="flex gap-1">
                     <button
                       onClick={() => {
                         if (isEditable) {
@@ -131,7 +134,7 @@ export function HighlightManageCategoryView({
                         }
                         showToast('기본 목업 항목은 수정하지 않습니다', 'error')
                       }}
-                      className="rounded-lg border border-[var(--color-border-default)] bg-[var(--color-bg-muted)] px-3 py-1.5 text-xs font-medium text-[var(--color-text-secondary)]"
+                      className="rounded-[6px] border border-[#DEE4EC] bg-white px-3 py-1.5 text-[12px] font-bold text-[#25313D]"
                     >
                       수정
                     </button>
@@ -143,7 +146,7 @@ export function HighlightManageCategoryView({
                         }
                         showToast('기본 목업 항목은 삭제하지 않습니다', 'error')
                       }}
-                      className="rounded-lg border border-[var(--color-state-danger-bg)] px-3 py-1.5 text-xs font-medium text-[var(--color-state-danger-text)]"
+                      className="rounded-[6px] border border-[#DEE4EC] bg-white px-3 py-1.5 text-[12px] font-bold text-[#FF4242]"
                     >
                       삭제
                     </button>
@@ -153,14 +156,21 @@ export function HighlightManageCategoryView({
             })}
           </div>
         ) : (
-          <div className="rounded-[22px] border border-dashed border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-10 text-center text-sm text-[var(--color-text-tertiary)]">
-            아직 추가한 {selectedCat.label.toLowerCase()} 항목이 없어요
+          <div className="flex flex-col items-center gap-6 rounded-[24px] py-6">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/ai-tools/exp-empty-icon.svg" alt="" className="h-12 w-12" />
+            <p className="text-[14px] font-semibold text-[#6C7786]">아직 등록된 {selectedCat.label} 항목이 없어요</p>
           </div>
         )}
       </div>
 
-      <div className="border-t border-[var(--color-border-soft)] px-5 py-4">
-        <Button onClick={onAdd}>+ {selectedCat.label} 추가</Button>
+      <div className="px-5 pb-6">
+        <Button onClick={onAdd}>
+          <span className="flex items-center justify-center gap-1.5">
+            <Plus size={18} />
+            {selectedCat.label} 추가
+          </span>
+        </Button>
       </div>
     </div>
   )

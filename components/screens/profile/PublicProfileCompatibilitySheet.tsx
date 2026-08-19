@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { ChevronLeft, Download, Share2, Sparkles } from 'lucide-react'
+import { ChevronLeft, Download, Share2 } from 'lucide-react'
 import { BottomSheet, showToast } from '@/components/ui'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import type { KemiData, PublicProfileLife, PublicProfileWhoIAm } from '@/types'
@@ -154,10 +154,12 @@ function PolaroidCard({
         padding: '24px',
       }}>
         <div style={{
-          position: 'absolute', left: 0, top: 0,
+          position: 'absolute', left: '50%', top: 0, transform: 'translateX(-50%)',
           background: '#FFFFFF', borderBottomLeftRadius: '6px', borderBottomRightRadius: '6px',
           padding: '4px 6px', display: 'flex', alignItems: 'center', gap: '2px',
         }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/kemi/report-badge-icon.svg" alt="" style={{ width: 12, height: 12 }} />
           <span style={{ fontSize: '12px', fontWeight: 700, color: '#25313D' }}>Kemi Report</span>
         </div>
 
@@ -250,7 +252,7 @@ function PolaroidPreviewCard({
           className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-25"
           style={{ mixBlendMode: 'color-dodge' }}
         />
-        <div className="absolute left-0 top-0 flex items-center gap-0.5 rounded-bl-[6px] rounded-br-[6px] bg-white px-1.5 py-1">
+        <div className="absolute left-1/2 top-0 flex -translate-x-1/2 items-center gap-0.5 rounded-bl-[6px] rounded-br-[6px] bg-white px-1.5 py-1">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/images/kemi/report-badge-icon.svg" alt="" className="size-3" />
           <span className="text-[12px] font-bold" style={{ color: '#25313D' }}>Kemi Report</span>
@@ -440,7 +442,8 @@ export function PublicProfileCompatibilitySheet({
                 color: '#0D0D0D',
               }}
             >
-              <Sparkles size={16} style={{ color: '#0657FF' }} />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/kemi/report-badge-icon.svg" alt="" className="size-4" />
               케미카드 만들기
             </button>
           )}

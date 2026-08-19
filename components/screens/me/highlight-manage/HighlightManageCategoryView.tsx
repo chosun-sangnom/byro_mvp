@@ -52,6 +52,8 @@ export function HighlightManageCategoryView({
   onVerify,
 }: HighlightManageCategoryViewProps) {
   const isVerifiable = VERIFIABLE_CATEGORIES.has(selectedCat.id)
+  // 명시적으로 메인 설정된 항목이 없으면 최상단 항목을 기본 메인으로 표시
+  const effectivePrimaryId = primaryHighlightId ?? selectedCategoryHighlights[0]?.id
 
   return (
     <div className="flex flex-col h-full">
@@ -90,7 +92,7 @@ export function HighlightManageCategoryView({
             {selectedCategoryHighlights.map((item, index) => {
               const isEditable = editableHighlightIds.has(item.id)
               const metaParts = getHighlightMetaParts(item)
-              const isPrimary = isPrimaryHighlight(item, primaryHighlightId)
+              const isPrimary = isPrimaryHighlight(item, effectivePrimaryId)
 
               return (
                 <div

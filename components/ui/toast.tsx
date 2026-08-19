@@ -36,23 +36,25 @@ function ToastIcon({ variant }: { variant: ToastVariant }) {
 
 function ToastViewport({ messages }: { messages: Array<{ id: number; msg: string; variant: ToastVariant }> }) {
   return (
-    <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-2 z-[200] pointer-events-none px-4">
-      <AnimatePresence>
-        {messages.map(({ id, msg, variant }) => (
-          <motion.div
-            key={id}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 8 }}
-            transition={{ duration: 0.2 }}
-            className="flex items-center gap-2.5 text-sm font-semibold px-4 py-3 rounded-full shadow-lg max-w-[320px]"
-            style={{ backgroundColor: '#27272B', color: '#fff' }}
-          >
-            <ToastIcon variant={variant} />
-            <span className="truncate">{msg}</span>
-          </motion.div>
-        ))}
-      </AnimatePresence>
+    <div className="pointer-events-none fixed inset-x-0 bottom-6 z-[200] px-4">
+      <div className="mx-auto flex w-full max-w-[430px] flex-col items-center gap-2">
+        <AnimatePresence>
+          {messages.map(({ id, msg, variant }) => (
+            <motion.div
+              key={id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 8 }}
+              transition={{ duration: 0.2 }}
+              className="flex items-center gap-2.5 text-sm font-semibold px-4 py-3 rounded-full shadow-lg max-w-[320px]"
+              style={{ backgroundColor: '#27272B', color: '#fff' }}
+            >
+              <ToastIcon variant={variant} />
+              <span className="truncate">{msg}</span>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
     </div>
   )
 }

@@ -68,10 +68,7 @@ export function HighlightManageScreen({
     : [...SAMPLE_PROFILE.manualHighlights, ...store.highlights]
   const editableHighlightIds = new Set(allManualHighlights.map((h) => h.id))
   const selectedCategoryHighlights = selectedCat
-    ? sortHighlightsByPrimary(
-        allManualHighlights.filter((item) => item.categoryId === selectedCat.id),
-        store.primaryHighlightOverrides[selectedCat.id],
-      )
+    ? allManualHighlights.filter((item) => item.categoryId === selectedCat.id)
     : []
   const groupedCategoryCards = buildGroupedCategoryCards(allManualHighlights, store.primaryHighlightOverrides)
   const freeRemaining = Math.max(0, HIGHLIGHT_FREE_LIMIT - allManualHighlights.length)

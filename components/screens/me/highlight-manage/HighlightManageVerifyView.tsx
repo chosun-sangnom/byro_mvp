@@ -735,7 +735,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
               onChange={(e) => setEmailInput(e.target.value)}
               placeholder="예: hong@korea.ac.kr"
               className={[
-                'w-full rounded-[10px] border bg-white px-3 py-3 text-[14px] text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]',
+                'w-full rounded-full border bg-white px-4 py-3 text-[14px] text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]',
                 emailError ? 'border-[#FF4242]' : 'border-[#DEE4EC]',
               ].join(' ')}
             />
@@ -805,7 +805,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
                 onChange={(e) => { setCodeInput(e.target.value.replace(/\D/g, '')); setCodeError(false) }}
                 placeholder="인증코드 6자리"
                 className={[
-                  'w-full rounded-[10px] border bg-white px-3 py-3 text-[14px] text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]',
+                  'w-full rounded-full border bg-white px-4 py-3 text-[14px] text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]',
                   codeError ? 'border-[#FF4242]' : 'border-[#DEE4EC]',
                 ].join(' ')}
               />

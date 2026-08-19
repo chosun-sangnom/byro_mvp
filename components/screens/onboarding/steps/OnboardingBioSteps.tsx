@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { ChevronRight, Images, Network, UserSearch } from 'lucide-react'
+import { Brain, ChevronRight, Images, Network, Sparkles, UserSearch } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { Button } from '@/components/ui'
 
@@ -67,9 +67,9 @@ function CardHeader({ label, title, badge }: { label: string; title: string; bad
 function PreviewBasicInfo() {
   return (
     <MenuCard>
-      <MenuRow icon="🧠" title="MBTI" sub="예: ENFP · 재기발랄한 활동가" trailing={<ChevronRight size={24} className="flex-shrink-0 text-[#A8B1BD]" />} />
+      <MenuRow icon={<Brain size={18} className="text-[#6C7786]" />} title="MBTI" sub="예: ENFP · 재기발랄한 활동가" trailing={<ChevronRight size={24} className="flex-shrink-0 text-[#A8B1BD]" />} />
       <MenuDivider />
-      <MenuRow icon="✨" title="성향" sub="관계·소통 스타일을 알려줘요" trailing={<ChevronRight size={24} className="flex-shrink-0 text-[#A8B1BD]" />} />
+      <MenuRow icon={<Sparkles size={18} className="text-[#6C7786]" />} title="성향" sub="관계·소통 스타일을 알려줘요" trailing={<ChevronRight size={24} className="flex-shrink-0 text-[#A8B1BD]" />} />
     </MenuCard>
   )
 }
@@ -120,7 +120,7 @@ function PreviewLife() {
     </div>
   )
   return (
-    <div className="flex h-[220px] w-full gap-1">
+    <div className="flex h-[293px] w-[242px] gap-1">
       <div className="grid flex-[1.3] grid-rows-3 gap-1">
         <Cell src="/images/onboarding-guide/vibe-book.png" color="#0657FF" label="책" name="보통의 언어들" sub="김하나" className="" />
         <div className="grid grid-cols-2 gap-1">
@@ -191,8 +191,23 @@ function PreviewNetwork() {
   return (
     <div className="w-full rounded-[12px] border border-[#DEE4EC] p-4">
       <CardHeader label="리멤버 네트워크" title="명함 기반 관계 네트워크" badge="총 247명" />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src="/images/onboarding-guide/network-chart.png" alt="" className="w-full rounded-[8px] object-cover" />
+      <svg viewBox="0 0 280 110" className="w-full" fill="none">
+        <polyline points="0,70 40,90 80,60 120,75 160,50 200,85 240,20 280,60" stroke="#0657FF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        <polyline points="0,55 40,80 80,70 120,55 160,65 200,45 240,55 280,50" stroke="#25313D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
+        <polyline points="0,90 40,60 80,85 120,65 160,80 200,60 240,75 280,70" stroke="#A8B1BD" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <div className="mt-3 flex items-center gap-3">
+        {[
+          { color: '#0657FF', label: 'IT/테크', count: 112 },
+          { color: '#25313D', label: '금융/투자', count: 94 },
+          { color: '#A8B1BD', label: '교육/연구', count: 53 },
+        ].map((item) => (
+          <div key={item.label} className="flex items-center gap-1">
+            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: item.color }} />
+            <span className="text-[11px] font-medium text-[#6C7786]">{item.label} {item.count}명</span>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

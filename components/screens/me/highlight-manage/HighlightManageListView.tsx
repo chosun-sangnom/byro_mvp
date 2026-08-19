@@ -67,10 +67,16 @@ export function HighlightManageListView({
             <button
               type="button"
               onClick={onLlmImport}
-              className="flex w-full items-center justify-center gap-1.5 rounded-[10px] border border-[#DEE4EC] py-3 pl-3 pr-4"
+              className="flex w-full items-center justify-center gap-1.5 rounded-[10px] bg-white py-3 pl-3 pr-4"
+              style={{
+                border: '1px solid transparent',
+                backgroundImage: 'linear-gradient(#fff, #fff), linear-gradient(90deg, #00ADFF, #0657FF)',
+                backgroundOrigin: 'border-box',
+                backgroundClip: 'padding-box, border-box',
+              }}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/ai-tools/sparkle-dark.svg" alt="" className="h-5 w-5" />
+              <img src="/images/ai-tools/sparkle-highlight-btn.svg" alt="" className="h-5 w-5" />
               <span className="text-[14px] font-bold text-[#0D0D0D]">스크린샷으로 경력 · 학력 자동 채우기</span>
             </button>
           </div>

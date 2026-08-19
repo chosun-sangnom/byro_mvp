@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, type ChangeEvent, type PointerEvent } from 'react'
-import { Calendar, Copy, Check, Image as ImageIcon, Info, Sparkles } from 'lucide-react'
+import { Calendar, Image as ImageIcon, Info, Sparkles } from 'lucide-react'
 import {
   BIRTH_TIME_OPTIONS,
   BirthDateCalendar,
@@ -116,76 +116,74 @@ function AiPersonalitySheet({
     window.open(tool.url(promptText), '_blank')
   }
 
+  const handlePasteFromClipboard = async () => {
+    try {
+      const text = await navigator.clipboard.readText()
+      if (text) setPastedText(text)
+    } catch {
+      showToast('클립보드를 읽지 못했어요. 직접 붙여넣어 주세요', 'error')
+    }
+  }
+
   return (
     <BottomSheet open={open} onClose={onClose}>
-      <div className="px-5 pb-6 space-y-5">
+      <div className="px-4 pb-6 flex flex-col gap-6">
         {/* 헤더 */}
-        <div>
-          <p className="text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color: 'var(--color-text-tertiary)' }}>
-            AI 도움받기
-          </p>
-          <h3 className="mt-1.5 text-[22px] font-black leading-[1.2]" style={{ color: 'var(--color-text-primary)' }}>
-            AI로 성향 채우기
-          </h3>
+        <div className="flex items-center gap-1">
+          <Sparkles size={20} className="text-[#0D0D0D]" />
+          <h3 className="text-[18px] font-bold text-[#0D0D0D]">AI로 성향 채우기</h3>
         </div>
 
         {/* 프롬프트 */}
-        <div>
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-[12px] font-bold" style={{ color: 'var(--color-text-secondary)' }}>프롬프트</p>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-1">
+            <span className="flex-1 text-[14px] font-semibold text-[#0D0D0D]">프롬프트</span>
             <button
               type="button"
               onClick={handleCopy}
-              className="flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-all"
-              style={{
-                background: promptCopied ? 'var(--color-state-success-bg)' : 'var(--color-accent-bg-subtle)',
-                color: promptCopied ? 'var(--color-state-success-text)' : 'var(--color-accent-dark)',
-                border: `1px solid ${promptCopied ? 'var(--color-state-success-border)' : 'var(--color-accent-border-soft)'}`,
-              }}
+              className="shrink-0 rounded-[7px] border border-[#DEE4EC] bg-white px-3 py-1 text-[12px] font-semibold text-[#25313D]"
             >
-              {promptCopied ? <Check size={11} /> : <Copy size={11} />}
-              {promptCopied ? '복사됨' : '복사'}
+              {promptCopied ? '복사됨' : '복사하기'}
             </button>
           </div>
-          <div
-            className="rounded-[14px] px-4 py-3.5 text-[12px] leading-[1.8] font-mono whitespace-pre-wrap"
-            style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)' }}
-          >
+          <div className="whitespace-pre-wrap rounded-[24px] border border-[#DEE4EC] bg-[#F5F6F7] px-4 py-3 text-[14px] leading-[1.5] text-[#6C7786]">
             {promptText}
           </div>
         </div>
 
         {/* AI 도구 선택 */}
-        <div>
-          <p className="mb-3 text-[12px] font-bold" style={{ color: 'var(--color-text-secondary)' }}>
-            AI로 바로 열기
-          </p>
+        <div className="flex flex-col gap-2">
+          <span className="text-[14px] font-semibold text-[#0D0D0D]">AI로 바로 열기</span>
           <div className="grid grid-cols-4 gap-2">
             {AI_TOOLS.map((tool) => (
               <button
                 key={tool.id}
                 type="button"
                 onClick={() => handleOpenTool(tool)}
-                className="flex flex-col items-center gap-1.5 rounded-[16px] py-3.5 transition-opacity active:opacity-70"
-                style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-default)' }}
+                className="flex flex-col items-center gap-1.5 rounded-[16px] border border-[#DEE4EC] py-3.5 transition-opacity active:opacity-70"
               >
-                <span style={{ color: 'var(--color-text-primary)' }}>{tool.icon}</span>
-                <span className="text-[10px] font-semibold" style={{ color: 'var(--color-text-secondary)' }}>
-                  {tool.name}
-                </span>
+                <span className="text-[#0D0D0D]">{tool.icon}</span>
+                <span className="text-[12px] font-medium text-[#25313D]">{tool.name}</span>
               </button>
             ))}
           </div>
-          <p className="mt-2 text-[11px] leading-[1.6]" style={{ color: 'var(--color-text-tertiary)' }}>
+          <p className="text-[12px] leading-[1.5] text-[#6C7786]">
             선택하면 프롬프트가 대화창에 자동 입력돼요. 답변을 받은 뒤 아래에 붙여넣으세요.
           </p>
         </div>
 
         {/* 붙여넣기 입력창 */}
-        <div>
-          <p className="mb-2 text-[12px] font-bold" style={{ color: 'var(--color-text-secondary)' }}>
-            AI 답변 붙여넣기
-          </p>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-1">
+            <span className="flex-1 text-[14px] font-semibold text-[#0D0D0D]">AI 답변 붙여넣기</span>
+            <button
+              type="button"
+              onClick={handlePasteFromClipboard}
+              className="shrink-0 rounded-[7px] border border-[#DEE4EC] bg-white px-3 py-1 text-[12px] font-semibold text-[#25313D]"
+            >
+              붙여넣기
+            </button>
+          </div>
           <TextArea
             value={pastedText}
             onChange={setPastedText}
@@ -199,7 +197,7 @@ function AiPersonalitySheet({
           onClick={() => onApply(pastedText.trim())}
           disabled={!pastedText.trim()}
         >
-          이걸로 채우기
+          저장하기
         </Button>
       </div>
     </BottomSheet>

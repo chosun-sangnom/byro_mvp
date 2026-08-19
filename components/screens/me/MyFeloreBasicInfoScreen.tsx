@@ -857,13 +857,16 @@ export function BasicInfoEditScreen({
                   <img
                     src={cropSource}
                     alt="자르기 미리보기"
+                    draggable={false}
+                    onDragStart={(event) => event.preventDefault()}
                     className="absolute max-w-none object-cover"
                     style={{
                       width: `${cropImageLayout.width}px`,
                       height: `${cropImageLayout.height}px`,
                       left: `${cropImageLayout.left}px`,
                       top: `${cropImageLayout.top}px`,
-                    }}
+                      WebkitUserDrag: 'none',
+                    } as React.CSSProperties}
                   />
                 )}
 

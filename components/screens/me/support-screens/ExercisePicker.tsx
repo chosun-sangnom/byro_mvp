@@ -6,21 +6,21 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useRef, useState, type ChangeEvent } from 'react'
-import { Camera, X } from 'lucide-react'
+import { Camera, Plus, X } from 'lucide-react'
 import { showToast } from '@/components/ui'
 import type { LifeMediaItem } from '@/types'
 
 type ExerciseCategory = 'all' | 'run' | 'ball' | 'fitness' | 'martial' | 'water' | 'outdoor' | 'other'
 
-const CATEGORY_TABS: Array<{ id: ExerciseCategory; label: string; emoji: string }> = [
-  { id: 'all',     label: '전체',    emoji: ''   },
-  { id: 'run',     label: '러닝',    emoji: '🏃' },
-  { id: 'ball',    label: '구기',    emoji: '⚽' },
-  { id: 'fitness', label: '피트니스', emoji: '🏋️' },
-  { id: 'martial', label: '무도',    emoji: '🥊' },
-  { id: 'water',   label: '수상',    emoji: '🏊' },
-  { id: 'outdoor', label: '아웃도어', emoji: '🏔️' },
-  { id: 'other',   label: '기타',    emoji: '🎯' },
+const CATEGORY_TABS: Array<{ id: ExerciseCategory; label: string }> = [
+  { id: 'all',     label: '전체'    },
+  { id: 'run',     label: '러닝'    },
+  { id: 'ball',    label: '구기'    },
+  { id: 'fitness', label: '피트니스' },
+  { id: 'martial', label: '무도'    },
+  { id: 'water',   label: '수상'    },
+  { id: 'outdoor', label: '아웃도어' },
+  { id: 'other',   label: '기타'    },
 ]
 
 const CATEGORY_ORDER: Exclude<ExerciseCategory, 'all'>[] = ['run', 'ball', 'fitness', 'martial', 'water', 'outdoor', 'other']
@@ -264,7 +264,7 @@ export function ExercisePicker({
   }, {})
 
   const getCategoryInfo = (cat: string) =>
-    CATEGORY_TABS.find((t) => t.id === cat) ?? { label: '기타', emoji: '🎯' }
+    CATEGORY_TABS.find((t) => t.id === cat) ?? { label: '기타' }
 
   return (
     <div>
@@ -280,18 +280,18 @@ export function ExercisePicker({
           </p>
 
           {CATEGORY_ORDER.filter((cat) => grouped[cat]).map((cat) => {
-            const { label, emoji } = getCategoryInfo(cat)
+            const items = grouped[cat]
+            const { label } = getCategoryInfo(cat)
+            const headerText = items.length === 1 ? items[0].label : label
             return (
               <div key={cat}>
-                <div className="mb-2 flex items-center gap-1.5">
-                  {emoji && <span className="text-[12px]">{emoji}</span>}
-                  <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">
-                    {label}
+                <div className="mb-2">
+                  <span className="text-[14px] font-bold text-[var(--color-text-primary)]">
+                    {headerText}
                   </span>
-                  <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
                 </div>
                 <div className="space-y-2">
-                  {grouped[cat].map((item) => {
+                  {items.map((item) => {
                     const dbItem = EXERCISE_DB.find((e) => e.name === item.label)
                     const defaultImg = dbItem
                       ? getExerciseImage(item.label, dbItem.category)
@@ -342,7 +342,7 @@ export function ExercisePicker({
                     color: active ? '#fff' : 'var(--color-text-secondary)',
                   }}
                 >
-                  {tab.emoji ? `${tab.emoji} ${tab.label}` : tab.label}
+                  {tab.label}
                 </button>
               )
             })}
@@ -380,9 +380,10 @@ export function ExercisePicker({
             <button
               onClick={addCustom}
               disabled={!customInput.trim() || isAtLimit}
-              className="flex-shrink-0 rounded-xl px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-40"
+              className="flex flex-shrink-0 items-center gap-1 rounded-xl px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-40"
               style={{ background: 'var(--color-accent-dark)' }}
             >
+              <Plus size={14} />
               추가
             </button>
           </div>

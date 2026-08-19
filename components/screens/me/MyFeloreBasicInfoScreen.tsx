@@ -52,8 +52,6 @@ const AI_TOOLS = [
 function AiPersonalitySheet({
   open,
   onClose,
-  mbti,
-  user,
   promptCopied,
   setPromptCopied,
   pastedText,
@@ -62,31 +60,17 @@ function AiPersonalitySheet({
 }: {
   open: boolean
   onClose: () => void
-  mbti: string | undefined
-  user: Pick<import('@/types').UserState, 'whoIAm' | 'life'>
   promptCopied: boolean
   setPromptCopied: (v: boolean) => void
   pastedText: string
   setPastedText: (v: string) => void
   onApply: (text: string) => void
 }) {
-  const life = user.life
-  const music = life?.tastes.music[0]
-  const exercise = life?.daily.exercise[0]
-  const cafe = life?.tastes.cafes[0]
-
-  const promptLines = [
+  const promptText = [
     '내 성향을 2-3문장으로 솔직하게 표현해줘.',
     '관계 맺는 방식, 에너지 쓰는 방향, 일하는 스타일 중 하나 이상 포함해줘.',
     '딱딱하지 않게 자연스러운 말투로.',
-    '',
-    '참고 정보:',
-  ]
-  if (mbti) promptLines.push(`- MBTI: ${mbti}`)
-  if (exercise) promptLines.push(`- 즐겨 하는 것: ${exercise.label}`)
-  if (music) promptLines.push(`- 자주 듣는 음악: ${music.sublabel ?? music.label}`)
-  if (cafe) promptLines.push(`- 자주 찾는 곳: ${cafe.label}`)
-  const promptText = promptLines.join('\n')
+  ].join('\n')
 
   const handleCopy = () => {
     navigator.clipboard.writeText(promptText).then(() => {
@@ -308,8 +292,6 @@ export function WhoIAmEditScreen({
           <AiPersonalitySheet
             open={aiSheetOpen}
             onClose={() => setAiSheetOpen(false)}
-            mbti={mbti}
-            user={user}
             promptCopied={promptCopied}
             setPromptCopied={setPromptCopied}
             pastedText={pastedText}

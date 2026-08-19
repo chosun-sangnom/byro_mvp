@@ -436,10 +436,7 @@ export function BasicInfoEditScreen({
     frame: { x: number; y: number; width: number; height: number }
   } | null>(null)
 
-  const cropStage = {
-    width: 344,
-    height: 468,
-  }
+  const [cropStage, setCropStage] = useState({ width: 344, height: 468 })
   const cropImageLayout = getCropImageLayout(cropNaturalSize.width, cropNaturalSize.height, cropStage)
 
   const handleSave = () => {
@@ -492,7 +489,11 @@ export function BasicInfoEditScreen({
             return
           }
           setCropNaturalSize({ width: img.width, height: img.height })
-          const initialLayout = getCropImageLayout(img.width, img.height, cropStage)
+          // 화면 너비에 맞춰 스테이지 크기 조정 — 코너 조절 핸들이 화면 밖으로 잘리지 않도록 여유 공간 확보
+          const maxStageWidth = Math.min(344, window.innerWidth - 80)
+          const stage = { width: maxStageWidth, height: maxStageWidth * (468 / 344) }
+          setCropStage(stage)
+          const initialLayout = getCropImageLayout(img.width, img.height, stage)
           const initialFrame = getDefaultCropFrame(initialLayout)
           setCropSource(reader.result as string)
           setCropFrame(initialFrame)
@@ -540,25 +541,34 @@ export function BasicInfoEditScreen({
       frameX: cropFrame.x,
       frameY: cropFrame.y,
     }
-    event.currentTarget.setPointerCapture(event.pointerId)
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId)
+    } catch {
+      // 일부 모바일 브라우저에서 pointerId가 이미 무효화된 경우 무시
+    }
   }
 
   const handleCropPointerMove = (event: PointerEvent<HTMLDivElement>) => {
-    if (resizeStartRef.current) {
-      const deltaX = event.clientX - resizeStartRef.current.x
-      const deltaY = event.clientY - resizeStartRef.current.y
-      setCropFrame(getResizedCropFrame(resizeStartRef.current.frame, resizeStartRef.current.corner, deltaX, deltaY, cropImageLayout))
-      return
-    }
+    try {
+      if (resizeStartRef.current) {
+        const deltaX = event.clientX - resizeStartRef.current.x
+        const deltaY = event.clientY - resizeStartRef.current.y
+        setCropFrame(getResizedCropFrame(resizeStartRef.current.frame, resizeStartRef.current.corner, deltaX, deltaY, cropImageLayout))
+        return
+      }
 
-    if (dragStartRef.current) {
-      const deltaX = event.clientX - dragStartRef.current.x
-      const deltaY = event.clientY - dragStartRef.current.y
-      setCropFrame((prev) => clampCropFrameRect({
-        ...prev,
-        x: dragStartRef.current!.frameX + deltaX,
-        y: dragStartRef.current!.frameY + deltaY,
-      }, cropImageLayout))
+      if (dragStartRef.current) {
+        const { x: startX, y: startY, frameX, frameY } = dragStartRef.current
+        const deltaX = event.clientX - startX
+        const deltaY = event.clientY - startY
+        setCropFrame((prev) => clampCropFrameRect({
+          ...prev,
+          x: frameX + deltaX,
+          y: frameY + deltaY,
+        }, cropImageLayout))
+      }
+    } catch {
+      handleCropPointerEnd()
     }
   }
 
@@ -576,6 +586,11 @@ export function BasicInfoEditScreen({
       y: event.clientY,
       corner,
       frame: cropFrame,
+    }
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId)
+    } catch {
+      // 일부 모바일 브라우저에서 pointerId가 이미 무효화된 경우 무시
     }
     event.stopPropagation()
   }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type ChangeEvent, type PointerEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { Calendar, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Eye, EyeOff, Image as ImageIcon, Sparkles } from 'lucide-react'
 import { IdentityVerification } from '@/components/auth/IdentityVerification'
@@ -8,6 +8,15 @@ import { useFeloreStore } from '@/store/useFeloreStore'
 import { BottomSheet, Button, GoogleIcon, showToast } from '@/components/ui'
 import { StepFooter } from '@/components/screens/onboarding/OnboardingShared'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
+import {
+  DEFAULT_CROP_FRAME,
+  clampCropFrameRect,
+  getCropImageLayout,
+  getDefaultCropFrame,
+  getMaxCropFrameWidth,
+  getResizedCropFrame,
+  renderCroppedImage,
+} from '@/lib/imageCropUtils'
 
 export type Mode = 'choose' | 'signup' | 'login'
 type LoginView = 'main' | 'oauth' | 'phone' | 'reset'
@@ -1245,6 +1254,21 @@ export function Step4Profile() {
   const [profileImages, setProfileImages] = useState(['', '', '', ''])
   const [bio, setBio] = useState('')
 
+  const [cropSource, setCropSource] = useState('')
+  const [cropOpen, setCropOpen] = useState(false)
+  const [cropFrame, setCropFrame] = useState({ x: 44, y: 74, width: DEFAULT_CROP_FRAME.width, height: DEFAULT_CROP_FRAME.height })
+  const [defaultCropFrame, setDefaultCropFrame] = useState(cropFrame)
+  const [cropNaturalSize, setCropNaturalSize] = useState({ width: 1, height: 1 })
+  const [cropStage, setCropStage] = useState({ width: 344, height: 468 })
+  const dragStartRef = useRef<{ x: number; y: number; frameX: number; frameY: number } | null>(null)
+  const resizeStartRef = useRef<{
+    x: number
+    y: number
+    corner: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
+    frame: { x: number; y: number; width: number; height: number }
+  } | null>(null)
+  const cropImageLayout = getCropImageLayout(cropNaturalSize.width, cropNaturalSize.height, cropStage)
+
   const handleAiFillBio = () => {
     showToast('AI 자기소개 생성 중...', 'loading')
     setTimeout(() => {
@@ -1260,16 +1284,118 @@ export function Step4Profile() {
       event.target.value = ''
       return
     }
+
     const reader = new FileReader()
+    reader.onerror = () => showToast('사진을 불러오지 못했어요', 'error')
     reader.onload = () => {
-      setProfileImages((prev) => {
-        const next = [...prev]
-        next[0] = reader.result as string
-        return next
-      })
+      if (typeof reader.result === 'string') {
+        const img = new Image()
+        img.onerror = () => showToast('사진을 불러오지 못했어요', 'error')
+        img.onload = () => {
+          if (!img.width || !img.height) {
+            showToast('사진을 불러오지 못했어요', 'error')
+            return
+          }
+          setCropNaturalSize({ width: img.width, height: img.height })
+          const maxStageWidth = Math.min(344, window.innerWidth - 80)
+          const stage = { width: maxStageWidth, height: maxStageWidth * (468 / 344) }
+          setCropStage(stage)
+          const initialLayout = getCropImageLayout(img.width, img.height, stage)
+          const initialFrame = getDefaultCropFrame(initialLayout)
+          setCropSource(reader.result as string)
+          setCropFrame(initialFrame)
+          setDefaultCropFrame(initialFrame)
+          setCropOpen(true)
+        }
+        img.src = reader.result
+      }
     }
     reader.readAsDataURL(file)
     event.target.value = ''
+  }
+
+  const handleCropPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    dragStartRef.current = {
+      x: event.clientX,
+      y: event.clientY,
+      frameX: cropFrame.x,
+      frameY: cropFrame.y,
+    }
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId)
+    } catch {
+      // 일부 모바일 브라우저에서 pointerId가 이미 무효화된 경우 무시
+    }
+  }
+
+  const handleCropPointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    try {
+      if (resizeStartRef.current) {
+        const deltaX = event.clientX - resizeStartRef.current.x
+        const deltaY = event.clientY - resizeStartRef.current.y
+        setCropFrame(getResizedCropFrame(resizeStartRef.current.frame, resizeStartRef.current.corner, deltaX, deltaY, cropImageLayout))
+        return
+      }
+
+      if (dragStartRef.current) {
+        const { x: startX, y: startY, frameX, frameY } = dragStartRef.current
+        const deltaX = event.clientX - startX
+        const deltaY = event.clientY - startY
+        setCropFrame((prev) => clampCropFrameRect({
+          ...prev,
+          x: frameX + deltaX,
+          y: frameY + deltaY,
+        }, cropImageLayout))
+      }
+    } catch {
+      handleCropPointerEnd()
+    }
+  }
+
+  const handleCropPointerEnd = () => {
+    dragStartRef.current = null
+    resizeStartRef.current = null
+  }
+
+  const handleFrameResizeStart = (
+    event: PointerEvent<HTMLButtonElement>,
+    corner: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right',
+  ) => {
+    resizeStartRef.current = {
+      x: event.clientX,
+      y: event.clientY,
+      corner,
+      frame: cropFrame,
+    }
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId)
+    } catch {
+      // 일부 모바일 브라우저에서 pointerId가 이미 무효화된 경우 무시
+    }
+    event.stopPropagation()
+  }
+
+  const isCropFrameDefault = cropFrame.x === defaultCropFrame.x
+    && cropFrame.y === defaultCropFrame.y
+    && cropFrame.width === defaultCropFrame.width
+    && cropFrame.height === defaultCropFrame.height
+
+  const handleResetCrop = () => setCropFrame(defaultCropFrame)
+
+  const handleApplyCrop = async () => {
+    if (!cropSource) return
+    try {
+      const cropped = await renderCroppedImage(cropSource, cropNaturalSize, cropImageLayout, cropFrame)
+      setProfileImages((prev) => {
+        const next = [...prev]
+        next[0] = cropped
+        return next
+      })
+      setCropOpen(false)
+      showToast('사진이 적용됐어요')
+    } catch {
+      showToast('사진을 적용하지 못했어요. 다시 시도해주세요', 'error')
+    }
   }
 
   const handleSubFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -1381,6 +1507,166 @@ export function Step4Profile() {
           건너뛰기
         </button>
       </div>
+
+      {cropOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black text-white select-none"
+          style={{
+            WebkitUserSelect: 'none',
+            WebkitTouchCallout: 'none',
+            touchAction: 'none',
+          }}
+        >
+          <div className="flex h-full flex-col">
+            <div className="flex items-center justify-between px-5 pt-5 pb-3">
+              <button onClick={() => setCropOpen(false)} className="text-[15px] font-medium text-white/86">취소</button>
+              <button
+                onClick={handleResetCrop}
+                disabled={isCropFrameDefault}
+                className="text-[13px] font-semibold text-white disabled:text-white/30"
+              >
+                재설정
+              </button>
+              <button onClick={handleApplyCrop} className="rounded-full bg-white px-4 py-1.5 text-[14px] font-bold text-black">
+                완료
+              </button>
+            </div>
+
+            <div className="flex-1 flex items-center justify-center px-5">
+              <div
+                className="relative overflow-hidden touch-none select-none"
+                style={{ width: `${cropStage.width}px`, height: `${cropStage.height}px` }}
+                onPointerMove={handleCropPointerMove}
+                onPointerUp={handleCropPointerEnd}
+                onPointerCancel={handleCropPointerEnd}
+                onPointerLeave={handleCropPointerEnd}
+              >
+                {cropSource && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={cropSource}
+                    alt="자르기 미리보기"
+                    draggable={false}
+                    onDragStart={(event) => event.preventDefault()}
+                    className="absolute max-w-none object-cover"
+                    style={{
+                      width: `${cropImageLayout.width}px`,
+                      height: `${cropImageLayout.height}px`,
+                      left: `${cropImageLayout.left}px`,
+                      top: `${cropImageLayout.top}px`,
+                      WebkitUserDrag: 'none',
+                    } as React.CSSProperties}
+                  />
+                )}
+
+                <div
+                  className="absolute overflow-hidden pointer-events-none"
+                  style={{
+                    left: `${cropImageLayout.left}px`,
+                    top: `${cropImageLayout.top}px`,
+                    width: `${cropImageLayout.width}px`,
+                    height: `${cropImageLayout.height}px`,
+                  }}
+                >
+                  <div
+                    className="absolute border border-white/16"
+                    style={{
+                      left: `${cropFrame.x - cropImageLayout.left}px`,
+                      top: `${cropFrame.y - cropImageLayout.top}px`,
+                      width: `${cropFrame.width}px`,
+                      height: `${cropFrame.height}px`,
+                      boxShadow: '0 0 0 9999px rgba(0,0,0,0.52)',
+                    }}
+                  />
+                </div>
+
+                <div
+                  className="absolute cursor-move"
+                  style={{
+                    left: `${cropFrame.x}px`,
+                    top: `${cropFrame.y}px`,
+                    width: `${cropFrame.width}px`,
+                    height: `${cropFrame.height}px`,
+                  }}
+                  onPointerDown={handleCropPointerDown}
+                >
+                  {/* 3x3 격자 가이드 */}
+                  <div className="pointer-events-none absolute inset-0">
+                    <div className="absolute left-1/3 top-0 h-full w-px bg-white/30" />
+                    <div className="absolute left-2/3 top-0 h-full w-px bg-white/30" />
+                    <div className="absolute top-1/3 left-0 h-px w-full bg-white/30" />
+                    <div className="absolute top-2/3 left-0 h-px w-full bg-white/30" />
+                  </div>
+
+                  {/* 코너 핸들 */}
+                  <div className="absolute left-0 top-0 h-5 w-5 border-l-[3px] border-t-[3px] border-white/92" />
+                  <div className="absolute right-0 top-0 h-5 w-5 border-r-[3px] border-t-[3px] border-white/92" />
+                  <div className="absolute left-0 bottom-0 h-5 w-5 border-l-[3px] border-b-[3px] border-white/92" />
+                  <div className="absolute right-0 bottom-0 h-5 w-5 border-r-[3px] border-b-[3px] border-white/92" />
+
+                  {/* 엣지 틱 마크 */}
+                  <div className="pointer-events-none absolute left-1/2 top-0 h-[3px] w-5 -translate-x-1/2 bg-white/92" />
+                  <div className="pointer-events-none absolute bottom-0 left-1/2 h-[3px] w-5 -translate-x-1/2 bg-white/92" />
+                  <div className="pointer-events-none absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 bg-white/92" />
+                  <div className="pointer-events-none absolute right-0 top-1/2 h-5 w-[3px] -translate-y-1/2 bg-white/92" />
+
+                  <div
+                    className="pointer-events-none absolute left-1/2 -translate-x-1/2 rounded-full border-[1.5px] border-white/85"
+                    style={{
+                      width: `${Math.min(getMaxCropFrameWidth(cropImageLayout) - 48, cropFrame.width - 48)}px`,
+                      height: `${Math.min(getMaxCropFrameWidth(cropImageLayout) - 48, cropFrame.width - 48)}px`,
+                      top: `${Math.max(28, cropFrame.height * 0.18)}px`,
+                    }}
+                  />
+                </div>
+
+                <button
+                  onPointerDown={(event) => handleFrameResizeStart(event, 'top-left')}
+                  className="absolute z-10 h-8 w-8 -translate-x-1/2 -translate-y-1/2 bg-transparent"
+                  style={{
+                    left: `${cropFrame.x}px`,
+                    top: `${cropFrame.y}px`,
+                  }}
+                  aria-label="프레임 좌상단 조절"
+                />
+                <button
+                  onPointerDown={(event) => handleFrameResizeStart(event, 'top-right')}
+                  className="absolute z-10 h-8 w-8 -translate-x-1/2 -translate-y-1/2 bg-transparent"
+                  style={{
+                    left: `${cropFrame.x + cropFrame.width}px`,
+                    top: `${cropFrame.y}px`,
+                  }}
+                  aria-label="프레임 우상단 조절"
+                />
+                <button
+                  onPointerDown={(event) => handleFrameResizeStart(event, 'bottom-left')}
+                  className="absolute z-10 h-8 w-8 -translate-x-1/2 -translate-y-1/2 bg-transparent"
+                  style={{
+                    left: `${cropFrame.x}px`,
+                    top: `${cropFrame.y + cropFrame.height}px`,
+                  }}
+                  aria-label="프레임 좌하단 조절"
+                />
+                <button
+                  onPointerDown={(event) => handleFrameResizeStart(event, 'bottom-right')}
+                  className="absolute z-10 h-8 w-8 -translate-x-1/2 -translate-y-1/2 bg-transparent"
+                  style={{
+                    left: `${cropFrame.x + cropFrame.width}px`,
+                    top: `${cropFrame.y + cropFrame.height}px`,
+                  }}
+                  aria-label="프레임 우하단 조절"
+                />
+              </div>
+            </div>
+
+            <div className="px-5 pb-5">
+              <div className="text-[11px] text-white/68 text-center mb-4">
+                프레임을 드래그해 위치를 잡고, 코너 핸들로 잘릴 범위를 조절하세요. 정원형 가이드는 방명록 프로필 사진으로 보이는 영역입니다.
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -120,7 +120,7 @@ function PreviewLife() {
     </div>
   )
   return (
-    <div className="flex h-[293px] w-[242px] gap-1">
+    <div className="flex w-full gap-1" style={{ aspectRatio: '242 / 293' }}>
       <div className="grid flex-[1.3] grid-rows-3 gap-1">
         <Cell src="/images/onboarding-guide/vibe-book.png" color="#0657FF" label="책" name="보통의 언어들" sub="김하나" className="" />
         <div className="grid grid-cols-2 gap-1">

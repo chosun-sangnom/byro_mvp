@@ -40,23 +40,24 @@ function SlotBadge({
   remaining: number
 }) {
   return (
-    <div className="mx-5 mt-3 rounded-xl border border-[var(--color-border-soft)] bg-[var(--color-bg-soft)] px-4 py-2.5">
-      <span
-        className="text-[12px] font-semibold"
-        style={remaining > 0 ? { color: 'var(--color-text-secondary)' } : { color: 'var(--color-state-danger-text, #ef4444)' }}
-      >
-        {remaining > 0 ? (
-          <>
-            슬롯 {remaining}개 남음
-            <span className="ml-1.5 font-normal text-[var(--color-text-tertiary)]">· Free 플랜</span>
-          </>
-        ) : (
-          '슬롯이 모두 찼어요'
-        )}
-      </span>
-      <p className="mt-1.5 text-[11px] text-[var(--color-text-tertiary)]">
-        Free는 반려동물 제외 최대 5개, Pro는 카테고리별 무제한이에요
-      </p>
+    <div className="mx-5 mt-4 flex gap-1.5 rounded-[24px] bg-[#F0F5FF] py-3 pl-3 pr-4">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/images/ai-tools/ocr-info.svg" alt="" className="mt-0.5 h-4 w-4 shrink-0" />
+      <div className="flex-1">
+        <p className={['text-[13px] font-bold', remaining > 0 ? 'text-[#0D0D0D]' : 'text-[#FF4242]'].join(' ')}>
+          {remaining > 0 ? (
+            <>
+              슬롯 {remaining}개 남음
+              <span className="ml-1.5 font-medium text-[#6C7786]">· Free 플랜</span>
+            </>
+          ) : (
+            '슬롯이 모두 찼어요'
+          )}
+        </p>
+        <p className="mt-1 text-[12px] font-medium leading-[1.5] text-[#475058]">
+          Free는 반려동물 제외 최대 5개, Pro는 카테고리별 무제한이에요
+        </p>
+      </div>
     </div>
   )
 }
@@ -77,11 +78,14 @@ function SubScreen({
   slotBadge?: ReactNode
 }) {
   return (
-    <div className="flex h-full flex-col">
-      <NavBar title={title} onBack={onBack} />
+    <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
+      <NavBar title="" onBack={onBack} onClose={onBack} />
+      <div className="px-5 pt-2">
+        <h1 className="text-[22px] font-bold text-[#0D0D0D]">{title}</h1>
+      </div>
       {slotBadge}
-      <div className="flex-1 overflow-y-auto px-5 py-4 space-y-6">{children}</div>
-      <div className="border-t border-[var(--color-border-soft)] px-5 pb-5 pt-3">
+      <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-6 space-y-6">{children}</div>
+      <div className="px-5 pb-6">
         <Button onClick={onSave}>저장</Button>
       </div>
     </div>
@@ -91,7 +95,7 @@ function SubScreen({
 function FieldBlock({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div>
-      <p className="mb-2 text-xs font-bold text-[var(--color-text-secondary)]">{label}</p>
+      <p className="mb-2 text-[14px] font-semibold text-[#0D0D0D]">{label}</p>
       {children}
     </div>
   )
@@ -140,12 +144,10 @@ function PetView({
               <button
                 key={option}
                 onClick={() => setPet(option)}
-                className="rounded-full border px-4 py-2 text-sm font-semibold transition-colors"
-                style={{
-                  borderColor: selected ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
-                  background: selected ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
-                  color: selected ? '#fff' : 'var(--color-text-secondary)',
-                }}
+                className={[
+                  'rounded-full px-4 py-2 text-[14px] font-semibold transition-colors',
+                  selected ? 'bg-[#0D0D0D] text-white' : 'bg-[#F5F6F7] text-[#6C7786]',
+                ].join(' ')}
               >
                 {option}
               </button>
@@ -161,7 +163,7 @@ function PetView({
               value={petName}
               onChange={(e) => setPetName(e.target.value)}
               placeholder="예: 몽이"
-              className="w-full rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-2.5 text-sm outline-none placeholder:text-[var(--color-text-tertiary)]"
+              className="w-full rounded-full border border-[#DEE4EC] bg-white px-4 py-3 text-[14px] text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
             />
           </FieldBlock>
 
@@ -169,16 +171,16 @@ function PetView({
             <input ref={fileInputRef} type="file" accept="image/*" className="sr-only" onChange={handleFileChange} />
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="relative h-24 w-24 overflow-hidden rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-muted)] flex items-center justify-center"
+              className="relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-[16px] border border-[#DEE4EC] bg-[#F5F6F7]"
             >
               {petImage
                 // eslint-disable-next-line @next/next/no-img-element
                 ? <img src={petImage} alt="반려동물" className="h-full w-full object-cover" />
-                : <Camera size={22} className="text-[var(--color-text-tertiary)]" />
+                : <Camera size={22} className="text-[#A8B1BD]" />
               }
             </button>
             {petImage && (
-              <button onClick={() => setPetImage('')} className="mt-2 text-xs text-[var(--color-state-danger-text)]">
+              <button onClick={() => setPetImage('')} className="mt-2 text-[12px] font-medium text-[#FF4242]">
                 사진 제거
               </button>
             )}
@@ -327,12 +329,12 @@ function AlbumView({
     >
       <div className="grid grid-cols-3 gap-2">
         {photos.map((url, i) => (
-          <div key={i} className="relative aspect-square overflow-hidden rounded-xl bg-[var(--color-bg-muted)]">
+          <div key={i} className="relative aspect-square overflow-hidden rounded-[16px] bg-[#F5F6F7]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={url} alt={`사진 ${i + 1}`} className="h-full w-full object-cover" />
             <button
               onClick={() => setPhotos((prev) => prev.filter((_, j) => j !== i))}
-              className="absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/60"
+              className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/60"
             >
               <X size={12} className="text-white" />
             </button>
@@ -342,15 +344,14 @@ function AlbumView({
         {photos.length < 9 && (
           <button
             onClick={() => showToast('사진 업로드는 준비 중이에요')}
-            className="aspect-square rounded-xl border-2 border-dashed flex flex-col items-center justify-center gap-1"
-            style={{ borderColor: 'var(--color-border-default)' }}
+            className="flex aspect-square flex-col items-center justify-center gap-1 rounded-[16px] border-2 border-dashed border-[#DEE4EC]"
           >
-            <Plus size={22} className="text-[var(--color-text-tertiary)]" />
-            <span className="text-[11px] text-[var(--color-text-tertiary)]">추가</span>
+            <Plus size={22} className="text-[#A8B1BD]" />
+            <span className="text-[11px] font-medium text-[#A8B1BD]">추가</span>
           </button>
         )}
       </div>
-      <p className="text-[12px] text-[var(--color-text-tertiary)] leading-relaxed">
+      <p className="text-[12px] font-medium leading-[1.5] text-[#6C7786]">
         나를 잘 표현하는 사진을 자유롭게 올려보세요. 취미, 일상, 좋아하는 공간 등 무엇이든 괜찮아요. (최대 9장)
       </p>
     </SubScreen>
@@ -380,10 +381,9 @@ function LifeHub({
   const totalCount = exerciseCount + cultureCount + foodCount
   const freeRemaining = Math.max(0, FREE_LIMIT - totalCount)
 
-  const rows: Array<{ view: LifeView; emoji: string; title: string; meta: string | null; nudge: string }> = [
+  const rows: Array<{ view: LifeView; title: string; meta: string | null; nudge: string }> = [
     {
       view: 'pet',
-      emoji: '🐾',
       title: '반려동물',
       meta: life.daily.pet !== '없음'
         ? [life.daily.pet, life.daily.petName].filter(Boolean).join(' · ')
@@ -392,28 +392,24 @@ function LifeHub({
     },
     {
       view: 'activity',
-      emoji: '🏃',
       title: '활동',
       meta: exerciseCount > 0 ? `운동 ${exerciseCount}` : null,
       nudge: '같은 운동을 좋아하면 바로 친해져요',
     },
     {
       view: 'culture',
-      emoji: '🎬',
       title: '문화',
       meta: cultureCount > 0 ? `${cultureCount}개` : null,
       nudge: '영화·음악·책 취향은 가장 좋은 대화 소재예요',
     },
     {
       view: 'place',
-      emoji: '📍',
       title: '플레이스',
       meta: foodCount > 0 ? `맛집 ${life.tastes.restaurants.length} · 카페 ${life.tastes.cafes.length}` : null,
       nudge: '좋아하는 동네 맛집을 공유해보세요',
     },
     {
       view: 'album',
-      emoji: '🖼️',
       title: '앨범',
       meta: albumCount > 0 ? `${albumCount}장` : null,
       nudge: '취미, 일상, 좋아하는 공간을 사진으로 보여줘요',
@@ -421,48 +417,54 @@ function LifeHub({
   ]
 
   return (
-    <div className="flex h-full flex-col">
-      <NavBar title="바이브 편집" onBack={onBack} />
+    <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
+      <NavBar title="" onBack={onBack} onClose={onBack} />
 
-      {/* Free 슬롯 배너 */}
-      {!isPro && <SlotBadge remaining={freeRemaining} />}
+      <div className="flex-1 overflow-y-auto scrollbar-hide">
+        <div className="px-5 pt-2">
+          <h1 className="text-[22px] font-bold text-[#0D0D0D]">바이브 편집</h1>
+          <p className="mt-2 text-[16px] font-medium leading-[1.5] text-[#475058]">
+            취향과 라이프스타일을 채우면 나와 잘 맞는 사람을 더 정확히 찾을 수 있어요.
+          </p>
+        </div>
 
-      <div className="flex-1 overflow-y-auto">
-        <div className="mx-5 mt-4 overflow-hidden rounded-2xl border border-[var(--color-border-soft)]">
+        {/* Free 슬롯 배너 */}
+        {!isPro && <SlotBadge remaining={freeRemaining} />}
+
+        <div className="mx-5 mt-4 overflow-hidden rounded-[12px] border border-[#DEE4EC] px-4">
           {rows.map((row, i) => (
             <button
               key={row.view}
+              type="button"
               onClick={() => onNavigate(row.view)}
               className={[
-                'flex w-full items-center gap-4 px-5 py-4 text-left transition-colors active:bg-white/[0.03]',
-                i < rows.length - 1 ? 'border-b border-[var(--color-border-soft)]' : '',
+                'flex w-full items-center justify-between py-4 text-left',
+                i < rows.length - 1 ? 'border-b border-[#DEE4EC]' : '',
               ].join(' ')}
             >
-              <span className="text-2xl flex-shrink-0">{row.emoji}</span>
               <div className="min-w-0 flex-1">
-                <p className="text-[15px] font-semibold text-[var(--color-text-primary)]">{row.title}</p>
+                <p className="text-[14px] font-semibold text-[#0D0D0D]">{row.title}</p>
                 {row.meta
-                  ? <p className="mt-0.5 text-[12px] font-medium text-[var(--color-accent-dark)]">{row.meta}</p>
-                  : <p className="mt-0.5 text-[12px] text-[var(--color-text-tertiary)]">💡 {row.nudge}</p>
+                  ? <p className="mt-0.5 text-[12px] font-bold text-[#0657FF]">{row.meta}</p>
+                  : <p className="mt-0.5 text-[12px] font-medium text-[#6C7786]">{row.nudge}</p>
                 }
               </div>
-              <ChevronRight size={14} className="flex-shrink-0 text-[var(--color-text-tertiary)] opacity-30" />
+              <ChevronRight size={20} className="shrink-0 text-[#A8B1BD]" />
             </button>
           ))}
         </div>
 
         {/* Free: Pro 플랜 비교 안내 */}
         {!isPro && (
-          <div className="mx-5 mt-3 mb-4 flex items-center justify-between rounded-xl bg-[var(--color-bg-soft)] px-4 py-3">
+          <div className="mx-5 mb-6 mt-3 flex items-center justify-between rounded-[12px] bg-[#F5F6F7] px-4 py-3">
             <div>
-              <p className="text-[12px] font-semibold text-[var(--color-text-secondary)]">Free · {FREE_LIMIT}개 슬롯</p>
-              <p className="text-[11px] text-[var(--color-text-tertiary)]">반려동물 제외, 활동·문화·플레이스 합산 최대 5개</p>
-              <p className="text-[11px] text-[var(--color-text-tertiary)]">Pro는 카테고리별 무제한</p>
+              <p className="text-[12px] font-semibold text-[#0D0D0D]">Free · {FREE_LIMIT}개 슬롯</p>
+              <p className="mt-0.5 text-[11px] font-medium text-[#6C7786]">반려동물 제외, 활동·문화·플레이스 합산 최대 5개</p>
+              <p className="text-[11px] font-medium text-[#6C7786]">Pro는 카테고리별 무제한</p>
             </div>
             <button
               onClick={onUpgrade}
-              className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-bold text-white"
-              style={{ background: 'var(--color-accent-dark)' }}
+              className="flex items-center gap-1.5 rounded-full bg-[#0D0D0D] px-3 py-1.5 text-[12px] font-bold text-white"
             >
               <Zap size={11} />
               업그레이드

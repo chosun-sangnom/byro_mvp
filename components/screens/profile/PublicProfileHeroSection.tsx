@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { BadgeCheck, Bookmark, BookmarkCheck, Pencil, Share2, Sparkles, X } from 'lucide-react'
+import { BadgeCheck, Bookmark, BookmarkCheck, ChevronLeft, ChevronRight, Pencil, Share2, Sparkles, X } from 'lucide-react'
 import { ActionMenu, ActionMenuItem, BottomSheet, Button, CheckRow, TextArea, showToast } from '@/components/ui'
 import { shareOrCopy } from '@/lib/share'
 import type { PersonaReason } from '@/lib/personaGen'
@@ -128,50 +128,54 @@ export function ProfileHeroSection({
       <AnimatePresence>
         {galleryOpen && activeImage && (
           <motion.div
-            className="fixed inset-0 z-[90] bg-black/92 px-4 pb-6 pt-[max(24px,env(safe-area-inset-top))]"
+            className="fixed inset-0 z-[100] bg-black/90"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            onClick={() => setGalleryOpen(false)}
           >
-            <div className="mx-auto flex h-full w-full max-w-[420px] flex-col">
-              <div className="flex items-center justify-between pb-4">
-                <div className="text-sm font-semibold text-white/68">
-                  사진 {activeImageIndex + 1} / {galleryImages.length}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setGalleryOpen(false)}
-                  className="rounded-full border border-white/12 bg-white/6 p-2 text-white/92"
-                >
-                  <X size={18} />
-                </button>
-              </div>
+            <div className="relative mx-auto h-full w-full max-w-[430px]" onClick={(e) => e.stopPropagation()}>
+              <button
+                type="button"
+                onClick={() => setGalleryOpen(false)}
+                className="absolute right-4 top-[max(16px,env(safe-area-inset-top))] z-10 flex h-9 w-9 items-center justify-center rounded-full bg-white/40 backdrop-blur-[10px]"
+              >
+                <X size={20} className="text-white" />
+              </button>
 
-              <div className="flex flex-1 items-center justify-center">
-                <div className="w-full overflow-hidden rounded-[28px] bg-white/4">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={activeImage} alt={`${profile.name} 확대 사진`} className="h-full max-h-[70vh] w-full object-cover" />
-                </div>
-              </div>
+              <div className="flex h-full w-full flex-col items-center justify-center px-8">
+                <div className="relative w-full max-w-[360px]">
+                  <div className="aspect-[328/432] w-full overflow-hidden rounded-[24px] bg-white/4">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={activeImage} alt={`${profile.name} 확대 사진`} className="h-full w-full object-cover" />
+                  </div>
 
-              {galleryImages.length > 1 && (
-                <div className="grid grid-cols-4 gap-2 pt-4">
-                  {galleryImages.map((image, index) => (
-                    <button
-                      key={image}
-                      type="button"
-                      onClick={() => setActiveImageIndex(index)}
-                      className={[
-                        'relative aspect-square overflow-hidden rounded-[16px] border bg-white/6',
-                        activeImageIndex === index ? 'border-white/50 ring-1 ring-white/20' : 'border-white/10',
-                      ].join(' ')}
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={image} alt={`${profile.name} 썸네일 ${index + 1}`} className="h-full w-full object-cover" />
-                    </button>
-                  ))}
+                  {galleryImages.length > 1 && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setActiveImageIndex((i) => (i - 1 + galleryImages.length) % galleryImages.length)}
+                        className="absolute left-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/40 backdrop-blur-[10px]"
+                      >
+                        <ChevronLeft size={20} className="text-white" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveImageIndex((i) => (i + 1) % galleryImages.length)}
+                        className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full bg-white/40 backdrop-blur-[10px]"
+                      >
+                        <ChevronRight size={20} className="text-white" />
+                      </button>
+                    </>
+                  )}
                 </div>
-              )}
+
+                {galleryImages.length > 1 && (
+                  <p className="mt-4 text-[14px] font-medium text-white/40">
+                    {activeImageIndex + 1}/{galleryImages.length}
+                  </p>
+                )}
+              </div>
             </div>
           </motion.div>
         )}

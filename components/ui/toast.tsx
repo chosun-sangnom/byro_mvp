@@ -36,7 +36,7 @@ function ToastIcon({ variant }: { variant: ToastVariant }) {
 
 function ToastViewport({ messages }: { messages: Array<{ id: number; msg: string; variant: ToastVariant }> }) {
   return (
-    <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-2 z-50 pointer-events-none px-4">
+    <div className="absolute bottom-6 left-0 right-0 flex flex-col items-center gap-2 z-[200] pointer-events-none px-4">
       <AnimatePresence>
         {messages.map(({ id, msg, variant }) => (
           <motion.div

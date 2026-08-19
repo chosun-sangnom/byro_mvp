@@ -221,7 +221,10 @@ function PetView({
     <SubScreen
       title="반려동물"
       onBack={() => onSave(life.daily)}
-      onSave={() => onSave({ ...life.daily, pets: pets.length ? pets : undefined })}
+      onSave={() => {
+        onSave({ ...life.daily, pets: pets.length ? pets : undefined })
+        showToast('반려동물이 저장됐어요')
+      }}
     >
       <div className="space-y-4">
         {pets.map((pet) => (

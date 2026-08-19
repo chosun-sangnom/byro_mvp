@@ -63,30 +63,29 @@ export function YearPickerSheet({
 }: YearPickerSheetProps) {
   return (
     <BottomSheet open={open} onClose={onClose}>
-      <div className="px-5 pb-6">
-        <div className="mb-4 text-[18px] font-black text-[var(--color-text-strong)]">{title}</div>
-        <div className="max-h-[44dvh] overflow-y-auto rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] p-2">
-          <div className="space-y-1">
-            {options.map((option) => {
-              const selected = value === option
-              return (
-                <button
-                  key={option}
-                  onClick={() => {
-                    onSelect(option)
-                    onClose()
-                  }}
-                  className="flex w-full items-center justify-between rounded-xl px-4 py-3 text-left"
-                  style={{
-                    backgroundColor: selected ? 'var(--color-accent-dark)' : 'transparent',
-                    color: selected ? '#ffffff' : 'var(--color-text-primary)',
-                  }}
-                >
-                  <span className="text-sm font-semibold">{option}</span>
-                </button>
-              )
-            })}
-          </div>
+      <div className="px-4 pb-6">
+        <div className="mb-4 px-1 text-[18px] font-bold text-[#0D0D0D]">{title}</div>
+        <div className="max-h-[44dvh] overflow-y-auto scrollbar-hide rounded-[24px] border border-[#DEE4EC] px-4">
+          {options.map((option, index) => {
+            const selected = value === option
+            return (
+              <button
+                key={option}
+                onClick={() => {
+                  onSelect(option)
+                  onClose()
+                }}
+                className={[
+                  'flex w-full items-center py-4 text-left',
+                  index < options.length - 1 ? 'border-b border-[#DEE4EC]' : '',
+                ].join(' ')}
+              >
+                <span className={['text-[16px]', selected ? 'font-bold text-[#0D0D0D]' : 'font-medium text-[#25313D]'].join(' ')}>
+                  {option}
+                </span>
+              </button>
+            )
+          })}
         </div>
       </div>
     </BottomSheet>

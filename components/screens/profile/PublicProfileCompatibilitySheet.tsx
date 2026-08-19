@@ -66,7 +66,7 @@ const BLOCK_META = [
   { index: 1, label: '공통점' },
   { index: 2, label: '대화 스타터' },
   { index: 3, label: '관계 흐름' },
-  { index: 4, label: '협업결' },
+  { index: 4, label: '협업방향' },
   { index: 5, label: '연결 가치' },
 ]
 

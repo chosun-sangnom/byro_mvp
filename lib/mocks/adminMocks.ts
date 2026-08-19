@@ -491,7 +491,7 @@ export const MOCK_AI_KEMI_CONFIG: AiKemiConfig = {
     },
     {
       key: 'collab',
-      label: '협업결',
+      label: '협업방향',
       description: '협업·업무 궁합 분석',
       enabled: true,
       promptTemplate: '두 사람의 하이라이트(경력·활동 이력)를 바탕으로 협업·업무 궁합을 2문장으로 분석해줘.',

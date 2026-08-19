@@ -738,10 +738,13 @@ export function BasicInfoEditScreen({
               </div>
             </div>
 
-            <div className="flex gap-2">
-              <div className="flex-1 min-w-0">
-                <span className="text-[14px] font-semibold text-[#0D0D0D]">생년월일</span>
-                <div className="relative mt-2">
+            <div>
+              <div className="flex gap-2">
+                <span className="flex-1 min-w-0 text-[14px] font-semibold text-[#0D0D0D]">생년월일</span>
+                <span className="flex-1 min-w-0 text-[14px] font-semibold text-[#0D0D0D]">생시</span>
+              </div>
+              <div className="relative mt-2 flex gap-2">
+                <div className="relative flex-1 min-w-0">
                   <input
                     type="text"
                     inputMode="numeric"
@@ -758,38 +761,34 @@ export function BasicInfoEditScreen({
                   >
                     <Calendar size={16} />
                   </button>
-                  {showCalendar && (
-                    <BirthDateCalendar
-                      digits={birthDigits}
-                      time={birthTime}
-                      onSelect={setBirthDigits}
-                      onSelectTime={setBirthTime}
-                      onClose={() => setShowCalendar(false)}
-                    />
-                  )}
                 </div>
-                {birthDateError && <p className="mt-1.5 text-[11px] text-[#FF4242]">올바른 날짜 형식을 입력해주세요.</p>}
-                <button
-                  type="button"
-                  onClick={() => setShowAge((prev) => !prev)}
-                  className="mt-2 flex items-center gap-2"
-                >
-                  <CheckboxDot checked={showAge} />
-                  <span className="text-[14px] font-medium text-[#25313D]">나이 공개</span>
-                </button>
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <span className="text-[14px] font-semibold text-[#0D0D0D]">생시</span>
                 <button
                   type="button"
                   onClick={() => setShowCalendar((prev) => !prev)}
-                  className="mt-2 w-full truncate rounded-full border bg-white px-4 py-3 text-left text-[14px] outline-none"
+                  className="flex-1 min-w-0 truncate rounded-full border bg-white px-4 py-3 text-left text-[14px] outline-none"
                   style={{ borderColor: '#DEE4EC', color: birthTime ? '#0D0D0D' : '#A8B1BD' }}
                 >
                   {BIRTH_TIME_OPTIONS.find((opt) => opt.value === birthTime)?.label ?? '모름'}
                 </button>
+                {showCalendar && (
+                  <BirthDateCalendar
+                    digits={birthDigits}
+                    time={birthTime}
+                    onSelect={setBirthDigits}
+                    onSelectTime={setBirthTime}
+                    onClose={() => setShowCalendar(false)}
+                  />
+                )}
               </div>
+              {birthDateError && <p className="mt-1.5 text-[11px] text-[#FF4242]">올바른 날짜 형식을 입력해주세요.</p>}
+              <button
+                type="button"
+                onClick={() => setShowAge((prev) => !prev)}
+                className="mt-2 flex items-center gap-2"
+              >
+                <CheckboxDot checked={showAge} />
+                <span className="text-[14px] font-medium text-[#25313D]">나이 공개</span>
+              </button>
             </div>
 
             <div>

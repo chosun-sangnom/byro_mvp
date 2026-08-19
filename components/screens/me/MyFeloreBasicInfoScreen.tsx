@@ -781,16 +781,14 @@ export function BasicInfoEditScreen({
 
               <div className="flex-1 min-w-0">
                 <span className="text-[14px] font-semibold text-[#0D0D0D]">생시</span>
-                <select
-                  value={birthTime}
-                  onChange={(e) => setBirthTime(e.target.value)}
-                  className="mt-2 w-full truncate rounded-full border bg-white px-4 py-3 text-[14px] outline-none appearance-none"
+                <button
+                  type="button"
+                  onClick={() => setShowCalendar((prev) => !prev)}
+                  className="mt-2 w-full truncate rounded-full border bg-white px-4 py-3 text-left text-[14px] outline-none"
                   style={{ borderColor: '#DEE4EC', color: birthTime ? '#0D0D0D' : '#A8B1BD' }}
                 >
-                  {BIRTH_TIME_OPTIONS.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
+                  {BIRTH_TIME_OPTIONS.find((opt) => opt.value === birthTime)?.label ?? '모름'}
+                </button>
               </div>
             </div>
 

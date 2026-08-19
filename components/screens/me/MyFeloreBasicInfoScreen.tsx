@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, type ChangeEvent, type PointerEvent } from 'react'
-import { Calendar, Image as ImageIcon, Info, Sparkles } from 'lucide-react'
+import { Calendar, Image as ImageIcon, Info } from 'lucide-react'
 import {
   BIRTH_TIME_OPTIONS,
   BirthDateCalendar,
@@ -26,41 +26,25 @@ const AI_TOOLS = [
     id: 'chatgpt',
     name: 'ChatGPT',
     url: (p: string) => `https://chatgpt.com/?q=${encodeURIComponent(p)}`,
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
-        <path d="M22.28 9.82a5.98 5.98 0 0 0-.52-4.91 6.05 6.05 0 0 0-6.51-2.9A6.07 6.07 0 0 0 4.98 4.18a5.98 5.98 0 0 0-4 2.9 6.05 6.05 0 0 0 .74 7.1 5.98 5.98 0 0 0 .51 4.91 6.05 6.05 0 0 0 6.51 2.9A5.98 5.98 0 0 0 13.26 24a6.06 6.06 0 0 0 5.77-4.21 5.99 5.99 0 0 0 4-2.9 6.06 6.06 0 0 0-.75-7.07zm-9.02 12.62a4.48 4.48 0 0 1-2.88-1.04l.14-.08 4.78-2.76a.8.8 0 0 0 .39-.68V11.2l2.02 1.17v5.58a4.5 4.5 0 0 1-4.45 4.49zm-9.66-4.13a4.47 4.47 0 0 1-.53-3.01l.14.08 4.78 2.76a.77.77 0 0 0 .78 0l5.84-3.37v2.33l-4.82 2.78a4.5 4.5 0 0 1-6.19-1.57zM2.34 7.9a4.49 4.49 0 0 1 2.37-1.97v5.69a.77.77 0 0 0 .39.68l5.81 3.35-2.02 1.17-4.83-2.79A4.5 4.5 0 0 1 2.34 7.9zm16.1 3.86-5.84-3.37 2.02-1.17 4.83 2.79a4.49 4.49 0 0 1-.68 8.1v-5.68a.79.79 0 0 0-.33-.67zm2.01-3.02-.14-.09-4.77-2.78a.78.78 0 0 0-.79 0L9.41 9.23V6.9l4.83-2.79a4.5 4.5 0 0 1 6.21 4.63zM8.31 12.86 6.29 11.7V6.07a4.5 4.5 0 0 1 7.38-3.45l-.14.08-4.78 2.76a.79.79 0 0 0-.4.68v6.72zm1.1-2.37 2.6-1.5 2.61 1.5v3L11.99 15l-2.61-1.5.03-3.01z" />
-      </svg>
-    ),
+    iconSrc: '/images/ai-tools/chatgpt.svg',
   },
   {
     id: 'claude',
     name: 'Claude',
     url: (p: string) => `https://claude.ai/new?q=${encodeURIComponent(p)}`,
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
-        <path d="M11.815 1.816 8.021 12.48.138 9.9l-.138.37 7.883 2.58L4.09 22.184l.37.138 3.905-9.75 3.777 10.612.37-.138-3.775-10.61 10.612 3.773.138-.37-10.61-3.773 3.773-9.497-.139-.37-3.771 9.495L.877 1.816l-.37.138 9.497 3.77L.138 14.22l.37.138 9.866-8.496 3.772 10.614.37-.138-3.77-10.612 9.497 3.773.138-.37-9.497-3.77 3.496-8.771-.37-.138-3.495 8.77-8.497-3.004-.138.37 8.497 3.004-3.496 8.77.37.138 3.496-8.77z" />
-      </svg>
-    ),
+    iconSrc: '/images/ai-tools/claude.png',
   },
   {
     id: 'perplexity',
     name: 'Perplexity',
     url: (p: string) => `https://www.perplexity.ai/search?q=${encodeURIComponent(p)}`,
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
-        <path d="M22 12 12 2 2 12l10 10 10-10zM12 4.83 19.17 12 12 19.17 4.83 12 12 4.83zM12 8l-4 4 4 4 4-4-4-4zm0 2.83L13.17 12 12 13.17 10.83 12 12 10.83z" />
-      </svg>
-    ),
+    iconSrc: '/images/ai-tools/perplexity.png',
   },
   {
     id: 'gemini',
     name: 'Gemini',
     url: (p: string) => `https://gemini.google.com/app?q=${encodeURIComponent(p)}`,
-    icon: (
-      <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
-        <path d="M12 2C9.2 9.2 2 9.2 2 12s7.2 2.8 10 10c2.8-7.2 10-7.2 10-10S14.8 9.2 12 2z" />
-      </svg>
-    ),
+    iconSrc: '/images/ai-tools/gemini.png',
   },
 ]
 
@@ -107,7 +91,10 @@ function AiPersonalitySheet({
   const handleCopy = () => {
     navigator.clipboard.writeText(promptText).then(() => {
       setPromptCopied(true)
+      showToast('프롬프트가 복사됐어요')
       setTimeout(() => setPromptCopied(false), 2000)
+    }).catch(() => {
+      showToast('복사하지 못했어요', 'error')
     })
   }
 
@@ -119,7 +106,10 @@ function AiPersonalitySheet({
   const handlePasteFromClipboard = async () => {
     try {
       const text = await navigator.clipboard.readText()
-      if (text) setPastedText(text)
+      if (text) {
+        setPastedText(text)
+        showToast('붙여넣었어요')
+      }
     } catch {
       showToast('클립보드를 읽지 못했어요. 직접 붙여넣어 주세요', 'error')
     }
@@ -130,7 +120,8 @@ function AiPersonalitySheet({
       <div className="px-4 pb-6 flex flex-col gap-6">
         {/* 헤더 */}
         <div className="flex items-center gap-1">
-          <Sparkles size={20} className="text-[#0D0D0D]" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/ai-tools/sparkle-modal.svg" alt="" className="h-6 w-6" />
           <h3 className="text-[18px] font-bold text-[#0D0D0D]">AI로 성향 채우기</h3>
         </div>
 
@@ -160,9 +151,12 @@ function AiPersonalitySheet({
                 key={tool.id}
                 type="button"
                 onClick={() => handleOpenTool(tool)}
-                className="flex flex-col items-center gap-1.5 rounded-[16px] border border-[#DEE4EC] py-3.5 transition-opacity active:opacity-70"
+                className="flex flex-col items-center gap-1.5 rounded-[16px] border border-[#DEE4EC] py-3 transition-opacity active:opacity-70"
               >
-                <span className="text-[#0D0D0D]">{tool.icon}</span>
+                <span className="flex size-7 items-center justify-center">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={tool.iconSrc} alt={tool.name} className="h-full w-full object-contain" />
+                </span>
                 <span className="text-[12px] font-medium text-[#25313D]">{tool.name}</span>
               </button>
             ))}
@@ -297,7 +291,8 @@ export function WhoIAmEditScreen({
                 className="flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[14px] font-semibold text-white"
                 style={{ backgroundImage: 'linear-gradient(129deg, rgba(0,173,255,0.2) 0%, #00ADFF 29.568%, #0657FF 59.137%)' }}
               >
-                <Sparkles size={14} />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/ai-tools/sparkle-ai-chip.svg" alt="" className="h-3.5 w-3.5" />
                 AI로 채우기
               </button>
             </div>
@@ -830,7 +825,8 @@ export function BasicInfoEditScreen({
                   className="flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[14px] font-semibold text-white"
                   style={{ backgroundImage: 'linear-gradient(129deg, rgba(0,173,255,0.2) 0%, #00ADFF 29.568%, #0657FF 59.137%)' }}
                 >
-                  <Sparkles size={14} />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/images/ai-tools/sparkle-ai-chip.svg" alt="" className="h-3.5 w-3.5" />
                   AI로 채우기
                 </button>
               </div>

@@ -80,9 +80,9 @@ export const SAMPLE_PROFILE = {
       exercise: [
         { label: '필라테스', posterUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=80&h=80&q=75&fit=crop&auto=format' },
       ],
-      pet: '강아지',
-      petName: '보리',
-      petImage: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=160&h=160&q=75&fit=crop&auto=format',
+      pets: [
+        { id: 'pet-gangminjun-1', type: '강아지', name: '보리', image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=160&h=160&q=75&fit=crop&auto=format' },
+      ],
     },
     tastes: {
       // TODO(real API): posterUrl from TMDB API — image.tmdb.org/t/p/w185/{poster_path}
@@ -371,9 +371,9 @@ export const MK_PROFILE = {
         { label: '웨이트', posterUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=80&h=80&q=75&fit=crop&auto=format' },
         { label: '산책', posterUrl: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=80&h=80&q=75&fit=crop&auto=format' },
       ],
-      pet: '고양이',
-      petName: '모카',
-      petImage: 'https://images.unsplash.com/photo-1533743983-6db3e3d99df4?w=160&h=160&q=75&fit=crop&auto=format',
+      pets: [
+        { id: 'pet-mk-1', type: '고양이', name: '모카', image: 'https://images.unsplash.com/photo-1533743983-6db3e3d99df4?w=160&h=160&q=75&fit=crop&auto=format' },
+      ],
     },
     tastes: {
       movies: [
@@ -609,7 +609,6 @@ export const JIMIN_PROFILE = {
         { label: '러닝', posterUrl: 'https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=80&h=80&q=75&fit=crop&auto=format' },
         { label: '골프', posterUrl: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=80&h=80&q=75&fit=crop&auto=format' },
       ],
-      pet: '없음',
     },
     tastes: {
       // TODO(real API): posterUrl from TMDB API — image.tmdb.org/t/p/w185/{poster_path}
@@ -1027,7 +1026,7 @@ export const YOONJISOO_PROFILE = {
     ],
   },
   life: {
-    daily: { exercise: [{ label: '요가' }], pet: '고양이', petName: '모카' },
+    daily: { exercise: [{ label: '요가' }], pets: [{ id: 'pet-yjs-1', type: '고양이', name: '모카' }] },
     tastes: {
       movies: [{ label: '비포 선라이즈', sublabel: '리처드 링클레이터' }, { label: '아멜리에', sublabel: '장 피에르 쥬네' }],
       music: [{ label: 'MUNA', sublabel: 'Silk Chiffon', previewUrl: '' }, { label: '새소년', sublabel: '난춘', previewUrl: '' }],

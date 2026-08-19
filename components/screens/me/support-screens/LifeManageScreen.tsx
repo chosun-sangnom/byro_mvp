@@ -6,7 +6,7 @@ import { ChevronRight, Image as ImageIcon, Plus, X, Zap } from 'lucide-react'
 import { Button, NavBar, showToast } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useFeloreStore } from '@/store/useFeloreStore'
-import type { LifeMediaItem, PublicProfileLife } from '@/types'
+import type { LifeMediaItem, Pet, PublicProfileLife } from '@/types'
 import { ExercisePicker } from './ExercisePicker'
 import { MusicSearchPicker } from './MusicSearchPicker'
 import { MediaSearchPicker } from './MediaSearchPicker'
@@ -17,6 +17,7 @@ import { PlacePicker } from './PlacePicker'
 type LifeView = 'hub' | 'pet' | 'activity' | 'culture' | 'place' | 'album'
 
 const PET_OPTIONS = ['강아지', '고양이', '기타']
+const PET_MAX = 5
 
 const FREE_LIMIT = 5
 
@@ -103,16 +104,15 @@ function FieldBlock({ label, children }: { label: string; children: ReactNode })
 
 // ─── Sub-screens ──────────────────────────────────────────────────────────────
 
-function PetView({
-  life,
-  onSave,
+function PetCard({
+  pet,
+  onChange,
+  onRemove,
 }: {
-  life: PublicProfileLife
-  onSave: (daily: PublicProfileLife['daily']) => void
+  pet: Pet
+  onChange: (patch: Partial<Pet>) => void
+  onRemove: () => void
 }) {
-  const [pet, setPet] = useState(life.daily.pet)
-  const [petName, setPetName] = useState(life.daily.petName ?? '')
-  const [petImage, setPetImage] = useState(life.daily.petImage ?? '')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -120,81 +120,129 @@ function PetView({
     if (!file) return
     if (!file.type.startsWith('image/')) { showToast('이미지 파일만 업로드할 수 있어요', 'error'); return }
     const reader = new FileReader()
-    reader.onload = () => { if (typeof reader.result === 'string') setPetImage(reader.result) }
+    reader.onload = () => { if (typeof reader.result === 'string') onChange({ image: reader.result }) }
     reader.readAsDataURL(file)
     e.target.value = ''
+  }
+
+  return (
+    <div className="relative rounded-[16px] border border-[#DEE4EC] p-4">
+      <button
+        type="button"
+        onClick={onRemove}
+        className="absolute right-3 top-3 flex h-7 w-7 items-center justify-center rounded-full bg-[#F5F6F7]"
+      >
+        <X size={14} className="text-[#6C7786]" />
+      </button>
+
+      <div className="space-y-4 pr-8">
+        <FieldBlock label="종류">
+          <div className="flex flex-wrap gap-2">
+            {PET_OPTIONS.map((option) => {
+              const selected = option === pet.type
+              return (
+                <button
+                  key={option}
+                  onClick={() => onChange({ type: option })}
+                  className={[
+                    'rounded-full px-4 py-2 text-[14px] font-semibold transition-colors',
+                    selected ? 'bg-[#0D0D0D] text-white' : 'bg-[#F5F6F7] text-[#6C7786]',
+                  ].join(' ')}
+                >
+                  {option}
+                </button>
+              )
+            })}
+          </div>
+        </FieldBlock>
+
+        <FieldBlock label="이름">
+          <input
+            value={pet.name ?? ''}
+            onChange={(e) => onChange({ name: e.target.value })}
+            placeholder="예: 몽이"
+            className="w-full rounded-full border border-[#DEE4EC] bg-white px-4 py-3 text-[14px] text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
+          />
+        </FieldBlock>
+
+        <FieldBlock label="사진">
+          <input ref={fileInputRef} type="file" accept="image/*" className="sr-only" onChange={handleFileChange} />
+          {pet.image ? (
+            <div className="relative h-[140px] w-[140px]">
+              <div className="h-full w-full overflow-hidden rounded-[20px]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={pet.image} alt="반려동물" className="h-full w-full object-cover" />
+              </div>
+              <button
+                type="button"
+                onClick={() => onChange({ image: undefined })}
+                className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/60"
+              >
+                <X size={14} className="text-white" />
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex h-[140px] w-[140px] flex-col items-center justify-center gap-2 rounded-[20px] bg-[#F5F6F7]"
+            >
+              <ImageIcon size={32} className="text-[#A8B1BD]" />
+              <span className="text-[14px] font-semibold text-[#25313D]">눌러서 등록</span>
+            </button>
+          )}
+        </FieldBlock>
+      </div>
+    </div>
+  )
+}
+
+function PetView({
+  life,
+  onSave,
+}: {
+  life: PublicProfileLife
+  onSave: (daily: PublicProfileLife['daily']) => void
+}) {
+  const [pets, setPets] = useState<Pet[]>(life.daily.pets ?? [])
+
+  const updatePet = (id: string, patch: Partial<Pet>) =>
+    setPets((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)))
+
+  const removePet = (id: string) =>
+    setPets((prev) => prev.filter((p) => p.id !== id))
+
+  const addPet = () => {
+    if (pets.length >= PET_MAX) return
+    setPets((prev) => [...prev, { id: `pet-${Date.now()}-${prev.length}`, type: PET_OPTIONS[0] }])
   }
 
   return (
     <SubScreen
       title="반려동물"
       onBack={() => onSave(life.daily)}
-      onSave={() => onSave({
-        ...life.daily,
-        pet,
-        petName: pet ? petName.trim() || undefined : undefined,
-        petImage: pet ? petImage || undefined : undefined,
-      })}
+      onSave={() => onSave({ ...life.daily, pets: pets.length ? pets : undefined })}
     >
-      <FieldBlock label="종류">
-        <div className="flex flex-wrap gap-2">
-          {PET_OPTIONS.map((option) => {
-            const selected = option === pet
-            return (
-              <button
-                key={option}
-                onClick={() => setPet(selected ? undefined : option)}
-                className={[
-                  'rounded-full px-4 py-2 text-[14px] font-semibold transition-colors',
-                  selected ? 'bg-[#0D0D0D] text-white' : 'bg-[#F5F6F7] text-[#6C7786]',
-                ].join(' ')}
-              >
-                {option}
-              </button>
-            )
-          })}
-        </div>
-      </FieldBlock>
+      <div className="space-y-4">
+        {pets.map((pet) => (
+          <PetCard
+            key={pet.id}
+            pet={pet}
+            onChange={(patch) => updatePet(pet.id, patch)}
+            onRemove={() => removePet(pet.id)}
+          />
+        ))}
+      </div>
 
-      {pet && (
-        <>
-          <FieldBlock label="이름">
-            <input
-              value={petName}
-              onChange={(e) => setPetName(e.target.value)}
-              placeholder="예: 몽이"
-              className="w-full rounded-full border border-[#DEE4EC] bg-white px-4 py-3 text-[14px] text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
-            />
-          </FieldBlock>
-
-          <FieldBlock label="사진">
-            <input ref={fileInputRef} type="file" accept="image/*" className="sr-only" onChange={handleFileChange} />
-            {petImage ? (
-              <div className="relative h-[140px] w-[140px]">
-                <div className="h-full w-full overflow-hidden rounded-[20px]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={petImage} alt="반려동물" className="h-full w-full object-cover" />
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setPetImage('')}
-                  className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/60"
-                >
-                  <X size={14} className="text-white" />
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="flex h-[140px] w-[140px] flex-col items-center justify-center gap-2 rounded-[20px] bg-[#F5F6F7]"
-              >
-                <ImageIcon size={32} className="text-[#A8B1BD]" />
-                <span className="text-[14px] font-semibold text-[#25313D]">눌러서 등록</span>
-              </button>
-            )}
-          </FieldBlock>
-        </>
+      {pets.length < PET_MAX && (
+        <button
+          type="button"
+          onClick={addPet}
+          className="flex w-full items-center justify-center gap-1.5 rounded-[16px] border-2 border-dashed border-[#DEE4EC] py-4 text-[14px] font-semibold text-[#6C7786]"
+        >
+          <Plus size={16} />
+          반려동물 추가
+        </button>
       )}
     </SubScreen>
   )
@@ -389,13 +437,14 @@ function LifeHub({
 
   const totalCount = exerciseCount + cultureCount + foodCount
   const freeRemaining = Math.max(0, FREE_LIMIT - totalCount)
+  const petCount = life.daily.pets?.length ?? 0
 
   const rows: Array<{ view: LifeView; title: string; meta: string | null; nudge: string }> = [
     {
       view: 'pet',
       title: '반려동물',
-      meta: life.daily.pet !== '없음'
-        ? [life.daily.pet, life.daily.petName].filter(Boolean).join(' · ')
+      meta: petCount > 0
+        ? life.daily.pets!.map((p) => p.name ?? p.type).join(' · ')
         : null,
       nudge: '반려동물이 있으면 공통 화제가 생겨요',
     },

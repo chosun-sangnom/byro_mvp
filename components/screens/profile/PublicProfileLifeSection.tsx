@@ -81,12 +81,15 @@ const LAYOUTS: LayoutPattern[] = [
 function buildVibeItemsRandom(life: PublicProfileLife): VibeItem[] {
   const candidates: VibeItem[] = []
 
-  const pet = life.daily.pet
-  if (pet && pet !== '없음') {
+  const pets = life.daily.pets ?? []
+  if (pets.length) {
+    const withImage = pets.filter((p) => p.image)
+    const pool = withImage.length > 0 ? withImage : pets
+    const pickedPet = pool[Math.floor(Math.random() * pool.length)]
     candidates.push({
-      label: life.daily.petName ?? pet,
-      sublabel: life.daily.petName ? pet : undefined,
-      posterUrl: life.daily.petImage,
+      label: pickedPet.name ?? pickedPet.type,
+      sublabel: pickedPet.name ? pickedPet.type : undefined,
+      posterUrl: pickedPet.image,
       category: '반려동물',
       aspectType: 'square',
     })
@@ -323,8 +326,8 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
   if (!life) return null
 
   const exercise = life.daily.exercise ?? []
-  const pet = life.daily.pet
-  const hasPet = !!pet && pet !== '없음'
+  const pets = life.daily.pets ?? []
+  const hasPet = pets.length > 0
   const hasActivity = exercise.length > 0
   const hasCulture =
     life.tastes.movies.length > 0 ||
@@ -343,13 +346,11 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
         <>
           <BlockHeader label="반려동물" />
           <SquareScroll
-            items={[
-              {
-                label: life.daily.petName ?? pet,
-                sublabel: life.daily.petName ? pet : undefined,
-                posterUrl: life.daily.petImage,
-              },
-            ]}
+            items={pets.map((p) => ({
+              label: p.name ?? p.type,
+              sublabel: p.name ? p.type : undefined,
+              posterUrl: p.image,
+            }))}
           />
         </>
       )}

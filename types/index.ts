@@ -163,12 +163,17 @@ export interface KemiData {
   missingItems: string[]
 }
 
+export interface Pet {
+  id: string
+  type: string
+  name?: string
+  image?: string
+}
+
 export interface PublicProfileLife {
   daily: {
     exercise: LifeMediaItem[]
-    pet?: string
-    petName?: string
-    petImage?: string
+    pets?: Pet[]
   }
   tastes: {
     movies: LifeMediaItem[]

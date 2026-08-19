@@ -423,6 +423,7 @@ export function BasicInfoEditScreen({
   const [cropSource, setCropSource] = useState('')
   const [cropOpen, setCropOpen] = useState(false)
   const [cropFrame, setCropFrame] = useState({ x: 44, y: 74, width: DEFAULT_CROP_FRAME.width, height: DEFAULT_CROP_FRAME.height })
+  const [defaultCropFrame, setDefaultCropFrame] = useState(cropFrame)
   const [cropNaturalSize, setCropNaturalSize] = useState({ width: 1, height: 1 })
   const mainPhotoInputRef = useRef<HTMLInputElement>(null)
   const subPhotoInputRef = useRef<HTMLInputElement>(null)
@@ -486,8 +487,10 @@ export function BasicInfoEditScreen({
         img.onload = () => {
           setCropNaturalSize({ width: img.width, height: img.height })
           const initialLayout = getCropImageLayout(img.width, img.height, cropStage)
+          const initialFrame = getDefaultCropFrame(initialLayout)
           setCropSource(reader.result as string)
-          setCropFrame(getDefaultCropFrame(initialLayout))
+          setCropFrame(initialFrame)
+          setDefaultCropFrame(initialFrame)
           setCropOpen(true)
         }
         img.src = reader.result
@@ -570,6 +573,13 @@ export function BasicInfoEditScreen({
     }
     event.stopPropagation()
   }
+
+  const isCropFrameDefault = cropFrame.x === defaultCropFrame.x
+    && cropFrame.y === defaultCropFrame.y
+    && cropFrame.width === defaultCropFrame.width
+    && cropFrame.height === defaultCropFrame.height
+
+  const handleResetCrop = () => setCropFrame(defaultCropFrame)
 
   const handleApplyCrop = async () => {
     if (!cropSource) return
@@ -788,9 +798,17 @@ export function BasicInfoEditScreen({
         <div className="absolute inset-0 z-50 bg-black text-white">
           <div className="flex h-full flex-col">
             <div className="flex items-center justify-between px-5 pt-5 pb-3">
-              <button onClick={() => setCropOpen(false)} className="text-3xl leading-none text-white/86">×</button>
-              <div className="text-sm font-semibold text-white/70">사진 자르기</div>
-              <button onClick={handleApplyCrop} className="text-2xl leading-none text-white">✓</button>
+              <button onClick={() => setCropOpen(false)} className="text-[15px] font-medium text-white/86">취소</button>
+              <button
+                onClick={handleResetCrop}
+                disabled={isCropFrameDefault}
+                className="text-[13px] font-semibold text-white disabled:text-white/30"
+              >
+                재설정
+              </button>
+              <button onClick={handleApplyCrop} className="rounded-full bg-white px-4 py-1.5 text-[14px] font-bold text-black">
+                완료
+              </button>
             </div>
 
             <div className="flex-1 flex items-center justify-center px-5">
@@ -848,12 +866,28 @@ export function BasicInfoEditScreen({
                   }}
                   onPointerDown={handleCropPointerDown}
                 >
+                  {/* 3x3 격자 가이드 */}
+                  <div className="pointer-events-none absolute inset-0">
+                    <div className="absolute left-1/3 top-0 h-full w-px bg-white/30" />
+                    <div className="absolute left-2/3 top-0 h-full w-px bg-white/30" />
+                    <div className="absolute top-1/3 left-0 h-px w-full bg-white/30" />
+                    <div className="absolute top-2/3 left-0 h-px w-full bg-white/30" />
+                  </div>
+
+                  {/* 코너 핸들 */}
                   <div className="absolute left-0 top-0 h-5 w-5 border-l-[3px] border-t-[3px] border-white/92" />
                   <div className="absolute right-0 top-0 h-5 w-5 border-r-[3px] border-t-[3px] border-white/92" />
                   <div className="absolute left-0 bottom-0 h-5 w-5 border-l-[3px] border-b-[3px] border-white/92" />
                   <div className="absolute right-0 bottom-0 h-5 w-5 border-r-[3px] border-b-[3px] border-white/92" />
+
+                  {/* 엣지 틱 마크 */}
+                  <div className="pointer-events-none absolute left-1/2 top-0 h-[3px] w-5 -translate-x-1/2 bg-white/92" />
+                  <div className="pointer-events-none absolute bottom-0 left-1/2 h-[3px] w-5 -translate-x-1/2 bg-white/92" />
+                  <div className="pointer-events-none absolute left-0 top-1/2 h-5 w-[3px] -translate-y-1/2 bg-white/92" />
+                  <div className="pointer-events-none absolute right-0 top-1/2 h-5 w-[3px] -translate-y-1/2 bg-white/92" />
+
                   <div
-                    className="absolute left-1/2 -translate-x-1/2 rounded-full border border-white/78 bg-white/5"
+                    className="pointer-events-none absolute left-1/2 -translate-x-1/2 rounded-full border-[1.5px] border-white/85"
                     style={{
                       width: `${Math.min(getMaxCropFrameWidth(cropImageLayout) - 48, cropFrame.width - 48)}px`,
                       height: `${Math.min(getMaxCropFrameWidth(cropImageLayout) - 48, cropFrame.width - 48)}px`,

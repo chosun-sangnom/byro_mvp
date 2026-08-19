@@ -133,7 +133,7 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
     return (
       <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
         <NavBar title="" onBack={onBack} onClose={onBack} />
-        <div className="flex-1 overflow-y-auto px-5 py-6">
+        <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-6">
           <div className="mb-10 flex flex-col gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/ai-tools/verify-intro-icon.svg" alt="" className="h-9 w-9" />
@@ -267,7 +267,7 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
             조회된 직장 이력이에요. 경력에 추가할 항목을 선택하세요.
           </p>
         </div>
-        <div className="flex-1 overflow-y-auto px-5">
+        <div className="flex-1 overflow-y-auto scrollbar-hide px-5">
           {foundCareers.length === 0 ? (
             <div className="flex flex-col items-center gap-6 py-6">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -329,7 +329,7 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
             건강보험공단 이력에는 직함 정보가 없어요. 각 경력에 직함과 담당 업무를 입력해주세요.
           </p>
         </div>
-        <div className="flex-1 overflow-y-auto px-5">
+        <div className="flex-1 overflow-y-auto scrollbar-hide px-5">
           <div className="flex flex-col gap-3">
             {selectedItems.map(({ c, i }) => {
               const detail = details[i] ?? { role: '', desc: '' }
@@ -473,7 +473,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
     return (
       <div className="flex flex-col h-full">
         <NavBar title="학력 확인" onBack={onBack} />
-        <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-6">
+        <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-6 flex flex-col gap-6">
           <div className="flex flex-col items-center gap-2 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[var(--color-accent-bg-subtle)]">
               <BadgeCheck size={28} className="text-[var(--color-accent-dark)]" />
@@ -527,7 +527,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
     return (
       <div className="flex flex-col h-full">
         <NavBar title="학력 확인 · 졸업증명서" onBack={() => setStep('method')} />
-        <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col items-center justify-center gap-6">
+        <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-6 flex flex-col items-center justify-center gap-6">
           <div className="flex flex-col items-center gap-3 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[var(--color-accent-bg-subtle)]">
               <Upload size={28} className="text-[var(--color-accent-dark)]" />
@@ -582,7 +582,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
     return (
       <div className="flex flex-col h-full">
         <NavBar title="학력 확인 · 졸업증명서" onBack={() => setStep('upload')} />
-        <div className="flex-1 overflow-y-auto px-5 py-5">
+        <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-5">
           <p className="mb-4 text-[13px] text-[var(--color-text-secondary)]">
             졸업증명서에서 아래 정보를 확인했어요. 맞으면 인증을 완료하세요.
           </p>
@@ -618,7 +618,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
     return (
       <div className="flex flex-col h-full">
         <NavBar title="학력 확인 · 이메일" onBack={() => setStep('method')} />
-        <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-6">
+        <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-6 flex flex-col gap-6">
           <div className="flex flex-col items-center gap-3 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[var(--color-accent-bg-subtle)]">
               <Mail size={28} className="text-[var(--color-accent-dark)]" />
@@ -686,7 +686,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
     return (
       <div className="flex flex-col h-full">
         <NavBar title="학력 확인 · 이메일" onBack={() => setStep('email-input')} />
-        <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-6">
+        <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-6 flex flex-col gap-6">
           <div className="flex flex-col items-center gap-3 text-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[var(--color-accent-bg-subtle)]">
               <Mail size={28} className="text-[var(--color-accent-dark)]" />

@@ -445,7 +445,7 @@ function LifeHub({
               <div className="min-w-0 flex-1">
                 <p className="text-[14px] font-semibold text-[#0D0D0D]">{row.title}</p>
                 {row.meta
-                  ? <p className="mt-0.5 text-[12px] font-bold text-[#0657FF]">{row.meta}</p>
+                  ? <p className="mt-0.5 text-[12px] font-bold text-[#0D0D0D]">{row.meta}</p>
                   : <p className="mt-0.5 text-[12px] font-medium text-[#6C7786]">{row.nudge}</p>
                 }
               </div>

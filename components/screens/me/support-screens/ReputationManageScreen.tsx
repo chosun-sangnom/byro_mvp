@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { Check, ChevronRight } from 'lucide-react'
+import { Check, ChevronRight, MoreVertical } from 'lucide-react'
 import { NavBar, ActionMenu, ActionMenuItem, Modal, BottomSheet, showToast } from '@/components/ui'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mocks/publicProfiles'
@@ -14,7 +14,7 @@ const REPORT_REASONS = [
   '기타',
 ]
 
-const FEEDBACK_PAGE_SIZE = 5
+const FEEDBACK_PAGE_SIZE = 10
 
 // 실제 프로필 사진이 없는 작성자는 이니셜 아바타로 표시 — 순서대로 이 팔레트를 순환
 const AVATAR_BG_PALETTE = ['#F4F2FE', '#EFF9FF', '#F5F6F7']
@@ -75,7 +75,7 @@ function FeedbackRow({
           className="flex h-6 w-6 items-center justify-center"
           aria-label="더보기"
         >
-          <ChevronRight size={20} style={{ color: '#A8B1BD' }} />
+          <MoreVertical size={24} style={{ color: '#A8B1BD' }} />
         </button>
         <ActionMenu open={openMenuId === entry.id} onClose={() => setOpenMenuId(null)}>
           <ActionMenuItem

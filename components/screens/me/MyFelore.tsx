@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
@@ -41,17 +41,28 @@ export default function MyFelore() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const store = useFeloreStore()
+  // returnTo는 딥링크로 진입한 "첫 화면"(initialScreenRef)의 뒤로가기에서만 소비됨 —
+  // manage 허브를 거쳐 하위 화면으로 더 들어간 경우엔(초기 진입 화면이 아니므로)
+  // returnTo를 무시하고 항상 manage 허브로 돌아감. returnTo 자체는 값을 바꾸지
+  // 않고 유지하므로, 허브로 돌아온 뒤 허브 자체의 뒤로가기는 여전히 정상 동작함
   const returnTo = searchParams.get('returnTo')
   const handleBackToManage = () => {
-    if (returnTo) {
+    if (returnTo && screen === initialScreenRef.current) {
       router.replace(returnTo)
       return
     }
     setScreen('manage')
   }
+  const handleBackFromManage = () => {
+    if (returnTo) {
+      router.replace(returnTo)
+      return
+    }
+    setScreen('preview')
+  }
 
   const sectionParam = searchParams.get('section')
-  const [screen, setScreen] = useState<Screen>(
+  const initialScreen: Screen =
     sectionParam === 'highlight'  ? 'editHighlight'  :
     sectionParam === 'vibe'       ? 'editLife'        :
     sectionParam === 'sns'        ? 'editSNS'         :
@@ -59,7 +70,8 @@ export default function MyFelore() {
     sectionParam === 'visibility' ? 'editVisibility'  :
     sectionParam === 'whoiam'     ? 'editWhoIAm'      :
     searchParams.get('edit') === 'true' ? 'manage' : 'preview'
-  )
+  const initialScreenRef = useRef(initialScreen)
+  const [screen, setScreen] = useState<Screen>(initialScreen)
   const [activeTab, setActiveTab] = useState<PublicProfileTabId>('who')
 
   const user = store.user!
@@ -91,7 +103,7 @@ export default function MyFelore() {
         profile={profile}
         instagramConnected={store.instagramConnected}
         linkedinConnected={store.linkedinConnected}
-        onBack={() => setScreen('preview')}
+        onBack={handleBackFromManage}
         onEditBasic={() => setScreen('editBasic')}
         onEditWhoIAm={() => setScreen('editWhoIAm')}
         onEditHighlight={() => setScreen('editHighlight')}

@@ -533,7 +533,7 @@ export default function SettingsScreen() {
           icon: Pencil,
           label: '펠로어 편집',
           description: '프로필·하이라이트·라이프스타일',
-          href: '/me?edit=true',
+          href: '/me?edit=true&returnTo=%2Fsettings',
         },
         {
           id: 'visibility',

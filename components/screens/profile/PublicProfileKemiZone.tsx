@@ -205,7 +205,7 @@ function buildOwnerCompatibilitySummary(
       body: `${lifestyle.place ? `${lifestyle.place}` : '생활 반경'}과 ${lifestyle.activity ? `${lifestyle.activity}` : '일상 리듬'}이 겹치는 사람과 자연스럽게 연결돼요. ${lifestyle.culture ? `${lifestyle.culture} 같은 취향 접점이 다음 만남으로 이어지기 좋습니다.` : '공통으로 즐길 수 있는 활동이나 장소가 보이면 관계가 더 빠르게 가까워져요.'}`,
     },
     caution: {
-      title: '주의할 결',
+      title: 'TIP',
       body: `${extrovert ? '반응이 너무 느리거나 리듬이 자주 끊기면 흥미가 빨리 꺼질 수 있어요.' : '처음부터 너무 가까워지려 하면 오히려 거리감이 남을 수 있어요.'} ${thinking ? '감정 신호가 없는 관계보다 솔직하게 표현하는 사람과 더 잘 맞아요.' : '일방적인 논리나 비교 위주의 대화는 피로하게 읽혀요.'}`,
     },
   }
@@ -281,46 +281,54 @@ function OwnerKemiReportSheet({
 
   return (
     <BottomSheet open={open} onClose={onClose}>
-      <div className="px-5 pb-6">
-        <div className="mb-5">
-          <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">
-            <Sparkles size={14} />
-            <span>My Kemi Report</span>
+      <div className="px-4 pb-6">
+        <div className="mb-6 flex flex-col gap-2">
+          <div className="flex items-center gap-1">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/kemi/report-badge-icon.svg" alt="" className="size-5" />
+            <span className="text-[14px] font-bold text-black">케미 리포트</span>
           </div>
-          <h3 className="mt-3 text-[24px] font-black leading-[1.2] text-[var(--color-text-primary)]">
+          <h3 className="text-[22px] font-bold tracking-[-0.03em]" style={{ color: '#0D0D0D' }}>
             나와 잘 맞는 사람
           </h3>
-          <p className="mt-2 text-[13px] leading-[1.7] text-[var(--color-text-secondary)]">
+          <p className="text-[16px] font-medium leading-[1.5]" style={{ color: '#475058' }}>
             라이프스타일을 바탕으로 어떤 유형과 잘 연결되는지 읽어드려요.
           </p>
         </div>
 
-        <div className="rounded-[24px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] p-4">
-          <h4 className="text-[18px] font-bold leading-[1.35] text-[var(--color-text-primary)]">
-            {report.title}
-          </h4>
-          <p className="mt-2 text-[13px] leading-[1.7] text-[var(--color-text-secondary)]">
-            {report.summary}
-          </p>
-          {report.lifestyleChips.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {report.lifestyleChips.map((chip) => (
-                <span key={chip} className="chip-metric">{chip}</span>
-              ))}
-            </div>
-          )}
-        </div>
+        <div className="flex flex-col gap-3">
+          <div className="rounded-[24px] p-4" style={{ border: '0.66px solid #DEE4EC' }}>
+            <h4 className="text-[16px] font-bold leading-[1.35]" style={{ color: '#0D0D0D' }}>
+              {report.title}
+            </h4>
+            <p className="mt-2 text-[14px] font-medium leading-[1.5]" style={{ color: '#25313D' }}>
+              {report.summary}
+            </p>
+            {report.lifestyleChips.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {report.lifestyleChips.map((chip) => (
+                  <span
+                    key={chip}
+                    className="rounded-[8px] border px-2.5 py-1.5 text-[14px] font-medium"
+                    style={{ borderColor: '#DEE4EC', background: '#fff', color: '#25313D' }}
+                  >
+                    {chip}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
 
-        <div className="mt-4 space-y-3">
           {[report.fit, report.chemistry, report.caution].map((section) => (
             <div
               key={section.title}
-              className="rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] p-4"
+              className="rounded-[24px] p-4"
+              style={{ border: '0.66px solid #DEE4EC' }}
             >
-              <div className="text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-tertiary)]">
+              <div className="text-[14px] font-bold" style={{ color: '#0D0D0D' }}>
                 {section.title}
               </div>
-              <p className="mt-2 text-[13px] leading-[1.7] text-[var(--color-text-secondary)]">
+              <p className="mt-1 text-[14px] font-medium leading-[1.5]" style={{ color: '#25313D' }}>
                 {section.body}
               </p>
             </div>

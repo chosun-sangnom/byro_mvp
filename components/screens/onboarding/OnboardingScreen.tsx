@@ -56,6 +56,7 @@ export default function OnboardingScreen() {
       <NavBar
         onBack={hasBack ? () => store.prevStep() : (store.step === 'login' ? loginBackHandler ?? undefined : undefined)}
         onClose={stepNum < 4 ? handleClose : undefined}
+        divider={store.step !== 'complete'}
       />
 
       {stepNum >= 1 && stepNum <= 3 && (

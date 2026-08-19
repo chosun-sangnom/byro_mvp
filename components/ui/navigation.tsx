@@ -8,11 +8,12 @@ interface NavBarProps {
   onBack?: () => void
   onClose?: () => void
   right?: ReactNode
+  divider?: boolean
 }
 
-export function NavBar({ title, onBack, onClose, right }: NavBarProps) {
+export function NavBar({ title, onBack, onClose, right, divider = true }: NavBarProps) {
   return (
-    <div className="flex items-center px-5 h-12 border-b border-[var(--color-border-soft)] bg-[var(--color-glass-mid)] backdrop-blur-md flex-shrink-0">
+    <div className={`flex items-center px-5 h-12 bg-[var(--color-glass-mid)] backdrop-blur-md flex-shrink-0 ${divider ? 'border-b border-[var(--color-border-soft)]' : ''}`}>
       {onBack && (
         <button onClick={onBack} className="-ml-1 mr-3 p-1 text-[var(--color-text-secondary)]">
           <ChevronLeft size={20} />

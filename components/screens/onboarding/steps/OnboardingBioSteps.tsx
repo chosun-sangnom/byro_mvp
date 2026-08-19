@@ -354,7 +354,7 @@ export function Step9Complete() {
   const guide = slide > 0 ? GUIDE_SLIDES[slide - 1] : null
 
   return (
-    <div className="flex flex-col h-full px-5 py-7">
+    <div className="flex flex-1 flex-col min-h-0 px-5 py-7">
       <div className="flex-1 overflow-y-auto">
         {slide === 0 ? (
           <div className="pt-5">
@@ -401,7 +401,7 @@ export function Step9Complete() {
       {/* Bottom buttons */}
       {slide === 0 ? (
         <div className="space-y-3 pt-6">
-          <Button onClick={goNext}>자세히보기</Button>
+          <Button onClick={goNext}>Felore 채우기</Button>
           <Button variant="outline" onClick={() => router.replace(`/${linkId}`)} style={{ borderRadius: 9999 }}>나중에 할게요</Button>
         </div>
       ) : isLastSlide ? (

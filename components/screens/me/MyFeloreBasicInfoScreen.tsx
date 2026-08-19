@@ -221,6 +221,7 @@ export function WhoIAmEditScreen({
   const [aiSheetOpen, setAiSheetOpen] = useState(false)
   const [promptCopied, setPromptCopied] = useState(false)
   const [pastedText, setPastedText] = useState('')
+  const [mbtiInfoOpen, setMbtiInfoOpen] = useState(false)
 
   const handleSave = () => {
     store.updateUserWhoIAm({ ...initialWhoIAm, mbti, personality: personality.trim() || undefined })
@@ -230,53 +231,58 @@ export function WhoIAmEditScreen({
 
   return (
     <div className="flex flex-col h-full">
-      <NavBar title="기본정보" onBack={onBack} />
+      <NavBar title="나의 성향" onBack={onBack} />
       <div className="flex-1 overflow-y-auto">
-        <div className="px-5 py-5 space-y-5">
+        <div className="px-5 py-5 flex flex-col gap-9">
 
           {/* MBTI */}
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-1">
-                <label className="text-xs text-[var(--color-text-tertiary)]">MBTI</label>
-                <div className="group relative">
-                  <Info size={12} className="text-[var(--color-text-tertiary)] opacity-50 cursor-default" />
-                  <div className="pointer-events-none absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-52 rounded-xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-3 py-2 text-[11px] leading-relaxed text-[var(--color-text-secondary)] shadow-lg opacity-0 group-hover:opacity-100 transition-opacity z-10">
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between">
+              <div className="relative flex items-center gap-0.5">
+                <span className="text-[14px] font-semibold text-[#0D0D0D]">MBTI</span>
+                <button
+                  type="button"
+                  onClick={() => setMbtiInfoOpen((prev) => !prev)}
+                  className="flex items-center justify-center p-0.5"
+                >
+                  <Info size={14} className="text-[#A8B1BD]" />
+                </button>
+                {mbtiInfoOpen && (
+                  <div className="absolute left-0 top-full z-10 mt-2 w-60 rounded-xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-3 py-2.5 text-[11px] leading-relaxed text-[var(--color-text-secondary)] shadow-lg">
                     Myers-Briggs 성격 유형 검사.<br />
                     E/I · N/S · T/F · J/P 4가지 기준으로 16가지 성격 유형을 분류해요.
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[var(--color-border-soft)]" />
                   </div>
-                </div>
+                )}
               </div>
-              <span className="text-sm font-bold text-[var(--color-text-primary)]">{mbti || '—'}</span>
+              <span className="text-[14px] font-semibold text-[#25313D]">{mbti}</span>
             </div>
-            <div className="space-y-2">
+            <div className="flex gap-2">
               {MBTI_DIMS.map((dim, dimIndex) => {
                 const selectedLetter = mbti?.[dimIndex] ?? ''
                 return (
-                  <div key={dimIndex} className="flex rounded-xl overflow-hidden border border-[var(--color-border-default)]">
-                    {dim.options.map((letter, optIndex) => {
-                      const isSelected = selectedLetter === letter
-                      return (
-                        <button
-                          key={letter}
-                          type="button"
-                          onClick={() => {
-                            const parts = (mbti || '????').split('')
-                            parts[dimIndex] = letter
-                            setMbti(parts.join(''))
-                          }}
-                          className="flex-1 py-2.5 text-left px-4 transition-colors"
-                          style={{
-                            background: isSelected ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
-                            borderRight: optIndex === 0 ? '1px solid var(--color-border-default)' : undefined,
-                          }}
-                        >
-                          <span className={`text-[13px] font-black ${isSelected ? 'text-white' : 'text-[var(--color-text-secondary)]'}`}>{letter}</span>
-                          <span className={`ml-1.5 text-[11px] ${isSelected ? 'text-white/80' : 'text-[var(--color-text-tertiary)]'}`}>{dim.labels[optIndex]}</span>
-                        </button>
-                      )
-                    })}
+                  <div key={dimIndex} className="flex flex-1 flex-col items-center gap-2">
+                    <span className="text-[12px] font-medium text-[#6C7786]">{dim.labels[0]}</span>
+                    <div className="flex w-full flex-col items-center gap-0.5 rounded-full bg-[#F5F6F7] p-1">
+                      {dim.options.map((letter) => {
+                        const isSelected = selectedLetter === letter
+                        return (
+                          <button
+                            key={letter}
+                            type="button"
+                            onClick={() => {
+                              const parts = (mbti || '????').split('')
+                              parts[dimIndex] = letter
+                              setMbti(parts.join(''))
+                            }}
+                            className="flex aspect-square w-full items-center justify-center rounded-full transition-colors"
+                            style={{ background: isSelected ? '#0D0D0D' : 'transparent' }}
+                          >
+                            <span className={`text-[18px] font-semibold ${isSelected ? 'text-white' : 'text-[#DEE4EC]'}`}>{letter}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                    <span className="text-[12px] font-medium text-[#6C7786]">{dim.labels[1]}</span>
                   </div>
                 )
               })}
@@ -284,20 +290,16 @@ export function WhoIAmEditScreen({
           </div>
 
           {/* 성향 */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-xs text-[var(--color-text-tertiary)]">성향</label>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-1">
+              <span className="flex-1 text-[14px] font-semibold text-[#0D0D0D]">성향</span>
               <button
                 type="button"
                 onClick={() => { setPastedText(''); setAiSheetOpen(true) }}
-                className="flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold"
-                style={{
-                  background: 'var(--color-accent-bg-subtle)',
-                  color: 'var(--color-accent-dark)',
-                  border: '1px solid var(--color-accent-border-soft)',
-                }}
+                className="flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[14px] font-semibold text-white"
+                style={{ backgroundImage: 'linear-gradient(129deg, rgba(0,173,255,0.2) 0%, #00ADFF 29.568%, #0657FF 59.137%)' }}
               >
-                <Sparkles size={11} />
+                <Sparkles size={14} />
                 AI로 채우기
               </button>
             </div>
@@ -329,7 +331,7 @@ export function WhoIAmEditScreen({
         </div>
       </div>
       <div className="px-5 pb-6">
-        <Button onClick={handleSave}>저장</Button>
+        <Button onClick={handleSave}>저장하기</Button>
       </div>
     </div>
   )

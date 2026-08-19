@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, type ChangeEvent, type PointerEvent } from 'react'
-import { Calendar, Camera, Copy, Check, Info, Sparkles } from 'lucide-react'
+import { Calendar, Copy, Check, Image as ImageIcon, Info, Sparkles } from 'lucide-react'
 import {
   BIRTH_TIME_OPTIONS,
   BirthDateCalendar,
@@ -370,41 +370,53 @@ function normalizeProfileImages(images?: string[], avatarImage?: string) {
 
 function PhotoSlot({
   image,
-  label,
-  compact = false,
+  variant = 'sub',
+  radius = 16,
   onClick,
 }: {
   image?: string
-  label: string
-  compact?: boolean
+  variant?: 'main' | 'sub'
+  radius?: number
   onClick: () => void
 }) {
+  const isMain = variant === 'main'
   return (
     <button
       type="button"
       onClick={onClick}
-      className="group relative h-full w-full overflow-hidden rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)]"
+      className="group relative h-full w-full overflow-hidden bg-[#F5F6F7]"
+      style={{ borderRadius: isMain ? 24 : radius }}
     >
       {image ? (
         <>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={image} alt={label} className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-active:scale-[1.02]" />
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.04)_0%,rgba(0,0,0,0.10)_100%)]" />
+          <img
+            src={image}
+            alt={isMain ? '대표 사진' : '서브 사진'}
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-active:scale-[1.02]"
+          />
+          {isMain && (
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0)_70%,rgba(0,0,0,0.7)_90%)]" />
+          )}
         </>
       ) : (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-[var(--color-text-tertiary)]">
-          <Camera size={compact ? 18 : 22} />
-          <span className="text-[11px] font-semibold">{label}</span>
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+          <ImageIcon size={isMain ? 22 : 16} className="text-[#A8B1BD]" />
+          <span className={isMain ? 'text-[14px] font-bold text-[#A8B1BD]' : 'text-[10px] font-semibold text-[#A8B1BD]'}>
+            탭하여 추가
+          </span>
         </div>
       )}
 
-      <div className="absolute left-2.5 top-2.5 rounded-full border border-white/15 bg-black/50 px-2 py-1 text-[10px] font-semibold text-white/92 backdrop-blur-sm">
-        {label}
-      </div>
+      {isMain && (
+        <div className="absolute left-4 top-4 flex h-5 items-center justify-center rounded-full bg-black/80 px-2 backdrop-blur-[10px]">
+          <span className="text-[12px] font-bold text-white">대표</span>
+        </div>
+      )}
 
-      {image && (
-        <div className="absolute inset-x-0 bottom-0 flex items-center justify-center bg-[linear-gradient(180deg,transparent_0%,rgba(0,0,0,0.42)_100%)] px-3 py-2 text-[11px] font-semibold text-white/92">
-          눌러서 변경
+      {isMain && image && (
+        <div className="absolute inset-x-0 bottom-4 flex items-center justify-center">
+          <span className="text-[14px] font-bold text-white">탭하여 변경</span>
         </div>
       )}
     </button>
@@ -657,19 +669,18 @@ export function BasicInfoEditScreen({
               onChange={handleSubPhotoFileChange}
             />
 
-            <div className="grid h-[336px] grid-cols-[minmax(0,1fr)_86px] items-stretch gap-3">
+            <div className="grid h-[336px] grid-cols-[minmax(0,1fr)_86px] items-stretch gap-2">
               <PhotoSlot
                 image={profileImages[0]}
-                label="메인"
+                variant="main"
                 onClick={() => mainPhotoInputRef.current?.click()}
               />
-              <div className="grid h-full grid-rows-3 gap-3">
+              <div className="grid h-full grid-rows-3 gap-2">
                 {[1, 2, 3].map((index) => (
                   <PhotoSlot
                     key={index}
                     image={profileImages[index]}
-                    label={`서브 ${index}`}
-                    compact
+                    radius={index === 2 ? 8 : 16}
                     onClick={() => {
                       pendingSubIndexRef.current = index
                       subPhotoInputRef.current?.click()
@@ -813,10 +824,10 @@ export function BasicInfoEditScreen({
 
             <div>
               <div className="flex items-center gap-1">
-                <span className="text-[14px] font-semibold text-[#0D0D0D]">자기소개</span>
+                <span className="flex-1 text-[14px] font-semibold text-[#0D0D0D]">자기소개</span>
                 <button
                   onClick={handleAiFillBio}
-                  className="flex items-center gap-1 rounded-full px-2 py-1 text-[14px] font-semibold text-white"
+                  className="flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[14px] font-semibold text-white"
                   style={{ backgroundImage: 'linear-gradient(129deg, rgba(0,173,255,0.2) 0%, #00ADFF 29.568%, #0657FF 59.137%)' }}
                 >
                   <Sparkles size={14} />

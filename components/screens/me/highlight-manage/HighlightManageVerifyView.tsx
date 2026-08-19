@@ -6,11 +6,11 @@ import { Button, NavBar, showToast } from '@/components/ui'
 import type { Highlight, HighlightIconId } from '@/types'
 import type { HighlightManageCategory } from './constants'
 
-// [임시] 건강보험공단 직장 이력 모의 데이터
+// [임시] 건강보험공단 직장 이력 모의 데이터 (직함 정보는 제공되지 않음)
 const MOCK_NHIS_CAREERS = [
-  { company: '위에이아이', role: '프로덕트 매니저', startYear: '2023', endYear: '', status: '재직 중' as const },
-  { company: '크래프톤', role: '프로덕트 디자이너', startYear: '2020', endYear: '2023', status: '종료' as const },
-  { company: '카카오', role: '서비스 기획자', startYear: '2017', endYear: '2020', status: '종료' as const },
+  { company: '위에이아이', startYear: '2023', endYear: '', status: '재직 중' as const },
+  { company: '크래프톤', startYear: '2020', endYear: '2023', status: '종료' as const },
+  { company: '카카오', startYear: '2017', endYear: '2020', status: '종료' as const },
 ]
 
 const NHIS_INTRO_STEPS = [
@@ -52,12 +52,15 @@ export function HighlightManageVerifyView(props: VerifyViewProps) {
 
 // ── 경력 인증 플로우 ──────────────────────────────────────────────────────────
 
-type CareerStep = 'identity' | 'loading' | 'select' | 'done'
+type CareerStep = 'identity' | 'loading' | 'select' | 'details' | 'done'
+
+type CareerDetail = { role: string; desc: string }
 
 function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewProps) {
   const [step, setStep] = useState<CareerStep>('identity')
   const [foundCareers, setFoundCareers] = useState<typeof MOCK_NHIS_CAREERS>([])
   const [selected, setSelected] = useState<Set<number>>(new Set())
+  const [details, setDetails] = useState<Record<number, CareerDetail>>({})
   const [importedCount, setImportedCount] = useState(0)
 
   useEffect(() => {
@@ -78,30 +81,41 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
       return next
     })
 
-  const handleConfirm = () => {
+  const setDetail = (i: number, patch: Partial<CareerDetail>) =>
+    setDetails((prev) => ({ ...prev, [i]: { ...(prev[i] ?? { role: '', desc: '' }), ...patch } }))
+
+  const goToDetails = () => {
     if (selected.size === 0) {
       showToast('경력에 추가할 항목을 선택해주세요.', 'error')
       return
     }
-    const items = foundCareers
-      .map((c, i) => ({ c, i }))
-      .filter(({ i }) => selected.has(i))
-      .map(({ c }) => ({
+    setStep('details')
+  }
+
+  const selectedItems = foundCareers.map((c, i) => ({ c, i })).filter(({ i }) => selected.has(i))
+  const detailsValid = selectedItems.every(({ i }) => (details[i]?.role ?? '').trim().length > 0)
+
+  const handleConfirm = () => {
+    if (!detailsValid) return
+    const items = selectedItems.map(({ c, i }) => {
+      const detail = details[i] ?? { role: '', desc: '' }
+      return {
         categoryId: 'career-role' as const,
         icon: selectedCat.icon as HighlightIconId,
         title: c.company,
         subtitle: `${selectedCat.label} · 건강보험공단 인증`,
-        description: '',
+        description: detail.desc,
         year: c.status === '재직 중' ? `${c.startYear} - 현재` : `${c.startYear} - ${c.endYear}`,
         verified: true,
         metadata: {
-          role: c.role,
+          role: detail.role,
           status: c.status,
           startYear: c.startYear,
           endYear: c.endYear,
           isPrimary: false,
         },
-      }))
+      }
+    })
     setImportedCount(items.length)
     onImportCareers(items)
     setStep('done')
@@ -216,7 +230,7 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
                       <img src="/images/ai-tools/exp-verified-badge.svg" alt="" className="h-3 w-3 shrink-0" />
                     </div>
                     <p className="mt-0.5 text-[12px] font-semibold text-[#6C7786]">
-                      {c.role} · {c.status === '재직 중' ? `${c.startYear} - 현재` : `${c.startYear} - ${c.endYear}`}
+                      {c.status === '재직 중' ? `${c.startYear} - 현재` : `${c.startYear} - ${c.endYear}`}
                     </p>
                   </div>
                 </button>
@@ -225,8 +239,72 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
           )}
         </div>
         <div className="px-5 pb-6">
-          <Button onClick={foundCareers.length === 0 ? onBack : handleConfirm}>
+          <Button onClick={foundCareers.length === 0 ? onBack : goToDetails}>
             {foundCareers.length === 0 ? '확인' : `선택한 ${selected.size}개 경력 가져오기`}
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
+  if (step === 'details') {
+    return (
+      <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
+        <NavBar title="" onBack={() => setStep('select')} onClose={onBack} />
+        <div className="px-5 pt-2 pb-5">
+          <h1 className="text-[22px] font-bold text-[#0D0D0D]">경력 인증</h1>
+          <p className="mt-2 text-[16px] font-medium leading-[1.5] text-[#475058]">
+            건강보험공단 이력에는 직함 정보가 없어요. 각 경력에 직함과 담당 업무를 입력해주세요.
+          </p>
+        </div>
+        <div className="flex-1 overflow-y-auto px-5">
+          <div className="flex flex-col gap-3">
+            {selectedItems.map(({ c, i }) => {
+              const detail = details[i] ?? { role: '', desc: '' }
+              return (
+                <div key={c.company} className="flex flex-col gap-4 rounded-[24px] border border-[#DEE4EC] p-4">
+                  <div>
+                    <p className="text-[16px] font-bold text-[#0D0D0D]">{c.company}</p>
+                    <p className="mt-0.5 text-[12px] font-semibold text-[#6C7786]">
+                      {c.status === '재직 중' ? `${c.startYear} - 현재` : `${c.startYear} - ${c.endYear}`} · 건강보험공단 조회 결과 (수정 불가)
+                    </p>
+                  </div>
+                  <div>
+                    <div className="mb-2 flex items-center">
+                      <span className="text-[14px] font-semibold text-[#0D0D0D]">직함</span>
+                      <span className="ml-0.5 mt-0.5 h-[3px] w-[3px] shrink-0 rounded-full bg-[#FF4242]" />
+                    </div>
+                    <input
+                      value={detail.role}
+                      onChange={(e) => setDetail(i, { role: e.target.value })}
+                      placeholder="직함"
+                      className="w-full rounded-full border border-[#DEE4EC] px-4 py-3 text-[14px] text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
+                    />
+                  </div>
+                  <div>
+                    <p className="mb-2 text-[14px] font-semibold text-[#0D0D0D]">설명</p>
+                    <div className="relative rounded-[20px] border border-[#DEE4EC]">
+                      <textarea
+                        value={detail.desc}
+                        onChange={(e) => setDetail(i, { desc: e.target.value })}
+                        placeholder="어떤 일을 했는지 적어주세요."
+                        maxLength={150}
+                        rows={3}
+                        className="w-full resize-none rounded-[20px] bg-transparent px-4 pb-6 pt-3 text-[14px] text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
+                      />
+                      <span className="pointer-events-none absolute bottom-2.5 right-4 text-[11px] text-[#A8B1BD]">
+                        {detail.desc.length}/150
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+        <div className="px-5 pb-6">
+          <Button onClick={handleConfirm} disabled={!detailsValid}>
+            선택한 {selected.size}개 경력 가져오기
           </Button>
         </div>
       </div>

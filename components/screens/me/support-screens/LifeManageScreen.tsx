@@ -271,7 +271,10 @@ function ActivityView({
     <SubScreen
       title="활동"
       onBack={() => onSave(life.daily)}
-      onSave={() => onSave({ ...life.daily, exercise })}
+      onSave={() => {
+        onSave({ ...life.daily, exercise })
+        showToast('활동이 저장됐어요')
+      }}
       slotBadge={freeRemaining !== undefined
         ? <SlotBadge remaining={freeRemaining} />
         : undefined
@@ -311,7 +314,10 @@ function CultureView({
     <SubScreen
       title="문화"
       onBack={() => onSave({})}
-      onSave={() => onSave({ movies, music, books, plays })}
+      onSave={() => {
+        onSave({ movies, music, books, plays })
+        showToast('문화가 저장됐어요')
+      }}
       slotBadge={freeRemaining !== undefined
         ? <SlotBadge remaining={freeRemaining} />
         : undefined
@@ -356,7 +362,10 @@ function PlaceView({
     <SubScreen
       title="플레이스"
       onBack={() => onSave({})}
-      onSave={() => onSave({ restaurants, cafes })}
+      onSave={() => {
+        onSave({ restaurants, cafes })
+        showToast('플레이스가 저장됐어요')
+      }}
       slotBadge={freeRemaining !== undefined
         ? <SlotBadge remaining={freeRemaining} />
         : undefined
@@ -385,7 +394,10 @@ function AlbumView({
     <SubScreen
       title="앨범"
       onBack={() => onSave(life.albumPhotos ?? [])}
-      onSave={() => onSave(photos)}
+      onSave={() => {
+        onSave(photos)
+        showToast('앨범이 저장됐어요')
+      }}
     >
       <div className="grid grid-cols-3 gap-2">
         {photos.map((url, i) => (
@@ -548,7 +560,6 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
 
   const saveAndBack = () => {
     store.updateUserLife(life)
-    showToast('바이브 정보가 저장됐어요')
     onBack()
   }
 

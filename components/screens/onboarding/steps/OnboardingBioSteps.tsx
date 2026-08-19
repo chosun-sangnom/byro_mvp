@@ -1,12 +1,74 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { BadgeCheck, Images, Network, UserSearch } from 'lucide-react'
+import { BadgeCheck, ChevronRight, Images, Mail, MessageCircle, Network, Phone, UserSearch } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { Button } from '@/components/ui'
 
-// ─── Mini preview components ──────────────────────────────────────────────────
+// ─── Shared "menu" list card (하이라이트/SNS/연락수단/저장한 프로필 공통 패턴) ──────────
+
+function MenuCard({ children }: { children: ReactNode }) {
+  return (
+    <div className="flex w-full flex-col items-stretch overflow-hidden rounded-[12px] border border-[#DEE4EC] px-4">
+      {children}
+    </div>
+  )
+}
+
+function MenuDivider() {
+  return <div className="h-px w-full flex-shrink-0 bg-[#DEE4EC]" />
+}
+
+function MenuRow({ icon, title, sub, trailing }: { icon: ReactNode; title: string; sub: string; trailing?: ReactNode }) {
+  return (
+    <div className="flex w-full items-center justify-between gap-3 py-4">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[8px] bg-[#F5F6F7] text-[18px]">{icon}</div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-[#0D0D0D]">{title}</p>
+          <p className="truncate text-xs font-medium text-[#6C7786]">{sub}</p>
+        </div>
+      </div>
+      {trailing}
+    </div>
+  )
+}
+
+function StatusChip({ label, active }: { label: string; active: boolean }) {
+  return (
+    <span
+      className="flex-shrink-0 rounded-[6px] px-1.5 py-1 text-xs font-bold"
+      style={{ backgroundColor: active ? '#EEFBF2' : '#F5F6F7', color: active ? '#11C34B' : '#6C7786' }}
+    >
+      {label}
+    </span>
+  )
+}
+
+function CardHeader({ label, title, badge }: { label: string; title: string; badge: string }) {
+  return (
+    <div className="mb-5 flex w-full flex-col gap-1">
+      <p className="text-sm font-medium text-[#6C7786]">{label}</p>
+      <div className="flex items-center justify-between">
+        <p className="text-[18px] font-bold text-[#0D0D0D]">{title}</p>
+        <span className="flex-shrink-0 rounded-[6px] bg-[#25313D] px-1.5 py-1 text-xs font-bold text-white">{badge}</span>
+      </div>
+    </div>
+  )
+}
+
+// ─── Mini preview components (Figma "온보딩 가이드" 목업 기준) ──────────────────
+
+function PreviewBasicInfo() {
+  return (
+    <MenuCard>
+      <MenuRow icon="🧠" title="MBTI" sub="예: ENFP · 재기발랄한 활동가" trailing={<ChevronRight size={24} className="flex-shrink-0 text-[#A8B1BD]" />} />
+      <MenuDivider />
+      <MenuRow icon="✨" title="성향" sub="관계·소통 스타일을 알려줘요" trailing={<ChevronRight size={24} className="flex-shrink-0 text-[#A8B1BD]" />} />
+    </MenuCard>
+  )
+}
 
 function PreviewHighlight() {
   const items = [
@@ -15,72 +77,104 @@ function PreviewHighlight() {
     { emoji: '🏆', title: '우수 스타트업 대상', sub: '중기부 · 2023' },
   ]
   return (
-    <div className="rounded-[18px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 divide-y divide-[var(--color-border-soft)]">
-      {items.map((item) => (
-        <div key={item.title} className="flex items-center gap-3 py-3">
-          <span className="text-[18px] flex-shrink-0">{item.emoji}</span>
-          <div className="flex-1 min-w-0">
-            <div className="text-[13px] font-semibold text-[var(--color-text-primary)] truncate">{item.title}</div>
-            <div className="text-[11px] text-[var(--color-text-tertiary)]">{item.sub}</div>
-          </div>
-          <BadgeCheck size={14} className="flex-shrink-0 text-[var(--color-accent-dark)]" />
+    <MenuCard>
+      {items.map((item, i) => (
+        <div key={item.title} className="contents">
+          {i > 0 && <MenuDivider />}
+          <MenuRow icon={item.emoji} title={item.title} sub={item.sub} trailing={<ChevronRight size={24} className="flex-shrink-0 text-[#A8B1BD]" />} />
         </div>
       ))}
-    </div>
+    </MenuCard>
   )
 }
 
 function PreviewLife() {
-  const cells = [
-    { label: '🐶 코코', style: { gridColumn: '1', gridRow: '1 / 3' } },
-    { label: '🎵 재즈', style: { gridColumn: '2 / 4', gridRow: '1' } },
-    { label: '🏃 러닝', style: { gridColumn: '2', gridRow: '2' } },
-    { label: '🍣 스시', style: { gridColumn: '3', gridRow: '2' } },
-    { label: '☕ 카페', style: { gridColumn: '2 / 4', gridRow: '3' } },
-    { label: '📚 경제학', style: { gridColumn: '1', gridRow: '3' } },
-  ]
+  const Cell = ({ color, label, name, sub, className }: { color: string; label: string; name: string; sub?: string; className: string }) => (
+    <div className={`relative flex flex-col justify-end overflow-hidden rounded-[6px] bg-[var(--color-bg-muted)] p-1.5 ${className}`}>
+      <span className="absolute left-1.5 top-1.5 rounded-[6px] px-1.5 py-0.5 text-[9px] font-bold text-white" style={{ backgroundColor: color }}>
+        {label}
+      </span>
+      <p className="truncate text-[9px] font-semibold text-[#0D0D0D]">{name}</p>
+      {sub && <p className="truncate text-[8px] text-[#6C7786]">{sub}</p>}
+    </div>
+  )
   return (
-    <div
-      className="grid w-full overflow-hidden rounded-[18px] gap-1"
-      style={{ gridTemplateColumns: '3fr 2fr 2fr', gridTemplateRows: '2fr 3fr 2fr', aspectRatio: '1' }}
-    >
-      {cells.map((cell, i) => (
-        <div
-          key={i}
-          style={cell.style}
-          className="bg-[var(--color-bg-muted)] flex items-end p-2 overflow-hidden"
-        >
-          <span className="text-[11px] font-semibold text-[var(--color-text-secondary)] leading-tight">{cell.label}</span>
+    <div className="flex h-[220px] w-full gap-1">
+      <div className="grid flex-[1.4] grid-rows-[1.4fr_1fr] gap-1">
+        <Cell color="#0657FF" label="책" name="보통의 언어들" sub="김하나" className="" />
+        <div className="grid grid-cols-2 gap-1">
+          <Cell color="#F4832F" label="카페" name="오츠커피" sub="한남동" className="" />
+          <Cell color="#11C34B" label="운동" name="필라테스" className="" />
         </div>
-      ))}
+      </div>
+      <div className="grid flex-1 grid-rows-[1.3fr_1fr] gap-1">
+        <Cell color="#6541F2" label="영화" name="작은 아씨들" sub="2019" className="" />
+        <Cell color="#FF4242" label="애완동물" name="보리" sub="강아지" className="" />
+      </div>
     </div>
   )
 }
 
-function PreviewNetwork() {
-  const industries = [
-    { name: 'IT/스타트업', pct: 58 },
-    { name: '금융', pct: 22 },
-    { name: '컨설팅', pct: 13 },
-    { name: '제조', pct: 7 },
+function PreviewSNS() {
+  const rows = [
+    { icon: '📷', iconColor: '#E1306C', title: 'Instagram', sub: '@myongkoo', status: '연동됨', active: true },
+    { icon: 'in', iconColor: '#0A66C2', title: 'LinkedIn', sub: 'linkedin.com/in/myongkoo', status: '연동됨', active: true },
+    { icon: '▶', iconColor: '#FF0000', title: 'YouTube', sub: '구독자 기반 콘텐츠 연결', status: '미연동', active: false },
+    { icon: 'T', iconColor: '#000', title: 'TikTok', sub: '준비 중', status: '미연동', active: false },
   ]
   return (
-    <div className="rounded-[18px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-4">
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Remember</div>
-          <div className="text-[17px] font-black tracking-tight text-[var(--color-text-strong)]">명함 기반 네트워크</div>
+    <MenuCard>
+      {rows.map((row, i) => (
+        <div key={row.title} className="contents">
+          {i > 0 && <MenuDivider />}
+          <MenuRow
+            icon={<span className="text-[15px] font-black" style={{ color: row.iconColor }}>{row.icon}</span>}
+            title={row.title}
+            sub={row.sub}
+            trailing={<StatusChip label={row.status} active={row.active} />}
+          />
         </div>
-        <div className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">총 247명</div>
-      </div>
-      <div className="space-y-2">
-        {industries.map(({ name, pct }) => (
-          <div key={name} className="flex items-center gap-2">
-            <span className="w-16 flex-shrink-0 text-[11px] text-[var(--color-text-tertiary)]">{name}</span>
-            <div className="flex-1 h-1.5 rounded-full bg-[var(--color-bg-muted)]">
-              <div className="h-full rounded-full bg-[var(--color-accent-dark)] opacity-60" style={{ width: `${pct}%` }} />
-            </div>
-            <span className="w-6 text-right text-[10px] font-semibold text-[var(--color-text-tertiary)]">{pct}%</span>
+      ))}
+    </MenuCard>
+  )
+}
+
+function PreviewContact() {
+  const rows = [
+    { Icon: Phone, title: '전화', sub: '비활성화됨', status: '비활성', active: false },
+    { Icon: Mail, title: '이메일', sub: 'gangminjun@byro.io', status: '활성', active: true },
+    { Icon: MessageCircle, title: '카카오', sub: '비활성화됨', status: '활성', active: true },
+  ]
+  return (
+    <MenuCard>
+      {rows.map((row, i) => (
+        <div key={row.title} className="contents">
+          {i > 0 && <MenuDivider />}
+          <MenuRow icon={<row.Icon size={18} className="text-[#6C7786]" />} title={row.title} sub={row.sub} trailing={<StatusChip label={row.status} active={row.active} />} />
+        </div>
+      ))}
+    </MenuCard>
+  )
+}
+
+function PreviewNetwork() {
+  return (
+    <div className="w-full rounded-[12px] border border-[#DEE4EC] p-4">
+      <CardHeader label="리멤버 네트워크" title="명함 기반 관계 네트워크" badge="총 247명" />
+      <svg viewBox="0 0 280 110" className="w-full" fill="none">
+        <polyline points="0,70 40,90 80,60 120,75 160,50 200,85 240,20 280,60" stroke="#0657FF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+        <polyline points="0,55 40,80 80,70 120,55 160,65 200,45 240,55 280,50" stroke="#25313D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
+        <polyline points="0,90 40,60 80,85 120,65 160,80 200,60 240,75 280,70" stroke="#A8B1BD" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+      <div className="mt-3 flex items-center gap-3">
+        {[
+          { color: '#0657FF', label: 'IT/테크', count: 112 },
+          { color: '#25313D', label: '금융/투자', count: 94 },
+          { color: '#A8B1BD', label: '교육/연구', count: 53 },
+        ].map((item) => (
+          <div key={item.label} className="flex items-center gap-1">
+            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: item.color }} />
+            <span className="text-[11px] font-medium text-[#6C7786]">{item.label} {item.count}명</span>
           </div>
         ))}
       </div>
@@ -88,28 +182,24 @@ function PreviewNetwork() {
   )
 }
 
-function PreviewReputation() {
-  const keywords = [
-    { kw: '실행력', cnt: 12 },
-    { kw: '신뢰감', cnt: 9 },
-    { kw: '창의적', cnt: 7 },
-    { kw: '꼼꼼함', cnt: 6 },
-    { kw: '리더십', cnt: 4 },
+function PreviewFeedback() {
+  const rows = [
+    [{ kw: '실행력', cnt: 12 }, { kw: '신뢰감', cnt: 9 }, { kw: '창의적', cnt: 7 }],
+    [{ kw: '꼼꼼함', cnt: 6 }, { kw: '리더십', cnt: 4 }],
   ]
   return (
-    <div className="rounded-[18px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-4">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-text-tertiary)]">Reputation</div>
-          <div className="text-[17px] font-black tracking-tight text-[var(--color-text-strong)]">누적 평판</div>
-        </div>
-        <div className="rounded-full border border-[var(--color-border-default)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">총 38</div>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {keywords.map(({ kw, cnt }) => (
-          <span key={kw} className="chip-metric">
-            {kw} <span className="font-black text-[var(--color-text-strong)]">{cnt}</span>
-          </span>
+    <div className="w-full rounded-[12px] border border-[#DEE4EC] p-4">
+      <CardHeader label="평판" title="누적 평판" badge="총 38개" />
+      <div className="flex flex-col gap-3">
+        {rows.map((row, i) => (
+          <div key={i} className="flex gap-1.5">
+            {row.map(({ kw, cnt }) => (
+              <span key={kw} className="flex items-center gap-1.5 rounded-full border border-[#DEE4EC] bg-white px-3.5 py-2 text-sm text-[#25313D]">
+                <span className="font-medium">{kw}</span>
+                <span className="font-semibold">{cnt}</span>
+              </span>
+            ))}
+          </div>
         ))}
       </div>
     </div>
@@ -118,62 +208,33 @@ function PreviewReputation() {
 
 function PreviewConnect() {
   const profiles = [
-    { initial: '김', name: '김철수', sub: 'B2B Sales · 5년차', savedAt: '어제' },
-    { initial: '이', name: '이지현', sub: '브랜드 마케터 · 3년차', savedAt: '3일 전' },
-    { initial: '박', name: '박준혁', sub: 'iOS 개발자 · 7년차', savedAt: '1주 전' },
+    { initial: '김', bg: '#F0F5FF', name: '김철수', sub: 'B2B Sales · 5년차', savedAt: '어제', verified: true },
+    { initial: '이', bg: '#F4F2FE', name: '이지현', sub: '브랜드 마케터 · 3년차', savedAt: '3일 전', verified: false },
+    { initial: '박', bg: '#FEF3EA', name: '박준혁', sub: 'iOS 개발자 · 7년차', savedAt: '1주 전', verified: false },
   ]
   return (
-    <div className="rounded-[18px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] divide-y divide-[var(--color-border-soft)]">
-      {profiles.map((p) => (
-        <div key={p.name} className="flex items-center gap-3 px-4 py-3">
-          <div className="w-9 h-9 rounded-full bg-[var(--color-bg-muted)] flex items-center justify-center text-[12px] font-bold text-[var(--color-text-secondary)] flex-shrink-0">{p.initial}</div>
-          <div className="flex-1 min-w-0">
-            <div className="text-[13px] font-semibold text-[var(--color-text-primary)]">{p.name}</div>
-            <div className="text-[11px] text-[var(--color-text-tertiary)]">{p.sub}</div>
+    <MenuCard>
+      {profiles.map((p, i) => (
+        <div key={p.name} className="contents">
+          {i > 0 && <MenuDivider />}
+          <div className="flex w-full items-center justify-between gap-3 py-4">
+            <div className="flex min-w-0 items-center gap-2.5">
+              <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold text-[#6C7786]" style={{ backgroundColor: p.bg }}>
+                {p.initial}
+              </div>
+              <div className="min-w-0">
+                <div className="flex items-center gap-1">
+                  <p className="truncate text-sm font-semibold text-[#0D0D0D]">{p.name}</p>
+                  {p.verified && <BadgeCheck size={12} className="flex-shrink-0 text-[#0657FF]" />}
+                </div>
+                <p className="truncate text-xs font-medium text-[#6C7786]">{p.sub}</p>
+              </div>
+            </div>
+            <p className="flex-shrink-0 text-xs font-medium text-[#6C7786]">{p.savedAt}</p>
           </div>
-          <div className="text-[10px] text-[var(--color-text-tertiary)]">{p.savedAt}</div>
         </div>
       ))}
-    </div>
-  )
-}
-
-function PreviewSNS() {
-  const rows = [
-    { icon: '▶', iconColor: '#FF0000', title: 'YouTube', sub: '구독자 기반 콘텐츠 연결', connected: false },
-    { icon: 'in', iconColor: '#0A66C2', title: 'LinkedIn', sub: 'linkedin.com/in/myongkoo', connected: true },
-    { icon: '📷', iconColor: '#E1306C', title: 'Instagram', sub: '@myongkoo', connected: true },
-    { icon: 'T', iconColor: '#000', title: 'TikTok', sub: '준비 중', connected: false },
-  ]
-  return (
-    <div className="rounded-[18px] border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 divide-y divide-[var(--color-border-soft)]">
-      {rows.map((row) => (
-        <div key={row.title} className="flex items-center gap-3 py-3">
-          <span className="text-[13px] font-black w-[18px] text-center flex-shrink-0" style={{ color: row.iconColor }}>{row.icon}</span>
-          <div className="flex-1 min-w-0">
-            <div className="text-[13px] font-semibold text-[var(--color-text-primary)]">{row.title}</div>
-            <div className={`text-[11px] truncate ${row.connected ? 'text-[var(--color-accent-dark)]' : 'text-[var(--color-text-tertiary)]'}`}>{row.sub}</div>
-          </div>
-          {row.connected && <div className="w-1.5 h-1.5 rounded-full bg-[var(--color-state-success-text)] flex-shrink-0" />}
-        </div>
-      ))}
-    </div>
-  )
-}
-
-function PreviewContact() {
-  return (
-    <div className="space-y-2">
-      {[
-        { label: '010-1234-5678' },
-        { label: 'kakao_myongkoo' },
-        { label: 'hello@felore.io' },
-      ].map(({ label }) => (
-        <div key={label} className="flex items-center gap-3 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-4 py-3">
-          <span className="text-[13px] font-semibold text-[var(--color-text-primary)]">{label}</span>
-        </div>
-      ))}
-    </div>
+    </MenuCard>
   )
 }
 
@@ -252,18 +313,26 @@ interface GuideSlide {
 
 const GUIDE_SLIDES: GuideSlide[] = [
   {
+    Preview: PreviewBasicInfo,
+    title: '기본정보',
+    tags: ['MBTI', '성향'],
+    value: 'MBTI와 성향을 채워두면 나와 잘 맞는 사람을 더 쉽게 찾을 수 있어요.',
+    ctaLabel: '기본정보 채우러 가기',
+    ctaRoute: '/me?section=whoiam',
+  },
+  {
     Preview: PreviewHighlight,
     title: '하이라이트',
     tags: ['경력', '학력', '수상', '자격증'],
-    value: '먼저 보여주고 싶은 이력과 강점을 정리해보세요',
+    value: '먼저 보여주고싶은 이력과 강점을 정리해보세요.',
     ctaLabel: '하이라이트 채우러 가기',
     ctaRoute: '/me?section=highlight',
   },
   {
     Preview: PreviewLife,
     title: '바이브',
-    tags: ['취향', '운동', '플레이스', '음식'],
-    value: '취향과 일상을 채우면 첫 대화 소재가 생겨요',
+    tags: ['취향', '운동', '여행지', '음식'],
+    value: '취향과 일상을 채우면 첫 대화 소재가 생겨요.',
     ctaLabel: '바이브 채우러 가기',
     ctaRoute: '/me?section=vibe',
   },
@@ -271,15 +340,15 @@ const GUIDE_SLIDES: GuideSlide[] = [
     Preview: PreviewSNS,
     title: 'SNS',
     tags: ['인스타그램', '링크드인', '유튜브', '틱톡'],
-    value: '자주 쓰는 채널을 연결하면 나다움이 더 잘 보여요',
+    value: '자주 쓰는 채널을 연결하면 나다움이 더 잘 보여요.',
     ctaLabel: 'SNS 연동하러 가기',
     ctaRoute: '/me?section=sns',
   },
   {
     Preview: PreviewContact,
     title: '연락수단',
-    tags: ['전화', '이메일', '메신저'],
-    value: '연락 가능한 수단을 남겨두면 실제 만남으로 이어져요',
+    tags: ['전화', '이메일', '카카오'],
+    value: '연락 가능한 수단을 남겨두면 실제 만남으로 이어져요.',
     ctaLabel: '연락처 추가하러 가기',
     ctaRoute: '/me?section=contact',
   },
@@ -287,19 +356,19 @@ const GUIDE_SLIDES: GuideSlide[] = [
     Preview: PreviewNetwork,
     title: '네트워크',
     tags: ['리멤버 명함', '공통 인맥'],
-    value: '쌓아온 네트워크를 보여주면 연결 고리가 더 선명해져요',
+    value: '쌓아온 네트워크를 보여주면 연결 고리가 더 선명해져요.',
   },
   {
-    Preview: PreviewReputation,
-    title: '평판',
+    Preview: PreviewFeedback,
+    title: '피드백',
     tags: ['경험 키워드', '방명록'],
-    value: '다른 사람이 남긴 신뢰 신호가 프로필을 더 단단하게 해줘요',
+    value: '다른 사람이 남긴 신뢰 신호가 프로필을 더 단단하게 해줘요.',
   },
   {
     Preview: PreviewConnect,
     title: '저장한 프로필',
     tags: ['프로필 저장', '나중에 보기', '최근 본 프로필'],
-    value: '관심 있는 프로필을 저장하고 언제든 다시 볼 수 있어요',
+    value: '관심 있는 프로필을 저장하고 언제든 다시 볼 수 있어요.',
   },
 ]
 
@@ -372,24 +441,24 @@ export function Step9Complete() {
             </div>
           </div>
         ) : guide ? (
-          <div className="pt-2">
-            <div className="mb-5">
-              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] mb-2">
-                {slide} / {GUIDE_SLIDES.length}
+          <div className="pt-5">
+            <div className="mb-12 flex flex-col gap-2">
+              <p className="text-[16px] font-medium tracking-[-0.02em] text-[#6C7786]">
+                {slide}/{GUIDE_SLIDES.length}
               </p>
-              <h2 className="text-[28px] font-black leading-[1.15] text-[var(--color-text-strong)] mb-2">{guide.title}</h2>
-              <p className="text-[15px] font-semibold text-[var(--color-accent-dark)] leading-snug">{guide.value}</p>
+              <h2 className="text-[22px] font-bold leading-[1.35] tracking-[-0.03em] text-[#0D0D0D]">{guide.title}</h2>
+              <p className="text-[16px] font-medium leading-[1.5] tracking-[-0.02em] text-[#475058]">{guide.value}</p>
             </div>
 
-            <div className="pointer-events-none mb-5">
-              <guide.Preview />
-            </div>
+            <div className="flex flex-col gap-4">
+              <div className="pointer-events-none">
+                <guide.Preview />
+              </div>
 
-            <div>
               <div className="flex flex-wrap gap-1.5">
                 {guide.tags.map((tag) => (
-                  <span key={tag} className="text-xs font-semibold px-3 py-1.5 rounded-full bg-[var(--color-bg-muted)] text-[var(--color-text-secondary)]">
-                    {tag}
+                  <span key={tag} className="rounded-full bg-[#25313D] px-2.5 py-1.5 text-sm font-bold text-white">
+                    #{tag}
                   </span>
                 ))}
               </div>

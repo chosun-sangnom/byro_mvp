@@ -57,6 +57,7 @@ export default function MyFelore() {
     sectionParam === 'sns'        ? 'editSNS'         :
     sectionParam === 'contact'    ? 'editContact'     :
     sectionParam === 'visibility' ? 'editVisibility'  :
+    sectionParam === 'whoiam'     ? 'editWhoIAm'      :
     searchParams.get('edit') === 'true' ? 'manage' : 'preview'
   )
   const [activeTab, setActiveTab] = useState<PublicProfileTabId>('who')

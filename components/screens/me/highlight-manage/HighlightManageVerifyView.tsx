@@ -404,10 +404,16 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
 
 // ── 학력 인증 플로우 ──────────────────────────────────────────────────────────
 
+const EDU_OCR_STEPS = [
+  '졸업증명서 업로드 (PDF / JPG / PNG)',
+  'OCR로 학교명·전공·졸업연도 자동 파싱',
+  '가입 시 실명·생년월일과 대조 후 인증 배지 부여',
+]
+
 type EducationMethod = 'ocr' | 'email'
 type EducationStep =
   | 'method'
-  | 'upload' | 'loading-ocr' | 'result'
+  | 'upload' | 'loading-ocr' | 'result' | 'result-error'
   | 'email-input' | 'email-sending' | 'email-verify'
   | 'done'
 
@@ -421,7 +427,10 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
 
   useEffect(() => {
     if (step !== 'loading-ocr') return
-    const t = setTimeout(() => setStep('result'), 2000)
+    const t = setTimeout(() => {
+      // [임시] 실제 OCR 연동 전까지, 인식 실패 상태 UI 확인을 위해 20% 확률로 실패를 시뮬레이션
+      setStep(Math.random() < 0.2 ? 'result-error' : 'result')
+    }, 2000)
     return () => clearTimeout(t)
   }, [step])
 
@@ -526,38 +535,49 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
 
   if (step === 'upload') {
     return (
-      <div className="flex flex-col h-full">
-        <NavBar title="학력 확인 · 졸업증명서" onBack={() => setStep('method')} />
-        <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-6 flex flex-col items-center justify-center gap-6">
-          <div className="flex flex-col items-center gap-3 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[var(--color-accent-bg-subtle)]">
-              <Upload size={28} className="text-[var(--color-accent-dark)]" />
-            </div>
-            <div className="text-[17px] font-bold text-[var(--color-text-strong)]">졸업증명서 OCR 인증</div>
-            <p className="text-sm leading-6 text-[var(--color-text-secondary)]">
+      <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
+        <NavBar title="" onBack={() => setStep('method')} onClose={onBack} />
+        <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-6">
+          <div className="mb-10 flex flex-col gap-2">
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0D0D0D]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/ai-tools/edu-upload-icon.svg" alt="" className="h-4 w-4" />
+            </span>
+            <h1 className="text-[22px] font-bold leading-[1.35] text-[#0D0D0D]">졸업증명서 OCR 인증</h1>
+            <p className="text-[16px] font-medium leading-[1.5] text-[#475058]">
               대학·대학원 졸업증명서 PDF 또는<br />이미지 파일을 업로드하세요.
             </p>
           </div>
-          <div className="w-full surface-card rounded-[22px] px-4 py-4 space-y-3">
-            {['졸업증명서 업로드 (PDF / JPG / PNG)', 'OCR로 학교명·전공·졸업연도 자동 파싱', '가입 시 실명·생년월일과 대조 후 인증 배지 부여'].map((label, i) => (
-              <div key={i} className="flex items-center gap-3 text-sm text-[var(--color-text-secondary)]">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-bg-subtle)] text-[10px] font-bold text-[var(--color-accent-dark)]">
-                  {i + 1}
-                </span>
-                {label}
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-3 rounded-[24px] border border-[#DEE4EC] p-4">
+              {EDU_OCR_STEPS.map((label, i) => (
+                <div key={label} className="flex items-center gap-1.5">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[4px] bg-[#0D0D0D] text-[12.5px] font-semibold text-white">
+                    {i + 1}
+                  </span>
+                  <p className="text-[14px] font-medium text-[#475058]">{label}</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-col items-center justify-center gap-3 rounded-[24px] bg-[#F5F6F7] py-12">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/ai-tools/edu-photo-dropzone.svg" alt="" className="h-6 w-[30.667px]" />
+              <div className="flex flex-col items-center gap-1 text-center text-[14px]">
+                <p className="font-bold text-[#475058]">졸업증명서 업로드</p>
+                <p className="font-medium text-[#6C7786]">PDF / JPG / PNG</p>
               </div>
-            ))}
+            </div>
           </div>
-          <div
-            className="w-full rounded-[18px] flex flex-col items-center justify-center gap-2 py-10"
-            style={{ border: '2px dashed var(--color-border-default)', background: 'var(--color-bg-soft)' }}
-          >
-            <Upload size={22} className="text-[var(--color-text-tertiary)]" />
-            <p className="text-sm text-[var(--color-text-tertiary)]">PDF / JPG / PNG</p>
+
+          <div className="mt-8 pb-2">
+            <Button onClick={() => setStep('loading-ocr')}>
+              <span className="flex items-center justify-center gap-1.5">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/ai-tools/edu-plus-icon.svg" alt="" className="h-[14.5px] w-[14.5px]" />
+                학력 추가
+              </span>
+            </Button>
           </div>
-        </div>
-        <div className="border-t border-[var(--color-border-soft)] px-5 py-4">
-          <Button onClick={() => setStep('loading-ocr')}>파일 업로드 및 인증 시작</Button>
         </div>
       </div>
     )
@@ -567,11 +587,39 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
 
   if (step === 'loading-ocr') {
     return (
-      <div className="flex flex-col h-full">
-        <NavBar title="학력 확인 · 졸업증명서" onBack={() => setStep('method')} />
-        <div className="flex-1 flex flex-col items-center justify-center gap-4">
-          <Loader2 size={36} className="animate-spin text-[var(--color-accent)]" />
-          <p className="text-sm text-[var(--color-text-secondary)]">졸업증명서 OCR 파싱 중...</p>
+      <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
+        <NavBar title="" onBack={() => setStep('method')} onClose={onBack} />
+        <div className="px-5 pt-2">
+          <h1 className="text-[22px] font-bold text-[#0D0D0D]">학력 확인 · 졸업증명서</h1>
+        </div>
+        <div className="flex flex-1 flex-col items-center justify-center gap-6">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/ai-tools/ocr-loading-spinner.svg" alt="" className="h-12 w-12 animate-spin" />
+          <p className="text-[14px] font-semibold text-[#475058]">졸업증명서 OCR 인식 중...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // ── OCR: 인식 실패 ──────────────────────────────────────────────────────────
+
+  if (step === 'result-error') {
+    return (
+      <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
+        <NavBar title="" onBack={() => setStep('upload')} onClose={onBack} />
+        <div className="px-5 pt-2">
+          <h1 className="text-[22px] font-bold text-[#0D0D0D]">학력 확인 · 졸업증명서</h1>
+        </div>
+        <div className="flex flex-1 flex-col items-center justify-center gap-6 px-5 text-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/ai-tools/edu-error-icon.svg" alt="" className="h-12 w-12" />
+          <div className="flex flex-col gap-2">
+            <p className="text-[22px] font-bold text-[#0D0D0D]">OCR 인식에 실패했어요</p>
+            <p className="text-[16px] font-medium text-[#475058]">글자가 잘 나온 문서를 다시 업로드해 주세요.</p>
+          </div>
+        </div>
+        <div className="px-5 pb-6">
+          <Button onClick={() => setStep('upload')}>다시 업로드</Button>
         </div>
       </div>
     )
@@ -581,32 +629,38 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
 
   if (step === 'result') {
     return (
-      <div className="flex flex-col h-full">
-        <NavBar title="학력 확인 · 졸업증명서" onBack={() => setStep('upload')} />
-        <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-5">
-          <p className="mb-4 text-[13px] text-[var(--color-text-secondary)]">
+      <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
+        <NavBar title="" onBack={() => setStep('upload')} onClose={onBack} />
+        <div className="px-5 pt-2 pb-5">
+          <h1 className="text-[22px] font-bold text-[#0D0D0D]">학력 확인 · 졸업증명서</h1>
+          <p className="mt-2 text-[16px] font-medium leading-[1.5] text-[#475058]">
             졸업증명서에서 아래 정보를 확인했어요. 맞으면 인증을 완료하세요.
           </p>
-          <div className="surface-card rounded-[22px] px-4 py-5 space-y-4">
+        </div>
+        <div className="flex-1 overflow-y-auto scrollbar-hide px-5">
+          <div className="flex flex-col rounded-[24px] border border-[#DEE4EC] px-4">
             {[
               { label: '학교명', value: ocrResult.school },
               { label: '학교 유형', value: ocrResult.schoolType },
               { label: '전공', value: ocrResult.major },
               { label: '학위', value: ocrResult.degree },
               { label: '상태', value: ocrResult.status },
-              { label: '재학 기간', value: `${ocrResult.startYear} — ${ocrResult.endYear}` },
-            ].map(({ label, value }) => (
-              <div key={label} className="flex items-center justify-between">
-                <span className="text-[13px] text-[var(--color-text-tertiary)]">{label}</span>
-                <span className="text-[14px] font-semibold text-[var(--color-text-primary)]">{value}</span>
+              { label: '재학 기간', value: `${ocrResult.startYear} - ${ocrResult.endYear}` },
+            ].map(({ label, value }, i, arr) => (
+              <div
+                key={label}
+                className={['flex flex-col gap-1 py-4', i < arr.length - 1 ? 'border-b border-[#DEE4EC]' : ''].join(' ')}
+              >
+                <span className="text-[12px] font-medium text-[#6C7786]">{label}</span>
+                <span className="text-[14px] font-semibold text-[#0D0D0D]">{value}</span>
               </div>
             ))}
           </div>
-          <p className="mt-3 text-[11px] leading-5 text-[var(--color-text-tertiary)]">
+          <p className="mt-3 pb-3 text-[12px] font-medium text-[#6C7786]">
             정보가 다를 경우 OCR 파싱 오류일 수 있습니다. 운영자 수동 검토를 요청하세요.
           </p>
         </div>
-        <div className="border-t border-[var(--color-border-soft)] px-5 py-4">
+        <div className="px-5 pb-6">
           <Button onClick={handleOcrConfirm}>인증 완료</Button>
         </div>
       </div>
@@ -744,15 +798,19 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
   // ── 완료 ────────────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex flex-col h-full">
-      <NavBar title="학력 확인" onBack={onBack} />
-      <div className="flex-1 flex flex-col items-center justify-center gap-4 px-5">
-        <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[var(--color-state-success-bg)]">
-          <BadgeCheck size={28} className="text-[var(--color-state-success-text)]" />
-        </div>
-        <div className="text-center">
-          <div className="text-[17px] font-bold text-[var(--color-text-strong)]">학력 확인 완료</div>
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
+    <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
+      <NavBar title="" onBack={onBack} onClose={onBack} />
+      <div className="px-5 pt-2">
+        <h1 className="text-[22px] font-bold text-[#0D0D0D]">
+          {method === 'email' ? '학력 확인 · 이메일' : '학력 확인 · 졸업증명서'}
+        </h1>
+      </div>
+      <div className="flex flex-1 flex-col items-center justify-center gap-6 px-5 text-center">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/images/ai-tools/verify-done-icon.svg" alt="" className="h-12 w-12" />
+        <div className="flex flex-col gap-2">
+          <p className="text-[22px] font-bold text-[#0D0D0D]">학력 확인이 완료되었어요</p>
+          <p className="text-[16px] font-medium text-[#475058]">
             {method === 'email'
               ? `${emailInput} 이메일로 학력이 인증됐어요.`
               : `${ocrResult.school} 학력에 인증 배지가 부여됐어요.`
@@ -760,7 +818,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
           </p>
         </div>
       </div>
-      <div className="border-t border-[var(--color-border-soft)] px-5 py-4">
+      <div className="px-5 pb-6">
         <Button onClick={onBack}>확인</Button>
       </div>
     </div>

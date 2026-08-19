@@ -172,54 +172,52 @@ export function ManageFeloreScreen({
       <div className="flex-1 overflow-y-auto">
 
         {/* 완성도 */}
-        <div className="mx-5 mt-5 rounded-2xl border border-[var(--color-border-soft)] px-5 py-4">
-          <div className="mb-3 flex items-center justify-between">
-            <p className="text-[13px] font-semibold text-[var(--color-text-primary)]">
-              프로필 완성도
-            </p>
-            <p className="text-[13px] font-bold text-[var(--color-accent-dark)]">
+        <div className="mx-5 mt-5 rounded-[24px] border border-[#DEE4EC] p-4">
+          <div className="flex items-start justify-between gap-5">
+            <div className="flex min-w-0 flex-1 flex-col gap-1">
+              <p className="text-[16px] font-bold text-[#0D0D0D]">프로필 완성도</p>
+              {firstMissing && (
+                <p className="text-[12px] font-medium text-[#6C7786]">{firstMissing.label} 항목을 채워보세요</p>
+              )}
+            </div>
+            <p className="whitespace-nowrap text-[22px] font-bold text-[var(--color-accent-dark)]">
               {completionPercent}%
             </p>
           </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-[var(--color-bg-muted)]">
+          <div className="mt-5 h-1 overflow-hidden rounded-full bg-[#DEE4EC]">
             <div
               className="h-full rounded-full bg-[var(--color-accent-dark)] transition-all"
               style={{ width: `${completionPercent}%` }}
             />
           </div>
-          {firstMissing && (
-            <p className="mt-2 text-[11px] text-[var(--color-text-tertiary)]">
-              {firstMissing.label} 항목을 채우면 더 좋아져요
-            </p>
-          )}
         </div>
 
-        <div className="flex flex-col gap-5 mx-5 mt-4">
+        <div className="mx-5 mt-6 flex flex-col gap-6">
           {sections.map((section) => (
             <div key={section.title}>
-              <p className="mb-2 px-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[var(--color-text-tertiary)]">
+              <p className="mb-3 px-1 text-[16px] font-bold text-[#0D0D0D]">
                 {section.title}
               </p>
-              <div className="overflow-hidden rounded-2xl border border-[var(--color-border-soft)]">
+              <div className="overflow-hidden rounded-[24px] border border-[#DEE4EC] px-4">
                 {section.rows.map((row, i) => (
                   <button
                     key={row.title}
                     onClick={row.onClick}
                     className={[
-                      'flex w-full items-center justify-between px-5 py-4 text-left transition-colors active:bg-white/[0.03]',
-                      i < section.rows.length - 1 ? 'border-b border-[var(--color-border-soft)]' : '',
+                      'flex w-full items-center gap-4 py-4 text-left transition-colors active:bg-black/[0.02]',
+                      i < section.rows.length - 1 ? 'border-b border-[#DEE4EC]' : '',
                     ].join(' ')}
                   >
                     <div className="min-w-0 flex-1">
-                      <p className="text-[15px] font-semibold text-[var(--color-text-primary)]">{row.title}</p>
-                      <p className="mt-0.5 truncate text-[11px] text-[var(--color-text-tertiary)]">{row.hint}</p>
+                      <p className="text-[14px] font-semibold text-[#0D0D0D]">{row.title}</p>
+                      <p className="mt-1 truncate text-[12px] font-medium text-[#6C7786]">{row.hint}</p>
                       {row.meta ? (
-                        <p className="mt-0.5 truncate text-[11px] font-medium text-[var(--color-accent-dark)]">{row.meta}</p>
+                        <p className="mt-1 truncate text-[12px] font-semibold text-[var(--color-accent-dark)]">{row.meta}</p>
                       ) : (
-                        <p className="mt-1 truncate text-[11px] text-[var(--color-text-secondary)]">💡 {row.nudge}</p>
+                        <p className="mt-1 truncate text-[12px] font-semibold text-[#475058]">{row.nudge}</p>
                       )}
                     </div>
-                    <ChevronRight size={14} className="ml-3 flex-shrink-0 text-[var(--color-text-tertiary)] opacity-30" />
+                    <ChevronRight size={24} className="shrink-0 text-[#A8B1BD]" />
                   </button>
                 ))}
               </div>

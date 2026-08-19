@@ -2,7 +2,7 @@
 
 import { type ReactNode } from 'react'
 import { motion } from 'framer-motion'
-import { ChevronRight, Lock, Mail, MessageCircle, Phone } from 'lucide-react'
+import { ChevronRight, Lock } from 'lucide-react'
 import type { CareerTimeline, ContactChannel, Experience, RememberIndustry } from '@/types'
 
 const SECTION_EASE = [0.22, 1, 0.36, 1] as const
@@ -496,6 +496,12 @@ export function AnimatedSection({
   )
 }
 
+const CONTACT_ICON_SRC = {
+  phone: '/images/contact/phone.svg',
+  email: '/images/contact/email.svg',
+  messenger: '/images/contact/messenger.svg',
+}
+
 export function ContactActionButton({
   channel,
   onClick,
@@ -503,12 +509,7 @@ export function ContactActionButton({
   channel: ContactChannel
   onClick: () => void
 }) {
-  const iconMap = {
-    phone: Phone,
-    email: Mail,
-    messenger: MessageCircle,
-  }
-  const Icon = iconMap[channel.id] ?? MessageCircle
+  const iconSrc = CONTACT_ICON_SRC[channel.id] ?? CONTACT_ICON_SRC.messenger
 
   return (
     <motion.button
@@ -518,10 +519,9 @@ export function ContactActionButton({
       transition={{ type: 'spring', stiffness: 400, damping: 20 }}
       className={['flex flex-col items-center gap-2', channel.enabled ? '' : 'opacity-30 pointer-events-none'].join(' ')}
     >
-      <div className="flex h-[52px] w-[52px] items-center justify-center rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-muted)]">
-        <Icon size={18} color="var(--color-text-secondary)" />
-      </div>
-      <span className="text-[12px] font-medium text-[var(--color-text-secondary)]">{channel.label}</span>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={iconSrc} alt="" className="size-14" />
+      <span className="text-[14px] font-medium text-black">{channel.label}</span>
     </motion.button>
   )
 }

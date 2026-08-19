@@ -31,6 +31,13 @@ import {
 // viewer-relative match data. The aiCopy field should be replaced with a
 // streaming LLM response generated server-side from full profile context.
 
+const cardBorderStyle = {
+  border: '1.5px solid transparent',
+  backgroundImage: 'linear-gradient(var(--color-bg-page), var(--color-bg-page)), linear-gradient(135deg, #BFDBFE 0%, #3B82F6 55%, #2563EB 100%)',
+  backgroundOrigin: 'border-box',
+  backgroundClip: 'padding-box, border-box',
+} as const
+
 export function PublicProfileKemiZone({
   kemi,
   isLoggedIn,
@@ -45,13 +52,6 @@ export function PublicProfileKemiZone({
   onLoginRequest?: () => void
 }) {
   if (!kemi && !isLoading) return null
-
-  const cardBorderStyle = {
-    border: '1.5px solid transparent',
-    backgroundImage: 'linear-gradient(var(--color-bg-page), var(--color-bg-page)), linear-gradient(135deg, #BFDBFE 0%, #3B82F6 55%, #2563EB 100%)',
-    backgroundOrigin: 'border-box',
-    backgroundClip: 'padding-box, border-box',
-  } as const
 
   if (isLoading) {
     return (
@@ -225,15 +225,7 @@ export function PublicProfileOwnerMatchZone({
   return (
     <>
       <div className="px-5 pb-3">
-        <div
-          className="rounded-[20px] p-4"
-          style={{
-            border: '1.5px solid transparent',
-            backgroundImage: 'linear-gradient(var(--color-bg-page), var(--color-bg-page)), linear-gradient(135deg, #BFDBFE 0%, #3B82F6 55%, #2563EB 100%)',
-            backgroundOrigin: 'border-box',
-            backgroundClip: 'padding-box, border-box',
-          }}
-        >
+        <div className="rounded-[20px] p-4" style={cardBorderStyle}>
           <div className="flex items-start gap-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/kemi-report-icon.svg" alt="" className="size-[40px] shrink-0" />
@@ -297,7 +289,7 @@ function OwnerKemiReportSheet({
         </div>
 
         <div className="flex flex-col gap-3">
-          <div className="rounded-[24px] p-4" style={{ border: '0.66px solid #DEE4EC' }}>
+          <div className="rounded-[24px] p-4" style={cardBorderStyle}>
             <h4 className="text-[16px] font-bold leading-[1.35]" style={{ color: '#0D0D0D' }}>
               {report.title}
             </h4>

@@ -73,7 +73,7 @@ export function ManageFeloreScreen({
   ).length
 
   const completionChecks = [
-    { label: '기본정보', done: Boolean(whoIAm.mbti) },
+    { label: '나의 성향', done: Boolean(whoIAm.mbti) },
     { label: '하이라이트', done: allHighlights.length > 0 },
 
     { label: '바이브', done: activityCount + cultureCount + placeCount > 0 },
@@ -89,7 +89,7 @@ export function ManageFeloreScreen({
       title: '프로필',
       rows: [
         {
-          title: '프로필카드 편집',
+          title: '프로필 편집',
           hint: '프로필사진 · 자기소개 · 생년월일',
           nudge: '얼굴 사진과 자기소개가 있으면 첫인상이 훨씬 기억에 남아요',
           meta: user.headline?.trim() || undefined,
@@ -108,7 +108,7 @@ export function ManageFeloreScreen({
       title: 'WHO 탭',
       rows: [
         {
-          title: '기본정보',
+          title: '나의 성향',
           hint: 'MBTI · 성향',
           nudge: 'MBTI와 성향이 있으면 케미 리포트가 더 정확해져요',
           meta: [whoIAm.mbti, whoIAm.personality ? '성향 있음' : undefined].filter(Boolean).join(' · ') || undefined,

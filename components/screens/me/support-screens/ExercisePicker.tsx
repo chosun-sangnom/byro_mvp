@@ -6,7 +6,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { useRef, useState, type ChangeEvent } from 'react'
-import { Camera, Plus, X } from 'lucide-react'
+import { Plus, X } from 'lucide-react'
 import { showToast } from '@/components/ui'
 import type { LifeMediaItem } from '@/types'
 
@@ -158,17 +158,16 @@ function ExercisePhotoButton({
   onCameraClick,
 }: {
   item: LifeMediaItem
-  defaultImageUrl: string
+  defaultImageUrl?: string
   onCameraClick: () => void
 }) {
   const [imgFailed, setImgFailed] = useState(false)
   const displayUrl = item.posterUrl ?? (!imgFailed ? defaultImageUrl : undefined)
-  const isUserPhoto = !!item.posterUrl
 
   return (
     <button
       onClick={onCameraClick}
-      className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg bg-[var(--color-bg-muted)] flex items-center justify-center"
+      className="relative size-[47px] flex-shrink-0 overflow-hidden rounded-md"
     >
       {displayUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
@@ -179,13 +178,8 @@ function ExercisePhotoButton({
           onError={() => setImgFailed(true)}
         />
       ) : (
-        <Camera size={15} className="text-[var(--color-text-tertiary)]" />
-      )}
-      {/* 카메라 뱃지: 기본 이미지일 때만 표시 */}
-      {!isUserPhoto && displayUrl && (
-        <div className="absolute bottom-0 right-0 flex h-4 w-4 items-center justify-center rounded-tl-md bg-black/50">
-          <Camera size={8} className="text-white" />
-        </div>
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src="/images/exercise-no-photo.svg" alt="" className="h-full w-full object-cover" />
       )}
     </button>
   )
@@ -272,11 +266,10 @@ export function ExercisePicker({
 
       {/* ── 선택된 운동 (카테고리별 그룹) ── */}
       {selected.length > 0 && (
-        <div className="mb-4 space-y-4">
+        <div className="mb-6 space-y-6">
           {/* 헬퍼 텍스트 */}
-          <p className="flex items-center gap-1.5 text-[11px] text-[var(--color-text-tertiary)]">
-            <Camera size={11} />
-            기본 이미지를 눌러 내 모습으로 바꿀 수 있어요
+          <p className="text-[16px] font-medium leading-[1.5]" style={{ color: 'var(--color-accent-light)' }}>
+            기본 이미지를 눌러 내 모습으로 바꿀 수 있어요.
           </p>
 
           {CATEGORY_ORDER.filter((cat) => grouped[cat]).map((cat) => {
@@ -284,33 +277,34 @@ export function ExercisePicker({
             const { label } = getCategoryInfo(cat)
             const headerText = items.length === 1 ? items[0].label : label
             return (
-              <div key={cat}>
-                <div className="mb-2">
-                  <span className="text-[14px] font-bold text-[var(--color-text-primary)]">
-                    {headerText}
-                  </span>
-                </div>
+              <div key={cat} className="space-y-3">
+                <p className="text-[16px] font-bold" style={{ color: 'var(--color-accent-gold)' }}>
+                  {headerText}
+                </p>
                 <div className="space-y-2">
                   {items.map((item) => {
                     const dbItem = EXERCISE_DB.find((e) => e.name === item.label)
                     const defaultImg = dbItem
                       ? getExerciseImage(item.label, dbItem.category)
-                      : CATEGORY_IMAGES['other']
+                      : undefined
                     return (
                       <div
                         key={item.label}
-                        className="flex items-center gap-3 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-3 py-2"
+                        className="flex w-full items-center gap-5 rounded-xl border py-2 pl-2 pr-3"
+                        style={{ borderColor: '#DEE4EC' }}
                       >
-                        <ExercisePhotoButton
-                          item={item}
-                          defaultImageUrl={defaultImg}
-                          onCameraClick={() => handleCameraClick(item.label)}
-                        />
-                        <p className="flex-1 text-[13px] font-semibold text-[var(--color-text-primary)]">
-                          {item.label}
-                        </p>
-                        <button onClick={() => remove(item.label)} className="flex-shrink-0 p-1">
-                          <X size={14} className="text-[var(--color-text-tertiary)]" />
+                        <div className="flex min-w-0 flex-1 items-center gap-3">
+                          <ExercisePhotoButton
+                            item={item}
+                            defaultImageUrl={defaultImg}
+                            onCameraClick={() => handleCameraClick(item.label)}
+                          />
+                          <p className="truncate text-[14px] font-semibold" style={{ color: 'var(--color-accent-gold)' }}>
+                            {item.label}
+                          </p>
+                        </div>
+                        <button onClick={() => remove(item.label)} className="flex-shrink-0">
+                          <X size={20} color="#A8B1BD" />
                         </button>
                       </div>
                     )
@@ -329,17 +323,19 @@ export function ExercisePicker({
       )}
 
       <div className={isAtLimit ? 'pointer-events-none opacity-40' : undefined}>
-          <div className="flex gap-1.5 overflow-x-auto pb-2 mb-3 no-scrollbar">
+          <div className="mb-3 flex flex-wrap gap-1.5 border-b pb-2.5 pt-0.5" style={{ borderColor: '#DEE4EC' }}>
             {CATEGORY_TABS.map((tab) => {
               const active = activeCategory === tab.id
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveCategory(tab.id)}
-                  className="flex-shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-colors"
+                  className="rounded-lg px-2.5 py-1.5 text-[14px] whitespace-nowrap transition-colors"
                   style={{
-                    background: active ? 'var(--color-accent-dark)' : 'var(--color-bg-muted)',
-                    color: active ? '#fff' : 'var(--color-text-secondary)',
+                    background: active ? 'var(--color-accent-dark)' : '#fff',
+                    color: active ? '#fff' : 'var(--color-accent-dark)',
+                    border: active ? 'none' : '1px solid #DEE4EC',
+                    fontWeight: active ? 700 : 500,
                   }}
                 >
                   {tab.label}
@@ -348,18 +344,17 @@ export function ExercisePicker({
             })}
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-x-1.5 gap-y-2">
             {filtered.map((item) => {
               const isSelected = selectedNames.has(item.name)
               return (
                 <button
                   key={item.id}
                   onClick={() => toggle(item)}
-                  className="rounded-full border px-3.5 py-2 text-[13px] font-semibold transition-colors"
+                  className="rounded-lg px-3.5 py-1.5 text-[14px] font-bold transition-colors"
                   style={{
-                    borderColor: isSelected ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
-                    background: isSelected ? 'var(--color-accent-dark)' : 'var(--color-bg-surface)',
-                    color: isSelected ? '#fff' : 'var(--color-text-secondary)',
+                    background: isSelected ? 'var(--color-accent-dark)' : 'var(--color-accent-soft)',
+                    color: isSelected ? '#fff' : '#A8B1BD',
                   }}
                 >
                   {item.name}
@@ -368,20 +363,21 @@ export function ExercisePicker({
             })}
           </div>
 
-          <div className="flex gap-2 mt-4">
+          <div className="mt-4 flex gap-1.5">
             <input
               value={customInput}
               onChange={(e) => setCustomInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addCustom() } }}
-              placeholder="목록에 없으면 직접 입력..."
+              placeholder="목록에 없으면 직접 입력"
               disabled={isAtLimit}
-              className="flex-1 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-2.5 text-sm outline-none placeholder:text-[var(--color-text-tertiary)]"
+              className="flex-1 rounded-[10px] border p-3 text-[14px] font-medium outline-none placeholder:text-[#A8B1BD]"
+              style={{ borderColor: '#DEE4EC', color: 'var(--color-accent-gold)' }}
             />
             <button
               onClick={addCustom}
               disabled={!customInput.trim() || isAtLimit}
-              className="flex flex-shrink-0 items-center gap-1 rounded-xl px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-40"
-              style={{ background: 'var(--color-accent-dark)' }}
+              className="flex flex-shrink-0 items-center gap-1.5 rounded-[10px] px-6 py-3 text-[14px] font-bold text-white disabled:opacity-40"
+              style={{ background: 'var(--color-accent-gold)' }}
             >
               <Plus size={14} />
               추가

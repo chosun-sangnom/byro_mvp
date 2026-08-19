@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { BadgeCheck, Bookmark, BookmarkCheck, Download, Pencil, Share2, Sparkles, X } from 'lucide-react'
+import { BadgeCheck, Bookmark, BookmarkCheck, Pencil, Share2, Sparkles, X } from 'lucide-react'
 import { ActionMenu, ActionMenuItem, BottomSheet, Button, CheckRow, TextArea, showToast } from '@/components/ui'
 import { shareOrCopy } from '@/lib/share'
 import type { PersonaReason } from '@/lib/personaGen'
@@ -295,74 +295,69 @@ export function ProfileHeroCard({
         {/* AI 페르소나 바텀시트 — createPortal로 transform 컨텍스트 탈출 */}
         {hasPersonaData && mounted && createPortal(
           <BottomSheet open={personaSheetOpen} onClose={() => setPersonaSheetOpen(false)}>
-            <div className="pb-8">
+            <div className="flex flex-col gap-6 px-4 pb-6">
               {/* 캡처 대상 카드 */}
               <div ref={personaCardRef} style={{ backgroundColor: '#ffffff' }}>
                 {/* [임시] AI 이미지 생성 모델 연동 전 placeholder 이미지 */}
                 {personaImage && (
-                  <div className="relative h-[200px] w-full shrink-0 overflow-hidden rounded-t-[inherit]">
+                  <div className="relative h-[190px] w-full shrink-0 overflow-hidden rounded-[12px] bg-[#F5F6F7]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={personaImage} alt="AI 페르소나 이미지" className="h-full w-full object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/40" />
-                    <div className="absolute bottom-3 right-3 flex items-center gap-1 rounded-full bg-black/40 px-2 py-1 backdrop-blur-sm">
-                      <Sparkles size={9} className="text-white/60" />
-                      <span className="text-[9px] font-semibold uppercase tracking-wider text-white/60">AI generated</span>
+                    <div className="absolute right-4 top-4 rounded-[6px] bg-black/80 px-1.5 py-1 text-[12px] font-bold text-white backdrop-blur-[10px]">
+                      AI 생성
                     </div>
                   </div>
                 )}
 
-                <div className="px-5 pt-5">
-                  <div className="mb-5">
-                    <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: '#9CA3AF' }}>
-                      <Sparkles size={11} />
-                      <span>AI 페르소나</span>
-                      <span className="rounded-full px-2 py-0.5 text-[9px]" style={{ background: '#F3F4F6' }}>매주 업데이트됨</span>
-                    </div>
-                    <p className="mt-3 text-[22px] font-black leading-[1.2]" style={{ color: '#111827' }}>{personaText}</p>
-                    <p className="mt-1.5 text-[12px]" style={{ color: '#6B7280' }}>{profile.name} · felore.io</p>
+                <div className="mt-6 flex flex-col gap-1.5">
+                  <div className="flex items-center gap-1">
+                    <Sparkles size={14} style={{ color: '#25313D' }} />
+                    <span className="text-[12px] font-bold" style={{ color: '#25313D' }}>AI 페르소나</span>
+                    <span className="rounded-[4px] px-1 py-0.5 text-[8px] font-bold" style={{ background: '#F0F5FF', color: '#25313D' }}>매주 업데이트됨</span>
                   </div>
+                  <p className="text-[18px] font-bold leading-[1.35]" style={{ color: '#0D0D0D' }}>{personaText}</p>
                 </div>
               </div>
 
-              {/* 생성 근거 (캡처 제외) */}
-              <div className="px-5">
-                <div className="space-y-2">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.12em]" style={{ color: 'var(--color-text-tertiary)' }}>생성 근거</p>
+              {/* 생성 근거 */}
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                  <p className="text-[16px] font-bold" style={{ color: '#0D0D0D' }}>생성 근거</p>
+                  <p className="text-[12px] font-medium" style={{ color: '#6C7786' }}>{profile.name} · felore.io</p>
+                </div>
+                <div className="flex flex-col gap-2.5">
                   {personaReasons.map((reason) => (
                     <div
                       key={reason.category}
-                      className="flex items-center justify-between rounded-[14px] px-4 py-3"
-                      style={{ background: 'var(--color-bg-soft)', border: '1px solid var(--color-border-soft)' }}
+                      className="flex items-center justify-between rounded-[12px] border px-4 py-4"
+                      style={{ borderColor: '#DEE4EC' }}
                     >
-                      <span className="text-[12px]" style={{ color: 'var(--color-text-secondary)' }}>{reason.category}</span>
-                      <span className="text-[13px] font-semibold" style={{ color: 'var(--color-text-primary)' }}>{reason.value}</span>
+                      <span className="text-[14px] font-semibold" style={{ color: '#6C7786' }}>{reason.category}</span>
+                      <span className="text-[14px] font-medium" style={{ color: '#25313D' }}>{reason.value}</span>
                     </div>
                   ))}
                 </div>
+              </div>
 
-                {/* 저장 / 공유 버튼 */}
-                <div className="mt-5 flex gap-2">
-                  <button
-                    type="button"
-                    onClick={handlePersonaShare}
-                    disabled={personaSharing}
-                    className="flex flex-1 items-center justify-center gap-1.5 rounded-[14px] py-2.5 text-[13px] font-semibold transition-opacity active:opacity-70 disabled:opacity-50"
-                    style={{ background: 'var(--color-accent-bg-subtle)', border: '1px solid var(--color-accent-border-soft)', color: 'var(--color-accent-dark)' }}
-                  >
-                    <Download size={13} />
-                    {personaSharing ? '저장 중…' : '저장'}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handlePersonaShare}
-                    disabled={personaSharing}
-                    className="flex flex-1 items-center justify-center gap-1.5 rounded-[14px] py-2.5 text-[13px] font-semibold text-white transition-opacity active:opacity-70 disabled:opacity-50"
-                    style={{ background: 'linear-gradient(135deg, #1D4ED8, #7C3AED)' }}
-                  >
-                    <Share2 size={13} />
-                    {personaSharing ? '공유 중…' : '공유'}
-                  </button>
-                </div>
+              {/* 저장 / 공유 버튼 */}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={handlePersonaShare}
+                  disabled={personaSharing}
+                  className="flex flex-1 items-center justify-center rounded-full border py-4 text-[14px] font-bold transition-opacity active:opacity-70 disabled:opacity-50"
+                  style={{ borderColor: '#DEE4EC', color: '#25313D' }}
+                >
+                  {personaSharing ? '저장 중…' : '저장'}
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePersonaShare}
+                  disabled={personaSharing}
+                  className="flex flex-1 items-center justify-center rounded-full bg-black py-4 text-[14px] font-bold text-white transition-opacity active:opacity-70 disabled:opacity-50"
+                >
+                  {personaSharing ? '공유 중…' : '공유'}
+                </button>
               </div>
             </div>
           </BottomSheet>,

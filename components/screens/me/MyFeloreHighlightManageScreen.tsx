@@ -23,6 +23,15 @@ import {
 
 const HIGHLIGHT_FREE_LIMIT = 3
 
+// 한글 마지막 음절의 받침 유무에 따라 '이'/'가' 조사를 고른다.
+function pickIGa(label: string): '이' | '가' {
+  const lastChar = label.trim().slice(-1)
+  const code = lastChar.charCodeAt(0)
+  if (code < 0xac00 || code > 0xd7a3) return '가'
+  const hasBatchim = (code - 0xac00) % 28 !== 0
+  return hasBatchim ? '이' : '가'
+}
+
 interface HighlightManageScreenProps {
   onBack: () => void
 }
@@ -248,7 +257,7 @@ export function HighlightManageScreen({
 
     resetFormFields()
     setMode('group')
-    showToast(editingHl ? '수정됐어요!' : '추가됐어요!')
+    showToast(`${selectedCat.label}${pickIGa(selectedCat.label)} 저장되었어요`)
   }
 
   if (mode === 'verify' && selectedCat) {

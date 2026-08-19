@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { BadgeCheck, ChevronRight, Images, Mail, MessageCircle, Network, Phone, UserSearch } from 'lucide-react'
+import { ChevronRight, Images, Network, UserSearch } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { Button } from '@/components/ui'
 
@@ -20,11 +20,15 @@ function MenuDivider() {
   return <div className="h-px w-full flex-shrink-0 bg-[#DEE4EC]" />
 }
 
-function MenuRow({ icon, title, sub, trailing }: { icon: ReactNode; title: string; sub: string; trailing?: ReactNode }) {
+function MenuRow({ icon, boxed = true, title, sub, trailing }: { icon: ReactNode; boxed?: boolean; title: string; sub: string; trailing?: ReactNode }) {
   return (
     <div className="flex w-full items-center justify-between gap-3 py-4">
       <div className="flex min-w-0 flex-1 items-center gap-3">
-        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[8px] bg-[#F5F6F7] text-[18px]">{icon}</div>
+        {boxed ? (
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[8px] bg-[#F5F6F7]">{icon}</div>
+        ) : (
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center">{icon}</div>
+        )}
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold text-[#0D0D0D]">{title}</p>
           <p className="truncate text-xs font-medium text-[#6C7786]">{sub}</p>
@@ -72,16 +76,23 @@ function PreviewBasicInfo() {
 
 function PreviewHighlight() {
   const items = [
-    { emoji: '💼', title: 'Product Owner', sub: '스타트업 · 5년' },
-    { emoji: '🎓', title: '연세대학교 경영학과', sub: '2015 졸업' },
-    { emoji: '🏆', title: '우수 스타트업 대상', sub: '중기부 · 2023' },
+    { icon: '/images/onboarding-guide/highlight-1.svg', title: 'Product Owner', sub: '스타트업 · 5년' },
+    { icon: '/images/onboarding-guide/highlight-2.svg', title: '연세대학교 경영학과', sub: '2015 졸업' },
+    { icon: '/images/onboarding-guide/highlight-3.svg', title: '우수 스타트업 대상', sub: '중기부 · 2023' },
   ]
   return (
     <MenuCard>
       {items.map((item, i) => (
         <div key={item.title} className="contents">
           {i > 0 && <MenuDivider />}
-          <MenuRow icon={item.emoji} title={item.title} sub={item.sub} trailing={<ChevronRight size={24} className="flex-shrink-0 text-[#A8B1BD]" />} />
+          <MenuRow
+            // eslint-disable-next-line @next/next/no-img-element
+            icon={<img src={item.icon} alt="" className="h-10 w-10" />}
+            boxed={false}
+            title={item.title}
+            sub={item.sub}
+            trailing={<ChevronRight size={24} className="flex-shrink-0 text-[#A8B1BD]" />}
+          />
         </div>
       ))}
     </MenuCard>
@@ -89,27 +100,38 @@ function PreviewHighlight() {
 }
 
 function PreviewLife() {
-  const Cell = ({ color, label, name, sub, className }: { color: string; label: string; name: string; sub?: string; className: string }) => (
-    <div className={`relative flex flex-col justify-end overflow-hidden rounded-[6px] bg-[var(--color-bg-muted)] p-1.5 ${className}`}>
+  const Cell = ({ src, color, label, name, sub, playIcon, className }: { src: string; color: string; label: string; name: string; sub?: string; playIcon?: boolean; className: string }) => (
+    <div className={`relative flex flex-col justify-end overflow-hidden rounded-[6px] p-1.5 ${className}`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt="" className="absolute inset-0 h-full w-full object-cover" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 from-[10%] to-transparent to-[60%]" />
       <span className="absolute left-1.5 top-1.5 rounded-[6px] px-1.5 py-0.5 text-[9px] font-bold text-white" style={{ backgroundColor: color }}>
         {label}
       </span>
-      <p className="truncate text-[9px] font-semibold text-[#0D0D0D]">{name}</p>
-      {sub && <p className="truncate text-[8px] text-[#6C7786]">{sub}</p>}
+      {playIcon && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white/90">
+            <div className="ml-0.5 h-0 w-0 border-y-[3px] border-l-[5px] border-y-transparent border-l-black" />
+          </div>
+        </div>
+      )}
+      <p className="relative truncate text-[9px] font-semibold text-white">{name}</p>
+      {sub && <p className="relative truncate text-[8px] text-white/85">{sub}</p>}
     </div>
   )
   return (
     <div className="flex h-[220px] w-full gap-1">
-      <div className="grid flex-[1.4] grid-rows-[1.4fr_1fr] gap-1">
-        <Cell color="#0657FF" label="책" name="보통의 언어들" sub="김하나" className="" />
+      <div className="grid flex-[1.3] grid-rows-3 gap-1">
+        <Cell src="/images/onboarding-guide/vibe-book.png" color="#0657FF" label="책" name="보통의 언어들" sub="김하나" className="" />
         <div className="grid grid-cols-2 gap-1">
-          <Cell color="#F4832F" label="카페" name="오츠커피" sub="한남동" className="" />
-          <Cell color="#11C34B" label="운동" name="필라테스" className="" />
+          <Cell src="/images/onboarding-guide/vibe-cafe.png" color="#1DAEFF" label="카페" name="오츠커피" sub="한남동" className="" />
+          <Cell src="/images/onboarding-guide/vibe-workout.png" color="#11C34B" label="운동" name="필라테스" className="" />
         </div>
+        <Cell src="/images/onboarding-guide/vibe-music.png" color="#F4832F" label="음악" name="Sqaure" sub="백예린" playIcon className="" />
       </div>
-      <div className="grid flex-1 grid-rows-[1.3fr_1fr] gap-1">
-        <Cell color="#6541F2" label="영화" name="작은 아씨들" sub="2019" className="" />
-        <Cell color="#FF4242" label="애완동물" name="보리" sub="강아지" className="" />
+      <div className="grid flex-1 grid-rows-[2fr_1fr] gap-1">
+        <Cell src="/images/onboarding-guide/vibe-movie.png" color="#6541F2" label="영화" name="작은 아씨들" sub="2019" className="" />
+        <Cell src="/images/onboarding-guide/vibe-pet.png" color="#FF4242" label="애완동물" name="보리" sub="강아지" className="" />
       </div>
     </div>
   )
@@ -117,10 +139,10 @@ function PreviewLife() {
 
 function PreviewSNS() {
   const rows = [
-    { icon: '📷', iconColor: '#E1306C', title: 'Instagram', sub: '@myongkoo', status: '연동됨', active: true },
-    { icon: 'in', iconColor: '#0A66C2', title: 'LinkedIn', sub: 'linkedin.com/in/myongkoo', status: '연동됨', active: true },
-    { icon: '▶', iconColor: '#FF0000', title: 'YouTube', sub: '구독자 기반 콘텐츠 연결', status: '미연동', active: false },
-    { icon: 'T', iconColor: '#000', title: 'TikTok', sub: '준비 중', status: '미연동', active: false },
+    { icon: '/images/onboarding-guide/sns-instagram.svg', title: 'Instagram', sub: '@myongkoo', status: '연동됨', active: true },
+    { icon: '/images/onboarding-guide/sns-linkedin.svg', title: 'LinkedIn', sub: 'linkedin.com/in/myongkoo', status: '연동됨', active: true },
+    { icon: '/images/onboarding-guide/sns-youtube.svg', title: 'YouTube', sub: '구독자 기반 콘텐츠 연결', status: '미연동', active: false },
+    { icon: '/images/onboarding-guide/sns-tiktok.svg', title: 'TikTok', sub: '준비 중', status: '미연동', active: false },
   ]
   return (
     <MenuCard>
@@ -128,7 +150,8 @@ function PreviewSNS() {
         <div key={row.title} className="contents">
           {i > 0 && <MenuDivider />}
           <MenuRow
-            icon={<span className="text-[15px] font-black" style={{ color: row.iconColor }}>{row.icon}</span>}
+            // eslint-disable-next-line @next/next/no-img-element
+            icon={<img src={row.icon} alt="" className="h-[17px] w-[17px]" />}
             title={row.title}
             sub={row.sub}
             trailing={<StatusChip label={row.status} active={row.active} />}
@@ -141,16 +164,23 @@ function PreviewSNS() {
 
 function PreviewContact() {
   const rows = [
-    { Icon: Phone, title: '전화', sub: '비활성화됨', status: '비활성', active: false },
-    { Icon: Mail, title: '이메일', sub: 'gangminjun@byro.io', status: '활성', active: true },
-    { Icon: MessageCircle, title: '카카오', sub: '비활성화됨', status: '활성', active: true },
+    { icon: '/images/onboarding-guide/contact-phone.svg', title: '전화', sub: '비활성화됨', status: '비활성', active: false },
+    { icon: '/images/onboarding-guide/contact-email.svg', title: '이메일', sub: 'gangminjun@byro.io', status: '활성', active: true },
+    { icon: '/images/onboarding-guide/contact-kakao.svg', title: '카카오', sub: '비활성화됨', status: '활성', active: true },
   ]
   return (
     <MenuCard>
       {rows.map((row, i) => (
         <div key={row.title} className="contents">
           {i > 0 && <MenuDivider />}
-          <MenuRow icon={<row.Icon size={18} className="text-[#6C7786]" />} title={row.title} sub={row.sub} trailing={<StatusChip label={row.status} active={row.active} />} />
+          <MenuRow
+            // eslint-disable-next-line @next/next/no-img-element
+            icon={<img src={row.icon} alt="" className="h-10 w-10" />}
+            boxed={false}
+            title={row.title}
+            sub={row.sub}
+            trailing={<StatusChip label={row.status} active={row.active} />}
+          />
         </div>
       ))}
     </MenuCard>
@@ -161,23 +191,8 @@ function PreviewNetwork() {
   return (
     <div className="w-full rounded-[12px] border border-[#DEE4EC] p-4">
       <CardHeader label="리멤버 네트워크" title="명함 기반 관계 네트워크" badge="총 247명" />
-      <svg viewBox="0 0 280 110" className="w-full" fill="none">
-        <polyline points="0,70 40,90 80,60 120,75 160,50 200,85 240,20 280,60" stroke="#0657FF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-        <polyline points="0,55 40,80 80,70 120,55 160,65 200,45 240,55 280,50" stroke="#25313D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
-        <polyline points="0,90 40,60 80,85 120,65 160,80 200,60 240,75 280,70" stroke="#A8B1BD" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-      <div className="mt-3 flex items-center gap-3">
-        {[
-          { color: '#0657FF', label: 'IT/테크', count: 112 },
-          { color: '#25313D', label: '금융/투자', count: 94 },
-          { color: '#A8B1BD', label: '교육/연구', count: 53 },
-        ].map((item) => (
-          <div key={item.label} className="flex items-center gap-1">
-            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: item.color }} />
-            <span className="text-[11px] font-medium text-[#6C7786]">{item.label} {item.count}명</span>
-          </div>
-        ))}
-      </div>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src="/images/onboarding-guide/network-chart.png" alt="" className="w-full rounded-[8px] object-cover" />
     </div>
   )
 }
@@ -225,7 +240,8 @@ function PreviewConnect() {
               <div className="min-w-0">
                 <div className="flex items-center gap-1">
                   <p className="truncate text-sm font-semibold text-[#0D0D0D]">{p.name}</p>
-                  {p.verified && <BadgeCheck size={12} className="flex-shrink-0 text-[#0657FF]" />}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  {p.verified && <img src="/images/onboarding-guide/connect-badge.svg" alt="" className="h-3 w-3 flex-shrink-0" />}
                 </div>
                 <p className="truncate text-xs font-medium text-[#6C7786]">{p.sub}</p>
               </div>

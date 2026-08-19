@@ -2,7 +2,7 @@
 
 import { useRef, useState, type ChangeEvent, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
-import { Camera, ChevronRight, Plus, X, Zap } from 'lucide-react'
+import { ChevronRight, Image as ImageIcon, Plus, X, Zap } from 'lucide-react'
 import { Button, NavBar, showToast } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useFeloreStore } from '@/store/useFeloreStore'
@@ -16,7 +16,7 @@ import { PlacePicker } from './PlacePicker'
 
 type LifeView = 'hub' | 'pet' | 'activity' | 'culture' | 'place' | 'album'
 
-const PET_OPTIONS = ['없음', '강아지', '고양이', '소형 포유류', '조류', '파충류', '어류', '기타']
+const PET_OPTIONS = ['강아지', '고양이', '기타']
 
 const FREE_LIMIT = 5
 
@@ -132,8 +132,8 @@ function PetView({
       onSave={() => onSave({
         ...life.daily,
         pet,
-        petName: pet === '없음' ? undefined : petName.trim() || undefined,
-        petImage: pet === '없음' ? undefined : petImage || undefined,
+        petName: pet ? petName.trim() || undefined : undefined,
+        petImage: pet ? petImage || undefined : undefined,
       })}
     >
       <FieldBlock label="종류">
@@ -143,7 +143,7 @@ function PetView({
             return (
               <button
                 key={option}
-                onClick={() => setPet(option)}
+                onClick={() => setPet(selected ? undefined : option)}
                 className={[
                   'rounded-full px-4 py-2 text-[14px] font-semibold transition-colors',
                   selected ? 'bg-[#0D0D0D] text-white' : 'bg-[#F5F6F7] text-[#6C7786]',
@@ -156,7 +156,7 @@ function PetView({
         </div>
       </FieldBlock>
 
-      {pet !== '없음' && (
+      {pet && (
         <>
           <FieldBlock label="이름">
             <input
@@ -169,19 +169,28 @@ function PetView({
 
           <FieldBlock label="사진">
             <input ref={fileInputRef} type="file" accept="image/*" className="sr-only" onChange={handleFileChange} />
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-[16px] border border-[#DEE4EC] bg-[#F5F6F7]"
-            >
-              {petImage
-                // eslint-disable-next-line @next/next/no-img-element
-                ? <img src={petImage} alt="반려동물" className="h-full w-full object-cover" />
-                : <Camera size={22} className="text-[#A8B1BD]" />
-              }
-            </button>
-            {petImage && (
-              <button onClick={() => setPetImage('')} className="mt-2 text-[12px] font-medium text-[#FF4242]">
-                사진 제거
+            {petImage ? (
+              <div className="relative h-[140px] w-[140px]">
+                <div className="h-full w-full overflow-hidden rounded-[20px]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={petImage} alt="반려동물" className="h-full w-full object-cover" />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPetImage('')}
+                  className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-black/60"
+                >
+                  <X size={14} className="text-white" />
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex h-[140px] w-[140px] flex-col items-center justify-center gap-2 rounded-[20px] bg-[#F5F6F7]"
+              >
+                <ImageIcon size={32} className="text-[#A8B1BD]" />
+                <span className="text-[14px] font-semibold text-[#25313D]">눌러서 등록</span>
               </button>
             )}
           </FieldBlock>

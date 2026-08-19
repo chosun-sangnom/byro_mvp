@@ -1,8 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Check, Info, MessageCircle } from 'lucide-react'
-import { Button, showToast } from '@/components/ui'
+import { Info, MessageCircle } from 'lucide-react'
+import { Button, Modal, showToast } from '@/components/ui'
 
 type VerifyTab = 'kakao' | 'sms'
 
@@ -20,12 +20,8 @@ function isValidPhone(phone: string) {
 
 function VerifiedBadgeIcon() {
   return (
-    <span
-      className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-full"
-      style={{ background: 'linear-gradient(135deg, #34D399, #0E9F6E)' }}
-    >
-      <Check size={40} strokeWidth={3} color="#fff" />
-    </span>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src="/images/auth/verification-done-badge.svg" alt="" className="h-20 w-20 flex-shrink-0" />
   )
 }
 
@@ -51,6 +47,7 @@ export function IdentityVerification({
   const [smsSent, setSmsSent] = useState(false)
   const [codeError, setCodeError] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
+  const [cancelModalOpen, setCancelModalOpen] = useState(false)
   const phoneInvalid = phone.length > 0 && !isValidPhone(phone)
 
   // [임시] 카카오 본인인증 API 미연동
@@ -64,6 +61,7 @@ export function IdentityVerification({
       return
     }
     setSmsSent(true)
+    showToast('입력하신 번호로 인증문자를 발송했어요.')
   }
 
   // [임시] 인증번호 확인 API 미연동 — 목업 정답 코드 123456과만 비교
@@ -83,13 +81,36 @@ export function IdentityVerification({
         <p className="mt-6 text-[16px] font-bold text-[var(--color-text-strong)]">본인인증이 완료됐어요</p>
         <p className="mt-2 text-[13px] text-[var(--color-text-secondary)] leading-relaxed">이제 프로필에 인증 뱃지가 표시돼요</p>
         {onCancelVerification && (
-          <button
-            type="button"
-            onClick={onCancelVerification}
-            className="mt-10 text-sm font-semibold text-[var(--color-text-tertiary)] underline"
-          >
-            본인인증 취소
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={() => setCancelModalOpen(true)}
+              className="mt-10 text-sm font-semibold text-[var(--color-text-tertiary)] underline"
+            >
+              본인인증 취소
+            </button>
+            <Modal open={cancelModalOpen} onClose={() => setCancelModalOpen(false)} widthClassName="w-[calc(100%-40px)]">
+              <div className="text-left">
+                <div className="text-lg font-black mb-2">본인인증을 취소할까요?</div>
+                <div className="meta-text mb-5 leading-relaxed">
+                  프로필에 인증 뱃지가 사라지게 돼요.
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setCancelModalOpen(false)}>계속 유지</Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => {
+                      setCancelModalOpen(false)
+                      onCancelVerification()
+                    }}
+                    style={{ backgroundColor: '#EF4444', borderColor: 'transparent', color: '#fff' }}
+                  >
+                    취소하기
+                  </Button>
+                </div>
+              </div>
+            </Modal>
+          </>
         )}
       </div>
     )

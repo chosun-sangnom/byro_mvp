@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { BadgeCheck, Mail, Upload, Loader2, ChevronRight } from 'lucide-react'
+import { BadgeCheck, Mail, ShieldCheck, Upload, Loader2, ChevronRight } from 'lucide-react'
 import { Button, NavBar, showToast } from '@/components/ui'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import type { Highlight, HighlightIconId } from '@/types'
 import type { HighlightManageCategory } from './constants'
 
@@ -14,7 +15,7 @@ const MOCK_NHIS_CAREERS = [
 ]
 
 const NHIS_INTRO_STEPS = [
-  '실명 + 생년월일 확인(카카오)',
+  '실명 + 생년월일 확인',
   '건강보험공단 직장가입자 이력 자동 조회',
   '원하는 항목만 선택 후 경력에 추가',
 ]
@@ -57,11 +58,18 @@ type CareerStep = 'identity' | 'loading' | 'select' | 'details' | 'done'
 type CareerDetail = { role: string; desc: string }
 
 function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewProps) {
+  const storeUser = useFeloreStore().user
   const [step, setStep] = useState<CareerStep>('identity')
   const [foundCareers, setFoundCareers] = useState<typeof MOCK_NHIS_CAREERS>([])
   const [selected, setSelected] = useState<Set<number>>(new Set())
   const [details, setDetails] = useState<Record<number, CareerDetail>>({})
   const [importedCount, setImportedCount] = useState(0)
+  const [authMethod, setAuthMethod] = useState<'kakao' | 'pass'>('kakao')
+  const [realName, setRealName] = useState(storeUser?.realName ?? '')
+  const [birthDateInput, setBirthDateInput] = useState((storeUser?.birthDate ?? '').replace(/\D/g, ''))
+  const [phoneInput, setPhoneInput] = useState(
+    (storeUser?.contactChannels?.find((c) => c.id === 'phone')?.value ?? '').replace(/\D/g, ''),
+  )
 
   useEffect(() => {
     if (step !== 'loading') return
@@ -131,7 +139,7 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
             <img src="/images/ai-tools/verify-intro-icon.svg" alt="" className="h-9 w-9" />
             <h1 className="text-[22px] font-bold leading-[1.35] text-[#0D0D0D]">건강보험공단 직장 이력 조회</h1>
             <p className="text-[16px] font-medium leading-[1.5] text-[#475058]">
-              카카오 본인인증으로 실명을 확인한 후<br />건강보험공단 직장가입자 이력을 자동 조회합니다.
+              본인인증으로 실명을 확인한 후<br />건강보험공단 직장가입자 이력을 자동 조회합니다.
             </p>
           </div>
           <div className="flex flex-col gap-3">
@@ -152,18 +160,82 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
                 건강보험공단에 가입되지 않은 경우(프리랜서 등)에는 이력이 조회되지 않을 수 있습니다. 수동 추가 후 인증 배지 없이 등록할 수 있어요.
               </p>
             </div>
+
+            <div className="mt-3 flex flex-col gap-3">
+              <p className="text-[14px] font-semibold text-[#0D0D0D]">인증 수단</p>
+              <div className="grid grid-cols-2 gap-2">
+                {(['kakao', 'pass'] as const).map((method) => {
+                  const isSelected = authMethod === method
+                  return (
+                    <button
+                      key={method}
+                      type="button"
+                      onClick={() => setAuthMethod(method)}
+                      className={[
+                        'flex flex-col items-start gap-2 rounded-[16px] p-3 text-left transition-colors',
+                        isSelected ? 'border border-[#0D0D0D] bg-white' : 'border border-transparent bg-[#F5F6F7]',
+                      ].join(' ')}
+                    >
+                      <span
+                        className={[
+                          'flex h-7 w-7 items-center justify-center rounded-full',
+                          method === 'kakao' ? 'bg-[#FFE400]' : 'bg-[#FF4B4B]',
+                        ].join(' ')}
+                      >
+                        {method === 'kakao' ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src="/images/ai-tools/verify-kakao.svg" alt="" className="h-[13px] w-[14px]" />
+                        ) : (
+                          <ShieldCheck size={14} className="text-white" />
+                        )}
+                      </span>
+                      <div>
+                        <p className="text-[14px] font-bold text-[#0D0D0D]">{method === 'kakao' ? '카카오 간편인증' : '통신사 PASS'}</p>
+                        <p className="mt-0.5 text-[11px] font-medium text-[#6C7786]">
+                          {method === 'kakao' ? '카카오톡으로 본인인증' : 'PASS 앱으로 본인인증'}
+                        </p>
+                      </div>
+                    </button>
+                  )
+                })}
+              </div>
+
+              <div className="flex flex-col gap-4">
+                <div>
+                  <p className="mb-2 text-[14px] font-semibold text-[#0D0D0D]">실명</p>
+                  <input
+                    value={realName}
+                    onChange={(e) => setRealName(e.target.value)}
+                    placeholder="실명"
+                    className="w-full rounded-full border border-[#DEE4EC] bg-white px-4 py-3 text-[14px] text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
+                  />
+                </div>
+                <div>
+                  <p className="mb-2 text-[14px] font-semibold text-[#0D0D0D]">생년월일</p>
+                  <input
+                    value={birthDateInput}
+                    onChange={(e) => setBirthDateInput(e.target.value.replace(/\D/g, '').slice(0, 8))}
+                    inputMode="numeric"
+                    placeholder="19940101"
+                    className="w-full rounded-full border border-[#DEE4EC] bg-white px-4 py-3 text-[14px] text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
+                  />
+                </div>
+                <div>
+                  <p className="mb-2 text-[14px] font-semibold text-[#0D0D0D]">휴대폰번호</p>
+                  <input
+                    value={phoneInput}
+                    onChange={(e) => setPhoneInput(e.target.value.replace(/\D/g, '').slice(0, 11))}
+                    inputMode="numeric"
+                    placeholder="01000000000"
+                    className="w-full rounded-full border border-[#DEE4EC] bg-white px-4 py-3 text-[14px] text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         <div className="px-5 pb-6">
-          <button
-            type="button"
-            onClick={() => setStep('loading')}
-            className="flex h-12 w-full items-center justify-center gap-1.5 rounded-full bg-[#FFE400] transition-opacity active:opacity-80"
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/ai-tools/verify-kakao.svg" alt="" className="h-[15px] w-4" />
-            <span className="text-[16px] font-semibold text-[#0D0D0D]">카카오로 본인인증하기</span>
-          </button>
+          <Button onClick={() => setStep('loading')}>인증 시작</Button>
         </div>
       </div>
     )

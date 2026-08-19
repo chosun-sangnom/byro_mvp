@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import {
-  ChevronRight, Link, Lock, Pencil, BookmarkCheck, CreditCard, Eye, Check, CheckCircle2, BadgeCheck,
+  ChevronRight, Pencil, BookmarkCheck, CreditCard, Eye, Check, CheckCircle2, BadgeCheck,
   Globe, FileText, HelpCircle,
 } from 'lucide-react'
 import { Avatar, NavBar, BottomSheet, showToast } from '@/components/ui'
@@ -65,6 +65,7 @@ export default function SettingsScreen() {
   const [cancelSheetOpen, setCancelSheetOpen] = useState(false)
   const [linkIdSheetOpen, setLinkIdSheetOpen] = useState(false)
   const [customLinkInput, setCustomLinkInput] = useState(user?.customLinkId ?? '')
+  const [customLinkError, setCustomLinkError] = useState(false)
   const [cardNumber, setCardNumber] = useState('')
   const [cardExpiry, setCardExpiry] = useState('')
   const [cardCvc, setCardCvc] = useState('')
@@ -73,9 +74,10 @@ export default function SettingsScreen() {
   const handleSaveCustomLinkId = () => {
     const trimmed = customLinkInput.trim().toLowerCase()
     if (trimmed && !CUSTOM_LINK_ID_REGEX.test(trimmed)) {
-      showToast('영문 소문자·숫자·_만 사용할 수 있어요 (2~20자)', 'error')
+      setCustomLinkError(true)
       return
     }
+    setCustomLinkError(false)
     store.setCustomLinkId(trimmed || null)
     setLinkIdSheetOpen(false)
     showToast(trimmed ? '링크가 변경됐어요!' : '기본 링크로 복원했어요')
@@ -380,34 +382,44 @@ export default function SettingsScreen() {
   // ── 유료결제 서브스크린 ──────────────────────────────────────────
   if (screen === 'billing') {
     return (
-      <div className="flex h-full flex-col bg-[var(--color-bg-page)]">
-        <NavBar title="유료 결제" onBack={() => setScreen('main')} />
+      <div className="flex h-full flex-col bg-white">
+        <NavBar title="" onBack={() => setScreen('main')} onClose={() => setScreen('main')} divider={false} />
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto px-4 pt-2 pb-8">
+          <h1 className="text-[22px] font-bold text-[#0D0D0D]">유료 결제</h1>
+
           {/* 플랜 상태 카드 */}
-          <div className="mx-4 mt-5 rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-5 py-5">
+          <div className="mt-6 rounded-[24px] border border-[#DEE4EC] p-4 flex flex-col gap-5">
             {isPaid ? (
               <>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="rounded-full bg-[var(--color-accent-soft)] px-2.5 py-1 text-[11px] font-bold text-[var(--color-accent-dark)]">PRO</span>
-                  <p className="text-[15px] font-black text-[var(--color-text-primary)]">프리미엄 이용 중</p>
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className="rounded-[6px] px-1.5 py-0.5 text-[12px] font-bold text-white"
+                      style={{ background: 'linear-gradient(112deg, rgba(0,173,255,0.2) 0%, #00ADFF 30%, #0657FF 59%)' }}
+                    >
+                      PRO
+                    </span>
+                    <p className="text-[16px] font-bold text-[#0D0D0D]">프리미엄 이용 중</p>
+                  </div>
+                  <p className="text-[14px] font-medium text-[#475058]">커스텀 링크 등 PRO 기능을 자유롭게 이용할 수 있어요.</p>
                 </div>
-                <p className="text-[12px] text-[var(--color-text-secondary)] mb-4">내 링크 커스터마이징 등 PRO 기능을 이용할 수 있어요.</p>
                 <button
                   onClick={() => setCancelSheetOpen(true)}
-                  className="w-full rounded-full py-3 text-[13px] font-semibold border border-[var(--color-border-soft)] text-[var(--color-text-tertiary)]"
+                  className="w-full rounded-full border border-[#DEE4EC] bg-white py-3 text-[14px] font-bold text-[#6C7786]"
                 >
                   구독 해제
                 </button>
               </>
             ) : (
               <>
-                <p className="text-[15px] font-black text-[var(--color-text-primary)] mb-1">무료 플랜</p>
-                <p className="text-[12px] text-[var(--color-text-secondary)] mb-4">PRO로 업그레이드하면 내 링크 커스터마이징 등 프리미엄 기능을 쓸 수 있어요.</p>
+                <div className="flex flex-col gap-1">
+                  <p className="text-[16px] font-bold text-[#0D0D0D]">무료 플랜</p>
+                  <p className="text-[14px] font-medium text-[#475058]">PRO로 업그레이드하면 커스텀 링크 등 프리미엄 기능을 자유롭게 이용할 수 있어요.</p>
+                </div>
                 <button
                   onClick={() => setScreen('upgrade')}
-                  className="w-full rounded-full py-3 text-[13px] font-semibold text-white whitespace-nowrap"
-                  style={{ backgroundColor: 'var(--color-accent-dark)' }}
+                  className="w-full rounded-full bg-black py-3 text-[14px] font-bold text-white"
                 >
                   PRO 업그레이드
                 </button>
@@ -415,104 +427,145 @@ export default function SettingsScreen() {
             )}
           </div>
 
-          {/* 내 링크 항목 */}
-          <div className="mx-4 mt-4 overflow-hidden rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)]">
+          {/* 나만의 링크 항목 */}
+          <div className="mt-4 rounded-[24px] border border-[#DEE4EC] p-4 flex flex-col gap-3">
             <button
-              onClick={() => isPaid ? setLinkIdSheetOpen(true) : showToast('유료 플랜에서 사용할 수 있는 기능이에요')}
-              className="flex w-full items-center gap-3.5 px-4 py-4 text-left active:bg-[var(--color-bg-muted)] transition-colors"
+              onClick={() => isPaid ? setLinkIdSheetOpen(true) : showToast('유료 플랜에서만 사용할 수 있는 기능이에요.', 'error')}
+              className="flex w-full items-center justify-between text-left"
             >
-              <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: 'var(--color-bg-muted)' }}
-              >
-                <Link size={16} className="text-[var(--color-text-secondary)]" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <p className="text-[14px] font-semibold text-[var(--color-text-primary)]">내 링크</p>
-                  {!isPaid && <Lock size={11} className="text-[var(--color-text-tertiary)]" />}
-                  {isPaid && (
-                    <span className="rounded-full bg-[var(--color-accent-soft)] px-2 py-0.5 text-[10px] font-bold text-[var(--color-accent-dark)]">PRO</span>
-                  )}
+              <div className="flex items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/icons/payment/link-icon.svg" alt="" className="w-10 h-10 flex-shrink-0" />
+                <div className="flex flex-col gap-0.5">
+                  <div className="flex items-center gap-1">
+                    <p className="text-[14px] font-semibold text-[#0D0D0D]">나만의 링크</p>
+                    {isPaid ? (
+                      <span className="rounded-[4px] bg-[#F0F5FF] px-1 py-0.5 text-[8px] font-bold text-[#25313D]">PRO</span>
+                    ) : (
+                      /* eslint-disable-next-line @next/next/no-img-element */
+                      <img src="/icons/payment/lock-badge.svg" alt="" className="w-3 h-3" />
+                    )}
+                  </div>
+                  <p className="text-[12px] font-medium text-[#6C7786]">felore.io/{currentLinkId}</p>
                 </div>
-                <p className="text-[12px] text-[var(--color-text-secondary)] mt-0.5">felore.io/{currentLinkId}</p>
-                {!isPaid && (
-                  <p className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5">유료 플랜으로 나만의 링크를 설정할 수 있어요</p>
-                )}
               </div>
-              <ChevronRight size={14} className="text-[var(--color-text-tertiary)] flex-shrink-0 opacity-50" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icons/payment/chevron-right.svg" alt="" className="w-6 h-6 flex-shrink-0" />
             </button>
+
+            {!isPaid && (
+              <div className="flex items-center gap-1 rounded-[8px] bg-[#F0F5FF] pl-3 pr-4 py-2.5">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/icons/payment/money.svg" alt="" className="w-4 h-4 flex-shrink-0" />
+                <p className="text-[12px] font-medium text-[#25313D]">유료 플랜으로 나만의 링크를 설정할 수 있어요</p>
+              </div>
+            )}
           </div>
         </div>
 
         {/* 구독 해제 확인 BottomSheet */}
         <BottomSheet open={cancelSheetOpen} onClose={() => setCancelSheetOpen(false)}>
-          <div className="px-5 pb-8">
-            <p className="text-[18px] font-black text-[var(--color-text-primary)] mb-1">구독을 해제할까요?</p>
-            <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed mb-5">
-              구독 해제 시 즉시 무료 플랜으로 전환돼요. 커스텀 링크는 기본 링크로 복원되고, PRO 기능을 더 이상 이용할 수 없어요.
-            </p>
-            <button
-              onClick={() => {
-                store.setPaidUser(false)
-                store.setCustomLinkId(null)
-                setCustomLinkInput('')
-                setCancelSheetOpen(false)
-                showToast('구독이 해제됐어요')
-              }}
-              className="w-full rounded-full py-3.5 text-[14px] font-semibold mb-2"
-              style={{ backgroundColor: 'var(--color-state-danger-text)', color: '#fff' }}
-            >
-              구독 해제
-            </button>
-            <button
-              onClick={() => setCancelSheetOpen(false)}
-              className="w-full py-3 text-[13px] font-medium text-[var(--color-text-tertiary)]"
-            >
-              취소
-            </button>
+          <div className="flex flex-col gap-6 px-4 pb-6 pt-3">
+            <div className="flex flex-col items-center gap-3 w-full">
+              <div className="h-1 w-11 rounded-full bg-[#DEE4EC]" />
+              <div className="flex flex-col gap-2 w-full">
+                <p className="text-[18px] font-bold text-[#0D0D0D]">구독을 해제할까요?</p>
+                <p className="text-[14px] font-medium leading-[1.5] text-[#475058]">
+                  구독 해제 시 즉시 무료 플랜으로 전환돼요. 커스텀 링크는 기본 링크로 복원되고, PRO 기능을 더 이상 이용할 수 없어요.
+                </p>
+              </div>
+            </div>
+            <div className="flex flex-col items-center gap-4 w-full">
+              <button
+                onClick={() => {
+                  store.setPaidUser(false)
+                  store.setCustomLinkId(null)
+                  setCustomLinkInput('')
+                  setCustomLinkError(false)
+                  setCancelSheetOpen(false)
+                  showToast('구독이 해제됐어요')
+                }}
+                className="w-full h-12 rounded-full bg-[#FF4242] text-[16px] font-semibold text-white"
+              >
+                구독 해제
+              </button>
+              <button
+                onClick={() => setCancelSheetOpen(false)}
+                className="text-[14px] font-bold text-[#6C7786]"
+              >
+                취소
+              </button>
+            </div>
           </div>
         </BottomSheet>
 
-        {/* 내 링크 편집 BottomSheet */}
-        <BottomSheet open={linkIdSheetOpen} onClose={() => setLinkIdSheetOpen(false)}>
-          <div className="px-5 pb-6">
-            <p className="text-[18px] font-black text-[var(--color-text-strong)] mb-1">내 링크 설정</p>
-            <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed mb-5">
-              나만의 링크를 설정하면 <span className="font-semibold">felore.io/내이름</span> 형태로 프로필을 공유할 수 있어요. 유료 이용 종료 시 기본 링크로 자동 복원돼요.
-            </p>
-
-            <p className="text-[11px] font-bold text-[var(--color-text-tertiary)] mb-1.5 uppercase tracking-[0.08em]">기본 링크 (변경 불가)</p>
-            <div className="flex items-center gap-1.5 mb-4 px-4 py-2.5 rounded-xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)]">
-              <span className="text-[13px] text-[var(--color-text-tertiary)]">felore.io/</span>
-              <span className="text-[13px] font-semibold text-[var(--color-text-tertiary)]">{randomLinkId}</span>
+        {/* 커스텀 링크 설정 BottomSheet */}
+        <BottomSheet
+          open={linkIdSheetOpen}
+          onClose={() => { setLinkIdSheetOpen(false); setCustomLinkError(false) }}
+        >
+          <div className="flex flex-col gap-6 px-4 pb-6 pt-3">
+            <div className="flex flex-col items-center gap-3 w-full">
+              <div className="h-1 w-11 rounded-full bg-[#DEE4EC]" />
+              <div className="flex flex-col gap-2 w-full">
+                <p className="text-[18px] font-bold text-[#0D0D0D]">커스텀 링크 설정</p>
+                <p className="text-[14px] font-medium leading-[1.5] text-[#475058]">
+                  나만의 링크를 설정하면 felore.io/내이름 형태로 프로필을 공유할 수 있어요. 유료 이용 종료 시 기본 링크로 자동 복원돼요.
+                </p>
+              </div>
             </div>
 
-            <p className="text-[11px] font-bold text-[var(--color-text-tertiary)] mb-1.5 uppercase tracking-[0.08em]">커스텀 링크</p>
-            <div className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] mb-1.5">
-              <span className="text-[13px] text-[var(--color-text-tertiary)] flex-shrink-0">felore.io/</span>
-              <input
-                type="text"
-                value={customLinkInput}
-                onChange={(e) => setCustomLinkInput(e.target.value.toLowerCase())}
-                placeholder="예: gangminjun"
-                maxLength={20}
-                className="flex-1 bg-transparent text-[13px] font-semibold text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)] placeholder:font-normal"
-              />
+            <div className="flex flex-col gap-2 w-full">
+              <p className="text-[14px] font-semibold text-[#0D0D0D]">
+                기본 링크<span className="text-[#6C7786]">(변경 불가)</span>
+              </p>
+              <div className="flex items-center gap-2.5 rounded-full border border-[#DEE4EC] bg-[#F5F6F7] px-4 py-3">
+                <span className="text-[14px] font-medium text-[#A8B1BD]">felore.io/{randomLinkId}</span>
+              </div>
             </div>
-            <p className="text-[11px] text-[var(--color-text-tertiary)] mb-5">영문 소문자·숫자·_만 사용, 2~20자</p>
 
-            <button
-              onClick={handleSaveCustomLinkId}
-              className="w-full rounded-full py-3.5 text-[14px] font-semibold text-white whitespace-nowrap"
-              style={{ backgroundColor: 'var(--color-accent-dark)' }}
-            >
-              저장
-            </button>
+            <div className="flex flex-col gap-2 w-full">
+              <p className="text-[14px] font-semibold text-[#0D0D0D]">커스텀 링크</p>
+              <div
+                className={[
+                  'flex items-center gap-2.5 rounded-full border bg-white px-4 py-3',
+                  customLinkError ? 'border-[#FF4242]' : 'border-[#DEE4EC]',
+                ].join(' ')}
+              >
+                <span className="text-[14px] font-medium text-[#A8B1BD] flex-shrink-0">felore.io/</span>
+                <input
+                  type="text"
+                  value={customLinkInput}
+                  onChange={(e) => { setCustomLinkInput(e.target.value.toLowerCase()); setCustomLinkError(false) }}
+                  placeholder="예: gangminjun"
+                  maxLength={20}
+                  className="flex-1 min-w-0 bg-transparent text-[14px] font-medium text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
+                />
+              </div>
+              {customLinkError && (
+                <p className="text-[12px] font-medium text-[#FF4242]">올바른 커스텀 링크 형식을 입력해주세요.</p>
+              )}
+              <p className="text-[12px] font-medium text-[#6C7786]">영문 소문자, 숫자, _만 사용, 2~20자</p>
+            </div>
+
+            <div className="flex items-start gap-2 w-full">
+              <button
+                onClick={() => { setLinkIdSheetOpen(false); setCustomLinkError(false) }}
+                className="flex-1 rounded-full border border-[#DEE4EC] px-6 py-3 text-[14px] font-bold text-[#25313D]"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleSaveCustomLinkId}
+                className="flex-1 rounded-full bg-black px-6 py-3 text-[14px] font-bold text-white"
+              >
+                저장
+              </button>
+            </div>
             {user?.customLinkId && (
               <button
-                onClick={() => { store.setCustomLinkId(null); setCustomLinkInput(''); setLinkIdSheetOpen(false); showToast('기본 링크로 복원했어요') }}
-                className="w-full mt-2 py-3 text-[13px] font-medium text-[var(--color-text-tertiary)]"
+                onClick={() => { store.setCustomLinkId(null); setCustomLinkInput(''); setCustomLinkError(false); setLinkIdSheetOpen(false); showToast('기본 링크로 복원했어요') }}
+                className="-mt-2 w-full text-center text-[13px] font-medium text-[#A8B1BD]"
               >
                 기본 링크로 복원
               </button>

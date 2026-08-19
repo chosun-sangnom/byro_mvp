@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { BadgeCheck } from 'lucide-react'
+import { BadgeCheck, Images, Network, UserSearch } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { Button } from '@/components/ui'
 
@@ -177,40 +177,64 @@ function PreviewContact() {
   )
 }
 
-function PreviewFeloreIntro() {
+const WELCOME_FEATURES = [
+  {
+    key: 'who',
+    Icon: UserSearch,
+    gradientStops: [
+      { offset: '20%', color: '#FF383C' },
+      { offset: '100%', color: '#FFCC00' },
+    ],
+    title: 'WHO',
+    desc: '내가 어떤 사람인지, 또 어떤 유형의 사람과 잘 맞는지 읽어줍니다.',
+  },
+  {
+    key: 'vibe',
+    Icon: Images,
+    gradientStops: [
+      { offset: '0%', color: '#34C759' },
+      { offset: '100%', color: '#0088FF' },
+    ],
+    title: 'VIBE',
+    desc: '나의 취향과 취미, 철학과 관점을 담은 나만의 바이브를 보여줍니다.',
+  },
+  {
+    key: 'network',
+    Icon: Network,
+    gradientStops: [
+      { offset: '20%', color: '#6155F5' },
+      { offset: '100%', color: '#FF2D55' },
+    ],
+    title: 'NETWORK',
+    desc: '주요 산업, 직무, 직급 등 나를 둘러싼 비즈니스 네트워크를 보여줍니다.',
+  },
+] as const
+
+function WelcomeFeatureCard() {
   return (
-    <div className="rounded-[26px] border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] p-4 shadow-[0_16px_40px_rgba(17,17,17,0.06)]">
-      <div className="rounded-[18px] bg-[var(--color-bg-muted)] p-3 mb-3">
-        <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-[var(--color-text-tertiary)] mb-2">Profile Card</div>
-        <div className="rounded-[16px] bg-white/90 px-3 py-3">
-          <div className="text-[15px] font-black text-[var(--color-text-strong)]">강민준 · 31</div>
-          <div className="text-[11px] text-[var(--color-text-tertiary)] mt-1">대화가 이어지는 바이브 프로필</div>
-        </div>
-      </div>
-      <div className="grid grid-cols-[1.1fr_0.9fr] gap-2">
-        <div className="rounded-[18px] bg-[var(--color-bg-muted)] p-3">
-          <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] mb-2">바이브</div>
-          <div className="grid gap-1" style={{ gridTemplateColumns: '1.2fr 1fr', gridTemplateRows: '54px 40px' }}>
-            <div className="rounded-[12px] bg-white/85 px-2 py-2 text-[11px] font-semibold text-[var(--color-text-secondary)]">러닝</div>
-            <div className="rounded-[12px] bg-white/85 px-2 py-2 text-[11px] font-semibold text-[var(--color-text-secondary)]">재즈</div>
-            <div className="rounded-[12px] bg-white/85 px-2 py-2 text-[11px] font-semibold text-[var(--color-text-secondary)]">성수</div>
-            <div className="rounded-[12px] bg-white/85 px-2 py-2 text-[11px] font-semibold text-[var(--color-text-secondary)]">도쿄</div>
+    <div className="flex flex-col gap-10 rounded-[24px] border border-[#DEE4EC] bg-[rgba(255,255,255,0.8)] px-4 py-6">
+      <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden>
+        <defs>
+          {WELCOME_FEATURES.map((f) => (
+            <linearGradient key={f.key} id={`welcome-${f.key}-gradient`} x1="0%" y1="0%" x2={f.key === 'vibe' ? '0%' : '100%'} y2={f.key === 'vibe' ? '100%' : '0%'}>
+              {f.gradientStops.map((stop) => (
+                <stop key={stop.offset} offset={stop.offset} stopColor={stop.color} />
+              ))}
+            </linearGradient>
+          ))}
+        </defs>
+      </svg>
+      {WELCOME_FEATURES.map((f) => (
+        <div key={f.key} className="flex items-start gap-2">
+          <div className="flex h-10 w-[60px] flex-shrink-0 items-center justify-center">
+            <f.Icon size={36} strokeWidth={1.6} color={`url(#welcome-${f.key}-gradient)`} />
+          </div>
+          <div className="flex-1">
+            <p className="text-[15px] font-semibold text-black">{f.title}</p>
+            <p className="mt-2.5 text-[13px] leading-[1.5] text-black/80">{f.desc}</p>
           </div>
         </div>
-        <div className="space-y-2">
-          <div className="rounded-[18px] bg-[var(--color-bg-muted)] p-3">
-            <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] mb-2">관계</div>
-            <div className="flex flex-wrap gap-1">
-              <span className="rounded-full bg-white/90 px-2 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">신뢰가 가요</span>
-              <span className="rounded-full bg-white/90 px-2 py-1 text-[10px] font-semibold text-[var(--color-text-secondary)]">대화가 편해요</span>
-            </div>
-          </div>
-          <div className="rounded-[18px] bg-[var(--color-bg-muted)] p-3">
-            <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)] mb-2">SNS</div>
-            <div className="text-[11px] font-semibold text-[var(--color-text-secondary)]">Instagram · LinkedIn 연결</div>
-          </div>
-        </div>
-      </div>
+      ))}
     </div>
   )
 }
@@ -288,6 +312,7 @@ export function Step9Complete() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const linkId = store.user?.linkId || store.linkId || 'myongkoo'
+  const welcomeName = store.user?.realName || store.onboardingName || '회원'
   const initialGuide = Number(searchParams.get('guide') ?? '0')
   const [slide, setSlide] = useState(Number.isFinite(initialGuide) ? Math.min(Math.max(initialGuide, 0), TOTAL - 1) : 0)
   const [showIntroText, setShowIntroText] = useState(false)
@@ -334,23 +359,16 @@ export function Step9Complete() {
         {slide === 0 ? (
           <div className="pt-5">
             <div className={`transition-all duration-500 ${showIntroText ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>
-              <p className="text-[26px] font-black leading-[1.18] text-[var(--color-text-strong)] mb-3">
-                프로필이 만들어졌어요!
+              <p className="mb-2 text-[22px] font-bold leading-[1.35] tracking-[-0.03em] text-[#0D0D0D]">
+                {welcomeName}님 환영합니다!
               </p>
-              <p className="text-[22px] font-black leading-[1.22] mb-3" style={{ color: 'var(--color-accent-dark)' }}>
-                이제 자유롭게 나를 표현하는
-                <br />
-                Felore를 만들어보세요!
-              </p>
-              <p className="text-[14px] text-[var(--color-text-secondary)] leading-relaxed mb-8">
-                어떤 사람인지, 어떤 취향을 가졌는지, 어떤 관계를 맺고 있는지
-                <br />
-                FELORE 안에서 한눈에 보여줄 수 있어요.
+              <p className="text-[16px] font-medium leading-[1.5] tracking-[-0.02em] text-[#475058]">
+                이제 자유롭게 나를 표현하는 FELORE를 만들어보세요!
               </p>
             </div>
 
-            <div className={`transition-all duration-500 ${showIntroPreview ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'}`}>
-              <PreviewFeloreIntro />
+            <div className={`mt-12 transition-all duration-500 ${showIntroPreview ? 'translate-y-0 opacity-100' : 'translate-y-3 opacity-0'}`}>
+              <WelcomeFeatureCard />
             </div>
           </div>
         ) : guide ? (
@@ -384,7 +402,7 @@ export function Step9Complete() {
       {slide === 0 ? (
         <div className="space-y-3 pt-6">
           <Button onClick={goNext}>자세히보기</Button>
-          <Button variant="outline" onClick={() => router.replace(`/${linkId}`)}>나중에 할게요</Button>
+          <Button variant="outline" onClick={() => router.replace(`/${linkId}`)} style={{ borderRadius: 9999 }}>나중에 할게요</Button>
         </div>
       ) : isLastSlide ? (
         <div className="space-y-3 pt-5">

@@ -32,7 +32,7 @@ export function HighlightManagePickerView({
                   <button
                     key={cat.id}
                     onClick={() => onOpenCategory(cat)}
-                    className="flex flex-col items-center justify-center gap-1.5 rounded-[16px] border border-[#DEE4EC] px-2 py-3.5 text-center"
+                    className="flex h-[84px] flex-col items-center justify-center gap-1.5 rounded-[16px] border border-[#DEE4EC] px-2 text-center"
                   >
                     <span className="flex items-center justify-center text-[#25313D]">
                       <HighlightIcon id={cat.icon as HighlightIconId} size={20} />

@@ -1,16 +1,22 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { BadgeCheck, Mail, ShieldCheck, Upload, Loader2, ChevronRight } from 'lucide-react'
-import { Button, NavBar, TextArea } from '@/components/ui'
+import { BadgeCheck, Mail, Upload, Loader2, ChevronRight } from 'lucide-react'
+import { Button, NavBar, showToast } from '@/components/ui'
 import type { Highlight, HighlightIconId } from '@/types'
 import type { HighlightManageCategory } from './constants'
 
-// [임시] 건강보험공단 직장 이력 모의 데이터 (직함 정보는 제공되지 않음)
+// [임시] 건강보험공단 직장 이력 모의 데이터
 const MOCK_NHIS_CAREERS = [
-  { company: '위에이아이', startYear: '2023', endYear: '', status: '재직 중' as const },
-  { company: '크래프톤', startYear: '2020', endYear: '2023', status: '종료' as const },
-  { company: '카카오', startYear: '2017', endYear: '2020', status: '종료' as const },
+  { company: '위에이아이', role: '프로덕트 매니저', startYear: '2023', endYear: '', status: '재직 중' as const },
+  { company: '크래프톤', role: '프로덕트 디자이너', startYear: '2020', endYear: '2023', status: '종료' as const },
+  { company: '카카오', role: '서비스 기획자', startYear: '2017', endYear: '2020', status: '종료' as const },
+]
+
+const NHIS_INTRO_STEPS = [
+  '실명 + 생년월일 확인(카카오)',
+  '건강보험공단 직장가입자 이력 자동 조회',
+  '원하는 항목만 선택 후 경력에 추가',
 ]
 
 // [임시] OCR 파싱 모의 데이터
@@ -46,22 +52,22 @@ export function HighlightManageVerifyView(props: VerifyViewProps) {
 
 // ── 경력 인증 플로우 ──────────────────────────────────────────────────────────
 
-type CareerStep = 'identity' | 'loading' | 'select' | 'details' | 'done'
-
-type CareerDetail = { role: string; desc: string; status: '재직 중' | '종료' }
+type CareerStep = 'identity' | 'loading' | 'select' | 'done'
 
 function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewProps) {
   const [step, setStep] = useState<CareerStep>('identity')
-  const [selected, setSelected] = useState<Set<number>>(new Set([0, 1, 2]))
-  const [details, setDetails] = useState<Record<number, CareerDetail>>({})
+  const [foundCareers, setFoundCareers] = useState<typeof MOCK_NHIS_CAREERS>([])
+  const [selected, setSelected] = useState<Set<number>>(new Set())
   const [importedCount, setImportedCount] = useState(0)
-
-  // 종료일이 없는 항목 = 가장 최근(현재) 경력. 재직중 여부를 직접 확인받아야 함.
-  const mostRecentIndex = MOCK_NHIS_CAREERS.findIndex((c) => c.endYear === '')
 
   useEffect(() => {
     if (step !== 'loading') return
-    const t = setTimeout(() => setStep('select'), 1800)
+    const t = setTimeout(() => {
+      // [임시] 실제 API 연동 전까지, 빈 결과 상태 UI 확인을 위해 20% 확률로 조회 결과 없음을 시뮬레이션
+      setFoundCareers(Math.random() < 0.2 ? [] : MOCK_NHIS_CAREERS)
+      setSelected(new Set())
+      setStep('select')
+    }, 1800)
     return () => clearTimeout(t)
   }, [step])
 
@@ -72,47 +78,30 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
       return next
     })
 
-  const setDetail = (i: number, patch: Partial<CareerDetail>) =>
-    setDetails((prev) => ({ ...prev, [i]: { ...(prev[i] ?? { role: '', desc: '', status: MOCK_NHIS_CAREERS[i].status }), ...patch } }))
-
-  const goToDetails = () => {
-    setDetails((prev) => {
-      const next = { ...prev }
-      MOCK_NHIS_CAREERS.forEach((c, i) => {
-        if (!selected.has(i) || next[i]) return
-        next[i] = { role: '', desc: '', status: c.status }
-      })
-      return next
-    })
-    setStep('details')
-  }
-
-  const detailsValid = Array.from(selected).every((i) => (details[i]?.role ?? '').trim().length > 0)
-
   const handleConfirm = () => {
-    const items = MOCK_NHIS_CAREERS
+    if (selected.size === 0) {
+      showToast('경력에 추가할 항목을 선택해주세요.', 'error')
+      return
+    }
+    const items = foundCareers
       .map((c, i) => ({ c, i }))
       .filter(({ i }) => selected.has(i))
-      .map(({ c, i }) => {
-        const detail = details[i] ?? { role: '', desc: '', status: c.status }
-        const status = i === mostRecentIndex ? detail.status : c.status
-        return {
-          categoryId: 'career-role' as const,
-          icon: selectedCat.icon as HighlightIconId,
-          title: c.company,
-          subtitle: `${selectedCat.label} · 건강보험공단 인증`,
-          description: detail.desc,
-          year: status === '재직 중' ? `${c.startYear} - 현재` : `${c.startYear} - ${c.endYear || '종료'}`,
-          verified: true,
-          metadata: {
-            role: detail.role,
-            status,
-            startYear: c.startYear,
-            endYear: c.endYear,
-            isPrimary: false,
-          },
-        }
-      })
+      .map(({ c }) => ({
+        categoryId: 'career-role' as const,
+        icon: selectedCat.icon as HighlightIconId,
+        title: c.company,
+        subtitle: `${selectedCat.label} · 건강보험공단 인증`,
+        description: '',
+        year: c.status === '재직 중' ? `${c.startYear} - 현재` : `${c.startYear} - ${c.endYear}`,
+        verified: true,
+        metadata: {
+          role: c.role,
+          status: c.status,
+          startYear: c.startYear,
+          endYear: c.endYear,
+          isPrimary: false,
+        },
+      }))
     setImportedCount(items.length)
     onImportCareers(items)
     setStep('done')
@@ -121,35 +110,46 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
   if (step === 'identity') {
     return (
       <div className="flex flex-col h-full">
-        <NavBar title="경력 인증" onBack={onBack} />
-        <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col items-center justify-center gap-6">
-          <div className="flex flex-col items-center gap-3 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[var(--color-accent-bg-subtle)]">
-              <ShieldCheck size={28} className="text-[var(--color-accent-dark)]" />
-            </div>
-            <div className="text-[17px] font-bold text-[var(--color-text-strong)]">건강보험공단 직장 이력 조회</div>
-            <p className="text-sm leading-6 text-[var(--color-text-secondary)]">
+        <NavBar title="" onBack={onBack} onClose={onBack} />
+        <div className="flex-1 overflow-y-auto px-5 py-6">
+          <div className="mb-10 flex flex-col gap-2">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/ai-tools/verify-intro-icon.svg" alt="" className="h-9 w-9" />
+            <h1 className="text-[22px] font-bold leading-[1.35] text-[#0D0D0D]">건강보험공단 직장 이력 조회</h1>
+            <p className="text-[16px] font-medium leading-[1.5] text-[#475058]">
               카카오 본인인증으로 실명을 확인한 후<br />건강보험공단 직장가입자 이력을 자동 조회합니다.
             </p>
           </div>
-          <div className="w-full surface-card rounded-[22px] px-4 py-4 space-y-3">
-            {['실명 + 생년월일 확인 (카카오)', '건강보험공단 직장가입자 이력 자동 조회', '원하는 항목만 선택 후 경력에 추가'].map((label, i) => (
-              <div key={i} className="flex items-center gap-3 text-sm text-[var(--color-text-secondary)]">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-accent-bg-subtle)] text-[10px] font-bold text-[var(--color-accent-dark)]">
-                  {i + 1}
-                </span>
-                {label}
-              </div>
-            ))}
-          </div>
-          <div className="w-full surface-card rounded-[22px] px-4 py-3">
-            <p className="text-[11px] leading-5 text-[var(--color-text-tertiary)]">
-              건강보험공단에 가입되지 않은 경우(프리랜서 등)에는 이력이 조회되지 않을 수 있습니다. 수동 추가 후 인증 배지 없이 등록할 수 있어요.
-            </p>
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3 rounded-[24px] border border-[#DEE4EC] p-4">
+              {NHIS_INTRO_STEPS.map((label, i) => (
+                <div key={label} className="flex items-center gap-1.5">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#F0F5FF] text-[12.5px] font-semibold text-[#0657FF]">
+                    {i + 1}
+                  </span>
+                  <p className="text-[14px] font-medium text-[#475058]">{label}</p>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-1.5 rounded-[24px] bg-[#F0F5FF] py-3 pl-3 pr-4">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/ai-tools/ocr-info.svg" alt="" className="mt-0.5 h-4 w-4 shrink-0" />
+              <p className="flex-1 text-[14px] font-medium leading-[1.5] text-[#25313D]">
+                건강보험공단에 가입되지 않은 경우(프리랜서 등)에는 이력이 조회되지 않을 수 있습니다. 수동 추가 후 인증 배지 없이 등록할 수 있어요.
+              </p>
+            </div>
           </div>
         </div>
-        <div className="border-t border-[var(--color-border-soft)] px-5 py-4">
-          <Button onClick={() => setStep('loading')}>카카오 본인인증 시작</Button>
+        <div className="px-5 pb-6">
+          <button
+            type="button"
+            onClick={() => setStep('loading')}
+            className="flex h-12 w-full items-center justify-center gap-1.5 rounded-full bg-[#FFE400] transition-opacity active:opacity-80"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/images/ai-tools/verify-kakao.svg" alt="" className="h-[15px] w-4" />
+            <span className="text-[16px] font-semibold text-[#0D0D0D]">카카오로 본인인증하기</span>
+          </button>
         </div>
       </div>
     )
@@ -158,10 +158,14 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
   if (step === 'loading') {
     return (
       <div className="flex flex-col h-full">
-        <NavBar title="경력 인증" onBack={onBack} />
-        <div className="flex-1 flex flex-col items-center justify-center gap-4">
-          <Loader2 size={36} className="animate-spin text-[var(--color-accent)]" />
-          <p className="text-sm text-[var(--color-text-secondary)]">건강보험공단 직장 이력 조회 중...</p>
+        <NavBar title="" onBack={onBack} onClose={onBack} />
+        <div className="px-5 pt-2">
+          <h1 className="text-[22px] font-bold text-[#0D0D0D]">경력 인증</h1>
+        </div>
+        <div className="flex flex-1 flex-col items-center justify-center gap-6">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/ai-tools/ocr-loading-spinner.svg" alt="" className="h-12 w-12 animate-spin" />
+          <p className="text-[14px] font-semibold text-[#475058]">건강보험공단 직장 이력 조회 중...</p>
         </div>
       </div>
     )
@@ -170,111 +174,59 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
   if (step === 'select') {
     return (
       <div className="flex flex-col h-full">
-        <NavBar title="경력 인증" onBack={onBack} />
-        <div className="flex-1 overflow-y-auto px-5 py-5">
-          <p className="mb-4 text-[13px] text-[var(--color-text-secondary)]">
+        <NavBar title="" onBack={() => setStep('identity')} onClose={onBack} />
+        <div className="px-5 pt-2 pb-5">
+          <h1 className="text-[22px] font-bold text-[#0D0D0D]">경력 인증</h1>
+          <p className="mt-2 text-[16px] font-medium leading-[1.5] text-[#475058]">
             조회된 직장 이력이에요. 경력에 추가할 항목을 선택하세요.
           </p>
-          <div className="space-y-3">
-            {MOCK_NHIS_CAREERS.map((c, i) => (
-              <button
-                key={i}
-                onClick={() => toggleItem(i)}
-                className={`w-full text-left surface-card rounded-[22px] px-4 py-4 flex items-center gap-3 transition-all ${selected.has(i) ? 'ring-2 ring-[var(--color-accent)]' : ''}`}
-              >
-                <div
-                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
-                    selected.has(i)
-                      ? 'border-[var(--color-accent)] bg-[var(--color-accent)]'
-                      : 'border-[var(--color-border-default)]'
-                  }`}
-                >
-                  {selected.has(i) && <span className="text-white text-[10px] font-bold">✓</span>}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{c.company}</div>
-                  <div className="mt-0.5 text-[12px] text-[var(--color-text-secondary)]">
-                    {c.status === '재직 중' ? `${c.startYear} - 현재` : `${c.startYear} - ${c.endYear}`}
-                  </div>
-                </div>
-                {selected.has(i) && <BadgeCheck size={16} className="shrink-0 text-[var(--color-accent)]" />}
-              </button>
-            ))}
-          </div>
         </div>
-        <div className="border-t border-[var(--color-border-soft)] px-5 py-4">
-          <Button onClick={goToDetails} disabled={selected.size === 0}>
-            다음
-          </Button>
-        </div>
-      </div>
-    )
-  }
-
-  if (step === 'details') {
-    const items = MOCK_NHIS_CAREERS.map((c, i) => ({ c, i })).filter(({ i }) => selected.has(i))
-    return (
-      <div className="flex flex-col h-full">
-        <NavBar title="경력 인증" onBack={() => setStep('select')} />
-        <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
-          <p className="text-[13px] text-[var(--color-text-secondary)]">
-            건강보험공단 이력에는 직함 정보가 없어요. 각 경력에 직함과 담당 업무를 입력해주세요.
-          </p>
-          {items.map(({ c, i }) => {
-            const detail = details[i] ?? { role: '', desc: '', status: c.status }
-            const isMostRecent = i === mostRecentIndex
-            return (
-              <div key={i} className="surface-card rounded-[22px] p-4 space-y-3">
-                <div>
-                  <div className="text-[15px] font-bold text-[var(--color-text-strong)]">{c.company}</div>
-                  <div className="mt-0.5 text-[12px] text-[var(--color-text-tertiary)]">
-                    {isMostRecent
-                      ? (detail.status === '재직 중' ? `${c.startYear} - 현재` : `${c.startYear} - 종료`)
-                      : `${c.startYear} - ${c.endYear}`}
-                    {' '}· 건강보험공단 조회 결과 (수정 불가)
-                  </div>
-                </div>
-                <input
-                  value={detail.role}
-                  onChange={(e) => setDetail(i, { role: e.target.value })}
-                  placeholder="직함"
-                  className="w-full rounded-2xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3 text-sm outline-none"
-                />
-                {isMostRecent && (
-                  <div className="space-y-2">
-                    <div className="micro-text">현재 상태</div>
-                    <div className="grid grid-cols-2 gap-2">
-                      {(['재직 중', '종료'] as const).map((status) => (
-                        <button
-                          key={status}
-                          onClick={() => setDetail(i, { status })}
-                          className="rounded-2xl border px-4 py-3 text-sm font-semibold"
-                          style={{
-                            borderColor: detail.status === status ? 'var(--color-accent-dark)' : '#E7E2DC',
-                            backgroundColor: detail.status === status ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
-                            color: detail.status === status ? '#fff' : 'var(--color-text-secondary)',
-                          }}
-                        >
-                          {status}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                <TextArea
-                  value={detail.desc}
-                  onChange={(value) => setDetail(i, { desc: value })}
-                  placeholder="어떤 일을 했는지 적어주세요"
-                  maxLength={150}
-                  rows={3}
-                />
+        <div className="flex-1 overflow-y-auto px-5">
+          {foundCareers.length === 0 ? (
+            <div className="flex flex-col items-center gap-6 py-6">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/images/ai-tools/exp-empty-icon.svg" alt="" className="h-12 w-12" />
+              <div className="flex flex-col items-center gap-1 text-center">
+                <p className="text-[14px] font-semibold text-[#475058]">조회된 직장 이력이 없습니다</p>
+                <p className="text-[14px] font-medium text-[#6C7786]">경력 추가하기로 직접 경력을 추가할 수 있어요.</p>
               </div>
-            )
-          })}
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {foundCareers.map((c, i) => (
+                <button
+                  key={c.company}
+                  type="button"
+                  onClick={() => toggleItem(i)}
+                  className={[
+                    'flex w-full items-center gap-4 rounded-[24px] px-4 py-4 text-left',
+                    selected.has(i) ? 'border border-[#25313D]' : 'border border-[#DEE4EC]',
+                  ].join(' ')}
+                >
+                  {selected.has(i) ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src="/images/ai-tools/verify-radio-selected.svg" alt="" className="h-[18px] w-[18px] shrink-0" />
+                  ) : (
+                    <span className="h-[18px] w-[18px] shrink-0 rounded-full border-[1.5px] border-[#DEE4EC]" />
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1">
+                      <p className="truncate text-[14px] font-semibold text-[#0D0D0D]">{c.company}</p>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src="/images/ai-tools/exp-verified-badge.svg" alt="" className="h-3 w-3 shrink-0" />
+                    </div>
+                    <p className="mt-0.5 text-[12px] font-semibold text-[#6C7786]">
+                      {c.role} · {c.status === '재직 중' ? `${c.startYear} - 현재` : `${c.startYear} - ${c.endYear}`}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
-        <div className="border-t border-[var(--color-border-soft)] px-5 py-4">
-          <Button onClick={handleConfirm} disabled={!detailsValid}>
-            선택한 {selected.size}개 경력 가져오기
+        <div className="px-5 pb-6">
+          <Button onClick={foundCareers.length === 0 ? onBack : handleConfirm}>
+            {foundCareers.length === 0 ? '확인' : `선택한 ${foundCareers.length}개 경력 가져오기`}
           </Button>
         </div>
       </div>
@@ -283,19 +235,16 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
 
   return (
     <div className="flex flex-col h-full">
-      <NavBar title="경력 인증" onBack={onBack} />
-      <div className="flex-1 flex flex-col items-center justify-center gap-4 px-5">
-        <div className="flex h-16 w-16 items-center justify-center rounded-3xl bg-[var(--color-state-success-bg)]">
-          <BadgeCheck size={28} className="text-[var(--color-state-success-text)]" />
-        </div>
-        <div className="text-center">
-          <div className="text-[17px] font-bold text-[var(--color-text-strong)]">경력 인증 완료</div>
-          <p className="mt-1 text-sm text-[var(--color-text-secondary)]">
-            {importedCount}개 경력이 인증 배지와 함께 추가됐어요.
-          </p>
+      <NavBar title="" onBack={onBack} onClose={onBack} />
+      <div className="flex flex-1 flex-col items-center justify-center gap-6 px-5 text-center">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/images/ai-tools/verify-done-icon.svg" alt="" className="h-12 w-12" />
+        <div className="flex flex-col gap-2">
+          <p className="text-[22px] font-bold text-[#0D0D0D]">경력 인증이 완료되었어요</p>
+          <p className="text-[16px] font-medium text-[#475058]">{importedCount}개 경력이 인증 배지와 함께 추가됐어요.</p>
         </div>
       </div>
-      <div className="border-t border-[var(--color-border-soft)] px-5 py-4">
+      <div className="px-5 pb-6">
         <Button onClick={onBack}>확인</Button>
       </div>
     </div>

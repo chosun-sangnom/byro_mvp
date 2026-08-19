@@ -67,18 +67,29 @@ function TextField({
   value,
   onChange,
   placeholder,
+  maxLength,
 }: {
   value: string
   onChange: (value: string) => void
   placeholder: string
+  maxLength?: number
 }) {
+  const atLimit = maxLength !== undefined && value.length >= maxLength
   return (
-    <input
-      value={value}
-      onChange={(event) => onChange(event.target.value)}
-      placeholder={placeholder}
-      className="w-full rounded-full border border-[#DEE4EC] bg-white px-4 py-3 text-[14px] text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
-    />
+    <div>
+      <input
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder={placeholder}
+        maxLength={maxLength}
+        className="w-full rounded-full border border-[#DEE4EC] bg-white px-4 py-3 text-[14px] text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
+      />
+      {maxLength !== undefined && (
+        <p className={['mt-1.5 ml-1 text-[12px] font-medium', atLimit ? 'text-[#FF4242]' : 'text-[#6C7786]'].join(' ')}>
+          {maxLength}자 이내로 입력해주세요.
+        </p>
+      )}
+    </div>
   )
 }
 
@@ -256,27 +267,28 @@ export function HighlightManageFormView({
               value={hlTitle}
               onChange={setHlTitle}
               placeholder={isCareerRole ? '회사명' : isEducationHistory ? '학교명' : '제목'}
+              maxLength={isEducationHistory ? 20 : 30}
             />
           </div>
 
           {(isPublish || isArticleInterview) && (
             <div>
               <FieldLabel label={isPublish ? '출판사 또는 매체명' : '매체명'} />
-              <TextField value={hlSourceLabel} onChange={setHlSourceLabel} placeholder={isPublish ? '출판사 또는 매체명' : '매체명'} />
+              <TextField value={hlSourceLabel} onChange={setHlSourceLabel} placeholder={isPublish ? '출판사 또는 매체명' : '매체명'} maxLength={30} />
             </div>
           )}
 
           {isEducationHistory && educationNeedsMajor && (
             <div>
               <FieldLabel label="전공" required />
-              <TextField value={hlRole} onChange={setHlRole} placeholder="전공" />
+              <TextField value={hlRole} onChange={setHlRole} placeholder="전공" maxLength={30} />
             </div>
           )}
 
           {isCareerRole && (
             <div>
               <FieldLabel label="직함" required />
-              <TextField value={hlRole} onChange={setHlRole} placeholder="직함" />
+              <TextField value={hlRole} onChange={setHlRole} placeholder="직함" maxLength={20} />
             </div>
           )}
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { BadgeCheck, Mail, ShieldCheck, Upload, Loader2, ChevronRight } from 'lucide-react'
 import { Button, NavBar, showToast } from '@/components/ui'
 import { useFeloreStore } from '@/store/useFeloreStore'
@@ -424,6 +424,14 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
   const [codeInput, setCodeInput] = useState('')
   const [codeError, setCodeError] = useState(false)
   const ocrResult = MOCK_OCR_EDUCATION
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setStep('loading-ocr')
+  }
 
   useEffect(() => {
     if (step !== 'loading-ocr') return
@@ -537,6 +545,13 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
     return (
       <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
         <NavBar title="" onBack={() => setStep('method')} onClose={onBack} />
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".pdf,image/*"
+          className="sr-only"
+          onChange={handleFileChange}
+        />
         <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-6">
           <div className="mb-10 flex flex-col gap-2">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0D0D0D]">
@@ -559,18 +574,22 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
                 </div>
               ))}
             </div>
-            <div className="flex flex-col items-center justify-center gap-3 rounded-[24px] bg-[#F5F6F7] py-12">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex flex-col items-center justify-center gap-3 rounded-[24px] bg-[#F5F6F7] py-12 transition-opacity active:opacity-70"
+            >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/images/ai-tools/edu-photo-dropzone.svg" alt="" className="h-6 w-[30.667px]" />
               <div className="flex flex-col items-center gap-1 text-center text-[14px]">
                 <p className="font-bold text-[#475058]">졸업증명서 업로드</p>
                 <p className="font-medium text-[#6C7786]">PDF / JPG / PNG</p>
               </div>
-            </div>
+            </button>
           </div>
 
           <div className="mt-8 pb-2">
-            <Button onClick={() => setStep('loading-ocr')}>
+            <Button onClick={() => fileInputRef.current?.click()}>
               <span className="flex items-center justify-center gap-1.5">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/images/ai-tools/edu-plus-icon.svg" alt="" className="h-[14.5px] w-[14.5px]" />

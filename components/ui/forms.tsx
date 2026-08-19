@@ -70,6 +70,21 @@ export function InfoBox({ children, variant = 'info' }: InfoBoxProps) {
   )
 }
 
+export function CheckboxDot({ checked }: { checked: boolean }) {
+  return (
+    <span
+      className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full"
+      style={{ backgroundColor: checked ? '#25313D' : '#F5F6F7' }}
+    >
+      {checked && (
+        <svg width="9" height="7" viewBox="0 0 9 7" fill="none">
+          <path d="M1 3.5L3.2 5.7L8 1" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      )}
+    </span>
+  )
+}
+
 interface TextAreaProps {
   value: string
   onChange: (v: string) => void

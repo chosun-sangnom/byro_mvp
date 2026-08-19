@@ -1,8 +1,21 @@
 'use client'
 
 import { useRef, useState, type ChangeEvent, type PointerEvent } from 'react'
-import { Camera, Copy, Check, Info, Sparkles } from 'lucide-react'
-import { BottomSheet, Button, NavBar, showToast, TextArea } from '@/components/ui'
+import { Calendar, Camera, Copy, Check, Info, Sparkles } from 'lucide-react'
+import {
+  BIRTH_TIME_OPTIONS,
+  BirthDateCalendar,
+  BottomSheet,
+  Button,
+  CheckboxDot,
+  digitsFromIso,
+  formatBirthDigits,
+  isoFromBirthDigits,
+  isValidBirthDigits,
+  NavBar,
+  showToast,
+  TextArea,
+} from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import type { PublicProfileWhoIAm, UserState } from '@/types'
@@ -414,8 +427,11 @@ export function BasicInfoEditScreen({
   const isActivityNameLocked = daysSinceChange !== null && daysSinceChange < 30
   const activityNameDaysRemaining = isActivityNameLocked ? 30 - daysSinceChange! : 0
 
-  const [birthDate, setBirthDate] = useState(user.birthDate ?? SAMPLE_PROFILE.birthDate ?? '')
-  const todayDateString = new Date().toISOString().slice(0, 10)
+  const [birthDigits, setBirthDigits] = useState(() => digitsFromIso(user.birthDate ?? SAMPLE_PROFILE.birthDate ?? ''))
+  const [showCalendar, setShowCalendar] = useState(false)
+  const birthComplete = birthDigits.length === 8
+  const birthValid = !birthComplete || isValidBirthDigits(birthDigits)
+  const birthDateError = birthComplete && !birthValid
   const [birthTime, setBirthTime] = useState(user.birthTime ?? SAMPLE_PROFILE.birthTime ?? '')
   const [calendarType, setCalendarType] = useState<'solar' | 'lunar'>(user.calendarType ?? SAMPLE_PROFILE.calendarType ?? 'solar')
   const [showAge, setShowAge] = useState(user.showAge ?? SAMPLE_PROFILE.showAge ?? true)
@@ -455,7 +471,8 @@ export function BasicInfoEditScreen({
         ? new Date().toISOString()
         : user.activityNameChangedAt,
     })
-    store.updateUserInfo({ birthDate, birthTime, calendarType, showAge })
+    const birthDate = birthComplete && birthValid ? isoFromBirthDigits(birthDigits) : ''
+    store.updateUserInfo({ birthDate, birthTime: birthDate ? birthTime : '', calendarType, showAge })
     showToast('저장됐어요!')
     onBack()
   }
@@ -620,15 +637,11 @@ export function BasicInfoEditScreen({
 
   return (
     <div className="flex flex-col h-full">
-      <NavBar title="프로필카드 편집" onBack={onBack} />
+      <NavBar title="프로필 편집" onBack={onBack} />
 
       <div className="flex-1 overflow-y-auto">
         <div className="px-5 py-5">
-          <div className="mb-7">
-            <div className="mb-1 text-[24px] font-black tracking-[-0.03em] text-[var(--color-text-primary)]">프로필 사진</div>
-            <div className="text-[13px] text-[var(--color-text-secondary)]">
-              얼굴이 나온 대표 사진 1장과 분위기를 보여주는 서브 사진 3장을 넣어주세요.
-            </div>
+          <div className="mb-6">
             <input
               ref={mainPhotoInputRef}
               type="file"
@@ -644,7 +657,7 @@ export function BasicInfoEditScreen({
               onChange={handleSubPhotoFileChange}
             />
 
-            <div className="mt-4 grid h-[336px] grid-cols-[minmax(0,1fr)_86px] items-stretch gap-3">
+            <div className="grid h-[336px] grid-cols-[minmax(0,1fr)_86px] items-stretch gap-3">
               <PhotoSlot
                 image={profileImages[0]}
                 label="메인"
@@ -665,134 +678,134 @@ export function BasicInfoEditScreen({
                 ))}
               </div>
             </div>
+            <p className="mt-2 text-[12px] leading-[1.5] text-[#6C7786]">
+              얼굴이 나온 대표 사진 1장, 나만의 분위기를 담은 사진을 추가해보세요
+            </p>
           </div>
 
-          <div className="space-y-4 mb-5">
-            <div>
-              <label className="text-xs text-[var(--color-text-tertiary)] mb-1 block">이름</label>
-              <input
-                value={user.realName ?? user.name}
-                disabled
-                className="w-full border border-[var(--color-border-soft)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-surface)] text-[var(--color-text-tertiary)]"
-              />
-            </div>
-
-            {/* 활동명 */}
-            <div>
-              <button
-                type="button"
-                onClick={() => {
-                  if (isActivityNameLocked) return
-                  setUseActivityName((prev) => !prev)
-                  if (useActivityName) setActivityName('')
-                }}
-                className="flex items-center gap-2 mb-2.5"
-              >
-                <div className={`w-4 h-4 rounded flex items-center justify-center border transition-colors flex-shrink-0 ${useActivityName ? 'border-[var(--color-accent-dark)] bg-[var(--color-accent-dark)]' : 'border-[var(--color-border-default)] bg-[var(--color-bg-soft)]'}`}>
-                  {useActivityName && (
-                    <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
-                      <path d="M1 4L3.5 6.5L9 1" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  )}
-                </div>
-                <span className="text-[13px] font-medium text-[var(--color-text-primary)]">활동명 사용</span>
-              </button>
-
-              {useActivityName && (
-                <div>
-                  <input
-                    type="text"
-                    value={activityName}
-                    onChange={(e) => setActivityName(e.target.value)}
-                    disabled={isActivityNameLocked}
-                    placeholder="예: 크리에이터K, Alex, 디에디트"
-                    maxLength={30}
-                    className={`w-full border rounded-xl px-4 py-2.5 text-sm outline-none transition-colors ${
-                      isActivityNameLocked
-                        ? 'border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] text-[var(--color-text-tertiary)]'
-                        : 'border-[var(--color-border-default)] bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] focus:border-[var(--color-accent-dark)]'
-                    }`}
-                  />
-                  {isActivityNameLocked ? (
-                    <p className="mt-1.5 text-[11px] text-[var(--color-state-warning-text)]">
-                      활동명은 변경 후 30일간 수정할 수 없어요. ({activityNameDaysRemaining}일 후 변경 가능)
-                    </p>
-                  ) : (
-                    <p className="mt-1.5 text-[11px] text-[var(--color-text-tertiary)]">
-                      변경 후 30일간 재변경이 불가해요.
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {!useActivityName && (
-                <p className="text-[11px] text-[var(--color-text-tertiary)] leading-relaxed">
-                  유튜버·크리에이터 등 활동명으로 활동하시는 분들을 위한 선택 기능이에요. 활동명을 설정하면 실명 대신 활동명으로 프로필에 노출돼요.
-                </p>
-              )}
-            </div>
-
-            <div className="grid grid-cols-[1.2fr_0.8fr] gap-3">
+          <div className="flex flex-col gap-6 mb-6">
+            <div className="flex flex-col gap-3">
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs text-[var(--color-text-tertiary)]">생년월일</label>
-                  <button
-                    type="button"
-                    onClick={() => setShowAge((prev) => !prev)}
-                    className="flex items-center gap-1.5"
-                  >
-                    <div className={`relative w-7 h-4 rounded-full transition-colors ${showAge ? 'bg-[var(--color-accent-dark)]' : 'bg-[var(--color-border-default)]'}`}>
-                      <div className={`absolute top-0.5 w-3 h-3 rounded-full bg-white shadow transition-transform ${showAge ? 'translate-x-3.5' : 'translate-x-0.5'}`} />
-                    </div>
-                    <span className="text-[11px] text-[var(--color-text-tertiary)]">나이 공개</span>
-                  </button>
+                <div className="mb-2 flex items-center">
+                  <span className="text-[14px] font-semibold text-[#0D0D0D]">이름</span>
+                  <span className="ml-0.5 mt-0.5 h-[3px] w-[3px] shrink-0 rounded-full bg-[#FF4242]" />
                 </div>
                 <input
-                  type="date"
-                  value={birthDate}
-                  max={todayDateString}
-                  onChange={(event) => setBirthDate(event.target.value > todayDateString ? todayDateString : event.target.value)}
-                  className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
+                  value={user.realName ?? user.name}
+                  disabled
+                  className="w-full truncate rounded-full border border-[#DEE4EC] bg-[#F5F6F7] px-4 py-3 text-[14px] text-[#A8B1BD] outline-none"
                 />
               </div>
 
+              {/* 활동명 */}
               <div>
-                <label className="text-xs text-[var(--color-text-tertiary)] mb-2 block">생시</label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isActivityNameLocked) return
+                    setUseActivityName((prev) => !prev)
+                    if (useActivityName) setActivityName('')
+                  }}
+                  className="mb-2 flex items-center gap-2"
+                >
+                  <CheckboxDot checked={useActivityName} />
+                  <span className="text-[14px] font-medium text-[#25313D]">활동명 사용</span>
+                </button>
+
+                {useActivityName && (
+                  <div>
+                    <input
+                      type="text"
+                      value={activityName}
+                      onChange={(e) => setActivityName(e.target.value)}
+                      disabled={isActivityNameLocked}
+                      placeholder="예: 크리에이터K, Alex, 디에디트"
+                      maxLength={30}
+                      className="w-full truncate rounded-full border bg-white px-4 py-3 text-[14px] outline-none transition-colors disabled:bg-[#F5F6F7] disabled:text-[#A8B1BD]"
+                      style={{ borderColor: '#DEE4EC', color: '#0D0D0D' }}
+                    />
+                    {isActivityNameLocked && (
+                      <p className="mt-1.5 text-[11px] text-[var(--color-state-warning-text)]">
+                        활동명은 변경 후 30일간 수정할 수 없어요. ({activityNameDaysRemaining}일 후 변경 가능)
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                <p className="mt-2 text-[12px] leading-[1.5] text-[#6C7786]">
+                  유튜버·크리에이터 등 활동명으로 활동하시는 분들을 위한 선택 기능이에요. 활동명을 설정하면 실명 대신 활동명으로 프로필에 노출돼요.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <div className="flex-1 min-w-0">
+                <span className="text-[14px] font-semibold text-[#0D0D0D]">생년월일</span>
+                <div className="relative mt-2">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={formatBirthDigits(birthDigits)}
+                    onChange={(event) => setBirthDigits(event.target.value.replace(/\D/g, '').slice(0, 8))}
+                    placeholder="YYYY. MM. DD."
+                    className="w-full truncate rounded-full border bg-white px-4 py-3 pr-11 text-[14px] outline-none"
+                    style={{ borderColor: birthDateError ? '#FF4242' : '#DEE4EC', color: '#0D0D0D' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowCalendar((prev) => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#A8B1BD]"
+                  >
+                    <Calendar size={16} />
+                  </button>
+                  {showCalendar && (
+                    <BirthDateCalendar
+                      digits={birthDigits}
+                      time={birthTime}
+                      onSelect={setBirthDigits}
+                      onSelectTime={setBirthTime}
+                      onClose={() => setShowCalendar(false)}
+                    />
+                  )}
+                </div>
+                {birthDateError && <p className="mt-1.5 text-[11px] text-[#FF4242]">올바른 날짜 형식을 입력해주세요.</p>}
+                <button
+                  type="button"
+                  onClick={() => setShowAge((prev) => !prev)}
+                  className="mt-2 flex items-center gap-2"
+                >
+                  <CheckboxDot checked={showAge} />
+                  <span className="text-[14px] font-medium text-[#25313D]">나이 공개</span>
+                </button>
+              </div>
+
+              <div className="flex-1 min-w-0">
+                <span className="text-[14px] font-semibold text-[#0D0D0D]">생시</span>
                 <select
                   value={birthTime}
                   onChange={(e) => setBirthTime(e.target.value)}
-                  className="w-full border border-[var(--color-border-default)] rounded-xl px-4 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none appearance-none"
+                  className="mt-2 w-full truncate rounded-full border bg-white px-4 py-3 text-[14px] outline-none appearance-none"
+                  style={{ borderColor: '#DEE4EC', color: birthTime ? '#0D0D0D' : '#A8B1BD' }}
                 >
-                  <option value="">모름</option>
-                  <option value="23:00">23:00 ~ 01:00</option>
-                  <option value="01:00">01:00 ~ 03:00</option>
-                  <option value="03:00">03:00 ~ 05:00</option>
-                  <option value="05:00">05:00 ~ 07:00</option>
-                  <option value="07:00">07:00 ~ 09:00</option>
-                  <option value="09:00">09:00 ~ 11:00</option>
-                  <option value="11:00">11:00 ~ 13:00</option>
-                  <option value="13:00">13:00 ~ 15:00</option>
-                  <option value="15:00">15:00 ~ 17:00</option>
-                  <option value="17:00">17:00 ~ 19:00</option>
-                  <option value="19:00">19:00 ~ 21:00</option>
-                  <option value="21:00">21:00 ~ 23:00</option>
+                  {BIRTH_TIME_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
                 </select>
               </div>
             </div>
 
             <div>
-              <label className="text-xs text-[var(--color-text-tertiary)] mb-2 block">양력 / 음력</label>
-              <div className="flex gap-2">
+              <span className="text-[14px] font-semibold text-[#0D0D0D]">양력/음력</span>
+              <div className="mt-2 flex gap-2">
                 {(['solar', 'lunar'] as const).map((type) => (
                   <button
                     key={type}
                     type="button"
                     onClick={() => setCalendarType(type)}
-                    className="rounded-full border px-3 py-1.5 text-xs font-semibold"
+                    className="rounded-full px-3.5 py-1.5 text-[14px] font-bold"
                     style={{
-                      borderColor: calendarType === type ? 'var(--color-accent-dark)' : 'var(--color-border-default)',
-                      background: calendarType === type ? 'var(--color-accent-dark)' : 'var(--color-bg-soft)',
-                      color: calendarType === type ? '#ffffff' : 'var(--color-text-secondary)',
+                      background: calendarType === type ? '#F0F5FF' : '#F5F6F7',
+                      color: calendarType === type ? '#25313D' : '#A8B1BD',
                     }}
                   >
                     {type === 'solar' ? '양력' : '음력'}
@@ -802,20 +815,24 @@ export function BasicInfoEditScreen({
             </div>
 
             <div>
-              <div className="flex items-center gap-2 mb-1">
-                <label className="text-xs text-[var(--color-text-tertiary)]">자기소개</label>
+              <div className="flex items-center gap-1">
+                <span className="text-[14px] font-semibold text-[#0D0D0D]">자기소개</span>
                 <button
                   onClick={handleAiFillBio}
-                  className="text-xs text-[var(--color-accent-dark)] font-bold"
+                  className="flex items-center gap-1 rounded-full px-2 py-1 text-[14px] font-semibold text-white"
+                  style={{ backgroundImage: 'linear-gradient(129deg, rgba(0,173,255,0.2) 0%, #00ADFF 29.568%, #0657FF 59.137%)' }}
                 >
-                  → AI로 채우기
+                  <Sparkles size={14} />
+                  AI로 채우기
                 </button>
               </div>
-              <TextArea value={bio} onChange={setBio} rows={4} maxLength={300} />
+              <div className="mt-2">
+                <TextArea value={bio} onChange={setBio} rows={4} maxLength={300} />
+              </div>
             </div>
           </div>
 
-          <Button onClick={handleSave}>저장</Button>
+          <Button onClick={handleSave}>저장하기</Button>
         </div>
       </div>
 

@@ -713,7 +713,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
             </p>
           </div>
 
-          <div className="flex flex-col gap-3 rounded-[10px] border border-[#DEE4EC] p-4">
+          <div className="flex flex-col gap-3 rounded-[24px] border border-[#DEE4EC] p-4">
             {['학교 발급 이메일 주소 입력', '이메일로 6자리 인증코드 발송', '코드 입력 후 학력 확인 배지 부여'].map((label, i) => (
               <div key={label} className="flex items-center gap-1.5">
                 <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[4px] bg-[#0D0D0D] text-[12.5px] font-semibold text-white">

@@ -320,6 +320,7 @@ export interface UserState {
   showAge?: boolean
   life?: PublicProfileLife
   networkDomains?: string[]
+  networkImported?: boolean
   contactChannels?: ContactChannel[]
   tabVisibility?: TabVisibility
   isVerified?: boolean

@@ -95,6 +95,7 @@ export function RememberNetworkManageScreen({
   }
 
   const handleApply = () => {
+    store.updateUserInfo({ networkImported: true })
     showToast('네트워크에 반영됐어요!')
     onBack()
   }
@@ -168,9 +169,23 @@ export function RememberNetworkManageScreen({
 
       <div className="flex-1 overflow-y-auto px-5 py-5 space-y-4">
 
+        {/* 현재 네트워크 — 이미 한 번이라도 업데이트한 경우에만 표시 */}
+        {store.user?.networkImported && (
+          <div className="-mx-5">
+            <ProfileRememberSection
+              total={MOCK_IMPORTED_NETWORK.total}
+              industries={MOCK_IMPORTED_NETWORK.industries}
+              topIndustryRanks={MOCK_IMPORTED_NETWORK.topIndustryRanks}
+              careerTimeline={MOCK_IMPORTED_NETWORK.careerTimeline}
+              isLoggedIn={false}
+              isOwner
+            />
+          </div>
+        )}
+
         {/* 관심 도메인 설정 */}
         <div>
-          <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.12em]" style={{ color: 'var(--color-text-tertiary)' }}>
+          <p className="mb-1 text-[16px] font-black tracking-[-0.02em]" style={{ color: 'var(--color-text-primary)' }}>
             관심 도메인
           </p>
           <p className="mb-3 text-[12px] leading-relaxed" style={{ color: 'var(--color-text-secondary)' }}>

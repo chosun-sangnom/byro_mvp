@@ -233,9 +233,10 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
               </div>
             </div>
           </div>
-        </div>
-        <div className="px-5 pb-6">
-          <Button onClick={() => setStep('loading')}>인증 시작</Button>
+
+          <div className="mt-8 pb-2">
+            <Button onClick={() => setStep('loading')}>인증 시작</Button>
+          </div>
         </div>
       </div>
     )

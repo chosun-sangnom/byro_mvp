@@ -820,7 +820,14 @@ export function BasicInfoEditScreen({
       </div>
 
       {cropOpen && (
-        <div className="fixed inset-0 z-50 bg-black text-white">
+        <div
+          className="fixed inset-0 z-50 bg-black text-white select-none"
+          style={{
+            WebkitUserSelect: 'none',
+            WebkitTouchCallout: 'none',
+            touchAction: 'none',
+          }}
+        >
           <div className="flex h-full flex-col">
             <div className="flex items-center justify-between px-5 pt-5 pb-3">
               <button onClick={() => setCropOpen(false)} className="text-[15px] font-medium text-white/86">취소</button>

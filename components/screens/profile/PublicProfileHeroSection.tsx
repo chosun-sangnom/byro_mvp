@@ -444,11 +444,11 @@ export function ProfileHeroCard({
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); onBookmarkClick() }}
-                  className="absolute left-4 top-4 z-10 rounded-full border border-white/14 bg-black/55 p-2 backdrop-blur-sm"
+                  className="absolute left-4 top-4 z-10 flex size-10 items-center justify-center rounded-full border border-[rgba(255,255,255,0.8)] bg-[rgba(102,102,102,0.4)] backdrop-blur-[10px]"
                 >
                   {isBookmarked
                     ? <BookmarkCheck size={18} className="text-white" />
-                    : <Bookmark size={18} className="text-white/88" />
+                    : <Bookmark size={18} className="text-white" />
                   }
                 </button>
               )}
@@ -457,7 +457,7 @@ export function ProfileHeroCard({
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); setMoreSheetOpen((v) => !v) }}
-                  className="rounded-full border border-white/14 bg-black/55 px-3 py-1.5 text-[13px] font-bold text-white/88 backdrop-blur-sm leading-none"
+                  className="flex size-10 items-center justify-center rounded-full border border-[rgba(255,255,255,0.8)] bg-[rgba(102,102,102,0.4)] text-[18px] font-bold leading-none text-white backdrop-blur-[10px]"
                 >
                   ···
                 </button>
@@ -487,9 +487,9 @@ export function ProfileHeroCard({
                 e.stopPropagation()
                 await shareOrCopy({ title: `${profile.name}의 펠로어`, url: window.location.href })
               }}
-              className="absolute left-4 top-4 z-10 rounded-full border border-white/14 bg-black/55 p-2 backdrop-blur-sm"
+              className="absolute left-4 top-4 z-10 flex size-10 items-center justify-center rounded-full border border-[rgba(255,255,255,0.8)] bg-[rgba(102,102,102,0.4)] backdrop-blur-[10px]"
             >
-              <Share2 size={16} className="text-white/88" />
+              <Share2 size={18} className="text-white" />
             </button>
           )}
 
@@ -498,9 +498,9 @@ export function ProfileHeroCard({
             <button
               type="button"
               onClick={onOwnerEdit}
-              className="absolute right-4 top-4 z-10 rounded-full border border-white/14 bg-black/55 p-2 backdrop-blur-sm"
+              className="absolute right-4 top-4 z-10 flex size-10 items-center justify-center rounded-full border border-[rgba(255,255,255,0.8)] bg-[rgba(102,102,102,0.4)] backdrop-blur-[10px]"
             >
-              <Pencil size={16} className="text-white/88" />
+              <Pencil size={18} className="text-white" />
             </button>
           )}
         </div>

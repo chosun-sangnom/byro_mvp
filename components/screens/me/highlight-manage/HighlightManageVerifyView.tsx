@@ -109,7 +109,7 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
 
   if (step === 'identity') {
     return (
-      <div className="fixed inset-0 z-[100] flex flex-col bg-white">
+      <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
         <NavBar title="" onBack={onBack} onClose={onBack} />
         <div className="flex-1 overflow-y-auto px-5 py-6">
           <div className="mb-10 flex flex-col gap-2">
@@ -157,7 +157,7 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
 
   if (step === 'loading') {
     return (
-      <div className="fixed inset-0 z-[100] flex flex-col bg-white">
+      <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
         <NavBar title="" onBack={onBack} onClose={onBack} />
         <div className="px-5 pt-2">
           <h1 className="text-[22px] font-bold text-[#0D0D0D]">경력 인증</h1>
@@ -173,7 +173,7 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
 
   if (step === 'select') {
     return (
-      <div className="fixed inset-0 z-[100] flex flex-col bg-white">
+      <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
         <NavBar title="" onBack={() => setStep('identity')} onClose={onBack} />
         <div className="px-5 pt-2 pb-5">
           <h1 className="text-[22px] font-bold text-[#0D0D0D]">경력 인증</h1>
@@ -234,7 +234,7 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
   }
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col bg-white">
+    <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
       <NavBar title="" onBack={onBack} onClose={onBack} />
       <div className="flex flex-1 flex-col items-center justify-center gap-6 px-5 text-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}

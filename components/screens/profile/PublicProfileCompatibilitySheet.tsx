@@ -432,9 +432,15 @@ export function PublicProfileCompatibilitySheet({
               type="button"
               onClick={handleGenerateCard}
               className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-full py-3 pl-3 pr-4 text-[14px] font-bold transition-opacity active:opacity-70"
-              style={{ background: '#F5F6F7', color: '#0D0D0D' }}
+              style={{
+                border: '1px solid transparent',
+                backgroundImage: 'linear-gradient(#F5F6F7, #F5F6F7), linear-gradient(135deg, #BFDBFE 0%, #3B82F6 55%, #2563EB 100%)',
+                backgroundOrigin: 'border-box',
+                backgroundClip: 'padding-box, border-box',
+                color: '#0D0D0D',
+              }}
             >
-              <Sparkles size={16} style={{ color: '#25313D' }} />
+              <Sparkles size={16} style={{ color: '#0657FF' }} />
               케미카드 만들기
             </button>
           )}

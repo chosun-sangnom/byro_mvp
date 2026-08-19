@@ -439,6 +439,10 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
     setStep('loading-ocr')
   }
 
+  // 처음부터 특정 방법으로 바로 진입한 경우(initialMethod) '방법 선택' 화면을 거치지 않았으므로,
+  // 뒤로가기도 그 화면을 건너뛰고 바로 상위(학력 관리)로 나가야 함
+  const goBackFromEntryStep = () => (initialMethod ? onBack() : setStep('method'))
+
   useEffect(() => {
     if (step !== 'loading-ocr') return
     const t = setTimeout(() => {
@@ -552,7 +556,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
   if (step === 'upload') {
     return (
       <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
-        <NavBar title="" onBack={() => setStep('method')} onClose={onBack} />
+        <NavBar title="" onBack={goBackFromEntryStep} onClose={onBack} />
         <input
           ref={fileInputRef}
           type="file"
@@ -610,7 +614,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
   if (step === 'loading-ocr') {
     return (
       <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
-        <NavBar title="" onBack={() => setStep('method')} onClose={onBack} />
+        <NavBar title="" onBack={goBackFromEntryStep} onClose={onBack} />
         <div className="px-5 pt-2">
           <h1 className="text-[22px] font-bold text-[#0D0D0D]">학력 확인 · 졸업증명서</h1>
         </div>
@@ -694,7 +698,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
   if (step === 'email-input') {
     return (
       <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
-        <NavBar title="" onBack={() => setStep('method')} onClose={onBack} />
+        <NavBar title="" onBack={goBackFromEntryStep} onClose={onBack} />
         <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-6">
           <div className="mb-10 flex flex-col gap-2">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0D0D0D]">

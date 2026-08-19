@@ -34,6 +34,8 @@ const MOCK_OCR_EDUCATION = {
 // [임시] 이메일 인증 모의 코드
 const MOCK_EMAIL_CODE = '123456'
 
+const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+
 interface VerifyViewProps {
   selectedCat: HighlightManageCategory
   existingHighlights: Highlight[]
@@ -696,11 +698,12 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
   // ── 이메일: 입력 ────────────────────────────────────────────────────────────
 
   if (step === 'email-input') {
+    const emailError = emailInput.length > 0 && !isValidEmail(emailInput)
     return (
       <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
         <NavBar title="" onBack={goBackFromEntryStep} onClose={onBack} />
         <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-6">
-          <div className="mb-10 flex flex-col gap-2">
+          <div className="mb-6 flex flex-col gap-2">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0D0D0D]">
               <Mail size={16} className="text-white" />
             </span>
@@ -710,10 +713,10 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
             </p>
           </div>
 
-          <div className="flex flex-col gap-3 rounded-[24px] border border-[#DEE4EC] p-4">
+          <div className="flex flex-col gap-3 rounded-[10px] border border-[#DEE4EC] p-4">
             {['학교 발급 이메일 주소 입력', '이메일로 6자리 인증코드 발송', '코드 입력 후 학력 확인 배지 부여'].map((label, i) => (
               <div key={label} className="flex items-center gap-1.5">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#0D0D0D] text-[12.5px] font-semibold text-white">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-[4px] bg-[#0D0D0D] text-[12.5px] font-semibold text-white">
                   {i + 1}
                 </span>
                 <p className="text-[14px] font-medium text-[#475058]">{label}</p>
@@ -722,27 +725,35 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
           </div>
 
           <div className="mt-6">
-            <p className="mb-2 text-[14px] font-semibold text-[#0D0D0D]">학교 이메일</p>
+            <div className="mb-1 flex items-center">
+              <span className="text-[14px] font-semibold text-[#0D0D0D]">학교 이메일</span>
+              <span className="ml-0.5 mt-0.5 h-[3px] w-[3px] shrink-0 rounded-full bg-[#FF4242]" />
+            </div>
             <input
               type="email"
               value={emailInput}
               onChange={(e) => setEmailInput(e.target.value)}
               placeholder="예: hong@korea.ac.kr"
-              className="w-full rounded-full border border-[#DEE4EC] bg-white px-4 py-3 text-[14px] text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
+              className={[
+                'w-full rounded-[10px] border bg-white px-3 py-3 text-[14px] text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]',
+                emailError ? 'border-[#FF4242]' : 'border-[#DEE4EC]',
+              ].join(' ')}
             />
+            {emailError && (
+              <p className="mt-1 text-[12px] font-medium text-[#FF4242]">올바른 이메일 형식을 입력해주세요.</p>
+            )}
             <p className="mt-2 text-[12px] font-medium text-[#6C7786]">
               학교에서 발급한 공식 이메일(@university.ac.kr 등)만 사용할 수 있어요.
             </p>
           </div>
-
-          <div className="mt-8 pb-2">
-            <Button
-              onClick={() => setStep('email-sending')}
-              disabled={!emailInput.trim() || !emailInput.includes('@')}
-            >
-              인증코드 발송
-            </Button>
-          </div>
+        </div>
+        <div className="px-5 pb-6">
+          <Button
+            onClick={() => setStep('email-sending')}
+            disabled={!isValidEmail(emailInput)}
+          >
+            인증코드 발송
+          </Button>
         </div>
       </div>
     )
@@ -773,7 +784,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
       <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
         <NavBar title="" onBack={() => setStep('email-input')} onClose={onBack} />
         <div className="flex-1 overflow-y-auto scrollbar-hide px-5 py-6">
-          <div className="mb-10 flex flex-col gap-2">
+          <div className="mb-6 flex flex-col gap-2">
             <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0D0D0D]">
               <Mail size={16} className="text-white" />
             </span>
@@ -784,44 +795,49 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
             </p>
           </div>
 
-          <div>
-            <input
-              type="text"
-              inputMode="numeric"
-              maxLength={6}
-              value={codeInput}
-              onChange={(e) => { setCodeInput(e.target.value.replace(/\D/g, '')); setCodeError(false) }}
-              placeholder="000000"
-              className={[
-                'w-full rounded-[20px] border px-4 py-3 text-center text-[22px] font-bold tracking-[0.35em] text-[#0D0D0D] outline-none',
-                codeError ? 'border-[#FF4242] bg-[#FFF1F1]' : 'border-[#DEE4EC] bg-white',
-              ].join(' ')}
-            />
-            {codeError && (
-              <p className="mt-2 text-center text-[12px] font-medium text-[#FF4242]">
-                코드가 올바르지 않아요. 다시 확인해주세요.
-              </p>
-            )}
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-full">
+              <input
+                type="text"
+                inputMode="numeric"
+                maxLength={6}
+                value={codeInput}
+                onChange={(e) => { setCodeInput(e.target.value.replace(/\D/g, '')); setCodeError(false) }}
+                placeholder="인증코드 6자리"
+                className={[
+                  'w-full rounded-[10px] border bg-white px-3 py-3 text-[14px] text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]',
+                  codeError ? 'border-[#FF4242]' : 'border-[#DEE4EC]',
+                ].join(' ')}
+              />
+              {codeError && (
+                <p className="mt-1 text-[12px] font-medium text-[#FF4242]">
+                  인증코드가 올바르지 않아요. 다시 확인해주세요.
+                </p>
+              )}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setCodeInput('')
+                setCodeError(false)
+                showToast('인증코드를 재발송했어요.')
+              }}
+              className="text-center text-[14px] font-bold text-[#6C7786]"
+            >
+              인증코드를 받지 못했나요? <span className="text-[#0657FF]">재발송</span>
+            </button>
+
+            {/* [임시] 개발용 힌트 */}
+            <p className="text-center text-[11px] text-[#A8B1BD]">
+              [임시] 테스트 코드: {MOCK_EMAIL_CODE}
+            </p>
           </div>
-
-          <button
-            type="button"
-            onClick={() => { setCodeInput(''); setStep('email-sending') }}
-            className="mt-4 w-full text-center text-[13px] font-semibold text-[#6C7786]"
-          >
-            코드를 받지 못했나요? 재발송
-          </button>
-
-          {/* [임시] 개발용 힌트 */}
-          <p className="mt-2 text-center text-[11px] text-[#A8B1BD]">
-            [임시] 테스트 코드: {MOCK_EMAIL_CODE}
-          </p>
-
-          <div className="mt-8 pb-2">
-            <Button onClick={handleCodeVerify} disabled={codeInput.length !== 6}>
-              인증 완료
-            </Button>
-          </div>
+        </div>
+        <div className="px-5 pb-6">
+          <Button onClick={handleCodeVerify} disabled={codeInput.length !== 6}>
+            인증 완료
+          </Button>
         </div>
       </div>
     )

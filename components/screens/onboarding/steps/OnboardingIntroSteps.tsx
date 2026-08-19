@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { Calendar, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Eye, EyeOff, Image as ImageIcon, Info, MessageCircle, Sparkles } from 'lucide-react'
+import { Calendar, CheckCircle2, ChevronDown, ChevronLeft, ChevronRight, Eye, EyeOff, Image as ImageIcon, Sparkles } from 'lucide-react'
+import { IdentityVerification } from '@/components/auth/IdentityVerification'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { BottomSheet, Button, GoogleIcon, showToast } from '@/components/ui'
 import { StepFooter } from '@/components/screens/onboarding/OnboardingShared'
@@ -851,158 +852,24 @@ function TermsAgreementSheet({
   )
 }
 
-type VerifyTab = 'kakao' | 'sms'
-
 export function Step2Verify() {
   const store = useFeloreStore()
-  const [tab, setTab] = useState<VerifyTab>('kakao')
-  const [phone, setPhone] = useState('')
-  const [code, setCode] = useState('')
-  const [smsSent, setSmsSent] = useState(false)
-  const [smsVerified, setSmsVerified] = useState(false)
-  const [codeError, setCodeError] = useState(false)
-  const phoneInvalid = phone.length > 0 && !isValidPhone(phone)
-
-  const handleVerified = () => {
-    store.setVerified(true)
-    store.nextStep()
-  }
-
-  const handleSmsSend = () => {
-    if (smsSent) {
-      showToast('인증번호를 다시 보냈어요')
-      return
-    }
-    setSmsSent(true)
-  }
-
-  // [임시] 인증번호 확인 API 미연동 — 목업 정답 코드 123456과만 비교
-  const handleSmsCodeConfirm = () => {
-    if (code !== '123456') {
-      setCodeError(true)
-      return
-    }
-    setCodeError(false)
-    store.setVerified(true)
-    setSmsVerified(true)
-    showToast('인증이 완료됐어요')
-  }
 
   return (
     <div className="flex flex-1 flex-col min-h-0 overflow-y-auto px-5 py-6">
       <div className="mb-6">
         <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight">본인인증</div>
-        <p className="meta-text mt-2">인증하면 프로필에 인증 뱃지가 표시돼요</p>
       </div>
 
-      {/* 탭 */}
-      <div className="mb-5 flex gap-1 rounded-full p-1" style={{ backgroundColor: 'var(--color-bg-soft)' }}>
-        {(['kakao', 'sms'] as VerifyTab[]).map((t) => (
-          <button
-            key={t}
-            type="button"
-            onClick={() => setTab(t)}
-            className={`flex-1 rounded-full py-2 text-[13px] font-bold transition-colors ${tab === t ? 'shadow-sm' : ''}`}
-            style={{
-              backgroundColor: tab === t ? '#fff' : 'transparent',
-              color: tab === t ? 'var(--color-text-strong)' : 'var(--color-text-secondary)',
-            }}
-          >
-            {t === 'kakao' ? '카카오 인증' : 'SMS 인증'}
-          </button>
-        ))}
-      </div>
-
-      {tab === 'kakao' ? (
-        <div>
-          <div
-            className="mb-4 flex items-center gap-2 rounded-xl px-3 py-2.5"
-            style={{ backgroundColor: 'var(--color-state-info-bg)' }}
-          >
-            <Info size={16} style={{ color: 'var(--color-state-info-text)' }} className="flex-shrink-0" />
-            <p className="text-[13px] text-[var(--color-text-secondary)]">카카오 본인인증 서비스를 통해 인증해요</p>
-          </div>
-          {/* [임시] 카카오 본인인증 API 미연동 */}
-          <Button variant="kakao" onClick={handleVerified}>
-            <span className="inline-flex w-full items-center justify-center gap-2">
-              <MessageCircle size={16} fill="#333" stroke="none" /> 카카오로 본인인증하기
-            </span>
-          </Button>
-        </div>
-      ) : (
-        <div className="space-y-2">
-          <div>
-            <div className="flex gap-2">
-              <input
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(formatPhone(e.target.value))}
-                placeholder="010-0000-0000"
-                className="flex-1 rounded-full border px-4 py-2.5 text-sm bg-white text-[var(--color-text-primary)] outline-none"
-                style={{ borderColor: phoneInvalid ? 'var(--color-state-danger-text)' : 'var(--color-border-default)' }}
-              />
-              {/* [임시] SMS 발송 API 미연동 */}
-              <Button
-                variant={smsSent ? 'outline' : 'primary'}
-                size="sm"
-                fullWidth={false}
-                className="w-24 flex-shrink-0"
-                disabled={smsSent ? false : !isValidPhone(phone)}
-                onClick={handleSmsSend}
-                style={smsSent ? { borderRadius: 9999, color: 'var(--color-text-strong)' } : undefined}
-              >
-                {smsSent ? '재발송' : '발송'}
-              </Button>
-            </div>
-            {phoneInvalid && (
-              <p className="mt-1 px-1 text-[12px]" style={{ color: 'var(--color-state-danger-text)' }}>올바른 전화번호 형식을 입력해주세요</p>
-            )}
-          </div>
-          {smsSent && (
-            smsVerified ? (
-              <div className="flex items-center gap-1.5 px-1 text-[13px] font-semibold" style={{ color: 'var(--color-state-success-text)' }}>
-                <CheckCircle2 size={16} />
-                인증 완료
-              </div>
-            ) : (
-              <div>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={code}
-                    onChange={(e) => { setCode(e.target.value); setCodeError(false) }}
-                    placeholder="인증번호 6자리"
-                    maxLength={6}
-                    className="flex-1 rounded-full border px-4 py-2.5 text-sm bg-white text-[var(--color-text-primary)] outline-none"
-                    style={{ borderColor: codeError ? 'var(--color-state-danger-text)' : 'var(--color-border-default)' }}
-                  />
-                  <Button
-                    size="sm"
-                    fullWidth={false}
-                    className="w-24 flex-shrink-0"
-                    disabled={code.length < 6}
-                    onClick={handleSmsCodeConfirm}
-                  >
-                    확인
-                  </Button>
-                </div>
-                {codeError && (
-                  <p className="mt-1 px-1 text-[12px]" style={{ color: 'var(--color-state-danger-text)' }}>인증번호가 일치하지 않아요</p>
-                )}
-              </div>
-            )
-          )}
-        </div>
-      )}
+      <IdentityVerification
+        isVerified={false}
+        onVerified={() => {
+          store.setVerified(true)
+          store.nextStep()
+        }}
+      />
 
       <div className="flex-1" />
-      <Button
-        disabled={!smsVerified}
-        onClick={() => store.nextStep()}
-        className={tab === 'kakao' ? 'invisible' : ''}
-      >
-        다음
-      </Button>
       {/* 본인인증은 필수가 아니므로 항상 클릭 가능한 텍스트 버튼으로 건너뛰기를 제공 */}
       <button
         type="button"

@@ -8,24 +8,12 @@ import {
   Globe, FileText, HelpCircle,
 } from 'lucide-react'
 import { Avatar, NavBar, BottomSheet, showToast } from '@/components/ui'
+import { IdentityVerification } from '@/components/auth/IdentityVerification'
 
 const CUSTOM_LINK_ID_REGEX = /^[a-z0-9_]{2,20}$/
 
 type Screen = 'main' | 'billing' | 'upgrade' | 'payment' | 'success' | 'verify'
 type BillingCycle = 'monthly' | 'yearly'
-type VerifyTab = 'kakao' | 'sms'
-
-function formatPhone(value: string) {
-  const digits = value.replace(/\D/g, '').slice(0, 11)
-  if (digits.length <= 3) return digits
-  if (digits.length <= 7) return `${digits.slice(0, 3)}-${digits.slice(3)}`
-  return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`
-}
-
-function isValidPhone(phone: string) {
-  const digits = phone.replace(/\D/g, '')
-  return digits.length === 11 && digits.startsWith('010')
-}
 
 const MONTHLY_PRICE = 7990
 const YEARLY_MONTHLY_PRICE = Math.round(MONTHLY_PRICE * 12 * 0.8 / 12)
@@ -81,10 +69,6 @@ export default function SettingsScreen() {
   const [cardExpiry, setCardExpiry] = useState('')
   const [cardCvc, setCardCvc] = useState('')
   const [cardName, setCardName] = useState('')
-  const [verifyTab, setVerifyTab] = useState<VerifyTab>('kakao')
-  const [verifyPhone, setVerifyPhone] = useState('')
-  const [verifyCode, setVerifyCode] = useState('')
-  const [verifySmsSent, setVerifySmsSent] = useState(false)
 
   const handleSaveCustomLinkId = () => {
     const trimmed = customLinkInput.trim().toLowerCase()
@@ -377,107 +361,17 @@ export default function SettingsScreen() {
         <NavBar title="본인인증" onBack={() => setScreen('main')} />
 
         <div className="flex-1 overflow-y-auto px-5 py-4">
-          {user?.isVerified ? (
-            <div className="mt-6 flex flex-col items-center text-center">
-              <div
-                className="w-16 h-16 rounded-full flex items-center justify-center mb-4"
-                style={{ backgroundColor: 'var(--color-accent-soft)' }}
-              >
-                <BadgeCheck size={32} className="text-[var(--color-accent-dark)]" />
-              </div>
-              <p className="text-[16px] font-black text-[var(--color-text-primary)] mb-1">본인인증이 완료됐어요</p>
-              <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed">
-                프로필 이름 옆에 인증 뱃지가 표시돼요.
-              </p>
-            </div>
-          ) : (
-            <>
-              <p className="text-[13px] text-[var(--color-text-secondary)] leading-relaxed mb-5">
-                인증하면 프로필에 인증 뱃지가 표시돼요.
-              </p>
-
-              {/* 탭 */}
-              <div className="flex border-b mb-5" style={{ borderColor: 'var(--color-border-default)' }}>
-                {(['kakao', 'sms'] as VerifyTab[]).map((t) => (
-                  <button
-                    key={t}
-                    type="button"
-                    onClick={() => setVerifyTab(t)}
-                    className="flex-1 py-2 text-[12px] font-bold transition-colors"
-                    style={{
-                      color: verifyTab === t ? 'var(--color-accent-dark)' : 'var(--color-text-tertiary)',
-                      borderBottom: verifyTab === t ? '2px solid var(--color-accent-dark)' : '2px solid transparent',
-                      marginBottom: -1,
-                    }}
-                  >
-                    {t === 'kakao' ? '카카오 인증' : 'SMS 인증'}
-                  </button>
-                ))}
-              </div>
-
-              {verifyTab === 'kakao' ? (
-                <div>
-                  <p className="text-[13px] text-[var(--color-text-secondary)] mb-4 leading-relaxed">
-                    카카오페이 인증 또는 카카오 본인인증 서비스를 통해 인증해요.
-                  </p>
-                  {/* [임시] 카카오 본인인증 API 미연동 */}
-                  <button
-                    type="button"
-                    onClick={() => { store.updateUserInfo({ isVerified: true }); showToast('본인인증이 완료됐어요'); setScreen('main') }}
-                    className="w-full rounded-xl py-3 text-[14px] font-bold"
-                    style={{ backgroundColor: '#FEE500', color: '#191600' }}
-                  >
-                    카카오로 본인인증하기
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="flex gap-2">
-                    <input
-                      type="tel"
-                      value={verifyPhone}
-                      onChange={(e) => setVerifyPhone(formatPhone(e.target.value))}
-                      placeholder="010-0000-0000"
-                      disabled={verifySmsSent}
-                      className="flex-1 border border-[var(--color-border-default)] rounded-xl px-3 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none disabled:opacity-50"
-                    />
-                    {/* [임시] SMS 발송 API 미연동 */}
-                    <button
-                      type="button"
-                      disabled={!isValidPhone(verifyPhone) || verifySmsSent}
-                      onClick={() => setVerifySmsSent(true)}
-                      className="flex-shrink-0 rounded-xl px-3 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
-                      style={{ backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
-                    >
-                      {verifySmsSent ? '발송됨' : '발송'}
-                    </button>
-                  </div>
-                  {verifySmsSent && (
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
-                        value={verifyCode}
-                        onChange={(e) => setVerifyCode(e.target.value)}
-                        placeholder="인증번호 6자리"
-                        maxLength={6}
-                        className="flex-1 border border-[var(--color-border-default)] rounded-xl px-3 py-2.5 text-sm bg-[var(--color-bg-soft)] text-[var(--color-text-primary)] outline-none"
-                      />
-                      {/* [임시] 인증번호 확인 API 미연동 */}
-                      <button
-                        type="button"
-                        disabled={verifyCode.length < 6}
-                        onClick={() => { store.updateUserInfo({ isVerified: true }); showToast('본인인증이 완료됐어요'); setScreen('main') }}
-                        className="flex-shrink-0 rounded-xl px-4 py-2.5 text-[12px] font-bold transition-opacity disabled:opacity-40"
-                        style={{ backgroundColor: 'var(--color-accent-dark)', color: '#fff' }}
-                      >
-                        확인
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </>
-          )}
+          <IdentityVerification
+            isVerified={user?.isVerified ?? false}
+            onVerified={() => {
+              store.updateUserInfo({ isVerified: true })
+              setScreen('main')
+            }}
+            onCancelVerification={() => {
+              store.updateUserInfo({ isVerified: false })
+              showToast('본인인증이 취소됐어요')
+            }}
+          />
         </div>
       </div>
     )

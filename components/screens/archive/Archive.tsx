@@ -2,15 +2,20 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { MoreHorizontal, Search, X } from 'lucide-react'
+import { Search, MoreVertical } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
-import { ActionMenu, ActionMenuItem, Modal, showToast } from '@/components/ui'
-import { SAMPLE_PROFILE, getProfileAvatar } from '@/lib/mocks/publicProfiles'
+import { NavBar, Avatar, ActionMenu, ActionMenuItem, Modal, showToast } from '@/components/ui'
+import { getProfileMeta } from '@/lib/mocks/publicProfiles'
 import type { SavedProfile } from '@/types'
 
 type SortKey = 'name' | 'recent'
 
 const SAVED_PAGE_SIZE = 10
+
+const SORT_OPTIONS: Array<{ key: SortKey; label: string }> = [
+  { key: 'name', label: '가나다순' },
+  { key: 'recent', label: '최근 저장순' },
+]
 
 export default function Archive() {
   const router = useRouter()
@@ -22,8 +27,7 @@ export default function Archive() {
   const [memoTarget, setMemoTarget] = useState<SavedProfile | null>(null)
   const [memoValue, setMemoValue] = useState('')
 
-  const { activeArchiveTab, setActiveArchiveTab, savedProfiles } = store
-  const { recentProfiles } = SAMPLE_PROFILE
+  const { activeArchiveTab, setActiveArchiveTab, savedProfiles, recentProfiles } = store
 
   const sorted: SavedProfile[] = sort === 'name'
     ? [...savedProfiles].sort((a, b) => a.name.localeCompare(b.name, 'ko'))
@@ -61,151 +65,197 @@ export default function Archive() {
   ]
 
   return (
-    <div className="flex flex-col h-full">
-      {/* 헤더 */}
-      <div className="flex items-center px-5 h-12 border-b flex-shrink-0" style={{ borderColor: 'var(--color-border-default)' }}>
-        <button onClick={() => router.back()} className="text-sm mr-3 text-[var(--color-text-secondary)]">‹</button>
-        <span className="text-base font-black">저장한 프로필</span>
-      </div>
+    <div className="flex h-full flex-col">
+      <NavBar title="저장한 프로필" onBack={() => router.back()} />
 
-      {/* 탭 */}
-      <div className="flex px-5 gap-2 flex-shrink-0 overflow-x-auto py-3">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveArchiveTab(tab.key)}
-            className={[
-              'flex-1 min-w-fit py-2.5 px-3 text-xs font-semibold rounded-full border transition-colors',
-              activeArchiveTab === tab.key
-                ? 'border-[var(--color-accent-dark)] text-white'
-                : 'bg-[var(--color-bg-soft)] text-[var(--color-text-secondary)] border-[var(--color-border-default)]',
-            ].join(' ')}
-            style={activeArchiveTab === tab.key ? { backgroundColor: 'var(--color-accent-dark)' } : undefined}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <div className="flex flex-1 flex-col overflow-y-auto px-4 py-4">
+        {/* 탭 */}
+        <div className="flex flex-shrink-0 items-center gap-0 rounded-full bg-[#f5f6f7] p-1">
+          {tabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveArchiveTab(tab.key)}
+              className={[
+                'flex-1 rounded-full px-6 py-2 text-[14px] tracking-[-0.28px] transition-colors',
+                activeArchiveTab === tab.key
+                  ? 'bg-white font-semibold text-[#25313d]'
+                  : 'font-bold text-[#6c7786]',
+              ].join(' ')}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
 
-      {/* 콘텐츠 */}
-      <div className="flex-1 overflow-y-auto">
-
-        {/* 저장됨 탭 */}
+        {/* 저장됨 탭: 검색 + 정렬 */}
         {activeArchiveTab === 'saved' && (
-          <div className="flex flex-col h-full">
-            {/* 검색바 + 정렬 */}
-            <div className="px-5 pb-3 space-y-2">
-              <div className="flex items-center gap-2 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-3 py-2.5">
-                <Search size={14} className="flex-shrink-0 text-[var(--color-text-tertiary)]" />
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="이름, 직함으로 검색"
-                  className="flex-1 bg-transparent text-[13px] text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)]"
-                />
-                {searchQuery && (
-                  <button onClick={() => setSearchQuery('')} className="flex-shrink-0">
-                    <X size={14} className="text-[var(--color-text-tertiary)]" />
-                  </button>
-                )}
-              </div>
-              <div className="flex gap-1.5">
-                {(['name', 'recent'] as SortKey[]).map((key) => (
-                  <button
-                    key={key}
-                    onClick={() => setSort(key)}
-                    className="rounded-full border px-3 py-1 text-[11px] font-semibold transition-colors"
-                    style={sort === key
-                      ? { backgroundColor: 'var(--color-accent-dark)', borderColor: 'var(--color-accent-dark)', color: '#fff' }
-                      : { backgroundColor: 'var(--color-bg-soft)', borderColor: 'var(--color-border-default)', color: 'var(--color-text-secondary)' }
-                    }
-                  >
-                    {key === 'name' ? '가나다순' : '최근 저장순'}
-                  </button>
-                ))}
-              </div>
+          <div className="mt-3 flex flex-shrink-0 flex-col gap-3">
+            <div className="flex items-center gap-1.5 rounded-full bg-[#f5f6f7] p-3">
+              <Search size={20} className="flex-shrink-0 text-[#a8b1bd]" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="이름, 직함으로 검색"
+                className="flex-1 bg-transparent text-[14px] tracking-[-0.28px] text-[#0d0d0d] outline-none placeholder:text-[#a8b1bd]"
+              />
             </div>
+            <div className="flex gap-1.5">
+              {SORT_OPTIONS.map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => setSort(key)}
+                  className={[
+                    'rounded-full px-2.5 py-1.5 text-[14px] tracking-[-0.28px] transition-colors',
+                    sort === key
+                      ? 'bg-[#25313d] font-bold text-white'
+                      : 'border border-[#dee4ec] bg-white font-medium text-[#25313d]',
+                  ].join(' ')}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
-            {/* 목록 */}
-            <div className="flex-1 overflow-y-auto px-5 pb-4">
-              {filtered.length === 0 ? (
-                <p className="micro-text text-center pt-10">
-                  {q ? '검색 결과가 없어요' : '저장된 프로필이 없어요'}
-                </p>
-              ) : visibleProfiles.map((p) => (
-                <div key={p.id} className="surface-card flex items-center gap-3 rounded-[22px] px-4 py-4 w-full text-left mb-3">
-                  <button className="flex items-center gap-3 flex-1 min-w-0" onClick={() => router.push(`/${p.linkId}`)}>
-                    <ProfileAvatar linkId={p.linkId} name={p.name} size={40} />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-bold truncate">{p.name}</div>
-                      {p.title && (
-                        <div className="meta-text mt-0.5 truncate">{p.title}</div>
-                      )}
+        {/* 콘텐츠 */}
+        <div className="mt-6 flex-1">
+          {activeArchiveTab === 'saved' ? (
+            filtered.length === 0 ? (
+              <EmptyState text={q ? '일치하는 검색 결과가 없어요' : '저장된 프로필이 없어요'} />
+            ) : (
+              <div className="overflow-hidden rounded-[24px] border-[0.66px] border-[#dee4ec]">
+                {visibleProfiles.map((p, i) => {
+                  const meta = getProfileMeta(p.linkId)
+                  return (
+                    <div
+                      key={p.id}
+                      className={[
+                        'flex flex-col gap-3 px-4 py-4',
+                        i < visibleProfiles.length - 1 ? 'border-b border-[#dee4ec]' : '',
+                      ].join(' ')}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <button
+                          className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
+                          onClick={() => router.push(`/${p.linkId}`)}
+                        >
+                          <Avatar
+                            name={p.name}
+                            src={meta.avatarImage}
+                            color={meta.avatarColor}
+                            textColor={meta.avatarImage ? undefined : '#6c7786'}
+                            size={44}
+                          />
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-0.5">
+                              <span className="truncate text-[14px] font-semibold tracking-[-0.28px] text-[#0d0d0d]">
+                                {p.name}
+                              </span>
+                              {meta.isVerified && (
+                                <img src="/images/ai-tools/exp-verified-badge.svg" alt="인증됨" className="h-3 w-3 flex-shrink-0" />
+                              )}
+                            </div>
+                            {p.title && (
+                              <div className="truncate text-[12px] font-medium tracking-[-0.24px] text-[#6c7786]">{p.title}</div>
+                            )}
+                          </div>
+                        </button>
+                        <div className="relative flex-shrink-0">
+                          <button
+                            onClick={() => setOpenMenuId(openMenuId === p.id ? null : p.id)}
+                            className="rounded-full p-1 text-[#0d0d0d] active:bg-[#f5f6f7] transition-colors"
+                          >
+                            <MoreVertical size={20} />
+                          </button>
+                          <ActionMenu open={openMenuId === p.id} onClose={() => setOpenMenuId(null)}>
+                            <ActionMenuItem
+                              label="메모 편집"
+                              onClick={() => { setOpenMenuId(null); setMemoTarget(p); setMemoValue(p.memo) }}
+                            />
+                            <ActionMenuItem
+                              label="저장 취소"
+                              danger
+                              onClick={() => {
+                                setOpenMenuId(null)
+                                store.unsaveProfile(p.linkId)
+                                showToast(`${p.name}님을 저장 목록에서 삭제했어요`)
+                              }}
+                            />
+                          </ActionMenu>
+                        </div>
+                      </div>
                       {p.memo && (
-                        <div className="text-[11px] text-[var(--color-text-tertiary)] mt-0.5 truncate">{p.memo}</div>
+                        <div className="flex items-center gap-1 rounded-lg bg-[#f0f5ff] py-2.5 pl-3 pr-4">
+                          <img src="/images/archive/memo-icon.svg" alt="" className="h-3.5 w-3 flex-shrink-0" />
+                          <span className="truncate text-[12px] font-medium tracking-[-0.24px] text-[#25313d]">{p.memo}</span>
+                        </div>
                       )}
                     </div>
-                  </button>
-                  <div className="relative flex-shrink-0">
-                    <button
-                      onClick={() => setOpenMenuId(openMenuId === p.id ? null : p.id)}
-                      className="rounded-full p-1.5 text-[var(--color-text-tertiary)] active:bg-[var(--color-bg-muted)] transition-colors"
-                    >
-                      <MoreHorizontal size={16} />
-                    </button>
-                    <ActionMenu open={openMenuId === p.id} onClose={() => setOpenMenuId(null)}>
-                      <ActionMenuItem
-                        label="메모 편집"
-                        onClick={() => { setOpenMenuId(null); setMemoTarget(p); setMemoValue(p.memo) }}
-                      />
-                      <ActionMenuItem
-                        label="저장 취소"
-                        danger
-                        onClick={() => {
-                          setOpenMenuId(null)
-                          store.unsaveProfile(p.linkId)
-                          showToast(`${p.name}님을 저장 목록에서 삭제했어요`)
-                        }}
-                      />
-                    </ActionMenu>
+                  )
+                })}
+                {visibleCount < filtered.length && (
+                  <div ref={loadMoreRef} className="py-4 text-center">
+                    <span className="text-[12px] text-[#a8b1bd]">불러오는 중…</span>
                   </div>
-                </div>
-              ))}
-              {visibleCount < filtered.length && (
-                <div ref={loadMoreRef} className="py-4 text-center">
-                  <span className="micro-text">불러오는 중…</span>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* 최근 본 탭 */}
-        {activeArchiveTab === 'recent' && (
-          <div className="px-5 py-2">
-            {recentProfiles.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => router.push(`/${p.linkId}`)}
-                className="surface-card flex items-center gap-3 rounded-[22px] px-4 py-4 w-full text-left mb-3"
-              >
-                <ProfileAvatar linkId={p.linkId} name={p.name} size={40} />
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-bold">{p.name}</div>
-                  <div className="meta-text mt-0.5">{p.title}</div>
-                </div>
-                <div className="micro-text flex-shrink-0">{p.viewedAt}</div>
-              </button>
-            ))}
-          </div>
-        )}
+                )}
+              </div>
+            )
+          ) : (
+            recentProfiles.length === 0 ? (
+              <EmptyState text="최근 본 프로필이 없어요" />
+            ) : (
+              <div className="overflow-hidden rounded-[24px] border-[0.66px] border-[#dee4ec]">
+                {recentProfiles.map((p, i) => {
+                  const meta = getProfileMeta(p.linkId)
+                  return (
+                    <button
+                      key={p.id}
+                      onClick={() => router.push(`/${p.linkId}`)}
+                      className={[
+                        'flex w-full items-center justify-between gap-3 px-4 py-4 text-left',
+                        i < recentProfiles.length - 1 ? 'border-b border-[#dee4ec]' : '',
+                      ].join(' ')}
+                    >
+                      <div className="flex min-w-0 flex-1 items-center gap-2.5">
+                        <Avatar
+                          name={p.name}
+                          src={meta.avatarImage}
+                          color={meta.avatarColor}
+                          textColor={meta.avatarImage ? undefined : '#6c7786'}
+                          size={44}
+                        />
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-0.5">
+                            <span className="truncate text-[14px] font-semibold tracking-[-0.28px] text-[#0d0d0d]">
+                              {p.name}
+                            </span>
+                            {meta.isVerified && (
+                              <img src="/images/ai-tools/exp-verified-badge.svg" alt="인증됨" className="h-3 w-3 flex-shrink-0" />
+                            )}
+                          </div>
+                          {p.title && (
+                            <div className="truncate text-[12px] font-medium tracking-[-0.24px] text-[#6c7786]">{p.title}</div>
+                          )}
+                        </div>
+                      </div>
+                      <span className="flex-shrink-0 text-[12px] font-medium tracking-[-0.24px] text-[#6c7786]">
+                        {p.viewedAt}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            )
+          )}
+        </div>
       </div>
 
       {/* 메모 편집 모달 */}
-      <Modal open={!!memoTarget} onClose={() => setMemoTarget(null)}>
+      <Modal open={!!memoTarget} onClose={() => setMemoTarget(null)} widthClassName="w-[294px]">
         <div>
-          <div className="text-base font-black mb-3">
+          <div className="mb-4 text-[18px] font-bold tracking-[-0.54px] text-[#0d0d0d]">
             {memoTarget?.name}님 메모 편집
           </div>
           <textarea
@@ -213,17 +263,16 @@ export default function Archive() {
             onChange={(e) => setMemoValue(e.target.value)}
             maxLength={100}
             rows={3}
-            placeholder="메모를 입력하세요"
-            className="w-full resize-none rounded-[16px] border border-[var(--color-border-default)] bg-[var(--color-bg-muted)] px-4 py-3 text-[14px] text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)] mb-1"
+            placeholder="메모를 입력하세요."
+            className="mb-1 w-full resize-none rounded-[16px] border border-[#dee4ec] px-3 py-3 text-[14px] tracking-[-0.28px] text-[#0d0d0d] outline-none placeholder:text-[#a8b1bd]"
           />
-          <div className="text-right text-[11px] text-[var(--color-text-tertiary)] mb-4">
+          <div className="mb-4 text-right text-[12px] tracking-[-0.24px] text-[#6c7786]">
             {memoValue.length}/100
           </div>
           <div className="flex gap-2">
             <button
               onClick={() => setMemoTarget(null)}
-              className="flex-1 rounded-xl border py-2.5 text-[13px] font-semibold text-[var(--color-text-secondary)]"
-              style={{ borderColor: 'var(--color-border-default)' }}
+              className="flex-1 rounded-[10px] border border-[#dee4ec] py-3 text-[14px] font-bold tracking-[-0.28px] text-[#25313d]"
             >
               취소
             </button>
@@ -234,8 +283,7 @@ export default function Archive() {
                 setMemoTarget(null)
                 showToast('메모를 저장했어요')
               }}
-              className="flex-1 rounded-xl py-2.5 text-[13px] font-semibold text-white"
-              style={{ backgroundColor: 'var(--color-accent-dark)' }}
+              className="flex-1 rounded-[10px] bg-black py-3 text-[14px] font-bold tracking-[-0.28px] text-white"
             >
               저장
             </button>
@@ -246,22 +294,11 @@ export default function Archive() {
   )
 }
 
-function ProfileAvatar({ linkId, name, size }: { linkId: string; name: string; size: number }) {
-  const avatar = getProfileAvatar(linkId)
-  const style = { width: size, height: size }
-
-  if (avatar) {
-    return (
-      <div className="overflow-hidden rounded-full bg-[var(--color-bg-muted)] flex-shrink-0" style={style}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={avatar} alt={`${name} 프로필 사진`} className="w-full h-full object-cover" />
-      </div>
-    )
-  }
-
+function EmptyState({ text }: { text: string }) {
   return (
-    <div className="rounded-full bg-[var(--color-bg-muted)] flex items-center justify-center font-bold text-[var(--color-text-secondary)] text-sm flex-shrink-0" style={style}>
-      {name.charAt(0)}
+    <div className="flex flex-col items-center gap-4 py-20">
+      <img src="/images/archive/empty-icon.svg" alt="" className="h-12 w-12" />
+      <p className="text-[14px] font-semibold tracking-[-0.28px] text-[#6c7786]">{text}</p>
     </div>
   )
 }

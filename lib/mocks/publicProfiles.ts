@@ -1615,3 +1615,23 @@ export function getProfileAvatar(linkId: string) {
   if (linkId === 'mk') return '/images/MK_img.jpeg'
   return ''
 }
+
+const FALLBACK_AVATAR_COLORS = ['#F0F5FF', '#F4F2FE', '#EFF9FF', '#EEFBF2']
+
+// TODO(real API): Replace this mock lookup with a profile/media service call.
+export function getProfileMeta(linkId: string) {
+  const profile = getPublicProfileByUsername(linkId)
+  if (profile.linkId === linkId) {
+    return {
+      avatarImage: profile.avatarImage || undefined,
+      avatarColor: profile.avatarColor,
+      isVerified: 'isVerified' in profile ? Boolean(profile.isVerified) : false,
+    }
+  }
+  const hash = Array.from(linkId).reduce((sum, ch) => sum + ch.charCodeAt(0), 0)
+  return {
+    avatarImage: undefined,
+    avatarColor: FALLBACK_AVATAR_COLORS[hash % FALLBACK_AVATAR_COLORS.length],
+    isVerified: false,
+  }
+}

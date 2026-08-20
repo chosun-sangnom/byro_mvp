@@ -13,6 +13,7 @@ import type {
   TabVisibility,
   TabVisibilityLevel,
   SavedProfile,
+  RecentProfile,
   Experience,
 } from '@/types'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
@@ -66,6 +67,7 @@ interface FeloreStore {
 
   // 아카이브
   savedProfiles: SavedProfile[]
+  recentProfiles: RecentProfile[]
 
   // 경험
   submittedExperiences: Record<string, Experience[]>
@@ -114,6 +116,7 @@ interface FeloreStore {
   clearExperience(): void
   markExpSubmitted(profileId: string): void
   setActiveArchiveTab(tab: 'saved' | 'recent'): void
+  addRecentProfile(linkId: string, name: string, title: string): void
   updateUserInfo(info: Partial<UserState>): void
   updateUserContactChannels(channels: ContactChannel[]): void
   updateUserWhoIAm(whoIAm: PublicProfileWhoIAm): void
@@ -198,6 +201,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
 
   // 아카이브
   savedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
+  recentProfiles: SAMPLE_PROFILE.recentProfiles as RecentProfile[],
 
   // 경험
   submittedExperiences: {},
@@ -472,6 +476,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
       bioMode: null,
       expSubmittedAt: {},
       savedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
+      recentProfiles: SAMPLE_PROFILE.recentProfiles as RecentProfile[],
       submittedExperiences: {},
     })
   },
@@ -515,6 +520,15 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
 
   setActiveArchiveTab(tab) {
     set({ activeArchiveTab: tab })
+  },
+
+  addRecentProfile(linkId, name, title) {
+    set((state) => ({
+      recentProfiles: [
+        { id: uuidv4(), linkId, name, title, viewedAt: '방금 전' },
+        ...state.recentProfiles.filter((p) => p.linkId !== linkId),
+      ],
+    }))
   },
 
   updateUserInfo(info) {
@@ -607,6 +621,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
       primaryHighlightOverrides: {},
       // 아카이브
       savedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
+      recentProfiles: SAMPLE_PROFILE.recentProfiles as RecentProfile[],
       // 경험/피드백
       submittedExperiences: {},
       expSubmittedAt: {},
@@ -656,6 +671,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
       expSubmittedAt: {},
       deletedGuestbookIds: [],
       savedProfiles: SAMPLE_PROFILE.savedProfiles as SavedProfile[],
+      recentProfiles: SAMPLE_PROFILE.recentProfiles as RecentProfile[],
       submittedExperiences: {},
       kemiComputedProfiles: [],
       hlOpenStates: {},
@@ -682,7 +698,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
   },
 }), {
   name: 'felore-store',
-  version: 20,
+  version: 21,
   migrate: (persistedState: unknown) => {
     const state = persistedState as FeloreStore | undefined
     if (!state) return persistedState
@@ -704,6 +720,8 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
       onboardingShowAge: (state as FeloreStore & { onboardingShowAge?: boolean }).onboardingShowAge ?? true,
       isVerified: (state as FeloreStore & { isVerified?: boolean }).isVerified ?? false,
       savedProfiles: SAMPLE_PROFILE.savedProfiles,
+      recentProfiles: (state as FeloreStore & { recentProfiles?: RecentProfile[] }).recentProfiles
+        ?? (SAMPLE_PROFILE.recentProfiles as RecentProfile[]),
     }
   },
   partialize: (state) => ({
@@ -741,6 +759,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
     deletedGuestbookIds: state.deletedGuestbookIds,
     tabVisibility: state.tabVisibility,
     savedProfiles: state.savedProfiles,
+    recentProfiles: state.recentProfiles,
     submittedExperiences: state.submittedExperiences,
     highlightsInitialized: state.highlightsInitialized,
     kemiComputedProfiles: state.kemiComputedProfiles,

@@ -338,6 +338,7 @@ interface GuideSlide {
   title: string
   tags: string[]
   value: string
+  note?: string
   ctaLabel?: string
   ctaRoute?: string
 }
@@ -388,6 +389,7 @@ const GUIDE_SLIDES: GuideSlide[] = [
     title: '네트워크',
     tags: ['리멤버 명함', '공통 인맥'],
     value: '쌓아온 네트워크를 보여주면 연결 고리가 더 선명해져요.',
+    note: '나중에 내 펠로어 > 네트워크에서 언제든 설정할 수 있어요.',
   },
   {
     Preview: PreviewFeedback,
@@ -479,6 +481,9 @@ export function Step9Complete() {
               </p>
               <h2 className="text-[22px] font-bold leading-[1.35] tracking-[-0.03em] text-[#0D0D0D]">{guide.title}</h2>
               <p className="text-[16px] font-medium leading-[1.5] tracking-[-0.02em] text-[#475058]">{guide.value}</p>
+              {guide.note && (
+                <p className="text-xs leading-relaxed text-[#6C7786]">{guide.note}</p>
+              )}
             </div>
 
             <div className="flex flex-col gap-4">

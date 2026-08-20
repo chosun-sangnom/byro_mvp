@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type PointerEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { Calendar, CheckCircle2, ChevronRight, Eye, EyeOff, Image as ImageIcon, Sparkles } from 'lucide-react'
+import { Calendar, CheckCircle2, ChevronRight, Eye, EyeOff, Image as ImageIcon, Sparkles, X } from 'lucide-react'
 import { IdentityVerification } from '@/components/auth/IdentityVerification'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import {
@@ -993,57 +993,102 @@ export function Step2BasicInfo() {
 }
 
 
-function MainPhotoSlot({ image, onClick }: { image: string; onClick: () => void }) {
+function MainPhotoSlot({ image, onClick, onRemove }: { image: string; onClick: () => void; onRemove: () => void }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="relative flex h-[325px] w-[244px] shrink-0 flex-col items-center justify-end overflow-hidden rounded-[24px] px-2.5 py-6"
-      style={{ backgroundColor: image ? undefined : '#F5F6F7' }}
-    >
-      {image && (
-        <>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={image} alt="대표" className="absolute inset-0 h-full w-full object-cover" />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0) 70%, rgba(0,0,0,0.7) 90%)' }} />
-        </>
-      )}
-      <div
-        className="absolute left-4 top-4 flex h-5 items-center justify-center rounded-full px-2 text-xs font-bold text-white"
-        style={{ backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)' }}
+    <div className="relative h-[325px] w-[244px] shrink-0">
+      <button
+        type="button"
+        onClick={onClick}
+        className="relative flex h-full w-full flex-col items-center justify-end overflow-hidden rounded-[24px] px-2.5 py-6"
+        style={{ backgroundColor: image ? undefined : '#F5F6F7' }}
       >
-        대표
-      </div>
-      {image ? (
-        <span className="relative text-sm font-bold text-white">탭하여 변경</span>
-      ) : (
-        <div className="relative flex flex-col items-center gap-2">
-          <ImageIcon size={24} className="text-[#A8B1BD]" />
-          <span className="text-sm font-bold text-[#A8B1BD]">탭하여 추가</span>
+        {image && (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={image} alt="대표" className="absolute inset-0 h-full w-full object-cover" />
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0) 70%, rgba(0,0,0,0.7) 90%)' }} />
+          </>
+        )}
+        <div
+          className="absolute left-4 top-4 flex h-5 items-center justify-center rounded-full px-2 text-xs font-bold text-white"
+          style={{ backgroundColor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)' }}
+        >
+          대표
         </div>
+        {image ? (
+          <span className="relative text-sm font-bold text-white">탭하여 변경</span>
+        ) : (
+          <div className="relative flex flex-col items-center gap-2">
+            <ImageIcon size={24} className="text-[#A8B1BD]" />
+            <span className="text-sm font-bold text-[#A8B1BD]">탭하여 추가</span>
+          </div>
+        )}
+      </button>
+      {image && (
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation()
+            onRemove()
+          }}
+          className="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full text-white"
+          style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+          aria-label="대표 사진 삭제"
+        >
+          <X size={14} />
+        </button>
       )}
-    </button>
+    </div>
   )
 }
 
-function SubPhotoSlot({ image, radius, onClick }: { image: string; radius: number; onClick: () => void }) {
+function SubPhotoSlot({
+  image,
+  radius,
+  disabled,
+  onClick,
+  onRemove,
+}: {
+  image: string
+  radius: number
+  disabled?: boolean
+  onClick: () => void
+  onRemove: () => void
+}) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="relative flex flex-1 items-center justify-center overflow-hidden"
-      style={{ backgroundColor: image ? undefined : '#F5F6F7', borderRadius: radius }}
-    >
-      {image ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={image} alt="서브 사진" className="absolute inset-0 h-full w-full object-cover" />
-      ) : (
-        <div className="flex flex-col items-center gap-1">
-          <ImageIcon size={18} className="text-[#A8B1BD]" />
-          <span className="text-[10px] font-semibold text-[#A8B1BD]">탭하여 추가</span>
-        </div>
+    <div className="relative flex-1 overflow-hidden" style={{ borderRadius: radius }}>
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={disabled}
+        className="relative flex h-full w-full items-center justify-center overflow-hidden disabled:cursor-not-allowed"
+        style={{ backgroundColor: image ? undefined : '#F5F6F7', opacity: disabled ? 0.5 : 1 }}
+      >
+        {image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={image} alt="서브 사진" className="absolute inset-0 h-full w-full object-cover" />
+        ) : (
+          <div className="flex flex-col items-center gap-1">
+            <ImageIcon size={18} className="text-[#A8B1BD]" />
+            <span className="text-[10px] font-semibold text-[#A8B1BD]">탭하여 추가</span>
+          </div>
+        )}
+      </button>
+      {image && (
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation()
+            onRemove()
+          }}
+          className="absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full text-white"
+          style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+          aria-label="서브 사진 삭제"
+        >
+          <X size={12} />
+        </button>
       )}
-    </button>
+    </div>
   )
 }
 
@@ -1246,17 +1291,31 @@ export function Step4Profile() {
         {/* 프로필 사진 */}
         <div className="mb-9">
           <div className="flex items-start gap-2">
-            <MainPhotoSlot image={profileImages[0]} onClick={() => mainPhotoInputRef.current?.click()} />
+            <MainPhotoSlot
+              image={profileImages[0]}
+              onClick={() => mainPhotoInputRef.current?.click()}
+              onRemove={() => setProfileImages((prev) => {
+                const next = [...prev]
+                next[0] = ''
+                return next
+              })}
+            />
             <div className="flex flex-1 flex-col gap-2 self-stretch">
               {[16, 8, 16].map((radius, i) => (
                 <SubPhotoSlot
                   key={i}
                   image={profileImages[i + 1]}
                   radius={radius}
+                  disabled={!profileImages[i] && !profileImages[i + 1]}
                   onClick={() => {
                     pendingSubIndexRef.current = i + 1
                     subPhotoInputRef.current?.click()
                   }}
+                  onRemove={() => setProfileImages((prev) => {
+                    const next = [...prev]
+                    next[i + 1] = ''
+                    return next
+                  })}
                 />
               ))}
             </div>

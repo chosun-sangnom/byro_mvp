@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, type ChangeEvent, type PointerEvent } from 'react'
-import { Calendar, Image as ImageIcon, Info } from 'lucide-react'
+import { Calendar, Image as ImageIcon, Info, X } from 'lucide-react'
 import {
   BIRTH_TIME_OPTIONS,
   BirthDateCalendar,
@@ -349,54 +349,79 @@ function PhotoSlot({
   image,
   variant = 'sub',
   radius = 16,
+  disabled,
   onClick,
+  onRemove,
 }: {
   image?: string
   variant?: 'main' | 'sub'
   radius?: number
+  disabled?: boolean
   onClick: () => void
+  onRemove: () => void
 }) {
   const isMain = variant === 'main'
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="group relative h-full w-full overflow-hidden bg-[#F5F6F7]"
-      style={{ borderRadius: isMain ? 24 : radius }}
-    >
-      {image ? (
-        <>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={image}
-            alt={isMain ? '대표 사진' : '서브 사진'}
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-active:scale-[1.02]"
-          />
-          {isMain && (
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0)_70%,rgba(0,0,0,0.7)_90%)]" />
-          )}
-        </>
-      ) : (
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-          <ImageIcon size={isMain ? 22 : 16} className="text-[#A8B1BD]" />
-          <span className={isMain ? 'text-[14px] font-bold text-[#A8B1BD]' : 'text-[10px] font-semibold text-[#A8B1BD]'}>
-            탭하여 추가
-          </span>
-        </div>
-      )}
+    <div className="relative h-full w-full">
+      <button
+        type="button"
+        onClick={onClick}
+        disabled={disabled}
+        className="group relative h-full w-full overflow-hidden bg-[#F5F6F7] disabled:cursor-not-allowed"
+        style={{ borderRadius: isMain ? 24 : radius, opacity: disabled ? 0.5 : 1 }}
+      >
+        {image ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={image}
+              alt={isMain ? '대표 사진' : '서브 사진'}
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-active:scale-[1.02]"
+            />
+            {isMain && (
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0)_70%,rgba(0,0,0,0.7)_90%)]" />
+            )}
+          </>
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+            <ImageIcon size={isMain ? 22 : 16} className="text-[#A8B1BD]" />
+            <span className={isMain ? 'text-[14px] font-bold text-[#A8B1BD]' : 'text-[10px] font-semibold text-[#A8B1BD]'}>
+              탭하여 추가
+            </span>
+          </div>
+        )}
 
-      {isMain && (
-        <div className="absolute left-4 top-4 flex h-5 items-center justify-center rounded-full bg-black/80 px-2 backdrop-blur-[10px]">
-          <span className="text-[12px] font-bold text-white">대표</span>
-        </div>
-      )}
+        {isMain && (
+          <div className="absolute left-4 top-4 flex h-5 items-center justify-center rounded-full bg-black/80 px-2 backdrop-blur-[10px]">
+            <span className="text-[12px] font-bold text-white">대표</span>
+          </div>
+        )}
 
-      {isMain && image && (
-        <div className="absolute inset-x-0 bottom-4 flex items-center justify-center">
-          <span className="text-[14px] font-bold text-white">탭하여 변경</span>
-        </div>
+        {isMain && image && (
+          <div className="absolute inset-x-0 bottom-4 flex items-center justify-center">
+            <span className="text-[14px] font-bold text-white">탭하여 변경</span>
+          </div>
+        )}
+      </button>
+      {image && (
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation()
+            onRemove()
+          }}
+          className="absolute flex items-center justify-center rounded-full text-white"
+          style={
+            isMain
+              ? { top: 12, right: 12, width: 24, height: 24, backgroundColor: 'rgba(0,0,0,0.6)' }
+              : { top: 6, right: 6, width: 20, height: 20, backgroundColor: 'rgba(0,0,0,0.6)' }
+          }
+          aria-label={isMain ? '대표 사진 삭제' : '서브 사진 삭제'}
+        >
+          <X size={isMain ? 14 : 12} />
+        </button>
       )}
-    </button>
+    </div>
   )
 }
 
@@ -651,6 +676,11 @@ export function BasicInfoEditScreen({
                 image={profileImages[0]}
                 variant="main"
                 onClick={() => mainPhotoInputRef.current?.click()}
+                onRemove={() => setProfileImages((prev) => {
+                  const next = [...prev]
+                  next[0] = ''
+                  return next
+                })}
               />
               <div className="grid h-full grid-rows-3 gap-2">
                 {[1, 2, 3].map((index) => (
@@ -658,10 +688,16 @@ export function BasicInfoEditScreen({
                     key={index}
                     image={profileImages[index]}
                     radius={index === 2 ? 8 : 16}
+                    disabled={!profileImages[index - 1] && !profileImages[index]}
                     onClick={() => {
                       pendingSubIndexRef.current = index
                       subPhotoInputRef.current?.click()
                     }}
+                    onRemove={() => setProfileImages((prev) => {
+                      const next = [...prev]
+                      next[index] = ''
+                      return next
+                    })}
                   />
                 ))}
               </div>

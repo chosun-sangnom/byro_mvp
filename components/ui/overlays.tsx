@@ -173,21 +173,23 @@ export function Modal({ open, onClose, children, widthClassName = 'w-[272px]' }:
             className="absolute inset-0 bg-black/60"
             onClick={onClose}
           />
-          <motion.div
-            initial={{ scale: 0.94, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.94, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className={`relative rounded-2xl p-5 z-10 border ${widthClassName}`}
-            style={{
-              backgroundColor: 'var(--color-bg-surface)',
-              borderColor: 'var(--color-border-default)',
-              boxShadow: '0 24px 48px rgba(0,0,0,0.4)',
-            }}
-            onClick={(event) => event.stopPropagation()}
-          >
-            {children}
-          </motion.div>
+          <div className="relative mx-auto flex w-full max-w-[430px] items-center justify-center">
+            <motion.div
+              initial={{ scale: 0.94, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.94, opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className={`relative rounded-2xl p-5 z-10 border ${widthClassName}`}
+              style={{
+                backgroundColor: 'var(--color-bg-surface)',
+                borderColor: 'var(--color-border-default)',
+                boxShadow: '0 24px 48px rgba(0,0,0,0.4)',
+              }}
+              onClick={(event) => event.stopPropagation()}
+            >
+              {children}
+            </motion.div>
+          </div>
         </div>
       )}
     </AnimatePresence>

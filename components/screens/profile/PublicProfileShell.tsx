@@ -15,7 +15,6 @@
 
 import { useEffect, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { BottomSheet, TextArea, showToast } from '@/components/ui'
 import { getNormalizedPublicProfile, computeTabAccess } from '@/components/screens/profile/publicProfileData'
@@ -159,11 +158,10 @@ export function PublicProfileShell({
 
         {/* 평판 탭 visitor 전용 액션 */}
         {showReputationActions && (
-          <div className="mb-4 flex gap-2">
+          <div className="mb-4 flex gap-3">
             <button
               onClick={() => store.isLoggedIn ? setFeedbackRequestOpen(true) : setLoginModalOpen(true)}
-              className="flex-1 rounded-[10px] border py-3 text-[14px] font-bold whitespace-nowrap"
-              style={{ borderColor: '#DEE4EC', color: '#25313D', background: '#fff' }}
+              className="flex-1 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)] whitespace-nowrap"
             >
               피드백 요청
             </button>
@@ -172,11 +170,12 @@ export function PublicProfileShell({
                 if (alreadySubmitted) { showToast('오늘 이미 경험을 남겼어요. 내일 다시 남길 수 있어요'); return }
                 setExpSheetOpen(true)
               }}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-[10px] py-3 text-[14px] font-bold text-white whitespace-nowrap disabled:opacity-40"
-              disabled={alreadySubmitted}
-              style={{ background: '#0657FF' }}
+              className="flex-1 rounded-full py-3 text-[13px] font-semibold whitespace-nowrap"
+              style={alreadySubmitted
+                ? { border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)' }
+                : { background: 'linear-gradient(135deg,var(--color-accent-light) 0%,var(--color-accent-dark) 100%)', color: '#fff', boxShadow: '0 10px 24px var(--color-accent-glow)' }}
             >
-              {alreadySubmitted ? '경험 남겼어요 ✓' : <><Plus size={14} />경험 남기기</>}
+              {alreadySubmitted ? '경험 남겼어요 ✓' : '+ 경험 남기기'}
             </button>
           </div>
         )}

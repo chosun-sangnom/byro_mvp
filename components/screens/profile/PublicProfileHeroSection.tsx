@@ -3,8 +3,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { BadgeCheck, Bookmark, BookmarkCheck, ChevronLeft, ChevronRight, Pencil, Share2, Sparkles, X } from 'lucide-react'
-import { ActionMenu, ActionMenuItem, BottomSheet, Button, CheckRow, TextArea, showToast } from '@/components/ui'
+import { BadgeCheck, Bookmark, BookmarkCheck, Check, ChevronLeft, ChevronRight, Pencil, Share2, Sparkles, X } from 'lucide-react'
+import { ActionMenu, ActionMenuItem, BottomSheet, TextArea, showToast } from '@/components/ui'
 import { shareOrCopy } from '@/lib/share'
 import type { PersonaReason } from '@/lib/personaGen'
 
@@ -273,7 +273,7 @@ export function ProfileHeroCard({
   }
   const [moreSheetOpen, setMoreSheetOpen] = useState(false)
   const [reportSheetOpen, setReportSheetOpen] = useState(false)
-  const [reportReason, setReportReason] = useState<string | undefined>(undefined)
+  const [reportReasons, setReportReasons] = useState<string[]>([])
   const [reportDetail, setReportDetail] = useState('')
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
@@ -282,12 +282,18 @@ export function ProfileHeroCard({
 
   const closeReportSheet = () => {
     setReportSheetOpen(false)
-    setReportReason(undefined)
+    setReportReasons([])
     setReportDetail('')
   }
 
+  const toggleReportReason = (reason: string) => {
+    setReportReasons((prev) =>
+      prev.includes(reason) ? prev.filter((r) => r !== reason) : [...prev, reason]
+    )
+  }
+
   const handleSubmitReport = () => {
-    if (!reportReason) return
+    if (reportReasons.length === 0) return
     closeReportSheet()
     showToast('신고가 접수됐어요')
   }
@@ -372,22 +378,35 @@ export function ProfileHeroCard({
         {mounted && createPortal(
           <BottomSheet open={reportSheetOpen} onClose={closeReportSheet}>
             <div className="px-5 pb-6">
-              <div className="text-base font-black mb-1" style={{ color: 'var(--color-text-primary)' }}>
+              <div className="mb-2 text-[18px] font-bold tracking-[-0.54px] text-[#0d0d0d]">
                 프로필 신고
               </div>
-              <p className="text-[12px] text-[var(--color-text-tertiary)] mb-4 leading-relaxed">
+              <p className="mb-5 text-[14px] leading-relaxed tracking-[-0.28px] text-[#475058]">
                 {profile.name}님의 프로필을 신고해요. 사유를 선택해주세요.
               </p>
 
-              <div className="mb-4">
-                {PROFILE_REPORT_REASONS.map((reason) => (
-                  <CheckRow
-                    key={reason}
-                    label={reason}
-                    checked={reportReason === reason}
-                    onToggle={() => setReportReason(reason)}
-                  />
-                ))}
+              <div className="mb-4 flex flex-col gap-4">
+                {PROFILE_REPORT_REASONS.map((reason) => {
+                  const checked = reportReasons.includes(reason)
+                  return (
+                    <button
+                      key={reason}
+                      type="button"
+                      onClick={() => toggleReportReason(reason)}
+                      className="flex items-center gap-2 text-left"
+                    >
+                      <span
+                        className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-[6px]"
+                        style={{ backgroundColor: checked ? '#25313d' : '#f5f6f7' }}
+                      >
+                        {checked && <Check size={12} strokeWidth={3} className="text-white" />}
+                      </span>
+                      <span className="text-[16px] font-medium tracking-[-0.32px] text-[#25313d]">
+                        {reason}
+                      </span>
+                    </button>
+                  )
+                })}
               </div>
 
               <TextArea
@@ -396,14 +415,16 @@ export function ProfileHeroCard({
                 placeholder="구체적인 내용을 적어주시면 검토에 도움이 돼요 (선택)"
                 maxLength={300}
                 rows={3}
-                dark
               />
 
-              <div className="mt-4">
-                <Button variant="danger" disabled={!reportReason} onClick={handleSubmitReport}>
-                  제출하기
-                </Button>
-              </div>
+              <button
+                type="button"
+                onClick={handleSubmitReport}
+                disabled={reportReasons.length === 0}
+                className="mt-4 flex w-full items-center justify-center rounded-full bg-black py-4 text-[16px] font-semibold tracking-[-0.48px] text-white transition-opacity disabled:opacity-50"
+              >
+                제출하기
+              </button>
             </div>
           </BottomSheet>,
           document.body

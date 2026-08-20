@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import {
-  ChevronRight, Pencil, BookmarkCheck, CreditCard, Eye, Check, CheckCircle2, BadgeCheck,
+  ChevronRight, Pencil, BookmarkCheck, CreditCard, Eye, BadgeCheck,
   Globe, FileText, HelpCircle,
 } from 'lucide-react'
 import { Avatar, NavBar, BottomSheet, showToast } from '@/components/ui'
@@ -22,10 +22,19 @@ const YEARLY_TOTAL = YEARLY_MONTHLY_PRICE * 12
 const FEATURES: { label: string; free: string; pro: string }[] = [
   { label: '하이라이트 블록', free: '최대 3개', pro: '무제한' },
   { label: '바이브탭 항목', free: '탭당 5개', pro: '무제한' },
-  { label: '내 링크 커스터마이징', free: '—', pro: '✓' },
+  { label: '커스텀 링크', free: '불가능', pro: '가능' },
   { label: '케미 체크', free: '하루 1회', pro: '하루 100회' },
   { label: '피드백 요청', free: '하루 1회', pro: '무제한' },
-  { label: '방문자 통계', free: '숫자만', pro: '상세 분석' },
+  { label: '방문자 통계', free: '숫자', pro: '상세 분석' },
+]
+
+const DONE_FEATURES: { label: string; value: string }[] = [
+  { label: '하이라이트 블록', value: '무제한' },
+  { label: '바이브탭 항목', value: '무제한' },
+  { label: '나만의 링크 커스터마이징', value: '' },
+  { label: '케미 체크', value: '하루 100회' },
+  { label: '피드백 요청', value: '무제한' },
+  { label: '방문자 통계', value: '상세 분석' },
 ]
 
 type MenuItem = {
@@ -93,7 +102,7 @@ export default function SettingsScreen() {
 
   const handlePay = () => {
     if (!cardNumber || !cardExpiry || !cardCvc || !cardName.trim()) {
-      showToast('카드 정보를 모두 입력해주세요', 'error')
+      showToast('카드 정보를 모두 입력해주세요.', 'error')
       return
     }
     store.setPaidUser(true)
@@ -107,96 +116,103 @@ export default function SettingsScreen() {
   if (screen === 'upgrade') {
     const price = billingCycle === 'monthly' ? MONTHLY_PRICE : YEARLY_MONTHLY_PRICE
     return (
-      <div className="flex h-full flex-col bg-[var(--color-bg-page)]">
-        <NavBar title="PRO 업그레이드" onBack={() => setScreen('billing')} />
+      <div className="flex h-full flex-col bg-white">
+        <NavBar title="" onBack={() => setScreen('billing')} onClose={() => setScreen('billing')} divider={false} />
 
-        <div className="flex-1 overflow-y-auto pb-32">
+        <div className="flex-1 overflow-y-auto px-4 pt-2 pb-8">
           {/* 헤더 */}
-          <div className="px-5 pt-6 pb-5 text-center">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-[var(--color-accent-soft)] px-3 py-1 mb-3">
-              <span className="text-[11px] font-black text-[var(--color-accent-dark)] tracking-wide">FELORE PRO</span>
+          <div className="flex flex-col items-center gap-3 text-center">
+            <span
+              className="rounded-full px-2.5 py-1.5 text-[12px] font-bold text-white"
+              style={{ background: 'linear-gradient(125deg, rgba(0,173,255,0.2) 0%, #00ADFF 30%, #0657FF 59%)' }}
+            >
+              FELORE PRO
+            </span>
+            <div className="flex flex-col gap-2">
+              <p className="text-[22px] font-bold text-[#0D0D0D]">더 넓게, 더 자유롭게</p>
+              <p className="text-[16px] font-medium text-[#475058]">제한 없이 나를 표현하는 프리미엄 플랜</p>
             </div>
-            <p className="text-[22px] font-black text-[var(--color-text-primary)] leading-tight">
-              더 넓게, 더 자유롭게
-            </p>
-            <p className="text-[13px] text-[var(--color-text-secondary)] mt-1.5">
-              제한 없이 나를 표현하는 프리미엄 플랜
-            </p>
           </div>
 
           {/* 결제 주기 토글 */}
-          <div className="mx-5 mb-5">
-            <div className="flex rounded-2xl p-1 gap-1" style={{ backgroundColor: 'var(--color-bg-muted)' }}>
-              {(['monthly', 'yearly'] as BillingCycle[]).map((cycle) => (
-                <button
-                  key={cycle}
-                  onClick={() => setBillingCycle(cycle)}
-                  className={[
-                    'flex-1 py-2.5 rounded-xl text-[13px] font-semibold transition-all',
-                    billingCycle === cycle
-                      ? 'bg-[var(--color-bg-surface)] text-[var(--color-text-primary)] shadow-sm'
-                      : 'text-[var(--color-text-tertiary)]',
-                  ].join(' ')}
-                >
-                  {cycle === 'monthly' ? '월간' : (
-                    <span className="flex items-center justify-center gap-1.5">
-                      연간
-                      <span className="rounded-full bg-[var(--color-accent-dark)] px-1.5 py-0.5 text-[10px] font-bold text-white">20% 할인</span>
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
+          <div className="mt-6 flex items-center gap-1 rounded-full bg-[#F5F6F7] p-1">
+            {(['monthly', 'yearly'] as BillingCycle[]).map((cycle) => (
+              <button
+                key={cycle}
+                onClick={() => setBillingCycle(cycle)}
+                className={[
+                  'flex-1 rounded-full py-2 text-[14px] transition-colors',
+                  billingCycle === cycle ? 'bg-white font-semibold text-[#25313D]' : 'font-bold text-[#6C7786]',
+                ].join(' ')}
+              >
+                {cycle === 'monthly' ? '월간' : '연간'}
+              </button>
+            ))}
           </div>
 
+          {billingCycle === 'monthly' && (
+            <div className="flex justify-end pr-2">
+              <div className="flex flex-col items-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/icons/payment/tooltip-tail.svg" alt="" className="w-2 h-1" />
+                <div className="rounded-[6px] bg-black/80 px-3 py-2">
+                  <p className="text-[12px] font-medium text-white whitespace-nowrap">연간 플랜 결제 시 20% 할인</p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* 가격 카드 */}
-          <div className="mx-5 mb-5 rounded-2xl border-2 border-[var(--color-accent-dark)] bg-[var(--color-bg-surface)] px-5 py-5">
-            <div className="flex items-end gap-1 mb-1">
-              <span className="text-[32px] font-black text-[var(--color-text-primary)] leading-none">
-                {price.toLocaleString()}원
-              </span>
-              <span className="text-[13px] text-[var(--color-text-secondary)] mb-1">/월</span>
+          <div className="mt-3 rounded-2xl border border-[#CCDDFF] bg-[#F0F5FF] p-4">
+            <div className="flex items-center gap-1">
+              <span className="text-[22px] font-bold text-[#25313D]">{price.toLocaleString()}원</span>
+              <span className="text-[14px] font-medium text-[#475058]">/월</span>
             </div>
             {billingCycle === 'yearly' && (
-              <p className="text-[12px] text-[var(--color-text-tertiary)]">
+              <p className="mt-1 text-[12px] font-medium text-[#6C7786]">
                 연 {YEARLY_TOTAL.toLocaleString()}원 청구 · 월간 대비 20% 절약
               </p>
             )}
           </div>
 
           {/* 기능 비교 */}
-          <div className="mx-5 rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] overflow-hidden">
-            <div className="grid grid-cols-3 border-b border-[var(--color-border-soft)]">
-              <div className="py-3 px-4 text-[11px] font-bold text-[var(--color-text-tertiary)] uppercase tracking-wide">기능</div>
-              <div className="py-3 text-center text-[11px] font-bold text-[var(--color-text-tertiary)] uppercase tracking-wide">무료</div>
-              <div className="py-3 text-center text-[11px] font-black text-[var(--color-accent-dark)] uppercase tracking-wide">PRO</div>
+          <div className="mt-3 overflow-hidden rounded-2xl border border-[#DEE4EC]">
+            <div className="flex w-full">
+              <div className="flex-1 border border-[#DEE4EC] bg-[#F5F6F7] px-3 py-2.5">
+                <p className="text-[12px] font-bold text-[#475058]">기능</p>
+              </div>
+              <div className="flex-1 border border-[#DEE4EC] bg-[#F5F6F7] px-3 py-2.5">
+                <p className="text-[12px] font-bold text-[#475058]">무료</p>
+              </div>
+              <div className="flex-1 border border-[#DEE4EC] bg-[#F5F6F7] px-3 py-2.5">
+                <p className="text-[12px] font-bold text-[#25313D]">PRO</p>
+              </div>
             </div>
-            {FEATURES.map((f, i) => (
-              <div
-                key={f.label}
-                className={[
-                  'grid grid-cols-3 items-center',
-                  i < FEATURES.length - 1 ? 'border-b border-[var(--color-border-soft)]' : '',
-                ].join(' ')}
-              >
-                <div className="py-3.5 px-4 text-[12px] text-[var(--color-text-primary)] font-medium">{f.label}</div>
-                <div className="py-3.5 text-center text-[12px] text-[var(--color-text-tertiary)]">{f.free}</div>
-                <div className="py-3.5 text-center text-[12px] font-semibold text-[var(--color-accent-dark)]">{f.pro}</div>
+            {FEATURES.map((f) => (
+              <div key={f.label} className="flex w-full">
+                <div className="flex-1 border border-[#DEE4EC] bg-white px-3 py-2.5">
+                  <p className="text-[12px] font-medium text-[#0D0D0D]">{f.label}</p>
+                </div>
+                <div className="flex-1 border border-[#DEE4EC] bg-white px-3 py-2.5">
+                  <p className="text-[12px] font-medium text-[#25313D]">{f.free}</p>
+                </div>
+                <div className="flex-1 border border-[#DEE4EC] bg-white px-3 py-2.5">
+                  <p className="text-[12px] font-medium text-[#25313D]">{f.pro}</p>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
         {/* 하단 CTA */}
-        <div className="px-5 pb-[calc(env(safe-area-inset-bottom)+20px)] pt-4 bg-[var(--color-bg-page)] border-t border-[var(--color-border-soft)]">
+        <div className="flex flex-col items-center gap-4 bg-gradient-to-b from-white/0 to-white px-4 pt-4 pb-[calc(env(safe-area-inset-bottom)+24px)]">
           <button
             onClick={() => setScreen('payment')}
-            className="w-full rounded-full py-4 text-[15px] font-black text-white"
-            style={{ backgroundColor: 'var(--color-accent-dark)' }}
+            className="h-12 w-full rounded-full bg-black text-[16px] font-semibold text-white"
           >
             월 {price.toLocaleString()}원으로 시작하기
           </button>
-          <p className="text-center text-[11px] text-[var(--color-text-tertiary)] mt-2.5">
+          <p className="text-center text-[12px] font-medium text-[#6C7786]">
             언제든지 구독 취소 가능 · 환불 정책 적용
           </p>
         </div>
@@ -209,94 +225,83 @@ export default function SettingsScreen() {
     const price = billingCycle === 'monthly' ? MONTHLY_PRICE : YEARLY_TOTAL
     const label = billingCycle === 'monthly' ? '월간 PRO' : '연간 PRO'
     return (
-      <div className="flex h-full flex-col bg-[var(--color-bg-page)]">
-        <NavBar title="결제" onBack={() => setScreen('upgrade')} />
+      <div className="flex h-full flex-col bg-white">
+        <NavBar title="" onBack={() => setScreen('upgrade')} onClose={() => setScreen('upgrade')} divider={false} />
 
-        <div className="flex-1 overflow-y-auto pb-32">
+        <div className="flex-1 overflow-y-auto px-4 pt-2 pb-8">
+          <h1 className="text-[22px] font-bold text-[#0D0D0D]">결제</h1>
+
           {/* 결제 요약 */}
-          <div className="mx-5 mt-5 rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-5 py-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-[14px] font-black text-[var(--color-text-primary)]">{label}</p>
-                <p className="text-[12px] text-[var(--color-text-secondary)] mt-0.5">
+          <div className="mt-6 rounded-2xl border border-[#CCDDFF] bg-[#F0F5FF] p-4">
+            <div className="flex items-center gap-5">
+              <div className="flex-1 flex flex-col gap-1">
+                <p className="text-[16px] font-bold text-[#0D0D0D]">{label}</p>
+                <p className="text-[12px] font-medium text-[#6C7786]">
                   {billingCycle === 'monthly' ? '매월 자동 갱신' : '1년 단위 자동 갱신'}
                 </p>
               </div>
-              <p className="text-[18px] font-black text-[var(--color-accent-dark)]">
-                {price.toLocaleString()}원
-              </p>
+              <p className="text-[22px] font-bold text-[#25313D] whitespace-nowrap">{price.toLocaleString()}원</p>
             </div>
           </div>
 
           {/* 카드 입력 폼 */}
-          <div className="mx-5 mt-5">
-            <p className="text-[11px] font-bold uppercase tracking-[0.1em] text-[var(--color-text-tertiary)] mb-3">카드 정보</p>
+          <div className="mt-6 flex flex-col gap-6">
+            <div className="flex flex-col gap-2">
+              <p className="text-[14px] font-semibold text-[#0D0D0D]">카드 번호</p>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={cardNumber}
+                onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                placeholder="0000 0000 0000 0000"
+                className="w-full rounded-full border border-[#DEE4EC] bg-white px-4 py-3 text-[14px] font-medium text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
+              />
+            </div>
 
-            <div className="rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] overflow-hidden divide-y divide-[var(--color-border-soft)]">
-              {/* 카드 번호 */}
-              <div className="px-4 py-3.5">
-                <p className="text-[10px] font-semibold text-[var(--color-text-tertiary)] mb-1.5 uppercase tracking-wide">카드 번호</p>
+            <div className="flex gap-2">
+              <div className="flex-1 flex flex-col gap-2">
+                <p className="text-[14px] font-semibold text-[#0D0D0D]">유효 기간</p>
                 <input
                   type="text"
                   inputMode="numeric"
-                  value={cardNumber}
-                  onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                  placeholder="0000 0000 0000 0000"
-                  className="w-full bg-transparent text-[15px] font-semibold text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)] placeholder:font-normal tracking-wider"
+                  value={cardExpiry}
+                  onChange={(e) => setCardExpiry(formatExpiry(e.target.value))}
+                  placeholder="MM/YY"
+                  className="w-full rounded-full border border-[#DEE4EC] bg-white px-4 py-3 text-[14px] font-medium text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
                 />
               </div>
-
-              {/* 유효기간 + CVC */}
-              <div className="flex divide-x divide-[var(--color-border-soft)]">
-                <div className="flex-1 px-4 py-3.5">
-                  <p className="text-[10px] font-semibold text-[var(--color-text-tertiary)] mb-1.5 uppercase tracking-wide">유효기간</p>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={cardExpiry}
-                    onChange={(e) => setCardExpiry(formatExpiry(e.target.value))}
-                    placeholder="MM/YY"
-                    className="w-full bg-transparent text-[15px] font-semibold text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)] placeholder:font-normal"
-                  />
-                </div>
-                <div className="flex-1 px-4 py-3.5">
-                  <p className="text-[10px] font-semibold text-[var(--color-text-tertiary)] mb-1.5 uppercase tracking-wide">CVC</p>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    value={cardCvc}
-                    onChange={(e) => setCardCvc(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                    placeholder="000"
-                    className="w-full bg-transparent text-[15px] font-semibold text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)] placeholder:font-normal"
-                  />
-                </div>
-              </div>
-
-              {/* 카드 소유자명 */}
-              <div className="px-4 py-3.5">
-                <p className="text-[10px] font-semibold text-[var(--color-text-tertiary)] mb-1.5 uppercase tracking-wide">카드 소유자명</p>
+              <div className="flex-1 flex flex-col gap-2">
+                <p className="text-[14px] font-semibold text-[#0D0D0D]">CVC</p>
                 <input
                   type="text"
-                  value={cardName}
-                  onChange={(e) => setCardName(e.target.value.toUpperCase())}
-                  placeholder="HONG GILDONG"
-                  className="w-full bg-transparent text-[15px] font-semibold text-[var(--color-text-primary)] outline-none placeholder:text-[var(--color-text-tertiary)] placeholder:font-normal tracking-wider"
+                  inputMode="numeric"
+                  value={cardCvc}
+                  onChange={(e) => setCardCvc(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                  placeholder="000"
+                  className="w-full rounded-full border border-[#DEE4EC] bg-white px-4 py-3 text-[14px] font-medium text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
                 />
               </div>
             </div>
 
-            <p className="text-[11px] text-[var(--color-text-tertiary)] mt-3 leading-relaxed">
-              카드 정보는 암호화되어 안전하게 처리됩니다. 실제 결제가 발생하지 않는 목업 화면이에요.
-            </p>
+            <div className="flex flex-col gap-2">
+              <p className="text-[14px] font-semibold text-[#0D0D0D]">카드 소유자명</p>
+              <input
+                type="text"
+                value={cardName}
+                onChange={(e) => setCardName(e.target.value.toUpperCase())}
+                placeholder="HONG GILDONG"
+                className="w-full rounded-full border border-[#DEE4EC] bg-white px-4 py-3 text-[14px] font-medium text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
+              />
+              <p className="text-[12px] font-medium text-[#6C7786]">카드 정보는 암호화되어 안전하게 처리됩니다</p>
+            </div>
           </div>
         </div>
 
         {/* 하단 결제 버튼 */}
-        <div className="px-5 pb-[calc(env(safe-area-inset-bottom)+20px)] pt-4 bg-[var(--color-bg-page)] border-t border-[var(--color-border-soft)]">
+        <div className="flex flex-col items-center bg-gradient-to-b from-white/0 to-white px-4 pt-4 pb-[calc(env(safe-area-inset-bottom)+24px)]">
           <button
             onClick={handlePay}
-            className="w-full rounded-full py-4 text-[15px] font-black text-white"
-            style={{ backgroundColor: 'var(--color-accent-dark)' }}
+            className="h-12 w-full rounded-full bg-black text-[16px] font-semibold text-white"
           >
             {price.toLocaleString()}원 결제하기
           </button>
@@ -308,50 +313,43 @@ export default function SettingsScreen() {
   // ── 결제 완료 화면 ──────────────────────────────────────────────
   if (screen === 'success') {
     return (
-      <div className="flex h-full flex-col items-center justify-center bg-[var(--color-bg-page)] px-6 text-center">
-        <div
-          className="w-20 h-20 rounded-full flex items-center justify-center mb-6"
-          style={{ backgroundColor: 'var(--color-accent-soft)' }}
-        >
-          <CheckCircle2 size={40} className="text-[var(--color-accent-dark)]" />
-        </div>
-        <p className="text-[24px] font-black text-[var(--color-text-primary)] leading-tight mb-2">
-          PRO 업그레이드 완료!
-        </p>
-        <p className="text-[14px] text-[var(--color-text-secondary)] leading-relaxed mb-8">
-          이제 모든 PRO 기능을 제한 없이 이용할 수 있어요.
-        </p>
+      <div className="flex h-full flex-col bg-white">
+        <NavBar title="" onBack={() => setScreen('billing')} onClose={() => setScreen('billing')} divider={false} />
 
-        <div className="w-full rounded-2xl border border-[var(--color-border-soft)] bg-[var(--color-bg-surface)] px-5 py-4 mb-8">
-          {FEATURES.map((f, i) => (
-            <div
-              key={f.label}
-              className={[
-                'flex items-center gap-3 py-2.5',
-                i < FEATURES.length - 1 ? 'border-b border-[var(--color-border-soft)]' : '',
-              ].join(' ')}
-            >
-              <div
-                className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ backgroundColor: 'var(--color-accent-soft)' }}
-              >
-                <Check size={11} className="text-[var(--color-accent-dark)]" />
+        <div className="flex-1 overflow-y-auto px-4 pt-14 pb-8">
+          <div className="flex flex-col items-center gap-10">
+            <div className="flex flex-col items-center gap-10">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icons/payment/success-check-large.svg" alt="" className="w-20 h-20" />
+              <div className="flex flex-col items-center gap-2 text-center">
+                <p className="text-[22px] font-bold text-[#0D0D0D]">PRO 업그레이드 완료!</p>
+                <p className="text-[16px] font-medium text-[#475058]">이제 모든 기능을 제한 없이 이용할 수 있어요</p>
               </div>
-              <p className="text-[13px] text-[var(--color-text-primary)] text-left">
-                <span className="font-semibold">{f.label}</span>
-                <span className="text-[var(--color-text-secondary)]"> {f.pro}</span>
-              </p>
             </div>
-          ))}
+
+            <div className="w-full rounded-[24px] border border-[#DEE4EC] p-4 flex flex-col gap-3">
+              {DONE_FEATURES.map((f) => (
+                <div key={f.label} className="flex items-center gap-1">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src="/icons/payment/success-check-small.svg" alt="" className="w-6 h-6 flex-shrink-0" />
+                  <p className="text-[14px]">
+                    <span className="font-semibold text-[#25313D]">{f.label}</span>
+                    {f.value && <span className="font-medium text-[#475058]"> {f.value}</span>}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
-        <button
-          onClick={() => setScreen('billing')}
-          className="w-full rounded-full py-4 text-[15px] font-black text-white"
-          style={{ backgroundColor: 'var(--color-accent-dark)' }}
-        >
-          확인
-        </button>
+        <div className="flex flex-col items-center bg-gradient-to-b from-white/0 to-white px-4 pt-4 pb-[calc(env(safe-area-inset-bottom)+24px)]">
+          <button
+            onClick={() => setScreen('billing')}
+            className="h-12 w-full rounded-full bg-black text-[16px] font-semibold text-white"
+          >
+            확인
+          </button>
+        </div>
       </div>
     )
   }

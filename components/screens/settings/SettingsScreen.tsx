@@ -58,7 +58,13 @@ export default function SettingsScreen() {
   const user = store.user
   const isLoggedIn = store.isLoggedIn
 
-  const isPaid = user?.isPaidUser ?? false
+  const paidUntilDate = user?.paidUntil ? new Date(user.paidUntil) : null
+  const subscriptionExpired = !!(user?.subscriptionCancelled && paidUntilDate && paidUntilDate.getTime() <= Date.now())
+  const isPaid = (user?.isPaidUser ?? false) && !subscriptionExpired
+  const subscriptionCancelled = isPaid && (user?.subscriptionCancelled ?? false)
+  const paidUntilLabel = paidUntilDate
+    ? paidUntilDate.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })
+    : ''
   const currentLinkId = user?.linkId ?? ''
   const randomLinkId = user?.randomLinkId ?? user?.linkId ?? ''
   const tabVisibility = store.tabVisibility ?? { who: 'public', vibe: 'public', network: 'public' }
@@ -105,7 +111,7 @@ export default function SettingsScreen() {
       showToast('카드 정보를 모두 입력해주세요.', 'error')
       return
     }
-    store.setPaidUser(true)
+    store.startSubscription(billingCycle)
     setScreen('success')
   }
 
@@ -400,14 +406,30 @@ export default function SettingsScreen() {
                     </span>
                     <p className="text-[16px] font-bold text-[#0D0D0D]">프리미엄 이용 중</p>
                   </div>
-                  <p className="text-[14px] font-medium text-[#475058]">커스텀 링크 등 PRO 기능을 자유롭게 이용할 수 있어요.</p>
+                  <p className="text-[14px] font-medium text-[#475058]">
+                    {subscriptionCancelled
+                      ? `${paidUntilLabel}까지 PRO 기능을 계속 이용할 수 있어요. 이후 무료 플랜으로 전환돼요.`
+                      : '커스텀 링크 등 PRO 기능을 자유롭게 이용할 수 있어요.'}
+                  </p>
                 </div>
-                <button
-                  onClick={() => setCancelSheetOpen(true)}
-                  className="w-full rounded-full border border-[#DEE4EC] bg-white py-3 text-[14px] font-bold text-[#6C7786]"
-                >
-                  구독 해제
-                </button>
+                {subscriptionCancelled ? (
+                  <button
+                    onClick={() => {
+                      store.resumeSubscription()
+                      showToast('구독을 유지할게요!')
+                    }}
+                    className="w-full rounded-full border border-[#DEE4EC] bg-white py-3 text-[14px] font-bold text-[#6C7786]"
+                  >
+                    구독 유지하기
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setCancelSheetOpen(true)}
+                    className="w-full rounded-full border border-[#DEE4EC] bg-white py-3 text-[14px] font-bold text-[#6C7786]"
+                  >
+                    구독 해제
+                  </button>
+                )}
               </>
             ) : (
               <>
@@ -469,19 +491,16 @@ export default function SettingsScreen() {
               <div className="flex flex-col gap-2 w-full">
                 <p className="text-[18px] font-bold text-[#0D0D0D]">구독을 해제할까요?</p>
                 <p className="text-[14px] font-medium leading-[1.5] text-[#475058]">
-                  구독 해제 시 즉시 무료 플랜으로 전환돼요. 커스텀 링크는 기본 링크로 복원되고, PRO 기능을 더 이상 이용할 수 없어요.
+                  구독 해제 시 자동 결제만 중단돼요. {paidUntilLabel}까지는 PRO 기능을 계속 이용할 수 있고, 이후 무료 플랜으로 자동 전환돼요.
                 </p>
               </div>
             </div>
             <div className="flex flex-col items-center gap-4 w-full">
               <button
                 onClick={() => {
-                  store.setPaidUser(false)
-                  store.setCustomLinkId(null)
-                  setCustomLinkInput('')
-                  setCustomLinkError(false)
+                  store.cancelSubscription()
                   setCancelSheetOpen(false)
-                  showToast('구독이 해제됐어요')
+                  showToast(`구독이 해제됐어요. ${paidUntilLabel}까지는 계속 이용할 수 있어요.`)
                 }}
                 className="w-full h-12 rounded-full bg-[#FF4242] text-[16px] font-semibold text-white"
               >

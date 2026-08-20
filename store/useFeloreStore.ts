@@ -90,6 +90,9 @@ interface FeloreStore {
   setLinkId(id: string): void
   setCustomLinkId(customId: string | null): void
   setPaidUser(paid: boolean): void
+  startSubscription(cycle: 'monthly' | 'yearly'): void
+  cancelSubscription(): void
+  resumeSubscription(): void
   connectInstagram(): void
   disconnectInstagram(): void
   connectLinkedIn(): void
@@ -286,6 +289,35 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
     const { user } = get()
     if (!user) return
     set({ user: { ...user, isPaidUser: paid } })
+  },
+
+  startSubscription(cycle) {
+    const { user } = get()
+    if (!user) return
+    const paidUntil = new Date()
+    if (cycle === 'monthly') paidUntil.setMonth(paidUntil.getMonth() + 1)
+    else paidUntil.setFullYear(paidUntil.getFullYear() + 1)
+    set({
+      user: {
+        ...user,
+        isPaidUser: true,
+        billingCycle: cycle,
+        paidUntil: paidUntil.toISOString(),
+        subscriptionCancelled: false,
+      },
+    })
+  },
+
+  cancelSubscription() {
+    const { user } = get()
+    if (!user) return
+    set({ user: { ...user, subscriptionCancelled: true } })
+  },
+
+  resumeSubscription() {
+    const { user } = get()
+    if (!user) return
+    set({ user: { ...user, subscriptionCancelled: false } })
   },
 
   connectInstagram() {

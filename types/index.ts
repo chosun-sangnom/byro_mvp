@@ -306,6 +306,9 @@ export interface UserState {
   randomLinkId?: string
   customLinkId?: string
   isPaidUser?: boolean
+  billingCycle?: 'monthly' | 'yearly'
+  paidUntil?: string
+  subscriptionCancelled?: boolean
   title: string
   headline?: string
   school: string

@@ -298,14 +298,14 @@ export function PublicProfileShell({
               <p className="mb-1 text-[14px] font-semibold" style={{ color: '#0D0D0D' }}>
                 한마디 <span className="font-medium" style={{ color: '#6C7786' }}>(선택)</span>
               </p>
-              <div className="flex items-center gap-2.5 rounded-[10px] border p-3" style={{ borderColor: '#DEE4EC' }}>
+              <div className="flex items-center gap-2.5 rounded-[10px] border p-3" style={{ borderColor: '#DEE4EC', background: 'var(--color-bg-surface)' }}>
                 <input
                   value={feedbackMessage}
                   onChange={(e) => setFeedbackMessage(e.target.value)}
                   placeholder="요청 이유나 인사를 남겨보세요"
                   maxLength={100}
                   className="w-full text-[14px] font-medium outline-none placeholder:text-[#A8B1BD]"
-                  style={{ color: '#0D0D0D' }}
+                  style={{ color: '#0D0D0D', background: 'transparent' }}
                 />
               </div>
             </div>

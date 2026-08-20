@@ -70,7 +70,7 @@ export function ExperienceBottomSheet({
           <p className="mb-2 text-[14px] font-semibold" style={{ color: '#0D0D0D' }}>
             한마디 <span className="font-medium" style={{ color: '#6C7786' }}>(선택)</span>
           </p>
-          <div className="rounded-3xl border p-3" style={{ borderColor: '#DEE4EC' }}>
+          <div className="rounded-3xl border p-3" style={{ borderColor: '#DEE4EC', background: 'var(--color-bg-surface)' }}>
             <textarea
               value={experienceMessage}
               onChange={(e) => onMessageChange(e.target.value)}
@@ -78,7 +78,7 @@ export function ExperienceBottomSheet({
               maxLength={100}
               rows={2}
               className="w-full resize-none text-[14px] font-medium outline-none placeholder:text-[#A8B1BD]"
-              style={{ color: '#0D0D0D' }}
+              style={{ color: '#0D0D0D', background: 'transparent' }}
             />
           </div>
           <p className="mt-1 text-right text-[12px] font-medium" style={{ color: '#6C7786' }}>{experienceMessage.length}/100</p>
@@ -100,7 +100,7 @@ export function ExperienceBottomSheet({
                 <span className="text-[14px] font-medium" style={{ color: '#7F8A95' }}>이름으로 남기고 싶다면</span>
                 <div className="h-px flex-1" style={{ background: '#DEE4EC' }} />
               </div>
-              <Button variant="outline" onClick={onLogin} style={{ borderColor: '#DEE4EC', color: '#25313D' }}>로그인하기</Button>
+              <Button variant="outline" onClick={onLogin} style={{ borderColor: '#DEE4EC', color: '#25313D', borderRadius: 9999 }}>로그인하기</Button>
             </>
           )}
         </div>
@@ -153,12 +153,12 @@ export function ExperienceDoneModal({
           {isLoggedIn ? (
             <>
               <Button onClick={onRequestExperience}>경험 요청 보내기</Button>
-              <Button variant="outline" onClick={onClose} style={{ borderColor: '#DEE4EC', color: '#25313D' }}>프로필로 돌아가기</Button>
+              <Button variant="outline" onClick={onClose} style={{ borderColor: '#DEE4EC', color: '#25313D', borderRadius: 9999 }}>프로필로 돌아가기</Button>
             </>
           ) : (
             <>
               <Button onClick={onCreateFelore}>내 FELORE 만들기</Button>
-              <Button variant="outline" onClick={onLogin} style={{ borderColor: '#DEE4EC', color: '#25313D' }}>로그인하기</Button>
+              <Button variant="outline" onClick={onLogin} style={{ borderColor: '#DEE4EC', color: '#25313D', borderRadius: 9999 }}>로그인하기</Button>
               <button onClick={onClose} className="w-full py-1 text-[14px] font-bold" style={{ color: '#6C7786' }}>프로필로 돌아가기</button>
             </>
           )}

@@ -47,23 +47,27 @@ export function ProfileReputationSummarySection({
 
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.04}>
-      <SectionTitle
-        title="평판"
-        subtitle={isEmpty ? undefined : `키워드 ${totalKeywordCount}개가 모였어요`}
-      />
-      <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3">
+      <div className="rounded-3xl border p-4" style={{ borderColor: '#DEE4EC' }}>
+        <p className="text-[14px] font-medium" style={{ color: '#6C7786' }}>평판</p>
+        <div className="mt-1 flex items-center justify-between gap-2">
+          <p className="text-[18px] font-bold" style={{ color: '#0D0D0D' }}>누적 평판</p>
+          <span className="shrink-0 rounded-md px-1.5 py-1 text-[12px] font-bold" style={{ background: '#F0F5FF', color: '#25313D' }}>
+            총 {totalKeywordCount}개
+          </span>
+        </div>
         {isEmpty ? (
-          <p className="py-1 text-center text-[13px] text-[#6C7786]">아직 받은 평판이 없어요</p>
+          <p className="mt-3 py-1 text-center text-[13px]" style={{ color: '#A8B1BD' }}>아직 받은 평판이 없어요</p>
         ) : (
-          <div className="flex flex-wrap gap-2">
+          <div className="mt-4 flex flex-wrap gap-2">
             {keywordCounts.map((item) => (
-              <span
+              <div
                 key={item.keyword}
-                className="rounded-full px-3 py-1.5 text-[13px] font-semibold"
-                style={{ background: 'var(--color-accent-soft)', color: 'var(--color-accent-dark)' }}
+                className="flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-[14px] font-medium"
+                style={{ borderColor: '#DEE4EC', color: '#25313D' }}
               >
-                {item.keyword} <span className="ml-1 font-bold text-[#0D0D0D]">{item.count}</span>
-              </span>
+                {item.keyword}
+                <span className="font-semibold">{item.count}</span>
+              </div>
             ))}
           </div>
         )}
@@ -71,6 +75,9 @@ export function ProfileReputationSummarySection({
     </AnimatedSection>
   )
 }
+
+// 실제 프로필 사진이 없는 작성자는 이니셜 아바타로 표시 — 순서대로 이 팔레트를 순환
+const FEEDBACK_AVATAR_PALETTE = ['#F4F2FE', '#EFF9FF', '#F5F6F7']
 
 export function ProfileFeedbackSection({
   profile,
@@ -89,52 +96,66 @@ export function ProfileFeedbackSection({
 }) {
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06}>
-      <SectionTitle
-        title="피드백"
-        subtitle={profile.guestbook.length > 0 ? `함께한 사람들이 남긴 메모 ${profile.guestbook.length}개` : undefined}
-      />
-      <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3">
+      <div className="rounded-3xl border p-4" style={{ borderColor: '#DEE4EC' }}>
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-[18px] font-bold" style={{ color: '#0D0D0D' }}>함께한 사람들이 남긴 피드백</p>
+          <span className="shrink-0 rounded-md px-1.5 py-1 text-[12px] font-bold" style={{ background: '#F0F5FF', color: '#25313D' }}>
+            총 {profile.guestbook.length}개
+          </span>
+        </div>
+
         {profile.guestbook.length === 0 ? (
-          <p className="py-1 text-center text-[13px] text-[#6C7786]">아직 방명록이 없어요</p>
+          <p className="mt-4 py-1 text-center text-[13px]" style={{ color: '#A8B1BD' }}>아직 받은 피드백이 없어요</p>
         ) : (
-          <div className="divide-y divide-[var(--color-border-soft)]">
-            {featuredGuestbook.map((entry) => (
-              <button
-                key={entry.id}
-                onClick={() => onGuestbookEntryClick(entry.linkId)}
-                className="flex w-full gap-2.5 py-3 text-left first:pt-0 last:pb-0"
-              >
-                {getProfileAvatar(entry.linkId) ? (
-                  <div className="mt-0.5 h-8 w-8 flex-shrink-0 overflow-hidden rounded-full bg-[var(--color-bg-soft)]">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={getProfileAvatar(entry.linkId)} alt={`${entry.authorName} 프로필 사진`} className="h-full w-full object-cover" />
-                  </div>
-                ) : (
-                  <div className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-[var(--color-bg-soft)] text-xs font-bold text-[#6C7786]">
-                    {entry.authorName.charAt(0)}
-                  </div>
-                )}
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="text-[12px] font-semibold text-[#0D0D0D]">{entry.authorName}</div>
-                    <div className="text-[10px] text-[#6C7786]">{entry.date}</div>
-                  </div>
-                  <div className="mt-1 text-[13px] leading-6 text-[#475058] line-clamp-2">{entry.message}</div>
+          <div className="mt-4 space-y-4">
+            {featuredGuestbook.map((entry, i) => {
+              const avatar = getProfileAvatar(entry.linkId)
+              return (
+                <div key={entry.id}>
+                  <button
+                    onClick={() => onGuestbookEntryClick(entry.linkId)}
+                    className="flex w-full items-start gap-2.5 text-left"
+                  >
+                    {avatar ? (
+                      <div className="h-11 w-11 flex-shrink-0 overflow-hidden rounded-full">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={avatar} alt={entry.authorName} className="h-full w-full object-cover" />
+                      </div>
+                    ) : (
+                      <div
+                        className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full"
+                        style={{ background: FEEDBACK_AVATAR_PALETTE[i % FEEDBACK_AVATAR_PALETTE.length] }}
+                      >
+                        <span className="text-[14px] font-bold" style={{ color: '#6C7786' }}>{entry.authorName.charAt(0)}</span>
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-1">
+                        <span className="text-[14px] font-semibold" style={{ color: '#0D0D0D' }}>{entry.authorName}</span>
+                        {avatar && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src="/images/reputation-verified-badge.svg" alt="" className="h-3 w-3" />
+                        )}
+                        <span className="ml-1 text-[12px] font-medium" style={{ color: '#6C7786' }}>{entry.date}</span>
+                      </div>
+                      <p className="mt-1 text-[14px] font-medium line-clamp-2" style={{ color: '#475058' }}>{entry.message}</p>
+                    </div>
+                  </button>
+                  {i < featuredGuestbook.length - 1 && <div className="mt-4 h-px" style={{ background: '#DEE4EC' }} />}
                 </div>
-              </button>
-            ))}
+              )
+            })}
           </div>
         )}
 
         {profile.guestbook.length > 0 && (
           <button
             onClick={onOpenGuestbook}
-            className="mt-3 flex w-full items-center justify-between rounded-[12px] border border-[#DEE4EC] px-4 py-3 text-left active:opacity-70"
+            className="mt-4 flex w-full items-center justify-center gap-0.5 text-[14px] font-semibold"
+            style={{ color: '#475058' }}
           >
-            <span className="text-[12px] font-semibold text-[#475058]">
-              피드백 전체보기
-            </span>
-            <ChevronRight className="h-4 w-4 text-[#6C7786]" />
+            피드백 전체 보기
+            <ChevronRight size={20} style={{ color: '#475058' }} />
           </button>
         )}
       </div>

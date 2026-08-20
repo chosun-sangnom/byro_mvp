@@ -1,0 +1,11 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="icon">
+<path id="success" d="M24 0C37.2548 0 48 10.7452 48 24C48 37.2548 37.2548 48 24 48C10.7452 48 0 37.2548 0 24C0 10.7452 10.7452 0 24 0ZM35.0449 16.4092C34.1662 15.5307 32.7419 15.5306 31.8633 16.4092L21.2871 26.9844L17.4053 23.8799C16.4349 23.1036 15.0194 23.2611 14.2432 24.2314C13.4671 25.2018 13.6245 26.6174 14.5947 27.3936L20.0488 31.7568C20.944 32.473 22.2342 32.4014 23.0449 31.5908L35.0449 19.5908C35.9236 18.7121 35.9236 17.2879 35.0449 16.4092Z" fill="url(#paint0_linear_0_50)"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_50" x1="24" y1="7.15256e-07" x2="24" y2="48" gradientUnits="userSpaceOnUse">
+<stop stop-color="#00ADFF"/>
+<stop offset="1" stop-color="#0657FF"/>
+</linearGradient>
+</defs>
+</svg>

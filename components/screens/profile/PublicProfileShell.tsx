@@ -15,6 +15,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
+import { Plus } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { BottomSheet, TextArea, showToast } from '@/components/ui'
 import { getNormalizedPublicProfile, computeTabAccess } from '@/components/screens/profile/publicProfileData'
@@ -94,6 +95,7 @@ export function PublicProfileShell({
   const [loginModalOpen, setLoginModalOpen] = useState(false)
   const [expSheetOpen, setExpSheetOpen] = useState(false)
   const [expDoneModal, setExpDoneModal] = useState(false)
+  const [expAnonymous, setExpAnonymous] = useState(false)
   const ONE_DAY_MS = 24 * 60 * 60 * 1000
   const submittedAt = store.expSubmittedAt[profile.linkId]
   const alreadySubmitted = !!submittedAt && (Date.now() - submittedAt < ONE_DAY_MS)
@@ -157,10 +159,11 @@ export function PublicProfileShell({
 
         {/* 평판 탭 visitor 전용 액션 */}
         {showReputationActions && (
-          <div className="mb-4 flex gap-3">
+          <div className="mb-4 flex gap-2">
             <button
               onClick={() => store.isLoggedIn ? setFeedbackRequestOpen(true) : setLoginModalOpen(true)}
-              className="flex-1 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)] whitespace-nowrap"
+              className="flex-1 rounded-[10px] border py-3 text-[14px] font-bold whitespace-nowrap"
+              style={{ borderColor: '#DEE4EC', color: '#25313D', background: '#fff' }}
             >
               피드백 요청
             </button>
@@ -169,12 +172,11 @@ export function PublicProfileShell({
                 if (alreadySubmitted) { showToast('오늘 이미 경험을 남겼어요. 내일 다시 남길 수 있어요'); return }
                 setExpSheetOpen(true)
               }}
-              className="flex-1 rounded-full py-3 text-[13px] font-semibold whitespace-nowrap"
-              style={alreadySubmitted
-                ? { border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)' }
-                : { background: 'linear-gradient(135deg,var(--color-accent-light) 0%,var(--color-accent-dark) 100%)', color: '#fff', boxShadow: '0 10px 24px var(--color-accent-glow)' }}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-[10px] py-3 text-[14px] font-bold text-white whitespace-nowrap disabled:opacity-40"
+              disabled={alreadySubmitted}
+              style={{ background: '#0657FF' }}
             >
-              {alreadySubmitted ? '경험 남겼어요 ✓' : '+ 경험 남기기'}
+              {alreadySubmitted ? '경험 남겼어요 ✓' : <><Plus size={14} />경험 남기기</>}
             </button>
           </div>
         )}
@@ -286,26 +288,27 @@ export function PublicProfileShell({
 
       {!isOwnerMode && (
         <BottomSheet open={feedbackRequestOpen} onClose={() => { setFeedbackRequestOpen(false); setFeedbackMessage('') }}>
-          <div className="px-5 pb-6">
-            <div className="mb-1 text-[18px] font-black text-[var(--color-text-strong)]">
+          <div className="px-4 pb-6">
+            <p className="text-[18px] font-bold" style={{ color: '#0D0D0D' }}>
               {profile.name}님께 피드백 요청
-            </div>
-            <p className="mb-5 text-[13px] leading-[1.65] text-[var(--color-text-secondary)]">
+            </p>
+            <p className="mt-2 text-[14px] font-medium" style={{ color: '#475058' }}>
               {profile.name}님이 나에 대한 경험을 남겨줄 수 있도록 요청해요.
             </p>
-            <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-tertiary)]">
-              한마디 <span className="font-normal normal-case tracking-normal text-[var(--color-text-tertiary)]">(선택)</span>
-            </label>
-            <TextArea
-              value={feedbackMessage}
-              onChange={setFeedbackMessage}
-              placeholder="요청 이유나 인사를 남겨보세요."
-              maxLength={100}
-              rows={3}
-              dark
-            />
-            <div className="mb-5 text-right text-[11px] text-[var(--color-text-tertiary)]">
-              {feedbackMessage.length}/100
+            <div className="mt-6">
+              <p className="mb-1 text-[14px] font-semibold" style={{ color: '#0D0D0D' }}>
+                한마디 <span className="font-medium" style={{ color: '#6C7786' }}>(선택)</span>
+              </p>
+              <div className="flex items-center gap-2.5 rounded-[10px] border p-3" style={{ borderColor: '#DEE4EC' }}>
+                <input
+                  value={feedbackMessage}
+                  onChange={(e) => setFeedbackMessage(e.target.value)}
+                  placeholder="요청 이유나 인사를 남겨보세요"
+                  maxLength={100}
+                  className="w-full text-[14px] font-medium outline-none placeholder:text-[#A8B1BD]"
+                  style={{ color: '#0D0D0D' }}
+                />
+              </div>
             </div>
             <button
               onClick={() => {
@@ -313,8 +316,8 @@ export function PublicProfileShell({
                 setFeedbackMessage('')
                 showToast('피드백 요청을 보냈어요')
               }}
-              className="w-full rounded-full py-3.5 text-[14px] font-semibold text-white whitespace-nowrap"
-              style={{ backgroundColor: 'var(--color-accent-dark)' }}
+              className="mt-6 flex w-full items-center justify-center rounded-full py-4 text-[16px] font-semibold text-white whitespace-nowrap"
+              style={{ backgroundColor: 'var(--color-accent-gold)' }}
             >
               요청 보내기
             </button>
@@ -329,24 +332,31 @@ export function PublicProfileShell({
         experienceKeywordGroups={REPUTATION_KEYWORD_GROUPS}
         selectedKeywords={store.experienceKeywords}
         experienceMessage={store.experienceMessage}
+        isAnonymous={expAnonymous}
+        onToggleAnonymous={() => setExpAnonymous((v) => !v)}
         onToggleKeyword={(keyword) => {
-          if (!store.experienceKeywords.includes(keyword) && store.experienceKeywords.length >= 3) {
-            showToast('키워드는 최대 3개까지 선택할 수 있어요', 'error')
+          // 카테고리당 1개만 선택 가능 — 같은 카테고리의 다른 선택은 자동 해제
+          if (store.experienceKeywords.includes(keyword)) {
+            store.setExperienceKeyword(keyword)
             return
           }
+          const group = REPUTATION_KEYWORD_GROUPS.find((g) => g.keywords.includes(keyword))
+          const sameGroupSelected = group?.keywords.find((k) => k !== keyword && store.experienceKeywords.includes(k))
+          if (sameGroupSelected) store.setExperienceKeyword(sameGroupSelected)
           store.setExperienceKeyword(keyword)
         }}
         onMessageChange={store.setExperienceMessage}
-        onSubmit={(isAnonymous) => {
+        onSubmit={() => {
           if (store.experienceKeywords.length === 0) { showToast('키워드를 하나 이상 선택해주세요', 'error'); return }
           store.submitExperience(profile.linkId, {
-            authorName: isAnonymous ? null : (store.user?.name ?? null),
-            isAnonymous: isAnonymous || !store.isLoggedIn,
+            authorName: expAnonymous ? null : (store.user?.name ?? null),
+            isAnonymous: expAnonymous || !store.isLoggedIn,
             keywords: store.experienceKeywords,
             message: store.experienceMessage,
           })
           store.markExpSubmitted(profile.linkId)
           store.clearExperience()
+          setExpAnonymous(false)
           setExpSheetOpen(false)
           setExpDoneModal(true)
         }}

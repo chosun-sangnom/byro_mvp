@@ -1,9 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { Award, Lightbulb } from 'lucide-react'
+import { X } from 'lucide-react'
 import type { ReputationKeywordGroup } from '@/lib/mocks/reputationKeywords'
-import { Button, BottomSheet, Chip, Modal, TextArea } from '@/components/ui'
+import { Button, BottomSheet, CheckboxDot, Modal } from '@/components/ui'
 
 export function ExperienceBottomSheet({
   open,
@@ -12,6 +11,8 @@ export function ExperienceBottomSheet({
   experienceKeywordGroups,
   selectedKeywords,
   experienceMessage,
+  isAnonymous,
+  onToggleAnonymous,
   onToggleKeyword,
   onMessageChange,
   onSubmit,
@@ -24,74 +25,82 @@ export function ExperienceBottomSheet({
   experienceKeywordGroups: ReputationKeywordGroup[]
   selectedKeywords: string[]
   experienceMessage: string
+  isAnonymous: boolean
+  onToggleAnonymous: () => void
   onToggleKeyword: (keyword: string) => void
   onMessageChange: (value: string) => void
-  onSubmit: (isAnonymous: boolean) => void
+  onSubmit: () => void
   onLogin: () => void
   onClose: () => void
 }) {
-  const [isAnonymous, setIsAnonymous] = useState(false)
-
   return (
     <BottomSheet open={open} onClose={onClose}>
-      <div className="px-5 pb-6">
-        <div className="mb-1 text-[15px] font-bold text-[var(--color-text-strong)]">{profileName}에게 경험 남기기</div>
+      <div className="px-4 pb-6">
+        <p className="text-[18px] font-bold" style={{ color: '#0D0D0D' }}>{profileName}에게 경험 남기기</p>
 
-        {isLoggedIn ? (
-          <button
-            onClick={() => setIsAnonymous((v) => !v)}
-            className="mb-5 flex items-center gap-1.5 text-[12px] text-[var(--color-text-tertiary)]"
-          >
-            <span
-              className={[
-                'inline-block h-3.5 w-3.5 rounded-sm border transition-colors',
-                isAnonymous
-                  ? 'border-[var(--color-accent-dark)] bg-[var(--color-accent-dark)]'
-                  : 'border-[var(--color-border-default)] bg-transparent',
-              ].join(' ')}
-            />
-            익명으로 남기기
-          </button>
-        ) : (
-          <div className="mb-5 text-[12px] text-[var(--color-text-tertiary)]">익명으로 남겨져요</div>
-        )}
-
-        <div className="mb-4 space-y-4">
+        <div className="mt-6 space-y-6">
           {experienceKeywordGroups.map((group) => (
             <div key={group.category}>
-              <div className="mb-2 text-[11px] font-bold text-[var(--color-text-secondary)]">{group.category}</div>
+              <p className="mb-2 text-[14px] font-semibold" style={{ color: '#0D0D0D' }}>{group.category}</p>
               <div className="flex flex-wrap gap-2">
-                {group.keywords.map((keyword) => (
-                  <Chip
-                    key={keyword}
-                    label={keyword}
-                    selected={selectedKeywords.includes(keyword)}
-                    onClick={() => onToggleKeyword(keyword)}
-                  />
-                ))}
+                {group.keywords.map((keyword) => {
+                  const selected = selectedKeywords.includes(keyword)
+                  return (
+                    <button
+                      key={keyword}
+                      onClick={() => onToggleKeyword(keyword)}
+                      className="rounded-full border px-3.5 py-2 text-[14px] font-medium transition-colors"
+                      style={{
+                        background: selected ? '#25313D' : '#fff',
+                        borderColor: selected ? '#25313D' : '#DEE4EC',
+                        color: selected ? '#fff' : '#25313D',
+                        fontWeight: selected ? 600 : 500,
+                      }}
+                    >
+                      {keyword}
+                    </button>
+                  )
+                })}
               </div>
             </div>
           ))}
         </div>
-        <div className="mb-1.5 text-[12px] text-[var(--color-text-tertiary)]">한마디 (선택)</div>
-        <TextArea
-          value={experienceMessage}
-          onChange={onMessageChange}
-          placeholder="이 분과의 경험을 한마디로 남겨보세요"
-          maxLength={100}
-          rows={3}
-          dark
-        />
-        <div className="mt-4 space-y-2">
-          <Button onClick={() => onSubmit(isAnonymous)}>경험 남기기</Button>
+
+        <div className="mt-6">
+          <p className="mb-2 text-[14px] font-semibold" style={{ color: '#0D0D0D' }}>
+            한마디 <span className="font-medium" style={{ color: '#6C7786' }}>(선택)</span>
+          </p>
+          <div className="rounded-3xl border p-3" style={{ borderColor: '#DEE4EC' }}>
+            <textarea
+              value={experienceMessage}
+              onChange={(e) => onMessageChange(e.target.value)}
+              placeholder="이 분과의 경험을 한마디로 남겨보세요"
+              maxLength={100}
+              rows={2}
+              className="w-full resize-none text-[14px] font-medium outline-none placeholder:text-[#A8B1BD]"
+              style={{ color: '#0D0D0D' }}
+            />
+          </div>
+          <p className="mt-1 text-right text-[12px] font-medium" style={{ color: '#6C7786' }}>{experienceMessage.length}/100</p>
+        </div>
+
+        {isLoggedIn && (
+          <button onClick={onToggleAnonymous} className="mt-4 flex items-center gap-2">
+            <CheckboxDot checked={isAnonymous} />
+            <span className="text-[16px] font-medium" style={{ color: '#25313D' }}>익명으로 남기기</span>
+          </button>
+        )}
+
+        <div className="mt-6 space-y-2">
+          <Button onClick={onSubmit}>피드백 남기기</Button>
           {!isLoggedIn && (
             <>
               <div className="flex items-center gap-2 py-1">
-                <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
-                <span className="text-[11px] text-[var(--color-text-tertiary)]">이름으로 남기고 싶다면</span>
-                <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
+                <div className="h-px flex-1" style={{ background: '#DEE4EC' }} />
+                <span className="text-[14px] font-medium" style={{ color: '#7F8A95' }}>이름으로 남기고 싶다면</span>
+                <div className="h-px flex-1" style={{ background: '#DEE4EC' }} />
               </div>
-              <Button variant="outline" onClick={onLogin}>로그인하기</Button>
+              <Button variant="outline" onClick={onLogin} style={{ borderColor: '#DEE4EC', color: '#25313D' }}>로그인하기</Button>
             </>
           )}
         </div>
@@ -119,53 +128,41 @@ export function ExperienceDoneModal({
   onClose: () => void
 }) {
   return (
-    <Modal open={open} onClose={onClose}>
-      <div className="text-center">
-        <div className="mb-4 flex justify-center">
-          <div
-            className="relative flex h-16 w-16 items-center justify-center rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-muted)]"
-            style={{ boxShadow: '0 0 24px var(--color-accent-border-soft)' }}
-          >
-            <Award size={28} color="var(--color-accent-dark)" strokeWidth={1.8} />
-          </div>
-        </div>
+    <Modal open={open} onClose={onClose} widthClassName="w-[288px]">
+      <div className="flex justify-end">
+        <button onClick={onClose} aria-label="닫기">
+          <X size={20} color="#A8B1BD" />
+        </button>
+      </div>
 
-        <div className="mb-2 text-[17px] font-black text-[var(--color-text-strong)]">경험을 남겼어요!</div>
-        <div className="mb-5 text-[13px] leading-relaxed text-[var(--color-text-secondary)]">
-          {profileName} 님의 평판이 쌓였어요.{isLoggedIn && <><br />서로 연결된 신뢰가 만들어졌습니다.</>}
-        </div>
+      <div className="flex flex-col items-center text-center">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/images/experience-done-icon.svg" alt="" className="h-12 w-12" />
 
-        {isLoggedIn ? (
-          <>
-            <div className="mb-5 flex gap-2.5 rounded-xl border border-[var(--color-state-info-bg)] bg-[var(--color-state-info-bg)] px-3.5 py-3 text-left">
-              <Lightbulb size={14} className="mt-0.5 flex-shrink-0 text-[var(--color-state-info-text)]" />
-              <div>
-                <div className="text-[12px] font-bold text-[var(--color-state-info-text)]">나도 평판을 받고 싶다면?</div>
-                <div className="mt-0.5 text-[12px] leading-relaxed text-[var(--color-state-info-text)] opacity-80">
-                  {profileName} 님에게 경험 남기기를 요청해 보세요.
-                </div>
-              </div>
-            </div>
-            <div className="space-y-2">
+        <p className="mt-4 text-[22px] font-bold" style={{ color: '#0D0D0D' }}>경험을 남겼어요!</p>
+        <p className="mt-2 text-[16px] font-medium leading-[1.5]" style={{ color: '#475058' }}>
+          {profileName}님의 평판이 쌓였어요.{isLoggedIn && <> 서로 연결된 신뢰가 만들어졌습니다.</>}
+        </p>
+      </div>
+
+      <div className="relative mt-9 flex flex-col items-center gap-1">
+        <div className="rounded-md px-3 py-2 text-[12px] font-medium text-white" style={{ background: 'rgba(0,0,0,0.8)' }}>
+          나도 평판을 받고 싶다면?
+        </div>
+        <div className="w-full space-y-3">
+          {isLoggedIn ? (
+            <>
               <Button onClick={onRequestExperience}>경험 요청 보내기</Button>
-              <Button variant="outline" onClick={onClose}>프로필로 돌아가기</Button>
-            </div>
-          </>
-        ) : (
-          <>
-            <div className="mb-5 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-3.5 text-left">
-              <div className="mb-1 text-[13px] font-bold text-[var(--color-text-primary)]">나도 평판을 받고 싶다면?</div>
-              <div className="text-[12px] leading-relaxed text-[var(--color-text-secondary)]">
-                Felore를 만들면 {profileName} 님에게 경험 요청을 보내고,<br />평판을 쌓을 수 있어요.
-              </div>
-            </div>
-            <div className="space-y-2">
+              <Button variant="outline" onClick={onClose} style={{ borderColor: '#DEE4EC', color: '#25313D' }}>프로필로 돌아가기</Button>
+            </>
+          ) : (
+            <>
               <Button onClick={onCreateFelore}>내 FELORE 만들기</Button>
-              <Button variant="outline" onClick={onLogin}>로그인하기</Button>
-              <Button variant="ghost" onClick={onClose}>프로필로 돌아가기</Button>
-            </div>
-          </>
-        )}
+              <Button variant="outline" onClick={onLogin} style={{ borderColor: '#DEE4EC', color: '#25313D' }}>로그인하기</Button>
+              <button onClick={onClose} className="w-full py-1 text-[14px] font-bold" style={{ color: '#6C7786' }}>프로필로 돌아가기</button>
+            </>
+          )}
+        </div>
       </div>
     </Modal>
   )

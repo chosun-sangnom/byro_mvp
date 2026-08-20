@@ -164,7 +164,7 @@ export function Modal({ open, onClose, children, widthClassName = 'w-[272px]' }:
   return (
     <AnimatePresence>
       {open && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

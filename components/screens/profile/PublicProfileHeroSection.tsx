@@ -193,7 +193,7 @@ export function ProfileHeroSection({
  * - 하단: 이름 + 인증 뱃지 + bio 글래스 카드
  *
  * owner 전용 편집/아카이브 버튼은 제거됨.
- * → 편집: 푸터 "FELORE 편집" 버튼 (PublicProfileShell)
+ * → 편집: 푸터 "Felore 편집" 버튼 (PublicProfileShell)
  * → 소셜 관리: /me 페이지
  *
  * TODO(profile-image): 프로필 사진 업로드/크롭 플로우 연동

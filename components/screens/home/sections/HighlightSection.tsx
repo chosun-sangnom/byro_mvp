@@ -123,7 +123,7 @@ export function HighlightSection() {
 
             <div className="rounded-xl p-4" style={{ backgroundColor: 'var(--color-bg-soft)' }}>
               <div className="text-[11px] text-[var(--color-text-tertiary)] mb-3 italic">
-                행사에서 명함을 받았다. FELORE 링크를 열었더니 —
+                행사에서 명함을 받았다. Felore 링크를 열었더니 —
               </div>
               <div className="space-y-2">
                 {[

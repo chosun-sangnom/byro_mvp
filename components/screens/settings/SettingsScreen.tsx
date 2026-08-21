@@ -132,7 +132,7 @@ export default function SettingsScreen() {
               className="rounded-full px-2.5 py-1.5 text-[12px] font-bold text-white"
               style={{ background: 'linear-gradient(125deg, rgba(0,173,255,0.2) 0%, #00ADFF 30%, #0657FF 59%)' }}
             >
-              FELORE PRO
+              Felore PRO
             </span>
             <div className="flex flex-col gap-2">
               <p className="text-[22px] font-bold text-[#0D0D0D]">더 넓게, 더 자유롭게</p>

@@ -59,7 +59,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       >
         <div className="mb-6 px-1">
           <div className="text-[18px] font-black" style={{ color: 'var(--color-text-strong)' }}>
-            FELORE 백오피스
+            Felore 백오피스
           </div>
           <div className="mt-0.5 text-[11px] font-semibold" style={{ color: 'var(--color-text-tertiary)' }}>
             운영자 전용

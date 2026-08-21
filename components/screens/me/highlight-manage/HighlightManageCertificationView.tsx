@@ -65,7 +65,7 @@ export function HighlightManageCertificationView({
                 <p>2. 아래 이메일 주소로 파일을 보내주시면 확인 후 반영돼요.</p>
               </div>
               <div className="mt-5 rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-4 py-4">
-                <div className="micro-text mb-2">나의 FELORE 인증 이메일 주소</div>
+                <div className="micro-text mb-2">나의 Felore 인증 이메일 주소</div>
                 <div className="flex items-center gap-2">
                   <div className="min-w-0 flex-1 truncate text-sm font-mono font-bold text-[var(--color-text-strong)]">
                     {userLinkId}@data.felore.io

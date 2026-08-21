@@ -45,7 +45,7 @@ export default function AdminLoginScreen() {
         <div className="mb-1 flex items-center gap-2">
           <ShieldCheck size={20} color="var(--color-accent-dark)" />
           <div className="text-[19px] font-black" style={{ color: 'var(--color-text-strong)' }}>
-            FELORE 백오피스
+            Felore 백오피스
           </div>
         </div>
         <p className="mb-6 text-[13px]" style={{ color: 'var(--color-text-secondary)' }}>

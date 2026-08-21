@@ -202,7 +202,7 @@ export const SAMPLE_PROFILE = {
       id: 'mh0',
       categoryId: 'career-role',
       icon: 'briefcase',
-      title: 'FELORE',
+      title: 'Felore',
       subtitle: '경력 · 재직 중',
       description: '스타트업 제품 전략과 파트너십 기반 성장을 설계하고 있습니다.',
       year: '2022 - 현재',
@@ -356,7 +356,7 @@ export const MK_PROFILE = {
   ],
   headline: 'Entrepreneur, Writer, Connector',
   school: '',
-  bio: 'Entrepreneur, Writer, Connector. Byth에서 FELORE 만들고 운영하고 있어요.',
+  bio: 'Entrepreneur, Writer, Connector. Byth에서 Felore 만들고 운영하고 있어요.',
   whoIAm: {
     mbti: 'ENTP',
   },

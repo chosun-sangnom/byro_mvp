@@ -157,7 +157,7 @@ export function ExperienceDoneModal({
             </>
           ) : (
             <>
-              <Button onClick={onCreateFelore}>내 FELORE 만들기</Button>
+              <Button onClick={onCreateFelore}>내 Felore 만들기</Button>
               <Button variant="outline" onClick={onLogin} style={{ borderColor: '#DEE4EC', color: '#25313D', borderRadius: 9999 }}>로그인하기</Button>
               <button onClick={onClose} className="w-full py-1 text-[14px] font-bold" style={{ color: '#6C7786' }}>프로필로 돌아가기</button>
             </>

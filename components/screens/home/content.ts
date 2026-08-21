@@ -68,7 +68,7 @@ export const useCases: Array<{
     icon: Users,
     title: '네트워킹 행사',
     scenario: '명함을 건네고, SNS를 교환하고, 링크드인까지 공유한다. 상대방은 어디를 봐야 할지 모른다.',
-    highlight: 'FELORE 링크 하나면 끝이에요. 인스타, 리멤버, 링크드인 — 다 필요 없어요.',
+    highlight: 'Felore 링크 하나면 끝이에요. 인스타, 리멤버, 링크드인 — 다 필요 없어요.',
   },
   {
     icon: Building2,
@@ -109,7 +109,7 @@ export const comparisons: Array<{
   },
   {
     icon: Sparkles,
-    name: 'FELORE',
+    name: 'Felore',
     color: 'from-[#3B82F6] to-[#2563EB]',
     isHighlight: true,
     description: '커리어 + 라이프스타일 + 검증된 평판',

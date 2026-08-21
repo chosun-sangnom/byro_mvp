@@ -1,6 +1,6 @@
 'use client'
 
-// [임시] OCR 목업 — 실제 구현 시 이미지를 FELORE OCR 모델에 전달하고 JSON 슬롯필링 결과를 받아야 함
+// [임시] OCR 목업 — 실제 구현 시 이미지를 Felore OCR 모델에 전달하고 JSON 슬롯필링 결과를 받아야 함
 
 import { useEffect, useRef, useState } from 'react'
 import { ChevronRight, ImageOff, Check } from 'lucide-react'

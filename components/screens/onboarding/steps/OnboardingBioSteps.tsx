@@ -465,7 +465,7 @@ export function Step9Complete() {
                 {welcomeName}님 환영합니다!
               </p>
               <p className="text-[16px] font-medium leading-[1.5] tracking-[-0.02em] text-[#475058]">
-                이제 자유롭게 나를 표현하는 FELORE를 만들어보세요!
+                이제 자유롭게 나를 표현하는 Felore를 만들어보세요!
               </p>
             </div>
 

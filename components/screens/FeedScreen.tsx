@@ -208,7 +208,7 @@ export default function FeedScreen() {
           onClick={() => router.push('/landing')}
           className="w-full flex items-center justify-center gap-1.5 py-3 text-[13px] text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
         >
-          <span>FELORE 서비스 소개 보기</span>
+          <span>Felore 서비스 소개 보기</span>
           <ChevronRight size={14} />
         </button>
       </div>

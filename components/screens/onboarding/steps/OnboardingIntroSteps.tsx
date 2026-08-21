@@ -208,7 +208,7 @@ export function Step1Login({
               <p className="meta-text leading-relaxed">펠로어에 오신 걸 환영해요!</p>
             </div>
             {/* [임시] 실제 로그인 API 미연동 */}
-            <Button onClick={handleLoginComplete}>내 FELORE 보기</Button>
+            <Button onClick={handleLoginComplete}>내 Felore 보기</Button>
           </div>
         )
       }
@@ -692,7 +692,7 @@ export function Step1Login({
     <>
       <div className="flex flex-1 flex-col min-h-0 px-5">
         <div className="flex flex-col items-center pt-16 text-center">
-          <div className="text-4xl font-black tracking-tight">FELORE</div>
+          <div className="text-4xl font-black tracking-tight">Felore</div>
           <div className="meta-text mt-3">가장 나다운 네트워킹의 시작, 펠로어</div>
         </div>
         <div className="flex-1" />

@@ -417,6 +417,8 @@ export const MOCK_AI_PERSONA_CONFIG: AiPersonaConfig = {
     { key: 'book', label: '책', weight: 10 },
   ],
   emptyStateText: '아직 페르소나를 만들 근거가 부족해요',
+  promptTemplate:
+    '아래 근거(평판 키워드, 직함, 취향)를 조합해 15~30자의 한 줄 문구를 생성하라. 사용자의 자기소개(bio)는 절대 참고하지 말 것.',
   updatedBy: '이서연',
   updatedAt: '2026-07-13 11:20',
 }

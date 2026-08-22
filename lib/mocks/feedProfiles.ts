@@ -4,6 +4,8 @@ import {
   KWONMINSEOK_PROFILE, LIMJIYEON_PROFILE, HANSANGHOON_PROFILE, OHYERIM_PROFILE,
   JUNGWONHO_PROFILE, BAEKHYUNJIN_PROFILE,
 } from '@/lib/mocks/publicProfiles'
+import { getProfileMiniSubtitle } from '@/lib/profileDisplay'
+import type { Highlight } from '@/types'
 
 export type FeedProfile = {
   linkId: string | null
@@ -17,8 +19,15 @@ export type FeedProfile = {
 
 const PASTEL_TEXT = '#6C7786'
 
-function fromProfile(p: { linkId: string; name: string; title: string; avatarColor: string }): FeedProfile {
-  return { linkId: p.linkId, name: p.name, title: p.title, fallbackColor: p.avatarColor }
+function fromProfile(p: {
+  linkId: string
+  name: string
+  title: string
+  school: string
+  manualHighlights: Highlight[]
+  avatarColor: string
+}): FeedProfile {
+  return { linkId: p.linkId, name: p.name, title: getProfileMiniSubtitle(p), fallbackColor: p.avatarColor }
 }
 
 export const NEW_PROFILES: FeedProfile[] = [

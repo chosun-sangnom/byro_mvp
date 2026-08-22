@@ -219,6 +219,7 @@ export interface AiPersonaConfig {
   manualEditAllowed: boolean
   weights: AiWeightItem[]
   emptyStateText: string
+  promptTemplate: string
   updatedBy?: string
   updatedAt?: string
 }

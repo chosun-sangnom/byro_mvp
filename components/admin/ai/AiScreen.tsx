@@ -101,8 +101,12 @@ function PersonaPanel() {
 
   const [weights, setWeights] = useState<AiWeightItem[]>(config.weights)
   const [emptyStateText, setEmptyStateText] = useState(config.emptyStateText)
+  const [promptTemplate, setPromptTemplate] = useState(config.promptTemplate)
   const total = weights.reduce((sum, w) => sum + w.weight, 0)
-  const dirty = JSON.stringify(weights) !== JSON.stringify(config.weights) || emptyStateText !== config.emptyStateText
+  const dirty =
+    JSON.stringify(weights) !== JSON.stringify(config.weights) ||
+    emptyStateText !== config.emptyStateText ||
+    promptTemplate !== config.promptTemplate
 
   return (
     <div>
@@ -142,11 +146,22 @@ function PersonaPanel() {
           style={{ borderColor: 'var(--color-border-default)' }}
         />
 
+        <div className="mt-4 text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>생성 프롬프트 템플릿</div>
+        <textarea
+          value={promptTemplate}
+          onChange={(e) => setPromptTemplate(e.target.value)}
+          rows={3}
+          className="mt-2 w-full rounded-lg border px-3 py-2 text-[13px] disabled:opacity-50"
+          style={{ borderColor: 'var(--color-border-default)' }}
+        />
+
         <SaveFooter
           updatedBy={config.updatedBy}
           updatedAt={config.updatedAt}
           disabled={!dirty || total !== 100}
-          onSave={() => updatePersonaConfig({ weights, emptyStateText }, `가중치·문구 수정 (합계 ${total}%)`)}
+          onSave={() =>
+            updatePersonaConfig({ weights, emptyStateText, promptTemplate }, `가중치·문구·프롬프트 수정 (합계 ${total}%)`)
+          }
         />
       </AdminCard>
     </div>

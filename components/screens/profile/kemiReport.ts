@@ -509,92 +509,96 @@ export function buildKemiReport(
   }
 }
 
-// ── 내 케미리포트 (자기 분석, 5축) ───────────────────────────────────────────
-// 상대가 없는 "나 혼자" 리포트라 협업/관계 구분이 필요 없다 — 축마다 통계적으로
-// 이 유형(직군/MBTI/생활 패턴)이 보이는 경향을 잘하는 점/조심할 점으로 안내한다.
+// ── 내 케미리포트 (나와 잘 맞는 사람, 5축) ────────────────────────────────────
+// 상대가 없는 "나 혼자" 리포트라 협업/관계 구분이 필요 없다 — 축마다 나의 유형
+// (직군/MBTI/생활 패턴)을 짚고, 통계적으로 "이런 나는 이런 사람과 잘 어울린다"를
+// 잘 맞는 유형 / 조심할 유형으로 안내한다.
 
 export interface SelfKemiAxis {
   id: KemiAxisId
   label: string
   lead: string
-  goodPoints: string[]
-  watchPoints: string[]
+  /** 이 축에서 나와 잘 맞는 사람의 특징 */
+  matchWith: string[]
+  /** 이 축에서 부딪히기 쉬운 사람의 특징 */
+  clashWith: string[]
   locked: boolean
   missingItems: string[]
 }
 
 function selfLockedAxis(id: KemiAxisId, missingItems: string[]): SelfKemiAxis {
-  return { id, label: AXIS_META[id].label, lead: '', goodPoints: [], watchPoints: [], locked: true, missingItems }
+  return { id, label: AXIS_META[id].label, lead: '', matchWith: [], clashWith: [], locked: true, missingItems }
 }
 
 interface CareerArchetype {
   match: RegExp
   label: string
-  good: string[]
-  watch: string[]
+  matchWith: string[]
+  clashWith: string[]
 }
 
 const CAREER_ARCHETYPES: CareerArchetype[] = [
   {
     match: /대표|창업|오너|CEO|공동창업/i,
     label: '오너·창업자형',
-    good: ['전체 그림을 먼저 그리고 우선순위를 빠르게 정하는 편이에요.', '애매한 상황에서도 일단 결정하고 밀어붙이는 추진력이 강해요.'],
-    watch: ['세부 실행이나 반복 업무는 남에게 맡기고 싶어 하는 경향이 있어요.', '위임한 일도 기준에 안 맞으면 다시 손대고 싶어질 수 있어요.'],
+    matchWith: ['큰 그림을 흔들림 없이 실행으로 옮겨주는 꼼꼼한 실무형과 시너지가 나요.', '결정 속도에 발맞춰주는 사람과 함께할 때 일이 빠르게 굴러가요.'],
+    clashWith: ['모든 걸 합의로만 정하려는 사람과는 답답함을 느낄 수 있어요.'],
+  },
+  {
+    // '프로덕트 디자이너'가 PM으로 잡히지 않도록 디자이너를 먼저 검사
+    match: /디자이너|디자인|Design/i,
+    label: '디자이너형',
+    matchWith: ['피드백을 구체적으로, 이유와 함께 주는 사람과 편하게 일해요.', '완성도의 가치를 알아주는 사람과 호흡이 잘 맞아요.'],
+    clashWith: ['취향으로 뭉뚱그려 지적하는 사람과는 예민해질 수 있어요.'],
   },
   {
     match: /PM|프로덕트|기획|Product/i,
     label: 'PM·기획형',
-    good: ['여러 팀 사이에서 우선순위를 조율하고 정리하는 데 강해요.', '데이터와 사용자 반응을 근거로 판단하는 습관이 있어요.'],
-    watch: ['모든 이해관계자를 만족시키려다 결정이 늦어질 때가 있어요.', '조율에 익숙해서 직접 실행은 손이 느려질 수 있어요.'],
+    matchWith: ['방향만 주면 알아서 파고드는 실행형과 잘 맞아요.', '근거와 데이터로 대화하는 사람과 호흡이 잘 맞아요.'],
+    clashWith: ['즉흥적으로 판을 자주 바꾸는 사람과는 계획이 계속 어그러질 수 있어요.'],
   },
   {
     match: /개발|엔지니어|Engineer|Developer/i,
     label: '개발자형',
-    good: ['문제를 구조적으로 쪼개서 원인을 정확히 짚어내요.', '한번 정한 기준이나 규칙은 꾸준히 지키는 편이에요.'],
-    watch: ['설명보다 결과로 보여주려다 소통이 늦어질 때가 있어요.', '완성도에 집착해서 마감을 넘기기 쉬워요.'],
+    matchWith: ['맥락과 이유를 미리 정리해서 전달해주는 사람과 편하게 일해요.', '기준과 약속을 지키는 사람과 신뢰가 빠르게 쌓여요.'],
+    clashWith: ['근거 없이 밀어붙이거나 방향을 자주 바꾸는 사람과는 부딪힐 수 있어요.'],
   },
   {
     match: /마케팅|브랜드|Marketing|Brand/i,
     label: '마케팅·브랜드형',
-    good: ['트렌드와 사람들의 반응을 빠르게 캐치해요.', '스토리로 설득하는 힘이 있어요.'],
-    watch: ['숫자보다 감으로 판단할 때가 있어 검증이 필요해요.', '여러 시도를 동시에 벌여서 힘이 분산될 수 있어요.'],
+    matchWith: ['아이디어를 숫자로 검증해주는 분석형과 균형이 잘 맞아요.', '빠른 실험을 함께 즐기는 사람과 에너지가 잘 통해요.'],
+    clashWith: ['정해진 절차만 고집하는 사람과는 속도가 안 맞을 수 있어요.'],
   },
   {
     match: /세일즈|영업|사업개발|Sales|BD/i,
     label: '세일즈·사업개발형',
-    good: ['사람 관계를 빠르게 트고 신뢰를 쌓는 데 능해요.', '거절에도 크게 흔들리지 않고 계속 시도해요.'],
-    watch: ['관계 유지에 에너지를 많이 써서 번아웃이 올 수 있어요.', '숫자를 빨리 만들려다 무리한 약속을 할 때가 있어요.'],
+    matchWith: ['맺어온 관계 뒤를 촘촘하게 챙겨주는 운영형과 잘 맞아요.', '거절에도 함께 담담한 사람과 오래 갑니다.'],
+    clashWith: ['숫자 압박에 예민하게 반응하는 사람과는 서로 지칠 수 있어요.'],
   },
   {
     match: /투자|심사역|VC|파트너/i,
     label: '투자·심사역형',
-    good: ['짧은 시간에 핵심을 파악하는 판단력이 좋아요.', '리스크를 냉정하게 따지는 편이에요.'],
-    watch: ['확신이 서기 전엔 거리를 두는 편이라 차갑게 보일 수 있어요.', '데이터 없는 결정은 잘 믿지 못하는 편이에요.'],
-  },
-  {
-    match: /디자이너|디자인|Design/i,
-    label: '디자이너형',
-    good: ['디테일과 완성도를 끝까지 챙기는 편이에요.', '사용자 입장에서 먼저 생각해요.'],
-    watch: ['피드백을 취향 지적처럼 느껴 예민해질 수 있어요.', '마음에 들 때까지 손봐서 일정이 늘어질 수 있어요.'],
+    matchWith: ['핵심을 짧게 정리해서 말해주는 사람과 대화가 잘 통해요.', '리스크를 솔직하게 먼저 공유하는 사람과 신뢰가 쌓여요.'],
+    clashWith: ['근거 없이 확신만 앞세우는 사람과는 거리가 생기기 쉬워요.'],
   },
   {
     match: /변호사|회계사|컨설턴트|컨설팅|Consultant/i,
     label: '전문직·컨설팅형',
-    good: ['논리적으로 구조화해서 설명하는 힘이 강해요.', '기준과 원칙을 지키는 편이에요.'],
-    watch: ['원칙을 앞세우다 융통성이 부족하게 느껴질 수 있어요.', '완벽한 근거가 없으면 움직이지 않으려는 편이에요.'],
+    matchWith: ['논리적인 대화를 즐기고 근거를 챙기는 사람과 잘 맞아요.', '원칙을 존중하는 사람과 신뢰가 오래 갑니다.'],
+    clashWith: ['즉흥적으로 규칙을 건너뛰는 사람과는 답답함을 느낄 수 있어요.'],
   },
   {
     match: /크리에이터|콘텐츠|작가|Creator|유튜브/i,
     label: '크리에이터·콘텐츠형',
-    good: ['자기만의 관점과 색깔이 뚜렷해요.', '꾸준히 뭔가를 만들어내는 실행력이 있어요.'],
-    watch: ['반응에 따라 감정 기복이 클 수 있어요.', '기분에 따라 일하는 편이라 예측이 어려울 수 있어요.'],
+    matchWith: ['꾸준함으로 기복을 받쳐주는 안정적인 사람과 잘 맞아요.', '자기 색깔을 존중해주는 사람과 편하게 어울려요.'],
+    clashWith: ['모든 걸 정량 지표로만 재려는 사람과는 결이 안 맞을 수 있어요.'],
   },
 ]
 
 const DEFAULT_CAREER_ARCHETYPE: Omit<CareerArchetype, 'match'> = {
   label: '전문가형',
-  good: ['자기 분야에서 쌓아온 노하우가 확실해요.', '맡은 일은 책임지고 끝까지 가져가는 편이에요.'],
-  watch: ['익숙한 방식을 고수하다 변화 적응이 늦을 수 있어요.', '전문 영역 밖 얘기에는 관심이 덜할 수 있어요.'],
+  matchWith: ['서로의 전문 영역을 존중하고 배우려는 사람과 잘 맞아요.', '맡은 건 끝까지 하는 책임감 있는 사람과 신뢰가 쌓여요.'],
+  clashWith: ['익숙한 방식을 갑자기 뒤엎으려는 사람과는 조율할 시간이 필요해요.'],
 }
 
 function buildSelfCareerAxis(title: string, manualHighlights: Highlight[]): SelfKemiAxis {
@@ -610,9 +614,9 @@ function buildSelfCareerAxis(title: string, manualHighlights: Highlight[]): Self
   return {
     id: 'career',
     label: AXIS_META.career.label,
-    lead: `${title ? `${title}(으)로 활동 중인` : '지금 하는 일로 보면'} 당신은 ${archetype.label}에 가까워요. 통계적으로 이 유형은 이런 경향을 보여요.`,
-    goodPoints: archetype.good,
-    watchPoints: archetype.watch,
+    lead: `${title ? `${title}(으)로 활동하는` : '지금 하는 일로 보면'} 당신은 ${archetype.label}이에요. 일로 만나는 사람 중엔 이런 결이 잘 맞아요.`,
+    matchWith: archetype.matchWith,
+    clashWith: archetype.clashWith,
     locked: false,
     missingItems: [],
   }
@@ -626,12 +630,12 @@ function buildSelfReputationAxis(keywords: ReputationKeyword[]): SelfKemiAxis {
   return {
     id: 'reputation',
     label: AXIS_META.reputation.label,
-    lead: `주변 사람들은 당신을 "${top.keyword}"로 가장 많이 기억해요${second ? `, "${second.keyword}"도 자주 나와요` : ''}.`,
-    goodPoints: [
-      `"${top.keyword}"라는 평판이 ${top.count}건 쌓여 있어서 처음 만나는 사람에게도 신뢰를 주는 편이에요.`,
+    lead: `주변에선 당신을 "${top.keyword}"로 가장 많이 기억해요${second ? `, "${second.keyword}"도 자주 나오고요` : ''}.`,
+    matchWith: [
+      `"${top.keyword}"라는 인상을 편하게 받아들이고 비슷한 신뢰를 돌려주는 사람과 오래 갑니다.`,
     ],
-    watchPoints: [
-      '평판은 보이는 모습 위주로 쌓이는 경우가 많아서, 실제 성향과는 다르게 비칠 수 있어요.',
+    clashWith: [
+      '첫인상만으로 사람을 판단하는 사람과는 진짜 모습을 보여주기까지 시간이 걸려요.',
     ],
     locked: false,
     missingItems: [],
@@ -641,19 +645,24 @@ function buildSelfReputationAxis(keywords: ReputationKeyword[]): SelfKemiAxis {
 function buildSelfPersonalityAxis(whoIAm?: PublicProfileWhoIAm): SelfKemiAxis {
   if (!whoIAm) return selfLockedAxis('personality', ['MBTI'])
 
-  const { mbti, extrovert, intuitive, thinking, judging } = getMbtiTraits(whoIAm.mbti)
+  const { mbti, extrovert, thinking, judging } = getMbtiTraits(whoIAm.mbti)
 
   return {
     id: 'personality',
     label: AXIS_META.personality.label,
-    lead: `${mbti} 성향은 통계적으로 이런 결을 보이는 경우가 많아요.${whoIAm.personality ? ` "${whoIAm.personality}"` : ''}`,
-    goodPoints: [
-      extrovert ? '사람을 만나며 에너지를 얻고, 먼저 다가가는 데 거리낌이 없어요.' : '혼자 생각을 정리하는 시간에서 좋은 판단이 나와요.',
-      thinking ? '기준이 분명해서 판단이 빠르고 냉정해요.' : '사람의 감정을 잘 읽고 배려해요.',
+    lead: `${mbti}${whoIAm.personality ? ` · "${whoIAm.personality}"` : ''} — 성향으로 보면 이런 사람과 균형이 잘 맞아요.`,
+    matchWith: [
+      extrovert
+        ? '차분하게 중심을 잡아주는 내향적인 사람과 텐션이 잘 맞아요.'
+        : '분위기를 먼저 열어주는 외향적인 사람과 함께 있으면 편해요.',
+      thinking
+        ? '감정을 살뜰히 챙겨주는 사람과 서로 부족한 면을 채워줘요.'
+        : '결정을 분명하게 내려주는 사람과 함께할 때 든든해요.',
     ],
-    watchPoints: [
-      intuitive ? '현실적인 디테일을 놓칠 때가 있어요.' : '새로운 시도 앞에서 조심스러워질 수 있어요.',
-      judging ? '계획이 틀어지면 스트레스를 크게 받아요.' : '마감이나 정리가 늘어질 때가 있어요.',
+    clashWith: [
+      judging
+        ? '계획을 자주 뒤엎는 즉흥적인 사람과는 스트레스를 받을 수 있어요.'
+        : '모든 걸 미리 정해두려는 사람과는 답답함을 느낄 수 있어요.',
     ],
     locked: false,
     missingItems: [],
@@ -666,21 +675,22 @@ function buildSelfLifeAxis(life?: PublicProfileLife): SelfKemiAxis {
 
   if (!signals.exercise && !signals.place && !hasPet) return selfLockedAxis('life', ['바이브(생활) 1개'])
 
-  const good: string[] = []
-  if (signals.exercise) good.push(`${signals.exercise}을(를) 꾸준히 챙기는 걸 보면 자기관리 습관이 몸에 밴 편이에요.`)
-  if (hasPet) good.push('반려동물을 챙기는 걸 보면 책임감과 애정이 깊은 편이에요.')
-  if (signals.place) good.push(`${signals.place} 같은 단골이 있는 걸 보면 익숙한 곳에서 안정감을 느끼는 편이에요.`)
-  if (good.length === 0) good.push('아직 드러난 루틴은 적지만, 그만큼 새로운 걸 시도하는 데 열려 있는 편일 수 있어요.')
+  const secondMatch = signals.exercise
+    ? `${signals.exercise} 같은 활동을 함께 즐기는 사람과 쉽게 가까워져요.`
+    : hasPet
+      ? '반려동물을 키우는 사람과는 공감대가 빨리 생겨요.'
+      : `${signals.place ?? '자주 가는 동네'}가 겹치는 사람과 금방 친해져요.`
 
   return {
     id: 'life',
     label: AXIS_META.life.label,
-    lead: `일상을 보면 ${signals.exercise ?? signals.place ?? '자기만의 루틴'} 위주로 흘러가는 편이에요.`,
-    goodPoints: good.slice(0, 2),
-    watchPoints: [
-      signals.exercise || hasPet
-        ? '루틴이 한번 깨지면 다시 자리 잡기까지 시간이 걸릴 수 있어요.'
-        : '고정된 루틴이 적어서 생활이 불규칙해지기 쉬워요.',
+    lead: `일상은 ${signals.exercise ?? signals.place ?? '자기만의 루틴'} 위주로 흘러가요. 생활이 겹치는 사람과 자연스럽게 자주 보게 돼요.`,
+    matchWith: [
+      '생활 반경이나 활동 시간대가 겹치는 사람과는 따로 애쓰지 않아도 자주 마주쳐요.',
+      secondMatch,
+    ],
+    clashWith: [
+      '활동 시간대나 리듬이 정반대인 사람과는 일부러 시간을 맞춰야 볼 수 있어요.',
     ],
     locked: false,
     missingItems: [],
@@ -698,16 +708,16 @@ function buildSelfTasteAxis(life?: PublicProfileLife): SelfKemiAxis {
   return {
     id: 'taste',
     label: AXIS_META.taste.label,
-    lead: `${hook} 같은 취향을 보면 ${wide ? '여러 장르를 폭넓게 즐기는' : '뚜렷하게 좋아하는 걸 깊이 파는'} 편이에요.`,
-    goodPoints: [
+    lead: `${hook} 같은 취향을 보면 ${wide ? '여러 장르를 폭넓게 즐기는' : '좋아하는 걸 깊이 파는'} 편이에요.`,
+    matchWith: [
       wide
-        ? '다양한 취향 덕분에 어떤 자리에서도 대화 소재가 마르지 않아요.'
-        : '좋아하는 걸 깊이 파고드는 만큼 그 분야에서는 할 얘기가 많아요.',
+        ? '취향의 폭이 넓어서 어떤 취향의 사람과도 대화가 잘 통해요.'
+        : `${hook} 쪽을 똑같이 좋아하는 사람과는 처음부터 할 얘기가 많아요.`,
     ],
-    watchPoints: [
+    clashWith: [
       wide
-        ? '취향이 넓은 만큼 정작 깊이 빠지는 하나를 찾기 어려울 수 있어요.'
-        : '취향이 좁으면 새로운 걸 권유받았을 때 거리감을 느낄 수 있어요.',
+        ? '하나에 깊이 빠져 있는 사람에겐 가볍게 느껴질 수도 있어요.'
+        : '취향이 아예 다른 사람과는 공통 화제를 찾는 데 시간이 걸려요.',
     ],
     locked: false,
     missingItems: [],

@@ -191,7 +191,7 @@ export function PublicProfileOwnerMatchZone({
                 케미 리포트
               </span>
               <p className="mt-1 text-[13px] leading-[1.5] text-[#475058]">
-                커리어·평판·성격·생활·취향 5축으로 당신이 어떤 사람인지 읽어줍니다.
+                커리어·평판·성격·생활·취향 5축으로 내가 어떤 사람과 잘 맞는지 읽어줍니다.
               </p>
               <button
                 type="button"
@@ -247,10 +247,10 @@ function OwnerKemiReportSheet({
             <span className="text-[14px] font-bold text-black">케미 리포트</span>
           </div>
           <h3 className="text-[22px] font-bold tracking-[-0.03em]" style={{ color: '#0D0D0D' }}>
-            나는 어떤 사람일까
+            나와 잘 맞는 사람
           </h3>
           <p className="text-[16px] font-medium leading-[1.5]" style={{ color: '#475058' }}>
-            커리어·평판·성격·생활·취향 5축으로 통계적인 성향을 읽어드려요.
+            커리어·평판·성격·생활·취향 5축으로 내가 어떤 사람과 잘 어울리는지 읽어드려요.
           </p>
         </div>
 
@@ -266,12 +266,12 @@ function OwnerKemiReportSheet({
                   <div className="relative">
                     <div className="select-none" style={{ filter: 'blur(5px)' }} aria-hidden>
                       <p className="mb-3 text-[13px] leading-[1.55]" style={{ color: '#475058' }}>
-                        성향 편집에서 이 정보를 채우면 통계적으로 내가 어떤 사람인지 이 축으로 읽어 드려요.
+                        내 정보를 채우면 이 축에서 어떤 사람과 잘 맞는지 통계로 읽어 드려요.
                       </p>
-                      <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>잘하는 것</p>
+                      <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>이런 사람과 잘 맞아요</p>
                       <div className="flex flex-col gap-1">
-                        <p className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· 이 유형이 보이는 강점이 여기에 표시돼요</p>
-                        <p className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· 통계로 본 나의 특징을 짚어 드려요</p>
+                        <p className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· 나와 결이 맞는 사람의 특징이 여기 표시돼요</p>
+                        <p className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· 서로 부족한 면을 채워주는 유형을 짚어 드려요</p>
                       </div>
                     </div>
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6" style={{ background: 'rgba(255,255,255,0.5)' }}>
@@ -287,21 +287,21 @@ function OwnerKemiReportSheet({
                     {axis.lead && (
                       <p className="mb-3 text-[13px] leading-[1.55]" style={{ color: '#475058' }}>{axis.lead}</p>
                     )}
-                    {axis.goodPoints.length > 0 && (
+                    {axis.matchWith.length > 0 && (
                       <div className="mb-3">
-                        <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>잘하는 것</p>
+                        <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>이런 사람과 잘 맞아요</p>
                         <div className="flex flex-col gap-1">
-                          {axis.goodPoints.map((text, i) => (
+                          {axis.matchWith.map((text, i) => (
                             <p key={i} className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· {text}</p>
                           ))}
                         </div>
                       </div>
                     )}
-                    {axis.watchPoints.length > 0 && (
+                    {axis.clashWith.length > 0 && (
                       <div>
-                        <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>조심할 것</p>
+                        <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>이런 사람과는 조심하세요</p>
                         <div className="flex flex-col gap-1">
-                          {axis.watchPoints.map((text, i) => (
+                          {axis.clashWith.map((text, i) => (
                             <p key={i} className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· {text}</p>
                           ))}
                         </div>

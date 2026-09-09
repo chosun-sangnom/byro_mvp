@@ -179,8 +179,12 @@ export interface KemiAxisReport {
   lead: string // 목적(협업/관계)에 따라 문구가 달라짐
   goodPoints: string[] // "잘 맞는 점"
   watchPoints: string[] // "보완이 필요한 점"
+  /** 뷰어 자신의 정보가 없어서 비교 자체가 불가 — 블러+넛지로 표시, 뷰어가 채우면 열림 */
   locked: boolean
-  missingItems: string[]
+  missingItems: string[] // locked일 때 넛지 문구
+  /** 상대 쪽 정보가 없거나(빈 값) 비공개 탭이라 양방향 비교는 못 하고, 뷰어 쪽 정보만으로 안내 */
+  partial: boolean
+  partialReason?: 'empty' | 'private'
 }
 
 export interface KemiArchetype {

@@ -212,8 +212,6 @@ export default function KemiReportScreen({ username }: { username: string }) {
 
   const [purpose, setPurpose] = useState<KemiPurpose>('work')
   const [sharing, setSharing] = useState(false)
-  const [cardGenerating, setCardGenerating] = useState(false)
-  const [cardGenerated, setCardGenerated] = useState(false)
   const cardRef = useRef<HTMLDivElement>(null)
 
   const viewerName = user?.name ?? '나'
@@ -228,39 +226,13 @@ export default function KemiReportScreen({ username }: { username: string }) {
 
   if (!mounted || isOwner || !isLoggedIn) return null
 
-  if (!report) {
-    return (
-      <div className="flex h-full flex-col bg-white">
-        <div className="flex h-12 flex-shrink-0 items-center border-b px-5" style={{ borderColor: HAIRLINE }}>
-          <button onClick={() => router.back()} className="mr-3 text-xl" style={{ color: '#475058' }}>‹</button>
-          <span className="text-[16px] font-bold" style={{ color: '#0D0D0D' }}>{profile.name}님과의 케미</span>
-        </div>
-        <div className="flex flex-1 flex-col items-center justify-center gap-3 px-8">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/kemi/empty-state-icon.svg" alt="" className="size-12" />
-          <p className="text-center text-[14px] font-semibold leading-[1.35]" style={{ color: '#6C7786' }}>
-            {profile.name}님의 프로필 정보가 아직 부족해서<br />케미를 분석할 수 없어요
-          </p>
-        </div>
-      </div>
-    )
-  }
-
   const archetype = report.archetype
   const score = computeKemiScore(report.axes, purpose)
   const strongTags = [...report.axes]
-    .filter((a) => !a.locked)
+    .filter((a) => !a.locked && !a.partial)
     .sort((a, b) => b.strength - a.strength)
     .slice(0, 3)
     .map((a) => a.label)
-
-  const handleGenerateCard = () => {
-    setCardGenerating(true)
-    setTimeout(() => {
-      setCardGenerating(false)
-      setCardGenerated(true)
-    }, 1400)
-  }
 
   const handleShare = async () => {
     if (!cardRef.current || sharing) return
@@ -366,14 +338,16 @@ export default function KemiReportScreen({ username }: { username: string }) {
                   <div style={axis.locked ? { filter: 'blur(6px)', userSelect: 'none' } : undefined}>
                     <div className="mb-1.5 flex items-center gap-1.5">
                       <span className="text-[15px] font-bold" style={{ color: '#0D0D0D' }}>{axis.label}</span>
-                      <span
-                        className="rounded-[4px] px-1.5 py-0.5 text-[10px] font-bold"
-                        style={axis.signalKind === 'same'
-                          ? { background: 'var(--color-accent-soft)', color: 'var(--color-accent-dark)' }
-                          : { background: '#FFF4E0', color: '#D95F00' }}
-                      >
-                        {axis.signalKind === 'same' ? '같음' : '보완'}
-                      </span>
+                      {!axis.partial && (
+                        <span
+                          className="rounded-[4px] px-1.5 py-0.5 text-[10px] font-bold"
+                          style={axis.signalKind === 'same'
+                            ? { background: 'var(--color-accent-soft)', color: 'var(--color-accent-dark)' }
+                            : { background: '#FFF4E0', color: '#D95F00' }}
+                        >
+                          {axis.signalKind === 'same' ? '같음' : '보완'}
+                        </span>
+                      )}
                     </div>
                     {axis.lead && (
                       <p className="mb-3 text-[13px] leading-[1.55]" style={{ color: '#475058' }}>{axis.lead}</p>
@@ -426,73 +400,40 @@ export default function KemiReportScreen({ username }: { username: string }) {
           </div>
         </div>
 
-        {/* 케미카드 공유 */}
+        {/* 케미 카드 — 항상 노출, 바로 저장/공유 */}
         <div className="px-5 pt-5 pb-8">
-          {!cardGenerated && !cardGenerating && (
+          <ShareCard
+            cardRef={cardRef}
+            viewerName={viewerName}
+            viewerAvatar={viewerAvatar}
+            profileName={profile.name}
+            profileAvatar={profileAvatar}
+            score={score}
+            tags={strongTags}
+          />
+          <div className="mt-3 flex gap-2">
             <button
               type="button"
-              onClick={handleGenerateCard}
-              className="flex w-full items-center justify-center gap-1.5 rounded-full py-3 text-[14px] font-bold"
-              style={{ border: `1px solid ${HAIRLINE}`, color: '#0D0D0D' }}
+              onClick={handleShare}
+              disabled={sharing}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-full py-3 text-[14px] font-bold disabled:opacity-50"
+              style={{ border: `1px solid ${HAIRLINE}`, color: '#25313D' }}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/kemi/report-badge-icon.svg" alt="" className="size-4" />
-              케미카드 만들기
+              <Download size={16} />
+              {sharing ? '저장 중…' : '저장'}
             </button>
-          )}
-          {cardGenerating && (
-            <div className="flex w-full items-center justify-center gap-2.5 rounded-full py-3" style={{ background: 'var(--color-bg-surface)' }}>
-              <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#25313D] border-t-transparent" />
-              <span className="text-[14px] font-bold" style={{ color: '#0D0D0D' }}>케미카드 생성 중…</span>
-            </div>
-          )}
-          {cardGenerated && (
-            <div className="flex flex-col gap-3">
-              <ShareCard
-                viewerName={viewerName}
-                viewerAvatar={viewerAvatar}
-                profileName={profile.name}
-                profileAvatar={profileAvatar}
-                score={score}
-                tags={strongTags}
-              />
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={handleShare}
-                  disabled={sharing}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-full py-3 text-[14px] font-bold disabled:opacity-50"
-                  style={{ border: `1px solid ${HAIRLINE}`, color: '#25313D' }}
-                >
-                  <Download size={16} />
-                  {sharing ? '저장 중…' : '저장'}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleShare}
-                  disabled={sharing}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-black py-3 text-[14px] font-bold text-white disabled:opacity-50"
-                >
-                  <Share2 size={16} />
-                  {sharing ? '공유 중…' : '공유'}
-                </button>
-              </div>
-            </div>
-          )}
+            <button
+              type="button"
+              onClick={handleShare}
+              disabled={sharing}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-black py-3 text-[14px] font-bold text-white disabled:opacity-50"
+            >
+              <Share2 size={16} />
+              {sharing ? '공유 중…' : '공유'}
+            </button>
+          </div>
         </div>
       </div>
-
-      {/* 캡처용 오프스크린 카드 */}
-      <ShareCard
-        cardRef={cardRef}
-        viewerName={viewerName}
-        viewerAvatar={viewerAvatar}
-        profileName={profile.name}
-        profileAvatar={profileAvatar}
-        score={score}
-        tags={strongTags}
-        offscreen
-      />
     </div>
   )
 }

@@ -10,6 +10,12 @@
  * 협업 = 이 사람과 일할 때 결, 관계 = 이 사람과 친구가 될 때 결.
  * 축 순서는 항상 career → reputation → personality → life → taste 로 고정한다.
  * (레이더 차트 각도가 이 순서에 의존, 레이더 강도(strength)는 목적과 무관)
+ *
+ * 축별 상태는 우선순위 순으로 하나만 적용된다:
+ *   1. locked  — 뷰어 자신의 정보가 없어서 비교 자체가 불가 (블러+넛지, 뷰어가 채우면 열림)
+ *   2. partial — 상대 정보가 없거나(빈 값) 상대가 비공개 탭으로 설정해서 양방향 비교는 못 하지만,
+ *                뷰어 쪽 정보만으로 안내 (예: 강명구님처럼 NETWORK 탭이 비공개인 경우)
+ *   3. full    — 양쪽 다 있어서 정상적인 두 사람 비교
  */
 
 import type {
@@ -52,7 +58,7 @@ export function computeKemiScore(axes: KemiAxisReport[], purpose: KemiPurpose): 
   return Math.max(0, Math.min(100, Math.round(total)))
 }
 
-function lockedAxis(id: KemiAxisId, missingItems: string[]): KemiAxisReport {
+function viewerLockedAxis(id: KemiAxisId, missingItems: string[]): KemiAxisReport {
   return {
     ...AXIS_META[id],
     id,
@@ -61,32 +67,69 @@ function lockedAxis(id: KemiAxisId, missingItems: string[]): KemiAxisReport {
     goodPoints: [],
     watchPoints: [],
     locked: true,
+    partial: false,
     missingItems,
   }
 }
 
-function buildCareerAxis(purpose: KemiPurpose, viewerTitle: string, target: PublicProfile): KemiAxisReport {
-  const careerHighlight = target.manualHighlights.find((h) => h.categoryId === 'career-role')
-  if (!careerHighlight) return lockedAxis('career', ['하이라이트(경력) 1개'])
+function partialAxis(
+  id: KemiAxisId,
+  reason: 'empty' | 'private',
+  lead: string,
+  goodPoints: string[],
+): KemiAxisReport {
+  return {
+    ...AXIS_META[id],
+    id,
+    strength: 0,
+    lead,
+    goodPoints,
+    watchPoints: [],
+    locked: false,
+    partial: true,
+    partialReason: reason,
+    missingItems: [],
+  }
+}
+
+// ── 커리어 ──────────────────────────────────────────────────────────────
+function buildCareerAxis(purpose: KemiPurpose, viewer: KemiViewer, target: PublicProfile): KemiAxisReport {
+  const viewerTitle = viewer.title?.trim()
+  if (!viewerTitle) return viewerLockedAxis('career', ['활동 중인 일·직함'])
+
+  const whoLocked = target.tabVisibility?.who === 'private'
+  const careerHighlight = whoLocked ? undefined : target.manualHighlights.find((h) => h.categoryId === 'career-role')
+
+  if (!careerHighlight) {
+    const reason: 'empty' | 'private' = whoLocked ? 'private' : 'empty'
+    const reasonText = whoLocked
+      ? `${target.name}님이 이 정보를 비공개로 설정해둬서 경력을 비교하지 못했어요.`
+      : `${target.name}님이 아직 경력 정보를 입력하지 않아서 비교하지 못했어요.`
+    return partialAxis('career', reason,
+      `${reasonText} 하지만 당신은 ${viewerTitle}(으)로 활동하고 있으니, 그 경험을 살려 이 관계를 이끌어볼 수 있어요.`,
+      [purpose === 'work'
+        ? `당신의 ${viewerTitle} 경험이면 처음 만나는 자리에서도 방향을 먼저 제안해볼 수 있어요.`
+        : `당신의 ${viewerTitle} 경험을 편하게 얘깃거리로 꺼내볼 수 있어요.`])
+  }
 
   const role = (careerHighlight.metadata?.role as string) ?? careerHighlight.subtitle
   const isCurrent = /현재|재직/.test(careerHighlight.subtitle) || /현재/.test(careerHighlight.year)
-  const me = viewerTitle || '지금 하는 일'
 
   if (purpose === 'work') {
     return {
       ...AXIS_META.career,
       id: 'career',
       strength: isCurrent ? 78 : 62,
-      lead: `${target.name}님은 ${careerHighlight.title}에서 ${role}로 일하고, 당신은 ${me}(으)로 활동 중이라 일로 만나면 서로 다른 축을 맡게 되는 조합이에요.`,
+      lead: `${target.name}님은 ${careerHighlight.title}에서 ${role}로 일하고, 당신은 ${viewerTitle}(으)로 활동 중이라 일로 만나면 서로 다른 축을 맡게 되는 조합이에요.`,
       goodPoints: [
-        `역할이 겹치지 않아서 ${role} × ${me} 조합이 서로의 빈 곳을 채워줘요.`,
+        `역할이 겹치지 않아서 ${role} × ${viewerTitle} 조합이 서로의 빈 곳을 채워줘요.`,
         `${careerHighlight.year} 기준 경력이 이어지고 있어서 지금이 함께 움직이기 좋은 시점이에요.`,
       ],
       watchPoints: [
         '산업·직무가 다르면 초반엔 서로의 용어와 맥락을 맞추는 시간이 필요해요.',
       ],
       locked: false,
+      partial: false,
       missingItems: [],
     }
   }
@@ -104,13 +147,25 @@ function buildCareerAxis(purpose: KemiPurpose, viewerTitle: string, target: Publ
       '바쁜 시기가 서로 다르면 약속을 미리 맞춰야 자주 볼 수 있어요.',
     ],
     locked: false,
+    partial: false,
     missingItems: [],
   }
 }
 
+// ── 평판 ────────────────────────────────────────────────────────────────
 function buildReputationAxis(purpose: KemiPurpose, target: PublicProfile): KemiAxisReport {
-  const keywords = target.reputationKeywords ?? []
-  if (keywords.length === 0) return lockedAxis('reputation', ['평판 키워드 1개 이상'])
+  const networkLocked = target.tabVisibility?.network === 'private'
+  const keywords = networkLocked ? [] : (target.reputationKeywords ?? [])
+
+  if (keywords.length === 0) {
+    const reason: 'empty' | 'private' = networkLocked ? 'private' : 'empty'
+    const reasonText = networkLocked
+      ? `${target.name}님이 평판 정보를 비공개로 설정해둬서 분석하지 못했어요.`
+      : `아직 ${target.name}님에 대한 평판이 쌓이지 않아서 분석하지 못했어요.`
+    return partialAxis('reputation', reason,
+      `${reasonText} 평판은 상대적인 축이라 지금은 미리 비교할 수 없지만, 실제로 만나보면서 서로에 대한 인상을 직접 쌓아가면 돼요.`,
+      [])
+  }
 
   const [top, second] = keywords
   const totalCount = keywords.reduce((sum, k) => sum + k.count, 0)
@@ -132,6 +187,7 @@ function buildReputationAxis(purpose: KemiPurpose, target: PublicProfile): KemiA
           : '평판은 결국 실제로 함께 일해봐야 확인되는 부분이라 참고 정도로만 보세요.',
       ],
       locked: false,
+      partial: false,
       missingItems: [],
     }
   }
@@ -149,20 +205,37 @@ function buildReputationAxis(purpose: KemiPurpose, target: PublicProfile): KemiA
       '평판은 결국 직접 겪어봐야 아는 부분이라, 첫 만남 전엔 가벼운 참고로만 두세요.',
     ],
     locked: false,
+    partial: false,
     missingItems: [],
   }
 }
 
-function buildPersonalityAxis(purpose: KemiPurpose, viewerWhoIAm: PublicProfileWhoIAm, target: PublicProfile): KemiAxisReport {
-  if (!target.whoIAm) return lockedAxis('personality', ['MBTI'])
+// ── 성격 ────────────────────────────────────────────────────────────────
+function buildPersonalityAxis(purpose: KemiPurpose, viewerWhoIAm: PublicProfileWhoIAm | undefined, target: PublicProfile): KemiAxisReport {
+  if (!viewerWhoIAm) return viewerLockedAxis('personality', ['MBTI(나의 성향)'])
 
   const me = getMbtiTraits(viewerWhoIAm.mbti)
-  const them = getMbtiTraits(target.whoIAm.mbti)
+  const whoLocked = target.tabVisibility?.who === 'private'
+  const targetWhoIAm = whoLocked ? undefined : target.whoIAm
+
+  if (!targetWhoIAm) {
+    const reason: 'empty' | 'private' = whoLocked ? 'private' : 'empty'
+    const reasonText = whoLocked
+      ? `${target.name}님이 이 정보를 비공개로 설정해둬서 성향을 비교하지 못했어요.`
+      : `${target.name}님이 아직 MBTI·성향을 입력하지 않아서 비교하지 못했어요.`
+    return partialAxis('personality', reason,
+      `${reasonText} 당신은 ${me.mbti} 성향이니, ${purpose === 'work' ? '이 판단 스타일을 먼저 밝히고 시작하면 협업 합의가 빨라져요.' : '이 성향을 먼저 보여주면 상대도 편하게 다가올 수 있어요.'}`,
+      [purpose === 'work'
+        ? `${me.thinking ? '기준과 판단을 먼저 정리해서 제안하면' : '분위기와 합의를 먼저 챙기면'} 첫 협업에서 신뢰를 빨리 얻을 수 있어요.`
+        : `${me.extrovert ? '먼저 말을 걸어보면' : '천천히 곁을 내주면'} 관계를 자연스럽게 열어갈 수 있어요.`])
+  }
+
+  const them = getMbtiTraits(targetWhoIAm.mbti)
   const sameExtrovert = me.extrovert === them.extrovert
   const sameThinking = me.thinking === them.thinking
   const sameJudging = me.judging === them.judging
   const sameCount = [sameExtrovert, sameThinking, sameJudging].filter(Boolean).length
-  const personalityLine = target.whoIAm.personality
+  const personalityLine = targetWhoIAm.personality
 
   if (purpose === 'work') {
     return {
@@ -184,6 +257,7 @@ function buildPersonalityAxis(purpose: KemiPurpose, viewerWhoIAm: PublicProfileW
           : `${me.extrovert ? '당신은 빠르게 치고 나가는' : '당신은 신중하게 검토하는'} 편이고 ${target.name}님은 반대라 회의 속도를 맞추는 합의가 필요해요.`,
       ],
       locked: false,
+      partial: false,
       missingItems: [],
     }
   }
@@ -207,20 +281,37 @@ function buildPersonalityAxis(purpose: KemiPurpose, viewerWhoIAm: PublicProfileW
         : '의사결정 기준이 달라서 같은 상황도 다르게 받아들일 수 있어요.',
     ],
     locked: false,
+    partial: false,
     missingItems: [],
   }
 }
 
+// ── 생활 ────────────────────────────────────────────────────────────────
 function buildLifeAxis(purpose: KemiPurpose, viewerLife: PublicProfileLife | undefined, target: PublicProfile): KemiAxisReport {
-  const targetLife = target.life
+  const me = getLifestyleSignals(viewerLife)
+  if (!me.exercise && !me.place) return viewerLockedAxis('life', ['바이브(생활) 1개'])
+
+  const vibeLocked = target.tabVisibility?.vibe === 'private'
+  const targetLife = vibeLocked ? undefined : target.life
   const hasLifeData = !!targetLife && (
     targetLife.daily.exercise.length > 0
     || targetLife.tastes.cafes.length > 0
     || targetLife.tastes.restaurants.length > 0
   )
-  if (!hasLifeData) return lockedAxis('life', ['바이브(생활) 1개'])
 
-  const me = getLifestyleSignals(viewerLife)
+  if (!hasLifeData) {
+    const reason: 'empty' | 'private' = vibeLocked ? 'private' : 'empty'
+    const reasonText = vibeLocked
+      ? `${target.name}님이 라이프(바이브) 탭을 비공개로 설정해둬서 생활 반경을 비교하지 못했어요.`
+      : `${target.name}님이 아직 라이프(바이브) 정보를 채우지 않아서 비교하지 못했어요.`
+    const myThing = me.exercise ?? me.place ?? '일상'
+    return partialAxis('life', reason,
+      `${reasonText} 당신은 ${myThing} 위주로 지내니, 그 리듬을 먼저 보여주면 돼요.`,
+      [purpose === 'work'
+        ? `당신의 ${myThing} 루틴에 맞춰 미팅 시간대를 제안해볼 수 있어요.`
+        : `${myThing}을(를) 먼저 공유하면서 만날 핑계를 만들어볼 수 있어요.`])
+  }
+
   const them = getLifestyleSignals(targetLife)
   const sameExercise = !!me.exercise && me.exercise === them.exercise
   const samePlace = !!me.place && me.place === them.place
@@ -239,6 +330,7 @@ function buildLifeAxis(purpose: KemiPurpose, viewerLife: PublicProfileLife | und
         '일과 시간대나 루틴이 다르면 미팅 시간을 조율하는 데 신경 써야 해요.',
       ],
       locked: false,
+      partial: false,
       missingItems: [],
     }
   }
@@ -258,13 +350,30 @@ function buildLifeAxis(purpose: KemiPurpose, viewerLife: PublicProfileLife | und
       '생활 루틴이 다르면 약속을 미리 맞춰야 자주 볼 수 있어요.',
     ],
     locked: false,
+    partial: false,
     missingItems: [],
   }
 }
 
+// ── 취향 ────────────────────────────────────────────────────────────────
 function buildTasteAxis(purpose: KemiPurpose, viewerLife: PublicProfileLife | undefined, target: PublicProfile): KemiAxisReport {
-  const targetHook = getTasteHook(target.life)
-  if (!targetHook) return lockedAxis('taste', ['바이브(취향) 1개'])
+  const myHook = getTasteHook(viewerLife)
+  if (!myHook) return viewerLockedAxis('taste', ['바이브(취향) 1개'])
+
+  const vibeLocked = target.tabVisibility?.vibe === 'private'
+  const targetHook = vibeLocked ? undefined : getTasteHook(target.life)
+
+  if (!targetHook) {
+    const reason: 'empty' | 'private' = vibeLocked ? 'private' : 'empty'
+    const reasonText = vibeLocked
+      ? `${target.name}님이 라이프(바이브) 탭을 비공개로 설정해둬서 취향을 비교하지 못했어요.`
+      : `${target.name}님이 아직 취향 정보를 채우지 않아서 비교하지 못했어요.`
+    return partialAxis('taste', reason,
+      `${reasonText} 당신은 ${myHook} 쪽을 좋아하니, 그 취향을 먼저 꺼내보면 돼요.`,
+      [purpose === 'work'
+        ? `${myHook} 얘기로 미팅 전후 가벼운 스몰토크를 열어볼 수 있어요.`
+        : `${myHook}을(를) 먼저 소개하면서 다음 약속거리를 만들어볼 수 있어요.`])
+  }
 
   const overlap = (['movies', 'music', 'books'] as const)
     .map((key) => {
@@ -287,6 +396,7 @@ function buildTasteAxis(purpose: KemiPurpose, viewerLife: PublicProfileLife | un
         '업무 관계에서는 취향이 안 맞아도 큰 문제가 되진 않아요 — 참고만 하세요.',
       ],
       locked: false,
+      partial: false,
       missingItems: [],
     }
   }
@@ -301,13 +411,14 @@ function buildTasteAxis(purpose: KemiPurpose, viewerLife: PublicProfileLife | un
       : [`${target.name}님은 ${targetHook}을(를) 즐기는데, 서로 취향을 소개하며 알아가는 재미로 접근하면 좋아요.`],
     watchPoints: overlap ? [] : ['겹치는 지점이 아직 뚜렷하지 않아서 몇 번 만나며 취향을 맞춰가야 해요.'],
     locked: false,
+    partial: false,
     missingItems: [],
   }
 }
 
 function buildArchetype(purpose: KemiPurpose, target: PublicProfile, axes: KemiAxisReport[]): KemiArchetype {
-  const unlockedCount = axes.filter((a) => !a.locked).length
-  const readyEnough = unlockedCount >= 4
+  const comparableCount = axes.filter((a) => !a.locked && !a.partial).length
+  const readyEnough = comparableCount >= 4
 
   if (purpose === 'work') {
     return {
@@ -329,34 +440,32 @@ function buildArchetype(purpose: KemiPurpose, target: PublicProfile, axes: KemiA
 }
 
 function buildNotes(purpose: KemiPurpose, target: PublicProfile, axes: KemiAxisReport[]): { goodNote: string; watchNote: string } {
-  const unlocked = axes.filter((a) => !a.locked)
+  // 양쪽 다 있어야 진짜 "궁합"을 말할 수 있음 — locked(뷰어 미입력)·partial(상대 없음/비공개)은 제외
+  const comparable = axes.filter((a) => !a.locked && !a.partial)
   const purposeWord = purpose === 'work' ? '함께 일할 때' : '친구로 지낼 때'
 
-  if (unlocked.length === 0) {
+  if (comparable.length === 0) {
     return {
-      goodNote: '아직 강하게 맞아떨어지는 축이 뚜렷하지 않아요. 프로필이 더 채워지면 구체적인 궁합을 볼 수 있어요.',
+      goodNote: `아직 ${target.name}님과 직접 비교할 수 있는 정보가 부족해요. 서로 프로필을 더 채우면 구체적인 궁합을 볼 수 있어요.`,
       watchNote: '지금은 판단할 근거 자체가 부족해서, 직접 만나보며 알아가는 게 가장 정확해요.',
     }
   }
 
-  const ranked = [...unlocked].sort((a, b) => b.strength - a.strength)
+  const ranked = [...comparable].sort((a, b) => b.strength - a.strength)
   const strongest = ranked.slice(0, 2)
-  const goodPool = ranked.filter((a) => a.goodPoints.length > 0)
   const watchPool = [...ranked].reverse().filter((a) => a.watchPoints.length > 0)
   const weakest = (watchPool.length > 2 ? watchPool.slice(0, 2) : watchPool)
 
   const goodLabels = strongest.map((a) => a.label).join('·')
   const goodDetail = strongest
-    .map((a) => goodPool.find((g) => g.id === a.id)?.goodPoints[0])
+    .map((a) => a.goodPoints[0])
     .filter((text): text is string => !!text)
     .join(' ')
   const goodTail = purpose === 'work'
     ? '따로 애쓰지 않아도 자연스럽게 시너지가 나는 조합이에요.'
     : '무리하지 않아도 편하게 가까워지는 조합이에요.'
 
-  const goodNote = strongest.length > 0
-    ? `${purposeWord} 특히 ${goodLabels} 쪽에서 궁합이 강하게 맞아떨어져요. ${goodDetail} ${target.name}님과는 ${goodTail}`
-    : '아직 강하게 맞아떨어지는 축이 뚜렷하지 않아요.'
+  const goodNote = `${purposeWord} 특히 ${goodLabels} 쪽에서 궁합이 강하게 맞아떨어져요. ${goodDetail} ${target.name}님과는 ${goodTail}`
 
   const watchLabels = weakest.map((a) => a.label).join('·')
   const watchDetail = weakest
@@ -374,16 +483,11 @@ function buildNotes(purpose: KemiPurpose, target: PublicProfile, axes: KemiAxisR
   return { goodNote, watchNote }
 }
 
-export function buildKemiReport(purpose: KemiPurpose, viewer: KemiViewer, target: PublicProfile): KemiReport | null {
-  // whoIAm(MBTI)이 아예 없으면 어떤 축도 근거를 만들 수 없어 리포트 자체를 생성하지 않는다.
-  if (!target.whoIAm) return null
-
-  const viewerWhoIAm: PublicProfileWhoIAm = viewer.whoIAm ?? { mbti: 'ENFP' }
-
+export function buildKemiReport(purpose: KemiPurpose, viewer: KemiViewer, target: PublicProfile): KemiReport {
   const axes: KemiAxisReport[] = [
-    buildCareerAxis(purpose, viewer.title, target),
+    buildCareerAxis(purpose, viewer, target),
     buildReputationAxis(purpose, target),
-    buildPersonalityAxis(purpose, viewerWhoIAm, target),
+    buildPersonalityAxis(purpose, viewer.whoIAm, target),
     buildLifeAxis(purpose, viewer.life, target),
     buildTasteAxis(purpose, viewer.life, target),
   ]

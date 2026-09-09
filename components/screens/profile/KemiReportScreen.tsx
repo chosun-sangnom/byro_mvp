@@ -28,11 +28,28 @@ import type { KemiAxisReport, KemiPurpose } from '@/types'
 
 const HAIRLINE = '#DEE4EC'
 
+// 히어로·레이더·항목 등장 애니메이션 키프레임 (스코프용 접두사 kemi-)
+const KEMI_ANIM_CSS = `
+@keyframes kemiCrossL { from { opacity: 0; transform: translateX(34px) scale(.72) } to { opacity: 1; transform: translateX(0) scale(1) } }
+@keyframes kemiCrossR { from { opacity: 0; transform: translateX(-34px) scale(.72) } to { opacity: 1; transform: translateX(0) scale(1) } }
+@keyframes kemiPop { from { opacity: 0; transform: scale(.6) } to { opacity: 1; transform: scale(1) } }
+@keyframes kemiFadeUp { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: translateY(0) } }
+@media (prefers-reduced-motion: reduce) {
+  [data-kemi-anim] { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+`
+
 // ── 오각형 레이더 차트 ───────────────────────────────────────────────────
 function KemiRadar({ axes, score }: { axes: KemiAxisReport[]; score: number }) {
   const cx = 120
   const cy = 112
   const maxR = 78
+
+  const [filled, setFilled] = useState(false)
+  useEffect(() => {
+    const t = setTimeout(() => setFilled(true), 160)
+    return () => clearTimeout(t)
+  }, [])
 
   const angleFor = (i: number) => (360 / axes.length) * i - 90
   const point = (i: number, r: number) => {
@@ -42,6 +59,7 @@ function KemiRadar({ axes, score }: { axes: KemiAxisReport[]; score: number }) {
 
   const ringPoints = (r: number) => axes.map((_, i) => point(i, r)).map((p) => `${p.x},${p.y}`).join(' ')
   const areaPoints = axes.map((a, i) => point(i, (Math.max(a.strength, 4) / 100) * maxR)).map((p) => `${p.x},${p.y}`).join(' ')
+  const centerOrigin = { transformOrigin: `${cx}px ${cy}px` } as const
 
   return (
     <svg viewBox="0 0 240 224" role="img" aria-label="다섯 축 케미 레이더" className="mx-auto w-full max-w-[220px]">
@@ -52,10 +70,37 @@ function KemiRadar({ axes, score }: { axes: KemiAxisReport[]; score: number }) {
         const p = point(i, maxR)
         return <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke={HAIRLINE} strokeWidth={1} />
       })}
-      <polygon points={areaPoints} fill="var(--color-accent-dark)" fillOpacity={0.16} stroke="var(--color-accent-dark)" strokeWidth={2} strokeLinejoin="round" />
+      <polygon
+        points={areaPoints}
+        fill="var(--color-accent-dark)"
+        fillOpacity={0.16}
+        stroke="var(--color-accent-dark)"
+        strokeWidth={2}
+        strokeLinejoin="round"
+        style={{
+          ...centerOrigin,
+          transform: filled ? 'scale(1)' : 'scale(0.02)',
+          opacity: filled ? 1 : 0,
+          transition: 'transform 0.85s cubic-bezier(0.34,1.4,0.5,1), opacity 0.5s ease',
+        }}
+      />
       {axes.map((a, i) => {
         const p = point(i, (Math.max(a.strength, 4) / 100) * maxR)
-        return <circle key={i} cx={p.x} cy={p.y} r={2.6} fill="var(--color-accent-dark)" />
+        return (
+          <circle
+            key={i}
+            cx={p.x}
+            cy={p.y}
+            r={2.6}
+            fill="var(--color-accent-dark)"
+            style={{
+              ...centerOrigin,
+              transform: filled ? 'scale(1)' : 'scale(0)',
+              opacity: filled ? 1 : 0,
+              transition: `transform 0.55s cubic-bezier(0.34,1.56,0.64,1) ${0.2 + i * 0.05}s, opacity 0.3s ease ${0.2 + i * 0.05}s`,
+            }}
+          />
+        )
       })}
       {axes.map((a, i) => {
         const p = point(i, maxR + 18)
@@ -318,6 +363,7 @@ export default function KemiReportScreen({ username }: { username: string }) {
 
   return (
     <div className="flex h-full flex-col bg-white">
+      <style>{KEMI_ANIM_CSS}</style>
       {/* 헤더 */}
       <div className="flex h-12 flex-shrink-0 items-center justify-between border-b px-2" style={{ borderColor: HAIRLINE }}>
         <button onClick={() => router.back()} className="flex items-center p-2" style={{ color: '#0D0D0D' }}>
@@ -335,21 +381,37 @@ export default function KemiReportScreen({ username }: { username: string }) {
         >
           <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-white/80">Kemi Report</span>
           <div className="mt-3 flex items-start justify-center gap-4">
-            <div className="flex flex-col items-center gap-2.5">
+            <div
+              className="flex flex-col items-center gap-2.5"
+              data-kemi-anim
+              style={{ animation: 'kemiCrossL .55s cubic-bezier(.22,1,.36,1) both' }}
+            >
               <AvatarCircle src={viewerAvatar} name={viewerName} size={56} fontSize={20} />
               <span className="text-[12px] font-bold text-white">{viewerName}</span>
             </div>
-            <span className="mt-4 text-[18px] font-bold text-white/70">×</span>
-            <div className="flex flex-col items-center gap-2.5">
+            <span
+              className="mt-4 text-[18px] font-bold text-white/70"
+              data-kemi-anim
+              style={{ animation: 'kemiPop .4s ease .32s both' }}
+            >
+              ×
+            </span>
+            <div
+              className="flex flex-col items-center gap-2.5"
+              data-kemi-anim
+              style={{ animation: 'kemiCrossR .55s cubic-bezier(.22,1,.36,1) both' }}
+            >
               <AvatarCircle src={profileAvatar} name={profile.name} size={56} fontSize={20} />
               <span className="text-[12px] font-bold text-white">{profile.name}</span>
             </div>
           </div>
-          <h1 className="mt-4 text-[22px] font-bold tracking-[-0.02em] text-white">{archetype.name}</h1>
-          <p className="mt-1 text-[14px] font-medium text-white/90">{archetype.verdict}</p>
-          <span className="mt-3 inline-block rounded-full border border-white/30 bg-white/15 px-3 py-1 text-[12px] font-semibold text-white">
-            {archetype.grade}
-          </span>
+          <div data-kemi-anim style={{ animation: 'kemiFadeUp .5s ease .38s both' }}>
+            <h1 className="mt-4 text-[22px] font-bold tracking-[-0.02em] text-white">{archetype.name}</h1>
+            <p className="mt-1 text-[14px] font-medium text-white/90">{archetype.verdict}</p>
+            <span className="mt-3 inline-block rounded-full border border-white/30 bg-white/15 px-3 py-1 text-[12px] font-semibold text-white">
+              {archetype.grade}
+            </span>
+          </div>
         </div>
 
         {/* 목적 토글 */}
@@ -378,10 +440,15 @@ export default function KemiReportScreen({ username }: { username: string }) {
         <div className="px-5 pt-2">
           <p className="mb-2 text-[12px] font-bold uppercase tracking-[0.08em]" style={{ color: '#6C7786' }}>축별 상세 분석</p>
           <div className="flex flex-col gap-3">
-            {AXIS_ORDER.map((id) => {
+            {AXIS_ORDER.map((id, idx) => {
               const axis = report.axes.find((a) => a.id === id)!
               return (
-                <div key={id} className="relative overflow-hidden rounded-[16px] px-4 py-4" style={{ border: `0.66px solid ${HAIRLINE}` }}>
+                <div
+                  key={id}
+                  data-kemi-anim
+                  className="relative overflow-hidden rounded-[16px] px-4 py-4"
+                  style={{ border: `0.66px solid ${HAIRLINE}`, animation: `kemiFadeUp .45s ease ${0.15 + idx * 0.08}s both` }}
+                >
                   {/* 타이틀은 잠긴 축이어도 항상 노출 — 안의 분석 내용만 가린다 */}
                   <div className="mb-1.5 flex items-center gap-1.5">
                     <span className="text-[15px] font-bold" style={{ color: '#0D0D0D' }}>{axis.label}</span>
@@ -452,11 +519,19 @@ export default function KemiReportScreen({ username }: { username: string }) {
 
         {/* 종합 노트 */}
         <div className="flex flex-col gap-2 px-5 pt-4">
-          <div className="rounded-[16px] p-4" style={{ background: 'var(--color-bg-surface)' }}>
+          <div
+            data-kemi-anim
+            className="rounded-[16px] p-4"
+            style={{ background: 'var(--color-bg-surface)', animation: 'kemiFadeUp .45s ease .6s both' }}
+          >
             <p className="text-[13px] font-bold" style={{ color: '#0D0D0D' }}>잘 맞는 지점</p>
             <p className="mt-1 text-[13px] leading-[1.55]" style={{ color: '#475058' }}>{report.goodNote}</p>
           </div>
-          <div className="rounded-[16px] p-4" style={{ background: 'var(--color-bg-surface)' }}>
+          <div
+            data-kemi-anim
+            className="rounded-[16px] p-4"
+            style={{ background: 'var(--color-bg-surface)', animation: 'kemiFadeUp .45s ease .68s both' }}
+          >
             <p className="text-[13px] font-bold" style={{ color: '#0D0D0D' }}>조심할 지점</p>
             <p className="mt-1 text-[13px] leading-[1.55]" style={{ color: '#475058' }}>{report.watchNote}</p>
           </div>

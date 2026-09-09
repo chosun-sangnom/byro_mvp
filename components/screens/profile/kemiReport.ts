@@ -418,26 +418,39 @@ function buildTasteAxis(purpose: KemiPurpose, viewerLife: PublicProfileLife | un
   }
 }
 
+// 상단 요약 카드 — 비교 가능한 축의 매칭 강도를 한 문장으로 요약한다.
+// "정보가 부족하다" 같은 표현은 절대 쓰지 않는다. 항상 유형명 + 근거 + 결론으로.
 function buildArchetype(purpose: KemiPurpose, target: PublicProfile, axes: KemiAxisReport[]): KemiArchetype {
-  const comparableCount = axes.filter((a) => !a.locked && !a.partial).length
-  const readyEnough = comparableCount >= 4
+  const comparable = axes.filter((a) => !a.locked && !a.partial)
+  const ranked = [...comparable].sort((a, b) => b.strength - a.strength)
+  const avg = comparable.length
+    ? comparable.reduce((sum, a) => sum + a.strength, 0) / comparable.length
+    : 42
 
-  if (purpose === 'work') {
-    return {
-      name: readyEnough ? '상호보완형' : '탐색형',
-      verdict: readyEnough
-        ? `일로 만나면 ${target.name}님과 서로 빈 곳을 채워주는 조합이에요.`
-        : `아직 정보가 적어서 ${target.name}님과의 협업 궁합은 더 채워져야 뚜렷해져요.`,
-      grade: readyEnough ? '채워주는 사이' : '더 알아갈 사이',
-    }
-  }
+  const strongLabels = ranked.filter((a) => a.strength >= 35).slice(0, 2).map((a) => a.label)
+  const reason = strongLabels.length > 0
+    ? `${strongLabels.join('·')} 궁합이 잘 맞아서`
+    : purpose === 'work' ? '일하는 결이 통해서' : '지내는 결이 통해서'
+
+  const tiers = purpose === 'work'
+    ? [
+        { min: 66, name: '환상의 팀', grade: '최고의 궁합', tail: '함께 일하면 시너지가 크게 나요.' },
+        { min: 46, name: '손발 맞는 사이', grade: '좋은 궁합', tail: '조금만 맞추면 매끄럽게 굴러가요.' },
+        { min: 26, name: '보완하는 사이', grade: '무난한 궁합', tail: '방식이 달라 오히려 서로 빈 곳을 채워줘요.' },
+        { min: -1, name: '색다른 조합', grade: '알아갈수록 좋은 궁합', tail: '결이 다른 만큼 새로운 시야를 주고받아요.' },
+      ]
+    : [
+        { min: 66, name: '단짝형', grade: '최고의 궁합', tail: `${target.name}님과는 편하게 가까워질 수 있어요.` },
+        { min: 46, name: '잘 맞는 사이', grade: '좋은 궁합', tail: '무리하지 않아도 자연스럽게 어울려요.' },
+        { min: 26, name: '천천히 가까워지는 사이', grade: '무난한 궁합', tail: '몇 번 만나면 금방 편해지는 사이예요.' },
+        { min: -1, name: '색다른 매력', grade: '알아갈수록 좋은 궁합', tail: '취향과 리듬이 달라 알아가는 재미가 있어요.' },
+      ]
+  const tier = tiers.find((t) => avg >= t.min)!
 
   return {
-    name: readyEnough ? '편안한 동행형' : '탐색형',
-    verdict: readyEnough
-      ? `사적으로는 ${target.name}님과 무리하지 않고 편하게 어울릴 수 있는 사이예요.`
-      : `아직 정보가 적어서 ${target.name}님과 얼마나 편할지는 더 지켜봐야 해요.`,
-    grade: readyEnough ? '편한 사이' : '더 알아갈 사이',
+    name: tier.name,
+    verdict: `${reason} ${tier.tail}`,
+    grade: tier.grade,
   }
 }
 

@@ -259,40 +259,55 @@ function OwnerKemiReportSheet({
             const axis = axes.find((a) => a.id === id) as SelfKemiAxis
             return (
               <div key={id} className="relative overflow-hidden rounded-[16px] px-4 py-4" style={{ border: '0.66px solid #DEE4EC' }}>
-                <div style={axis.locked ? { filter: 'blur(6px)', userSelect: 'none' } : undefined}>
-                  <div className="mb-1.5 text-[15px] font-bold" style={{ color: '#0D0D0D' }}>{axis.label}</div>
-                  {axis.lead && (
-                    <p className="mb-3 text-[13px] leading-[1.55]" style={{ color: '#475058' }}>{axis.lead}</p>
-                  )}
-                  {axis.goodPoints.length > 0 && (
-                    <div className="mb-3">
+                {/* 타이틀은 잠긴 축이어도 항상 노출 — 안의 분석 내용만 가린다 */}
+                <div className="mb-1.5 text-[15px] font-bold" style={{ color: '#0D0D0D' }}>{axis.label}</div>
+
+                {axis.locked ? (
+                  <div className="relative">
+                    <div className="select-none" style={{ filter: 'blur(5px)' }} aria-hidden>
+                      <p className="mb-3 text-[13px] leading-[1.55]" style={{ color: '#475058' }}>
+                        성향 편집에서 이 정보를 채우면 통계적으로 내가 어떤 사람인지 이 축으로 읽어 드려요.
+                      </p>
                       <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>잘하는 것</p>
                       <div className="flex flex-col gap-1">
-                        {axis.goodPoints.map((text, i) => (
-                          <p key={i} className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· {text}</p>
-                        ))}
+                        <p className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· 이 유형이 보이는 강점이 여기에 표시돼요</p>
+                        <p className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· 통계로 본 나의 특징을 짚어 드려요</p>
                       </div>
                     </div>
-                  )}
-                  {axis.watchPoints.length > 0 && (
-                    <div>
-                      <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>조심할 것</p>
-                      <div className="flex flex-col gap-1">
-                        {axis.watchPoints.map((text, i) => (
-                          <p key={i} className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· {text}</p>
-                        ))}
-                      </div>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6" style={{ background: 'rgba(255,255,255,0.5)' }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src="/images/kemi/locked-alert.svg" alt="" className="size-8" />
+                      <p className="text-center text-[13px] font-semibold leading-[1.3]" style={{ color: '#0D0D0D' }}>
+                        {axis.missingItems.join(' · ')} 채우면 열려요
+                      </p>
                     </div>
-                  )}
-                </div>
-                {axis.locked && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/40 px-6">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/images/kemi/locked-alert.svg" alt="" className="size-8" />
-                    <p className="text-center text-[13px] font-semibold leading-[1.3]" style={{ color: '#0D0D0D' }}>
-                      {axis.missingItems.join(' · ')} 채우면 열려요
-                    </p>
                   </div>
+                ) : (
+                  <>
+                    {axis.lead && (
+                      <p className="mb-3 text-[13px] leading-[1.55]" style={{ color: '#475058' }}>{axis.lead}</p>
+                    )}
+                    {axis.goodPoints.length > 0 && (
+                      <div className="mb-3">
+                        <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>잘하는 것</p>
+                        <div className="flex flex-col gap-1">
+                          {axis.goodPoints.map((text, i) => (
+                            <p key={i} className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· {text}</p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {axis.watchPoints.length > 0 && (
+                      <div>
+                        <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>조심할 것</p>
+                        <div className="flex flex-col gap-1">
+                          {axis.watchPoints.map((text, i) => (
+                            <p key={i} className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· {text}</p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             )

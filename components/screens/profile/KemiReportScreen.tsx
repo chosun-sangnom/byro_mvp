@@ -398,52 +398,67 @@ export default function KemiReportScreen({ username }: { username: string }) {
               const axis = report.axes.find((a) => a.id === id)!
               return (
                 <div key={id} className="relative overflow-hidden rounded-[16px] px-4 py-4" style={{ border: `0.66px solid ${HAIRLINE}` }}>
-                  <div style={axis.locked ? { filter: 'blur(6px)', userSelect: 'none' } : undefined}>
-                    <div className="mb-1.5 flex items-center gap-1.5">
-                      <span className="text-[15px] font-bold" style={{ color: '#0D0D0D' }}>{axis.label}</span>
-                      {!axis.partial && (
-                        <span
-                          className="rounded-[4px] px-1.5 py-0.5 text-[10px] font-bold"
-                          style={axis.signalKind === 'same'
-                            ? { background: 'var(--color-accent-soft)', color: 'var(--color-accent-dark)' }
-                            : { background: '#FFF4E0', color: '#D95F00' }}
-                        >
-                          {axis.signalKind === 'same' ? '같음' : '보완'}
-                        </span>
-                      )}
-                    </div>
-                    {axis.lead && (
-                      <p className="mb-3 text-[13px] leading-[1.55]" style={{ color: '#475058' }}>{axis.lead}</p>
-                    )}
-                    {axis.goodPoints.length > 0 && (
-                      <div className="mb-3">
-                        <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>잘 맞는 점</p>
-                        <div className="flex flex-col gap-1">
-                          {axis.goodPoints.map((text, i) => (
-                            <p key={i} className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· {text}</p>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {axis.watchPoints.length > 0 && (
-                      <div>
-                        <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>보완이 필요한 점</p>
-                        <div className="flex flex-col gap-1">
-                          {axis.watchPoints.map((text, i) => (
-                            <p key={i} className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· {text}</p>
-                          ))}
-                        </div>
-                      </div>
+                  {/* 타이틀은 잠긴 축이어도 항상 노출 — 안의 분석 내용만 가린다 */}
+                  <div className="mb-1.5 flex items-center gap-1.5">
+                    <span className="text-[15px] font-bold" style={{ color: '#0D0D0D' }}>{axis.label}</span>
+                    {!axis.locked && !axis.partial && (
+                      <span
+                        className="rounded-[4px] px-1.5 py-0.5 text-[10px] font-bold"
+                        style={axis.signalKind === 'same'
+                          ? { background: 'var(--color-accent-soft)', color: 'var(--color-accent-dark)' }
+                          : { background: '#FFF4E0', color: '#D95F00' }}
+                      >
+                        {axis.signalKind === 'same' ? '같음' : '보완'}
+                      </span>
                     )}
                   </div>
-                  {axis.locked && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/40 px-6">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/images/kemi/locked-alert.svg" alt="" className="size-8" />
-                      <p className="text-center text-[13px] font-semibold leading-[1.3]" style={{ color: '#0D0D0D' }}>
-                        {axis.missingItems.join(' · ')} 채우면 열려요
-                      </p>
+
+                  {axis.locked ? (
+                    <div className="relative">
+                      <div className="select-none" style={{ filter: 'blur(5px)' }} aria-hidden>
+                        <p className="mb-3 text-[13px] leading-[1.55]" style={{ color: '#475058' }}>
+                          내 정보를 채우면 이 축에서 {profile.name}님과 얼마나 잘 맞는지, 어떤 점을 조심하면 좋을지 함께 정리해 드려요.
+                        </p>
+                        <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>잘 맞는 점</p>
+                        <div className="flex flex-col gap-1">
+                          <p className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· 두 사람의 공통점이 여기에 표시돼요</p>
+                          <p className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· 서로 잘 맞는 부분을 짚어 드려요</p>
+                        </div>
+                      </div>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6" style={{ background: 'rgba(255,255,255,0.5)' }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src="/images/kemi/locked-alert.svg" alt="" className="size-8" />
+                        <p className="text-center text-[13px] font-semibold leading-[1.3]" style={{ color: '#0D0D0D' }}>
+                          {axis.missingItems.join(' · ')} 채우면 열려요
+                        </p>
+                      </div>
                     </div>
+                  ) : (
+                    <>
+                      {axis.lead && (
+                        <p className="mb-3 text-[13px] leading-[1.55]" style={{ color: '#475058' }}>{axis.lead}</p>
+                      )}
+                      {axis.goodPoints.length > 0 && (
+                        <div className="mb-3">
+                          <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>잘 맞는 점</p>
+                          <div className="flex flex-col gap-1">
+                            {axis.goodPoints.map((text, i) => (
+                              <p key={i} className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· {text}</p>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                      {axis.watchPoints.length > 0 && (
+                        <div>
+                          <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>보완이 필요한 점</p>
+                          <div className="flex flex-col gap-1">
+                            {axis.watchPoints.map((text, i) => (
+                              <p key={i} className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· {text}</p>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               )

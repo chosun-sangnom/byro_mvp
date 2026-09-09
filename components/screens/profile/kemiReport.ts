@@ -19,6 +19,7 @@
  */
 
 import type {
+  Highlight,
   KemiArchetype,
   KemiAxisId,
   KemiAxisReport,
@@ -27,6 +28,7 @@ import type {
   PublicProfile,
   PublicProfileLife,
   PublicProfileWhoIAm,
+  ReputationKeyword,
 } from '@/types'
 import { getLifestyleSignals, getMbtiTraits, getTasteHook } from './profileAnalysis'
 
@@ -497,4 +499,225 @@ export function buildKemiReport(purpose: KemiPurpose, viewer: KemiViewer, target
     archetype: buildArchetype(purpose, target, axes),
     ...buildNotes(purpose, target, axes),
   }
+}
+
+// ── 내 케미리포트 (자기 분석, 5축) ───────────────────────────────────────────
+// 상대가 없는 "나 혼자" 리포트라 협업/관계 구분이 필요 없다 — 축마다 통계적으로
+// 이 유형(직군/MBTI/생활 패턴)이 보이는 경향을 잘하는 점/조심할 점으로 안내한다.
+
+export interface SelfKemiAxis {
+  id: KemiAxisId
+  label: string
+  lead: string
+  goodPoints: string[]
+  watchPoints: string[]
+  locked: boolean
+  missingItems: string[]
+}
+
+function selfLockedAxis(id: KemiAxisId, missingItems: string[]): SelfKemiAxis {
+  return { id, label: AXIS_META[id].label, lead: '', goodPoints: [], watchPoints: [], locked: true, missingItems }
+}
+
+interface CareerArchetype {
+  match: RegExp
+  label: string
+  good: string[]
+  watch: string[]
+}
+
+const CAREER_ARCHETYPES: CareerArchetype[] = [
+  {
+    match: /대표|창업|오너|CEO|공동창업/i,
+    label: '오너·창업자형',
+    good: ['전체 그림을 먼저 그리고 우선순위를 빠르게 정하는 편이에요.', '애매한 상황에서도 일단 결정하고 밀어붙이는 추진력이 강해요.'],
+    watch: ['세부 실행이나 반복 업무는 남에게 맡기고 싶어 하는 경향이 있어요.', '위임한 일도 기준에 안 맞으면 다시 손대고 싶어질 수 있어요.'],
+  },
+  {
+    match: /PM|프로덕트|기획|Product/i,
+    label: 'PM·기획형',
+    good: ['여러 팀 사이에서 우선순위를 조율하고 정리하는 데 강해요.', '데이터와 사용자 반응을 근거로 판단하는 습관이 있어요.'],
+    watch: ['모든 이해관계자를 만족시키려다 결정이 늦어질 때가 있어요.', '조율에 익숙해서 직접 실행은 손이 느려질 수 있어요.'],
+  },
+  {
+    match: /개발|엔지니어|Engineer|Developer/i,
+    label: '개발자형',
+    good: ['문제를 구조적으로 쪼개서 원인을 정확히 짚어내요.', '한번 정한 기준이나 규칙은 꾸준히 지키는 편이에요.'],
+    watch: ['설명보다 결과로 보여주려다 소통이 늦어질 때가 있어요.', '완성도에 집착해서 마감을 넘기기 쉬워요.'],
+  },
+  {
+    match: /마케팅|브랜드|Marketing|Brand/i,
+    label: '마케팅·브랜드형',
+    good: ['트렌드와 사람들의 반응을 빠르게 캐치해요.', '스토리로 설득하는 힘이 있어요.'],
+    watch: ['숫자보다 감으로 판단할 때가 있어 검증이 필요해요.', '여러 시도를 동시에 벌여서 힘이 분산될 수 있어요.'],
+  },
+  {
+    match: /세일즈|영업|사업개발|Sales|BD/i,
+    label: '세일즈·사업개발형',
+    good: ['사람 관계를 빠르게 트고 신뢰를 쌓는 데 능해요.', '거절에도 크게 흔들리지 않고 계속 시도해요.'],
+    watch: ['관계 유지에 에너지를 많이 써서 번아웃이 올 수 있어요.', '숫자를 빨리 만들려다 무리한 약속을 할 때가 있어요.'],
+  },
+  {
+    match: /투자|심사역|VC|파트너/i,
+    label: '투자·심사역형',
+    good: ['짧은 시간에 핵심을 파악하는 판단력이 좋아요.', '리스크를 냉정하게 따지는 편이에요.'],
+    watch: ['확신이 서기 전엔 거리를 두는 편이라 차갑게 보일 수 있어요.', '데이터 없는 결정은 잘 믿지 못하는 편이에요.'],
+  },
+  {
+    match: /디자이너|디자인|Design/i,
+    label: '디자이너형',
+    good: ['디테일과 완성도를 끝까지 챙기는 편이에요.', '사용자 입장에서 먼저 생각해요.'],
+    watch: ['피드백을 취향 지적처럼 느껴 예민해질 수 있어요.', '마음에 들 때까지 손봐서 일정이 늘어질 수 있어요.'],
+  },
+  {
+    match: /변호사|회계사|컨설턴트|컨설팅|Consultant/i,
+    label: '전문직·컨설팅형',
+    good: ['논리적으로 구조화해서 설명하는 힘이 강해요.', '기준과 원칙을 지키는 편이에요.'],
+    watch: ['원칙을 앞세우다 융통성이 부족하게 느껴질 수 있어요.', '완벽한 근거가 없으면 움직이지 않으려는 편이에요.'],
+  },
+  {
+    match: /크리에이터|콘텐츠|작가|Creator|유튜브/i,
+    label: '크리에이터·콘텐츠형',
+    good: ['자기만의 관점과 색깔이 뚜렷해요.', '꾸준히 뭔가를 만들어내는 실행력이 있어요.'],
+    watch: ['반응에 따라 감정 기복이 클 수 있어요.', '기분에 따라 일하는 편이라 예측이 어려울 수 있어요.'],
+  },
+]
+
+const DEFAULT_CAREER_ARCHETYPE: Omit<CareerArchetype, 'match'> = {
+  label: '전문가형',
+  good: ['자기 분야에서 쌓아온 노하우가 확실해요.', '맡은 일은 책임지고 끝까지 가져가는 편이에요.'],
+  watch: ['익숙한 방식을 고수하다 변화 적응이 늦을 수 있어요.', '전문 영역 밖 얘기에는 관심이 덜할 수 있어요.'],
+}
+
+function buildSelfCareerAxis(title: string, manualHighlights: Highlight[]): SelfKemiAxis {
+  const roleText = [
+    title,
+    ...manualHighlights.filter((h) => h.categoryId === 'career-role').map((h) => (h.metadata?.role as string) ?? h.subtitle),
+  ].join(' ').trim()
+
+  if (!roleText) return selfLockedAxis('career', ['활동명 직함 또는 하이라이트(경력)'])
+
+  const archetype = CAREER_ARCHETYPES.find((a) => a.match.test(roleText)) ?? DEFAULT_CAREER_ARCHETYPE
+
+  return {
+    id: 'career',
+    label: AXIS_META.career.label,
+    lead: `${title ? `${title}(으)로 활동 중인` : '지금 하는 일로 보면'} 당신은 ${archetype.label}에 가까워요. 통계적으로 이 유형은 이런 경향을 보여요.`,
+    goodPoints: archetype.good,
+    watchPoints: archetype.watch,
+    locked: false,
+    missingItems: [],
+  }
+}
+
+function buildSelfReputationAxis(keywords: ReputationKeyword[]): SelfKemiAxis {
+  if (keywords.length === 0) return selfLockedAxis('reputation', ['평판 키워드 1개 이상'])
+
+  const [top, second] = keywords
+
+  return {
+    id: 'reputation',
+    label: AXIS_META.reputation.label,
+    lead: `주변 사람들은 당신을 "${top.keyword}"로 가장 많이 기억해요${second ? `, "${second.keyword}"도 자주 나와요` : ''}.`,
+    goodPoints: [
+      `"${top.keyword}"라는 평판이 ${top.count}건 쌓여 있어서 처음 만나는 사람에게도 신뢰를 주는 편이에요.`,
+    ],
+    watchPoints: [
+      '평판은 보이는 모습 위주로 쌓이는 경우가 많아서, 실제 성향과는 다르게 비칠 수 있어요.',
+    ],
+    locked: false,
+    missingItems: [],
+  }
+}
+
+function buildSelfPersonalityAxis(whoIAm?: PublicProfileWhoIAm): SelfKemiAxis {
+  if (!whoIAm) return selfLockedAxis('personality', ['MBTI'])
+
+  const { mbti, extrovert, intuitive, thinking, judging } = getMbtiTraits(whoIAm.mbti)
+
+  return {
+    id: 'personality',
+    label: AXIS_META.personality.label,
+    lead: `${mbti} 성향은 통계적으로 이런 결을 보이는 경우가 많아요.${whoIAm.personality ? ` "${whoIAm.personality}"` : ''}`,
+    goodPoints: [
+      extrovert ? '사람을 만나며 에너지를 얻고, 먼저 다가가는 데 거리낌이 없어요.' : '혼자 생각을 정리하는 시간에서 좋은 판단이 나와요.',
+      thinking ? '기준이 분명해서 판단이 빠르고 냉정해요.' : '사람의 감정을 잘 읽고 배려해요.',
+    ],
+    watchPoints: [
+      intuitive ? '현실적인 디테일을 놓칠 때가 있어요.' : '새로운 시도 앞에서 조심스러워질 수 있어요.',
+      judging ? '계획이 틀어지면 스트레스를 크게 받아요.' : '마감이나 정리가 늘어질 때가 있어요.',
+    ],
+    locked: false,
+    missingItems: [],
+  }
+}
+
+function buildSelfLifeAxis(life?: PublicProfileLife): SelfKemiAxis {
+  const signals = getLifestyleSignals(life)
+  const hasPet = !!life?.daily.pets?.length
+
+  if (!signals.exercise && !signals.place && !hasPet) return selfLockedAxis('life', ['바이브(생활) 1개'])
+
+  const good: string[] = []
+  if (signals.exercise) good.push(`${signals.exercise}을(를) 꾸준히 챙기는 걸 보면 자기관리 습관이 몸에 밴 편이에요.`)
+  if (hasPet) good.push('반려동물을 챙기는 걸 보면 책임감과 애정이 깊은 편이에요.')
+  if (signals.place) good.push(`${signals.place} 같은 단골이 있는 걸 보면 익숙한 곳에서 안정감을 느끼는 편이에요.`)
+  if (good.length === 0) good.push('아직 드러난 루틴은 적지만, 그만큼 새로운 걸 시도하는 데 열려 있는 편일 수 있어요.')
+
+  return {
+    id: 'life',
+    label: AXIS_META.life.label,
+    lead: `일상을 보면 ${signals.exercise ?? signals.place ?? '자기만의 루틴'} 위주로 흘러가는 편이에요.`,
+    goodPoints: good.slice(0, 2),
+    watchPoints: [
+      signals.exercise || hasPet
+        ? '루틴이 한번 깨지면 다시 자리 잡기까지 시간이 걸릴 수 있어요.'
+        : '고정된 루틴이 적어서 생활이 불규칙해지기 쉬워요.',
+    ],
+    locked: false,
+    missingItems: [],
+  }
+}
+
+function buildSelfTasteAxis(life?: PublicProfileLife): SelfKemiAxis {
+  const hook = getTasteHook(life)
+  if (!hook) return selfLockedAxis('taste', ['바이브(취향) 1개'])
+
+  const genreCount = (['movies', 'music', 'books', 'plays'] as const)
+    .filter((key) => (life?.tastes[key]?.length ?? 0) > 0).length
+  const wide = genreCount >= 3
+
+  return {
+    id: 'taste',
+    label: AXIS_META.taste.label,
+    lead: `${hook} 같은 취향을 보면 ${wide ? '여러 장르를 폭넓게 즐기는' : '뚜렷하게 좋아하는 걸 깊이 파는'} 편이에요.`,
+    goodPoints: [
+      wide
+        ? '다양한 취향 덕분에 어떤 자리에서도 대화 소재가 마르지 않아요.'
+        : '좋아하는 걸 깊이 파고드는 만큼 그 분야에서는 할 얘기가 많아요.',
+    ],
+    watchPoints: [
+      wide
+        ? '취향이 넓은 만큼 정작 깊이 빠지는 하나를 찾기 어려울 수 있어요.'
+        : '취향이 좁으면 새로운 걸 권유받았을 때 거리감을 느낄 수 있어요.',
+    ],
+    locked: false,
+    missingItems: [],
+  }
+}
+
+export function buildSelfKemiAxes(input: {
+  title: string
+  whoIAm?: PublicProfileWhoIAm
+  life?: PublicProfileLife
+  manualHighlights: Highlight[]
+  reputationKeywords?: ReputationKeyword[]
+}): SelfKemiAxis[] {
+  return [
+    buildSelfCareerAxis(input.title, input.manualHighlights),
+    buildSelfReputationAxis(input.reputationKeywords ?? []),
+    buildSelfPersonalityAxis(input.whoIAm),
+    buildSelfLifeAxis(input.life),
+    buildSelfTasteAxis(input.life),
+  ]
 }

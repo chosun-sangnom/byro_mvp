@@ -21,11 +21,8 @@
 import { useState } from 'react'
 import { Sparkles } from 'lucide-react'
 import { BottomSheet } from '@/components/ui'
-import type { KemiData, PublicProfileLife, PublicProfileWhoIAm } from '@/types'
-import {
-  getLifestyleSignals,
-  getMbtiTraits,
-} from '@/components/screens/profile/profileAnalysis'
+import type { Highlight, KemiData, PublicProfileLife, PublicProfileWhoIAm, ReputationKeyword } from '@/types'
+import { AXIS_ORDER, buildSelfKemiAxes, type SelfKemiAxis } from '@/components/screens/profile/kemiReport'
 
 // TODO(AI): When real kemi endpoint is wired up, this component receives
 // viewer-relative match data. The aiCopy field should be replaced with a
@@ -165,54 +162,18 @@ export function PublicProfileKemiZone({
   )
 }
 
-type OwnerCompatibilitySummary = {
-  strengths: string[]
-  weaknesses: string[]
-  paragraphs: string[]
-}
-
-function buildOwnerCompatibilitySummary(
-  whoIAm: PublicProfileWhoIAm,
-  life: PublicProfileLife | undefined,
-): OwnerCompatibilitySummary {
-  const { extrovert, intuitive, thinking, judging } = getMbtiTraits(whoIAm.mbti)
-  const lifestyle = getLifestyleSignals(life)
-
-  const strengths = [
-    extrovert ? '친화력' : '차분한 관찰력',
-    intuitive ? '넓은 상상력' : '현실적인 감각',
-    thinking ? '명확한 판단력' : '따뜻한 공감력',
-    judging ? '꾸준한 실행력' : '유연한 대응력',
-    ...(lifestyle.activity ? ['활동적인 에너지'] : []),
-    ...(lifestyle.culture ? ['다채로운 취향'] : []),
-  ]
-
-  const weaknesses = [
-    extrovert ? '산만해지기 쉬움' : '거리감 있는 인상',
-    intuitive ? '현실 감각이 흐려짐' : '새로운 시도에 조심스러움',
-    thinking ? '차갑게 보일 때가 있음' : '판단이 감정에 흔들림',
-    judging ? '고집이 셀 때가 있음' : '마감이 늘어짐',
-  ]
-
-  const topicStyle = intuitive ? '맥락과 방향을 오래 이야기할 수 있는' : '생활 루틴과 현실 감각이 자연스럽게 맞는'
-  const decisionStyle = thinking ? '기준과 판단이 분명한' : '감정 표현과 배려가 자연스러운'
-  const paceStyle = extrovert ? '초반부터 대화가 자연스럽게 열리는' : '과한 텐션 없이 천천히 가까워지는'
-
-  const paragraphs = [
-    `당신은 ${extrovert ? '먼저 다가가는 편이라 관계를 여는 속도가 빠른' : '천천히 곁을 내주는 편이라 신뢰가 쌓이기까지 시간이 필요한'} 타입입니다. ${intuitive ? '맥락과 가능성을 오래 붙잡고 생각하는 편이라' : '눈앞의 현실과 루틴을 먼저 챙기는 편이라'} 대화가 깊어질수록 진짜 매력이 드러납니다.`,
-    `그래서 ${paceStyle} 사람, ${topicStyle} 사람과 특히 잘 맞습니다. ${decisionStyle} 태도를 가진 상대일수록 편하고, ${lifestyle.culture ? `${lifestyle.culture} 같은 취향이 겹치면` : '공통 취향이 하나만 보여도'} 관계가 빠르게 가까워집니다. ${judging ? '약속과 계획이 분명한 사람과 함께할 때 신뢰가 쌓여요.' : '유연하게 흐름을 타는 사람과 편하게 어울려요.'}`,
-    `다만 ${extrovert ? '반응이 느리거나 리듬이 자주 끊기면 흥미가 빨리 식을 수' : '처음부터 너무 가까워지려 하면 오히려 거리감이 남을 수'} 있으니 주의하세요. ${thinking ? '감정 신호가 없는 관계보다 솔직하게 표현하는 사람과 더 잘 맞고,' : '일방적인 논리나 비교 위주의 대화는 피로하게 느껴질 수 있고,'} ${lifestyle.place ? `${lifestyle.place} 같은 생활 반경이 겹치는 사람일수록` : '생활 반경이 겹치는 사람일수록'} 관계를 오래 이어가기 좋습니다.`,
-  ]
-
-  return { strengths, weaknesses, paragraphs }
-}
-
 export function PublicProfileOwnerMatchZone({
   whoIAm,
   life,
+  title,
+  manualHighlights,
+  reputationKeywords,
 }: {
   whoIAm?: PublicProfileWhoIAm
   life?: PublicProfileLife
+  title: string
+  manualHighlights: Highlight[]
+  reputationKeywords?: ReputationKeyword[]
 }) {
   const [reportOpen, setReportOpen] = useState(false)
 
@@ -230,7 +191,7 @@ export function PublicProfileOwnerMatchZone({
                 케미 리포트
               </span>
               <p className="mt-1 text-[13px] leading-[1.5] text-[#475058]">
-                라이프스타일을 바탕으로 내가 어떤 유형의 사람과 잘 맞는지 읽어줍니다.
+                커리어·평판·성격·생활·취향 5축으로 당신이 어떤 사람인지 읽어줍니다.
               </p>
               <button
                 type="button"
@@ -249,6 +210,9 @@ export function PublicProfileOwnerMatchZone({
         onClose={() => setReportOpen(false)}
         whoIAm={whoIAm}
         life={life}
+        title={title}
+        manualHighlights={manualHighlights}
+        reputationKeywords={reputationKeywords}
       />
     </>
   )
@@ -259,13 +223,19 @@ function OwnerKemiReportSheet({
   onClose,
   whoIAm,
   life,
+  title,
+  manualHighlights,
+  reputationKeywords,
 }: {
   open: boolean
   onClose: () => void
   whoIAm: PublicProfileWhoIAm
   life?: PublicProfileLife
+  title: string
+  manualHighlights: Highlight[]
+  reputationKeywords?: ReputationKeyword[]
 }) {
-  const report = buildOwnerCompatibilitySummary(whoIAm, life)
+  const axes = buildSelfKemiAxes({ title, whoIAm, life, manualHighlights, reputationKeywords })
 
   return (
     <BottomSheet open={open} onClose={onClose}>
@@ -277,35 +247,56 @@ function OwnerKemiReportSheet({
             <span className="text-[14px] font-bold text-black">케미 리포트</span>
           </div>
           <h3 className="text-[22px] font-bold tracking-[-0.03em]" style={{ color: '#0D0D0D' }}>
-            나와 잘 맞는 사람
+            나는 어떤 사람일까
           </h3>
           <p className="text-[16px] font-medium leading-[1.5]" style={{ color: '#475058' }}>
-            라이프스타일을 바탕으로 어떤 유형과 잘 연결되는지 읽어드려요.
+            커리어·평판·성격·생활·취향 5축으로 통계적인 성향을 읽어드려요.
           </p>
         </div>
 
         <div className="flex flex-col gap-3">
-          <div className="rounded-[16px] p-4 text-center" style={{ border: '0.66px solid #DEE4EC' }}>
-            <div className="text-[13px] font-bold" style={{ color: '#6C7786' }}>장점</div>
-            <p className="mt-1.5 text-[15px] font-semibold leading-[1.5]" style={{ color: '#0D0D0D' }}>
-              {report.strengths.join(', ')}
-            </p>
-          </div>
-
-          <div className="rounded-[16px] p-4 text-center" style={{ border: '0.66px solid #DEE4EC' }}>
-            <div className="text-[13px] font-bold" style={{ color: '#6C7786' }}>단점</div>
-            <p className="mt-1.5 text-[15px] font-semibold leading-[1.5]" style={{ color: '#0D0D0D' }}>
-              {report.weaknesses.join(', ')}
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-3 px-1 pt-1">
-            {report.paragraphs.map((p, i) => (
-              <p key={i} className="text-[14px] font-medium leading-[1.6]" style={{ color: '#25313D' }}>
-                {p}
-              </p>
-            ))}
-          </div>
+          {AXIS_ORDER.map((id) => {
+            const axis = axes.find((a) => a.id === id) as SelfKemiAxis
+            return (
+              <div key={id} className="relative overflow-hidden rounded-[16px] px-4 py-4" style={{ border: '0.66px solid #DEE4EC' }}>
+                <div style={axis.locked ? { filter: 'blur(6px)', userSelect: 'none' } : undefined}>
+                  <div className="mb-1.5 text-[15px] font-bold" style={{ color: '#0D0D0D' }}>{axis.label}</div>
+                  {axis.lead && (
+                    <p className="mb-3 text-[13px] leading-[1.55]" style={{ color: '#475058' }}>{axis.lead}</p>
+                  )}
+                  {axis.goodPoints.length > 0 && (
+                    <div className="mb-3">
+                      <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>잘하는 것</p>
+                      <div className="flex flex-col gap-1">
+                        {axis.goodPoints.map((text, i) => (
+                          <p key={i} className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· {text}</p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {axis.watchPoints.length > 0 && (
+                    <div>
+                      <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>조심할 것</p>
+                      <div className="flex flex-col gap-1">
+                        {axis.watchPoints.map((text, i) => (
+                          <p key={i} className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· {text}</p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {axis.locked && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-white/40 px-6">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/images/kemi/locked-alert.svg" alt="" className="size-8" />
+                    <p className="text-center text-[13px] font-semibold leading-[1.3]" style={{ color: '#0D0D0D' }}>
+                      {axis.missingItems.join(' · ')} 채우면 열려요
+                    </p>
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </div>
       </div>
     </BottomSheet>

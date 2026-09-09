@@ -131,7 +131,13 @@ export function PublicProfileShell({
         </div>
 
         {isOwnerMode ? (
-          <PublicProfileOwnerMatchZone whoIAm={profile.whoIAm} life={profile.life} />
+          <PublicProfileOwnerMatchZone
+            whoIAm={profile.whoIAm}
+            life={profile.life}
+            title={profile.title}
+            manualHighlights={profile.manualHighlights}
+            reputationKeywords={profile.reputationKeywords}
+          />
         ) : (
           <PublicProfileKemiZone
             kemi={profile.kemi}

@@ -328,6 +328,52 @@ function buildArchetype(purpose: KemiPurpose, target: PublicProfile, axes: KemiA
   }
 }
 
+function buildNotes(purpose: KemiPurpose, target: PublicProfile, axes: KemiAxisReport[]): { goodNote: string; watchNote: string } {
+  const unlocked = axes.filter((a) => !a.locked)
+  const purposeWord = purpose === 'work' ? '함께 일할 때' : '친구로 지낼 때'
+
+  if (unlocked.length === 0) {
+    return {
+      goodNote: '아직 강하게 맞아떨어지는 축이 뚜렷하지 않아요. 프로필이 더 채워지면 구체적인 궁합을 볼 수 있어요.',
+      watchNote: '지금은 판단할 근거 자체가 부족해서, 직접 만나보며 알아가는 게 가장 정확해요.',
+    }
+  }
+
+  const ranked = [...unlocked].sort((a, b) => b.strength - a.strength)
+  const strongest = ranked.slice(0, 2)
+  const goodPool = ranked.filter((a) => a.goodPoints.length > 0)
+  const watchPool = [...ranked].reverse().filter((a) => a.watchPoints.length > 0)
+  const weakest = (watchPool.length > 2 ? watchPool.slice(0, 2) : watchPool)
+
+  const goodLabels = strongest.map((a) => a.label).join('·')
+  const goodDetail = strongest
+    .map((a) => goodPool.find((g) => g.id === a.id)?.goodPoints[0])
+    .filter((text): text is string => !!text)
+    .join(' ')
+  const goodTail = purpose === 'work'
+    ? '따로 애쓰지 않아도 자연스럽게 시너지가 나는 조합이에요.'
+    : '무리하지 않아도 편하게 가까워지는 조합이에요.'
+
+  const goodNote = strongest.length > 0
+    ? `${purposeWord} 특히 ${goodLabels} 쪽에서 궁합이 강하게 맞아떨어져요. ${goodDetail} ${target.name}님과는 ${goodTail}`
+    : '아직 강하게 맞아떨어지는 축이 뚜렷하지 않아요.'
+
+  const watchLabels = weakest.map((a) => a.label).join('·')
+  const watchDetail = weakest
+    .map((a) => a.watchPoints[0])
+    .filter((text): text is string => !!text)
+    .join(' ')
+  const watchTail = purpose === 'work'
+    ? '서로 다른 방식을 미리 맞춰두면 오히려 협업의 강점이 될 수 있어요.'
+    : '천천히 알아가면서 서로의 속도에 맞추면 자연스럽게 풀려요.'
+
+  const watchNote = weakest.length > 0
+    ? `반면 ${watchLabels} 쪽은 결이 좀 달라요. ${watchDetail} 다만 이건 ${target.name}님의 흠이 아니라 이 조합만의 특성이에요 — ${watchTail}`
+    : `지금 확인된 축들은 대체로 잘 맞는 편이라 크게 조심할 지점은 없어요. 다만 어떤 관계든 ${watchTail}`
+
+  return { goodNote, watchNote }
+}
+
 export function buildKemiReport(purpose: KemiPurpose, viewer: KemiViewer, target: PublicProfile): KemiReport | null {
   // whoIAm(MBTI)이 아예 없으면 어떤 축도 근거를 만들 수 없어 리포트 자체를 생성하지 않는다.
   if (!target.whoIAm) return null
@@ -342,15 +388,9 @@ export function buildKemiReport(purpose: KemiPurpose, viewer: KemiViewer, target
     buildTasteAxis(purpose, viewer.life, target),
   ]
 
-  const unlocked = axes.filter((a) => !a.locked)
-  const strongest = [...unlocked].sort((a, b) => b.strength - a.strength).slice(0, 2)
-
   return {
     axes,
     archetype: buildArchetype(purpose, target, axes),
-    goodNote: strongest.length > 0
-      ? `${strongest.map((a) => a.label).join('·')}이(가) 강하게 맞아떨어지는 조합이에요.`
-      : '아직 강하게 맞아떨어지는 축은 뚜렷하지 않아요.',
-    watchNote: '서로 다른 영역은 알아가는 데 약간의 시간이 필요할 수 있어요 — 상대의 흠이 아니라 이 조합의 특성이에요.',
+    ...buildNotes(purpose, target, axes),
   }
 }

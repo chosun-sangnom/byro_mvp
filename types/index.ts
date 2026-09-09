@@ -163,6 +163,44 @@ export interface KemiData {
   missingItems: string[]
 }
 
+// ── 케미 리포트 (5축 재설계, 전용 페이지) ──────────────────────────────────
+// TODO(real API): 매칭 알고리즘·BE 없음 — components/screens/profile/kemiReport.ts의
+// 목업 규칙 기반 생성을 서버사이드 계산(또는 LLM)으로 교체
+export type KemiPurpose = 'work' | 'relationship'
+export type KemiAxisId = 'career' | 'reputation' | 'personality' | 'life' | 'taste'
+export type KemiSignalKind = 'same' | 'complement'
+
+export interface KemiSignalLine {
+  tone: 'good' | 'watch'
+  text: string
+}
+
+export interface KemiAxisReport {
+  id: KemiAxisId
+  label: string
+  question: string
+  signalKind: KemiSignalKind
+  strength: number // 0~100, 레이더용 매칭 강도 (목적 가중치와 무관)
+  lead: string
+  signals: KemiSignalLine[]
+  evidence: string
+  locked: boolean
+  missingItems: string[]
+}
+
+export interface KemiArchetype {
+  name: string
+  verdict: string
+  grade: string
+}
+
+export interface KemiReport {
+  axes: KemiAxisReport[] // 항상 career→reputation→personality→life→taste 순서 (레이더 각도 고정)
+  archetypeByPurpose: Record<KemiPurpose, KemiArchetype>
+  goodNote: string
+  watchNote: string
+}
+
 export interface Pet {
   id: string
   type: string

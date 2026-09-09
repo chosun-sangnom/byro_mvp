@@ -26,6 +26,7 @@
   /network                 → NETWORK 탭 (평판)
   /feedback                → 피드백 전체 보기
   /guestbook               → 방명록 전체 보기
+  /kemi-report             → 케미 리포트 (전용 페이지, 5축 궁합 — 구 바텀시트 대체)
 /virtual/[id]              가상 프로필 (미가입자)
 /archive                   아카이브 (저장됨 / 최근 본)
 /api/ai-search             AI 검색 API 라우트

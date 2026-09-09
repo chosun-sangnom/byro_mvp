@@ -23,7 +23,6 @@ import { ContactActionButton } from '@/components/screens/profile/PublicProfileS
 import { ProfileHeroSection } from '@/components/screens/profile/PublicProfileHeroSection'
 import { PublicProfileTabBar, type PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
 import { PublicProfileKemiZone, PublicProfileOwnerMatchZone } from '@/components/screens/profile/PublicProfileKemiZone'
-import { PublicProfileCompatibilitySheet } from '@/components/screens/profile/PublicProfileCompatibilitySheet'
 import { LoginModal } from '@/components/screens/profile/LoginModal'
 import { ExperienceBottomSheet, ExperienceDoneModal } from '@/components/screens/profile/PublicProfileOverlays'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
@@ -85,7 +84,6 @@ export function PublicProfileShell({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile.linkId])
 
-  const [compatibilityOpen, setCompatibilityOpen] = useState(false)
   const [feedbackRequestOpen, setFeedbackRequestOpen] = useState(false)
   const [feedbackMessage, setFeedbackMessage] = useState('')
   const [bookmarkSheetOpen, setBookmarkSheetOpen] = useState(false)
@@ -139,7 +137,7 @@ export function PublicProfileShell({
             kemi={profile.kemi}
             isLoggedIn={isLoggedIn}
             isLoading={kemiLoading}
-            onCompatibilityOpen={profile.kemi ? () => setCompatibilityOpen(true) : undefined}
+            onCompatibilityOpen={profile.kemi ? () => router.push(`/${username}/kemi-report`) : undefined}
             onLoginRequest={() => setLoginModalOpen(true)}
           />
         )}
@@ -271,18 +269,6 @@ export function PublicProfileShell({
             </div>
           </div>
         </BottomSheet>
-      )}
-
-      {!isOwnerMode && profile.kemi && (
-        <PublicProfileCompatibilitySheet
-          open={compatibilityOpen}
-          onClose={() => setCompatibilityOpen(false)}
-          profileName={profile.name}
-          profileAvatar={profile.profileImages?.[0] ?? profile.avatarImage}
-          whoIAm={profile.whoIAm}
-          life={profile.life}
-          kemi={profile.kemi}
-        />
       )}
 
       {!isOwnerMode && (

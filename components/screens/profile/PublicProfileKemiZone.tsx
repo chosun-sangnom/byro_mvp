@@ -23,6 +23,15 @@ import { Sparkles } from 'lucide-react'
 import { BottomSheet } from '@/components/ui'
 import type { Highlight, KemiData, PublicProfileLife, PublicProfileWhoIAm, ReputationKeyword } from '@/types'
 import { AXIS_ORDER, buildSelfKemiAxes, type SelfKemiAxis } from '@/components/screens/profile/kemiReport'
+import {
+  BODY,
+  INK,
+  KEMI_ANIM_CSS,
+  KemiAxisCard,
+  KemiLockedOverlay,
+  MUTED,
+  PointGroup,
+} from '@/components/screens/profile/kemiReportUi'
 
 // TODO(AI): When real kemi endpoint is wired up, this component receives
 // viewer-relative match data. The aiCopy field should be replaced with a
@@ -53,7 +62,7 @@ export function PublicProfileKemiZone({
   if (isLoading) {
     return (
       <div className="px-5 pb-3">
-        <div className="rounded-[16px] p-4" style={cardBorderStyle}>
+        <div className="rounded-[20px] p-4" style={cardBorderStyle}>
           <div className="mb-3 flex items-center gap-1.5">
             <Sparkles size={13} style={{ color: 'var(--color-accent-dark)' }} className="animate-pulse" />
             <span className="text-[13px] font-bold animate-pulse text-[#0D0D0D]">케미 분석 중...</span>
@@ -79,7 +88,7 @@ export function PublicProfileKemiZone({
   return (
     <div className="px-5 pb-3 space-y-3">
       {/* 케미(공통점) — 케미 리포트와 별개 카드로 분리 노출 */}
-      <div className="rounded-[16px] p-4" style={cardBorderStyle}>
+      <div className="rounded-[20px] p-4" style={cardBorderStyle}>
         <div className="mb-3 flex items-center gap-1.5">
           <Sparkles size={13} style={{ color: 'var(--color-accent-dark)' }} />
           <span className="text-[13px] font-bold text-[#0D0D0D]">
@@ -138,7 +147,7 @@ export function PublicProfileKemiZone({
 
       {/* 케미 리포트 CTA — 내 펠로어(WHO 탭)와 동일한 카드 디자인 */}
       {isLoggedIn && (
-        <div className="rounded-[16px] p-4" style={cardBorderStyle}>
+        <div className="rounded-[20px] p-4" style={cardBorderStyle}>
           <div className="flex items-start gap-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/kemi-report-icon.svg" alt="" className="size-[40px] shrink-0" />
@@ -191,7 +200,7 @@ export function PublicProfileOwnerMatchZone({
                 케미 리포트
               </span>
               <p className="mt-1 text-[13px] leading-[1.5] text-[#475058]">
-                커리어·평판·성격·생활·취향 5축으로 내가 어떤 사람과 잘 맞는지 읽어줍니다.
+                커리어·평판·성격·생활·취향 다섯 항목으로 내가 어떤 사람과 잘 맞는지 읽어줍니다.
               </p>
               <button
                 type="button"
@@ -239,76 +248,61 @@ function OwnerKemiReportSheet({
 
   return (
     <BottomSheet open={open} onClose={onClose}>
-      <div className="px-4 pb-6">
-        <div className="mb-6 flex flex-col gap-2">
-          <div className="flex items-center gap-1">
+      <style>{KEMI_ANIM_CSS}</style>
+      <div className="px-4 pb-6" data-kemi-report>
+        <div className="mb-5 flex flex-col gap-1.5">
+          <div className="flex items-center gap-1.5">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/images/kemi/report-badge-icon.svg" alt="" className="size-5" />
-            <span className="text-[14px] font-bold text-black">케미 리포트</span>
+            <img src="/images/kemi/report-badge-icon.svg" alt="" className="size-[18px]" />
+            <span className="text-[12px] font-bold uppercase tracking-[0.08em]" style={{ color: MUTED }}>Kemi Report</span>
           </div>
-          <h3 className="text-[22px] font-bold tracking-[-0.03em]" style={{ color: '#0D0D0D' }}>
+          <h3 className="text-[23px] font-bold leading-[1.3] tracking-[-0.03em]" style={{ color: INK }}>
             나와 잘 맞는 사람
           </h3>
-          <p className="text-[16px] font-medium leading-[1.5]" style={{ color: '#475058' }}>
-            커리어·평판·성격·생활·취향 5축으로 내가 어떤 사람과 잘 어울리는지 읽어드려요.
+          <p className="text-[14px] font-medium leading-[1.6]" style={{ color: BODY }}>
+            커리어·평판·성격·생활·취향 다섯 항목으로 내가 어떤 사람과 잘 어울리는지 읽어드려요.
           </p>
         </div>
 
-        <div className="flex flex-col gap-3">
-          {AXIS_ORDER.map((id) => {
+        <div className="flex flex-col gap-2.5">
+          {AXIS_ORDER.map((id, idx) => {
             const axis = axes.find((a) => a.id === id) as SelfKemiAxis
             return (
-              <div key={id} className="relative overflow-hidden rounded-[16px] px-4 py-4" style={{ border: '0.66px solid #DEE4EC' }}>
-                {/* 타이틀은 잠긴 축이어도 항상 노출 — 안의 분석 내용만 가린다 */}
-                <div className="mb-1.5 text-[15px] font-bold" style={{ color: '#0D0D0D' }}>{axis.label}</div>
+              <div key={id} data-kemi-anim style={{ animation: `kemiFadeUp .4s ease ${idx * 0.06}s both` }}>
+                <KemiAxisCard>
+                  {/* 타이틀은 잠긴 항목이어도 항상 노출 — 안의 분석 내용만 가린다 */}
+                  <div className="mb-2 text-[15.5px] font-bold tracking-[-0.02em]" style={{ color: INK }}>{axis.label}</div>
 
-                {axis.locked ? (
-                  <div className="relative">
-                    <div className="select-none" style={{ filter: 'blur(5px)' }} aria-hidden>
-                      <p className="mb-3 text-[13px] leading-[1.55]" style={{ color: '#475058' }}>
-                        내 정보를 채우면 이 축에서 어떤 사람과 잘 맞는지 통계로 읽어 드려요.
-                      </p>
-                      <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>이런 사람과 잘 맞아요</p>
-                      <div className="flex flex-col gap-1">
-                        <p className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· 나와 결이 맞는 사람의 특징이 여기 표시돼요</p>
-                        <p className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· 서로 부족한 면을 채워주는 유형을 짚어 드려요</p>
+                  {axis.locked ? (
+                    <div className="relative">
+                      <div className="select-none" style={{ filter: 'blur(5px)' }} aria-hidden>
+                        <p className="mb-3.5 text-[13.5px] leading-[1.65]" style={{ color: BODY }}>
+                          내 정보를 채우면 이 항목에서 어떤 사람과 잘 맞는지 통계로 읽어 드려요.
+                        </p>
+                        <PointGroup
+                          tone="good"
+                          title="이런 사람과 잘 맞아요"
+                          items={['나와 결이 맞는 사람의 특징이 여기 표시돼요', '서로 부족한 면을 채워주는 유형을 짚어 드려요']}
+                        />
                       </div>
+                      <KemiLockedOverlay missingItems={axis.missingItems} />
                     </div>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6" style={{ background: 'rgba(255,255,255,0.5)' }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/images/kemi/locked-alert.svg" alt="" className="size-8" />
-                      <p className="text-center text-[13px] font-semibold leading-[1.3]" style={{ color: '#0D0D0D' }}>
-                        {axis.missingItems.join(' · ')} 채우면 열려요
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    {axis.lead && (
-                      <p className="mb-3 text-[13px] leading-[1.55]" style={{ color: '#475058' }}>{axis.lead}</p>
-                    )}
-                    {axis.matchWith.length > 0 && (
-                      <div className="mb-3">
-                        <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>이런 사람과 잘 맞아요</p>
-                        <div className="flex flex-col gap-1">
-                          {axis.matchWith.map((text, i) => (
-                            <p key={i} className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· {text}</p>
-                          ))}
-                        </div>
+                  ) : (
+                    <>
+                      {axis.lead && (
+                        <p className="mb-3.5 text-[13.5px] leading-[1.65]" style={{ color: BODY }}>{axis.lead}</p>
+                      )}
+                      <div className="flex flex-col gap-3.5">
+                        {axis.matchWith.length > 0 && (
+                          <PointGroup tone="good" title="이런 사람과 잘 맞아요" items={axis.matchWith} />
+                        )}
+                        {axis.clashWith.length > 0 && (
+                          <PointGroup tone="watch" title="이런 사람과는 조심하세요" items={axis.clashWith} />
+                        )}
                       </div>
-                    )}
-                    {axis.clashWith.length > 0 && (
-                      <div>
-                        <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>이런 사람과는 조심하세요</p>
-                        <div className="flex flex-col gap-1">
-                          {axis.clashWith.map((text, i) => (
-                            <p key={i} className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· {text}</p>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
+                    </>
+                  )}
+                </KemiAxisCard>
               </div>
             )
           })}

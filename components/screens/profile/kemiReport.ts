@@ -165,7 +165,7 @@ function buildReputationAxis(purpose: KemiPurpose, target: PublicProfile): KemiA
       ? `${target.name}님이 평판 정보를 비공개로 설정해둬서 분석하지 못했어요.`
       : `아직 ${target.name}님에 대한 평판이 쌓이지 않아서 분석하지 못했어요.`
     return partialAxis('reputation', reason,
-      `${reasonText} 평판은 상대적인 축이라 지금은 미리 비교할 수 없지만, 실제로 만나보면서 서로에 대한 인상을 직접 쌓아가면 돼요.`,
+      `${reasonText} 평판은 상대적인 항목이라 지금은 미리 비교할 수 없지만, 실제로 만나보면서 서로에 대한 인상을 직접 쌓아가면 돼요.`,
       [])
   }
 

@@ -26,18 +26,20 @@ import {
 } from '@/components/screens/profile/kemiReport'
 import type { KemiAxisReport, KemiPurpose } from '@/types'
 
-const HAIRLINE = '#DEE4EC'
-
-// 히어로·레이더·항목 등장 애니메이션 키프레임 (스코프용 접두사 kemi-)
-const KEMI_ANIM_CSS = `
-@keyframes kemiCrossL { from { opacity: 0; transform: translateX(34px) scale(.72) } to { opacity: 1; transform: translateX(0) scale(1) } }
-@keyframes kemiCrossR { from { opacity: 0; transform: translateX(-34px) scale(.72) } to { opacity: 1; transform: translateX(0) scale(1) } }
-@keyframes kemiPop { from { opacity: 0; transform: scale(.6) } to { opacity: 1; transform: scale(1) } }
-@keyframes kemiFadeUp { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: translateY(0) } }
-@media (prefers-reduced-motion: reduce) {
-  [data-kemi-anim] { animation: none !important; opacity: 1 !important; transform: none !important; }
-}
-`
+import {
+  ACCENT,
+  BODY,
+  FAINT,
+  HAIRLINE,
+  HERO_GRADIENT,
+  INK,
+  KEMI_ANIM_CSS,
+  KemiAxisCard,
+  KemiLockedOverlay,
+  MUTED,
+  PointGroup,
+  WARN,
+} from '@/components/screens/profile/kemiReportUi'
 
 // ── 오각형 레이더 차트 ───────────────────────────────────────────────────
 function KemiRadar({ axes, score }: { axes: KemiAxisReport[]; score: number }) {
@@ -58,24 +60,46 @@ function KemiRadar({ axes, score }: { axes: KemiAxisReport[]; score: number }) {
   }
 
   const ringPoints = (r: number) => axes.map((_, i) => point(i, r)).map((p) => `${p.x},${p.y}`).join(' ')
-  const areaPoints = axes.map((a, i) => point(i, (Math.max(a.strength, 4) / 100) * maxR)).map((p) => `${p.x},${p.y}`).join(' ')
+  const valueR = (a: KemiAxisReport) => (Math.max(a.strength, 4) / 100) * maxR
+  const areaPoints = axes.map((a, i) => point(i, valueR(a))).map((p) => `${p.x},${p.y}`).join(' ')
   const centerOrigin = { transformOrigin: `${cx}px ${cy}px` } as const
 
   return (
-    <svg viewBox="0 0 240 224" role="img" aria-label="다섯 축 케미 레이더" className="mx-auto w-full max-w-[220px]">
-      {[1 / 3, 2 / 3, 1].map((f) => (
-        <polygon key={f} points={ringPoints(maxR * f)} fill="none" stroke={HAIRLINE} strokeWidth={1} />
+    <svg viewBox="0 0 240 224" role="img" aria-label="다섯 항목 케미 레이더" className="mx-auto w-full max-w-[248px]">
+      <defs>
+        <linearGradient id="kemiRadarFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor={ACCENT} stopOpacity={0.26} />
+          <stop offset="100%" stopColor={ACCENT} stopOpacity={0.08} />
+        </linearGradient>
+        <radialGradient id="kemiRadarBed" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="#F5F6F7" stopOpacity={0.9} />
+          <stop offset="100%" stopColor="#F5F6F7" stopOpacity={0} />
+        </radialGradient>
+      </defs>
+
+      {/* 배경 — 그리드가 허공에 떠 보이지 않게 아주 옅은 바닥을 깐다 */}
+      <circle cx={cx} cy={cy} r={maxR + 4} fill="url(#kemiRadarBed)" />
+
+      {[0.25, 0.5, 0.75, 1].map((f) => (
+        <polygon
+          key={f}
+          points={ringPoints(maxR * f)}
+          fill="none"
+          stroke={HAIRLINE}
+          strokeWidth={f === 1 ? 1.2 : 1}
+          strokeOpacity={f === 1 ? 1 : 0.7}
+        />
       ))}
       {axes.map((_, i) => {
         const p = point(i, maxR)
-        return <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke={HAIRLINE} strokeWidth={1} />
+        return <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke={HAIRLINE} strokeWidth={1} strokeOpacity={0.8} />
       })}
+
       <polygon
         points={areaPoints}
-        fill="var(--color-accent-dark)"
-        fillOpacity={0.16}
-        stroke="var(--color-accent-dark)"
-        strokeWidth={2}
+        fill="url(#kemiRadarFill)"
+        stroke={ACCENT}
+        strokeWidth={2.2}
         strokeLinejoin="round"
         style={{
           ...centerOrigin,
@@ -85,14 +109,18 @@ function KemiRadar({ axes, score }: { axes: KemiAxisReport[]; score: number }) {
         }}
       />
       {axes.map((a, i) => {
-        const p = point(i, (Math.max(a.strength, 4) / 100) * maxR)
+        const p = point(i, valueR(a))
+        // 데이터가 없는 항목(잠김·부분)은 "0점"이 아니라 "없음"으로 읽히게 옅은 점으로
+        const noData = a.locked || a.partial
         return (
           <circle
             key={i}
             cx={p.x}
             cy={p.y}
-            r={2.6}
-            fill="var(--color-accent-dark)"
+            r={noData ? 2.6 : 3.4}
+            fill={noData ? FAINT : ACCENT}
+            stroke="#fff"
+            strokeWidth={1.5}
             style={{
               ...centerOrigin,
               transform: filled ? 'scale(1)' : 'scale(0)',
@@ -103,7 +131,7 @@ function KemiRadar({ axes, score }: { axes: KemiAxisReport[]; score: number }) {
         )
       })}
       {axes.map((a, i) => {
-        const p = point(i, maxR + 18)
+        const p = point(i, maxR + 19)
         const anchor = Math.abs(p.x - cx) < 4 ? 'middle' : p.x > cx ? 'start' : 'end'
         return (
           <text
@@ -112,41 +140,62 @@ function KemiRadar({ axes, score }: { axes: KemiAxisReport[]; score: number }) {
             y={p.y}
             textAnchor={anchor}
             dominantBaseline="middle"
-            fontSize={11}
+            fontSize={11.5}
             fontWeight={700}
-            fill={a.locked ? '#A8B1BD' : '#475058'}
+            letterSpacing="-0.01em"
+            fill={a.locked ? FAINT : BODY}
           >
             {a.label}
           </text>
         )
       })}
-      <circle cx={cx} cy={cy} r={27} fill="#fff" stroke={HAIRLINE} strokeWidth={1} />
-      <text x={cx} y={cy - 2} textAnchor="middle" fontSize={22} fontWeight={800} fill="#0D0D0D">{score}</text>
-      <text x={cx} y={cy + 14} textAnchor="middle" fontSize={8} fontWeight={700} letterSpacing="0.05em" fill="#6C7786">케미 점수</text>
+
+      {/* 중앙 점수 — 폴리곤 위에 흰 원으로 얹어 항상 읽히게 한다 */}
+      <circle cx={cx} cy={cy} r={30} fill="#fff" />
+      <circle cx={cx} cy={cy} r={30} fill="none" stroke={HAIRLINE} strokeWidth={1} />
+      <text x={cx} y={cy - 1} textAnchor="middle" fontSize={25} fontWeight={800} letterSpacing="-0.03em" fill={INK}>{score}</text>
+      <text x={cx} y={cy + 15} textAnchor="middle" fontSize={8.5} fontWeight={700} letterSpacing="0.06em" fill={MUTED}>케미 점수</text>
     </svg>
   )
 }
 
 // ── 공유 카드 (html2canvas 캡처 + 미리보기 겸용) ────────────────────────────
-function AvatarCircle({ src, name, size, fontSize }: { src?: string; name: string; size: number; fontSize: number }) {
+function AvatarCircle({
+  src,
+  name,
+  size,
+  fontSize,
+  ring,
+}: {
+  src?: string
+  name: string
+  size: number
+  fontSize: number
+  /** 히어로처럼 컬러 배경 위에 올릴 때 — 흰 링 + 그림자로 아바타를 띄운다 */
+  ring?: boolean
+}) {
+  const shell = ring
+    ? { border: '2.5px solid rgba(255,255,255,0.92)', boxShadow: '0 6px 18px rgba(9, 34, 82, 0.28)' }
+    : { border: '0.66px solid rgba(255,255,255,0.85)' }
+
   if (src) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={src}
         alt={name}
-        style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', border: '0.66px solid rgba(255,255,255,0.85)', flexShrink: 0 }}
+        style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, ...shell }}
       />
     )
   }
   return (
     <div style={{
       width: size, height: size, borderRadius: '50%',
-      background: 'linear-gradient(135deg, #BFDBFE, #2563EB)',
+      background: 'linear-gradient(150deg, #DCEBFF 0%, #9CC6FF 45%, #4E8BE8 100%)',
       display: 'flex', alignItems: 'center', justifyContent: 'center',
-      border: '0.66px solid rgba(255,255,255,0.85)', flexShrink: 0,
+      flexShrink: 0, ...shell,
     }}>
-      <span style={{ fontSize, fontWeight: 900, color: '#fff', lineHeight: 1 }}>{name.charAt(0)}</span>
+      <span style={{ fontSize, fontWeight: 800, color: '#fff', lineHeight: 1, letterSpacing: '-0.02em' }}>{name.charAt(0)}</span>
     </div>
   )
 }
@@ -184,7 +233,7 @@ function ShareCard({
     >
       <div style={{
         position: 'relative',
-        background: 'radial-gradient(circle at 28% 8%, #73B9FF 0%, #57ABFF 22%, #3A9DFF 38%, #1D8EFF 52%, #0E87FF 62%, #0080FF 72%, #0657FF 100%)',
+        background: HERO_GRADIENT,
         padding: '24px',
       }}>
         <div style={{
@@ -219,7 +268,7 @@ function ShareCard({
         </div>
         {tags.length > 0 && (
           <div>
-            <p style={{ fontSize: '12px', fontWeight: 700, color: '#6C7786', marginBottom: '12px' }}>강한 축</p>
+            <p style={{ fontSize: '12px', fontWeight: 700, color: MUTED, marginBottom: '12px' }}>강한 항목</p>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
               {tags.map((tag) => (
                 <span key={tag} style={{ background: '#F0F5FF', color: '#25313D', borderRadius: '8px', padding: '6px 10px', fontSize: '14px', fontWeight: 700 }}>
@@ -373,91 +422,117 @@ export default function KemiReportScreen({ username }: { username: string }) {
         <div className="w-9" />
       </div>
 
-      <div className="flex-1 overflow-y-auto">
-        {/* 히어로 */}
-        <div
-          className="px-6 pb-7 pt-6 text-center"
-          style={{ background: 'radial-gradient(circle at 28% 8%, #73B9FF 0%, #57ABFF 22%, #3A9DFF 38%, #1D8EFF 52%, #0E87FF 62%, #0080FF 72%, #0657FF 100%)' }}
-        >
-          <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-white/80">Kemi Report</span>
-          <div className="mt-3 flex items-start justify-center gap-4">
-            <div
-              className="flex flex-col items-center gap-2.5"
-              data-kemi-anim
-              style={{ animation: 'kemiCrossL .55s cubic-bezier(.22,1,.36,1) both' }}
-            >
-              <AvatarCircle src={viewerAvatar} name={viewerName} size={56} fontSize={20} />
-              <span className="text-[12px] font-bold text-white">{viewerName}</span>
-            </div>
-            <span
-              className="mt-4 text-[18px] font-bold text-white/70"
-              data-kemi-anim
-              style={{ animation: 'kemiPop .4s ease .32s both' }}
-            >
-              ×
-            </span>
-            <div
-              className="flex flex-col items-center gap-2.5"
-              data-kemi-anim
-              style={{ animation: 'kemiCrossR .55s cubic-bezier(.22,1,.36,1) both' }}
-            >
-              <AvatarCircle src={profileAvatar} name={profile.name} size={56} fontSize={20} />
-              <span className="text-[12px] font-bold text-white">{profile.name}</span>
-            </div>
-          </div>
-          <div data-kemi-anim style={{ animation: 'kemiFadeUp .5s ease .38s both' }}>
-            <h1 className="mt-4 text-[22px] font-bold tracking-[-0.02em] text-white">{archetype.name}</h1>
-            <p className="mt-1 text-[14px] font-medium text-white/90">{archetype.verdict}</p>
-            <span className="mt-3 inline-block rounded-full border border-white/30 bg-white/15 px-3 py-1 text-[12px] font-semibold text-white">
-              {archetype.grade}
-            </span>
-          </div>
-        </div>
-
-        {/* 목적 토글 */}
-        <div className="flex justify-center gap-2 px-5 pt-4">
-          {(['work', 'relationship'] as const).map((p) => (
-            <button
-              key={p}
-              type="button"
-              onClick={() => setPurpose(p)}
-              className="rounded-full px-4 py-1.5 text-[13px] font-bold whitespace-nowrap"
-              style={purpose === p
-                ? { background: '#0D0D0D', color: '#fff' }
-                : { border: `1px solid ${HAIRLINE}`, color: '#6C7786' }}
-            >
-              {p === 'work' ? '협업' : '관계'}
-            </button>
-          ))}
-        </div>
-
-        {/* 레이더 */}
+      <div className="flex-1 overflow-y-auto" data-kemi-report>
+        {/* 히어로 — 전면 배경이 아니라 카드로 띄워서 앱의 카드 언어와 맞춘다 */}
         <div className="px-5 pt-3">
-          <KemiRadar axes={report.axes} score={score} />
+          <div
+            className="relative overflow-hidden px-6 pb-7 pt-6 text-center"
+            style={{
+              background: HERO_GRADIENT,
+              borderRadius: 28,
+              boxShadow: '0 14px 32px rgba(14, 48, 110, 0.20)',
+            }}
+          >
+            {/* 우하단 음영 — 단색처럼 평평해 보이지 않게 깊이만 더한다 */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0"
+              style={{ background: 'radial-gradient(75% 55% at 82% 110%, rgba(10,28,66,0.40) 0%, rgba(10,28,66,0) 72%)' }}
+            />
+
+            <div className="relative">
+              <span className="text-[10.5px] font-bold uppercase tracking-[0.16em] text-white/75">Kemi Report</span>
+
+              <div className="mt-4 flex items-start justify-center gap-3">
+                <div
+                  className="flex w-[92px] flex-col items-center gap-2.5"
+                  data-kemi-anim
+                  style={{ animation: 'kemiCrossL .55s cubic-bezier(.22,1,.36,1) both' }}
+                >
+                  <AvatarCircle src={viewerAvatar} name={viewerName} size={62} fontSize={22} ring />
+                  <span className="line-clamp-1 text-[12.5px] font-bold text-white">{viewerName}</span>
+                </div>
+                <span
+                  className="mt-[22px] flex size-[22px] shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white/90"
+                  data-kemi-anim
+                  style={{
+                    background: 'rgba(255,255,255,0.16)',
+                    border: '1px solid rgba(255,255,255,0.28)',
+                    animation: 'kemiPop .4s ease .32s both',
+                  }}
+                >
+                  ×
+                </span>
+                <div
+                  className="flex w-[92px] flex-col items-center gap-2.5"
+                  data-kemi-anim
+                  style={{ animation: 'kemiCrossR .55s cubic-bezier(.22,1,.36,1) both' }}
+                >
+                  <AvatarCircle src={profileAvatar} name={profile.name} size={62} fontSize={22} ring />
+                  <span className="line-clamp-1 text-[12.5px] font-bold text-white">{profile.name}</span>
+                </div>
+              </div>
+
+              <div data-kemi-anim style={{ animation: 'kemiFadeUp .5s ease .38s both' }}>
+                <h1 className="mt-5 text-[24px] font-bold leading-[1.25] tracking-[-0.03em] text-white">{archetype.name}</h1>
+                <p className="mx-auto mt-2 max-w-[286px] text-[13.5px] font-medium leading-[1.6] text-white/85">{archetype.verdict}</p>
+                <span
+                  className="mt-4 inline-flex items-center rounded-full px-3.5 py-1.5 text-[12px] font-bold text-white"
+                  style={{ background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.32)' }}
+                >
+                  {archetype.grade}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* 축별 상세 분석 */}
-        <div className="px-5 pt-2">
-          <p className="mb-2 text-[12px] font-bold uppercase tracking-[0.08em]" style={{ color: '#6C7786' }}>축별 상세 분석</p>
+        {/* 관점 토글 + 레이더 — 요약 시각화를 한 카드로 묶어 본문과 분리한다 */}
+        <div className="px-5 pt-4">
+          <div
+            className="rounded-[24px] px-4 pb-3 pt-4"
+            style={{ border: `1px solid ${HAIRLINE}`, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}
+          >
+            <div className="mx-auto flex w-full max-w-[236px] gap-1 rounded-full p-1" style={{ background: '#F2F3F5' }}>
+              {(['work', 'relationship'] as const).map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setPurpose(p)}
+                  className="flex-1 whitespace-nowrap rounded-full py-2 text-[13px] font-bold transition-colors"
+                  style={purpose === p
+                    ? { background: INK, color: '#fff', boxShadow: '0 2px 8px rgba(13,13,13,0.16)' }
+                    : { color: MUTED }}
+                >
+                  {p === 'work' ? '협업' : '관계'}
+                </button>
+              ))}
+            </div>
+
+            <div className="pt-2">
+              <KemiRadar axes={report.axes} score={score} />
+            </div>
+          </div>
+        </div>
+
+        {/* 항목별 상세 분석 */}
+        <div className="px-5 pt-6">
+          <p className="mb-3 text-[15px] font-bold tracking-[-0.02em]" style={{ color: INK }}>항목별 상세 분석</p>
           <div className="flex flex-col gap-3">
             {AXIS_ORDER.map((id, idx) => {
               const axis = report.axes.find((a) => a.id === id)!
               return (
-                <div
-                  key={id}
-                  data-kemi-anim
-                  className="relative overflow-hidden rounded-[16px] px-4 py-4"
-                  style={{ border: `0.66px solid ${HAIRLINE}`, animation: `kemiFadeUp .45s ease ${0.15 + idx * 0.08}s both` }}
-                >
-                  {/* 타이틀은 잠긴 축이어도 항상 노출 — 안의 분석 내용만 가린다 */}
-                  <div className="mb-1.5 flex items-center gap-1.5">
-                    <span className="text-[15px] font-bold" style={{ color: '#0D0D0D' }}>{axis.label}</span>
+                <div key={id} data-kemi-anim style={{ animation: `kemiFadeUp .45s ease ${0.15 + idx * 0.08}s both` }}>
+                <KemiAxisCard>
+                  {/* 타이틀은 잠긴 항목이어도 항상 노출 — 안의 분석 내용만 가린다 */}
+                  <div className="mb-2 flex items-center gap-1.5">
+                    <span className="text-[15.5px] font-bold tracking-[-0.02em]" style={{ color: INK }}>{axis.label}</span>
                     {!axis.locked && !axis.partial && (
                       <span
-                        className="rounded-[4px] px-1.5 py-0.5 text-[10px] font-bold"
+                        className="rounded-[6px] px-[7px] py-[3px] text-[10.5px] font-bold"
                         style={axis.signalKind === 'same'
-                          ? { background: 'var(--color-accent-soft)', color: 'var(--color-accent-dark)' }
-                          : { background: '#FFF4E0', color: '#D95F00' }}
+                          ? { background: '#F0F5FF', color: ACCENT }
+                          : { background: '#FFF4E0', color: WARN }}
                       >
                         {axis.signalKind === 'same' ? '같음' : '보완'}
                       </span>
@@ -467,78 +542,66 @@ export default function KemiReportScreen({ username }: { username: string }) {
                   {axis.locked ? (
                     <div className="relative">
                       <div className="select-none" style={{ filter: 'blur(5px)' }} aria-hidden>
-                        <p className="mb-3 text-[13px] leading-[1.55]" style={{ color: '#475058' }}>
-                          내 정보를 채우면 이 축에서 {profile.name}님과 얼마나 잘 맞는지, 어떤 점을 조심하면 좋을지 함께 정리해 드려요.
+                        <p className="mb-3.5 text-[13.5px] leading-[1.65]" style={{ color: BODY }}>
+                          내 정보를 채우면 이 항목에서 {profile.name}님과 얼마나 잘 맞는지, 어떤 점을 조심하면 좋을지 함께 정리해 드려요.
                         </p>
-                        <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>잘 맞는 점</p>
-                        <div className="flex flex-col gap-1">
-                          <p className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· 두 사람의 공통점이 여기에 표시돼요</p>
-                          <p className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· 서로 잘 맞는 부분을 짚어 드려요</p>
-                        </div>
+                        <PointGroup
+                          tone="good"
+                          title="잘 맞는 점"
+                          items={['두 사람의 공통점이 여기에 표시돼요', '서로 잘 맞는 부분을 짚어 드려요']}
+                        />
                       </div>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6" style={{ background: 'rgba(255,255,255,0.5)' }}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src="/images/kemi/locked-alert.svg" alt="" className="size-8" />
-                        <p className="text-center text-[13px] font-semibold leading-[1.3]" style={{ color: '#0D0D0D' }}>
-                          {axis.missingItems.join(' · ')} 채우면 열려요
-                        </p>
-                      </div>
+                      <KemiLockedOverlay missingItems={axis.missingItems} />
                     </div>
                   ) : (
                     <>
                       {axis.lead && (
-                        <p className="mb-3 text-[13px] leading-[1.55]" style={{ color: '#475058' }}>{axis.lead}</p>
+                        <p className="mb-3.5 text-[13.5px] leading-[1.65]" style={{ color: BODY }}>{axis.lead}</p>
                       )}
-                      {axis.goodPoints.length > 0 && (
-                        <div className="mb-3">
-                          <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>잘 맞는 점</p>
-                          <div className="flex flex-col gap-1">
-                            {axis.goodPoints.map((text, i) => (
-                              <p key={i} className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· {text}</p>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                      {axis.watchPoints.length > 0 && (
-                        <div>
-                          <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>보완이 필요한 점</p>
-                          <div className="flex flex-col gap-1">
-                            {axis.watchPoints.map((text, i) => (
-                              <p key={i} className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· {text}</p>
-                            ))}
-                          </div>
-                        </div>
-                      )}
+                      <div className="flex flex-col gap-3.5">
+                        {axis.goodPoints.length > 0 && (
+                          <PointGroup tone="good" title="잘 맞는 점" items={axis.goodPoints} />
+                        )}
+                        {axis.watchPoints.length > 0 && (
+                          <PointGroup tone="watch" title="보완이 필요한 점" items={axis.watchPoints} />
+                        )}
+                      </div>
                     </>
                   )}
+                </KemiAxisCard>
                 </div>
               )
             })}
           </div>
         </div>
 
-        {/* 종합 노트 */}
-        <div className="flex flex-col gap-2 px-5 pt-4">
-          <div
-            data-kemi-anim
-            className="rounded-[16px] p-4"
-            style={{ background: 'var(--color-bg-surface)', animation: 'kemiFadeUp .45s ease .6s both' }}
-          >
-            <p className="text-[13px] font-bold" style={{ color: '#0D0D0D' }}>잘 맞는 지점</p>
-            <p className="mt-1 text-[13px] leading-[1.55]" style={{ color: '#475058' }}>{report.goodNote}</p>
-          </div>
-          <div
-            data-kemi-anim
-            className="rounded-[16px] p-4"
-            style={{ background: 'var(--color-bg-surface)', animation: 'kemiFadeUp .45s ease .68s both' }}
-          >
-            <p className="text-[13px] font-bold" style={{ color: '#0D0D0D' }}>조심할 지점</p>
-            <p className="mt-1 text-[13px] leading-[1.55]" style={{ color: '#475058' }}>{report.watchNote}</p>
+        {/* 종합 노트 — 왼쪽 컬러 바로 두 카드의 성격을 구분한다 */}
+        <div className="px-5 pt-6">
+          <p className="mb-3 text-[15px] font-bold tracking-[-0.02em]" style={{ color: INK }}>종합</p>
+          <div className="flex flex-col gap-2.5">
+            {([
+              { title: '잘 맞는 지점', body: report.goodNote, color: ACCENT, delay: 0.6 },
+              { title: '조심할 지점', body: report.watchNote, color: WARN, delay: 0.68 },
+            ] as const).map((note) => (
+              <div
+                key={note.title}
+                data-kemi-anim
+                className="overflow-hidden rounded-[18px] py-4 pl-4 pr-[18px]"
+                style={{
+                  background: 'var(--color-bg-surface)',
+                  borderLeft: `3px solid ${note.color}`,
+                  animation: `kemiFadeUp .45s ease ${note.delay}s both`,
+                }}
+              >
+                <p className="text-[13px] font-bold" style={{ color: note.color }}>{note.title}</p>
+                <p className="mt-1.5 text-[13px] leading-[1.65]" style={{ color: BODY }}>{note.body}</p>
+              </div>
+            ))}
           </div>
         </div>
 
         {/* 저장/공유 — 미니 카드는 상단 히어로와 중복이라 화면엔 숨기고 캡처용으로만 렌더 */}
-        <div className="px-5 pt-5 pb-8">
+        <div className="px-5 pb-9 pt-7">
           <ShareCard
             cardRef={cardRef}
             viewerName={viewerName}
@@ -549,13 +612,13 @@ export default function KemiReportScreen({ username }: { username: string }) {
             tags={strongTags}
             offscreen
           />
-          <div className="flex gap-2">
+          <div className="flex gap-2.5">
             <button
               type="button"
               onClick={handleShare}
               disabled={sharing}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-full py-3 text-[14px] font-bold disabled:opacity-50"
-              style={{ border: `1px solid ${HAIRLINE}`, color: '#25313D' }}
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-full py-[13px] text-[14px] font-bold transition-opacity active:opacity-70 disabled:opacity-50"
+              style={{ border: `1px solid ${HAIRLINE}`, color: ACCENT }}
             >
               <Download size={16} />
               {sharing ? '저장 중…' : '저장'}
@@ -564,7 +627,8 @@ export default function KemiReportScreen({ username }: { username: string }) {
               type="button"
               onClick={handleShare}
               disabled={sharing}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-black py-3 text-[14px] font-bold text-white disabled:opacity-50"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-full py-[13px] text-[14px] font-bold text-white transition-opacity active:opacity-80 disabled:opacity-50"
+              style={{ background: INK, boxShadow: '0 4px 14px rgba(13,13,13,0.16)' }}
             >
               <Share2 size={16} />
               {sharing ? '공유 중…' : '공유'}

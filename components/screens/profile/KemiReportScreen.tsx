@@ -14,7 +14,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronLeft, Download, Share2 } from 'lucide-react'
+import { Check, ChevronLeft, Download, Loader2, Share2 } from 'lucide-react'
 import { showToast } from '@/components/ui'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { useProfileOwner } from '@/hooks/useProfileOwner'
@@ -189,6 +189,62 @@ function ShareCard({
   )
 }
 
+// ── 분석 중 로딩 화면 ───────────────────────────────────────────────────
+const ANALYZE_STEPS = ['이름을 인식하고 있어요', '경력을 인식하고 있어요', '학력을 인식하고 있어요']
+
+function KemiAnalyzing({ targetName, onDone }: { targetName: string; onDone: () => void }) {
+  const [step, setStep] = useState(0)
+
+  useEffect(() => {
+    const timers = [
+      setTimeout(() => setStep(1), 550),
+      setTimeout(() => setStep(2), 1150),
+      setTimeout(() => setStep(3), 1750),
+      setTimeout(onDone, 2250),
+    ]
+    return () => timers.forEach(clearTimeout)
+  }, [onDone])
+
+  return (
+    <div className="flex h-full flex-col items-center justify-center gap-7 bg-white px-8">
+      <Loader2 size={32} className="animate-spin" style={{ color: 'var(--color-accent-dark)' }} />
+      <div className="text-center">
+        <p className="text-[17px] font-bold" style={{ color: '#0D0D0D' }}>
+          {targetName}님과의 케미를 분석 중이에요
+        </p>
+        <p className="mt-1.5 text-[13px]" style={{ color: '#6C7786' }}>
+          잠깐이면 돼요
+        </p>
+      </div>
+      <div className="flex flex-col gap-2.5">
+        {ANALYZE_STEPS.map((label, i) => {
+          const done = step > i
+          const active = step === i
+          return (
+            <div key={label} className="flex items-center gap-2">
+              <span
+                className="flex size-[18px] items-center justify-center rounded-full"
+                style={{
+                  border: done ? 'none' : `1.5px solid ${active ? 'var(--color-accent-dark)' : HAIRLINE}`,
+                  background: done ? 'var(--color-accent-dark)' : 'transparent',
+                }}
+              >
+                {done && <Check size={11} strokeWidth={3} color="#fff" />}
+              </span>
+              <span
+                className="text-[14px] font-medium"
+                style={{ color: done || active ? '#25313D' : '#A8B1BD' }}
+              >
+                {label}
+              </span>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 // ── 메인 스크린 ─────────────────────────────────────────────────────────
 export default function KemiReportScreen({ username }: { username: string }) {
   const router = useRouter()
@@ -212,6 +268,7 @@ export default function KemiReportScreen({ username }: { username: string }) {
 
   const [purpose, setPurpose] = useState<KemiPurpose>('work')
   const [sharing, setSharing] = useState(false)
+  const [analyzing, setAnalyzing] = useState(true)
   const cardRef = useRef<HTMLDivElement>(null)
 
   const viewerName = user?.name ?? '나'
@@ -222,9 +279,15 @@ export default function KemiReportScreen({ username }: { username: string }) {
     purpose,
     { name: viewerName, title: user?.title ?? '', whoIAm: user?.whoIAm, life: user?.life },
     profile,
+    // [임시] 강명구 리포트에선 생활 축 잠금(뷰어 미입력) 패턴을 목업으로 보여준다
+    { forceLifeLock: username === 'mk' },
   )
 
   if (!mounted || isOwner || !isLoggedIn) return null
+
+  if (analyzing) {
+    return <KemiAnalyzing targetName={profile.name} onDone={() => setAnalyzing(false)} />
+  }
 
   const archetype = report.archetype
   const score = computeKemiScore(report.axes, purpose)
@@ -400,7 +463,7 @@ export default function KemiReportScreen({ username }: { username: string }) {
           </div>
         </div>
 
-        {/* 케미 카드 — 항상 노출, 바로 저장/공유 */}
+        {/* 저장/공유 — 미니 카드는 상단 히어로와 중복이라 화면엔 숨기고 캡처용으로만 렌더 */}
         <div className="px-5 pt-5 pb-8">
           <ShareCard
             cardRef={cardRef}
@@ -410,8 +473,9 @@ export default function KemiReportScreen({ username }: { username: string }) {
             profileAvatar={profileAvatar}
             score={score}
             tags={strongTags}
+            offscreen
           />
-          <div className="mt-3 flex gap-2">
+          <div className="flex gap-2">
             <button
               type="button"
               onClick={handleShare}

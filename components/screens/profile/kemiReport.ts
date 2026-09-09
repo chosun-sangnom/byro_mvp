@@ -485,12 +485,20 @@ function buildNotes(purpose: KemiPurpose, target: PublicProfile, axes: KemiAxisR
   return { goodNote, watchNote }
 }
 
-export function buildKemiReport(purpose: KemiPurpose, viewer: KemiViewer, target: PublicProfile): KemiReport {
+export function buildKemiReport(
+  purpose: KemiPurpose,
+  viewer: KemiViewer,
+  target: PublicProfile,
+  opts?: { forceLifeLock?: boolean },
+): KemiReport {
   const axes: KemiAxisReport[] = [
     buildCareerAxis(purpose, viewer, target),
     buildReputationAxis(purpose, target),
     buildPersonalityAxis(purpose, viewer.whoIAm, target),
-    buildLifeAxis(purpose, viewer.life, target),
+    // [임시] forceLifeLock — 뷰어 미입력으로 생활 축이 잠기는 패턴을 보여주기 위한 목업 스위치
+    opts?.forceLifeLock
+      ? viewerLockedAxis('life', ['바이브(생활) 1개'])
+      : buildLifeAxis(purpose, viewer.life, target),
     buildTasteAxis(purpose, viewer.life, target),
   ]
 

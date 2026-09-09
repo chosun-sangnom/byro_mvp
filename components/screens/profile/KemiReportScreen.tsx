@@ -14,7 +14,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Check, ChevronLeft, Download, Loader2, Share2 } from 'lucide-react'
+import { ChevronLeft, Download, Share2 } from 'lucide-react'
 import { showToast } from '@/components/ui'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { useProfileOwner } from '@/hooks/useProfileOwner'
@@ -189,57 +189,41 @@ function ShareCard({
   )
 }
 
-// ── 분석 중 로딩 화면 ───────────────────────────────────────────────────
-const ANALYZE_STEPS = ['이름을 인식하고 있어요', '경력을 인식하고 있어요', '학력을 인식하고 있어요']
+// ── 분석 중 로딩 화면 (학력 OCR 인증 화면과 동일한 스피너·레이아웃) ─────────────
+const KEMI_ANALYZE_STEPS = [
+  '이름·프로필 인식 중...',
+  '경력·평판 분석 중...',
+  '성격·생활·취향 분석 중...',
+  '케미 리포트 정리 중...',
+]
 
-function KemiAnalyzing({ targetName, onDone }: { targetName: string; onDone: () => void }) {
+function KemiAnalyzing({ targetName, onBack, onDone }: { targetName: string; onBack: () => void; onDone: () => void }) {
   const [step, setStep] = useState(0)
 
   useEffect(() => {
     const timers = [
-      setTimeout(() => setStep(1), 550),
-      setTimeout(() => setStep(2), 1150),
-      setTimeout(() => setStep(3), 1750),
-      setTimeout(onDone, 2250),
+      setTimeout(() => setStep(1), 700),
+      setTimeout(() => setStep(2), 1400),
+      setTimeout(() => setStep(3), 2100),
+      setTimeout(onDone, 2800),
     ]
     return () => timers.forEach(clearTimeout)
   }, [onDone])
 
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-7 bg-white px-8">
-      <Loader2 size={32} className="animate-spin" style={{ color: 'var(--color-accent-dark)' }} />
-      <div className="text-center">
-        <p className="text-[17px] font-bold" style={{ color: '#0D0D0D' }}>
-          {targetName}님과의 케미를 분석 중이에요
-        </p>
-        <p className="mt-1.5 text-[13px]" style={{ color: '#6C7786' }}>
-          잠깐이면 돼요
-        </p>
+    <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
+      <div className="flex h-12 flex-shrink-0 items-center px-2" style={{ borderBottom: `1px solid ${HAIRLINE}` }}>
+        <button onClick={onBack} className="flex items-center p-2" style={{ color: '#0D0D0D' }}>
+          <ChevronLeft size={20} />
+        </button>
       </div>
-      <div className="flex flex-col gap-2.5">
-        {ANALYZE_STEPS.map((label, i) => {
-          const done = step > i
-          const active = step === i
-          return (
-            <div key={label} className="flex items-center gap-2">
-              <span
-                className="flex size-[18px] items-center justify-center rounded-full"
-                style={{
-                  border: done ? 'none' : `1.5px solid ${active ? 'var(--color-accent-dark)' : HAIRLINE}`,
-                  background: done ? 'var(--color-accent-dark)' : 'transparent',
-                }}
-              >
-                {done && <Check size={11} strokeWidth={3} color="#fff" />}
-              </span>
-              <span
-                className="text-[14px] font-medium"
-                style={{ color: done || active ? '#25313D' : '#A8B1BD' }}
-              >
-                {label}
-              </span>
-            </div>
-          )
-        })}
+      <div className="px-5 pt-2">
+        <h1 className="text-[22px] font-bold text-[#0D0D0D]">{targetName}님과의 케미 리포트</h1>
+      </div>
+      <div className="flex flex-1 flex-col items-center justify-center gap-6">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/images/ai-tools/ocr-loading-spinner.svg" alt="" className="h-12 w-12 animate-spin" />
+        <p className="text-[14px] font-semibold text-[#475058]">{KEMI_ANALYZE_STEPS[step]}</p>
       </div>
     </div>
   )
@@ -286,7 +270,7 @@ export default function KemiReportScreen({ username }: { username: string }) {
   if (!mounted || isOwner || !isLoggedIn) return null
 
   if (analyzing) {
-    return <KemiAnalyzing targetName={profile.name} onDone={() => setAnalyzing(false)} />
+    return <KemiAnalyzing targetName={profile.name} onBack={() => router.back()} onDone={() => setAnalyzing(false)} />
   }
 
   const archetype = report.archetype

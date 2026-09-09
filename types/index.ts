@@ -170,20 +170,15 @@ export type KemiPurpose = 'work' | 'relationship'
 export type KemiAxisId = 'career' | 'reputation' | 'personality' | 'life' | 'taste'
 export type KemiSignalKind = 'same' | 'complement'
 
-export interface KemiSignalLine {
-  tone: 'good' | 'watch'
-  text: string
-}
-
 export interface KemiAxisReport {
   id: KemiAxisId
   label: string
   question: string
   signalKind: KemiSignalKind
-  strength: number // 0~100, 레이더용 매칭 강도 (목적 가중치와 무관)
-  lead: string
-  signals: KemiSignalLine[]
-  evidence: string
+  strength: number // 0~100, 레이더용 매칭 강도 (목적과 무관 — 텍스트만 목적별로 달라짐)
+  lead: string // 목적(협업/관계)에 따라 문구가 달라짐
+  goodPoints: string[] // "잘 맞는 점"
+  watchPoints: string[] // "보완이 필요한 점"
   locked: boolean
   missingItems: string[]
 }
@@ -196,7 +191,7 @@ export interface KemiArchetype {
 
 export interface KemiReport {
   axes: KemiAxisReport[] // 항상 career→reputation→personality→life→taste 순서 (레이더 각도 고정)
-  archetypeByPurpose: Record<KemiPurpose, KemiArchetype>
+  archetype: KemiArchetype // 현재 목적(purpose) 기준 1개
   goodNote: string
   watchNote: string
 }

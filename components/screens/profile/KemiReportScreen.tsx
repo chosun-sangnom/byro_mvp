@@ -14,7 +14,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { ChevronLeft, Check, Download, Share2 } from 'lucide-react'
+import { ChevronLeft, Download, Share2 } from 'lucide-react'
 import { showToast } from '@/components/ui'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { useProfileOwner } from '@/hooks/useProfileOwner'
@@ -221,6 +221,7 @@ export default function KemiReportScreen({ username }: { username: string }) {
   const profileAvatar = profile.profileImages?.[0] ?? profile.avatarImage
 
   const report = buildKemiReport(
+    purpose,
     { name: viewerName, title: user?.title ?? '', whoIAm: user?.whoIAm, life: user?.life },
     profile,
   )
@@ -245,7 +246,7 @@ export default function KemiReportScreen({ username }: { username: string }) {
     )
   }
 
-  const archetype = report.archetypeByPurpose[purpose]
+  const archetype = report.archetype
   const score = computeKemiScore(report.axes, purpose)
   const strongTags = [...report.axes]
     .filter((a) => !a.locked)
@@ -377,29 +378,25 @@ export default function KemiReportScreen({ username }: { username: string }) {
                     {axis.lead && (
                       <p className="mb-3 text-[13px] leading-[1.55]" style={{ color: '#475058' }}>{axis.lead}</p>
                     )}
-                    <div className="flex flex-col gap-1.5">
-                      {axis.signals.map((sig, i) => (
-                        <div
-                          key={i}
-                          className="flex items-start gap-2 rounded-[10px] px-2.5 py-2 text-[13px] leading-[1.5]"
-                          style={sig.tone === 'good'
-                            ? { background: 'var(--color-state-success-bg)', color: '#475058' }
-                            : { background: 'var(--color-state-danger-bg)', color: '#475058' }}
-                        >
-                          <span
-                            className="mt-[1px] flex size-[16px] flex-shrink-0 items-center justify-center rounded-full text-[10px] font-bold text-white"
-                            style={{ background: sig.tone === 'good' ? 'var(--color-state-success-text)' : 'var(--color-state-danger-text)' }}
-                          >
-                            {sig.tone === 'good' ? <Check size={10} strokeWidth={3} /> : '!'}
-                          </span>
-                          <span>{sig.text}</span>
+                    {axis.goodPoints.length > 0 && (
+                      <div className="mb-3">
+                        <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>잘 맞는 점</p>
+                        <div className="flex flex-col gap-1">
+                          {axis.goodPoints.map((text, i) => (
+                            <p key={i} className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· {text}</p>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                    {axis.evidence && (
-                      <span className="mt-2 inline-block text-[11px] font-semibold" style={{ color: 'var(--color-accent-dark)' }}>
-                        근거 · {axis.evidence}
-                      </span>
+                      </div>
+                    )}
+                    {axis.watchPoints.length > 0 && (
+                      <div>
+                        <p className="mb-1 text-[12px] font-bold" style={{ color: '#0D0D0D' }}>보완이 필요한 점</p>
+                        <div className="flex flex-col gap-1">
+                          {axis.watchPoints.map((text, i) => (
+                            <p key={i} className="text-[13px] leading-[1.55]" style={{ color: '#475058' }}>· {text}</p>
+                          ))}
+                        </div>
+                      </div>
                     )}
                   </div>
                   {axis.locked && (

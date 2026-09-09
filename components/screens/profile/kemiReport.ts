@@ -420,7 +420,12 @@ function buildTasteAxis(purpose: KemiPurpose, viewerLife: PublicProfileLife | un
 
 // 상단 요약 카드 — 비교 가능한 축의 매칭 강도를 한 문장으로 요약한다.
 // "정보가 부족하다" 같은 표현은 절대 쓰지 않는다. 항상 유형명 + 근거 + 결론으로.
-function buildArchetype(purpose: KemiPurpose, target: PublicProfile, axes: KemiAxisReport[]): KemiArchetype {
+//
+// 관점(협업/관계) 토글과 무관하게 고정된다: 토글은 그 아래 항목·종합 문구를 바꾸는
+// 컨트롤이고, 히어로 요약은 두 사람 관계의 전체 인상이라 토글에 따라 흔들리면
+// 사용자가 "무엇이 바뀌는 건지"를 잘못 읽게 된다. 매칭 강도(strength) 자체가
+// 목적과 무관하므로 유형 판정도 목적 없이 낼 수 있다.
+function buildArchetype(target: PublicProfile, axes: KemiAxisReport[]): KemiArchetype {
   const comparable = axes.filter((a) => !a.locked && !a.partial)
   const ranked = [...comparable].sort((a, b) => b.strength - a.strength)
   const avg = comparable.length
@@ -430,21 +435,14 @@ function buildArchetype(purpose: KemiPurpose, target: PublicProfile, axes: KemiA
   const strongLabels = ranked.filter((a) => a.strength >= 35).slice(0, 2).map((a) => a.label)
   const reason = strongLabels.length > 0
     ? `${strongLabels.join('·')} 궁합이 잘 맞아서`
-    : purpose === 'work' ? '일하는 결이 통해서' : '지내는 결이 통해서'
+    : '서로의 결이 통해서'
 
-  const tiers = purpose === 'work'
-    ? [
-        { min: 66, name: '환상의 팀', grade: '최고의 궁합', tail: '함께 일하면 시너지가 크게 나요.' },
-        { min: 46, name: '손발 맞는 사이', grade: '좋은 궁합', tail: '조금만 맞추면 매끄럽게 굴러가요.' },
-        { min: 26, name: '보완하는 사이', grade: '무난한 궁합', tail: '방식이 달라 오히려 서로 빈 곳을 채워줘요.' },
-        { min: -1, name: '색다른 조합', grade: '알아갈수록 좋은 궁합', tail: '결이 다른 만큼 새로운 시야를 주고받아요.' },
-      ]
-    : [
-        { min: 66, name: '단짝형', grade: '최고의 궁합', tail: `${target.name}님과는 편하게 가까워질 수 있어요.` },
-        { min: 46, name: '잘 맞는 사이', grade: '좋은 궁합', tail: '무리하지 않아도 자연스럽게 어울려요.' },
-        { min: 26, name: '천천히 가까워지는 사이', grade: '무난한 궁합', tail: '몇 번 만나면 금방 편해지는 사이예요.' },
-        { min: -1, name: '색다른 매력', grade: '알아갈수록 좋은 궁합', tail: '취향과 리듬이 달라 알아가는 재미가 있어요.' },
-      ]
+  const tiers = [
+    { min: 66, name: '찰떡 궁합', grade: '최고의 궁합', tail: `${target.name}님과는 어떻게 만나도 편한 사이예요.` },
+    { min: 46, name: '잘 맞는 사이', grade: '좋은 궁합', tail: '무리하지 않아도 자연스럽게 이어지는 조합이에요.' },
+    { min: 26, name: '보완하는 사이', grade: '무난한 궁합', tail: '결이 달라 오히려 서로의 빈 곳을 채워줘요.' },
+    { min: -1, name: '색다른 조합', grade: '알아갈수록 좋은 궁합', tail: '겹치는 게 적은 만큼 새로운 시야를 주고받아요.' },
+  ]
   const tier = tiers.find((t) => avg >= t.min)!
 
   return {
@@ -517,7 +515,7 @@ export function buildKemiReport(
 
   return {
     axes,
-    archetype: buildArchetype(purpose, target, axes),
+    archetype: buildArchetype(target, axes),
     ...buildNotes(purpose, target, axes),
   }
 }

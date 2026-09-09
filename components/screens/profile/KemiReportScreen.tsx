@@ -65,19 +65,21 @@ function KemiRadar({ axes, score }: { axes: KemiAxisReport[]; score: number }) {
   const centerOrigin = { transformOrigin: `${cx}px ${cy}px` } as const
 
   return (
-    <svg viewBox="0 0 240 224" role="img" aria-label="다섯 항목 케미 레이더" className="mx-auto w-full max-w-[248px]">
+    <div className="relative mx-auto w-full max-w-[248px]">
+    <svg viewBox="0 0 240 224" role="img" aria-label="다섯 항목 케미 레이더" className="w-full">
       <defs>
         <linearGradient id="kemiRadarFill" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={ACCENT} stopOpacity={0.26} />
           <stop offset="100%" stopColor={ACCENT} stopOpacity={0.08} />
         </linearGradient>
         <radialGradient id="kemiRadarBed" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#F5F6F7" stopOpacity={0.9} />
-          <stop offset="100%" stopColor="#F5F6F7" stopOpacity={0} />
+          <stop offset="0%" stopColor={ACCENT} stopOpacity={0.09} />
+          <stop offset="100%" stopColor={ACCENT} stopOpacity={0} />
         </radialGradient>
       </defs>
 
-      {/* 배경 — 그리드가 허공에 떠 보이지 않게 아주 옅은 바닥을 깐다 */}
+      {/* 배경 — 그리드가 허공에 떠 보이지 않게, 그리고 중앙 글라스가 굴절할
+          바탕이 생기게 아주 옅은 네이비 헤이즈를 깐다 */}
       <circle cx={cx} cy={cy} r={maxR + 4} fill="url(#kemiRadarBed)" />
 
       {[0.25, 0.5, 0.75, 1].map((f) => (
@@ -150,12 +152,32 @@ function KemiRadar({ axes, score }: { axes: KemiAxisReport[]; score: number }) {
         )
       })}
 
-      {/* 중앙 점수 — 폴리곤 위에 흰 원으로 얹어 항상 읽히게 한다 */}
-      <circle cx={cx} cy={cy} r={30} fill="#fff" />
-      <circle cx={cx} cy={cy} r={30} fill="none" stroke={HAIRLINE} strokeWidth={1} />
-      <text x={cx} y={cy - 1} textAnchor="middle" fontSize={25} fontWeight={800} letterSpacing="-0.03em" fill={INK}>{score}</text>
-      <text x={cx} y={cy + 15} textAnchor="middle" fontSize={8.5} fontWeight={700} letterSpacing="0.06em" fill={MUTED}>케미 점수</text>
     </svg>
+
+    {/*
+      중앙 케미 점수 — SVG는 backdrop-filter를 쓸 수 없어서 HTML로 얹는다.
+      아래 폴리곤 채움과 네이비 헤이즈를 흐리게 통과시켜 유리처럼 보이게.
+      viewBox(240×224) 기준 cx=120, cy=112 = 정확히 가운데, 지름 62 ≈ 25%.
+    */}
+    <div
+      className="pointer-events-none absolute left-1/2 top-1/2 flex aspect-square w-[25%] -translate-x-1/2 -translate-y-1/2 flex-col items-center justify-center rounded-full"
+      style={{
+        background: 'rgba(255,255,255,0.55)',
+        backdropFilter: 'blur(9px) saturate(160%)',
+        WebkitBackdropFilter: 'blur(9px) saturate(160%)',
+        border: '1px solid rgba(255,255,255,0.85)',
+        boxShadow: '0 6px 18px rgba(37,49,61,0.14), inset 0 1px 1px rgba(255,255,255,0.95)',
+        opacity: filled ? 1 : 0,
+        transform: filled
+          ? 'translate(-50%,-50%) scale(1)'
+          : 'translate(-50%,-50%) scale(0.82)',
+        transition: 'opacity .45s ease .2s, transform .55s cubic-bezier(0.34,1.4,0.5,1) .2s',
+      }}
+    >
+      <span className="text-[24px] font-extrabold leading-none tracking-[-0.03em]" style={{ color: INK }}>{score}</span>
+      <span className="mt-[3px] text-[8.5px] font-bold tracking-[0.06em]" style={{ color: MUTED }}>케미 점수</span>
+    </div>
+    </div>
   )
 }
 
@@ -487,31 +509,39 @@ export default function KemiReportScreen({ username }: { username: string }) {
           </div>
         </div>
 
-        {/* 관점 토글 + 레이더 — 요약 시각화를 한 카드로 묶어 본문과 분리한다 */}
+        {/*
+          관점 토글 — 카드 안이 아니라 바깥, 그리고 아래 모든 블록보다 위에 둔다.
+          그래프 안에 있으면 "그래프만 바뀐다"로 읽히지만 실제로는 레이더·항목·종합이
+          전부 바뀌기 때문. 반대로 위의 요약 히어로는 토글과 무관하게 고정이다.
+        */}
+        <div className="px-5 pt-5">
+          <div className="mx-auto flex w-full max-w-[236px] gap-1 rounded-full p-1" style={{ background: '#F2F3F5' }}>
+            {(['work', 'relationship'] as const).map((p) => (
+              <button
+                key={p}
+                type="button"
+                onClick={() => setPurpose(p)}
+                className="flex-1 whitespace-nowrap rounded-full py-2 text-[13px] font-bold transition-colors"
+                style={purpose === p
+                  ? { background: INK, color: '#fff', boxShadow: '0 2px 8px rgba(13,13,13,0.16)' }
+                  : { color: MUTED }}
+              >
+                {p === 'work' ? '협업' : '관계'}
+              </button>
+            ))}
+          </div>
+          <p className="mt-2.5 text-center text-[11.5px] font-medium" style={{ color: FAINT }}>
+            관점을 바꾸면 아래 분석이 모두 달라져요
+          </p>
+        </div>
+
+        {/* 레이더 */}
         <div className="px-5 pt-4">
           <div
-            className="rounded-[24px] px-4 pb-3 pt-4"
+            className="rounded-[24px] px-4 py-5"
             style={{ border: `1px solid ${HAIRLINE}`, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}
           >
-            <div className="mx-auto flex w-full max-w-[236px] gap-1 rounded-full p-1" style={{ background: '#F2F3F5' }}>
-              {(['work', 'relationship'] as const).map((p) => (
-                <button
-                  key={p}
-                  type="button"
-                  onClick={() => setPurpose(p)}
-                  className="flex-1 whitespace-nowrap rounded-full py-2 text-[13px] font-bold transition-colors"
-                  style={purpose === p
-                    ? { background: INK, color: '#fff', boxShadow: '0 2px 8px rgba(13,13,13,0.16)' }
-                    : { color: MUTED }}
-                >
-                  {p === 'work' ? '협업' : '관계'}
-                </button>
-              ))}
-            </div>
-
-            <div className="pt-2">
-              <KemiRadar axes={report.axes} score={score} />
-            </div>
+            <KemiRadar axes={report.axes} score={score} />
           </div>
         </div>
 

@@ -224,37 +224,27 @@ function RememberTopValuesCard({
       </p>
 
       <div className="mt-4 space-y-3.5">
-        {rows.map(({ label, value }, i) => {
-          // 막대는 "전체 명함 대비 비율"만 뜻한다 — 축끼리 비교하라는 뜻이 아니다
-          const percent = Math.round((value.count / total) * 100)
-          return (
-            <div
-              key={label}
-              className={i > 0 ? 'border-t border-[#EEEEF0] pt-3.5' : undefined}
-            >
-              <div className="flex items-baseline justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="text-[11.5px] font-medium text-[#6C7786]">{label}</p>
-                  <p className="mt-0.5 truncate text-[17px] font-bold tracking-[-0.02em] text-[#0D0D0D]">
-                    {value.name}
-                  </p>
-                </div>
-                <p className="shrink-0 text-[11.5px] text-[#6C7786]">
-                  {total.toLocaleString()}장 중{' '}
-                  <span className="text-[15px] font-bold text-[#25313D]">
-                    {value.count.toLocaleString()}장
-                  </span>
+        {rows.map(({ label, value }, i) => (
+          <div
+            key={label}
+            className={i > 0 ? 'border-t border-[#EEEEF0] pt-3.5' : undefined}
+          >
+            <div className="flex items-baseline justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[11.5px] font-medium text-[#6C7786]">{label}</p>
+                <p className="mt-0.5 truncate text-[17px] font-bold tracking-[-0.02em] text-[#0D0D0D]">
+                  {value.name}
                 </p>
               </div>
-              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#F2F3F5]">
-                <div
-                  className="h-full rounded-full"
-                  style={{ width: `${Math.max(3, percent)}%`, background: '#25313D' }}
-                />
-              </div>
+              <p className="shrink-0 text-[11.5px] text-[#6C7786]">
+                {total.toLocaleString()}장 중{' '}
+                <span className="text-[15px] font-bold text-[#25313D]">
+                  {value.count.toLocaleString()}장
+                </span>
+              </p>
             </div>
-          )
-        })}
+          </div>
+        ))}
       </div>
     </div>
   )

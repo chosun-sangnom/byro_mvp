@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, type ChangeEvent, type PointerEvent } from 'react'
-import { Calendar, Image as ImageIcon, Info, X } from 'lucide-react'
+import { ChevronDown, Calendar, Image as ImageIcon, Info, X } from 'lucide-react'
 import {
   BIRTH_TIME_OPTIONS,
   BirthDateCalendar,
@@ -789,7 +789,7 @@ export function BasicInfoEditScreen({
             <div>
               <div className="flex gap-2">
                 <span className="flex-1 min-w-0 text-[14px] font-semibold text-[#0D0D0D]">생년월일</span>
-                <span className="flex-1 min-w-0 text-[14px] font-semibold text-[#0D0D0D]">생시</span>
+                <span className="w-[104px] shrink-0 text-[14px] font-semibold text-[#0D0D0D]">생시</span>
               </div>
               <div className="relative mt-2 flex gap-2">
                 <div className="relative flex-1 min-w-0">
@@ -798,7 +798,7 @@ export function BasicInfoEditScreen({
                     inputMode="numeric"
                     value={formatBirthDigits(birthDigits)}
                     onChange={(event) => setBirthDigits(event.target.value.replace(/\D/g, '').slice(0, 8))}
-                    placeholder="YYYY. MM. DD."
+                    placeholder="YYYY. MM. DD"
                     className="w-full truncate rounded-full border bg-white px-4 py-3 pr-11 text-[14px] outline-none"
                     style={{ borderColor: birthDateError ? '#FF4242' : '#DEE4EC', color: '#0D0D0D' }}
                   />
@@ -810,14 +810,20 @@ export function BasicInfoEditScreen({
                     <Calendar size={16} />
                   </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setShowCalendar((prev) => !prev)}
-                  className="flex-1 min-w-0 truncate rounded-full border bg-white px-4 py-3 text-left text-[14px] outline-none"
-                  style={{ borderColor: '#DEE4EC', color: birthTime ? '#0D0D0D' : '#A8B1BD' }}
-                >
-                  {BIRTH_TIME_OPTIONS.find((opt) => opt.value === birthTime)?.label ?? '모름'}
-                </button>
+                {/* 생시는 기본 드롭다운으로. 캘린더 팝업의 '태어난 시각' 선택과 birthTime 상태를 공유해 자동 동기화된다. */}
+                <div className="relative w-[104px] shrink-0">
+                  <select
+                    value={birthTime}
+                    onChange={(e) => setBirthTime(e.target.value)}
+                    className="w-full appearance-none truncate rounded-full border bg-white py-3 pl-4 pr-8 text-[14px] outline-none"
+                    style={{ borderColor: '#DEE4EC', color: birthTime ? '#0D0D0D' : '#A8B1BD' }}
+                  >
+                    {BIRTH_TIME_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                  <ChevronDown size={16} className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[#A8B1BD]" />
+                </div>
                 {showCalendar && (
                   <BirthDateCalendar
                     digits={birthDigits}

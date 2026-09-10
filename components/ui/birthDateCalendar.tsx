@@ -10,7 +10,7 @@ export function formatBirthDigits(digits: string) {
   let out = y
   if (digits.length > 4) out += `. ${m}`
   if (digits.length > 6) out += `. ${d}`
-  if (digits.length >= 8) out += '.'
+  // 8자리 끝에 '.'을 붙이면 백스페이스가 그것만 지웠다가 재생성돼 마지막 자릿수를 못 지운다.
   return out
 }
 
@@ -35,18 +35,18 @@ export function isValidBirthDigits(digits: string) {
 
 export const BIRTH_TIME_OPTIONS: Array<{ value: string; label: string }> = [
   { value: '', label: '모름' },
-  { value: '23:00', label: '23:00 ~ 01:00' },
-  { value: '01:00', label: '01:00 ~ 03:00' },
-  { value: '03:00', label: '03:00 ~ 05:00' },
-  { value: '05:00', label: '05:00 ~ 07:00' },
-  { value: '07:00', label: '07:00 ~ 09:00' },
-  { value: '09:00', label: '09:00 ~ 11:00' },
-  { value: '11:00', label: '11:00 ~ 13:00' },
-  { value: '13:00', label: '13:00 ~ 15:00' },
-  { value: '15:00', label: '15:00 ~ 17:00' },
-  { value: '17:00', label: '17:00 ~ 19:00' },
-  { value: '19:00', label: '19:00 ~ 21:00' },
-  { value: '21:00', label: '21:00 ~ 23:00' },
+  { value: '23:00', label: '23–01시' },
+  { value: '01:00', label: '01–03시' },
+  { value: '03:00', label: '03–05시' },
+  { value: '05:00', label: '05–07시' },
+  { value: '07:00', label: '07–09시' },
+  { value: '09:00', label: '09–11시' },
+  { value: '11:00', label: '11–13시' },
+  { value: '13:00', label: '13–15시' },
+  { value: '15:00', label: '15–17시' },
+  { value: '17:00', label: '17–19시' },
+  { value: '19:00', label: '19–21시' },
+  { value: '21:00', label: '21–23시' },
 ]
 
 const CALENDAR_WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토']
@@ -185,16 +185,19 @@ export function BirthDateCalendar({
           </div>
 
           <div className="mt-3 flex items-center justify-between border-t border-[#DEE4EC] pt-3">
-            <span className="text-sm font-medium text-[#25313D]">시간</span>
-            <select
-              value={time}
-              onChange={(e) => onSelectTime(e.target.value)}
-              className="appearance-none rounded-full bg-[rgba(255,255,255,0.7)] px-3 py-1.5 text-sm text-[#0D0D0D] outline-none"
-            >
-              {BIRTH_TIME_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+            <span className="text-sm font-medium text-[#25313D]">태어난 시각</span>
+            <div className="relative">
+              <select
+                value={time}
+                onChange={(e) => onSelectTime(e.target.value)}
+                className="appearance-none rounded-full border border-[#DEE4EC] bg-white py-1.5 pl-3 pr-7 text-sm text-[#0D0D0D] outline-none"
+              >
+                {BIRTH_TIME_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+              <ChevronDown size={14} className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[#A8B1BD]" />
+            </div>
           </div>
         </>
       )}

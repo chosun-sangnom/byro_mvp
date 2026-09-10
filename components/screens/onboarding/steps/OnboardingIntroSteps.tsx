@@ -952,7 +952,7 @@ export function Step2BasicInfo() {
               inputMode="numeric"
               value={formatBirthDigits(birthDigits)}
               onChange={(e) => setBirthDigits(e.target.value.replace(/\D/g, '').slice(0, 8))}
-              placeholder="YYYY. MM. DD."
+              placeholder="YYYY. MM. DD"
               className="w-full truncate rounded-full border bg-white px-4 py-3 pr-11 text-sm outline-none"
               style={{ borderColor: birthDateError ? '#FF4242' : '#DEE4EC', color: '#0D0D0D' }}
             />

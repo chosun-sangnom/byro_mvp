@@ -67,6 +67,7 @@ function usePublicProfileTabData(username: string) {
   return {
     store,
     profile,
+    isOwner: isOwnerMode,
     groupedHighlights,
     keywordCounts,
     totalKeywordCount,
@@ -74,6 +75,9 @@ function usePublicProfileTabData(username: string) {
     tabAccess,
   }
 }
+
+/** 프로필 섹션(하이라이트·바이브·성향)이 비어 있을 때 오너가 편집 화면으로 바로 진입 */
+export type ProfileSectionEditKey = 'highlight' | 'vibe' | 'whoiam'
 
 function LockedTabContent() {
   return (
@@ -99,10 +103,12 @@ function LockedTabContent() {
 
 export function PublicProfileWhoTabPage({
   username,
+  onEditSection,
 }: {
   username: string
+  onEditSection?: (key: ProfileSectionEditKey) => void
 }) {
-  const { store, profile, groupedHighlights, tabAccess } = usePublicProfileTabData(username)
+  const { store, profile, isOwner, groupedHighlights, tabAccess } = usePublicProfileTabData(username)
 
   if (tabAccess.who !== 'visible') {
     return <LockedTabContent />
@@ -113,6 +119,8 @@ export function PublicProfileWhoTabPage({
       <PublicProfileWhoIAmSection
         whoIAm={profile.whoIAm}
         bio={profile.bio}
+        isOwner={isOwner}
+        onAdd={onEditSection && (() => onEditSection('whoiam'))}
       />
       <ProfileHighlightsSection
         groupedHighlights={groupedHighlights}
@@ -120,6 +128,8 @@ export function PublicProfileWhoTabPage({
         primaryHighlightOverrides={store.primaryHighlightOverrides}
         getHighlightOpen={(key) => store.hlOpenStates[key] ?? false}
         onToggleHighlight={(key) => store.toggleHlOpen(key)}
+        isOwner={isOwner}
+        onAdd={onEditSection && (() => onEditSection('highlight'))}
       />
       <ProfileSnsSection
         instagramConnected={profile.instagramConnected}
@@ -137,16 +147,24 @@ export function PublicProfileWhoTabPage({
 
 export function PublicProfileLifeTabPage({
   username,
+  onEditSection,
 }: {
   username: string
+  onEditSection?: (key: ProfileSectionEditKey) => void
 }) {
-  const { profile, tabAccess } = usePublicProfileTabData(username)
+  const { profile, isOwner, tabAccess } = usePublicProfileTabData(username)
 
   if (tabAccess.vibe !== 'visible') {
     return <LockedTabContent />
   }
 
-  return <PublicProfileLifeSection life={profile.life} />
+  return (
+    <PublicProfileLifeSection
+      life={profile.life}
+      isOwner={isOwner}
+      onAdd={onEditSection && (() => onEditSection('vibe'))}
+    />
+  )
 }
 
 export function PublicProfileReputationTabPage({

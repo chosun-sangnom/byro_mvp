@@ -17,16 +17,24 @@
  */
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { PublicProfileShell } from '@/components/screens/profile/PublicProfileShell'
 import { type PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
 import {
   PublicProfileLifeTabPage,
   PublicProfileReputationTabPage,
   PublicProfileWhoTabPage,
+  type ProfileSectionEditKey,
 } from '@/components/screens/profile/PublicProfileTabPages'
 
 export default function UserProfilePage({ params }: { params: { username: string } }) {
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState<PublicProfileTabId>('who')
+
+  // 오너가 자기 공개 링크에서 빈 섹션 "추가하기"를 누르면 편집 허브의 해당 화면으로
+  const goEditSection = (key: ProfileSectionEditKey) => {
+    router.push(`/me?section=${key}&returnTo=${encodeURIComponent(`/${params.username}`)}`)
+  }
 
   return (
     <PublicProfileShell
@@ -34,8 +42,8 @@ export default function UserProfilePage({ params }: { params: { username: string
       activeTab={activeTab}
       onTabChange={setActiveTab}
     >
-      {activeTab === 'who' && <PublicProfileWhoTabPage username={params.username} />}
-      {activeTab === 'vibe' && <PublicProfileLifeTabPage username={params.username} />}
+      {activeTab === 'who' && <PublicProfileWhoTabPage username={params.username} onEditSection={goEditSection} />}
+      {activeTab === 'vibe' && <PublicProfileLifeTabPage username={params.username} onEditSection={goEditSection} />}
       {activeTab === 'network' && <PublicProfileReputationTabPage username={params.username} />}
     </PublicProfileShell>
   )

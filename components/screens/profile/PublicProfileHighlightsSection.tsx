@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { BadgeCheck, ChevronDown, ChevronUp, ShieldCheck } from 'lucide-react'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { AnimatedSection, SectionTitle } from '@/components/screens/profile/PublicProfileSections'
+import { ProfileEmptyAddBlock } from '@/components/screens/profile/ProfileEmptyAddBlock'
 import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
 import { getGroupedHighlightPreview, getHighlightDetailFootnote, getHighlightMetaParts } from '@/lib/highlightMeta'
 import type { Highlight, HighlightIconId } from '@/types'
@@ -49,14 +50,30 @@ export function ProfileHighlightsSection({
   primaryHighlightOverrides,
   getHighlightOpen,
   onToggleHighlight,
+  isOwner,
+  onAdd,
 }: {
   groupedHighlights: HighlightGroupSection[]
   username: string
   primaryHighlightOverrides: Record<string, string>
   getHighlightOpen: (key: string) => boolean
   onToggleHighlight: (key: string) => void
+  isOwner?: boolean
+  onAdd?: () => void
 }) {
-  if (groupedHighlights.length === 0) return null
+  const isEmpty = groupedHighlights.length === 0
+
+  // 방문자에게는 빈 섹션을 숨기고, 오너에게만 추가 진입점을 노출.
+  if (isEmpty && !(isOwner && onAdd)) return null
+
+  if (isEmpty) {
+    return (
+      <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06}>
+        <SectionTitle title="하이라이트" />
+        <ProfileEmptyAddBlock label="아직 하이라이트가 없어요" onAdd={onAdd!} />
+      </AnimatedSection>
+    )
+  }
 
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06}>

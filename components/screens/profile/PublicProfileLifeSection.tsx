@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom'
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import type { LifeMediaItem, PublicProfileLife } from '@/types'
+import { ProfileEmptyAddBlock } from '@/components/screens/profile/ProfileEmptyAddBlock'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -315,7 +316,15 @@ function PlaceScroll({ items }: { items: LifeMediaItem[] }) {
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife }) {
+export function PublicProfileLifeSection({
+  life,
+  isOwner,
+  onAdd,
+}: {
+  life?: PublicProfileLife
+  isOwner?: boolean
+  onAdd?: () => void
+}) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
   const [{ vibeItems, vibeLayout }] = useState(() => ({
@@ -323,19 +332,30 @@ export function PublicProfileLifeSection({ life }: { life?: PublicProfileLife })
     vibeLayout: LAYOUTS[Math.floor(Math.random() * LAYOUTS.length)],
   }))
 
-  if (!life) return null
-
-  const exercise = life.daily.exercise ?? []
-  const pets = life.daily.pets ?? []
+  const exercise = life?.daily.exercise ?? []
+  const pets = life?.daily.pets ?? []
   const hasPet = pets.length > 0
   const hasActivity = exercise.length > 0
-  const hasCulture =
-    life.tastes.movies.length > 0 ||
-    life.tastes.music.length > 0 ||
-    life.tastes.books.length > 0 ||
-    (life.tastes.plays?.length ?? 0) > 0
-  const placeItems = [...life.tastes.restaurants, ...life.tastes.cafes]
+  const hasCulture = Boolean(
+    life &&
+      (life.tastes.movies.length > 0 ||
+        life.tastes.music.length > 0 ||
+        life.tastes.books.length > 0 ||
+        (life.tastes.plays?.length ?? 0) > 0),
+  )
+  const placeItems = life ? [...life.tastes.restaurants, ...life.tastes.cafes] : []
   const hasPlace = placeItems.length > 0
+  const hasAlbum = (life?.albumPhotos?.length ?? 0) > 0
+  const hasAny = vibeItems.length > 0 || hasPet || hasActivity || hasCulture || hasPlace || hasAlbum
+
+  if (!hasAny || !life) {
+    if (!(isOwner && onAdd)) return null
+    return (
+      <div className="px-5 pb-32 pt-6">
+        <ProfileEmptyAddBlock label="아직 바이브가 없어요" onAdd={onAdd} />
+      </div>
+    )
+  }
 
   return (
     <div className="pb-32 pt-2">

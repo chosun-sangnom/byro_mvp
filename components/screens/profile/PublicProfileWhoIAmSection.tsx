@@ -3,6 +3,7 @@
 import { Sparkles } from 'lucide-react'
 import type { PublicProfileWhoIAm } from '@/types'
 import { SectionTitle } from '@/components/screens/profile/PublicProfileSections'
+import { ProfileEmptyAddBlock } from '@/components/screens/profile/ProfileEmptyAddBlock'
 
 function AiBadge() {
   return (
@@ -39,11 +40,18 @@ function PersonalityBlock({ text }: { text: string }) {
 export function PublicProfileWhoIAmSection({
   whoIAm,
   bio,
+  isOwner,
+  onAdd,
 }: {
   whoIAm?: PublicProfileWhoIAm
   bio?: string
+  isOwner?: boolean
+  onAdd?: () => void
 }) {
-  if (!whoIAm && !bio) return null
+  const isEmpty = !bio && !whoIAm?.personality && !whoIAm?.mbti
+
+  // 방문자에게는 빈 섹션을 숨긴다. 오너에게만 추가 진입점을 노출.
+  if (isEmpty && !(isOwner && onAdd)) return null
 
   return (
     <div className="px-5 pt-6 pb-2">
@@ -51,10 +59,14 @@ export function PublicProfileWhoIAmSection({
         title="나"
         subtitle="MBTI와 생활감 있는 정보로 프로필의 기본 결을 정리합니다."
       />
-      <div className="grid grid-cols-1 gap-3">
-        {bio && <BioBlock text={bio} />}
-        {whoIAm?.personality && <PersonalityBlock text={whoIAm.personality} />}
-      </div>
+      {isEmpty ? (
+        <ProfileEmptyAddBlock label="아직 성향 정보가 없어요" onAdd={onAdd!} />
+      ) : (
+        <div className="grid grid-cols-1 gap-3">
+          {bio && <BioBlock text={bio} />}
+          {whoIAm?.personality && <PersonalityBlock text={whoIAm.personality} />}
+        </div>
+      )}
     </div>
   )
 }

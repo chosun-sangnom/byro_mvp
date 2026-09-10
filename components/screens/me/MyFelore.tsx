@@ -82,6 +82,9 @@ export default function MyFelore() {
     : [...profile.manualHighlights, ...store.highlights]
   // ── 화면 분기 ──────────────────────────────────────────────
   if (screen === 'preview') {
+    const goEditSection = (key: 'highlight' | 'vibe' | 'whoiam') => {
+      setScreen(key === 'highlight' ? 'editHighlight' : key === 'vibe' ? 'editLife' : 'editWhoIAm')
+    }
     return (
       <PublicProfileShell
         username={user.linkId}
@@ -89,8 +92,8 @@ export default function MyFelore() {
         onTabChange={setActiveTab}
         onOwnerEdit={() => setScreen('manage')}
       >
-        {activeTab === 'who' && <PublicProfileWhoTabPage username={user.linkId} />}
-        {activeTab === 'vibe' && <PublicProfileLifeTabPage username={user.linkId} />}
+        {activeTab === 'who' && <PublicProfileWhoTabPage username={user.linkId} onEditSection={goEditSection} />}
+        {activeTab === 'vibe' && <PublicProfileLifeTabPage username={user.linkId} onEditSection={goEditSection} />}
         {activeTab === 'network' && <PublicProfileReputationTabPage username={user.linkId} />}
       </PublicProfileShell>
     )

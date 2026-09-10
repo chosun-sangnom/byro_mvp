@@ -1274,7 +1274,7 @@ export function Step4Profile() {
     const filledImages = profileImages.filter(Boolean)
     if (filledImages.length > 0) store.updateUserInfo({ avatarImage: profileImages[0], profileImages: filledImages })
     if (bio.trim()) store.updateUserInfo({ bio: bio.trim() })
-    store.goToStep('complete')
+    store.goToStep('highlight')
   }
 
   return (

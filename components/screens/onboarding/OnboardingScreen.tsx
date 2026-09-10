@@ -7,13 +7,15 @@ import { Button, Modal, NavBar, StepBar } from '@/components/ui'
 import type { OnboardingStep } from '@/types'
 import { Step1Login, Step2Verify, Step2BasicInfo, Step4Profile, type Mode } from '@/components/screens/onboarding/steps/OnboardingIntroSteps'
 import { Step9Complete } from '@/components/screens/onboarding/steps/OnboardingBioSteps'
+import { Step5CareerImport } from '@/components/screens/onboarding/steps/OnboardingHighlightStep'
 
 const STEP_NUMS: Record<OnboardingStep, number> = {
   login: 0,
   verify: 1,
   basicinfo: 2,
   profile: 3,
-  complete: 4,
+  highlight: 4,
+  complete: 5,
 }
 
 const STEP_COMPONENTS: Record<OnboardingStep, () => JSX.Element> = {
@@ -21,6 +23,7 @@ const STEP_COMPONENTS: Record<OnboardingStep, () => JSX.Element> = {
   verify: Step2Verify,
   basicinfo: Step2BasicInfo,
   profile: Step4Profile,
+  highlight: Step5CareerImport,
   complete: Step9Complete,
 }
 
@@ -36,7 +39,7 @@ export default function OnboardingScreen() {
 
   const stepNum = STEP_NUMS[store.step]
   const CurrentStep = STEP_COMPONENTS[store.step]
-  const hasBack = stepNum >= 1 && stepNum <= 3
+  const hasBack = stepNum >= 1 && stepNum <= 4
   const skipExitModal = store.step === 'login' && loginFlowMode !== 'signup'
 
   const handleClose = () => {
@@ -55,12 +58,12 @@ export default function OnboardingScreen() {
     <div className="flex flex-1 flex-col min-h-0">
       <NavBar
         onBack={hasBack ? () => store.prevStep() : (store.step === 'login' ? loginBackHandler ?? undefined : undefined)}
-        onClose={stepNum < 4 ? handleClose : undefined}
+        onClose={stepNum < 5 ? handleClose : undefined}
         divider={store.step !== 'complete'}
       />
 
-      {stepNum >= 1 && stepNum <= 3 && (
-        <StepBar current={stepNum} total={3} />
+      {stepNum >= 1 && stepNum <= 4 && (
+        <StepBar current={stepNum} total={4} />
       )}
 
       <div className="flex flex-1 flex-col overflow-hidden">

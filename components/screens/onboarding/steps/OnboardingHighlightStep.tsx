@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Trash2 } from 'lucide-react'
-import { Button, InfoBox, showToast } from '@/components/ui'
+import { InfoBox, showToast } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { StepFooter, StepIntro } from '@/components/screens/onboarding/OnboardingShared'
@@ -10,47 +10,6 @@ import type { HighlightIconId } from '@/types'
 import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
 import { getHighlightMetaParts } from '@/lib/highlightMeta'
 import { HighlightOnboardingSheet } from '@/components/screens/onboarding/steps/HighlightOnboardingSheet'
-import { CareerScreenshotImportFlow } from '@/components/screens/me/highlight-manage/HighlightLlmImportSheet'
-
-const HIGHLIGHT_FREE_LIMIT = 3
-
-/**
- * 온보딩 5단계 — 스크린샷으로 경력·학력 자동 채우기 (SCRUM-126 파트2).
- * 링크드인·리멤버·명함 스크린샷을 올리면 OCR로 하이라이트를 채운다. 건너뛸 수 있다.
- */
-export function Step5CareerImport() {
-  const store = useFeloreStore()
-  const isPro = store.user?.isPaidUser ?? false
-  const freeRemaining = Math.max(0, HIGHLIGHT_FREE_LIMIT - store.highlights.length)
-
-  return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto px-5 py-4">
-        <StepIntro
-          eyebrow="Highlight"
-          title={'경력·학력을\n스크린샷으로 채워요'}
-          description={'링크드인·리멤버·명함 스크린샷을 올리면\n경력과 학력을 자동으로 인식해 채워드려요.'}
-        />
-        <CareerScreenshotImportFlow
-          active
-          isPro={isPro}
-          freeRemaining={freeRemaining}
-          onDone={() => store.nextStep()}
-        />
-      </div>
-
-      <div className="px-5 pb-5 pt-3 border-t border-[var(--color-border-soft)] bg-[var(--color-glass-strong)] backdrop-blur-md space-y-2">
-        <Button variant="outline" onClick={() => store.prevStep()} style={{ borderRadius: 9999 }}>이전</Button>
-        <button
-          className="w-full text-center text-sm text-[var(--color-text-secondary)]"
-          onClick={() => store.nextStep()}
-        >
-          나중에 할게요
-        </button>
-      </div>
-    </div>
-  )
-}
 
 export function Step7Highlight() {
   const store = useFeloreStore()

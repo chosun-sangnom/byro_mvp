@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ChangeEvent, type PointerEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { Calendar, CheckCircle2, ChevronRight, Eye, EyeOff, Image as ImageIcon, Sparkles, X } from 'lucide-react'
+import { Calendar, CheckCircle2, ChevronRight, Eye, EyeOff, Image as ImageIcon, X } from 'lucide-react'
 import { IdentityVerification } from '@/components/auth/IdentityVerification'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import {
@@ -1115,13 +1115,6 @@ export function Step4Profile() {
   } | null>(null)
   const cropImageLayout = getCropImageLayout(cropNaturalSize.width, cropNaturalSize.height, cropStage)
 
-  const handleAiFillBio = () => {
-    showToast('AI 자기소개 생성 중...', 'loading')
-    setTimeout(() => {
-      showToast('AI 자기소개 생성이 완료됐어요')
-    }, 1200)
-  }
-
   const handleMainFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (!file) return
@@ -1274,7 +1267,7 @@ export function Step4Profile() {
     const filledImages = profileImages.filter(Boolean)
     if (filledImages.length > 0) store.updateUserInfo({ avatarImage: profileImages[0], profileImages: filledImages })
     if (bio.trim()) store.updateUserInfo({ bio: bio.trim() })
-    store.goToStep('highlight')
+    store.goToStep('complete')
   }
 
   return (
@@ -1327,17 +1320,8 @@ export function Step4Profile() {
 
         {/* 자기소개 */}
         <div>
-          <div className="flex h-[19px] items-center justify-between">
+          <div className="flex h-[19px] items-center">
             <span className="text-sm font-semibold text-[#0D0D0D]">자기소개</span>
-            <button
-              type="button"
-              onClick={handleAiFillBio}
-              className="flex items-center gap-1 rounded-full px-1.5 py-0.5 text-xs font-semibold text-white"
-              style={{ backgroundImage: 'linear-gradient(133deg, #00C8B3 0%, #00ADFF 30%, #0657FF 59%)' }}
-            >
-              <Sparkles size={12} />
-              AI로 채우기
-            </button>
           </div>
           <div className="mt-2">
             <textarea

@@ -357,6 +357,7 @@ const GUIDE_SLIDES: GuideSlide[] = [
     title: '하이라이트',
     tags: ['경력', '학력', '수상', '자격증'],
     value: '먼저 보여주고싶은 이력과 강점을 정리해보세요.',
+    note: '경력·학력은 스크린샷으로 채우거나, 건강보험공단 직장 이력 조회로 자동으로 채우고 인증받을 수 있어요.',
     ctaLabel: '하이라이트 채우러 가기',
     ctaRoute: '/me?section=highlight',
   },

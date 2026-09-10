@@ -514,13 +514,13 @@ export const MOCK_AI_KEMI_CONFIG: AiKemiConfig = {
   updatedAt: '2026-06-25 16:00',
 }
 
-// AI 검색(app/api/ai-search/route.ts) — 실제 OpenAI(gpt-4o-mini) 연동. 마이 펠로어 편집의
+// AI 검색(app/api/ai-search/route.ts) — 실제 OpenAI(GPT-6 Astra) 연동. 마이 펠로어 편집의
 // 장소·미디어·음악 검색 피커(PlacePicker/MediaSearchPicker/MusicSearchPicker)에서 사용.
 // promptDraft는 route.ts의 SYSTEM_PROMPTS를 그대로 옮긴 참고용 초안 — 여기서 수정해도 코드 배포 전까진 실제 반영되지 않음.
 export const MOCK_AI_SEARCH_CONFIG: AiSearchConfig = {
   enabled: true,
   status: '실제 LLM 연동(OpenAI)',
-  model: 'gpt-4o-mini',
+  model: 'gpt-6-astra',
   temperature: 0.1,
   maxTokens: 600,
   categories: [

@@ -1,4 +1,4 @@
-import type { CareerTimeline, ContactChannel, Highlight } from '@/types'
+import type { ContactChannel, Highlight } from '@/types'
 import { INSTAGRAM_PROFILE, LINKEDIN_PROFILE, MK_LINKEDIN_PROFILE } from '@/lib/mocks/socialProfiles'
 
 // Temporary profile fixtures for local development and design iteration.
@@ -6,7 +6,7 @@ import { INSTAGRAM_PROFILE, LINKEDIN_PROFILE, MK_LINKEDIN_PROFILE } from '@/lib/
 // the backend. Verified highlights, guestbook, reputation aggregates, and
 // connected SNS summaries should come from their respective APIs, not this file.
 
-// [임시] 리멤버 네트워크의 "상호 연결 회사" / "커리어 타임라인" 목업 생성기.
+// [임시] 리멤버 네트워크의 "상호 연결 회사" 목업 생성기.
 // TODO(real API): 실제 명함 데이터 기반 집계로 교체.
 const MUTUAL_COMPANY_POOL = [
   '카카오뱅크', 'NAVER', '두나무', 'KRAFTON', 'MOLOCO', '토스',
@@ -17,40 +17,6 @@ function buildMutualCompanies(seed: number): string[] {
   const start = seed % MUTUAL_COMPANY_POOL.length
   const rotated = [...MUTUAL_COMPANY_POOL.slice(start), ...MUTUAL_COMPANY_POOL.slice(0, start)]
   return rotated.slice(0, 5 + (seed % 4))
-}
-
-const TIMELINE_ERA_COLORS = ['#2563EB', '#0E8F50', '#D95F00']
-
-function buildCareerTimeline(seed: number, eraLabels: [string, string, string]): CareerTimeline {
-  const startYear = 2026 - (10 + (seed % 6))
-  const years = 2026 - startYear
-  const yearCount = years + 1
-  const boundary1 = Math.floor(yearCount / 3)
-  const boundary2 = Math.floor((yearCount * 2) / 3)
-
-  const yearly = Array.from({ length: yearCount }, (_, i) => {
-    const year = startYear + i
-    const eraIndex = i < boundary1 ? 0 : i < boundary2 ? 1 : 2
-    const count = 40 + ((seed * (i + 1) * 37) % 90)
-    return { year, count, eraIndex }
-  })
-
-  const eraCounts = [0, 0, 0]
-  yearly.forEach((y) => { eraCounts[y.eraIndex] += y.count })
-
-  const eras = eraLabels.map((label, i) => {
-    const yearsInEra = yearly.filter((y) => y.eraIndex === i)
-    const yearRange = `${yearsInEra[0]?.year ?? startYear} - ${yearsInEra[yearsInEra.length - 1]?.year ?? 2026}`
-    return {
-      yearRange,
-      domainLabel: label,
-      count: eraCounts[i],
-      breakdown: `핵심 인맥 ${Math.round(eraCounts[i] * 0.28)}명, 관련 업계 ${Math.round(eraCounts[i] * 0.48)}명`,
-      color: TIMELINE_ERA_COLORS[i],
-    }
-  })
-
-  return { years, eras, yearly }
 }
 
 export const SAMPLE_PROFILE = {
@@ -144,29 +110,10 @@ export const SAMPLE_PROFILE = {
   },
   rememberHighlight: {
     total: 247,
+    topCompany: { name: '삼성전자', count: 22 },
+    topIndustry: { name: '스타트업', count: 94 },
+    topRole: { name: '대표/임원', count: 17 },
     mutualCompanies: ['카카오뱅크', 'NAVER', '두나무', 'KRAFTON', 'MOLOCO', '토스', '당근마켓', '컬리'],
-    careerTimeline: {
-      years: 12,
-      eras: [
-        { yearRange: '2015 - 2018', domainLabel: '스타트업 · 커머스', count: 195, breakdown: '커머스 18명, 스타트업 134명', color: '#2563EB' },
-        { yearRange: '2018 - 2022', domainLabel: '플랫폼 · 핀테크', count: 357, breakdown: '핀테크 52명, 플랫폼 121명', color: '#0E8F50' },
-        { yearRange: '2022 - 2026', domainLabel: 'B2B SaaS · 파트너십', count: 591, breakdown: '파트너십 61명, SaaS 118명', color: '#D95F00' },
-      ],
-      yearly: [
-        { year: 2015, count: 58, eraIndex: 0 },
-        { year: 2016, count: 72, eraIndex: 0 },
-        { year: 2017, count: 65, eraIndex: 0 },
-        { year: 2018, count: 44, eraIndex: 1 },
-        { year: 2019, count: 80, eraIndex: 1 },
-        { year: 2020, count: 135, eraIndex: 1 },
-        { year: 2021, count: 98, eraIndex: 1 },
-        { year: 2022, count: 110, eraIndex: 2 },
-        { year: 2023, count: 88, eraIndex: 2 },
-        { year: 2024, count: 140, eraIndex: 2 },
-        { year: 2025, count: 105, eraIndex: 2 },
-        { year: 2026, count: 148, eraIndex: 2 },
-      ],
-    },
     industries: [
       { name: '스타트업', ratio: 38, count: 94 },
       { name: '마케팅', ratio: 24, count: 59 },
@@ -451,30 +398,10 @@ export const MK_PROFILE = {
   linkedin: MK_LINKEDIN_PROFILE,
   rememberHighlight: {
     total: 1691,
+    topCompany: { name: 'NAVER', count: 186 },
+    topIndustry: { name: 'IT/테크', count: 286 },
+    topRole: { name: '부장/이사', count: 161 },
     mutualCompanies: ['카카오뱅크', 'NAVER', '두나무', 'KRAFTON', 'MOLOCO', '토스', '당근마켓'],
-    careerTimeline: {
-      years: 13,
-      eras: [
-        { yearRange: '2013 - 2017', domainLabel: '게임 · 글로벌 IT', count: 475, breakdown: '게임사 16명, IT/테크 127명', color: '#2563EB' },
-        { yearRange: '2017 - 2022', domainLabel: '금융 · 블록체인', count: 633, breakdown: '크립토 59명, 금융/투자 109명', color: '#0E8F50' },
-        { yearRange: '2022 - 2026', domainLabel: '창업 · 법률 · 대기업', count: 583, breakdown: '법률/회계 53명, 대기업 46명', color: '#D95F00' },
-      ],
-      yearly: [
-        { year: 2013, count: 62, eraIndex: 0 },
-        { year: 2014, count: 78, eraIndex: 0 },
-        { year: 2015, count: 55, eraIndex: 0 },
-        { year: 2016, count: 90, eraIndex: 0 },
-        { year: 2017, count: 68, eraIndex: 1 },
-        { year: 2018, count: 100, eraIndex: 1 },
-        { year: 2019, count: 145, eraIndex: 1 },
-        { year: 2020, count: 88, eraIndex: 1 },
-        { year: 2021, count: 132, eraIndex: 1 },
-        { year: 2022, count: 96, eraIndex: 2 },
-        { year: 2023, count: 118, eraIndex: 2 },
-        { year: 2024, count: 84, eraIndex: 2 },
-        { year: 2025, count: 150, eraIndex: 2 },
-      ],
-    },
     industries: [
       { name: 'IT/테크', ratio: 17, count: 286 },
       { name: '금융/투자', ratio: 16, count: 263 },
@@ -678,8 +605,10 @@ export const JIMIN_PROFILE = {
   },
   rememberHighlight: {
     total: 183,
+    topCompany: { name: '카카오', count: 24 },
+    topIndustry: { name: '스타트업', count: 70 },
+    topRole: { name: '대표/CEO', count: 22 },
     mutualCompanies: buildMutualCompanies(11),
-    careerTimeline: buildCareerTimeline(11, ['브랜드 · 콘텐츠', '스타트업 · 마케팅', '그로스 · PR']),
     industries: [
       { name: '스타트업', ratio: 38, count: 70, topRole: { name: '대표/CEO', count: 28 } },
       { name: '마케팅', ratio: 24, count: 44, topRole: { name: '브랜드', count: 13 } },
@@ -775,8 +704,10 @@ export const PARKSOJIN_PROFILE = {
   linkedinConnected: false,
   rememberHighlight: {
     total: 312,
+    topCompany: { name: '토스', count: 47 },
+    topIndustry: { name: 'IT/테크', count: 125 },
+    topRole: { name: '시니어/리드', count: 45 },
     mutualCompanies: buildMutualCompanies(12),
-    careerTimeline: buildCareerTimeline(12, ['UX · 리서치', '핀테크 · 프로덕트', '디자인 시스템']),
     industries: [
       { name: 'IT/테크', ratio: 40, count: 125 },
       { name: '금융', ratio: 25, count: 78 },
@@ -860,8 +791,10 @@ export const LEEJUNHYUK_PROFILE = {
   linkedinConnected: true,
   rememberHighlight: {
     total: 428,
+    topCompany: { name: '쿠팡', count: 73 },
+    topIndustry: { name: '스타트업', count: 193 },
+    topRole: { name: 'CTO/VPE', count: 30 },
     mutualCompanies: buildMutualCompanies(13),
-    careerTimeline: buildCareerTimeline(13, ['개발 · 엔지니어링', '스타트업 · 테크리드', 'CTO · 조직관리']),
     industries: [
       { name: '스타트업', ratio: 45, count: 193 },
       { name: 'IT/테크', ratio: 30, count: 128 },
@@ -932,8 +865,10 @@ export const CHOISUNYOUNG_PROFILE = {
   linkedinConnected: true,
   rememberHighlight: {
     total: 589,
+    topCompany: { name: '당근마켓', count: 53 },
+    topIndustry: { name: '투자/VC', count: 247 },
+    topRole: { name: '심사역/파트너', count: 56 },
     mutualCompanies: buildMutualCompanies(14),
-    careerTimeline: buildCareerTimeline(14, ['스타트업 · 투자', 'VC · 심사역', '포트폴리오 · 그로스']),
     industries: [
       { name: '투자/VC', ratio: 42, count: 247 },
       { name: '스타트업', ratio: 32, count: 188 },
@@ -1004,8 +939,10 @@ export const YOONJISOO_PROFILE = {
   linkedinConnected: false,
   rememberHighlight: {
     total: 276,
+    topCompany: { name: 'LG전자', count: 30 },
+    topIndustry: { name: '마케팅/PR', count: 97 },
+    topRole: { name: '디렉터/본부장', count: 33 },
     mutualCompanies: buildMutualCompanies(15),
-    careerTimeline: buildCareerTimeline(15, ['뷰티 · 유통', '브랜드 · MD', '컬래버 · 마케팅']),
     industries: [
       { name: '마케팅/PR', ratio: 35, count: 97 },
       { name: '유통/리테일', ratio: 28, count: 77 },
@@ -1089,8 +1026,10 @@ export const KWONMINSEOK_PROFILE = {
   linkedinConnected: true,
   rememberHighlight: {
     total: 203,
+    topCompany: { name: '우아한형제들', count: 26 },
+    topIndustry: { name: 'IT/테크', count: 71 },
+    topRole: { name: '시니어 엔지니어', count: 29 },
     mutualCompanies: buildMutualCompanies(16),
-    careerTimeline: buildCareerTimeline(16, ['데이터 · 분석', 'IT · 플랫폼', 'AI · 머신러닝']),
     industries: [
       { name: 'IT/테크', ratio: 35, count: 71 },
       { name: '스타트업', ratio: 28, count: 57 },
@@ -1173,8 +1112,10 @@ export const LIMJIYEON_PROFILE = {
   linkedinConnected: false,
   rememberHighlight: {
     total: 47,
+    topCompany: { name: 'SK텔레콤', count: 7 },
+    topIndustry: { name: '컨설팅', count: 14 },
+    topRole: { name: '매니저', count: 3 },
     mutualCompanies: buildMutualCompanies(17),
-    careerTimeline: buildCareerTimeline(17, ['조직 · 인사', '채용 · HR', '컨설팅 · 전략']),
     industries: [
       { name: '컨설팅', ratio: 30, count: 14 },
       { name: '교육/HR', ratio: 28, count: 13 },
@@ -1232,8 +1173,10 @@ export const HANSANGHOON_PROFILE = {
   linkedinConnected: true,
   rememberHighlight: {
     total: 534,
+    topCompany: { name: '크래프톤', count: 91 },
+    topIndustry: { name: 'IT/테크', count: 203 },
+    topRole: { name: '매니저/디렉터', count: 51 },
     mutualCompanies: buildMutualCompanies(18),
-    careerTimeline: buildCareerTimeline(18, ['세일즈 · B2B', '글로벌 · 파트너십', 'SaaS · 엔터프라이즈']),
     industries: [
       { name: 'IT/테크', ratio: 38, count: 203 },
       { name: '미디어/광고', ratio: 25, count: 134 },
@@ -1314,8 +1257,10 @@ export const OHYERIM_PROFILE = {
   linkedinConnected: false,
   rememberHighlight: {
     total: 138,
+    topCompany: { name: '무신사', count: 12 },
+    topIndustry: { name: '미디어/콘텐츠', count: 58 },
+    topRole: { name: '프리랜서/독립', count: 17 },
     mutualCompanies: buildMutualCompanies(19),
-    careerTimeline: buildCareerTimeline(19, ['콘텐츠 · 크리에이티브', '유튜브 · 미디어', '브랜드 협업']),
     industries: [
       { name: '미디어/콘텐츠', ratio: 42, count: 58 },
       { name: '마케팅/PR', ratio: 28, count: 39 },
@@ -1402,8 +1347,10 @@ export const JUNGWONHO_PROFILE = {
   linkedinConnected: true,
   rememberHighlight: {
     total: 364,
+    topCompany: { name: '컬리', count: 40 },
+    topIndustry: { name: '의료/바이오', count: 146 },
+    topRole: { name: '교수/전문의', count: 53 },
     mutualCompanies: buildMutualCompanies(20),
-    careerTimeline: buildCareerTimeline(20, ['의료 · 헬스케어', 'AI · 스타트업', '창업 · 경영']),
     industries: [
       { name: '의료/바이오', ratio: 40, count: 146 },
       { name: '스타트업', ratio: 28, count: 102 },
@@ -1476,8 +1423,10 @@ export const BAEKHYUNJIN_PROFILE = {
   linkedinConnected: true,
   rememberHighlight: {
     total: 872,
+    topCompany: { name: '넥슨', count: 113 },
+    topIndustry: { name: '컨설팅', count: 305 },
+    topRole: { name: '파트너/디렉터', count: 61 },
     mutualCompanies: buildMutualCompanies(21),
-    careerTimeline: buildCareerTimeline(21, ['전략 · 컨설팅', '디지털 트랜스포메이션', '경영 · 자문']),
     industries: [
       { name: '컨설팅', ratio: 35, count: 305 },
       { name: '금융/투자', ratio: 28, count: 244 },

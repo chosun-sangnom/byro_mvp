@@ -3,7 +3,7 @@
 import { type ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronRight, Lock } from 'lucide-react'
-import type { CareerTimeline, ContactChannel, Experience, RememberIndustry } from '@/types'
+import type { ContactChannel, Experience, RememberIndustry, RememberTopValue } from '@/types'
 
 const SECTION_EASE = [0.22, 1, 0.36, 1] as const
 
@@ -198,106 +198,61 @@ function MutualCompaniesCard({ companies }: { companies: string[] }) {
   )
 }
 
-// 관심 도메인은 카테고리(정체성) 데이터이므로 시퀀셜이 아니라 카테고리 팔레트 사용.
-// validate_palette.js로 색맹 안전성 확인된 블루/그린/오렌지 조합.
-const DOMAIN_TREND_COLORS = ['#2563EB', '#0E8F50', '#D95F00']
-
-// [임시] 실제로는 명함 저장 날짜 기준 연도별 집계로 교체.
-// 지금은 누적 총량을 연도 수만큼 나눠 최근으로 갈수록 증가하는 추세로 합성.
-function buildDomainYearlySeries(years: number[], count: number, seed: number): number[] {
-  const avgPerYear = count / Math.max(years.length, 1)
-  return years.map((_, i) => {
-    const progress = years.length > 1 ? i / (years.length - 1) : 1
-    const growth = 0.55 + progress * 0.9
-    const jitter = ((seed * (i + 1) * 13) % 7) - 3
-    return Math.max(1, Math.round(avgPerYear * growth + jitter))
-  })
-}
-
-type TrendSeries = { name: string; color: string; values: number[]; total: number }
-
-function CareerTimelineCard({
-  timeline,
-  trendSeries,
+/**
+ * 최빈값 3축 카드 (SCRUM-124)
+ *
+ * 회사·산업군·직함에서 각각 독립적으로 1위 값을 뽑아 "명함 N장 중 M장" 형태로
+ * 보여준다. 세 축은 서로 종속되지 않으므로 막대는 각자 "전체 대비 비율"만 뜻하고
+ * 축끼리 비교하라는 의미가 아니다.
+ */
+function RememberTopValuesCard({
+  total,
+  rows,
 }: {
-  timeline: CareerTimeline
-  trendSeries?: TrendSeries[]
+  total: number
+  rows: Array<{ label: string; value: RememberTopValue }>
 }) {
-  if (timeline.yearly.length === 0) return null
-
-  const years = timeline.yearly.map((y) => y.year)
-  const hasTrend = trendSeries && trendSeries.length > 0
-  const chartWidth = 296
-  const chartHeight = 88
-  // 끝점에 작은 원 마커를 그릴 여백만 확보 (숫자 라벨은 범례에서 보여주므로 넓은 여백 불필요)
-  const plotWidth = chartWidth - 4
-  const maxValue = hasTrend ? Math.max(1, ...trendSeries.flatMap((s) => s.values)) : 1
-  const stepX = years.length > 1 ? plotWidth / (years.length - 1) : 0
-  const valueToY = (v: number) => chartHeight - (v / maxValue) * (chartHeight - 6) - 3
-
-  const toPoints = (values: number[]) =>
-    values
-      .map((v, i) => {
-        const x = years.length > 1 ? i * stepX : plotWidth / 2
-        return `${x},${valueToY(v)}`
-      })
-      .join(' ')
+  if (rows.length === 0 || total === 0) return null
 
   return (
-    <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3">
+    <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-4">
       <p className="text-[14px] font-bold text-[#0D0D0D]">
-        명함이 기록한 {timeline.years}년의 커리어
+        명함 {total.toLocaleString()}장에서 가장 많이 나온 값
       </p>
       <p className="mt-1 text-[12px] text-[#6C7786]">
-        누구를 만났는지가 어디에 있었는지를 말해줘요
+        회사·산업군·직함을 각각 따로 집계했어요
       </p>
 
-      {hasTrend && (
-        <>
-          <svg
-            className="mt-4"
-            viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-            width="100%"
-            height={chartHeight}
-            preserveAspectRatio="none"
-          >
-            {trendSeries.map((s) => (
-              <polyline
-                key={s.name}
-                points={toPoints(s.values)}
-                fill="none"
-                stroke={s.color}
-                strokeWidth={2}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            ))}
-            {trendSeries.map((s) => (
-              <circle
-                key={s.name}
-                cx={plotWidth}
-                cy={valueToY(s.values[s.values.length - 1])}
-                r={2.5}
-                fill={s.color}
-              />
-            ))}
-          </svg>
-          <div className="mt-2 flex justify-between text-[11px] text-[#6C7786]">
-            <span>{years[0]}</span>
-            <span>{years[years.length - 1]}</span>
-          </div>
-          <div className="mt-3 space-y-1.5">
-            {trendSeries.map((s) => (
-              <div key={s.name} className="flex items-center gap-2">
-                <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: s.color }} />
-                <p className="text-[12px] text-[#475058]">
-                  <span className="font-bold text-[#0D0D0D]">{s.name}</span> · {s.total}명
-                </p>
+      <div className="mt-4 space-y-3.5">
+        {rows.map(({ label, value }, i) => {
+          const percent = Math.round((value.count / total) * 100)
+          return (
+            <div
+              key={label}
+              className={i > 0 ? 'border-t border-[#EEEEF0] pt-3.5' : undefined}
+            >
+              <div className="flex items-end justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="text-[11.5px] font-medium text-[#6C7786]">{label}</p>
+                  <p className="mt-0.5 truncate text-[17px] font-bold tracking-[-0.02em] text-[#0D0D0D]">
+                    {value.name}
+                  </p>
+                </div>
+                <div className="shrink-0 text-right">
+                  <p className="text-[15px] font-bold text-[#25313D]">{value.count.toLocaleString()}장</p>
+                  <p className="text-[11.5px] text-[#6C7786]">전체의 {percent}%</p>
+                </div>
               </div>
-            ))}
-          </div>
-        </>
-      )}
+              <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-[#F2F3F5]">
+                <div
+                  className="h-full rounded-full"
+                  style={{ width: `${Math.max(3, percent)}%`, background: '#25313D' }}
+                />
+              </div>
+            </div>
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -311,7 +266,9 @@ export function ProfileRememberSection({
   viewerName,
   isOwner = false,
   mutualCompanies,
-  careerTimeline,
+  topCompany,
+  topIndustry,
+  topRole,
 }: {
   total: number
   industries: Array<{ name: string; ratio: number; count?: number; topRole?: { name: string; count: number } }>
@@ -321,10 +278,20 @@ export function ProfileRememberSection({
   viewerName?: string
   isOwner?: boolean
   mutualCompanies?: string[]
-  careerTimeline?: CareerTimeline
+  topCompany?: RememberTopValue
+  topIndustry?: RememberTopValue
+  topRole?: RememberTopValue
 }) {
-  const topIndustry = industries[0]
+  // industries[0] — 관심 도메인 인사이트에서 "이 업종이 1위인가" 판정에만 쓴다.
+  // 최빈값 3축의 topIndustry prop과는 다른 값이라 이름을 분리한다.
+  const topIndustryEntry = industries[0]
   const topRank = topIndustryRanks?.[0]
+
+  const topValueRows = [
+    { label: '회사', value: topCompany },
+    { label: '산업군', value: topIndustry },
+    { label: '직함', value: topRole },
+  ].filter((r): r is { label: string; value: RememberTopValue } => !!r.value)
 
   // 도메인별 인사이트 — 겹치는 업종이 있는 관심 도메인만, 밀도 좋은 순으로.
   // "IT" vs "IT/테크", "투자" vs "금융/투자"처럼 표기가 완전히 같진 않아도
@@ -338,7 +305,7 @@ export function ProfileRememberSection({
       if (!entry) return null
       const count = entry.count ?? Math.round(total * entry.ratio / 100)
       const percentile = Math.max(3, Math.round(35 - entry.ratio * 0.6))
-      const isTop = entry.name === topIndustry?.name
+      const isTop = entry.name === topIndustryEntry?.name
       const rankCount = isTop && topRank ? Math.round(count * topRank.ratio / 100) : 0
       const headline = entry.topRole
         ? `${domain} 쪽에 ${count}명, 그중 ${entry.topRole.name}이 ${entry.topRole.count}명입니다.`
@@ -352,21 +319,6 @@ export function ProfileRememberSection({
     .filter((item, i, arr) => arr.findIndex((x) => x.entryName === item.entryName) === i)
     .sort((a, b) => a.percentile - b.percentile)
 
-  // 커리어 그래프 — 뷰어의 관심 도메인이 아니라 이 사람 명함의 실제 업종 Top3
-  const topIndustries = [...industries].sort((a, b) => b.ratio - a.ratio).slice(0, 3)
-  const trendYears = careerTimeline?.yearly.map((y) => y.year) ?? []
-  const trendSeries = trendYears.length > 1
-    ? topIndustries.map((item, i) => {
-        const count = item.count ?? Math.round(total * item.ratio / 100)
-        return {
-          name: item.name,
-          color: DOMAIN_TREND_COLORS[i],
-          values: buildDomainYearlySeries(trendYears, count, i + 1),
-          total: count,
-        }
-      })
-    : []
-
   const showPersonalized = isLoggedIn && (viewerNetworkDomains?.length ?? 0) > 0
   const isEmpty = total === 0
 
@@ -374,7 +326,7 @@ export function ProfileRememberSection({
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.02}>
       <SectionTitle
         title="리멤버 네트워크"
-        subtitle={isEmpty ? undefined : `지금까지 명함 ${total}명을 리멤버했어요`}
+        subtitle={isEmpty ? undefined : `지금까지 명함 ${total.toLocaleString()}장을 리멤버했어요`}
       />
 
       {isEmpty ? (
@@ -387,12 +339,7 @@ export function ProfileRememberSection({
             <MutualCompaniesCard companies={mutualCompanies} />
           )}
 
-          {careerTimeline && (
-            <CareerTimelineCard
-              timeline={careerTimeline}
-              trendSeries={!isOwner ? trendSeries : undefined}
-            />
-          )}
+          <RememberTopValuesCard total={total} rows={topValueRows} />
 
           {showPersonalized && !isOwner && domainInsights.length > 0 ? (
             /* 타인 프로필 — 관심 도메인별 인사이트 (밀도 좋은 순, 막대+문장으로 전부 표시) */

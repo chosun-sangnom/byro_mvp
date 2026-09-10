@@ -230,24 +230,16 @@ export interface RememberIndustry {
   topRole?: { name: string; count: number }
 }
 
-export interface CareerTimelineEra {
-  yearRange: string
-  domainLabel: string
+/**
+ * 명함 집계 한 축의 1위 값.
+ * 회사·산업군·직함 세 축은 서로 종속되지 않는다 — 각 축에서 독립적으로 최빈값을
+ * 뽑기 때문에 "1위 회사의 1위 직함" 같은 관계가 아니다.
+ */
+export interface RememberTopValue {
+  /** 최빈값 이름 (예: 삼성전자 / 마케팅 / CEO) */
+  name: string
+  /** 그 값이 찍힌 명함 수 — 비율은 total로 나눠서 화면에서 계산한다 */
   count: number
-  breakdown: string
-  color: string
-}
-
-export interface CareerTimelineYear {
-  year: number
-  count: number
-  eraIndex: number
-}
-
-export interface CareerTimeline {
-  years: number
-  eras: CareerTimelineEra[]
-  yearly: CareerTimelineYear[]
 }
 
 export interface RememberInsight {
@@ -263,13 +255,17 @@ export interface RememberInsight {
 }
 
 export interface RememberHighlight {
+  /** 지금까지 리멤버한 명함 총 수 */
   total: number
+  /** 최빈값 3축 — 각각 독립적으로 뽑는다 (SCRUM-124) */
+  topCompany?: RememberTopValue
+  topIndustry?: RememberTopValue
+  topRole?: RememberTopValue
   industries: RememberIndustry[]
   topIndustryRanks?: RememberIndustry[]
   topIndustryRoles?: RememberIndustry[]
   insight?: RememberInsight
   mutualCompanies?: string[]
-  careerTimeline?: CareerTimeline
 }
 
 export interface ReputationKeyword {

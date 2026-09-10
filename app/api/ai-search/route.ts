@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from 'next/server'
 // ─── AI 검색 폴백 엔드포인트 ──────────────────────────────────────────────────
 //
 // 각 카테고리 전용 API 연동 전까지, 또는 전용 API가 없는 경우(공연·연극)의 검색.
-// OpenAI gpt-4o-mini를 사용해 부분 입력을 구조화된 결과로 변환.
+// OpenAI GPT-6 Astra를 사용해 부분 입력을 구조화된 결과로 변환.
 //
 // TODO(real API): 우선순위 연동 목록 — 연동 후 이 라우트는 진짜 폴백으로만 사용
 //   영화  → TMDB  GET /3/search/movie?language=ko-KR
@@ -63,7 +63,7 @@ export async function GET(req: NextRequest) {
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-6-astra',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: q },

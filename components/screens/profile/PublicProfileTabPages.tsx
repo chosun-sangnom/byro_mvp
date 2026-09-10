@@ -178,7 +178,9 @@ export function PublicProfileReputationTabPage({
         viewerName={store.user?.name}
         isOwner={isOwner}
         mutualCompanies={profile.rememberHighlight.mutualCompanies}
-        careerTimeline={profile.rememberHighlight.careerTimeline}
+        topCompany={profile.rememberHighlight.topCompany}
+        topIndustry={profile.rememberHighlight.topIndustry}
+        topRole={profile.rememberHighlight.topRole}
       />
       <ProfileReputationSummarySection
         keywordCounts={keywordCounts}

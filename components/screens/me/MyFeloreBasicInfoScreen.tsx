@@ -187,13 +187,14 @@ export function WhoIAmEditScreen({
   user,
   onBack,
 }: {
-  user: Pick<UserState, 'whoIAm' | 'life'>
+  user: Pick<UserState, 'whoIAm' | 'life' | 'bio'>
   onBack: () => void
 }) {
   const store = useFeloreStore()
   const initialWhoIAm: PublicProfileWhoIAm = user.whoIAm ?? SAMPLE_PROFILE.whoIAm
   const [mbti, setMbti] = useState(initialWhoIAm.mbti)
   const [personality, setPersonality] = useState(initialWhoIAm.personality ?? '')
+  const [bio, setBio] = useState(user.bio ?? '')
   const [aiSheetOpen, setAiSheetOpen] = useState(false)
   const [promptCopied, setPromptCopied] = useState(false)
   const [pastedText, setPastedText] = useState('')
@@ -201,8 +202,17 @@ export function WhoIAmEditScreen({
 
   const handleSave = () => {
     store.updateUserWhoIAm({ ...initialWhoIAm, mbti, personality: personality.trim() || undefined })
+    store.updateUserInfo({ bio })
     showToast('저장됐어요!')
     onBack()
+  }
+
+  // [임시] 실제 AI 생성 API 미연동 — 로딩 토스트만 보여주고 1.2초 후 완료 처리
+  const handleAiFillBio = () => {
+    showToast('AI 자기소개 생성 중...', 'loading')
+    setTimeout(() => {
+      showToast('AI 자기소개 생성이 완료됐어요')
+    }, 1200)
   }
 
   return (
@@ -210,6 +220,30 @@ export function WhoIAmEditScreen({
       <NavBar title="나의 성향" onBack={onBack} />
       <div className="flex-1 overflow-y-auto">
         <div className="px-5 py-5 flex flex-col gap-9">
+
+          {/* 자기소개 */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-1">
+              <span className="flex-1 text-[14px] font-semibold text-[#0D0D0D]">자기소개</span>
+              <button
+                type="button"
+                onClick={handleAiFillBio}
+                className="flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[14px] font-semibold text-white"
+                style={{ backgroundImage: 'linear-gradient(129deg, rgba(0,173,255,0.2) 0%, #00ADFF 29.568%, #0657FF 59.137%)' }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/ai-tools/sparkle-ai-chip.svg" alt="" className="h-3.5 w-3.5" />
+                AI로 채우기
+              </button>
+            </div>
+            <TextArea
+              value={bio}
+              onChange={setBio}
+              placeholder="한 문단으로 나를 소개해 주세요."
+              rows={4}
+              maxLength={300}
+            />
+          </div>
 
           {/* MBTI */}
           <div className="flex flex-col gap-4">
@@ -322,7 +356,7 @@ import {
 } from '@/lib/imageCropUtils'
 
 interface BasicInfoEditScreenProps {
-  user: Pick<UserState, 'name' | 'realName' | 'activityName' | 'activityNameChangedAt' | 'linkId' | 'title' | 'headline' | 'school' | 'bio' | 'avatarImage' | 'profileImages' | 'birthDate' | 'birthTime' | 'calendarType' | 'showAge'>
+  user: Pick<UserState, 'name' | 'realName' | 'activityName' | 'activityNameChangedAt' | 'linkId' | 'title' | 'headline' | 'school' | 'avatarImage' | 'profileImages' | 'birthDate' | 'birthTime' | 'calendarType' | 'showAge'>
   onBack: () => void
 }
 
@@ -430,7 +464,6 @@ export function BasicInfoEditScreen({
   onBack,
 }: BasicInfoEditScreenProps) {
   const store = useFeloreStore()
-  const [bio, setBio] = useState(user.bio)
 
   const [useActivityName, setUseActivityName] = useState(!!user.activityName)
   const [activityName, setActivityName] = useState(user.activityName ?? '')
@@ -476,7 +509,6 @@ export function BasicInfoEditScreen({
 
     store.updateUserInfo({
       headline: user.headline,
-      bio,
       avatarImage: profileImages[0] || '',
       profileImages: profileImages.filter(Boolean),
       name: newActivityName || realName,
@@ -489,14 +521,6 @@ export function BasicInfoEditScreen({
     store.updateUserInfo({ birthDate, birthTime: birthDate ? birthTime : '', calendarType, showAge })
     showToast('저장됐어요!')
     onBack()
-  }
-
-  // [임시] 실제 AI 생성 API 미연동 — 로딩 토스트만 보여주고 1.2초 후 완료 처리
-  const handleAiFillBio = () => {
-    showToast('AI 자기소개 생성 중...', 'loading')
-    setTimeout(() => {
-      showToast('AI 자기소개 생성이 완료됐어요')
-    }, 1200)
   }
 
   const handleAvatarFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -835,23 +859,6 @@ export function BasicInfoEditScreen({
               </div>
             </div>
 
-            <div>
-              <div className="flex items-center gap-1">
-                <span className="flex-1 text-[14px] font-semibold text-[#0D0D0D]">자기소개</span>
-                <button
-                  onClick={handleAiFillBio}
-                  className="flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[14px] font-semibold text-white"
-                  style={{ backgroundImage: 'linear-gradient(129deg, rgba(0,173,255,0.2) 0%, #00ADFF 29.568%, #0657FF 59.137%)' }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="/images/ai-tools/sparkle-ai-chip.svg" alt="" className="h-3.5 w-3.5" />
-                  AI로 채우기
-                </button>
-              </div>
-              <div className="mt-2">
-                <TextArea value={bio} onChange={setBio} rows={4} maxLength={300} />
-              </div>
-            </div>
           </div>
 
           <Button onClick={handleSave}>저장하기</Button>

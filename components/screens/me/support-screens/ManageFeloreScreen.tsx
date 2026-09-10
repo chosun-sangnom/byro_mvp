@@ -49,17 +49,18 @@ export function ManageFeloreScreen({
   user,
   onResetMockData,
 }: ManageFeloreScreenProps) {
-  const whoIAm = (profile.whoIAm ?? user.whoIAm) as PublicProfileWhoIAm
-  const life = (profile.life ?? user.life) as PublicProfileLife
-  const activityCount = life.daily.exercise.length
-  const cultureCount =
-    life.tastes.movies.length +
-    life.tastes.music.length +
-    life.tastes.books.length +
-    (life.tastes.plays?.length ?? 0)
-  const placeCount =
-    life.tastes.restaurants.length +
-    life.tastes.cafes.length
+  const whoIAm = (profile.whoIAm ?? user.whoIAm) as PublicProfileWhoIAm | undefined
+  const life = (profile.life ?? user.life) as PublicProfileLife | undefined
+  const activityCount = life?.daily.exercise.length ?? 0
+  const cultureCount = life
+    ? life.tastes.movies.length +
+      life.tastes.music.length +
+      life.tastes.books.length +
+      (life.tastes.plays?.length ?? 0)
+    : 0
+  const placeCount = life
+    ? life.tastes.restaurants.length + life.tastes.cafes.length
+    : 0
   const activeContactCount =
     user.contactChannels?.filter((ch) => ch.enabled && ch.value.trim()).length ?? 0
   const connectedSnsCount = Number(instagramConnected) + Number(linkedinConnected)
@@ -73,7 +74,7 @@ export function ManageFeloreScreen({
   ).length
 
   const completionChecks = [
-    { label: '나의 성향', done: Boolean(whoIAm.mbti) },
+    { label: '나의 성향', done: Boolean(whoIAm?.mbti || whoIAm?.personality || user.bio?.trim()) },
     { label: '하이라이트', done: allHighlights.length > 0 },
 
     { label: '바이브', done: activityCount + cultureCount + placeCount > 0 },
@@ -90,8 +91,8 @@ export function ManageFeloreScreen({
       rows: [
         {
           title: '프로필 편집',
-          hint: '프로필사진 · 자기소개 · 생년월일',
-          nudge: '얼굴 사진과 자기소개가 있으면 첫인상이 훨씬 기억에 남아요',
+          hint: '프로필사진 · 생년월일',
+          nudge: '얼굴 사진이 있으면 첫인상이 훨씬 기억에 남아요',
           meta: user.headline?.trim() || undefined,
           onClick: onEditBasic,
         },
@@ -109,9 +110,9 @@ export function ManageFeloreScreen({
       rows: [
         {
           title: '나의 성향',
-          hint: 'MBTI · 성향',
-          nudge: 'MBTI와 성향이 있으면 케미 리포트가 더 정확해져요',
-          meta: [whoIAm.mbti, whoIAm.personality ? '성향 있음' : undefined].filter(Boolean).join(' · ') || undefined,
+          hint: '자기소개 · MBTI · 성향',
+          nudge: '자기소개와 성향이 있으면 케미 리포트가 더 정확해져요',
+          meta: [whoIAm?.mbti, whoIAm?.personality ? '성향 있음' : undefined].filter(Boolean).join(' · ') || undefined,
           onClick: onEditWhoIAm,
         },
         {

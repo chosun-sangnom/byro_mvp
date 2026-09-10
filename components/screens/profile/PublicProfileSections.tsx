@@ -201,11 +201,13 @@ function MutualCompaniesCard({ companies }: { companies: string[] }) {
 /**
  * 최빈값 3축 카드 (SCRUM-124)
  *
- * 회사·산업군·직함에서 각각 독립적으로 1위 값을 뽑아 한 줄씩 보여준다.
- * 세 축은 서로 종속되지 않는다 — "1위 회사의 1위 직함" 같은 관계가 아니라
- * 각 축에서 따로 센 값이라, 축끼리 비교하거나 합산하면 안 된다.
- * 비율·막대는 쓰지 않는다(축끼리 비교하라는 오독을 부름). 총 장수는 섹션
- * 부제가 이미 말해주므로 값별 "N장"만 노출한다.
+ * 회사·산업군·직함에서 각각 독립적으로 1위 값을 뽑는다. 세 축은 서로 종속되지
+ * 않는다 — "1위 회사의 1위 직함" 같은 관계가 아니라 각 축에서 따로 센 값이라,
+ * 축끼리 비교하거나 합산하면 안 된다.
+ *
+ * 그래서 세로 리스트가 아니라 가로 3분할이다. 세로로 쌓으면 위에서 아래로
+ * 순위처럼 읽히는데, 셋은 동등한 별개 집계다. 비율·막대도 쓰지 않는다(축끼리
+ * 비교하라는 오독을 부름). 총 장수는 섹션 부제가 이미 말해주므로 값별 "N장"만.
  */
 function RememberTopValuesCard({
   total,
@@ -217,24 +219,31 @@ function RememberTopValuesCard({
   if (rows.length === 0 || total === 0) return null
 
   return (
-    <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-4">
+    <div className="rounded-[16px] border border-[#DEE4EC] px-4 pb-4 pt-3.5">
       <p className="text-[14px] font-bold text-[#0D0D0D]">가장 많이 나온 값</p>
       <p className="mt-1 text-[12px] text-[#6C7786]">
         회사·산업군·직함을 각각 따로 집계했어요
       </p>
 
-      {/* 총 장수는 섹션 부제("명함 247장을 리멤버했어요")가 이미 말해주므로
-          여기서는 "22장"만 둔다 — 줄마다 247을 반복하지 않는다 */}
-      <div className="mt-3.5 space-y-2.5">
-        {rows.map(({ label, value }) => (
-          <div key={label} className="flex items-baseline gap-3">
-            <span className="w-[44px] shrink-0 text-[12px] text-[#6C7786]">{label}</span>
-            <span className="min-w-0 flex-1 truncate text-[15px] font-bold tracking-[-0.01em] text-[#0D0D0D]">
+      <div className="mt-3 flex">
+        {rows.map(({ label, value }, i) => (
+          <div
+            key={label}
+            className={`min-w-0 flex-1 ${i > 0 ? 'border-l border-[#EDF1F6] pl-3' : ''} ${i < rows.length - 1 ? 'pr-3' : ''}`}
+          >
+            <span
+              className="inline-flex rounded-full px-1.5 py-0.5 text-[10px] font-semibold leading-[1.4]"
+              style={{ background: 'var(--color-accent-soft)', color: 'var(--color-accent-dark)' }}
+            >
+              {label}
+            </span>
+            {/* 회사·직함 이름은 8자까지 온다 — 3분할 칸에선 자르지 말고 어절 단위로 접는다 */}
+            <p className="mt-1.5 break-keep text-[14px] font-bold leading-[1.35] tracking-[-0.01em] text-[#0D0D0D]">
               {value.name}
-            </span>
-            <span className="shrink-0 text-[14px] font-bold text-[#25313D]">
+            </p>
+            <p className="mt-1 text-[12px] font-bold text-[#6C7786]">
               {value.count.toLocaleString()}장
-            </span>
+            </p>
           </div>
         ))}
       </div>

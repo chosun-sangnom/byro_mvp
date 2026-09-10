@@ -317,7 +317,7 @@ export function WhoIAmEditScreen({
             <TextArea
               value={personality}
               onChange={setPersonality}
-              placeholder="느슨하게 관계를 맺으며 천천히 신뢰를 쌓는 편이에요."
+              placeholder="관계 맺는 방식, 에너지 쓰는 방향, 일하는 스타일을 적어 주세요. (예: 처음엔 거리를 두지만 한번 신뢰하면 깊게 가고, 실행은 빠른 편이에요.)"
               rows={3}
             />
           </div>

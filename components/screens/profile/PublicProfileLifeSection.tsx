@@ -351,8 +351,11 @@ export function PublicProfileLifeSection({
   if (!hasAny || !life) {
     if (!(isOwner && onAdd)) return null
     return (
-      <div className="px-5 pb-32 pt-6">
-        <ProfileEmptyAddBlock label="바이브가" onAdd={onAdd} />
+      <div className="pb-32">
+        <BlockHeader label="무드보드" />
+        <div className="px-5">
+          <ProfileEmptyAddBlock label="바이브가" onAdd={onAdd} />
+        </div>
       </div>
     )
   }

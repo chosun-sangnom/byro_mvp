@@ -3,28 +3,27 @@
 import { Plus } from 'lucide-react'
 
 /**
- * 오너 뷰에서 섹션이 완전히 비어 있을 때(섹션 0개) 노출하는 "추가하기" 블록.
+ * 오너 뷰에서 섹션이 완전히 비어 있을 때(섹션 0개) 노출하는 "탭하여 추가" 블록.
  * 방문자에게는 렌더하지 않는다 — 빈 섹션은 그대로 숨긴다.
- * 기존 빈 상태(점선 박스 + 회색 안내 문구) 톤을 유지하고 버튼만 얹는다.
+ * 박스 전체가 탭 타깃. 점선 테두리 + 흰 배경 + 한 줄 안내.
  */
 export function ProfileEmptyAddBlock({
   label,
   onAdd,
 }: {
+  /** 예: "성향 정보가" / "하이라이트가" — "아직 {label} 없어요"로 조합 */
   label: string
   onAdd: () => void
 }) {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-[16px] border border-dashed border-[#DEE4EC] bg-[var(--color-bg-soft)] px-4 py-8 text-center">
-      <p className="text-[13px] text-[#A8B1BD]">{label}</p>
-      <button
-        type="button"
-        onClick={onAdd}
-        className="inline-flex items-center gap-1 rounded-full bg-[#0D0D0D] px-3.5 py-2 text-[13px] font-semibold text-white active:opacity-80"
-      >
-        <Plus size={14} strokeWidth={2.5} />
-        추가하기
-      </button>
-    </div>
+    <button
+      type="button"
+      onClick={onAdd}
+      className="flex w-full items-center justify-center gap-1.5 rounded-[14px] border border-dashed border-[#CBD3DE] bg-white px-4 py-3.5 text-[13px] transition-colors active:bg-[#F5F6F7]"
+    >
+      <Plus size={14} strokeWidth={2.5} className="shrink-0 text-[#A8B1BD]" />
+      <span className="text-[#6C7786]">아직 {label} 없어요</span>
+      <span className="text-[#A8B1BD]">· 탭하여 추가해보세요</span>
+    </button>
   )
 }

@@ -60,7 +60,7 @@ export function PublicProfileWhoIAmSection({
         subtitle="MBTI와 생활감 있는 정보로 프로필의 기본 결을 정리합니다."
       />
       {isEmpty ? (
-        <ProfileEmptyAddBlock label="아직 성향 정보가 없어요" onAdd={onAdd!} />
+        <ProfileEmptyAddBlock label="성향 정보가" onAdd={onAdd!} />
       ) : (
         <div className="grid grid-cols-1 gap-3">
           {bio && <BioBlock text={bio} />}

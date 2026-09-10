@@ -106,7 +106,7 @@ function AiPersonalitySheet({
         <div className="flex items-center gap-1">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/images/ai-tools/sparkle-modal.svg" alt="" className="h-6 w-6" />
-          <h3 className="text-[18px] font-bold text-[#0D0D0D]">AI로 성향 채우기</h3>
+          <h3 className="text-[18px] font-bold text-[#0D0D0D]">AI에게 성향 물어보기</h3>
         </div>
 
         {/* 프롬프트 */}
@@ -221,30 +221,6 @@ export function WhoIAmEditScreen({
       <div className="flex-1 overflow-y-auto">
         <div className="px-5 py-5 flex flex-col gap-9">
 
-          {/* 자기소개 */}
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-1">
-              <span className="flex-1 text-[14px] font-semibold text-[#0D0D0D]">자기소개</span>
-              <button
-                type="button"
-                onClick={handleAiFillBio}
-                className="flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[14px] font-semibold text-white"
-                style={{ backgroundImage: 'linear-gradient(129deg, rgba(0,173,255,0.2) 0%, #00ADFF 29.568%, #0657FF 59.137%)' }}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/ai-tools/sparkle-ai-chip.svg" alt="" className="h-3.5 w-3.5" />
-                AI로 채우기
-              </button>
-            </div>
-            <TextArea
-              value={bio}
-              onChange={setBio}
-              placeholder="한 문단으로 나를 소개해 주세요."
-              rows={4}
-              maxLength={300}
-            />
-          </div>
-
           {/* MBTI */}
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
@@ -299,6 +275,30 @@ export function WhoIAmEditScreen({
             </div>
           </div>
 
+          {/* 자기소개 */}
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-1">
+              <span className="flex-1 text-[14px] font-semibold text-[#0D0D0D]">자기소개</span>
+              <button
+                type="button"
+                onClick={handleAiFillBio}
+                className="flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[14px] font-semibold text-white"
+                style={{ backgroundImage: 'linear-gradient(129deg, rgba(0,173,255,0.2) 0%, #00ADFF 29.568%, #0657FF 59.137%)' }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/images/ai-tools/sparkle-ai-chip.svg" alt="" className="h-3.5 w-3.5" />
+                AI로 채우기
+              </button>
+            </div>
+            <TextArea
+              value={bio}
+              onChange={setBio}
+              placeholder="어떤 일을 하고 무엇에 관심 있는지 두세 문장으로 적어 주세요. (예: 브랜드·커뮤니티 일을 하고, 오프라인 모임을 자주 열어요.)"
+              rows={4}
+              maxLength={300}
+            />
+          </div>
+
           {/* 성향 */}
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-1">
@@ -311,7 +311,7 @@ export function WhoIAmEditScreen({
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src="/images/ai-tools/sparkle-ai-chip.svg" alt="" className="h-3.5 w-3.5" />
-                AI로 채우기
+                AI로 물어보기
               </button>
             </div>
             <TextArea

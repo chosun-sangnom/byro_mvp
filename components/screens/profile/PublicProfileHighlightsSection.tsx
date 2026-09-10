@@ -70,7 +70,7 @@ export function ProfileHighlightsSection({
     return (
       <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06}>
         <SectionTitle title="하이라이트" />
-        <ProfileEmptyAddBlock label="아직 하이라이트가 없어요" onAdd={onAdd!} />
+        <ProfileEmptyAddBlock label="하이라이트가" onAdd={onAdd!} />
       </AnimatedSection>
     )
   }

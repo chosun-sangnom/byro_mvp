@@ -172,7 +172,6 @@ export function PublicProfileReputationTabPage({
       <ProfileRememberSection
         total={profile.rememberHighlight.total}
         industries={profile.rememberHighlight.industries}
-        topIndustryRanks={profile.rememberHighlight.topIndustryRanks}
         isLoggedIn={store.isLoggedIn}
         viewerNetworkDomains={store.user?.networkDomains}
         viewerName={store.user?.name}

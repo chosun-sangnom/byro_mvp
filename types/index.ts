@@ -227,7 +227,6 @@ export interface RememberIndustry {
   name: string
   ratio: number
   count?: number
-  topRole?: { name: string; count: number }
 }
 
 /**
@@ -261,9 +260,8 @@ export interface RememberHighlight {
   topCompany?: RememberTopValue
   topIndustry?: RememberTopValue
   topRole?: RememberTopValue
+  /** 관심 도메인 인사이트(겹치는 업종 밀도) 계산용 업종 분포 */
   industries: RememberIndustry[]
-  topIndustryRanks?: RememberIndustry[]
-  topIndustryRoles?: RememberIndustry[]
   insight?: RememberInsight
   mutualCompanies?: string[]
 }

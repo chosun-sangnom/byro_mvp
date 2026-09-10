@@ -3,7 +3,7 @@
 import { type ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronRight, Lock } from 'lucide-react'
-import type { ContactChannel, Experience, RememberIndustry, RememberTopValue } from '@/types'
+import type { ContactChannel, Experience, RememberTopValue } from '@/types'
 
 const SECTION_EASE = [0.22, 1, 0.36, 1] as const
 
@@ -201,9 +201,11 @@ function MutualCompaniesCard({ companies }: { companies: string[] }) {
 /**
  * 최빈값 3축 카드 (SCRUM-124)
  *
- * 회사·산업군·직함에서 각각 독립적으로 1위 값을 뽑아 "명함 N장 중 M장" 형태로
- * 보여준다. 세 축은 서로 종속되지 않으므로 막대는 각자 "전체 대비 비율"만 뜻하고
- * 축끼리 비교하라는 의미가 아니다.
+ * 회사·산업군·직함에서 각각 독립적으로 1위 값을 뽑아 한 줄씩 보여준다.
+ * 세 축은 서로 종속되지 않는다 — "1위 회사의 1위 직함" 같은 관계가 아니라
+ * 각 축에서 따로 센 값이라, 축끼리 비교하거나 합산하면 안 된다.
+ * 비율·막대는 쓰지 않는다(축끼리 비교하라는 오독을 부름). 총 장수는 섹션
+ * 부제가 이미 말해주므로 값별 "N장"만 노출한다.
  */
 function RememberTopValuesCard({
   total,
@@ -243,7 +245,6 @@ function RememberTopValuesCard({
 export function ProfileRememberSection({
   total,
   industries,
-  topIndustryRanks,
   isLoggedIn,
   viewerNetworkDomains,
   viewerName,
@@ -254,8 +255,7 @@ export function ProfileRememberSection({
   topRole,
 }: {
   total: number
-  industries: Array<{ name: string; ratio: number; count?: number; topRole?: { name: string; count: number } }>
-  topIndustryRanks?: RememberIndustry[]
+  industries: Array<{ name: string; ratio: number; count?: number }>
   isLoggedIn: boolean
   viewerNetworkDomains?: string[]
   viewerName?: string
@@ -265,11 +265,6 @@ export function ProfileRememberSection({
   topIndustry?: RememberTopValue
   topRole?: RememberTopValue
 }) {
-  // industries[0] — 관심 도메인 인사이트에서 "이 업종이 1위인가" 판정에만 쓴다.
-  // 최빈값 3축의 topIndustry prop과는 다른 값이라 이름을 분리한다.
-  const topIndustryEntry = industries[0]
-  const topRank = topIndustryRanks?.[0]
-
   const topValueRows = [
     { label: '회사', value: topCompany },
     { label: '산업군', value: topIndustry },
@@ -288,13 +283,11 @@ export function ProfileRememberSection({
       if (!entry) return null
       const count = entry.count ?? Math.round(total * entry.ratio / 100)
       const percentile = Math.max(3, Math.round(35 - entry.ratio * 0.6))
-      const isTop = entry.name === topIndustryEntry?.name
-      const rankCount = isTop && topRank ? Math.round(count * topRank.ratio / 100) : 0
-      const headline = entry.topRole
-        ? `${domain} 쪽에 ${count}명, 그중 ${entry.topRole.name}이 ${entry.topRole.count}명입니다.`
-        : isTop && topRank
-          ? `${domain} 쪽에 ${count}명, 그중 ${topRank.name}이 ${rankCount}명입니다.`
-          : `${domain} 쪽에 ${count}명입니다.`
+      // 이 블록은 "내 관심 분야와 얼마나 겹치나"(밀도)만 말한다.
+      // 직함 구성은 위의 최빈값 3축이 이미 세고 있어서, 여기서 또 세면
+      // 같은 값을 다르게 집계한 두 숫자가 나란히 놓여 서로를 부정한다.
+      // 단위도 '장'으로 통일 — 같은 명함 집계에 '명'/'장'이 섞이면 다른 값처럼 읽힌다.
+      const headline = `${domain} 쪽 명함이 ${count}장이에요.`
       return { domain, entryName: entry.name, percentile, headline, count }
     })
     .filter((v): v is { domain: string; entryName: string; percentile: number; headline: string; count: number } => v !== null)

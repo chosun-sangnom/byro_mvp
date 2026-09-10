@@ -143,7 +143,6 @@ export function RememberNetworkManageScreen({
           <ProfileRememberSection
             total={MOCK_IMPORTED_NETWORK.total}
             industries={MOCK_IMPORTED_NETWORK.industries}
-            topIndustryRanks={MOCK_IMPORTED_NETWORK.topIndustryRanks}
             topCompany={MOCK_IMPORTED_NETWORK.topCompany}
             topIndustry={MOCK_IMPORTED_NETWORK.topIndustry}
             topRole={MOCK_IMPORTED_NETWORK.topRole}
@@ -178,7 +177,6 @@ export function RememberNetworkManageScreen({
             <ProfileRememberSection
               total={MOCK_IMPORTED_NETWORK.total}
               industries={MOCK_IMPORTED_NETWORK.industries}
-              topIndustryRanks={MOCK_IMPORTED_NETWORK.topIndustryRanks}
               topCompany={MOCK_IMPORTED_NETWORK.topCompany}
               topIndustry={MOCK_IMPORTED_NETWORK.topIndustry}
               topRole={MOCK_IMPORTED_NETWORK.topRole}

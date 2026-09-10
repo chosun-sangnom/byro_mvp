@@ -144,11 +144,14 @@ export function ProfileHeroSection({
               </button>
 
               <div className="flex h-full w-full flex-col items-center justify-center px-8">
-                <div className="relative w-full max-w-[360px]">
-                  <div className="aspect-[328/432] w-full overflow-hidden rounded-[24px] bg-white/4">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={activeImage} alt={`${profile.name} 확대 사진`} className="h-full w-full object-cover" />
-                  </div>
+                <div className="relative flex w-full max-w-[360px] items-center justify-center">
+                  {/* 라이트박스는 카드 비율로 크롭하지 않고 원본 비율 그대로, 뷰포트 안에서 최대치로 보여준다 */}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={activeImage}
+                    alt={`${profile.name} 확대 사진`}
+                    className="max-h-[70vh] w-auto max-w-full rounded-[24px] object-contain"
+                  />
 
                   {galleryImages.length > 1 && (
                     <>

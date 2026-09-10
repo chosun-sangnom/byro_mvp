@@ -207,7 +207,10 @@ function MutualCompaniesCard({ companies }: { companies: string[] }) {
  *
  * 그래서 세로 리스트가 아니라 가로 3분할이다. 세로로 쌓으면 위에서 아래로
  * 순위처럼 읽히는데, 셋은 동등한 별개 집계다. 비율·막대도 쓰지 않는다(축끼리
- * 비교하라는 오독을 부름). 총 장수는 섹션 부제가 이미 말해주므로 값별 "N장"만.
+ * 비교하라는 오독을 부름). 총합은 섹션 부제가 이미 말해주므로 값별 "N명"만.
+ *
+ * 단위는 '장'이 아니라 '명'이다 — 집계 원본은 명함이지만, 읽는 사람이 알고 싶은
+ * 건 "카카오 사람 중 아는 사람이 몇인가"이지 명함이 몇 장인가가 아니다.
  */
 function RememberTopValuesCard({
   total,
@@ -220,9 +223,9 @@ function RememberTopValuesCard({
 
   return (
     <div className="rounded-[16px] border border-[#DEE4EC] px-4 pb-4 pt-3.5">
-      <p className="text-[14px] font-bold text-[#0D0D0D]">가장 많이 나온 값</p>
+      <p className="text-[14px] font-bold text-[#0D0D0D]">이런 사람을 많이 알아요</p>
       <p className="mt-1 text-[12px] text-[#6C7786]">
-        회사·산업군·직함을 각각 따로 집계했어요
+        회사·산업군·직함을 각각 따로 세었어요
       </p>
 
       <div className="mt-3 flex">
@@ -242,7 +245,7 @@ function RememberTopValuesCard({
               {value.name}
             </p>
             <p className="mt-1 text-[12px] font-bold text-[#6C7786]">
-              {value.count.toLocaleString()}장
+              {value.count.toLocaleString()}명
             </p>
           </div>
         ))}
@@ -295,8 +298,7 @@ export function ProfileRememberSection({
       // 이 블록은 "내 관심 분야와 얼마나 겹치나"(밀도)만 말한다.
       // 직함 구성은 위의 최빈값 3축이 이미 세고 있어서, 여기서 또 세면
       // 같은 값을 다르게 집계한 두 숫자가 나란히 놓여 서로를 부정한다.
-      // 단위도 '장'으로 통일 — 같은 명함 집계에 '명'/'장'이 섞이면 다른 값처럼 읽힌다.
-      const headline = `${domain} 쪽 명함이 ${count}장이에요.`
+      const headline = `${domain} 쪽에 아는 사람이 ${count}명이에요.`
       return { domain, entryName: entry.name, percentile, headline, count }
     })
     .filter((v): v is { domain: string; entryName: string; percentile: number; headline: string; count: number } => v !== null)
@@ -311,7 +313,7 @@ export function ProfileRememberSection({
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.02}>
       <SectionTitle
         title="리멤버 네트워크"
-        subtitle={isEmpty ? undefined : `지금까지 명함 ${total.toLocaleString()}장을 리멤버했어요`}
+        subtitle={isEmpty ? undefined : `지금까지 ${total.toLocaleString()}명을 리멤버했어요`}
       />
 
       {isEmpty ? (

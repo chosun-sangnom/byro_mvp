@@ -133,7 +133,7 @@ export function RememberNetworkManageScreen({
               <Sparkles size={24} />
             </div>
             <p className="text-[16px] font-black tracking-[-0.02em]" style={{ color: 'var(--color-text-primary)' }}>
-              명함 {MOCK_IMPORTED_NETWORK.total}장을 가져왔어요!
+              명함에서 {MOCK_IMPORTED_NETWORK.total}명을 가져왔어요!
             </p>
             <p className="mt-1 text-[13px] leading-[1.6]" style={{ color: 'var(--color-text-secondary)' }}>
               확인을 누르면 아래 내용으로 내 네트워크에 반영돼요

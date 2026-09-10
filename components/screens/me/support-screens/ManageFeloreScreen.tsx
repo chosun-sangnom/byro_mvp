@@ -151,7 +151,7 @@ export function ManageFeloreScreen({
           title: '네트워크',
           hint: '리멤버 명함 기반 자동 집계',
           nudge: '공통 인맥이 보이면 연결 고리가 생겨요',
-          meta: `${profile.rememberHighlight.total}장 리멤버`,
+          meta: `${profile.rememberHighlight.total}명 리멤버`,
           onClick: onEditNetwork,
         },
         {

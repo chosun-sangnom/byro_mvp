@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Brain, ChevronRight, Images, Network, Sparkles, UserSearch } from 'lucide-react'
+import { Brain, Images, Network, Sparkles, UserSearch } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { Button } from '@/components/ui'
 
@@ -67,9 +67,9 @@ function CardHeader({ label, title, badge }: { label: string; title: string; bad
 function PreviewBasicInfo() {
   return (
     <MenuCard>
-      <MenuRow icon={<Brain size={18} className="text-[#6C7786]" />} title="MBTI" sub="예: ENFP · 재기발랄한 활동가" trailing={<ChevronRight size={24} className="flex-shrink-0 text-[#A8B1BD]" />} />
+      <MenuRow icon={<Brain size={18} className="text-[#6C7786]" />} title="MBTI" sub="예: ENFP · 재기발랄한 활동가" />
       <MenuDivider />
-      <MenuRow icon={<Sparkles size={18} className="text-[#6C7786]" />} title="성향" sub="관계·소통 스타일을 알려줘요" trailing={<ChevronRight size={24} className="flex-shrink-0 text-[#A8B1BD]" />} />
+      <MenuRow icon={<Sparkles size={18} className="text-[#6C7786]" />} title="성향" sub="관계·소통 스타일을 알려줘요" />
     </MenuCard>
   )
 }
@@ -91,7 +91,6 @@ function PreviewHighlight() {
             boxed={false}
             title={item.title}
             sub={item.sub}
-            trailing={<ChevronRight size={24} className="flex-shrink-0 text-[#A8B1BD]" />}
           />
         </div>
       ))}

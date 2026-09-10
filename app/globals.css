@@ -15,6 +15,15 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/*
+ * Pretendard — 디자인 시스템(Figma) 기준 서체. 앱 전역 서체 교체는 별도 결정이라
+ * 지금은 케미 리포트 화면에만 적용한다(타이틀이 시스템 폴백으로 명조처럼 렌더되던 문제).
+ */
+.font-pretendard,
+[data-kemi-report] {
+  font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
 /* Prevent text selection on UI elements */
 .no-select {
   -webkit-user-select: none;

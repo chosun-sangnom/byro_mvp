@@ -248,7 +248,7 @@ function ShareCard({
         ...(offscreen ? { position: 'fixed', left: '-9999px', top: 0, width: '328px' } : { width: '100%' }),
         background: '#FFFFFF',
         borderRadius: '12px',
-        fontFamily: "'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif",
+        fontFamily: "'Pretendard', 'Apple SD Gothic Neo', -apple-system, BlinkMacSystemFont, sans-serif",
         overflow: 'hidden',
         border: offscreen ? undefined : `0.66px solid ${HAIRLINE}`,
       }}
@@ -327,7 +327,7 @@ function KemiAnalyzing({ targetName, onBack, onDone }: { targetName: string; onB
   }, [onDone])
 
   return (
-    <div className="fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
+    <div className="font-pretendard fixed inset-0 z-[100] mx-auto flex w-full max-w-[430px] flex-col bg-white">
       <div className="flex h-12 flex-shrink-0 items-center px-2" style={{ borderBottom: `1px solid ${HAIRLINE}` }}>
         <button onClick={onBack} className="flex items-center p-2" style={{ color: '#0D0D0D' }}>
           <ChevronLeft size={20} />
@@ -433,7 +433,7 @@ export default function KemiReportScreen({ username }: { username: string }) {
   }
 
   return (
-    <div className="flex h-full flex-col bg-white">
+    <div className="font-pretendard flex h-full flex-col bg-white">
       <style>{KEMI_ANIM_CSS}</style>
       {/* 헤더 */}
       <div className="flex h-12 flex-shrink-0 items-center justify-between border-b px-2" style={{ borderColor: HAIRLINE }}>

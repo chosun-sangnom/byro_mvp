@@ -13,6 +13,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
+      <head>
+        {/* Pretendard — 디자인 시스템 기준 서체(Figma 전체 Pretendard). 한글 dynamic subset. */}
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard-dynamic-subset.min.css"
+        />
+      </head>
       <body className="antialiased overflow-x-hidden">
         {children}
       </body>

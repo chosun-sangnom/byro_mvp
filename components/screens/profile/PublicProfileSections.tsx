@@ -216,33 +216,23 @@ function RememberTopValuesCard({
 
   return (
     <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-4">
-      <p className="text-[14px] font-bold text-[#0D0D0D]">
-        명함에서 가장 많이 나온 값
-      </p>
+      <p className="text-[14px] font-bold text-[#0D0D0D]">가장 많이 나온 값</p>
       <p className="mt-1 text-[12px] text-[#6C7786]">
         회사·산업군·직함을 각각 따로 집계했어요
       </p>
 
-      <div className="mt-4 space-y-3.5">
-        {rows.map(({ label, value }, i) => (
-          <div
-            key={label}
-            className={i > 0 ? 'border-t border-[#EEEEF0] pt-3.5' : undefined}
-          >
-            <div className="flex items-baseline justify-between gap-3">
-              <div className="min-w-0">
-                <p className="text-[11.5px] font-medium text-[#6C7786]">{label}</p>
-                <p className="mt-0.5 truncate text-[17px] font-bold tracking-[-0.02em] text-[#0D0D0D]">
-                  {value.name}
-                </p>
-              </div>
-              <p className="shrink-0 text-[11.5px] text-[#6C7786]">
-                {total.toLocaleString()}장 중{' '}
-                <span className="text-[15px] font-bold text-[#25313D]">
-                  {value.count.toLocaleString()}장
-                </span>
-              </p>
-            </div>
+      {/* 총 장수는 섹션 부제("명함 247장을 리멤버했어요")가 이미 말해주므로
+          여기서는 "22장"만 둔다 — 줄마다 247을 반복하지 않는다 */}
+      <div className="mt-3.5 space-y-2.5">
+        {rows.map(({ label, value }) => (
+          <div key={label} className="flex items-baseline gap-3">
+            <span className="w-[44px] shrink-0 text-[12px] text-[#6C7786]">{label}</span>
+            <span className="min-w-0 flex-1 truncate text-[15px] font-bold tracking-[-0.01em] text-[#0D0D0D]">
+              {value.name}
+            </span>
+            <span className="shrink-0 text-[14px] font-bold text-[#25313D]">
+              {value.count.toLocaleString()}장
+            </span>
           </div>
         ))}
       </div>

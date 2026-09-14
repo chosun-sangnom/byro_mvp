@@ -19,11 +19,7 @@ import { ProfileHighlightsSection } from '@/components/screens/profile/PublicPro
 import { PublicProfileLifeSection } from '@/components/screens/profile/PublicProfileLifeSection'
 import { PublicProfileWhoIAmSection } from '@/components/screens/profile/PublicProfileWhoIAmSection'
 import { TabSummaryBlock } from '@/components/screens/profile/TabSummaryBlock'
-import {
-  buildNetworkSummaryPrompt,
-  buildVibeSummaryPrompt,
-  buildWhoSummaryPrompt,
-} from '@/lib/tabSummaryPrompt'
+import { autoNetworkSummary, autoVibeSummary, autoWhoSummary } from '@/lib/tabSummaryAuto'
 
 function usePublicProfileTabData(username: string) {
   const store = useFeloreStore()
@@ -125,8 +121,8 @@ export function PublicProfileWhoTabPage({
       <TabSummaryBlock
         summary={profile.tabSummaries?.who}
         isOwner={isOwner}
-        promptText={buildWhoSummaryPrompt(profile)}
-        onSave={(text) => store.updateTabSummary('who', text || undefined)}
+        autoSummary={autoWhoSummary(profile)}
+        onSave={(text) => store.updateTabSummary('who', text)}
       />
       <PublicProfileWhoIAmSection
         whoIAm={profile.whoIAm}
@@ -175,8 +171,8 @@ export function PublicProfileLifeTabPage({
       <TabSummaryBlock
         summary={profile.tabSummaries?.vibe}
         isOwner={isOwner}
-        promptText={buildVibeSummaryPrompt(profile.life)}
-        onSave={(text) => store.updateTabSummary('vibe', text || undefined)}
+        autoSummary={autoVibeSummary(profile.life)}
+        onSave={(text) => store.updateTabSummary('vibe', text)}
       />
       <PublicProfileLifeSection
         life={profile.life}
@@ -210,8 +206,8 @@ export function PublicProfileReputationTabPage({
       <TabSummaryBlock
         summary={profile.tabSummaries?.network}
         isOwner={isOwner}
-        promptText={buildNetworkSummaryPrompt(profile.rememberHighlight, profile.reputationKeywords)}
-        onSave={(text) => store.updateTabSummary('network', text || undefined)}
+        autoSummary={autoNetworkSummary(profile.rememberHighlight, profile.reputationKeywords)}
+        onSave={(text) => store.updateTabSummary('network', text)}
       />
       <ProfileRememberSection
         total={profile.rememberHighlight.total}

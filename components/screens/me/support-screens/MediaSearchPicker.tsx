@@ -23,7 +23,6 @@
 
 import { useEffect, useState } from 'react'
 import { BookOpen, Clapperboard, Loader2, PenLine, Search, Sparkles, Theater, X } from 'lucide-react'
-import { ItemReviewField } from '@/components/ui'
 import type { LifeMediaItem } from '@/types'
 import type { AiSearchItem } from '@/app/api/ai-search/route'
 
@@ -215,9 +214,6 @@ export function MediaSearchPicker({
 
   const remove = (label: string) => onChange(selected.filter((s) => s.label !== label))
 
-  const updateReview = (label: string, review: string | undefined) =>
-    onChange(selected.map((s) => (s.label === label ? { ...s, review } : s)))
-
   const getPlaceholderColor = (label: string) =>
     MOCK_DATA[type].find((m) => m.title === label)?.placeholderColor ?? '#555'
 
@@ -231,29 +227,23 @@ export function MediaSearchPicker({
           {selected.map((item) => (
             <div
               key={item.label}
-              className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-3 py-2"
+              className="flex items-center gap-3 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-3 py-2"
             >
-              <div className="flex items-center gap-3">
-                <MediaCover
-                  posterUrl={item.posterUrl}
-                  placeholderColor={getPlaceholderColor(item.label)}
-                  Icon={config.Icon}
-                  size={36}
-                />
-                <div className="flex-1 min-w-0">
-                  <p className="truncate text-[13px] font-semibold text-[var(--color-text-primary)]">{item.label}</p>
-                  {item.sublabel && (
-                    <p className="text-[11px] text-[var(--color-text-tertiary)]">{item.sublabel}</p>
-                  )}
-                </div>
-                <button onClick={() => remove(item.label)} className="flex-shrink-0 p-1">
-                  <X size={14} className="text-[var(--color-text-tertiary)]" />
-                </button>
-              </div>
-              <ItemReviewField
-                value={item.review}
-                onChange={(review) => updateReview(item.label, review)}
+              <MediaCover
+                posterUrl={item.posterUrl}
+                placeholderColor={getPlaceholderColor(item.label)}
+                Icon={config.Icon}
+                size={36}
               />
+              <div className="flex-1 min-w-0">
+                <p className="truncate text-[13px] font-semibold text-[var(--color-text-primary)]">{item.label}</p>
+                {item.sublabel && (
+                  <p className="text-[11px] text-[var(--color-text-tertiary)]">{item.sublabel}</p>
+                )}
+              </div>
+              <button onClick={() => remove(item.label)} className="flex-shrink-0 p-1">
+                <X size={14} className="text-[var(--color-text-tertiary)]" />
+              </button>
             </div>
           ))}
         </div>

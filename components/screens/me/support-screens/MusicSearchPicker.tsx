@@ -23,7 +23,6 @@
 
 import { useEffect, useState } from 'react'
 import { Loader2, Music, PenLine, Search, Sparkles, X } from 'lucide-react'
-import { ItemReviewField } from '@/components/ui'
 import type { LifeMediaItem } from '@/types'
 import type { AiSearchItem } from '@/app/api/ai-search/route'
 
@@ -174,9 +173,6 @@ export function MusicSearchPicker({
     onChange(selected.filter((s) => !(s.label === item.label && s.sublabel === item.sublabel)))
   }
 
-  const updateReview = (item: LifeMediaItem, review: string | undefined) =>
-    onChange(selected.map((s) => (s.label === item.label && s.sublabel === item.sublabel ? { ...s, review } : s)))
-
   const getPlaceholderColor = (item: LifeMediaItem) =>
     MOCK_TRACKS.find((t) => t.title === item.label && t.artist === item.sublabel)?.placeholderColor ?? '#888'
 
@@ -188,19 +184,16 @@ export function MusicSearchPicker({
           {selected.map((item) => (
             <div
               key={`${item.label}__${item.sublabel}`}
-              className="rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-3 py-2"
+              className="flex items-center gap-3 rounded-xl border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] px-3 py-2"
             >
-              <div className="flex items-center gap-3">
-                <AlbumArt posterUrl={item.posterUrl} placeholderColor={getPlaceholderColor(item)} size={36} />
-                <div className="flex-1 min-w-0">
-                  <p className="truncate text-[13px] font-semibold text-[var(--color-text-primary)]">{item.label}</p>
-                  <p className="text-[11px] text-[var(--color-text-tertiary)]">{item.sublabel}</p>
-                </div>
-                <button onClick={() => remove(item)} className="flex-shrink-0 p-1">
-                  <X size={14} className="text-[var(--color-text-tertiary)]" />
-                </button>
+              <AlbumArt posterUrl={item.posterUrl} placeholderColor={getPlaceholderColor(item)} size={36} />
+              <div className="flex-1 min-w-0">
+                <p className="truncate text-[13px] font-semibold text-[var(--color-text-primary)]">{item.label}</p>
+                <p className="text-[11px] text-[var(--color-text-tertiary)]">{item.sublabel}</p>
               </div>
-              <ItemReviewField value={item.review} onChange={(review) => updateReview(item, review)} />
+              <button onClick={() => remove(item)} className="flex-shrink-0 p-1">
+                <X size={14} className="text-[var(--color-text-tertiary)]" />
+              </button>
             </div>
           ))}
         </div>

@@ -1,22 +1,13 @@
 'use client'
 
-import { createPortal } from 'react-dom'
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight, MessageSquareText, X } from 'lucide-react'
 import { BottomSheet } from '@/components/ui'
-import type { LifeMediaItem, PublicProfileLife } from '@/types'
+import type { PublicProfileLife } from '@/types'
 import { ProfileEmptyAddBlock } from '@/components/screens/profile/ProfileEmptyAddBlock'
+import { VibeImage, VibeKindBadge } from '@/components/screens/profile/vibeCardParts'
+import { flattenVibe, VIBE_GROUPS, VIBE_KIND_META, type VibeEntry, type VibeGroup } from '@/lib/vibeItems'
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-type AspectType = 'portrait' | 'square' | 'place'
-
-type VibeItem = LifeMediaItem & {
-  category: string
-  aspectType: AspectType
-}
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
+// ─── 무드보드 콜라주 ──────────────────────────────────────────────────────────
 
 type GridSlot = { col: string; row: string }
 type LayoutPattern = {
@@ -80,149 +71,57 @@ const LAYOUTS: LayoutPattern[] = [
   },
 ]
 
-function buildVibeItemsRandom(life: PublicProfileLife): VibeItem[] {
-  const candidates: VibeItem[] = []
-
-  const pets = life.daily.pets ?? []
-  if (pets.length) {
-    const withImage = pets.filter((p) => p.image)
-    const pool = withImage.length > 0 ? withImage : pets
-    const pickedPet = pool[Math.floor(Math.random() * pool.length)]
-    candidates.push({
-      label: pickedPet.name ?? pickedPet.type,
-      sublabel: pickedPet.name ? pickedPet.type : undefined,
-      posterUrl: pickedPet.image,
-      category: '반려동물',
-      aspectType: 'square',
-    })
+// 사진 카드를 뺀 종류별 1장씩 랜덤(이미지 있는 카드 우선), 최대 6장
+function pickCollageEntries(entries: VibeEntry[]): VibeEntry[] {
+  const byKind = new Map<string, VibeEntry[]>()
+  for (const entry of entries) {
+    if (entry.kind === 'photo') continue
+    byKind.set(entry.kind, [...(byKind.get(entry.kind) ?? []), entry])
   }
 
-  const sources: [LifeMediaItem[], string, AspectType][] = [
-    [life.tastes.movies, '영화', 'portrait'],
-    [life.tastes.music, '음악', 'square'],
-    [life.tastes.books, '책', 'portrait'],
-    [life.tastes.plays ?? [], '뮤지컬', 'portrait'],
-    [life.daily.exercise, '운동', 'square'],
-    [life.tastes.restaurants, '맛집', 'place'],
-    [life.tastes.cafes, '카페', 'place'],
-  ]
+  const picked: VibeEntry[] = []
+  byKind.forEach((list) => {
+    const withImage = list.filter((e) => e.imageUrl)
+    const pool = withImage.length > 0 ? withImage : list
+    picked.push(pool[Math.floor(Math.random() * pool.length)])
+  })
 
-  // 카테고리당 1개 랜덤 뽑기 (이미지 있는 것 우선)
-  for (const [arr, category, aspectType] of sources) {
-    if (!arr.length) continue
-    const withImage = arr.filter((item) => item.posterUrl)
-    const pool = withImage.length > 0 ? withImage : arr
-    const picked = pool[Math.floor(Math.random() * pool.length)]
-    candidates.push({ ...picked, category, aspectType })
-  }
-
-  // Fisher-Yates 셔플
-  for (let i = candidates.length - 1; i > 0; i--) {
+  for (let i = picked.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
-    ;[candidates[i], candidates[j]] = [candidates[j], candidates[i]]
+    ;[picked[i], picked[j]] = [picked[j], picked[i]]
   }
-
-  return candidates.slice(0, 6)
+  return picked.slice(0, 6)
 }
 
-function getItemId(item: LifeMediaItem) {
-  return item.label + (item.sublabel ?? '')
-}
-
-// 딥 감상이 있는 항목에 표시하는 인디케이터. 탭하면 감상 전문을 시트로 보여준다. (SCRUM-122)
-function ReviewBadge({ onOpen, dark }: { onOpen: () => void; dark?: boolean }) {
+function CollageCard({ entry, onOpen }: { entry: VibeEntry; onOpen: () => void }) {
   return (
-    <button
-      type="button"
-      onClick={(e) => {
-        e.stopPropagation()
-        onOpen()
-      }}
-      aria-label="감상 보기"
-      className="absolute bottom-1.5 right-1.5 flex h-6 w-6 items-center justify-center rounded-full"
-      style={{ backgroundColor: dark ? 'rgba(0,0,0,0.55)' : 'rgba(13,13,13,0.08)' }}
-    >
-      <MessageSquareText size={12} className={dark ? 'text-white' : 'text-[#0D0D0D]'} />
+    <button type="button" onClick={onOpen} className="relative h-full w-full overflow-hidden rounded-xl text-left">
+      <div className="absolute inset-0">
+        <VibeImage entry={entry} />
+      </div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+      <div className="absolute left-2 top-2">
+        <VibeKindBadge kind={entry.kind} />
+      </div>
+      <div className="absolute bottom-0 left-0 right-0 p-2.5">
+        <p className="truncate text-[12px] font-semibold leading-tight text-white drop-shadow">{entry.label}</p>
+        {entry.sublabel && <p className="truncate text-[10px] text-white/70">{entry.sublabel}</p>}
+      </div>
     </button>
   )
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  영화: '#3B82F6',
-  음악: '#22C55E',
-  책: '#F59E0B',
-  뮤지컬: '#A855F7',
-  운동: '#EF4444',
-  맛집: '#EC4899',
-  카페: '#92400E',
-  반려동물: '#FB923C',
-}
-
-// ─── Vibe Board ───────────────────────────────────────────────────────────────
-
-function VibeCard({ item, onOpenReview }: { item: VibeItem; onOpenReview: (item: LifeMediaItem) => void }) {
-  const color = CATEGORY_COLORS[item.category] ?? 'var(--color-accent-dark)'
-
+function Collage({ entries, layout, onOpen }: { entries: VibeEntry[]; layout: LayoutPattern; onOpen: (e: VibeEntry) => void }) {
+  if (entries.length === 0) return null
   return (
-    // 카드가 그리드 셀을 꽉 채우도록 h-full w-full 사용
-    <div className="relative h-full w-full overflow-hidden rounded-xl">
-      {item.review && <ReviewBadge dark onOpen={() => onOpenReview(item)} />}
-      {item.posterUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={item.posterUrl}
-          alt={item.label}
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-      ) : (
-        <div className="absolute inset-0" style={{ backgroundColor: `${color}18` }} />
-      )}
-
-      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-
-      <div
-        className="absolute left-2 top-2 rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white"
-        style={{ backgroundColor: `${color}CC` }}
-      >
-        {item.category}
-      </div>
-
-      <div className="absolute bottom-0 left-0 right-0 p-2.5">
-        <p className="truncate text-[12px] font-semibold leading-tight text-white drop-shadow">
-          {item.label}
-        </p>
-        {item.sublabel && (
-          <p className="truncate text-[10px] text-white/70">{item.sublabel}</p>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function VibeBoard({
-  items,
-  layout,
-  onOpenReview,
-}: {
-  items: VibeItem[]
-  layout: LayoutPattern
-  onOpenReview: (item: LifeMediaItem) => void
-}) {
-  if (items.length === 0) return null
-
-  return (
-    <div className="px-4 pt-4 pb-2">
+    <div className="px-4 pb-2 pt-4">
       <div
         className="grid w-full gap-1.5"
-        style={{
-          aspectRatio: '1/1',
-          gridTemplateColumns: layout.columns,
-          gridTemplateRows: layout.rows,
-        }}
+        style={{ aspectRatio: '1/1', gridTemplateColumns: layout.columns, gridTemplateRows: layout.rows }}
       >
-        {items.map((item, i) => (
-          <div key={i} style={{ gridColumn: layout.slots[i].col, gridRow: layout.slots[i].row }}>
-            <VibeCard item={item} onOpenReview={onOpenReview} />
+        {entries.map((entry, i) => (
+          <div key={entry.key} style={{ gridColumn: layout.slots[i].col, gridRow: layout.slots[i].row }}>
+            <CollageCard entry={entry} onOpen={() => onOpen(entry)} />
           </div>
         ))}
       </div>
@@ -230,129 +129,72 @@ function VibeBoard({
   )
 }
 
-// ─── Section & Sub-category headers ──────────────────────────────────────────
+// ─── 카드 그리드 ──────────────────────────────────────────────────────────────
 
-function BlockHeader({ label }: { label: string }) {
+function GridCard({ entry, onOpen }: { entry: VibeEntry; onOpen: () => void }) {
   return (
-    <div className="px-5 pb-3 pt-6">
-      <span className="text-[18px] font-bold text-[#0D0D0D]">{label}</span>
-    </div>
+    <button type="button" onClick={onOpen} className="flex flex-col text-left">
+      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[14px] bg-[var(--color-bg-muted)]">
+        <VibeImage entry={entry} iconSize={28} />
+        <div className="absolute left-2 top-2">
+          <VibeKindBadge kind={entry.kind} />
+        </div>
+      </div>
+      {entry.label && (
+        <p className="mt-2 truncate text-[13px] font-semibold text-[#0D0D0D]">{entry.label}</p>
+      )}
+      {entry.sublabel && <p className="truncate text-[11px] text-[#A8B1BD]">{entry.sublabel}</p>}
+      {entry.caption && (
+        <p className={['text-[12px] leading-[1.5] text-[#475058]', entry.label ? 'mt-1 line-clamp-2' : 'mt-2 line-clamp-3'].join(' ')}>
+          {entry.caption}
+        </p>
+      )}
+    </button>
   )
 }
 
-function SubHeader({ label }: { label: string }) {
+function DetailSheet({ entry, onClose }: { entry: VibeEntry | null; onClose: () => void }) {
   return (
-    <p className="mb-2.5 px-5 text-[15px] font-bold text-[#0D0D0D]">
-      {label}
-    </p>
-  )
-}
-
-// ─── Scroll rows ──────────────────────────────────────────────────────────────
-
-function PortraitScroll({
-  items,
-  onOpenReview,
-}: {
-  items: LifeMediaItem[]
-  onOpenReview: (item: LifeMediaItem) => void
-}) {
-  if (!items.length) return null
-  return (
-    <div className="overflow-x-auto scrollbar-hide">
-      <div className="flex gap-3 px-5">
-        {items.map((item) => (
-          <div key={getItemId(item)} className="w-[76px] flex-shrink-0">
-            <div className="relative h-[114px] w-[76px] overflow-hidden rounded-[12px] bg-[var(--color-bg-muted)]">
-              {item.posterUrl && (
+    <BottomSheet open={entry !== null} onClose={onClose}>
+      {entry && (
+        <div className="px-5 pb-6">
+          {entry.kind === 'photo' || entry.kind === 'pet' ? (
+            <div className="overflow-hidden rounded-[16px] bg-[#F5F6F7]">
+              {entry.imageUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={item.posterUrl} alt={item.label} className="h-full w-full object-cover" />
+                <img src={entry.imageUrl} alt={entry.label ?? ''} className="max-h-[50vh] w-full object-contain" />
+              ) : (
+                <div className="aspect-[4/3]">
+                  <VibeImage entry={entry} iconSize={40} />
+                </div>
               )}
-              {item.review && <ReviewBadge dark onOpen={() => onOpenReview(item)} />}
             </div>
-            <p className="mt-1.5 truncate text-[11px] font-semibold leading-snug text-[var(--color-text-primary)]">
-              {item.label}
-            </p>
-            {item.sublabel && (
-              <p className="truncate text-[10px] leading-snug text-[var(--color-text-tertiary)]">
-                {item.sublabel}
-              </p>
-            )}
-          </div>
-        ))}
-        <div className="w-2 flex-shrink-0" />
-      </div>
-    </div>
-  )
-}
-
-function SquareScroll({
-  items,
-  onOpenReview,
-}: {
-  items: LifeMediaItem[]
-  onOpenReview: (item: LifeMediaItem) => void
-}) {
-  if (!items.length) return null
-  return (
-    <div className="overflow-x-auto scrollbar-hide">
-      <div className="flex gap-3 px-5">
-        {items.map((item) => (
-          <div key={getItemId(item)} className="w-[76px] flex-shrink-0">
-            <div className="relative h-[76px] w-[76px] overflow-hidden rounded-[12px] bg-[var(--color-bg-muted)]">
-              {item.posterUrl && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={item.posterUrl} alt={item.label} className="h-full w-full object-cover" />
-              )}
-              {item.review && <ReviewBadge dark onOpen={() => onOpenReview(item)} />}
+          ) : (
+            <div className="flex items-center gap-3">
+              <div className="h-[72px] w-[72px] shrink-0 overflow-hidden rounded-[14px]">
+                <VibeImage entry={entry} iconSize={24} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <VibeKindBadge kind={entry.kind} />
+                <p className="mt-1.5 truncate text-[16px] font-bold text-[#0D0D0D]">{entry.label}</p>
+                {entry.sublabel && <p className="truncate text-[12px] text-[#6C7786]">{entry.sublabel}</p>}
+              </div>
             </div>
-            <p className="mt-1.5 truncate text-[11px] font-semibold leading-snug text-[var(--color-text-primary)]">
-              {item.label}
+          )}
+          {(entry.kind === 'photo' || entry.kind === 'pet') && entry.label && (
+            <p className="mt-4 text-[16px] font-bold text-[#0D0D0D]">
+              {entry.label}
+              {entry.sublabel && <span className="ml-1.5 text-[13px] font-medium text-[#6C7786]">{entry.sublabel}</span>}
             </p>
-            {item.sublabel && (
-              <p className="truncate text-[10px] leading-snug text-[var(--color-text-tertiary)]">
-                {item.sublabel}
-              </p>
-            )}
-          </div>
-        ))}
-        <div className="w-2 flex-shrink-0" />
-      </div>
-    </div>
-  )
-}
-
-function PlaceScroll({
-  items,
-  onOpenReview,
-}: {
-  items: LifeMediaItem[]
-  onOpenReview: (item: LifeMediaItem) => void
-}) {
-  if (!items.length) return null
-  return (
-    <div className="overflow-x-auto scrollbar-hide">
-      <div className="flex gap-3 px-5">
-        {items.map((item) => (
-          <div key={getItemId(item)} className="w-[136px] flex-shrink-0">
-            <div className="relative h-[102px] w-[136px] overflow-hidden rounded-[12px] bg-[var(--color-bg-muted)]">
-              {item.posterUrl && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={item.posterUrl} alt={item.label} className="h-full w-full object-cover" />
-              )}
-              {item.review && <ReviewBadge dark onOpen={() => onOpenReview(item)} />}
-            </div>
-            <p className="mt-1.5 truncate text-[12px] font-semibold text-[var(--color-text-primary)]">
-              {item.label}
-            </p>
-            {item.sublabel && (
-              <p className="truncate text-[10px] text-[var(--color-text-tertiary)]">{item.sublabel}</p>
-            )}
-          </div>
-        ))}
-        <div className="w-2 flex-shrink-0" />
-      </div>
-    </div>
+          )}
+          {entry.caption ? (
+            <p className="mt-4 whitespace-pre-wrap text-[14px] leading-[1.7] text-[#25313D]">{entry.caption}</p>
+          ) : (
+            <p className="mt-4 text-[13px] text-[#A8B1BD]">아직 남긴 설명이 없어요</p>
+          )}
+        </div>
+      )}
+    </BottomSheet>
   )
 }
 
@@ -367,35 +209,21 @@ export function PublicProfileLifeSection({
   isOwner?: boolean
   onAdd?: () => void
 }) {
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
-  const [reviewItem, setReviewItem] = useState<LifeMediaItem | null>(null)
-
-  const [{ vibeItems, vibeLayout }] = useState(() => ({
-    vibeItems: life ? buildVibeItemsRandom(life) : [],
-    vibeLayout: LAYOUTS[Math.floor(Math.random() * LAYOUTS.length)],
+  const entries = flattenVibe(life)
+  const [filter, setFilter] = useState<'all' | VibeGroup>('all')
+  const [opened, setOpened] = useState<VibeEntry | null>(null)
+  const [collage] = useState(() => ({
+    entries: pickCollageEntries(entries),
+    layout: LAYOUTS[Math.floor(Math.random() * LAYOUTS.length)],
   }))
 
-  const exercise = life?.daily.exercise ?? []
-  const pets = life?.daily.pets ?? []
-  const hasPet = pets.length > 0
-  const hasActivity = exercise.length > 0
-  const hasCulture = Boolean(
-    life &&
-      (life.tastes.movies.length > 0 ||
-        life.tastes.music.length > 0 ||
-        life.tastes.books.length > 0 ||
-        (life.tastes.plays?.length ?? 0) > 0),
-  )
-  const placeItems = life ? [...life.tastes.restaurants, ...life.tastes.cafes] : []
-  const hasPlace = placeItems.length > 0
-  const hasAlbum = (life?.albumPhotos?.length ?? 0) > 0
-  const hasAny = vibeItems.length > 0 || hasPet || hasActivity || hasCulture || hasPlace || hasAlbum
-
-  if (!hasAny || !life) {
+  if (entries.length === 0) {
     if (!(isOwner && onAdd)) return null
     return (
       <div className="pb-32">
-        <BlockHeader label="무드보드" />
+        <div className="px-5 pb-3 pt-6">
+          <span className="text-[18px] font-bold text-[#0D0D0D]">무드보드</span>
+        </div>
         <div className="px-5">
           <ProfileEmptyAddBlock label="바이브가" onAdd={onAdd} />
         </div>
@@ -403,175 +231,48 @@ export function PublicProfileLifeSection({
     )
   }
 
+  const presentGroups = VIBE_GROUPS.filter((g) => entries.some((e) => VIBE_KIND_META[e.kind].group === g.id))
+  const visible = filter === 'all' ? entries : entries.filter((e) => VIBE_KIND_META[e.kind].group === filter)
+  const chips: Array<{ id: 'all' | VibeGroup; label: string }> = [{ id: 'all', label: '전체' }, ...presentGroups]
+
   return (
     <div className="pb-32 pt-2">
-      <BlockHeader label="무드보드" />
-      <VibeBoard items={vibeItems} layout={vibeLayout} onOpenReview={setReviewItem} />
+      <div className="px-5 pb-1 pt-6">
+        <span className="text-[18px] font-bold text-[#0D0D0D]">무드보드</span>
+      </div>
+      <Collage entries={collage.entries} layout={collage.layout} onOpen={setOpened} />
 
-      {hasPet && (
-        <>
-          <BlockHeader label="반려동물" />
-          <SquareScroll
-            items={pets.map((p) => ({
-              label: p.name ?? p.type,
-              sublabel: p.name ? p.type : undefined,
-              posterUrl: p.image,
-              review: p.review,
-            }))}
-            onOpenReview={setReviewItem}
-          />
-        </>
-      )}
-
-      {hasActivity && (
-        <>
-          <BlockHeader label="취미" />
-          <div>
-            <SubHeader label="운동" />
-            <SquareScroll items={exercise} onOpenReview={setReviewItem} />
-          </div>
-        </>
-      )}
-
-      {hasCulture && (
-        <>
-          <BlockHeader label="취향" />
-          {life.tastes.movies.length > 0 && (
-            <div className="mb-4">
-              <SubHeader label="영화" />
-              <PortraitScroll items={life.tastes.movies} onOpenReview={setReviewItem} />
-            </div>
-          )}
-          {life.tastes.music.length > 0 && (
-            <div className="mb-4">
-              <SubHeader label="음악" />
-              <SquareScroll items={life.tastes.music} onOpenReview={setReviewItem} />
-            </div>
-          )}
-          {life.tastes.books.length > 0 && (
-            <div className="mb-4">
-              <SubHeader label="책" />
-              <PortraitScroll items={life.tastes.books} onOpenReview={setReviewItem} />
-            </div>
-          )}
-          {(life.tastes.plays?.length ?? 0) > 0 && (
-            <div>
-              <SubHeader label="뮤지컬 · 연극" />
-              <PortraitScroll items={life.tastes.plays ?? []} onOpenReview={setReviewItem} />
-            </div>
-          )}
-        </>
-      )}
-
-      {hasPlace && (
-        <>
-          <BlockHeader label="장소" />
-          {life.tastes.restaurants.length > 0 && (
-            <div className="mb-4">
-              <SubHeader label="맛집" />
-              <PlaceScroll items={life.tastes.restaurants} onOpenReview={setReviewItem} />
-            </div>
-          )}
-          {life.tastes.cafes.length > 0 && (
-            <div>
-              <SubHeader label="카페" />
-              <PlaceScroll items={life.tastes.cafes} onOpenReview={setReviewItem} />
-            </div>
-          )}
-        </>
-      )}
-
-      {life.albumPhotos && life.albumPhotos.length > 0 && (
-        <>
-          <BlockHeader label="앨범" />
-          <div className="px-5 pb-6">
-            <div className="grid grid-cols-3 gap-1.5">
-              {life.albumPhotos.map((url, i) => (
+      {presentGroups.length > 1 && (
+        <div className="overflow-x-auto scrollbar-hide pt-5">
+          <div className="flex gap-1.5 px-5">
+            {chips.map((chip) => {
+              const active = chip.id === filter
+              return (
                 <button
-                  key={i}
-                  onClick={() => setLightboxIndex(i)}
-                  className="aspect-square overflow-hidden rounded-xl bg-[var(--color-bg-muted)]"
+                  key={chip.id}
+                  type="button"
+                  onClick={() => setFilter(chip.id)}
+                  className="shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors"
+                  style={{
+                    backgroundColor: active ? 'var(--color-accent-dark)' : '#F5F6F7',
+                    color: active ? '#fff' : '#6C7786',
+                  }}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={url} alt={`사진 ${i + 1}`} className="h-full w-full object-cover" />
+                  {chip.label}
                 </button>
-              ))}
-            </div>
+              )
+            })}
           </div>
-        </>
+        </div>
       )}
 
-      {lightboxIndex !== null && typeof document !== 'undefined' && createPortal(
-        <div
-          className="fixed inset-0 z-[9999] flex flex-col"
-          style={{ backgroundColor: 'rgba(0,0,0,0.95)' }}
-          onClick={() => setLightboxIndex(null)}
-        >
-          <div className="flex items-center justify-end px-4 pt-4 pb-2">
-            <button
-              onClick={() => setLightboxIndex(null)}
-              className="flex h-9 w-9 items-center justify-center rounded-full"
-              style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}
-            >
-              <X size={18} className="text-white" />
-            </button>
-          </div>
-          <div className="flex flex-1 items-center justify-center px-4" onClick={(e) => e.stopPropagation()}>
-            <button
-              onClick={() => setLightboxIndex((i) => i !== null && i > 0 ? i - 1 : i)}
-              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
-              style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}
-              aria-label="이전"
-            >
-              <ChevronLeft size={22} className="text-white" />
-            </button>
-            <div className="mx-3 flex-1 flex items-center justify-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={life.albumPhotos?.[lightboxIndex] ?? ''}
-                alt={`사진 ${lightboxIndex + 1}`}
-                className="max-h-[70vh] w-full rounded-2xl object-contain"
-              />
-            </div>
-            <button
-              onClick={() => setLightboxIndex((i) => i !== null && life.albumPhotos && i < life.albumPhotos.length - 1 ? i + 1 : i)}
-              className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
-              style={{ backgroundColor: 'rgba(255,255,255,0.15)' }}
-              aria-label="다음"
-            >
-              <ChevronRight size={22} className="text-white" />
-            </button>
-          </div>
-          <div className="pb-8 text-center text-[13px]" style={{ color: 'rgba(255,255,255,0.5)' }}>
-            {(lightboxIndex ?? 0) + 1} / {life.albumPhotos?.length ?? 0}
-          </div>
-        </div>,
-        document.body
-      )}
+      <div className="grid grid-cols-2 gap-x-3 gap-y-5 px-5 pt-4">
+        {visible.map((entry) => (
+          <GridCard key={entry.key} entry={entry} onOpen={() => setOpened(entry)} />
+        ))}
+      </div>
 
-      <BottomSheet open={reviewItem !== null} onClose={() => setReviewItem(null)}>
-        {reviewItem && (
-          <div className="px-5 pb-6 pt-2">
-            <div className="flex items-center gap-3">
-              {reviewItem.posterUrl && (
-                <div className="h-14 w-14 shrink-0 overflow-hidden rounded-[12px] bg-[var(--color-bg-muted)]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={reviewItem.posterUrl} alt={reviewItem.label} className="h-full w-full object-cover" />
-                </div>
-              )}
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-[15px] font-bold text-[#0D0D0D]">{reviewItem.label}</p>
-                {reviewItem.sublabel && (
-                  <p className="truncate text-[12px] text-[var(--color-text-tertiary)]">{reviewItem.sublabel}</p>
-                )}
-              </div>
-            </div>
-            <p className="mt-4 whitespace-pre-wrap text-[14px] leading-[1.6] text-[#25313D]">
-              {reviewItem.review}
-            </p>
-          </div>
-        )}
-      </BottomSheet>
+      <DetailSheet entry={opened} onClose={() => setOpened(null)} />
     </div>
   )
 }

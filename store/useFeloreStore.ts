@@ -18,6 +18,7 @@ import type {
   Experience,
 } from '@/types'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
+import { normalizeAlbumPhotos } from '@/lib/vibeItems'
 
 function generateRandomLinkId(): string {
   const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
@@ -160,7 +161,7 @@ const normalizeSampleUser = (user: UserState | null): UserState | null => {
     avatarImage: SAMPLE_PROFILE.avatarImage,
     profileImages: SAMPLE_PROFILE.profileImages,
     whoIAm: SAMPLE_PROFILE.whoIAm,
-    life: SAMPLE_PROFILE.life,
+    life: user.life ?? SAMPLE_PROFILE.life,
   }
 }
 
@@ -740,7 +741,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
   },
 }), {
   name: 'felore-store',
-  version: 23,
+  version: 24,
   migrate: (persistedState: unknown) => {
     const state = persistedState as FeloreStore | undefined
     if (!state) return persistedState
@@ -753,9 +754,14 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
       : validSteps.includes(persistedStep as OnboardingStep)
         ? (persistedStep as OnboardingStep)
         : 'login'
+    const normalizedUser = normalizeSampleUser(state.user)
+    // v24: 앨범 사진이 URL 문자열 → { url, caption } 객체
+    const migratedUser = normalizedUser?.life
+      ? { ...normalizedUser, life: { ...normalizedUser.life, albumPhotos: normalizeAlbumPhotos(normalizedUser.life.albumPhotos as Array<string | { url: string }>) } }
+      : normalizedUser
     return {
       ...state,
-      user: normalizeSampleUser(state.user),
+      user: migratedUser,
       step: migratedStep,
       onboardingName: (state as FeloreStore & { onboardingName?: string }).onboardingName ?? '',
       onboardingNickname: (state as FeloreStore & { onboardingNickname?: string }).onboardingNickname ?? '',

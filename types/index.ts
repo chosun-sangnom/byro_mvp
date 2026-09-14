@@ -139,8 +139,10 @@ export interface LifeMediaItem {
   posterUrl?: string
   // TODO(real API): Spotify 30s preview URL
   previewUrl?: string
-  // 딥 감상 — 선택 입력, 최대 200자 (SCRUM-122)
-  review?: string
+  // 카드 설명 — 선택 입력, 최대 200자
+  caption?: string
+  // 바이브 카드 최신순 정렬용 (ISO). 없는 기존 데이터는 뒤로 밀린다
+  addedAt?: string
 }
 
 export interface KemiMatchItem {
@@ -207,8 +209,14 @@ export interface Pet {
   type: string
   name?: string
   image?: string
-  // 딥 감상 — 선택 입력, 최대 200자 (SCRUM-122)
-  review?: string
+  caption?: string
+  addedAt?: string
+}
+
+export interface AlbumPhoto {
+  url: string
+  caption?: string
+  addedAt?: string
 }
 
 export interface PublicProfileLife {
@@ -224,7 +232,7 @@ export interface PublicProfileLife {
     restaurants: LifeMediaItem[]
     cafes: LifeMediaItem[]
   }
-  albumPhotos?: string[]
+  albumPhotos?: AlbumPhoto[]
 }
 
 export interface RememberIndustry {
@@ -334,9 +342,8 @@ export interface TabVisibility {
 }
 
 /**
- * 탭별 한 줄 요약 (SCRUM-122). ME/VIBE/PEOPLE 탭 상단에 노출되며,
- * GEO(SCRUM-123)에서 탭별 페이지 meta description으로도 사용된다.
- * LLM 초안 생성 + 사용자 편집 하이브리드 — 명시적으로 생성/저장한 값만 존재.
+ * 탭별 한 줄 요약 중 사용자가 직접 고친 값 (SCRUM-122). 기본은 AI가 탭 내용으로
+ * 자동 요약하고, 값이 있으면 그 문장을 우선 노출한다. GEO(SCRUM-123) meta description 소스.
  */
 export interface TabSummaries {
   who?: string

@@ -4,6 +4,7 @@ import { ChevronRight } from 'lucide-react'
 import { NavBar } from '@/components/ui'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import type { Highlight, PublicProfile, PublicProfileLife, PublicProfileWhoIAm, UserState } from '@/types'
+import { flattenVibe } from '@/lib/vibeItems'
 
 interface ManageFeloreScreenProps {
   allHighlights: Highlight[]
@@ -51,16 +52,7 @@ export function ManageFeloreScreen({
 }: ManageFeloreScreenProps) {
   const whoIAm = (profile.whoIAm ?? user.whoIAm) as PublicProfileWhoIAm | undefined
   const life = (profile.life ?? user.life) as PublicProfileLife | undefined
-  const activityCount = life?.daily.exercise.length ?? 0
-  const cultureCount = life
-    ? life.tastes.movies.length +
-      life.tastes.music.length +
-      life.tastes.books.length +
-      (life.tastes.plays?.length ?? 0)
-    : 0
-  const placeCount = life
-    ? life.tastes.restaurants.length + life.tastes.cafes.length
-    : 0
+  const vibeCardCount = flattenVibe(life).length
   const activeContactCount =
     user.contactChannels?.filter((ch) => ch.enabled && ch.value.trim()).length ?? 0
   const connectedSnsCount = Number(instagramConnected) + Number(linkedinConnected)
@@ -77,7 +69,7 @@ export function ManageFeloreScreen({
     { label: '나의 성향', done: Boolean(whoIAm?.mbti || whoIAm?.personality || user.bio?.trim()) },
     { label: '하이라이트', done: allHighlights.length > 0 },
 
-    { label: '바이브', done: activityCount + cultureCount + placeCount > 0 },
+    { label: '바이브', done: vibeCardCount > 0 },
     { label: 'SNS', done: connectedSnsCount > 0 },
     { label: '연락수단', done: activeContactCount > 0 },
   ]
@@ -136,11 +128,9 @@ export function ManageFeloreScreen({
       rows: [
         {
           title: '바이브',
-          hint: '반려동물 · 운동 · 플레이스 · 문화',
+          hint: '콘텐츠 · 장소 · 운동 · 반려동물 · 사진',
           nudge: '취향이 겹치면 어색한 첫 대화가 자연스러워져요',
-          meta: activityCount + cultureCount + placeCount > 0
-            ? `활동 ${activityCount} · 문화 ${cultureCount} · 장소 ${placeCount}`
-            : undefined,
+          meta: vibeCardCount > 0 ? `카드 ${vibeCardCount}장` : undefined,
           onClick: onEditLife,
         },
       ],

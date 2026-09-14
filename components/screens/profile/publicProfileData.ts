@@ -123,11 +123,11 @@ function buildEditableOwnerProfile(
     avatarColor: user.avatarColor ?? baseProfile.avatarColor,
     avatarImage: user.avatarImage || baseProfile.avatarImage,
     profileImages: user.profileImages ?? baseProfile.profileImages,
-    // TODO(real API): whoIAm/life는 Supabase 연동 후 user 필드로 교체
+    // TODO(real API): whoIAm은 Supabase 연동 후 user 필드로 교체
     whoIAm: baseProfile.whoIAm,
     birthDate: user.birthDate ?? baseProfile.birthDate,
     showAge: user.showAge ?? baseProfile.showAge,
-    life: baseProfile.life,
+    life: user.life ?? baseProfile.life,
     contactChannels: user.contactChannels ?? baseProfile.contactChannels,
     isPaidUser: user.isPaidUser,
     isVerified: user.isVerified,

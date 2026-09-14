@@ -44,46 +44,46 @@ export const SAMPLE_PROFILE = {
   life: {
     daily: {
       exercise: [
-        { label: '필라테스', posterUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=80&h=80&q=75&fit=crop&auto=format' },
+        { label: '필라테스', caption: '허리 때문에 시작했는데 3년째. 화·목 아침 7시 고정이에요.', posterUrl: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=320&h=320&q=75&fit=crop&auto=format' },
       ],
       pets: [
-        { id: 'pet-gangminjun-1', type: '강아지', name: '보리', image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=160&h=160&q=75&fit=crop&auto=format' },
+        { id: 'pet-gangminjun-1', type: '강아지', name: '보리', caption: '산책만 나가면 세상에서 제일 신난 얼굴이 돼요. 사진 찍으면 늘 웃고 있어요.', image: 'https://images.unsplash.com/photo-1552053831-71594a27632d?w=480&h=480&q=75&fit=crop&auto=format' },
       ],
     },
     tastes: {
       // TODO(real API): posterUrl from TMDB API — image.tmdb.org/t/p/w185/{poster_path}
       movies: [
-        { label: '이터널 선샤인', sublabel: '2004', posterUrl: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=80&h=112&q=75&fit=crop&auto=format' },
-        { label: '작은 아씨들', sublabel: '2019', posterUrl: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=80&h=112&q=75&fit=crop&auto=format' },
+        { label: '이터널 선샤인', sublabel: '2004', caption: '기억을 지워도 결국 같은 사람에게 끌린다는 설정이 좋아요. 1년에 한 번은 꼭 다시 봐요.', posterUrl: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=320&h=448&q=75&fit=crop&auto=format' },
+        { label: '작은 아씨들', sublabel: '2019', posterUrl: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=320&h=448&q=75&fit=crop&auto=format' },
       ],
       // TODO(real API): posterUrl from Spotify API — i.scdn.co album art URL
       music: [
-        { label: 'Square', sublabel: '백예린', posterUrl: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=80&h=80&q=75&fit=crop&auto=format' },
-        { label: 'Ditto', sublabel: 'NewJeans', posterUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=80&h=80&q=75&fit=crop&auto=format' },
+        { label: 'Square', sublabel: '백예린', posterUrl: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=320&h=320&q=75&fit=crop&auto=format' },
+        { label: 'Ditto', sublabel: 'NewJeans', posterUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=320&h=320&q=75&fit=crop&auto=format' },
       ],
       // TODO(real API): posterUrl from 알라딘 API — cover image URL
       books: [
-        { label: '아무튼, 여름', sublabel: '위고', posterUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=80&h=112&q=75&fit=crop&auto=format' },
-        { label: '보통의 언어들', sublabel: '김이나', posterUrl: 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=80&h=112&q=75&fit=crop&auto=format' },
+        { label: '아무튼, 여름', sublabel: '위고', posterUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=320&h=448&q=75&fit=crop&auto=format' },
+        { label: '보통의 언어들', sublabel: '김이나', posterUrl: 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=320&h=448&q=75&fit=crop&auto=format' },
       ],
       // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
       restaurants: [
-        { label: '진작다이닝', sublabel: '한남동', posterUrl: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=148&h=96&q=75&fit=crop&auto=format' },
+        { label: '진작다이닝', sublabel: '한남동', posterUrl: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=480&h=312&q=75&fit=crop&auto=format' },
       ],
       // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
       cafes: [
-        { label: '오츠커피', sublabel: '한남동', posterUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=148&h=96&q=75&fit=crop&auto=format' },
+        { label: '오츠커피', sublabel: '한남동', posterUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=480&h=312&q=75&fit=crop&auto=format' },
       ],
       plays: [
-        { label: '햄릿', sublabel: '연극', posterUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=80&h=112&q=75&fit=crop&auto=format' },
+        { label: '햄릿', sublabel: '연극', posterUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=320&h=448&q=75&fit=crop&auto=format' },
       ],
     },
     albumPhotos: [
-      'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=400&q=80&fit=crop',
-      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=400&q=80&fit=crop',
-      'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&h=400&q=80&fit=crop',
-      'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&q=80&fit=crop',
-      'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=400&q=80&fit=crop',
+      { url: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=400&q=80&fit=crop', caption: '요즘 제일 오래 머무는 자리. 새벽에 여기서 기획서 쓸 때가 제일 집중 잘 돼요.' },
+      { url: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=400&q=80&fit=crop' },
+      { url: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&h=400&q=80&fit=crop' },
+      { url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&q=80&fit=crop' },
+      { url: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=400&q=80&fit=crop' },
     ],
   },
   heroTheme: {
@@ -302,47 +302,47 @@ export const MK_PROFILE = {
   life: {
     daily: {
       exercise: [
-        { label: '골프', posterUrl: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=80&h=80&q=75&fit=crop&auto=format' },
-        { label: '웨이트', posterUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=80&h=80&q=75&fit=crop&auto=format' },
-        { label: '산책', posterUrl: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=80&h=80&q=75&fit=crop&auto=format' },
+        { label: '골프', posterUrl: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=320&h=320&q=75&fit=crop&auto=format' },
+        { label: '웨이트', posterUrl: 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=320&h=320&q=75&fit=crop&auto=format' },
+        { label: '산책', posterUrl: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?w=320&h=320&q=75&fit=crop&auto=format' },
       ],
       pets: [
-        { id: 'pet-mk-1', type: '고양이', name: '모카', image: 'https://images.unsplash.com/photo-1533743983-6db3e3d99df4?w=160&h=160&q=75&fit=crop&auto=format' },
+        { id: 'pet-mk-1', type: '고양이', name: '모카', image: 'https://images.unsplash.com/photo-1533743983-6db3e3d99df4?w=480&h=480&q=75&fit=crop&auto=format' },
       ],
     },
     tastes: {
       movies: [
-        { label: '인턴', sublabel: '2015', posterUrl: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=80&h=112&q=75&fit=crop&auto=format' },
-        { label: '월터의 상상은 현실이 된다', sublabel: '2013', posterUrl: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=80&h=112&q=75&fit=crop&auto=format' },
-        { label: '헤어질 결심', sublabel: '2022', posterUrl: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=80&h=112&q=75&fit=crop&auto=format' },
+        { label: '인턴', sublabel: '2015', posterUrl: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?w=320&h=448&q=75&fit=crop&auto=format' },
+        { label: '월터의 상상은 현실이 된다', sublabel: '2013', posterUrl: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=320&h=448&q=75&fit=crop&auto=format' },
+        { label: '헤어질 결심', sublabel: '2022', posterUrl: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=320&h=448&q=75&fit=crop&auto=format' },
       ],
       music: [
-        { label: '주저하는 연인들을 위해', sublabel: '잔나비', posterUrl: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=80&h=80&q=75&fit=crop&auto=format' },
-        { label: '희재', sublabel: '성시경', posterUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=80&h=80&q=75&fit=crop&auto=format' },
-        { label: 'Yellow', sublabel: 'Coldplay', posterUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=80&h=80&q=75&fit=crop&auto=format' },
+        { label: '주저하는 연인들을 위해', sublabel: '잔나비', posterUrl: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=320&h=320&q=75&fit=crop&auto=format' },
+        { label: '희재', sublabel: '성시경', posterUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=320&h=320&q=75&fit=crop&auto=format' },
+        { label: 'Yellow', sublabel: 'Coldplay', posterUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=320&h=320&q=75&fit=crop&auto=format' },
       ],
       books: [
-        { label: '당신의 엔진을 뜨겁게 달궈라', sublabel: '권도균', posterUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=80&h=112&q=75&fit=crop&auto=format' },
-        { label: '원씽', sublabel: '게리 켈러', posterUrl: 'https://images.unsplash.com/photo-1495741545814-2d7f4d75ea09?w=80&h=112&q=75&fit=crop&auto=format' },
-        { label: '사피엔스', sublabel: '유발 하라리', posterUrl: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=80&h=112&q=75&fit=crop&auto=format' },
+        { label: '당신의 엔진을 뜨겁게 달궈라', sublabel: '권도균', posterUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=320&h=448&q=75&fit=crop&auto=format' },
+        { label: '원씽', sublabel: '게리 켈러', posterUrl: 'https://images.unsplash.com/photo-1495741545814-2d7f4d75ea09?w=320&h=448&q=75&fit=crop&auto=format' },
+        { label: '사피엔스', sublabel: '유발 하라리', posterUrl: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=320&h=448&q=75&fit=crop&auto=format' },
       ],
       plays: [
-        { label: '웃는 남자', sublabel: '뮤지컬', posterUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=80&h=112&q=75&fit=crop&auto=format' },
+        { label: '웃는 남자', sublabel: '뮤지컬', posterUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=320&h=448&q=75&fit=crop&auto=format' },
       ],
       restaurants: [
-        { label: '몽탄', sublabel: '한남동', posterUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=148&h=96&q=75&fit=crop&auto=format' },
-        { label: '금돼지식당', sublabel: '한남동', posterUrl: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=148&h=96&q=75&fit=crop&auto=format' },
+        { label: '몽탄', sublabel: '한남동', posterUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=480&h=312&q=75&fit=crop&auto=format' },
+        { label: '금돼지식당', sublabel: '한남동', posterUrl: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=480&h=312&q=75&fit=crop&auto=format' },
       ],
       cafes: [
-        { label: '테라로사', sublabel: '여러 지점', posterUrl: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=148&h=96&q=75&fit=crop&auto=format' },
-        { label: '블루보틀', sublabel: '성수동', posterUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=148&h=96&q=75&fit=crop&auto=format' },
+        { label: '테라로사', sublabel: '여러 지점', posterUrl: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=480&h=312&q=75&fit=crop&auto=format' },
+        { label: '블루보틀', sublabel: '성수동', posterUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=480&h=312&q=75&fit=crop&auto=format' },
       ],
     },
     albumPhotos: [
-      'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=400&q=80&fit=crop',
-      'https://images.unsplash.com/photo-1553484771-47a3aba16a77?w=400&h=400&q=80&fit=crop',
-      'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?w=400&h=400&q=80&fit=crop',
-      'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&h=400&q=80&fit=crop',
+      { url: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=400&q=80&fit=crop' },
+      { url: 'https://images.unsplash.com/photo-1553484771-47a3aba16a77?w=400&h=400&q=80&fit=crop' },
+      { url: 'https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?w=400&h=400&q=80&fit=crop' },
+      { url: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=400&h=400&q=80&fit=crop' },
     ],
   },
   heroTheme: {
@@ -509,50 +509,50 @@ export const JIMIN_PROFILE = {
   life: {
     daily: {
       exercise: [
-        { label: '러닝', posterUrl: 'https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=80&h=80&q=75&fit=crop&auto=format' },
-        { label: '골프', posterUrl: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=80&h=80&q=75&fit=crop&auto=format' },
+        { label: '러닝', caption: '주말마다 한강 10km. 같이 뛸 사람 언제든 환영이에요.', posterUrl: 'https://images.unsplash.com/photo-1571008887538-b36bb32f4571?w=320&h=320&q=75&fit=crop&auto=format' },
+        { label: '골프', posterUrl: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=320&h=320&q=75&fit=crop&auto=format' },
       ],
     },
     tastes: {
       // TODO(real API): posterUrl from TMDB API — image.tmdb.org/t/p/w185/{poster_path}
       movies: [
-        { label: '머니볼', sublabel: '2011', posterUrl: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=80&h=112&q=75&fit=crop&auto=format' },
-        { label: '소셜 네트워크', sublabel: '2010', posterUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=80&h=112&q=75&fit=crop&auto=format' },
-        { label: '나 홀로 집에 2', sublabel: '1992', posterUrl: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=80&h=112&q=75&fit=crop&auto=format' },
+        { label: '머니볼', sublabel: '2011', caption: '감이 아니라 데이터로 편견을 이기는 이야기. 일하다 막히면 다시 봐요.', posterUrl: 'https://images.unsplash.com/photo-1566577739112-5180d4bf9390?w=320&h=448&q=75&fit=crop&auto=format' },
+        { label: '소셜 네트워크', sublabel: '2010', posterUrl: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=320&h=448&q=75&fit=crop&auto=format' },
+        { label: '나 홀로 집에 2', sublabel: '1992', posterUrl: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=320&h=448&q=75&fit=crop&auto=format' },
       ],
       // TODO(real API): posterUrl from Spotify API — i.scdn.co album art URL
       music: [
-        { label: 'Tomboy', sublabel: '혁오', posterUrl: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=80&h=80&q=75&fit=crop&auto=format' },
-        { label: 'Everything', sublabel: '검정치마', posterUrl: 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=80&h=80&q=75&fit=crop&auto=format' },
-        { label: 'Replay', sublabel: '김동률', posterUrl: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=80&h=80&q=75&fit=crop&auto=format' },
+        { label: 'Tomboy', sublabel: '혁오', posterUrl: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=320&h=320&q=75&fit=crop&auto=format' },
+        { label: 'Everything', sublabel: '검정치마', posterUrl: 'https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=320&h=320&q=75&fit=crop&auto=format' },
+        { label: 'Replay', sublabel: '김동률', posterUrl: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=320&h=320&q=75&fit=crop&auto=format' },
       ],
       // TODO(real API): posterUrl from 알라딘 API — cover image URL
       books: [
-        { label: '린 스타트업', sublabel: '에릭 리스', posterUrl: 'https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=80&h=112&q=75&fit=crop&auto=format' },
-        { label: '제로 투 원', sublabel: '피터 틸', posterUrl: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=80&h=112&q=75&fit=crop&auto=format' },
-        { label: '좋은 전략 나쁜 전략', sublabel: '리처드 루멜트', posterUrl: 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=80&h=112&q=75&fit=crop&auto=format' },
+        { label: '린 스타트업', sublabel: '에릭 리스', posterUrl: 'https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=320&h=448&q=75&fit=crop&auto=format' },
+        { label: '제로 투 원', sublabel: '피터 틸', posterUrl: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=320&h=448&q=75&fit=crop&auto=format' },
+        { label: '좋은 전략 나쁜 전략', sublabel: '리처드 루멜트', posterUrl: 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=320&h=448&q=75&fit=crop&auto=format' },
       ],
       plays: [
-        { label: '렛미플라이', sublabel: '뮤지컬', posterUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=80&h=112&q=75&fit=crop&auto=format' },
+        { label: '렛미플라이', sublabel: '뮤지컬', posterUrl: 'https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=320&h=448&q=75&fit=crop&auto=format' },
       ],
       // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
       restaurants: [
-        { label: '성수 우육미엔', sublabel: '성수동', posterUrl: 'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=148&h=96&q=75&fit=crop&auto=format' },
-        { label: '압구정 뜸들이다', sublabel: '압구정', posterUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=148&h=96&q=75&fit=crop&auto=format' },
+        { label: '성수 우육미엔', caption: '비 오는 날엔 무조건 여기. 고수 추가 필수!', sublabel: '성수동', posterUrl: 'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=480&h=312&q=75&fit=crop&auto=format' },
+        { label: '압구정 뜸들이다', sublabel: '압구정', posterUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=480&h=312&q=75&fit=crop&auto=format' },
       ],
       // TODO(real API): posterUrl from Kakao Maps / Google Places photo API
       cafes: [
-        { label: '센터커피', sublabel: '성수동', posterUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=148&h=96&q=75&fit=crop&auto=format' },
-        { label: '프릳츠 원서점', sublabel: '서촌', posterUrl: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=148&h=96&q=75&fit=crop&auto=format' },
+        { label: '센터커피', sublabel: '성수동', posterUrl: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=480&h=312&q=75&fit=crop&auto=format' },
+        { label: '프릳츠 원서점', sublabel: '서촌', posterUrl: 'https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=480&h=312&q=75&fit=crop&auto=format' },
       ],
     },
     albumPhotos: [
-      'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=400&q=80&fit=crop',
-      'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=400&q=80&fit=crop',
-      'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&h=400&q=80&fit=crop',
-      'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=400&h=400&q=80&fit=crop',
-      'https://images.unsplash.com/photo-1521334884684-d80222895322?w=400&h=400&q=80&fit=crop',
-      'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=400&q=80&fit=crop',
+      { url: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=400&q=80&fit=crop' },
+      { url: 'https://images.unsplash.com/photo-1445205170230-053b83016050?w=400&h=400&q=80&fit=crop' },
+      { url: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400&h=400&q=80&fit=crop' },
+      { url: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=400&h=400&q=80&fit=crop' },
+      { url: 'https://images.unsplash.com/photo-1521334884684-d80222895322?w=400&h=400&q=80&fit=crop' },
+      { url: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=400&q=80&fit=crop' },
     ],
   },
   heroTheme: {
@@ -891,9 +891,9 @@ export const YOONJISOO_PROFILE = {
       cafes: [{ label: '카페 노티드', sublabel: '청담' }, { label: '테라로사', sublabel: '강릉' }],
     },
     albumPhotos: [
-      'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&h=400&fit=crop',
+      { url: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&h=400&fit=crop' },
+      { url: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400&h=400&fit=crop' },
+      { url: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&h=400&fit=crop' },
     ],
   },
   manualHighlights: [
@@ -1165,10 +1165,10 @@ export const OHYERIM_PROFILE = {
       cafes: [{ label: '어니언', sublabel: '성수' }, { label: '카페 할아버지', sublabel: '서울 마포' }],
     },
     albumPhotos: [
-      'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1493863641943-9b68992a8d07?w=400&h=400&fit=crop',
-      'https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=400&h=400&fit=crop',
+      { url: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400&h=400&fit=crop' },
+      { url: 'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=400&h=400&fit=crop' },
+      { url: 'https://images.unsplash.com/photo-1493863641943-9b68992a8d07?w=400&h=400&fit=crop' },
+      { url: 'https://images.unsplash.com/photo-1519682337058-a94d519337bc?w=400&h=400&fit=crop' },
     ],
   },
   manualHighlights: [

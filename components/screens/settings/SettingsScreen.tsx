@@ -21,7 +21,6 @@ const YEARLY_TOTAL = YEARLY_MONTHLY_PRICE * 12
 
 const FEATURES: { label: string; free: string; pro: string }[] = [
   { label: '하이라이트 블록', free: '최대 3개', pro: '무제한' },
-  { label: '바이브탭 항목', free: '탭당 5개', pro: '무제한' },
   { label: '커스텀 링크', free: '불가능', pro: '가능' },
   { label: '케미 체크', free: '하루 1회', pro: '하루 100회' },
   { label: '피드백 요청', free: '하루 1회', pro: '무제한' },
@@ -30,7 +29,6 @@ const FEATURES: { label: string; free: string; pro: string }[] = [
 
 const DONE_FEATURES: { label: string; value: string }[] = [
   { label: '하이라이트 블록', value: '무제한' },
-  { label: '바이브탭 항목', value: '무제한' },
   { label: '나만의 링크 커스터마이징', value: '' },
   { label: '케미 체크', value: '하루 100회' },
   { label: '피드백 요청', value: '무제한' },

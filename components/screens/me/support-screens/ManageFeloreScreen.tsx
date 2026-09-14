@@ -128,7 +128,7 @@ export function ManageFeloreScreen({
       rows: [
         {
           title: '바이브',
-          hint: '콘텐츠 · 장소 · 운동 · 반려동물 · 사진',
+          hint: '콘텐츠 · 장소 · 운동 · 반려동물 · 앨범',
           nudge: '취향이 겹치면 어색한 첫 대화가 자연스러워져요',
           meta: vibeCardCount > 0 ? `카드 ${vibeCardCount}장` : undefined,
           onClick: onEditLife,

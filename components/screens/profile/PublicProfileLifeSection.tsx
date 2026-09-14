@@ -5,7 +5,7 @@ import { BottomSheet } from '@/components/ui'
 import type { PublicProfileLife } from '@/types'
 import { ProfileEmptyAddBlock } from '@/components/screens/profile/ProfileEmptyAddBlock'
 import { VibeImage, VibeKindBadge } from '@/components/screens/profile/vibeCardParts'
-import { flattenVibe, VIBE_GROUPS, VIBE_KIND_META, type VibeEntry, type VibeGroup } from '@/lib/vibeItems'
+import { flattenVibe, groupVibeEntries, type VibeEntry } from '@/lib/vibeItems'
 
 // ─── 무드보드 콜라주 ──────────────────────────────────────────────────────────
 
@@ -131,14 +131,16 @@ function Collage({ entries, layout, onOpen }: { entries: VibeEntry[]; layout: La
 
 // ─── 카드 그리드 ──────────────────────────────────────────────────────────────
 
-function GridCard({ entry, onOpen }: { entry: VibeEntry; onOpen: () => void }) {
+function GridCard({ entry, showBadge, onOpen }: { entry: VibeEntry; showBadge: boolean; onOpen: () => void }) {
   return (
     <button type="button" onClick={onOpen} className="flex flex-col text-left">
       <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[14px] bg-[var(--color-bg-muted)]">
         <VibeImage entry={entry} iconSize={28} />
-        <div className="absolute left-2 top-2">
-          <VibeKindBadge kind={entry.kind} />
-        </div>
+        {showBadge && (
+          <div className="absolute left-2 top-2">
+            <VibeKindBadge kind={entry.kind} />
+          </div>
+        )}
       </div>
       {entry.label && (
         <p className="mt-2 truncate text-[13px] font-semibold text-[#0D0D0D]">{entry.label}</p>
@@ -210,7 +212,6 @@ export function PublicProfileLifeSection({
   onAdd?: () => void
 }) {
   const entries = flattenVibe(life)
-  const [filter, setFilter] = useState<'all' | VibeGroup>('all')
   const [opened, setOpened] = useState<VibeEntry | null>(null)
   const [collage] = useState(() => ({
     entries: pickCollageEntries(entries),
@@ -231,9 +232,7 @@ export function PublicProfileLifeSection({
     )
   }
 
-  const presentGroups = VIBE_GROUPS.filter((g) => entries.some((e) => VIBE_KIND_META[e.kind].group === g.id))
-  const visible = filter === 'all' ? entries : entries.filter((e) => VIBE_KIND_META[e.kind].group === filter)
-  const chips: Array<{ id: 'all' | VibeGroup; label: string }> = [{ id: 'all', label: '전체' }, ...presentGroups]
+  const sections = groupVibeEntries(entries).filter((section) => section.entries.length > 0)
 
   return (
     <div className="pb-32 pt-2">
@@ -242,35 +241,19 @@ export function PublicProfileLifeSection({
       </div>
       <Collage entries={collage.entries} layout={collage.layout} onOpen={setOpened} />
 
-      {presentGroups.length > 1 && (
-        <div className="overflow-x-auto scrollbar-hide pt-5">
-          <div className="flex gap-1.5 px-5">
-            {chips.map((chip) => {
-              const active = chip.id === filter
-              return (
-                <button
-                  key={chip.id}
-                  type="button"
-                  onClick={() => setFilter(chip.id)}
-                  className="shrink-0 rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition-colors"
-                  style={{
-                    backgroundColor: active ? 'var(--color-accent-dark)' : '#F5F6F7',
-                    color: active ? '#fff' : '#6C7786',
-                  }}
-                >
-                  {chip.label}
-                </button>
-              )
-            })}
+      {sections.map((section) => (
+        <section key={section.id} className="pt-8">
+          <div className="flex items-baseline gap-1.5 px-5 pb-3">
+            <h3 className="text-[18px] font-bold text-[#0D0D0D]">{section.label}</h3>
+            <span className="text-[14px] font-semibold text-[#A8B1BD]">{section.entries.length}</span>
           </div>
-        </div>
-      )}
-
-      <div className="grid grid-cols-2 gap-x-3 gap-y-5 px-5 pt-4">
-        {visible.map((entry) => (
-          <GridCard key={entry.key} entry={entry} onOpen={() => setOpened(entry)} />
-        ))}
-      </div>
+          <div className="grid grid-cols-2 gap-x-3 gap-y-5 px-5">
+            {section.entries.map((entry) => (
+              <GridCard key={entry.key} entry={entry} showBadge={section.mixedKinds} onOpen={() => setOpened(entry)} />
+            ))}
+          </div>
+        </section>
+      ))}
 
       <DetailSheet entry={opened} onClose={() => setOpened(null)} />
     </div>

@@ -14,7 +14,7 @@ export const VIBE_GROUPS: Array<{ id: VibeGroup; label: string; description: str
   { id: 'place', label: '장소', description: '맛집 · 카페' },
   { id: 'exercise', label: '운동', description: '즐겨 하는 운동' },
   { id: 'pet', label: '반려동물', description: '함께 사는 친구' },
-  { id: 'photo', label: '사진', description: '일상 · 취미 · 공간' },
+  { id: 'photo', label: '앨범', description: '일상 · 취미 · 공간' },
 ]
 
 export const VIBE_KIND_META: Record<VibeKind, { label: string; group: VibeGroup; color: string; captionPlaceholder: string }> = {
@@ -26,7 +26,7 @@ export const VIBE_KIND_META: Record<VibeKind, { label: string; group: VibeGroup;
   restaurant: { label: '맛집', group: 'place', color: '#EC4899', captionPlaceholder: '어떤 메뉴를, 언제 찾는지 알려주세요' },
   cafe: { label: '카페', group: 'place', color: '#92400E', captionPlaceholder: '이 카페에서 주로 뭘 하나요?' },
   pet: { label: '반려동물', group: 'pet', color: '#FB923C', captionPlaceholder: '우리 아이 자랑을 마음껏 해주세요' },
-  photo: { label: '사진', group: 'photo', color: '#64748B', captionPlaceholder: '이 사진에 담긴 이야기를 적어보세요' },
+  photo: { label: '앨범', group: 'photo', color: '#64748B', captionPlaceholder: '이 사진에 담긴 이야기를 적어보세요' },
 }
 
 export interface VibeEntry {
@@ -127,6 +127,16 @@ export function flattenVibe(life?: PublicProfileLife): VibeEntry[] {
       return a.order - b.order
     })
     .map(({ entry }) => entry)
+}
+
+// 카테고리 섹션용 — VIBE_GROUPS 순서, 섹션 안에서는 flattenVibe의 최신순 유지
+export function groupVibeEntries(entries: VibeEntry[]) {
+  return VIBE_GROUPS.map((group) => ({
+    ...group,
+    entries: entries.filter((entry) => VIBE_KIND_META[entry.kind].group === group.id),
+    // 콘텐츠(영화·음악…)·장소(맛집·카페)처럼 여러 종류가 섞이는 섹션만 카드에 종류 뱃지를 단다
+    mixedKinds: group.id === 'content' || group.id === 'place',
+  }))
 }
 
 export function hasMediaLabel(life: PublicProfileLife, kind: MediaKind, label: string): boolean {

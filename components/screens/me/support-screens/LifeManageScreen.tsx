@@ -9,11 +9,11 @@ import {
   addVibeItem,
   EMPTY_LIFE,
   flattenVibe,
+  groupVibeEntries,
   hasMediaLabel,
   removeVibeEntry,
   updateVibeCaption,
   VIBE_CAPTION_MAX,
-  VIBE_GROUPS,
   VIBE_KIND_META,
   type MediaKind,
   type NewVibeItem,
@@ -102,7 +102,7 @@ function Chips<T extends string>({
 
 // ─── 추가 플로우: 무엇을 → 고르기 → 설명 ─────────────────────────────────────
 
-type AddStep = 'group' | 'pick' | 'caption'
+type AddStep = 'pick' | 'caption'
 
 const CONTENT_KINDS: Array<{ id: MediaKind; label: string }> = [
   { id: 'movie', label: '영화' },
@@ -124,58 +124,49 @@ function previewOf(draft: NewVibeItem): Pick<VibeEntry, 'kind' | 'imageUrl' | 'l
   return { kind: draft.kind, imageUrl: draft.item.posterUrl, label: draft.item.label, sublabel: draft.item.sublabel }
 }
 
+async function readImageInput(e: ChangeEvent<HTMLInputElement>): Promise<string | undefined> {
+  const file = e.target.files?.[0]
+  e.target.value = ''
+  if (!file) return undefined
+  if (!file.type.startsWith('image/')) {
+    showToast('이미지 파일만 업로드할 수 있어요', 'error')
+    return undefined
+  }
+  try {
+    return await readImageFileAsDataUrl(file)
+  } catch {
+    showToast('사진을 불러오지 못했어요', 'error')
+    return undefined
+  }
+}
+
 function VibeAddFlow({
   life,
+  group,
+  initialDraft,
   onCancel,
   onAdd,
 }: {
   life: PublicProfileLife
+  group: VibeGroup
+  initialDraft?: NewVibeItem
   onCancel: () => void
   onAdd: (draft: NewVibeItem) => void
 }) {
-  const [step, setStep] = useState<AddStep>('group')
-  const [group, setGroup] = useState<VibeGroup>('content')
+  const [step, setStep] = useState<AddStep>(initialDraft ? 'caption' : 'pick')
   const [contentKind, setContentKind] = useState<MediaKind>('movie')
   const [placeKind, setPlaceKind] = useState<MediaKind>('restaurant')
-  const [draft, setDraft] = useState<NewVibeItem | null>(null)
+  const [draft, setDraft] = useState<NewVibeItem | null>(initialDraft ?? null)
   const [caption, setCaption] = useState('')
   const [petType, setPetType] = useState(PET_OPTIONS[0])
   const [petName, setPetName] = useState('')
   const [petImage, setPetImage] = useState<string>()
-  const photoInputRef = useRef<HTMLInputElement>(null)
   const petInputRef = useRef<HTMLInputElement>(null)
   const exerciseInputRef = useRef<HTMLInputElement>(null)
 
   const goBack = () => {
-    if (step === 'caption') setStep(group === 'photo' ? 'group' : 'pick')
-    else if (step === 'pick') setStep('group')
+    if (step === 'caption' && group !== 'photo') setStep('pick')
     else onCancel()
-  }
-
-  const readImage = async (e: ChangeEvent<HTMLInputElement>): Promise<string | undefined> => {
-    const file = e.target.files?.[0]
-    e.target.value = ''
-    if (!file) return undefined
-    if (!file.type.startsWith('image/')) {
-      showToast('이미지 파일만 업로드할 수 있어요', 'error')
-      return undefined
-    }
-    try {
-      return await readImageFileAsDataUrl(file)
-    } catch {
-      showToast('사진을 불러오지 못했어요', 'error')
-      return undefined
-    }
-  }
-
-  const pickGroup = (next: VibeGroup) => {
-    setGroup(next)
-    setCaption('')
-    if (next === 'photo') {
-      photoInputRef.current?.click()
-      return
-    }
-    setStep('pick')
   }
 
   const pickMedia = (kind: MediaKind, items: LifeMediaItem[]) => {
@@ -188,53 +179,6 @@ function VibeAddFlow({
     const item = kind === 'exercise' ? { ...picked, posterUrl: picked.posterUrl ?? resolveExerciseImage(picked.label) } : picked
     setDraft({ kind, item })
     setStep('caption')
-  }
-
-  const photoInput = (
-    <input
-      ref={photoInputRef}
-      type="file"
-      accept="image/*"
-      className="sr-only"
-      onChange={async (e) => {
-        const url = await readImage(e)
-        if (!url) return
-        setDraft({ kind: 'photo', photo: { url } })
-        setStep('caption')
-      }}
-    />
-  )
-
-  if (step === 'group') {
-    return (
-      <Shell title="무엇을 올릴까요?" subtitle="카드 한 장에 하나씩 올려요." onBack={goBack} onClose={onCancel}>
-        {photoInput}
-        <div className="grid grid-cols-2 gap-2.5 px-5 pb-8 pt-6">
-          {VIBE_GROUPS.map((item, i) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => pickGroup(item.id)}
-              className={[
-                'flex flex-col items-start gap-3 rounded-[20px] border border-[#DEE4EC] bg-white p-4 text-left transition-colors active:bg-[#F5F6F7]',
-                i === VIBE_GROUPS.length - 1 && VIBE_GROUPS.length % 2 === 1 ? 'col-span-2' : '',
-              ].join(' ')}
-            >
-              <span
-                className="flex h-11 w-11 items-center justify-center rounded-full"
-                style={{ backgroundColor: `${VIBE_KIND_META[GROUP_ICON_KIND[item.id]].color}1F` }}
-              >
-                <VibeKindIcon kind={GROUP_ICON_KIND[item.id]} size={22} />
-              </span>
-              <span>
-                <span className="block text-[16px] font-bold text-[#0D0D0D]">{item.label}</span>
-                <span className="mt-0.5 block text-[12px] font-medium text-[#6C7786]">{item.description}</span>
-              </span>
-            </button>
-          ))}
-        </div>
-      </Shell>
-    )
   }
 
   if (step === 'pick') {
@@ -278,7 +222,7 @@ function VibeAddFlow({
                 accept="image/*"
                 className="sr-only"
                 onChange={async (e) => {
-                  const url = await readImage(e)
+                  const url = await readImageInput(e)
                   if (url) setPetImage(url)
                 }}
               />
@@ -347,7 +291,6 @@ function VibeAddFlow({
       onClose={onCancel}
       footer={<Button onClick={() => onAdd(withCaption(draft, caption))}>추가하기</Button>}
     >
-      {photoInput}
       <div className="space-y-5 px-5 pb-8 pt-6">
         <div className="flex items-center gap-3 rounded-[20px] border border-[#DEE4EC] p-3">
           <div className="relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-[14px]">
@@ -366,7 +309,7 @@ function VibeAddFlow({
                 accept="image/*"
                 className="sr-only"
                 onChange={async (e) => {
-                  const url = await readImage(e)
+                  const url = await readImageInput(e)
                   if (url) setDraft({ kind: 'exercise', item: { ...draft.item, posterUrl: url } })
                 }}
               />
@@ -402,14 +345,16 @@ function withCaption(draft: NewVibeItem, caption: string): NewVibeItem {
 
 // ─── 허브: 내 바이브 카드 그리드 ─────────────────────────────────────────────
 
-function ManageCard({ entry, onClick }: { entry: VibeEntry; onClick: () => void }) {
+function ManageCard({ entry, showBadge, onClick }: { entry: VibeEntry; showBadge: boolean; onClick: () => void }) {
   return (
     <button type="button" onClick={onClick} className="flex flex-col text-left">
       <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[14px]">
         <VibeImage entry={entry} />
-        <div className="absolute left-1.5 top-1.5">
-          <VibeKindBadge kind={entry.kind} />
-        </div>
+        {showBadge && (
+          <div className="absolute left-1.5 top-1.5">
+            <VibeKindBadge kind={entry.kind} />
+          </div>
+        )}
       </div>
       {entry.label && <p className="mt-1.5 truncate text-[12px] font-semibold text-[#0D0D0D]">{entry.label}</p>}
       {entry.caption ? (
@@ -490,18 +435,21 @@ function EditEntrySheet({
 export function LifeManageScreen({ onBack }: { onBack: () => void }) {
   const store = useFeloreStore()
   const life = store.user?.life ?? EMPTY_LIFE
-  const [adding, setAdding] = useState(false)
+  const [adding, setAdding] = useState<{ group: VibeGroup; draft?: NewVibeItem } | null>(null)
   const [editing, setEditing] = useState<VibeEntry | null>(null)
-  const entries = flattenVibe(life)
+  const albumInputRef = useRef<HTMLInputElement>(null)
+  const sections = groupVibeEntries(flattenVibe(life))
 
   if (adding) {
     return (
       <VibeAddFlow
         life={life}
-        onCancel={() => setAdding(false)}
+        group={adding.group}
+        initialDraft={adding.draft}
+        onCancel={() => setAdding(null)}
         onAdd={(draft) => {
           store.updateUserLife(addVibeItem(life, draft))
-          setAdding(false)
+          setAdding(null)
           showToast('바이브에 추가됐어요')
         }}
       />
@@ -515,24 +463,43 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
       onBack={onBack}
       onClose={onBack}
     >
-      <div className="grid grid-cols-3 gap-x-2 gap-y-3 px-5 pb-10 pt-6">
-        <button
-          type="button"
-          onClick={() => setAdding(true)}
-          className="flex aspect-[3/4] w-full flex-col items-center justify-center gap-1.5 rounded-[14px] border border-dashed border-[#CBD3DE] bg-white transition-colors active:bg-[#F5F6F7]"
-        >
-          <Plus size={22} className="text-[#6C7786]" />
-          <span className="text-[12px] font-semibold text-[#6C7786]">카드 추가</span>
-        </button>
-        {entries.map((entry) => (
-          <ManageCard key={entry.key} entry={entry} onClick={() => setEditing(entry)} />
+      <input
+        ref={albumInputRef}
+        type="file"
+        accept="image/*"
+        className="sr-only"
+        onChange={async (e) => {
+          const url = await readImageInput(e)
+          if (url) setAdding({ group: 'photo', draft: { kind: 'photo', photo: { url } } })
+        }}
+      />
+      <div className="space-y-8 px-5 pb-10 pt-6">
+        {sections.map((section) => (
+          <section key={section.id}>
+            <div className="mb-3 flex items-center gap-2">
+              <VibeKindIcon kind={GROUP_ICON_KIND[section.id]} size={16} />
+              <h2 className="text-[16px] font-bold text-[#0D0D0D]">{section.label}</h2>
+              {section.entries.length > 0 && (
+                <span className="text-[14px] font-semibold text-[#A8B1BD]">{section.entries.length}</span>
+              )}
+              <span className="ml-auto text-[12px] font-medium text-[#A8B1BD]">{section.description}</span>
+            </div>
+            <div className="grid grid-cols-3 gap-x-2 gap-y-3">
+              <button
+                type="button"
+                onClick={() => (section.id === 'photo' ? albumInputRef.current?.click() : setAdding({ group: section.id }))}
+                className="flex aspect-[3/4] w-full flex-col items-center justify-center gap-1.5 rounded-[14px] border border-dashed border-[#CBD3DE] bg-white transition-colors active:bg-[#F5F6F7]"
+              >
+                <Plus size={20} className="text-[#6C7786]" />
+                <span className="text-[12px] font-semibold text-[#6C7786]">추가</span>
+              </button>
+              {section.entries.map((entry) => (
+                <ManageCard key={entry.key} entry={entry} showBadge={section.mixedKinds} onClick={() => setEditing(entry)} />
+              ))}
+            </div>
+          </section>
         ))}
       </div>
-      {entries.length === 0 && (
-        <p className="px-5 text-center text-[13px] leading-[1.6] text-[#A8B1BD]">
-          영화 한 편, 단골 카페 하나, 반려동물 사진 한 장부터 시작해보세요.
-        </p>
-      )}
 
       <EditEntrySheet
         entry={editing}

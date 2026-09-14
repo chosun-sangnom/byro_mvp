@@ -2,12 +2,13 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { BadgeCheck, ChevronRight, Flame, PartyPopper, ThumbsUp, UserRound } from 'lucide-react'
+import { BadgeCheck, ChevronRight, Flame, PartyPopper, UserRound } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { useProfileCompletion } from '@/hooks/useProfileCompletion'
 import { Avatar, Button, ProgressBar, showToast } from '@/components/ui'
 import { LoginModal } from '@/components/screens/profile/LoginModal'
-import { NEW_PROFILES, ACTIVE_PROFILES, RECOMMENDED_PREVIEW } from '@/lib/mocks/feedProfiles'
+import { NEW_PROFILES, ACTIVE_PROFILES } from '@/lib/mocks/feedProfiles'
+import { TodayRecommendationCard } from '@/components/screens/feed/TodayRecommendationCard'
 
 const BLACK = '#0D0D0D'
 
@@ -78,6 +79,8 @@ function AccountCard() {
 
 export default function FeedScreen() {
   const router = useRouter()
+  // 오늘의 추천에 나온 사람은 "활발하게 활동중"에서 뺀다 (섹션 간 중복 방지)
+  const [todayPickLinkId, setTodayPickLinkId] = useState<string | null>(null)
 
   const handleProfileClick = (linkId: string | null) => {
     if (!linkId) {
@@ -119,40 +122,8 @@ export default function FeedScreen() {
           </div>
         </section>
 
-        {/* 추천 프로필 */}
-        <section className="flex flex-col gap-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <ThumbsUp size={18} className="text-[#6155F5]" />
-              <h2 className="text-[17px] font-black tracking-[-0.03em] text-[#6155F5]">추천 프로필</h2>
-            </div>
-            <button
-              onClick={() => router.push('/recommended')}
-              className="text-[12px] font-medium text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
-            >
-              더보기
-            </button>
-          </div>
-          <div className="flex flex-col gap-5">
-            {RECOMMENDED_PREVIEW.map((p, i) => (
-              <button
-                key={i}
-                onClick={() => handleProfileClick(p.linkId)}
-                className="w-full flex items-center gap-2.5 text-left"
-              >
-                <Avatar src={p.avatarImage} name={p.name} color={p.fallbackColor} textColor={p.fallbackTextColor} size={48} />
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-0.5">
-                    <p className="text-[14px] font-semibold text-[var(--color-text-primary)] truncate">{p.name}</p>
-                    {p.avatarImage && <VerifiedBadge />}
-                  </div>
-                  <p className="text-[12px] text-[var(--color-text-secondary)] truncate">{p.title}</p>
-                </div>
-                <ChevronRight size={16} className="text-[var(--color-text-tertiary)] flex-shrink-0" />
-              </button>
-            ))}
-          </div>
-        </section>
+        {/* 오늘의 추천 (SCRUM-125) */}
+        <TodayRecommendationCard onPicked={setTodayPickLinkId} />
 
         {/* 활발하게 활동중 */}
         <section className="flex flex-col gap-4">
@@ -161,7 +132,7 @@ export default function FeedScreen() {
             <h2 className="text-[17px] font-black tracking-[-0.03em] text-[#FF523E]">활발하게 활동중</h2>
           </div>
           <div className="flex gap-2 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
-            {ACTIVE_PROFILES.map((p, i) => (
+            {ACTIVE_PROFILES.filter((p) => p.linkId !== todayPickLinkId).map((p, i) => (
               <button
                 key={i}
                 onClick={() => handleProfileClick(p.linkId)}

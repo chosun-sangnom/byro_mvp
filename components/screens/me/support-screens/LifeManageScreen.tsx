@@ -2,7 +2,7 @@
 
 import { useRef, useState, type ChangeEvent, type ReactNode } from 'react'
 import { Camera, ImagePlus, Plus } from 'lucide-react'
-import { BottomSheet, Button, NavBar, showToast, TextArea } from '@/components/ui'
+import { BottomSheet, Button, Modal, NavBar, showToast, TextArea } from '@/components/ui'
 import { VibeImage, VibeKindBadge, VibeKindIcon } from '@/components/screens/profile/vibeCardParts'
 import { readImageFileAsDataUrl } from '@/lib/imageFile'
 import {
@@ -378,13 +378,11 @@ function EditEntrySheet({
   onDelete: (entry: VibeEntry) => void
 }) {
   const [caption, setCaption] = useState('')
-  const [confirmDelete, setConfirmDelete] = useState(false)
   const [loadedKey, setLoadedKey] = useState<string | null>(null)
 
   if (entry && loadedKey !== entry.key) {
     setLoadedKey(entry.key)
     setCaption(entry.caption ?? '')
-    setConfirmDelete(false)
   }
 
   return (
@@ -421,10 +419,10 @@ function EditEntrySheet({
           <Button onClick={() => onSave(entry, caption)}>저장</Button>
           <button
             type="button"
-            onClick={() => (confirmDelete ? onDelete(entry) : setConfirmDelete(true))}
+            onClick={() => onDelete(entry)}
             className="text-[14px] font-semibold text-[#FF4242]"
           >
-            {confirmDelete ? '한 번 더 누르면 삭제돼요' : '카드 삭제'}
+            카드 삭제
           </button>
         </div>
       )}
@@ -437,6 +435,7 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
   const life = store.user?.life ?? EMPTY_LIFE
   const [adding, setAdding] = useState<{ group: VibeGroup; draft?: NewVibeItem } | null>(null)
   const [editing, setEditing] = useState<VibeEntry | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<VibeEntry | null>(null)
   const albumInputRef = useRef<HTMLInputElement>(null)
   const sections = groupVibeEntries(flattenVibe(life))
 
@@ -510,11 +509,38 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
           showToast('설명이 저장됐어요')
         }}
         onDelete={(entry) => {
-          store.updateUserLife(removeVibeEntry(life, entry))
           setEditing(null)
-          showToast('카드를 삭제했어요')
+          setDeleteTarget(entry)
         }}
       />
+
+      <Modal open={deleteTarget !== null} onClose={() => setDeleteTarget(null)} widthClassName="w-[294px]">
+        <p className="text-[18px] font-bold text-[#0D0D0D]">카드를 삭제하시겠어요?</p>
+        <p className="mt-2 text-[14px] font-medium text-[#475058]">삭제하면 복구할 수 없어요.</p>
+        <div className="mt-6 flex gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              setEditing(deleteTarget)
+              setDeleteTarget(null)
+            }}
+            className="flex-1 rounded-[10px] border border-[#DEE4EC] bg-white py-3 text-[14px] font-bold text-[#25313D]"
+          >
+            취소
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (deleteTarget) store.updateUserLife(removeVibeEntry(life, deleteTarget))
+              setDeleteTarget(null)
+              showToast('카드를 삭제했어요')
+            }}
+            className="flex-1 rounded-[10px] bg-[#FF4242] py-3 text-[14px] font-bold text-white"
+          >
+            삭제하기
+          </button>
+        </div>
+      </Modal>
     </Shell>
   )
 }

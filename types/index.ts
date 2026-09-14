@@ -139,6 +139,8 @@ export interface LifeMediaItem {
   posterUrl?: string
   // TODO(real API): Spotify 30s preview URL
   previewUrl?: string
+  // 딥 감상 — 선택 입력, 최대 200자 (SCRUM-122)
+  review?: string
 }
 
 export interface KemiMatchItem {
@@ -205,6 +207,8 @@ export interface Pet {
   type: string
   name?: string
   image?: string
+  // 딥 감상 — 선택 입력, 최대 200자 (SCRUM-122)
+  review?: string
 }
 
 export interface PublicProfileLife {
@@ -316,6 +320,7 @@ export interface PublicProfile {
   guestbook?: GuestbookEntry[]
   kemi?: KemiData
   tabVisibility?: TabVisibility
+  tabSummaries?: TabSummaries
   isPaidUser?: boolean
   isVerified?: boolean
 }
@@ -326,6 +331,17 @@ export interface TabVisibility {
   who: TabVisibilityLevel
   vibe: TabVisibilityLevel
   network: TabVisibilityLevel
+}
+
+/**
+ * 탭별 한 줄 요약 (SCRUM-122). ME/VIBE/PEOPLE 탭 상단에 노출되며,
+ * GEO(SCRUM-123)에서 탭별 페이지 meta description으로도 사용된다.
+ * LLM 초안 생성 + 사용자 편집 하이브리드 — 명시적으로 생성/저장한 값만 존재.
+ */
+export interface TabSummaries {
+  who?: string
+  vibe?: string
+  network?: string
 }
 
 export interface UserState {
@@ -357,6 +373,7 @@ export interface UserState {
   networkImported?: boolean
   contactChannels?: ContactChannel[]
   tabVisibility?: TabVisibility
+  tabSummaries?: TabSummaries
   isVerified?: boolean
 }
 

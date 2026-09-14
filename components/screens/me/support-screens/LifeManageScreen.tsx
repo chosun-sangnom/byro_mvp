@@ -3,7 +3,7 @@
 import { useRef, useState, type ChangeEvent, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronRight, Image as ImageIcon, Plus, X, Zap } from 'lucide-react'
-import { Button, NavBar, showToast } from '@/components/ui'
+import { Button, ItemReviewField, NavBar, showToast } from '@/components/ui'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import type { LifeMediaItem, Pet, PublicProfileLife } from '@/types'
@@ -192,6 +192,12 @@ function PetCard({
             </button>
           )}
         </FieldBlock>
+
+        <ItemReviewField
+          value={pet.review}
+          onChange={(review) => onChange({ review })}
+          placeholder="이 아이와의 특별한 이야기를 남겨보세요"
+        />
       </div>
     </div>
   )

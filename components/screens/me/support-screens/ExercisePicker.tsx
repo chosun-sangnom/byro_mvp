@@ -7,7 +7,7 @@
 
 import { useRef, useState, type ChangeEvent } from 'react'
 import { Plus, X } from 'lucide-react'
-import { showToast } from '@/components/ui'
+import { ItemReviewField, showToast } from '@/components/ui'
 import type { LifeMediaItem } from '@/types'
 
 type ExerciseCategory = 'all' | 'run' | 'ball' | 'fitness' | 'martial' | 'water' | 'outdoor' | 'other'
@@ -290,22 +290,32 @@ export function ExercisePicker({
                     return (
                       <div
                         key={item.label}
-                        className="flex w-full items-center gap-5 rounded-xl border py-2 pl-2 pr-3"
+                        className="w-full rounded-xl border py-2 pl-2 pr-3"
                         style={{ borderColor: '#DEE4EC' }}
                       >
-                        <div className="flex min-w-0 flex-1 items-center gap-3">
-                          <ExercisePhotoButton
-                            item={item}
-                            defaultImageUrl={defaultImg}
-                            onCameraClick={() => handleCameraClick(item.label)}
-                          />
-                          <p className="truncate text-[14px] font-semibold" style={{ color: 'var(--color-accent-gold)' }}>
-                            {item.label}
-                          </p>
+                        <div className="flex w-full items-center gap-5">
+                          <div className="flex min-w-0 flex-1 items-center gap-3">
+                            <ExercisePhotoButton
+                              item={item}
+                              defaultImageUrl={defaultImg}
+                              onCameraClick={() => handleCameraClick(item.label)}
+                            />
+                            <p className="truncate text-[14px] font-semibold" style={{ color: 'var(--color-accent-gold)' }}>
+                              {item.label}
+                            </p>
+                          </div>
+                          <button onClick={() => remove(item.label)} className="flex-shrink-0">
+                            <X size={20} color="#A8B1BD" />
+                          </button>
                         </div>
-                        <button onClick={() => remove(item.label)} className="flex-shrink-0">
-                          <X size={20} color="#A8B1BD" />
-                        </button>
+                        <div className="pl-[52px]">
+                          <ItemReviewField
+                            value={item.review}
+                            onChange={(review) =>
+                              onChange(selected.map((s) => (s.label === item.label ? { ...s, review } : s)))
+                            }
+                          />
+                        </div>
                       </div>
                     )
                   })}

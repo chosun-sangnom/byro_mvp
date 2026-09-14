@@ -2,7 +2,8 @@
 
 import { createPortal } from 'react-dom'
 import { useState } from 'react'
-import { ChevronLeft, ChevronRight, X } from 'lucide-react'
+import { ChevronLeft, ChevronRight, MessageSquareText, X } from 'lucide-react'
+import { BottomSheet } from '@/components/ui'
 import type { LifeMediaItem, PublicProfileLife } from '@/types'
 import { ProfileEmptyAddBlock } from '@/components/screens/profile/ProfileEmptyAddBlock'
 
@@ -128,6 +129,23 @@ function getItemId(item: LifeMediaItem) {
   return item.label + (item.sublabel ?? '')
 }
 
+// 딥 감상이 있는 항목에 표시하는 인디케이터. 탭하면 감상 전문을 시트로 보여준다. (SCRUM-122)
+function ReviewBadge({ onOpen, dark }: { onOpen: () => void; dark?: boolean }) {
+  return (
+    <button
+      type="button"
+      onClick={(e) => {
+        e.stopPropagation()
+        onOpen()
+      }}
+      aria-label="감상 보기"
+      className="absolute bottom-1.5 right-1.5 flex h-6 w-6 items-center justify-center rounded-full"
+      style={{ backgroundColor: dark ? 'rgba(0,0,0,0.55)' : 'rgba(13,13,13,0.08)' }}
+    >
+      <MessageSquareText size={12} className={dark ? 'text-white' : 'text-[#0D0D0D]'} />
+    </button>
+  )
+}
 
 const CATEGORY_COLORS: Record<string, string> = {
   영화: '#3B82F6',
@@ -142,12 +160,13 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 // ─── Vibe Board ───────────────────────────────────────────────────────────────
 
-function VibeCard({ item }: { item: VibeItem }) {
+function VibeCard({ item, onOpenReview }: { item: VibeItem; onOpenReview: (item: LifeMediaItem) => void }) {
   const color = CATEGORY_COLORS[item.category] ?? 'var(--color-accent-dark)'
 
   return (
     // 카드가 그리드 셀을 꽉 채우도록 h-full w-full 사용
     <div className="relative h-full w-full overflow-hidden rounded-xl">
+      {item.review && <ReviewBadge dark onOpen={() => onOpenReview(item)} />}
       {item.posterUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -183,9 +202,11 @@ function VibeCard({ item }: { item: VibeItem }) {
 function VibeBoard({
   items,
   layout,
+  onOpenReview,
 }: {
   items: VibeItem[]
   layout: LayoutPattern
+  onOpenReview: (item: LifeMediaItem) => void
 }) {
   if (items.length === 0) return null
 
@@ -201,7 +222,7 @@ function VibeBoard({
       >
         {items.map((item, i) => (
           <div key={i} style={{ gridColumn: layout.slots[i].col, gridRow: layout.slots[i].row }}>
-            <VibeCard item={item} />
+            <VibeCard item={item} onOpenReview={onOpenReview} />
           </div>
         ))}
       </div>
@@ -229,18 +250,25 @@ function SubHeader({ label }: { label: string }) {
 
 // ─── Scroll rows ──────────────────────────────────────────────────────────────
 
-function PortraitScroll({ items }: { items: LifeMediaItem[] }) {
+function PortraitScroll({
+  items,
+  onOpenReview,
+}: {
+  items: LifeMediaItem[]
+  onOpenReview: (item: LifeMediaItem) => void
+}) {
   if (!items.length) return null
   return (
     <div className="overflow-x-auto scrollbar-hide">
       <div className="flex gap-3 px-5">
         {items.map((item) => (
           <div key={getItemId(item)} className="w-[76px] flex-shrink-0">
-            <div className="h-[114px] w-[76px] overflow-hidden rounded-[12px] bg-[var(--color-bg-muted)]">
+            <div className="relative h-[114px] w-[76px] overflow-hidden rounded-[12px] bg-[var(--color-bg-muted)]">
               {item.posterUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={item.posterUrl} alt={item.label} className="h-full w-full object-cover" />
               )}
+              {item.review && <ReviewBadge dark onOpen={() => onOpenReview(item)} />}
             </div>
             <p className="mt-1.5 truncate text-[11px] font-semibold leading-snug text-[var(--color-text-primary)]">
               {item.label}
@@ -258,18 +286,25 @@ function PortraitScroll({ items }: { items: LifeMediaItem[] }) {
   )
 }
 
-function SquareScroll({ items }: { items: LifeMediaItem[] }) {
+function SquareScroll({
+  items,
+  onOpenReview,
+}: {
+  items: LifeMediaItem[]
+  onOpenReview: (item: LifeMediaItem) => void
+}) {
   if (!items.length) return null
   return (
     <div className="overflow-x-auto scrollbar-hide">
       <div className="flex gap-3 px-5">
         {items.map((item) => (
           <div key={getItemId(item)} className="w-[76px] flex-shrink-0">
-            <div className="h-[76px] w-[76px] overflow-hidden rounded-[12px] bg-[var(--color-bg-muted)]">
+            <div className="relative h-[76px] w-[76px] overflow-hidden rounded-[12px] bg-[var(--color-bg-muted)]">
               {item.posterUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={item.posterUrl} alt={item.label} className="h-full w-full object-cover" />
               )}
+              {item.review && <ReviewBadge dark onOpen={() => onOpenReview(item)} />}
             </div>
             <p className="mt-1.5 truncate text-[11px] font-semibold leading-snug text-[var(--color-text-primary)]">
               {item.label}
@@ -287,18 +322,25 @@ function SquareScroll({ items }: { items: LifeMediaItem[] }) {
   )
 }
 
-function PlaceScroll({ items }: { items: LifeMediaItem[] }) {
+function PlaceScroll({
+  items,
+  onOpenReview,
+}: {
+  items: LifeMediaItem[]
+  onOpenReview: (item: LifeMediaItem) => void
+}) {
   if (!items.length) return null
   return (
     <div className="overflow-x-auto scrollbar-hide">
       <div className="flex gap-3 px-5">
         {items.map((item) => (
           <div key={getItemId(item)} className="w-[136px] flex-shrink-0">
-            <div className="h-[102px] w-[136px] overflow-hidden rounded-[12px] bg-[var(--color-bg-muted)]">
+            <div className="relative h-[102px] w-[136px] overflow-hidden rounded-[12px] bg-[var(--color-bg-muted)]">
               {item.posterUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={item.posterUrl} alt={item.label} className="h-full w-full object-cover" />
               )}
+              {item.review && <ReviewBadge dark onOpen={() => onOpenReview(item)} />}
             </div>
             <p className="mt-1.5 truncate text-[12px] font-semibold text-[var(--color-text-primary)]">
               {item.label}
@@ -326,6 +368,7 @@ export function PublicProfileLifeSection({
   onAdd?: () => void
 }) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
+  const [reviewItem, setReviewItem] = useState<LifeMediaItem | null>(null)
 
   const [{ vibeItems, vibeLayout }] = useState(() => ({
     vibeItems: life ? buildVibeItemsRandom(life) : [],
@@ -363,7 +406,7 @@ export function PublicProfileLifeSection({
   return (
     <div className="pb-32 pt-2">
       <BlockHeader label="무드보드" />
-      <VibeBoard items={vibeItems} layout={vibeLayout} />
+      <VibeBoard items={vibeItems} layout={vibeLayout} onOpenReview={setReviewItem} />
 
       {hasPet && (
         <>
@@ -373,7 +416,9 @@ export function PublicProfileLifeSection({
               label: p.name ?? p.type,
               sublabel: p.name ? p.type : undefined,
               posterUrl: p.image,
+              review: p.review,
             }))}
+            onOpenReview={setReviewItem}
           />
         </>
       )}
@@ -383,7 +428,7 @@ export function PublicProfileLifeSection({
           <BlockHeader label="취미" />
           <div>
             <SubHeader label="운동" />
-            <SquareScroll items={exercise} />
+            <SquareScroll items={exercise} onOpenReview={setReviewItem} />
           </div>
         </>
       )}
@@ -394,25 +439,25 @@ export function PublicProfileLifeSection({
           {life.tastes.movies.length > 0 && (
             <div className="mb-4">
               <SubHeader label="영화" />
-              <PortraitScroll items={life.tastes.movies} />
+              <PortraitScroll items={life.tastes.movies} onOpenReview={setReviewItem} />
             </div>
           )}
           {life.tastes.music.length > 0 && (
             <div className="mb-4">
               <SubHeader label="음악" />
-              <SquareScroll items={life.tastes.music} />
+              <SquareScroll items={life.tastes.music} onOpenReview={setReviewItem} />
             </div>
           )}
           {life.tastes.books.length > 0 && (
             <div className="mb-4">
               <SubHeader label="책" />
-              <PortraitScroll items={life.tastes.books} />
+              <PortraitScroll items={life.tastes.books} onOpenReview={setReviewItem} />
             </div>
           )}
           {(life.tastes.plays?.length ?? 0) > 0 && (
             <div>
               <SubHeader label="뮤지컬 · 연극" />
-              <PortraitScroll items={life.tastes.plays ?? []} />
+              <PortraitScroll items={life.tastes.plays ?? []} onOpenReview={setReviewItem} />
             </div>
           )}
         </>
@@ -424,13 +469,13 @@ export function PublicProfileLifeSection({
           {life.tastes.restaurants.length > 0 && (
             <div className="mb-4">
               <SubHeader label="맛집" />
-              <PlaceScroll items={life.tastes.restaurants} />
+              <PlaceScroll items={life.tastes.restaurants} onOpenReview={setReviewItem} />
             </div>
           )}
           {life.tastes.cafes.length > 0 && (
             <div>
               <SubHeader label="카페" />
-              <PlaceScroll items={life.tastes.cafes} />
+              <PlaceScroll items={life.tastes.cafes} onOpenReview={setReviewItem} />
             </div>
           )}
         </>
@@ -503,6 +548,30 @@ export function PublicProfileLifeSection({
         </div>,
         document.body
       )}
+
+      <BottomSheet open={reviewItem !== null} onClose={() => setReviewItem(null)}>
+        {reviewItem && (
+          <div className="px-5 pb-6 pt-2">
+            <div className="flex items-center gap-3">
+              {reviewItem.posterUrl && (
+                <div className="h-14 w-14 shrink-0 overflow-hidden rounded-[12px] bg-[var(--color-bg-muted)]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={reviewItem.posterUrl} alt={reviewItem.label} className="h-full w-full object-cover" />
+                </div>
+              )}
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[15px] font-bold text-[#0D0D0D]">{reviewItem.label}</p>
+                {reviewItem.sublabel && (
+                  <p className="truncate text-[12px] text-[var(--color-text-tertiary)]">{reviewItem.sublabel}</p>
+                )}
+              </div>
+            </div>
+            <p className="mt-4 whitespace-pre-wrap text-[14px] leading-[1.6] text-[#25313D]">
+              {reviewItem.review}
+            </p>
+          </div>
+        )}
+      </BottomSheet>
     </div>
   )
 }

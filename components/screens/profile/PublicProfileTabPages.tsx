@@ -18,6 +18,12 @@ import { ProfileSnsSection } from '@/components/screens/profile/PublicProfileSns
 import { ProfileHighlightsSection } from '@/components/screens/profile/PublicProfileHighlightsSection'
 import { PublicProfileLifeSection } from '@/components/screens/profile/PublicProfileLifeSection'
 import { PublicProfileWhoIAmSection } from '@/components/screens/profile/PublicProfileWhoIAmSection'
+import { TabSummaryBlock } from '@/components/screens/profile/TabSummaryBlock'
+import {
+  buildNetworkSummaryPrompt,
+  buildVibeSummaryPrompt,
+  buildWhoSummaryPrompt,
+} from '@/lib/tabSummaryPrompt'
 
 function usePublicProfileTabData(username: string) {
   const store = useFeloreStore()
@@ -116,6 +122,12 @@ export function PublicProfileWhoTabPage({
 
   return (
     <>
+      <TabSummaryBlock
+        summary={profile.tabSummaries?.who}
+        isOwner={isOwner}
+        promptText={buildWhoSummaryPrompt(profile)}
+        onSave={(text) => store.updateTabSummary('who', text || undefined)}
+      />
       <PublicProfileWhoIAmSection
         whoIAm={profile.whoIAm}
         bio={profile.bio}
@@ -152,18 +164,26 @@ export function PublicProfileLifeTabPage({
   username: string
   onEditSection?: (key: ProfileSectionEditKey) => void
 }) {
-  const { profile, isOwner, tabAccess } = usePublicProfileTabData(username)
+  const { store, profile, isOwner, tabAccess } = usePublicProfileTabData(username)
 
   if (tabAccess.vibe !== 'visible') {
     return <LockedTabContent />
   }
 
   return (
-    <PublicProfileLifeSection
-      life={profile.life}
-      isOwner={isOwner}
-      onAdd={onEditSection && (() => onEditSection('vibe'))}
-    />
+    <>
+      <TabSummaryBlock
+        summary={profile.tabSummaries?.vibe}
+        isOwner={isOwner}
+        promptText={buildVibeSummaryPrompt(profile.life)}
+        onSave={(text) => store.updateTabSummary('vibe', text || undefined)}
+      />
+      <PublicProfileLifeSection
+        life={profile.life}
+        isOwner={isOwner}
+        onAdd={onEditSection && (() => onEditSection('vibe'))}
+      />
+    </>
   )
 }
 
@@ -187,6 +207,12 @@ export function PublicProfileReputationTabPage({
 
   return (
     <div className="pb-6">
+      <TabSummaryBlock
+        summary={profile.tabSummaries?.network}
+        isOwner={isOwner}
+        promptText={buildNetworkSummaryPrompt(profile.rememberHighlight, profile.reputationKeywords)}
+        onSave={(text) => store.updateTabSummary('network', text || undefined)}
+      />
       <ProfileRememberSection
         total={profile.rememberHighlight.total}
         industries={profile.rememberHighlight.industries}

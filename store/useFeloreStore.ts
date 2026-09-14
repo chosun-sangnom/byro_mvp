@@ -12,6 +12,7 @@ import type {
   PublicProfileWhoIAm,
   TabVisibility,
   TabVisibilityLevel,
+  TabSummaries,
   SavedProfile,
   RecentProfile,
   Experience,
@@ -124,6 +125,7 @@ interface FeloreStore {
   updateUserContactChannels(channels: ContactChannel[]): void
   updateUserWhoIAm(whoIAm: PublicProfileWhoIAm): void
   updateUserLife(life: PublicProfileLife): void
+  updateTabSummary(tab: keyof TabSummaries, text: string | undefined): void
   updateNetworkDomains(domains: string[]): void
   deleteGuestbookEntry(id: string): void
   updateTabVisibility(tab: keyof TabVisibility, level: TabVisibilityLevel): void
@@ -586,6 +588,14 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
     set((state) => ({
       user: state.user ? { ...state.user, life } : null,
       kemiComputedProfiles: [],
+    }))
+  },
+
+  updateTabSummary(tab, text) {
+    set((state) => ({
+      user: state.user
+        ? { ...state.user, tabSummaries: { ...state.user.tabSummaries, [tab]: text } }
+        : null,
     }))
   },
 

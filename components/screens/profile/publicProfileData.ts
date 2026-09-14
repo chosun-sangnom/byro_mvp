@@ -131,6 +131,7 @@ function buildEditableOwnerProfile(
     contactChannels: user.contactChannels ?? baseProfile.contactChannels,
     isPaidUser: user.isPaidUser,
     isVerified: user.isVerified,
+    tabSummaries: user.tabSummaries ?? baseProfile.tabSummaries,
   }
 }
 

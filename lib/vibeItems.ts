@@ -10,10 +10,10 @@ export type VibeGroup = 'content' | 'place' | 'exercise' | 'pet' | 'photo'
 export type MediaKind = Exclude<VibeKind, 'pet' | 'photo'>
 
 export const VIBE_GROUPS: Array<{ id: VibeGroup; label: string; description: string }> = [
+  { id: 'pet', label: '반려동물', description: '함께 사는 친구' },
   { id: 'content', label: '콘텐츠', description: '영화 · 음악 · 책 · 공연' },
   { id: 'place', label: '장소', description: '맛집 · 카페' },
   { id: 'exercise', label: '운동', description: '즐겨 하는 운동' },
-  { id: 'pet', label: '반려동물', description: '함께 사는 친구' },
   { id: 'photo', label: '앨범', description: '일상 · 취미 · 공간' },
 ]
 

@@ -134,20 +134,17 @@ function Collage({ entries, layout, onOpen }: { entries: VibeEntry[]; layout: La
 function GridCard({ entry, showBadge, onOpen }: { entry: VibeEntry; showBadge: boolean; onOpen: () => void }) {
   return (
     <button type="button" onClick={onOpen} className="flex flex-col text-left">
-      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[14px] bg-[var(--color-bg-muted)]">
-        <VibeImage entry={entry} iconSize={28} />
+      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[14px] bg-[var(--color-bg-muted)]">
+        <VibeImage entry={entry} />
         {showBadge && (
-          <div className="absolute left-2 top-2">
+          <div className="absolute left-1.5 top-1.5">
             <VibeKindBadge kind={entry.kind} />
           </div>
         )}
       </div>
-      {entry.label && (
-        <p className="mt-2 truncate text-[13px] font-semibold text-[#0D0D0D]">{entry.label}</p>
-      )}
-      {entry.sublabel && <p className="truncate text-[11px] text-[#A8B1BD]">{entry.sublabel}</p>}
+      {entry.label && <p className="mt-1.5 truncate text-[12px] font-semibold text-[#0D0D0D]">{entry.label}</p>}
       {entry.caption && (
-        <p className={['text-[12px] leading-[1.5] text-[#475058]', entry.label ? 'mt-1 line-clamp-2' : 'mt-2 line-clamp-3'].join(' ')}>
+        <p className={['text-[11px] leading-[1.45] text-[#6C7786]', entry.label ? 'line-clamp-2' : 'mt-1.5 line-clamp-3'].join(' ')}>
           {entry.caption}
         </p>
       )}
@@ -247,7 +244,7 @@ export function PublicProfileLifeSection({
             <h3 className="text-[18px] font-bold text-[#0D0D0D]">{section.label}</h3>
             <span className="text-[14px] font-semibold text-[#A8B1BD]">{section.entries.length}</span>
           </div>
-          <div className="grid grid-cols-2 gap-x-3 gap-y-5 px-5">
+          <div className="grid grid-cols-3 gap-x-2 gap-y-3 px-5">
             {section.entries.map((entry) => (
               <GridCard key={entry.key} entry={entry} showBadge={section.mixedKinds} onOpen={() => setOpened(entry)} />
             ))}

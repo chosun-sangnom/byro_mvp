@@ -79,6 +79,7 @@ function AccountCard() {
 
 export default function FeedScreen() {
   const router = useRouter()
+  const { isLoggedIn } = useAuth()
   // 오늘의 추천에 나온 사람은 "활발하게 활동중"에서 뺀다 (섹션 간 중복 방지)
   const [todayPickLinkId, setTodayPickLinkId] = useState<string | null>(null)
 
@@ -125,7 +126,8 @@ export default function FeedScreen() {
         {/* 오늘의 추천 (SCRUM-125) */}
         <TodayRecommendationCard onPicked={setTodayPickLinkId} />
 
-        {/* 활발하게 활동중 */}
+        {/* 활발하게 활동중 — 로그인 사용자에게만 (SCRUM-125) */}
+        {isLoggedIn && (
         <section className="flex flex-col gap-4">
           <div className="flex items-center gap-1">
             <Flame size={18} className="text-[#FF523E]" />
@@ -170,6 +172,7 @@ export default function FeedScreen() {
             ))}
           </div>
         </section>
+        )}
 
       </div>
 

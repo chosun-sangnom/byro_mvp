@@ -7,9 +7,13 @@ import { Avatar, Button } from '@/components/ui'
 import { useAuth } from '@/hooks/useAuth'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import {
+  buildReasonPayload,
   DAILY_SKIP_LIMIT,
   hasMatchableInfo,
   rankRecommendations,
+  readCachedReason,
+  todayKst,
+  writeCachedReason,
   resolveTodayRecommendation,
   skipTodayRecommendation,
   type RecommendationSignal,
@@ -34,6 +38,7 @@ export function TodayRecommendationCard({ onPicked }: { onPicked?: (linkId: stri
   const highlights = useFeloreStore((s) => s.highlights)
   const [state, setState] = useState<{ recommendation: TodayRecommendation | null; skipsLeft: number } | null>(null)
   const viewerKey = isLoggedIn && user ? user.linkId : 'guest'
+  const [reason, setReason] = useState<{ cacheId: string; text: string | null }>({ cacheId: '', text: null })
 
   const refresh = () => {
     const ranked = rankRecommendations(isLoggedIn && user ? { ...user, highlights } : null)
@@ -44,6 +49,40 @@ export function TodayRecommendationCard({ onPicked }: { onPicked?: (linkId: stri
 
   // 로그인 상태·내 정보가 바뀌면 다시 계산 (하루 고정 픽은 localStorage가 유지)
   useEffect(refresh, [viewerKey, user?.school, user?.title, user?.life, highlights]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 추천이 정해지면 AI 추천 근거를 붙인다 (하루·추천 단위 캐시)
+  useEffect(() => {
+    const current = state?.recommendation
+    if (!current) return
+    // 같은 사람이라도 근거(매칭 신호/활동량 대체)가 바뀌면 다시 생성
+    const signature = current.isFallback ? 'active' : current.chips.map((c) => `${c.signal}:${c.label}`).join(',')
+    const cacheId = `${todayKst()}:${viewerKey}:${current.profile.linkId}:${signature}`
+    const cached = readCachedReason(cacheId)
+    if (cached) {
+      setReason({ cacheId, text: cached })
+      return
+    }
+    setReason({ cacheId, text: null })
+    let cancelled = false
+    fetch('/api/ai-recommend-reason', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(buildReasonPayload(current, isLoggedIn && user ? { ...user, highlights } : null)),
+    })
+      .then((res) => res.json())
+      .then((data: { explanation?: string }) => {
+        if (cancelled || !data.explanation) return
+        writeCachedReason(cacheId, data.explanation)
+        setReason({ cacheId, text: data.explanation })
+      })
+      .catch(() => {
+        // 실패 시 근거 블록만 숨긴다
+        if (!cancelled) setReason({ cacheId, text: '' })
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [state]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!state) return null
   const rec = state.recommendation
@@ -109,6 +148,23 @@ export function TodayRecommendationCard({ onPicked }: { onPicked?: (linkId: stri
               </div>
             )}
           </div>
+
+          {reason.text !== '' && (
+            <div className="rounded-[14px] bg-[#F7F6FE] px-3.5 py-3">
+              <p className="flex items-center gap-1 text-[11px] font-bold text-[#6155F5]">
+                <Sparkles size={11} />
+                AI 추천 근거
+              </p>
+              {reason.text ? (
+                <p className="mt-1.5 break-keep text-[13px] leading-[1.6] text-[#25313D]">{reason.text}</p>
+              ) : (
+                <div className="mt-2 space-y-1.5" aria-label="추천 근거를 분석하는 중">
+                  <div className="h-3 w-full animate-pulse rounded-full bg-[#E9E6FB]" />
+                  <div className="h-3 w-4/5 animate-pulse rounded-full bg-[#E9E6FB]" />
+                </div>
+              )}
+            </div>
+          )}
 
           {viewerMissingInfo && (
             <button

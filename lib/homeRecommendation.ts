@@ -15,6 +15,7 @@ import {
 } from '@/lib/mocks/publicProfiles'
 import { flattenVibe } from '@/lib/vibeItems'
 import type { Highlight, PublicProfile, UserState } from '@/types'
+import type { RecommendReasonPayload } from '@/app/api/ai-recommend-reason/route'
 
 // [임시] SCRUM-125 홈 "오늘의 추천" 목업 — 규칙 기반 클라이언트 계산.
 // TODO(real API): GET /feed/recommended/today 로 교체. 서버는 저장한 사람·7일 내 본 사람도 제외하고,
@@ -184,6 +185,64 @@ export function rankRecommendations(
   })
   matched.sort((a, b) => b.score - a.score || a.order - b.order)
   return [...matched.map((m) => m.rec), ...rest]
+}
+
+function careerRoles(highlights?: Highlight[]): string[] {
+  return (highlights ?? [])
+    .filter((h) => h.categoryId === 'career-role')
+    .map((h) => String((h.metadata as { role?: string } | undefined)?.role ?? ''))
+    .filter(Boolean)
+}
+
+/** AI 추천 근거 요청 — 공개 정보와 이미 계산된 신호만 보낸다 */
+export function buildReasonPayload(
+  rec: TodayRecommendation,
+  viewer: (Pick<UserState, 'school' | 'life'> & { highlights: Highlight[] }) | null,
+): RecommendReasonPayload {
+  const p = rec.profile
+  return {
+    viewer: viewer
+      ? { school: viewer.school || undefined, roles: careerRoles(viewer.highlights), vibeLabels: vibeLabels(viewer.life).slice(0, 10) }
+      : null,
+    target: {
+      name: p.name,
+      title: p.title,
+      headline: p.headline,
+      school: p.school,
+      roles: careerRoles(p.manualHighlights),
+      vibeLabels: vibeLabels(p.life).slice(0, 10),
+      reputationKeywords: [...(p.reputationKeywords ?? [])].sort((a, b) => b.count - a.count).slice(0, 3).map((k) => k.keyword),
+      feedbackCount: feedbackCount(p),
+      isVerified: Boolean(p.isVerified),
+    },
+    signals: { sentence: rec.sentence, chips: rec.chips, isFallback: rec.isFallback },
+  }
+}
+
+// ─── AI 추천 근거 캐시 — 같은 날 같은 추천이면 다시 호출하지 않는다 ─────────────
+
+const REASON_CACHE_KEY = 'felore-today-recommendation-reason'
+
+export function readCachedReason(cacheId: string): string | null {
+  try {
+    const raw = window.localStorage.getItem(REASON_CACHE_KEY)
+    const map = raw ? (JSON.parse(raw) as Record<string, string>) : {}
+    return map[cacheId] ?? null
+  } catch {
+    return null
+  }
+}
+
+export function writeCachedReason(cacheId: string, explanation: string) {
+  try {
+    const today = todayKst()
+    const raw = window.localStorage.getItem(REASON_CACHE_KEY)
+    const map = raw ? (JSON.parse(raw) as Record<string, string>) : {}
+    const fresh = Object.fromEntries(Object.entries(map).filter(([id]) => id.startsWith(today)))
+    window.localStorage.setItem(REASON_CACHE_KEY, JSON.stringify({ ...fresh, [cacheId]: explanation }))
+  } catch {
+    // 캐시 실패는 무시 (다음에 다시 생성)
+  }
 }
 
 // ─── 하루 고정 + 넘기기 기록 (목업: localStorage) ──────────────────────────────

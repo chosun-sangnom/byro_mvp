@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef, useState, type ChangeEvent, type ReactNode } from 'react'
-import { Camera, ImagePlus, Plus } from 'lucide-react'
+import { Image as ImageIcon, Plus } from 'lucide-react'
 import { BottomSheet, Button, Modal, NavBar, showToast, TextArea } from '@/components/ui'
 import { VibeImage, VibeKindBadge, VibeKindIcon } from '@/components/screens/profile/vibeCardParts'
 import { readImageFileAsDataUrl } from '@/lib/imageFile'
@@ -12,7 +12,7 @@ import {
   groupVibeEntries,
   hasMediaLabel,
   removeVibeEntry,
-  updateVibeCaption,
+  updateVibeEntry,
   VIBE_CAPTION_MAX,
   VIBE_KIND_META,
   type MediaKind,
@@ -140,6 +140,70 @@ async function readImageInput(e: ChangeEvent<HTMLInputElement>): Promise<string 
   }
 }
 
+// 프로필 사진 편집과 같은 "탭하여 변경" 타일
+function PhotoField({
+  entry,
+  onChange,
+  width = 132,
+  showHelper = true,
+}: {
+  entry: Pick<VibeEntry, 'kind' | 'imageUrl' | 'label'>
+  onChange: (url: string) => void
+  width?: number
+  showHelper?: boolean
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  return (
+    <div className="flex flex-col items-center">
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="sr-only"
+        onChange={async (e) => {
+          const url = await readImageInput(e)
+          if (url) onChange(url)
+        }}
+      />
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        className="group relative aspect-[3/4] overflow-hidden rounded-[20px] bg-[#F5F6F7]"
+        style={{ width }}
+      >
+        {entry.imageUrl ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={entry.imageUrl}
+              alt={entry.label ?? ''}
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-active:scale-[1.02]"
+            />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0)_55%,rgba(0,0,0,0.7)_90%)]" />
+            <span className="absolute inset-x-0 bottom-3 text-center text-[13px] font-bold text-white">탭하여 변경</span>
+          </>
+        ) : (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+            <ImageIcon size={22} className="text-[#A8B1BD]" />
+            <span className="text-[13px] font-bold text-[#A8B1BD]">탭하여 추가</span>
+          </div>
+        )}
+      </button>
+      {showHelper && (
+        <p className="mt-2 text-center text-[12px] font-medium leading-[1.5] text-[#6C7786]">
+          {VIBE_KIND_META[entry.kind].photoHelper}
+        </p>
+      )}
+    </div>
+  )
+}
+
+function withImage(draft: NewVibeItem, url: string): NewVibeItem {
+  if (draft.kind === 'pet') return { kind: 'pet', pet: { ...draft.pet, image: url } }
+  if (draft.kind === 'photo') return { kind: 'photo', photo: { ...draft.photo, url } }
+  return { kind: draft.kind, item: { ...draft.item, posterUrl: url } }
+}
+
 function VibeAddFlow({
   life,
   group,
@@ -160,9 +224,6 @@ function VibeAddFlow({
   const [caption, setCaption] = useState('')
   const [petType, setPetType] = useState(PET_OPTIONS[0])
   const [petName, setPetName] = useState('')
-  const [petImage, setPetImage] = useState<string>()
-  const petInputRef = useRef<HTMLInputElement>(null)
-  const exerciseInputRef = useRef<HTMLInputElement>(null)
 
   const goBack = () => {
     if (step === 'caption' && group !== 'photo') setStep('pick')
@@ -191,7 +252,7 @@ function VibeAddFlow({
           footer={
             <Button
               onClick={() => {
-                setDraft({ kind: 'pet', pet: { id: `pet-${Date.now()}`, type: petType, name: petName.trim() || undefined, image: petImage } })
+                setDraft({ kind: 'pet', pet: { id: `pet-${Date.now()}`, type: petType, name: petName.trim() || undefined } })
                 setStep('caption')
               }}
             >
@@ -213,34 +274,6 @@ function VibeAddFlow({
                 maxLength={20}
                 className="w-full rounded-full border border-[#DEE4EC] bg-white px-4 py-3 text-[14px] text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
               />
-            </div>
-            <div>
-              <p className="mb-2 text-[14px] font-semibold text-[#0D0D0D]">사진 (선택)</p>
-              <input
-                ref={petInputRef}
-                type="file"
-                accept="image/*"
-                className="sr-only"
-                onChange={async (e) => {
-                  const url = await readImageInput(e)
-                  if (url) setPetImage(url)
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => petInputRef.current?.click()}
-                className="relative flex h-[140px] w-[140px] flex-col items-center justify-center gap-2 overflow-hidden rounded-[20px] bg-[#F5F6F7]"
-              >
-                {petImage ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={petImage} alt="반려동물" className="h-full w-full object-cover" />
-                ) : (
-                  <>
-                    <ImagePlus size={28} className="text-[#A8B1BD]" />
-                    <span className="text-[13px] font-semibold text-[#25313D]">눌러서 등록</span>
-                  </>
-                )}
-              </button>
             </div>
           </div>
         </Shell>
@@ -285,45 +318,34 @@ function VibeAddFlow({
 
   return (
     <Shell
-      title="한 줄 설명을 남겨보세요"
-      subtitle="선택이에요. 나중에 추가해도 돼요."
+      title={meta.photoHelper ? '사진과 설명을 남겨보세요' : '한 줄 설명을 남겨보세요'}
+      subtitle={meta.photoHelper ? '둘 다 선택이에요. 나중에 바꿔도 돼요.' : '선택이에요. 나중에 추가해도 돼요.'}
       onBack={goBack}
       onClose={onCancel}
       footer={<Button onClick={() => onAdd(withCaption(draft, caption))}>추가하기</Button>}
     >
       <div className="space-y-5 px-5 pb-8 pt-6">
-        <div className="flex items-center gap-3 rounded-[20px] border border-[#DEE4EC] p-3">
-          <div className="relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-[14px]">
-            <VibeImage entry={preview} />
+        {meta.photoHelper ? (
+          <div className="flex flex-col items-center">
+            <PhotoField entry={preview} onChange={(url) => setDraft(withImage(draft, url))} />
+            <div className="mt-4 flex flex-col items-center">
+              <VibeKindBadge kind={preview.kind} />
+              <p className="mt-1.5 text-[16px] font-bold text-[#0D0D0D]">{preview.label}</p>
+              {preview.sublabel && <p className="text-[12px] text-[#6C7786]">{preview.sublabel}</p>}
+            </div>
           </div>
-          <div className="min-w-0 flex-1">
-            <VibeKindBadge kind={preview.kind} />
-            {preview.label && <p className="mt-1.5 truncate text-[15px] font-bold text-[#0D0D0D]">{preview.label}</p>}
-            {preview.sublabel && <p className="truncate text-[12px] text-[#6C7786]">{preview.sublabel}</p>}
+        ) : (
+          <div className="flex items-center gap-3 rounded-[20px] border border-[#DEE4EC] p-3">
+            <div className="relative h-[72px] w-[72px] shrink-0 overflow-hidden rounded-[14px]">
+              <VibeImage entry={preview} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <VibeKindBadge kind={preview.kind} />
+              {preview.label && <p className="mt-1.5 truncate text-[15px] font-bold text-[#0D0D0D]">{preview.label}</p>}
+              {preview.sublabel && <p className="truncate text-[12px] text-[#6C7786]">{preview.sublabel}</p>}
+            </div>
           </div>
-          {draft.kind === 'exercise' && (
-            <>
-              <input
-                ref={exerciseInputRef}
-                type="file"
-                accept="image/*"
-                className="sr-only"
-                onChange={async (e) => {
-                  const url = await readImageInput(e)
-                  if (url) setDraft({ kind: 'exercise', item: { ...draft.item, posterUrl: url } })
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => exerciseInputRef.current?.click()}
-                className="flex shrink-0 items-center gap-1 rounded-full bg-[#F5F6F7] px-3 py-1.5 text-[12px] font-semibold text-[#25313D]"
-              >
-                <Camera size={12} />
-                내 사진
-              </button>
-            </>
-          )}
-        </div>
+        )}
         <TextArea
           value={caption}
           onChange={setCaption}
@@ -374,22 +396,36 @@ function EditEntrySheet({
 }: {
   entry: VibeEntry | null
   onClose: () => void
-  onSave: (entry: VibeEntry, caption: string) => void
+  onSave: (entry: VibeEntry, patch: { caption: string; imageUrl?: string }) => void
   onDelete: (entry: VibeEntry) => void
 }) {
   const [caption, setCaption] = useState('')
+  const [imageUrl, setImageUrl] = useState<string>()
   const [loadedKey, setLoadedKey] = useState<string | null>(null)
 
   if (entry && loadedKey !== entry.key) {
     setLoadedKey(entry.key)
     setCaption(entry.caption ?? '')
+    setImageUrl(entry.imageUrl)
   }
 
   return (
     <BottomSheet open={entry !== null} onClose={onClose}>
       {entry && (
         <div className="flex flex-col gap-5 px-5 pb-6">
-          {entry.kind === 'photo' ? (
+          {VIBE_KIND_META[entry.kind].photoHelper ? (
+            <div className="flex items-center gap-4">
+              <PhotoField entry={{ ...entry, imageUrl }} onChange={setImageUrl} width={112} showHelper={false} />
+              <div className="min-w-0 flex-1">
+                <VibeKindBadge kind={entry.kind} />
+                <p className="mt-1.5 truncate text-[16px] font-bold text-[#0D0D0D]">{entry.label}</p>
+                {entry.sublabel && <p className="truncate text-[12px] text-[#6C7786]">{entry.sublabel}</p>}
+                <p className="mt-3 text-[12px] font-medium leading-[1.5] text-[#6C7786]">
+                  {VIBE_KIND_META[entry.kind].photoHelper}
+                </p>
+              </div>
+            </div>
+          ) : entry.kind === 'photo' ? (
             <div className="overflow-hidden rounded-[16px] bg-[#F5F6F7]">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={entry.imageUrl} alt="" className="max-h-[36vh] w-full object-contain" />
@@ -416,7 +452,7 @@ function EditEntrySheet({
               rows={4}
             />
           </div>
-          <Button onClick={() => onSave(entry, caption)}>저장</Button>
+          <Button onClick={() => onSave(entry, { caption, imageUrl })}>저장</Button>
           <button
             type="button"
             onClick={() => onDelete(entry)}
@@ -503,10 +539,10 @@ export function LifeManageScreen({ onBack }: { onBack: () => void }) {
       <EditEntrySheet
         entry={editing}
         onClose={() => setEditing(null)}
-        onSave={(entry, caption) => {
-          store.updateUserLife(updateVibeCaption(life, entry, caption))
+        onSave={(entry, patch) => {
+          store.updateUserLife(updateVibeEntry(life, entry, patch))
           setEditing(null)
-          showToast('설명이 저장됐어요')
+          showToast('카드가 저장됐어요')
         }}
         onDelete={(entry) => {
           setEditing(null)

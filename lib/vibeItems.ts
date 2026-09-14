@@ -17,15 +17,16 @@ export const VIBE_GROUPS: Array<{ id: VibeGroup; label: string; description: str
   { id: 'photo', label: '앨범', description: '일상 · 취미 · 공간' },
 ]
 
-export const VIBE_KIND_META: Record<VibeKind, { label: string; group: VibeGroup; color: string; captionPlaceholder: string }> = {
+// photoHelper가 있는 종류만 카드 사진을 내 사진으로 바꿀 수 있다
+export const VIBE_KIND_META: Record<VibeKind, { label: string; group: VibeGroup; color: string; captionPlaceholder: string; photoHelper?: string }> = {
   movie: { label: '영화', group: 'content', color: '#3B82F6', captionPlaceholder: '왜 좋았는지, 뭘 느꼈는지 남겨보세요' },
   music: { label: '음악', group: 'content', color: '#22C55E', captionPlaceholder: '이 곡을 들으면 떠오르는 순간이 있나요?' },
   book: { label: '책', group: 'content', color: '#F59E0B', captionPlaceholder: '왜 읽었는지, 뭘 느꼈는지 남겨보세요' },
   play: { label: '공연', group: 'content', color: '#A855F7', captionPlaceholder: '어떤 장면이 기억에 남았나요?' },
-  exercise: { label: '운동', group: 'exercise', color: '#EF4444', captionPlaceholder: '언제부터, 얼마나 즐기고 있나요?' },
-  restaurant: { label: '맛집', group: 'place', color: '#EC4899', captionPlaceholder: '어떤 메뉴를, 언제 찾는지 알려주세요' },
-  cafe: { label: '카페', group: 'place', color: '#92400E', captionPlaceholder: '이 카페에서 주로 뭘 하나요?' },
-  pet: { label: '반려동물', group: 'pet', color: '#FB923C', captionPlaceholder: '우리 아이 자랑을 마음껏 해주세요' },
+  exercise: { label: '운동', group: 'exercise', color: '#EF4444', captionPlaceholder: '언제부터, 얼마나 즐기고 있나요?', photoHelper: '기본 이미지 대신 내가 운동하는 사진을 올릴 수 있어요' },
+  restaurant: { label: '맛집', group: 'place', color: '#EC4899', captionPlaceholder: '어떤 메뉴를, 언제 찾는지 알려주세요', photoHelper: '직접 찍은 사진으로 바꿀 수 있어요' },
+  cafe: { label: '카페', group: 'place', color: '#92400E', captionPlaceholder: '이 카페에서 주로 뭘 하나요?', photoHelper: '직접 찍은 사진으로 바꿀 수 있어요' },
+  pet: { label: '반려동물', group: 'pet', color: '#FB923C', captionPlaceholder: '우리 아이 자랑을 마음껏 해주세요', photoHelper: '우리 아이 사진을 올리거나 바꿀 수 있어요' },
   photo: { label: '앨범', group: 'photo', color: '#64748B', captionPlaceholder: '이 사진에 담긴 이야기를 적어보세요' },
 }
 
@@ -154,27 +155,26 @@ export function addVibeItem(life: PublicProfileLife, input: NewVibeItem): Public
   return withMediaList(life, input.kind, [...getMediaList(life, input.kind), { ...input.item, addedAt }])
 }
 
-function patchEntry(
-  life: PublicProfileLife,
-  entry: VibeEntry,
-  patch: { caption?: string } | null,
-): PublicProfileLife {
-  const apply = <T extends { caption?: string }>(items: T[]): T[] =>
+type EntryPatch = { caption?: string; imageUrl?: string }
+
+function patchEntry(life: PublicProfileLife, entry: VibeEntry, patch: EntryPatch | null): PublicProfileLife {
+  const apply = <T,>(items: T[], update: (item: T) => T): T[] =>
     patch === null
       ? items.filter((_, i) => i !== entry.index)
-      : items.map((item, i) => (i === entry.index ? { ...item, ...patch } : item))
+      : items.map((item, i) => (i === entry.index ? update(item) : item))
+  const caption = patch?.caption?.trim() || undefined
 
   if (entry.kind === 'pet') {
-    return { ...life, daily: { ...life.daily, pets: apply(life.daily.pets ?? []) } }
+    return { ...life, daily: { ...life.daily, pets: apply(life.daily.pets ?? [], (pet) => ({ ...pet, caption, image: patch?.imageUrl })) } }
   }
   if (entry.kind === 'photo') {
-    return { ...life, albumPhotos: apply(normalizeAlbumPhotos(life.albumPhotos)) }
+    return { ...life, albumPhotos: apply(normalizeAlbumPhotos(life.albumPhotos), (photo) => ({ ...photo, caption })) }
   }
-  return withMediaList(life, entry.kind, apply(getMediaList(life, entry.kind)))
+  return withMediaList(life, entry.kind, apply(getMediaList(life, entry.kind), (item) => ({ ...item, caption, posterUrl: patch?.imageUrl })))
 }
 
-export function updateVibeCaption(life: PublicProfileLife, entry: VibeEntry, caption?: string): PublicProfileLife {
-  return patchEntry(life, entry, { caption: caption?.trim() || undefined })
+export function updateVibeEntry(life: PublicProfileLife, entry: VibeEntry, patch: EntryPatch): PublicProfileLife {
+  return patchEntry(life, entry, patch)
 }
 
 export function removeVibeEntry(life: PublicProfileLife, entry: VibeEntry): PublicProfileLife {

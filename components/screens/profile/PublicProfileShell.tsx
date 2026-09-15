@@ -7,7 +7,8 @@
  * - 상단 nav: 뒤로가기 / URL / 액션 버튼
  * - 고정 헤더 영역: 히어로 카드 → 케미 존 → 탭바
  * - 스크롤 영역: 탭 콘텐츠 (children)
- * - 고정 푸터: 편집(owner) or 저장 버튼(visitor) + 연락처
+ * - 고정 푸터: visitor 전용 — 피드백 요청 + 경험 남기기 (전 탭 공통, owner는 푸터 없음)
+ * - 연락처: 히어로 카드 우상단 연락하기 아이콘 → 연락처 시트
  *
  * owner 판별: store.user.linkId === username && isLoggedIn
  * TODO(auth): 실제 인증 연동 시 서버사이드 세션으로 owner 판별 교체
@@ -90,6 +91,7 @@ export function PublicProfileShell({
   const [bookmarkMemo, setBookmarkMemo] = useState('')
   const [unsaveSheetOpen, setUnsaveSheetOpen] = useState(false)
   const [loginModalOpen, setLoginModalOpen] = useState(false)
+  const [contactSheetOpen, setContactSheetOpen] = useState(false)
   const [expSheetOpen, setExpSheetOpen] = useState(false)
   const [expDoneModal, setExpDoneModal] = useState(false)
   const [expAnonymous, setExpAnonymous] = useState(false)
@@ -97,8 +99,7 @@ export function PublicProfileShell({
   const submittedAt = store.expSubmittedAt[profile.linkId]
   const alreadySubmitted = !!submittedAt && (Date.now() - submittedAt < ONE_DAY_MS)
 
-  // NETWORK 탭에서만 "피드백 요청 / 경험 남기기" 버튼 표시 (visitor only)
-  const showReputationActions = activeTab === 'network' && !isOwnerMode
+  const hasContactChannels = profile.contactChannels.some((channel) => channel.enabled)
 
   return (
     <div className="flex h-full flex-col">
@@ -126,6 +127,7 @@ export function PublicProfileShell({
                 }
               : undefined
             }
+            onContactClick={!isOwnerMode && hasContactChannels ? () => setContactSheetOpen(true) : undefined}
             onOwnerEdit={isOwnerMode ? (onOwnerEdit ?? (() => router.push('/me'))) : undefined}
           />
         </div>
@@ -157,52 +159,52 @@ export function PublicProfileShell({
         {children}
       </div>
 
-      {/* ── 고정 푸터 ── */}
-      <div className="flex-shrink-0 border-t border-[var(--color-border-soft)] bg-[var(--color-glass-strong)] px-5 pt-4 pb-[calc(env(safe-area-inset-bottom)+16px)] backdrop-blur-md">
-
-        {/* 평판 탭 visitor 전용 액션 */}
-        {showReputationActions && (
-          <div className="mb-4 flex gap-3">
-            <button
-              onClick={() => store.isLoggedIn ? setFeedbackRequestOpen(true) : setLoginModalOpen(true)}
-              className="flex-1 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)] whitespace-nowrap"
-            >
-              피드백 요청
-            </button>
-            <button
-              onClick={() => {
-                if (alreadySubmitted) { showToast('오늘 이미 경험을 남겼어요. 내일 다시 남길 수 있어요'); return }
-                setExpSheetOpen(true)
-              }}
-              className="flex-1 rounded-full py-3 text-[13px] font-semibold whitespace-nowrap"
-              style={alreadySubmitted
-                ? { border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)' }
-                : { background: 'linear-gradient(135deg,var(--color-accent-light) 0%,var(--color-accent-dark) 100%)', color: '#fff', boxShadow: '0 10px 24px var(--color-accent-glow)' }}
-            >
-              {alreadySubmitted ? '경험 남겼어요 ✓' : '+ 경험 남기기'}
-            </button>
-          </div>
-        )}
-
-        {/* 연락처 채널 */}
-        <div>
-          <div className="mb-3 text-[18px] font-bold text-[#0D0D0D]">
-            연락처
-          </div>
-          <div className="flex justify-around">
-            {profile.contactChannels.map((channel) => (
-              <ContactActionButton
-                key={channel.id}
-                channel={channel}
-                onClick={() => {
-                  if (!channel.enabled || !channel.href) return
-                  window.open(channel.href, channel.href.startsWith('http') ? '_blank' : '_self')
-                }}
-              />
-            ))}
-          </div>
+      {/* ── 고정 푸터 (visitor 전용, 전 탭 공통) ── */}
+      {!isOwnerMode && (
+        <div className="flex flex-shrink-0 gap-3 border-t border-[var(--color-border-soft)] bg-[var(--color-glass-strong)] px-5 pt-4 pb-[calc(env(safe-area-inset-bottom)+16px)] backdrop-blur-md">
+          <button
+            onClick={() => store.isLoggedIn ? setFeedbackRequestOpen(true) : setLoginModalOpen(true)}
+            className="flex-1 rounded-full border border-[var(--color-border-default)] bg-[var(--color-bg-surface)] py-3 text-[13px] font-semibold text-[var(--color-text-primary)] whitespace-nowrap"
+          >
+            피드백 요청
+          </button>
+          <button
+            onClick={() => {
+              if (alreadySubmitted) { showToast('오늘 이미 경험을 남겼어요. 내일 다시 남길 수 있어요'); return }
+              setExpSheetOpen(true)
+            }}
+            className="flex-1 rounded-full py-3 text-[13px] font-semibold whitespace-nowrap"
+            style={alreadySubmitted
+              ? { border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)' }
+              : { background: 'linear-gradient(135deg,var(--color-accent-light) 0%,var(--color-accent-dark) 100%)', color: '#fff', boxShadow: '0 10px 24px var(--color-accent-glow)' }}
+          >
+            {alreadySubmitted ? '경험 남겼어요 ✓' : '+ 경험 남기기'}
+          </button>
         </div>
-      </div>
+      )}
+
+      {/* 연락처 시트 */}
+      {!isOwnerMode && (
+        <BottomSheet open={contactSheetOpen} onClose={() => setContactSheetOpen(false)}>
+          <div className="px-5 pb-6">
+            <div className="mb-5 text-[18px] font-bold text-[#0D0D0D]">
+              {profile.name}님에게 연락하기
+            </div>
+            <div className="flex justify-around">
+              {profile.contactChannels.map((channel) => (
+                <ContactActionButton
+                  key={channel.id}
+                  channel={channel}
+                  onClick={() => {
+                    if (!channel.enabled || !channel.href) return
+                    window.open(channel.href, channel.href.startsWith('http') ? '_blank' : '_self')
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </BottomSheet>
+      )}
 
       {/* 저장 시트 */}
       {!isOwnerMode && (

@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
-import { BadgeCheck, Bookmark, BookmarkCheck, Check, ChevronLeft, ChevronRight, Pencil, Share2, Sparkles, X } from 'lucide-react'
+import { BadgeCheck, Bookmark, BookmarkCheck, Check, ChevronLeft, ChevronRight, MessageCircle, Pencil, Share2, Sparkles, X } from 'lucide-react'
 import { ActionMenu, ActionMenuItem, BottomSheet, TextArea, showToast } from '@/components/ui'
 import { shareOrCopy } from '@/lib/share'
 import type { PersonaReason } from '@/lib/personaGen'
@@ -35,6 +35,7 @@ export function ProfileHeroSection({
   isOwner,
   isBookmarked,
   onBookmarkClick,
+  onContactClick,
   onOwnerEdit,
 }: {
   profile: {
@@ -58,6 +59,7 @@ export function ProfileHeroSection({
   isOwner?: boolean
   isBookmarked?: boolean
   onBookmarkClick?: () => void
+  onContactClick?: () => void
   onOwnerEdit?: () => void
 }) {
   const galleryImages = normalizeProfileImages(profile.profileImages, profile.avatarImage)
@@ -94,6 +96,7 @@ export function ProfileHeroSection({
         isOwner={isOwner}
         isBookmarked={isBookmarked}
         onBookmarkClick={onBookmarkClick}
+        onContactClick={onContactClick}
         onOwnerEdit={onOwnerEdit}
       />
 
@@ -212,6 +215,7 @@ export function ProfileHeroCard({
   isOwner,
   isBookmarked,
   onBookmarkClick,
+  onContactClick,
   onOwnerEdit,
 }: {
   profile: {
@@ -238,6 +242,7 @@ export function ProfileHeroCard({
   isOwner?: boolean
   isBookmarked?: boolean
   onBookmarkClick?: () => void
+  onContactClick?: () => void
   onOwnerEdit?: () => void
 }) {
   const [personaSheetOpen, setPersonaSheetOpen] = useState(false)
@@ -460,7 +465,7 @@ export function ProfileHeroCard({
             </div>
           )}
 
-          {activeImage && !isOwner && (
+          {!isOwner && (
             <>
               {/* 북마크 — 카드 상단 왼쪽 */}
               {onBookmarkClick && (
@@ -475,8 +480,18 @@ export function ProfileHeroCard({
                   }
                 </button>
               )}
-              {/* 더보기 — 카드 상단 오른쪽 */}
-              <div className="absolute right-4 top-4 z-10">
+              {/* 연락하기 + 더보기 — 카드 상단 오른쪽 */}
+              <div className="absolute right-4 top-4 z-10 flex gap-2">
+                {onContactClick && (
+                  <button
+                    type="button"
+                    aria-label="연락하기"
+                    onClick={(e) => { e.stopPropagation(); onContactClick() }}
+                    className="flex size-10 items-center justify-center rounded-full border border-[rgba(255,255,255,0.8)] bg-[rgba(102,102,102,0.4)] backdrop-blur-[10px]"
+                  >
+                    <MessageCircle size={18} className="text-white" />
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); setMoreSheetOpen((v) => !v) }}

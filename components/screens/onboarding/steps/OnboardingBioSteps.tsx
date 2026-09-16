@@ -68,7 +68,7 @@ function useTypewriter(text: string, { speed = 28, startDelay = 0 }: { speed?: n
 // 기본정보 — 실제 PublicProfileWhoIAmSection 재사용(이지민 자기소개·성향). 자기소개 →
 // 성향 순서로 한 글자씩 써지는 타이핑 애니메이션. 실제 컴포넌트가 렌더링할 문자열을
 // 타이핑 진행률만큼 잘라 넘기는 방식이라 UI 자체는 100% 실제 컴포넌트 그대로다.
-const TYPE_SPEED = 22
+const TYPE_SPEED = 11 // 기존 22ms/글자 대비 2배 빠르게
 
 function PreviewBasicInfo() {
   const bioSource = JIMIN_PROFILE.bio
@@ -194,6 +194,7 @@ function PreviewNetwork() {
         topCompany={r.topCompany}
         topIndustry={r.topIndustry}
         topRole={r.topRole}
+        hidePersonalizedNudge
       />
     </div>
   )
@@ -224,6 +225,7 @@ function PreviewFeedback() {
         onGuestbookEntryClick={() => {}}
         onOpenGuestbook={() => {}}
         revealOnMount
+        hideViewAllButton
       />
     </div>
   )

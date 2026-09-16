@@ -101,6 +101,7 @@ export function ProfileFeedbackSection({
   onGuestbookEntryClick,
   onOpenGuestbook,
   revealOnMount,
+  hideViewAllButton,
 }: {
   profile: {
     guestbook: { length: number }
@@ -111,6 +112,8 @@ export function ProfileFeedbackSection({
   onOpenGuestbook: () => void
   /** 온보딩 가이드 데모 전용 — 뷰포트 진입(whileInView) 대신 마운트 즉시 재생 */
   revealOnMount?: boolean
+  /** 온보딩 가이드 데모 전용 — "피드백 전체 보기" 버튼 숨김(데모에선 눌러도 아무 동작 안 함) */
+  hideViewAllButton?: boolean
 }) {
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06} revealOnMount={revealOnMount}>
@@ -171,7 +174,7 @@ export function ProfileFeedbackSection({
           </motion.div>
         )}
 
-        {profile.guestbook.length > 0 && (
+        {profile.guestbook.length > 0 && !hideViewAllButton && (
           <button
             onClick={onOpenGuestbook}
             className="mt-4 flex w-full items-center justify-center gap-0.5 text-[14px] font-semibold"
@@ -298,6 +301,7 @@ export function ProfileRememberSection({
   topCompany,
   topIndustry,
   topRole,
+  hidePersonalizedNudge,
 }: {
   total: number
   industries: Array<{ name: string; ratio: number; count?: number }>
@@ -309,6 +313,8 @@ export function ProfileRememberSection({
   topCompany?: RememberTopValue
   topIndustry?: RememberTopValue
   topRole?: RememberTopValue
+  /** 온보딩 가이드 데모 전용 — "로그인하면 맞춤 인사이트를 볼 수 있어요" 블러 넛지 숨김 */
+  hidePersonalizedNudge?: boolean
 }) {
   const topValueRows = [
     { label: '회사', value: topCompany },
@@ -403,7 +409,7 @@ export function ProfileRememberSection({
                 설정한 관심 분야와 겹치는 인맥 정보가 아직 없어요.
               </p>
             </div>
-          ) : !isOwner ? (
+          ) : !isOwner && !hidePersonalizedNudge ? (
             /* 블러 넛지 — 비로그인 or 관심 도메인 미설정 (본인 프로필 제외) */
             <div className="relative overflow-hidden rounded-[16px]" style={{ minHeight: 80 }}>
               <div className="px-4 py-4 space-y-2 select-none pointer-events-none" aria-hidden>

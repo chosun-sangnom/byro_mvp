@@ -1,12 +1,72 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { Search, MoreVertical } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { NavBar, Avatar, ActionMenu, ActionMenuItem, Modal, showToast } from '@/components/ui'
 import { getProfileMeta } from '@/lib/mocks/publicProfiles'
 import type { SavedProfile } from '@/types'
+
+// 온보딩 가이드(SCRUM-148)에서도 그대로 재사용하는 실제 저장 프로필 카드 UI
+export function SavedProfileRow({
+  profile,
+  isLast,
+  onOpen,
+  onMenuClick,
+  menuContent,
+}: {
+  profile: SavedProfile
+  isLast?: boolean
+  onOpen: () => void
+  onMenuClick: () => void
+  menuContent?: ReactNode
+}) {
+  const meta = getProfileMeta(profile.linkId)
+  return (
+    <div className={['flex flex-col gap-3 px-4 py-4', isLast ? '' : 'border-b border-[#dee4ec]'].join(' ')}>
+      <div className="flex items-center justify-between gap-3">
+        <button className="flex min-w-0 flex-1 items-center gap-2.5 text-left" onClick={onOpen}>
+          <Avatar
+            name={profile.name}
+            src={meta.avatarImage}
+            color={meta.avatarColor}
+            textColor={meta.avatarImage ? undefined : '#6c7786'}
+            size={44}
+          />
+          <div className="min-w-0">
+            <div className="flex items-center gap-0.5">
+              <span className="truncate text-[14px] font-semibold tracking-[-0.28px] text-[#0d0d0d]">
+                {profile.name}
+              </span>
+              {meta.isVerified && (
+                <img src="/images/ai-tools/exp-verified-badge.svg" alt="인증됨" className="h-3 w-3 flex-shrink-0" />
+              )}
+            </div>
+            {profile.title && (
+              <div className="truncate text-[12px] font-medium tracking-[-0.24px] text-[#6c7786]">{profile.title}</div>
+            )}
+          </div>
+        </button>
+        <div className="relative flex-shrink-0">
+          <button
+            onClick={onMenuClick}
+            className="rounded-full p-1 text-[#0d0d0d] active:bg-[#f5f6f7] transition-colors"
+          >
+            <MoreVertical size={20} />
+          </button>
+          {menuContent}
+        </div>
+      </div>
+      {profile.memo && (
+        <div className="flex items-center gap-1 rounded-lg bg-[#f0f5ff] py-2.5 pl-3 pr-4">
+          <img src="/images/archive/memo-icon.svg" alt="" className="h-3.5 w-3 flex-shrink-0" />
+          <span className="truncate text-[12px] font-medium tracking-[-0.24px] text-[#25313d]">{profile.memo}</span>
+        </div>
+      )}
+    </div>
+  )
+}
 
 type SortKey = 'name' | 'recent'
 
@@ -126,75 +186,32 @@ export default function Archive() {
               <EmptyState text={q ? '일치하는 검색 결과가 없어요' : '저장된 프로필이 없어요'} />
             ) : (
               <div className="overflow-hidden rounded-[24px] border-[0.66px] border-[#dee4ec]">
-                {visibleProfiles.map((p, i) => {
-                  const meta = getProfileMeta(p.linkId)
-                  return (
-                    <div
-                      key={p.id}
-                      className={[
-                        'flex flex-col gap-3 px-4 py-4',
-                        i < visibleProfiles.length - 1 ? 'border-b border-[#dee4ec]' : '',
-                      ].join(' ')}
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <button
-                          className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
-                          onClick={() => router.push(`/${p.linkId}`)}
-                        >
-                          <Avatar
-                            name={p.name}
-                            src={meta.avatarImage}
-                            color={meta.avatarColor}
-                            textColor={meta.avatarImage ? undefined : '#6c7786'}
-                            size={44}
-                          />
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-0.5">
-                              <span className="truncate text-[14px] font-semibold tracking-[-0.28px] text-[#0d0d0d]">
-                                {p.name}
-                              </span>
-                              {meta.isVerified && (
-                                <img src="/images/ai-tools/exp-verified-badge.svg" alt="인증됨" className="h-3 w-3 flex-shrink-0" />
-                              )}
-                            </div>
-                            {p.title && (
-                              <div className="truncate text-[12px] font-medium tracking-[-0.24px] text-[#6c7786]">{p.title}</div>
-                            )}
-                          </div>
-                        </button>
-                        <div className="relative flex-shrink-0">
-                          <button
-                            onClick={() => setOpenMenuId(openMenuId === p.id ? null : p.id)}
-                            className="rounded-full p-1 text-[#0d0d0d] active:bg-[#f5f6f7] transition-colors"
-                          >
-                            <MoreVertical size={20} />
-                          </button>
-                          <ActionMenu open={openMenuId === p.id} onClose={() => setOpenMenuId(null)}>
-                            <ActionMenuItem
-                              label="메모 편집"
-                              onClick={() => { setOpenMenuId(null); setMemoTarget(p); setMemoValue(p.memo) }}
-                            />
-                            <ActionMenuItem
-                              label="저장 취소"
-                              danger
-                              onClick={() => {
-                                setOpenMenuId(null)
-                                store.unsaveProfile(p.linkId)
-                                showToast(`${p.name}님을 저장 목록에서 삭제했어요`)
-                              }}
-                            />
-                          </ActionMenu>
-                        </div>
-                      </div>
-                      {p.memo && (
-                        <div className="flex items-center gap-1 rounded-lg bg-[#f0f5ff] py-2.5 pl-3 pr-4">
-                          <img src="/images/archive/memo-icon.svg" alt="" className="h-3.5 w-3 flex-shrink-0" />
-                          <span className="truncate text-[12px] font-medium tracking-[-0.24px] text-[#25313d]">{p.memo}</span>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
+                {visibleProfiles.map((p, i) => (
+                  <SavedProfileRow
+                    key={p.id}
+                    profile={p}
+                    isLast={i === visibleProfiles.length - 1}
+                    onOpen={() => router.push(`/${p.linkId}`)}
+                    onMenuClick={() => setOpenMenuId(openMenuId === p.id ? null : p.id)}
+                    menuContent={
+                      <ActionMenu open={openMenuId === p.id} onClose={() => setOpenMenuId(null)}>
+                        <ActionMenuItem
+                          label="메모 편집"
+                          onClick={() => { setOpenMenuId(null); setMemoTarget(p); setMemoValue(p.memo) }}
+                        />
+                        <ActionMenuItem
+                          label="저장 취소"
+                          danger
+                          onClick={() => {
+                            setOpenMenuId(null)
+                            store.unsaveProfile(p.linkId)
+                            showToast(`${p.name}님을 저장 목록에서 삭제했어요`)
+                          }}
+                        />
+                      </ActionMenu>
+                    }
+                  />
+                ))}
                 {visibleCount < filtered.length && (
                   <div ref={loadMoreRef} className="py-4 text-center">
                     <span className="text-[12px] text-[#a8b1bd]">불러오는 중…</span>

@@ -1,11 +1,11 @@
 'use client'
 
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, type Variants } from 'framer-motion'
-import { Brain, Images, Network, Sparkles, UserSearch } from 'lucide-react'
+import { Images, Network, UserSearch } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
-import { Avatar, Button } from '@/components/ui'
+import { Button } from '@/components/ui'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
 import { JIMIN_PROFILE, SAMPLE_PROFILE, getPublicProfileByUsername } from '@/lib/mocks/publicProfiles'
 import {
@@ -16,6 +16,9 @@ import {
 } from '@/components/screens/profile/PublicProfileSections'
 import { ProfileHighlightsSection } from '@/components/screens/profile/PublicProfileHighlightsSection'
 import { ProfileSnsSection } from '@/components/screens/profile/PublicProfileSnsSection'
+import { PublicProfileLifeSection } from '@/components/screens/profile/PublicProfileLifeSection'
+import { PublicProfileWhoIAmSection } from '@/components/screens/profile/PublicProfileWhoIAmSection'
+import { SavedProfileRow } from '@/components/screens/archive/Archive'
 import type { Highlight } from '@/types'
 
 // SCRUM-148: 온보딩 가이드 미리보기는 이지민(/jiminlee) 실제 목업 데이터를 그대로 써서
@@ -58,56 +61,23 @@ function useTypewriter(text: string, { speed = 28, startDelay = 0 }: { speed?: n
   return output
 }
 
-// ─── Shared "menu" list card (하이라이트/SNS/연락수단/저장한 프로필 공통 패턴) ──────────
-
-function MenuCard({ children }: { children: ReactNode }) {
-  return (
-    <div className="flex w-full flex-col items-stretch overflow-hidden rounded-[12px] border border-[#DEE4EC] px-4">
-      {children}
-    </div>
-  )
-}
-
-function MenuDivider() {
-  return <div className="h-px w-full flex-shrink-0 bg-[#DEE4EC]" />
-}
-
-function MenuRow({ icon, boxed = true, title, sub, trailing }: { icon: ReactNode; boxed?: boolean; title: string; sub: string; trailing?: ReactNode }) {
-  return (
-    <div className="flex w-full items-center justify-between gap-3 py-4">
-      <div className="flex min-w-0 flex-1 items-center gap-3">
-        {boxed ? (
-          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[8px] bg-[#F5F6F7]">{icon}</div>
-        ) : (
-          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center">{icon}</div>
-        )}
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold text-[#0D0D0D]">{title}</p>
-          <p className="truncate text-xs font-medium text-[#6C7786]">{sub}</p>
-        </div>
-      </div>
-      {trailing}
-    </div>
-  )
-}
-
 // ─── Mini preview components (Figma "온보딩 가이드" 목업 기준) ──────────────────
 
-// 기본정보 — 예시 문구가 한 글자씩 써지는 타이핑 애니메이션 (MBTI → 성향 순서로)
-const MBTI_EXAMPLE = 'ENFP · 재기발랄한 활동가'
-const PERSONALITY_EXAMPLE = '관계·소통 스타일을 알려줘요'
-const TYPE_SPEED = 28
+// 기본정보 — 실제 PublicProfileWhoIAmSection 재사용(이지민 자기소개·성향). 자기소개 →
+// 성향 순서로 한 글자씩 써지는 타이핑 애니메이션. 실제 컴포넌트가 렌더링할 문자열을
+// 타이핑 진행률만큼 잘라 넘기는 방식이라 UI 자체는 100% 실제 컴포넌트 그대로다.
+const TYPE_SPEED = 22
 
 function PreviewBasicInfo() {
-  const mbti = useTypewriter(MBTI_EXAMPLE, { startDelay: 200, speed: TYPE_SPEED })
-  const personalityDelay = 200 + MBTI_EXAMPLE.length * TYPE_SPEED + 300
-  const personality = useTypewriter(PERSONALITY_EXAMPLE, { startDelay: personalityDelay, speed: TYPE_SPEED })
+  const bioSource = JIMIN_PROFILE.bio
+  const personalitySource = JIMIN_PROFILE.whoIAm.personality
+  const bio = useTypewriter(bioSource, { startDelay: 200, speed: TYPE_SPEED })
+  const personalityDelay = 200 + bioSource.length * TYPE_SPEED + 300
+  const personality = useTypewriter(personalitySource, { startDelay: personalityDelay, speed: TYPE_SPEED })
   return (
-    <MenuCard>
-      <MenuRow icon={<Brain size={18} className="text-[#6C7786]" />} title="MBTI" sub={mbti || ' '} />
-      <MenuDivider />
-      <MenuRow icon={<Sparkles size={18} className="text-[#6C7786]" />} title="성향" sub={personality || ' '} />
-    </MenuCard>
+    <div className="-mx-5">
+      <PublicProfileWhoIAmSection bio={bio} whoIAm={{ mbti: JIMIN_PROFILE.whoIAm.mbti, personality }} />
+    </div>
   )
 }
 
@@ -132,45 +102,11 @@ function PreviewHighlight() {
   )
 }
 
-// 바이브보드 — 이지민의 실제 취향 데이터로 카드가 하나씩 떠오르는 스태거 애니메이션
-const vibeContainer = { hidden: {}, show: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } } }
-const vibeItem: Variants = {
-  hidden: { opacity: 0, scale: 0.85, y: 8 },
-  show: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
-}
-
+// 바이브보드 — 실제 PublicProfileLifeSection 재사용 (이지민 무드보드·취향 데이터 그대로)
 function PreviewLife() {
-  const { daily, tastes } = JIMIN_PROFILE.life
-  const items = [
-    { key: 'exercise', color: '#11C34B', label: '운동', name: daily.exercise[0].label, sub: undefined, src: daily.exercise[0].posterUrl },
-    { key: 'movie', color: '#6541F2', label: '영화', name: tastes.movies[0].label, sub: tastes.movies[0].sublabel, src: tastes.movies[0].posterUrl },
-    { key: 'music', color: '#F4832F', label: '음악', name: tastes.music[0].label, sub: tastes.music[0].sublabel, src: tastes.music[0].posterUrl },
-    { key: 'book', color: '#0657FF', label: '책', name: tastes.books[0].label, sub: tastes.books[0].sublabel, src: tastes.books[0].posterUrl },
-    { key: 'restaurant', color: '#FF6B00', label: '맛집', name: tastes.restaurants[0].label, sub: tastes.restaurants[0].sublabel, src: tastes.restaurants[0].posterUrl },
-    { key: 'cafe', color: '#1DAEFF', label: '카페', name: tastes.cafes[0].label, sub: tastes.cafes[0].sublabel, src: tastes.cafes[0].posterUrl },
-  ]
   return (
-    <div>
-      <p className="mb-2 text-[13.5px] font-bold text-[#0D0D0D]">무드보드</p>
-      <motion.div variants={vibeContainer} initial="hidden" animate="show" className="grid grid-cols-2 gap-2">
-        {items.map((item) => (
-          <motion.div key={item.key} variants={vibeItem} className="relative aspect-square overflow-hidden rounded-[14px]">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={item.src} alt="" className="absolute inset-0 h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 from-[10%] to-transparent to-[60%]" />
-            <span
-              className="absolute left-2 top-2 rounded-[6px] px-1.5 py-0.5 text-[9px] font-bold text-white"
-              style={{ backgroundColor: item.color }}
-            >
-              {item.label}
-            </span>
-            <div className="absolute bottom-2 left-2 right-2">
-              <p className="truncate text-[11px] font-semibold text-white">{item.name}</p>
-              {item.sub && <p className="truncate text-[10px] text-white/85">{item.sub}</p>}
-            </div>
-          </motion.div>
-        ))}
-      </motion.div>
+    <div className="-mx-5 -mt-2">
+      <PublicProfileLifeSection life={JIMIN_PROFILE.life} />
     </div>
   )
 }
@@ -251,6 +187,7 @@ const connectItem: Variants = {
   show: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } },
 }
 
+// 저장한 프로필 — 실제 SavedProfileRow(아카이브 화면과 동일 컴포넌트) 재사용, 하나씩 나타나는 스태거
 function PreviewConnect() {
   const profiles = SAMPLE_PROFILE.savedProfiles.slice(0, 4)
   return (
@@ -260,35 +197,11 @@ function PreviewConnect() {
       animate="show"
       className="overflow-hidden rounded-[24px] border-[0.66px] border-[#DEE4EC]"
     >
-      {profiles.map((p, i) => {
-        const meta = getPublicProfileByUsername(p.linkId)
-        return (
-          <motion.div
-            key={p.id}
-            variants={connectItem}
-            className={['flex flex-col gap-3 px-4 py-4', i < profiles.length - 1 ? 'border-b border-[#DEE4EC]' : ''].join(' ')}
-          >
-            <div className="flex items-center gap-2.5">
-              <Avatar
-                name={p.name}
-                src={meta?.avatarImage}
-                color={meta?.avatarColor}
-                textColor={meta?.avatarImage ? undefined : '#6C7786'}
-                size={44}
-              />
-              <div className="min-w-0">
-                <p className="truncate text-[14px] font-semibold text-[#0D0D0D]">{p.name}</p>
-                {p.title && <p className="truncate text-[12px] font-medium text-[#6C7786]">{p.title}</p>}
-              </div>
-            </div>
-            {p.memo && (
-              <div className="flex items-center rounded-lg bg-[#F0F5FF] py-2.5 pl-3 pr-4">
-                <span className="truncate text-[12px] font-medium text-[#25313D]">{p.memo}</span>
-              </div>
-            )}
-          </motion.div>
-        )
-      })}
+      {profiles.map((p, i) => (
+        <motion.div key={p.id} variants={connectItem}>
+          <SavedProfileRow profile={p} isLast={i === profiles.length - 1} onOpen={() => {}} onMenuClick={() => {}} />
+        </motion.div>
+      ))}
     </motion.div>
   )
 }

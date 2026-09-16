@@ -74,66 +74,22 @@ function PreviewBasicInfo() {
   )
 }
 
-function PreviewHighlight() {
-  const items = [
-    { icon: '/images/onboarding-guide/highlight-1.svg', title: 'Product Owner', sub: '스타트업 · 5년' },
-    { icon: '/images/onboarding-guide/highlight-2.svg', title: '연세대학교 경영학과', sub: '2015 졸업' },
-    { icon: '/images/onboarding-guide/highlight-3.svg', title: '우수 스타트업 대상', sub: '중기부 · 2023' },
-  ]
+// SCRUM-148: 손그림 UI 안내 대신 실제 화면 스크린샷 사용
+function ScreenshotFrame({ src, alt }: { src: string; alt: string }) {
   return (
-    <MenuCard>
-      {items.map((item, i) => (
-        <div key={item.title} className="contents">
-          {i > 0 && <MenuDivider />}
-          <MenuRow
-            // eslint-disable-next-line @next/next/no-img-element
-            icon={<img src={item.icon} alt="" className="h-10 w-10" />}
-            boxed={false}
-            title={item.title}
-            sub={item.sub}
-          />
-        </div>
-      ))}
-    </MenuCard>
+    <div className="w-full overflow-hidden rounded-[12px] border" style={{ borderColor: '#DEE4EC' }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt={alt} className="block w-full" />
+    </div>
   )
 }
 
+function PreviewHighlight() {
+  return <ScreenshotFrame src="/images/onboarding-guide-screens/highlight.png" alt="하이라이트 화면 예시" />
+}
+
 function PreviewLife() {
-  const Cell = ({ src, color, label, name, sub, playIcon, className }: { src: string; color: string; label: string; name: string; sub?: string; playIcon?: boolean; className: string }) => (
-    <div className={`relative flex flex-col justify-end overflow-hidden rounded-[6px] p-1.5 ${className}`}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt="" className="absolute inset-0 h-full w-full object-cover" />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/70 from-[10%] to-transparent to-[60%]" />
-      <span className="absolute left-1.5 top-1.5 rounded-[6px] px-1.5 py-0.5 text-[9px] font-bold text-white" style={{ backgroundColor: color }}>
-        {label}
-      </span>
-      {playIcon && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white/90">
-            <div className="ml-0.5 h-0 w-0 border-y-[3px] border-l-[5px] border-y-transparent border-l-black" />
-          </div>
-        </div>
-      )}
-      <p className="relative truncate text-[9px] font-semibold text-white">{name}</p>
-      {sub && <p className="relative truncate text-[8px] text-white/85">{sub}</p>}
-    </div>
-  )
-  return (
-    <div className="flex w-full gap-1" style={{ aspectRatio: '242 / 293' }}>
-      <div className="grid flex-[1.3] grid-rows-3 gap-1">
-        <Cell src="/images/onboarding-guide/vibe-book.png" color="#0657FF" label="책" name="보통의 언어들" sub="김하나" className="" />
-        <div className="grid grid-cols-2 gap-1">
-          <Cell src="/images/onboarding-guide/vibe-cafe.png" color="#1DAEFF" label="카페" name="오츠커피" sub="한남동" className="" />
-          <Cell src="/images/onboarding-guide/vibe-workout.png" color="#11C34B" label="운동" name="필라테스" className="" />
-        </div>
-        <Cell src="/images/onboarding-guide/vibe-music.png" color="#F4832F" label="음악" name="Sqaure" sub="백예린" playIcon className="" />
-      </div>
-      <div className="grid flex-1 grid-rows-[2fr_1fr] gap-1">
-        <Cell src="/images/onboarding-guide/vibe-movie.png" color="#6541F2" label="영화" name="작은 아씨들" sub="2019" className="" />
-        <Cell src="/images/onboarding-guide/vibe-pet.png" color="#FF4242" label="애완동물" name="보리" sub="강아지" className="" />
-      </div>
-    </div>
-  )
+  return <ScreenshotFrame src="/images/onboarding-guide-screens/vibe.png" alt="바이브보드 화면 예시" />
 }
 
 function PreviewSNS() {

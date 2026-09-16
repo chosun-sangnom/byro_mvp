@@ -50,18 +50,6 @@ function StatusChip({ label, active }: { label: string; active: boolean }) {
   )
 }
 
-function CardHeader({ label, title, badge }: { label: string; title: string; badge: string }) {
-  return (
-    <div className="mb-5 flex w-full flex-col gap-1">
-      <p className="text-sm font-medium text-[#6C7786]">{label}</p>
-      <div className="flex items-center justify-between">
-        <p className="text-[18px] font-bold text-[#0D0D0D]">{title}</p>
-        <span className="flex-shrink-0 rounded-[6px] bg-[#25313D] px-1.5 py-1 text-xs font-bold text-white">{badge}</span>
-      </div>
-    </div>
-  )
-}
-
 // ─── Mini preview components (Figma "온보딩 가이드" 목업 기준) ──────────────────
 
 function PreviewBasicInfo() {
@@ -93,28 +81,7 @@ function PreviewLife() {
 }
 
 function PreviewSNS() {
-  const rows = [
-    { icon: '/images/onboarding-guide/sns-instagram.svg', title: 'Instagram', sub: '@myongkoo', status: '연동됨', active: true },
-    { icon: '/images/onboarding-guide/sns-linkedin.svg', title: 'LinkedIn', sub: 'linkedin.com/in/myongkoo', status: '연동됨', active: true },
-    { icon: '/images/onboarding-guide/sns-youtube.svg', title: 'YouTube', sub: '구독자 기반 콘텐츠 연결', status: '미연동', active: false },
-    { icon: '/images/onboarding-guide/sns-tiktok.svg', title: 'TikTok', sub: '준비 중', status: '미연동', active: false },
-  ]
-  return (
-    <MenuCard>
-      {rows.map((row, i) => (
-        <div key={row.title} className="contents">
-          {i > 0 && <MenuDivider />}
-          <MenuRow
-            // eslint-disable-next-line @next/next/no-img-element
-            icon={<img src={row.icon} alt="" className="h-[17px] w-[17px]" />}
-            title={row.title}
-            sub={row.sub}
-            trailing={<StatusChip label={row.status} active={row.active} />}
-          />
-        </div>
-      ))}
-    </MenuCard>
-  )
+  return <ScreenshotFrame src="/images/onboarding-guide-screens/sns.png" alt="SNS 연동 화면 예시" />
 }
 
 function PreviewContact() {
@@ -143,85 +110,15 @@ function PreviewContact() {
 }
 
 function PreviewNetwork() {
-  return (
-    <div className="w-full rounded-[12px] border border-[#DEE4EC] p-4">
-      <CardHeader label="리멤버 네트워크" title="명함 기반 관계 네트워크" badge="총 247명" />
-      <svg viewBox="0 0 280 110" className="w-full" fill="none">
-        <polyline points="0,70 40,90 80,60 120,75 160,50 200,85 240,20 280,60" stroke="#0657FF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-        <polyline points="0,55 40,80 80,70 120,55 160,65 200,45 240,55 280,50" stroke="#25313D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.6" />
-        <polyline points="0,90 40,60 80,85 120,65 160,80 200,60 240,75 280,70" stroke="#A8B1BD" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-      <div className="mt-3 flex items-center gap-3">
-        {[
-          { color: '#0657FF', label: 'IT/테크', count: 112 },
-          { color: '#25313D', label: '금융/투자', count: 94 },
-          { color: '#A8B1BD', label: '교육/연구', count: 53 },
-        ].map((item) => (
-          <div key={item.label} className="flex items-center gap-1">
-            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: item.color }} />
-            <span className="text-[11px] font-medium text-[#6C7786]">{item.label} {item.count}명</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  )
+  return <ScreenshotFrame src="/images/onboarding-guide-screens/network.png" alt="리멤버 네트워크 화면 예시" />
 }
 
 function PreviewFeedback() {
-  const rows = [
-    [{ kw: '실행력', cnt: 12 }, { kw: '신뢰감', cnt: 9 }, { kw: '창의적', cnt: 7 }],
-    [{ kw: '꼼꼼함', cnt: 6 }, { kw: '리더십', cnt: 4 }],
-  ]
-  return (
-    <div className="w-full rounded-[12px] border border-[#DEE4EC] p-4">
-      <CardHeader label="평판" title="누적 평판" badge="총 38개" />
-      <div className="flex flex-col gap-3">
-        {rows.map((row, i) => (
-          <div key={i} className="flex gap-1.5">
-            {row.map(({ kw, cnt }) => (
-              <span key={kw} className="flex items-center gap-1.5 rounded-full border border-[#DEE4EC] bg-white px-3.5 py-2 text-sm text-[#25313D]">
-                <span className="font-medium">{kw}</span>
-                <span className="font-semibold">{cnt}</span>
-              </span>
-            ))}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
+  return <ScreenshotFrame src="/images/onboarding-guide-screens/feedback.png" alt="평판·피드백 화면 예시" />
 }
 
 function PreviewConnect() {
-  const profiles = [
-    { initial: '김', bg: '#F0F5FF', name: '김철수', sub: 'B2B Sales · 5년차', savedAt: '어제', verified: true },
-    { initial: '이', bg: '#F4F2FE', name: '이지현', sub: '브랜드 마케터 · 3년차', savedAt: '3일 전', verified: false },
-    { initial: '박', bg: '#FEF3EA', name: '박준혁', sub: 'iOS 개발자 · 7년차', savedAt: '1주 전', verified: false },
-  ]
-  return (
-    <MenuCard>
-      {profiles.map((p, i) => (
-        <div key={p.name} className="contents">
-          {i > 0 && <MenuDivider />}
-          <div className="flex w-full items-center justify-between gap-3 py-4">
-            <div className="flex min-w-0 items-center gap-2.5">
-              <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-xs font-bold text-[#6C7786]" style={{ backgroundColor: p.bg }}>
-                {p.initial}
-              </div>
-              <div className="min-w-0">
-                <div className="flex items-center gap-1">
-                  <p className="truncate text-sm font-semibold text-[#0D0D0D]">{p.name}</p>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  {p.verified && <img src="/images/onboarding-guide/connect-badge.svg" alt="" className="h-3 w-3 flex-shrink-0" />}
-                </div>
-                <p className="truncate text-xs font-medium text-[#6C7786]">{p.sub}</p>
-              </div>
-            </div>
-            <p className="flex-shrink-0 text-xs font-medium text-[#6C7786]">{p.savedAt}</p>
-          </div>
-        </div>
-      ))}
-    </MenuCard>
-  )
+  return <ScreenshotFrame src="/images/onboarding-guide-screens/connect.png" alt="저장한 프로필 화면 예시" />
 }
 
 const WELCOME_FEATURES = [

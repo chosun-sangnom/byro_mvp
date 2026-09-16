@@ -199,7 +199,10 @@ function PreviewNetwork() {
   )
 }
 
-// 피드백 — 실제 ProfileReputationSummarySection + ProfileFeedbackSection 재사용 (이지민 평판·방명록)
+// 피드백 — 실제 ProfileReputationSummarySection + ProfileFeedbackSection 재사용 (이지민 평판·방명록).
+// whileInView는 이미 화면 안에 떠 있는 가이드 슬라이드에선 트리거가 불안정해서
+// revealOnMount로 마운트 즉시 재생시키고, 공유 컴포넌트 자체 여백(pt-6)은 그대로 두고
+// 가이드 슬라이드에서만 상단 여백을 보정.
 function PreviewFeedback() {
   const keywordCounts = [...JIMIN_PROFILE.reputationKeywords]
     .sort((a, b) => b.count - a.count)
@@ -208,16 +211,21 @@ function PreviewFeedback() {
   const totalKeywordCount = keywordCounts.reduce((sum, item) => sum + item.count, 0)
   const featuredGuestbook = JIMIN_PROFILE.guestbook.slice(0, 2)
   return (
-    <>
-      <ProfileReputationSummarySection keywordCounts={keywordCounts} totalKeywordCount={totalKeywordCount} />
+    <div className="-mt-4">
+      <ProfileReputationSummarySection
+        keywordCounts={keywordCounts}
+        totalKeywordCount={totalKeywordCount}
+        revealOnMount
+      />
       <ProfileFeedbackSection
         profile={{ guestbook: { length: JIMIN_PROFILE.guestbook.length } }}
         featuredGuestbook={featuredGuestbook}
         getProfileAvatar={(linkId) => getPublicProfileByUsername(linkId)?.avatarImage ?? ''}
         onGuestbookEntryClick={() => {}}
         onOpenGuestbook={() => {}}
+        revealOnMount
       />
-    </>
+    </div>
   )
 }
 

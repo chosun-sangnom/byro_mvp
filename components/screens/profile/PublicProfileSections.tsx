@@ -45,14 +45,17 @@ export function SectionTitle({
 export function ProfileReputationSummarySection({
   keywordCounts,
   totalKeywordCount,
+  revealOnMount,
 }: {
   keywordCounts: KeywordCount[]
   totalKeywordCount: number
+  /** 온보딩 가이드 데모 전용 — 뷰포트 진입(whileInView) 대신 마운트 즉시 재생 */
+  revealOnMount?: boolean
 }) {
   const isEmpty = keywordCounts.length === 0
 
   return (
-    <AnimatedSection className="px-5 pt-6 pb-2" delay={0.04}>
+    <AnimatedSection className="px-5 pt-6 pb-2" delay={0.04} revealOnMount={revealOnMount}>
       <div className="rounded-3xl border p-4" style={{ borderColor: '#DEE4EC' }}>
         <p className="text-[14px] font-medium" style={{ color: '#6C7786' }}>평판</p>
         <div className="mt-1 flex items-center justify-between gap-2">
@@ -68,8 +71,7 @@ export function ProfileReputationSummarySection({
             className="mt-4 flex flex-wrap gap-2"
             variants={staggerContainer}
             initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, margin: '-40px' }}
+            {...(revealOnMount ? { animate: 'show' } : { whileInView: 'show', viewport: { once: true, margin: '-40px' } })}
           >
             {keywordCounts.map((item) => (
               <motion.div
@@ -98,6 +100,7 @@ export function ProfileFeedbackSection({
   getProfileAvatar,
   onGuestbookEntryClick,
   onOpenGuestbook,
+  revealOnMount,
 }: {
   profile: {
     guestbook: { length: number }
@@ -106,9 +109,11 @@ export function ProfileFeedbackSection({
   getProfileAvatar: (linkId: string) => string
   onGuestbookEntryClick: (linkId: string) => void
   onOpenGuestbook: () => void
+  /** 온보딩 가이드 데모 전용 — 뷰포트 진입(whileInView) 대신 마운트 즉시 재생 */
+  revealOnMount?: boolean
 }) {
   return (
-    <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06}>
+    <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06} revealOnMount={revealOnMount}>
       <div className="rounded-3xl border p-4" style={{ borderColor: '#DEE4EC' }}>
         <div className="flex items-center justify-between gap-2">
           <p className="text-[18px] font-bold" style={{ color: '#0D0D0D' }}>함께한 사람들이 남긴 피드백</p>
@@ -124,8 +129,7 @@ export function ProfileFeedbackSection({
             className="mt-4 space-y-4"
             variants={staggerContainer}
             initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, margin: '-40px' }}
+            {...(revealOnMount ? { animate: 'show' } : { whileInView: 'show', viewport: { once: true, margin: '-40px' } })}
           >
             {featuredGuestbook.map((entry, i) => {
               const avatar = getProfileAvatar(entry.linkId)
@@ -462,17 +466,21 @@ export function AnimatedSection({
   children,
   className,
   delay = 0,
+  revealOnMount,
 }: {
   children: ReactNode
   className: string
   delay?: number
+  /** 온보딩 가이드 데모 전용 — 뷰포트 진입(whileInView) 대신 마운트 즉시 재생 */
+  revealOnMount?: boolean
 }) {
   return (
     <motion.div
       className={className}
       initial={{ opacity: 0, y: 22 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
+      {...(revealOnMount
+        ? { animate: { opacity: 1, y: 0 } }
+        : { whileInView: { opacity: 1, y: 0 }, viewport: { once: true, margin: '-40px' } })}
       transition={{ duration: 0.42, ease: SECTION_EASE, delay }}
     >
       {children}

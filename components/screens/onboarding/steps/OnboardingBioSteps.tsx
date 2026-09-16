@@ -128,8 +128,14 @@ function PreviewSNS() {
 function PreviewContact() {
   const [sheetOpen, setSheetOpen] = useState(false)
   useEffect(() => {
+    // 시트가 전체 화면(z-[80])을 덮어 가이드 하단 이전/다음 버튼까지 가리므로,
+    // 데모로 잠깐 보여준 뒤 자동으로 닫아 버튼을 다시 누를 수 있게 한다.
     const openTimer = setTimeout(() => setSheetOpen(true), 1300)
-    return () => clearTimeout(openTimer)
+    const closeTimer = setTimeout(() => setSheetOpen(false), 3300)
+    return () => {
+      clearTimeout(openTimer)
+      clearTimeout(closeTimer)
+    }
   }, [])
   return (
     <div className="px-5">

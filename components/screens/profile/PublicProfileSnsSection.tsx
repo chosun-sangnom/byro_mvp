@@ -1,7 +1,14 @@
 'use client'
 
+import { motion, type Variants } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
 import { AnimatedSection, SectionTitle } from '@/components/screens/profile/PublicProfileSections'
+
+const snsListContainer: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.08 } } }
+const snsListItem: Variants = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } },
+}
 
 interface SnsItem {
   key: string
@@ -67,23 +74,30 @@ export function ProfileSnsSection({
   return (
     <AnimatedSection className="px-5 pt-6 pb-2">
       <SectionTitle title="SNS" />
-      <div className="divide-y divide-[var(--color-border-soft)]">
+      <motion.div
+        className="divide-y divide-[var(--color-border-soft)]"
+        variants={snsListContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: '-40px' }}
+      >
         {items.map((item) => (
-          <a
+          <motion.a
             key={item.key}
             href={item.href}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3.5 py-3.5"
+            variants={snsListItem}
           >
             <span className="flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center">
               {item.icon}
             </span>
             <p className="flex-1 text-[14px] font-semibold text-[var(--color-text-primary)]">{item.title}</p>
             <ArrowUpRight size={15} className="flex-shrink-0 text-[var(--color-text-tertiary)] opacity-40" />
-          </a>
+          </motion.a>
         ))}
-      </div>
+      </motion.div>
     </AnimatedSection>
   )
 }

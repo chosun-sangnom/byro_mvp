@@ -217,6 +217,7 @@ export function ProfileHeroCard({
   onBookmarkClick,
   onContactClick,
   onOwnerEdit,
+  demoPulseContact,
 }: {
   profile: {
     name: string
@@ -244,6 +245,8 @@ export function ProfileHeroCard({
   onBookmarkClick?: () => void
   onContactClick?: () => void
   onOwnerEdit?: () => void
+  /** [임시] 온보딩 가이드 데모 전용 — 연락하기 아이콘을 탭한 것처럼 한 번 스케일 펄스 */
+  demoPulseContact?: boolean
 }) {
   const [personaSheetOpen, setPersonaSheetOpen] = useState(false)
   const [personaSharing, setPersonaSharing] = useState(false)
@@ -483,14 +486,16 @@ export function ProfileHeroCard({
               {/* 연락하기 + 더보기 — 카드 상단 오른쪽 */}
               <div className="absolute right-4 top-4 z-10 flex gap-2">
                 {onContactClick && (
-                  <button
+                  <motion.button
                     type="button"
                     aria-label="연락하기"
                     onClick={(e) => { e.stopPropagation(); onContactClick() }}
+                    animate={demoPulseContact ? { scale: [1, 1, 0.82, 1] } : undefined}
+                    transition={demoPulseContact ? { duration: 0.9, times: [0, 0.55, 0.75, 1], ease: [0.22, 1, 0.36, 1] } : undefined}
                     className="flex size-10 items-center justify-center rounded-full border border-[rgba(255,255,255,0.8)] bg-[rgba(102,102,102,0.4)] backdrop-blur-[10px]"
                   >
                     <MessageCircle size={18} className="text-white" />
-                  </button>
+                  </motion.button>
                 )}
                 <button
                   type="button"

@@ -7,6 +7,12 @@ import type { ContactChannel, Experience, RememberTopValue } from '@/types'
 
 const SECTION_EASE = [0.22, 1, 0.36, 1] as const
 
+const staggerContainer = { hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.08 } } }
+const staggerItem = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.3, ease: SECTION_EASE } },
+}
+
 type GuestbookPreview = {
   id: string
   linkId: string
@@ -58,18 +64,25 @@ export function ProfileReputationSummarySection({
         {isEmpty ? (
           <p className="mt-3 py-1 text-center text-[13px]" style={{ color: '#A8B1BD' }}>아직 받은 평판이 없어요</p>
         ) : (
-          <div className="mt-4 flex flex-wrap gap-2">
+          <motion.div
+            className="mt-4 flex flex-wrap gap-2"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: '-40px' }}
+          >
             {keywordCounts.map((item) => (
-              <div
+              <motion.div
                 key={item.keyword}
                 className="flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-[14px] font-medium"
                 style={{ borderColor: '#DEE4EC', color: '#25313D' }}
+                variants={staggerItem}
               >
                 {item.keyword}
                 <span className="font-semibold">{item.count}</span>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
     </AnimatedSection>
@@ -107,11 +120,17 @@ export function ProfileFeedbackSection({
         {profile.guestbook.length === 0 ? (
           <p className="mt-4 py-1 text-center text-[13px]" style={{ color: '#A8B1BD' }}>아직 받은 피드백이 없어요</p>
         ) : (
-          <div className="mt-4 space-y-4">
+          <motion.div
+            className="mt-4 space-y-4"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: '-40px' }}
+          >
             {featuredGuestbook.map((entry, i) => {
               const avatar = getProfileAvatar(entry.linkId)
               return (
-                <div key={entry.id}>
+                <motion.div key={entry.id} variants={staggerItem}>
                   <button
                     onClick={() => onGuestbookEntryClick(entry.linkId)}
                     className="flex w-full items-start gap-2.5 text-left"
@@ -142,10 +161,10 @@ export function ProfileFeedbackSection({
                     </div>
                   </button>
                   {i < featuredGuestbook.length - 1 && <div className="mt-4 h-px" style={{ background: '#DEE4EC' }} />}
-                </div>
+                </motion.div>
               )
             })}
-          </div>
+          </motion.div>
         )}
 
         {profile.guestbook.length > 0 && (
@@ -178,22 +197,32 @@ function MutualCompaniesCard({ companies }: { companies: string[] }) {
       <p className="mt-1 text-[12px] text-[#6C7786]">
         이 회사들에서 만난 사람 이야기로 대화를 시작해보세요
       </p>
-      <div className="mt-3 flex flex-wrap gap-1.5">
+      <motion.div
+        className="mt-3 flex flex-wrap gap-1.5"
+        variants={staggerContainer}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, margin: '-40px' }}
+      >
         {visible.map((name) => (
-          <span
+          <motion.span
             key={name}
             className="rounded-full px-3 py-1.5 text-[13px] font-semibold"
             style={{ background: 'var(--color-accent-soft)', color: 'var(--color-accent-dark)' }}
+            variants={staggerItem}
           >
             {name}
-          </span>
+          </motion.span>
         ))}
         {remaining > 0 && (
-          <span className="rounded-full bg-[var(--color-bg-muted)] px-3 py-1.5 text-[13px] font-semibold text-[#6C7786]">
+          <motion.span
+            className="rounded-full bg-[var(--color-bg-muted)] px-3 py-1.5 text-[13px] font-semibold text-[#6C7786]"
+            variants={staggerItem}
+          >
             +{remaining}곳
-          </span>
+          </motion.span>
         )}
-      </div>
+      </motion.div>
     </div>
   )
 }

@@ -5,20 +5,22 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, type Variants } from 'framer-motion'
 import { Images, Network, UserSearch } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
-import { Button } from '@/components/ui'
+import { Button, BottomSheet } from '@/components/ui'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
 import { JIMIN_PROFILE, SAMPLE_PROFILE, getPublicProfileByUsername } from '@/lib/mocks/publicProfiles'
 import {
-  ProfileConnectSection,
+  ContactActionButton,
   ProfileFeedbackSection,
   ProfileRememberSection,
   ProfileReputationSummarySection,
 } from '@/components/screens/profile/PublicProfileSections'
 import { ProfileHighlightsSection } from '@/components/screens/profile/PublicProfileHighlightsSection'
 import { ProfileSnsSection } from '@/components/screens/profile/PublicProfileSnsSection'
-import { PublicProfileLifeSection } from '@/components/screens/profile/PublicProfileLifeSection'
+import { Collage, LAYOUTS, pickCollageEntries } from '@/components/screens/profile/PublicProfileLifeSection'
+import { ProfileHeroCard } from '@/components/screens/profile/PublicProfileHeroSection'
 import { PublicProfileWhoIAmSection } from '@/components/screens/profile/PublicProfileWhoIAmSection'
 import { SavedProfileRow } from '@/components/screens/archive/Archive'
+import { flattenVibe } from '@/lib/vibeItems'
 import type { Highlight } from '@/types'
 
 // SCRUM-148: 온보딩 가이드 미리보기는 이지민(/jiminlee) 실제 목업 데이터를 그대로 써서
@@ -96,49 +98,81 @@ function PreviewHighlight() {
   )
 }
 
-// 바이브보드 — 실제 PublicProfileLifeSection 재사용 (이지민 무드보드·취향 데이터 그대로)
+// 바이브 — 콘텐츠 그리드 전체가 아니라 무드보드(콜라주)만, 카드가 하나씩 올라오는 스태거 애니메이션
 function PreviewLife() {
-  return <PublicProfileLifeSection life={JIMIN_PROFILE.life} />
+  const [collage] = useState(() => {
+    const entries = flattenVibe(JIMIN_PROFILE.life)
+    return {
+      entries: pickCollageEntries(entries),
+      layout: LAYOUTS[Math.floor(Math.random() * LAYOUTS.length)],
+    }
+  })
+  return <Collage entries={collage.entries} layout={collage.layout} onOpen={() => {}} animated />
 }
 
-// SNS — 실제 ProfileSnsSection 재사용 (이지민 Instagram 연동)
+// SNS — 실제 ProfileSnsSection 재사용, 인스타그램+링크드인 둘 다 노출(링크드인은 데모용 임의 값)
 function PreviewSNS() {
   return (
     <ProfileSnsSection
       instagramConnected
-      linkedinConnected={false}
+      linkedinConnected
       instagram={{ username: JIMIN_PROFILE.instagram.username, profileUrl: JIMIN_PROFILE.instagram.profileUrl }}
-      linkedin={{ profileUrl: '' }}
+      linkedin={{ profileUrl: 'https://www.linkedin.com/in/jiminlee' }}
     />
   )
 }
 
-// 연락수단 — 실제 ProfileConnectSection 재사용 (이지민 전화·이메일·카카오)
+// 연락수단 — 연락 버튼 그리드를 바로 보여주는 대신, 실제 프로필 히어로 카드에서
+// 우상단 "연락하기" 아이콘을 탭하는 애니메이션을 재생한 뒤 실제 연락처 시트를 여는
+// 2단계 데모(SCRUM-127에서 만든 실제 흐름 그대로)
 function PreviewContact() {
+  const [sheetOpen, setSheetOpen] = useState(false)
+  useEffect(() => {
+    const openTimer = setTimeout(() => setSheetOpen(true), 1300)
+    return () => clearTimeout(openTimer)
+  }, [])
   return (
-    <ProfileConnectSection
-      isOwnerMode={false}
-      contactChannels={JIMIN_PROFILE.contactChannels}
-      onRequestFeedback={() => {}}
-      onChannelClick={() => {}}
-    />
+    <div className="px-5">
+      <ProfileHeroCard
+        profile={{ ...JIMIN_PROFILE, mbti: JIMIN_PROFILE.whoIAm.mbti }}
+        heroTheme={JIMIN_PROFILE.heroTheme}
+        activeImage={JIMIN_PROFILE.profileImages[0]}
+        onContactClick={() => {}}
+        demoPulseContact
+      />
+      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
+        <div className="px-5 pb-6">
+          <div className="mb-5 text-[18px] font-bold text-[#0D0D0D]">
+            {JIMIN_PROFILE.name}님에게 연락하기
+          </div>
+          <div className="flex justify-around">
+            {JIMIN_PROFILE.contactChannels.map((channel) => (
+              <ContactActionButton key={channel.id} channel={channel} onClick={() => {}} />
+            ))}
+          </div>
+        </div>
+      </BottomSheet>
+    </div>
   )
 }
 
-// 네트워크 — 실제 ProfileRememberSection 재사용 (이지민 리멤버 네트워크 통계)
+// 네트워크 — 실제 ProfileRememberSection 재사용 (이지민 리멤버 네트워크 통계).
+// 공유 컴포넌트 자체 여백(pt-6)은 그대로 두고, 가이드 슬라이드에서만 상단 여백을 보정.
 function PreviewNetwork() {
   const r = JIMIN_PROFILE.rememberHighlight
   return (
-    <ProfileRememberSection
-      total={r.total}
-      industries={r.industries}
-      isLoggedIn={false}
-      isOwner={false}
-      mutualCompanies={r.mutualCompanies}
-      topCompany={r.topCompany}
-      topIndustry={r.topIndustry}
-      topRole={r.topRole}
-    />
+    <div className="-mt-4">
+      <ProfileRememberSection
+        total={r.total}
+        industries={r.industries}
+        isLoggedIn={false}
+        isOwner={false}
+        mutualCompanies={r.mutualCompanies}
+        topCompany={r.topCompany}
+        topIndustry={r.topIndustry}
+        topRole={r.topRole}
+      />
+    </div>
   )
 }
 
@@ -146,10 +180,10 @@ function PreviewNetwork() {
 function PreviewFeedback() {
   const keywordCounts = [...JIMIN_PROFILE.reputationKeywords]
     .sort((a, b) => b.count - a.count)
-    .slice(0, 5)
+    .slice(0, 3)
     .map((item) => ({ keyword: item.keyword, count: item.count }))
   const totalKeywordCount = keywordCounts.reduce((sum, item) => sum + item.count, 0)
-  const featuredGuestbook = JIMIN_PROFILE.guestbook.slice(0, 3)
+  const featuredGuestbook = JIMIN_PROFILE.guestbook.slice(0, 2)
   return (
     <>
       <ProfileReputationSummarySection keywordCounts={keywordCounts} totalKeywordCount={totalKeywordCount} />

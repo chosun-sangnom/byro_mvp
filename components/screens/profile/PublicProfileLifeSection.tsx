@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { motion, type Variants } from 'framer-motion'
 import { BottomSheet } from '@/components/ui'
 import type { PublicProfileLife } from '@/types'
 import { ProfileEmptyAddBlock } from '@/components/screens/profile/ProfileEmptyAddBlock'
@@ -10,13 +11,13 @@ import { flattenVibe, groupVibeEntries, type VibeEntry } from '@/lib/vibeItems'
 // ─── 무드보드 콜라주 ──────────────────────────────────────────────────────────
 
 type GridSlot = { col: string; row: string }
-type LayoutPattern = {
+export type LayoutPattern = {
   columns: string
   rows: string
   slots: [GridSlot, GridSlot, GridSlot, GridSlot, GridSlot, GridSlot]
 }
 
-const LAYOUTS: LayoutPattern[] = [
+export const LAYOUTS: LayoutPattern[] = [
   {
     // 좌측 tall
     columns: '3fr 2fr 2fr',
@@ -72,7 +73,7 @@ const LAYOUTS: LayoutPattern[] = [
 ]
 
 // 사진 카드를 뺀 종류별 1장씩 랜덤(이미지 있는 카드 우선), 최대 6장
-function pickCollageEntries(entries: VibeEntry[]): VibeEntry[] {
+export function pickCollageEntries(entries: VibeEntry[]): VibeEntry[] {
   const byKind = new Map<string, VibeEntry[]>()
   for (const entry of entries) {
     if (entry.kind === 'photo') continue
@@ -93,7 +94,7 @@ function pickCollageEntries(entries: VibeEntry[]): VibeEntry[] {
   return picked.slice(0, 6)
 }
 
-function CollageCard({ entry, onOpen }: { entry: VibeEntry; onOpen: () => void }) {
+export function CollageCard({ entry, onOpen }: { entry: VibeEntry; onOpen: () => void }) {
   return (
     <button type="button" onClick={onOpen} className="relative h-full w-full overflow-hidden rounded-xl text-left">
       <div className="absolute inset-0">
@@ -111,20 +112,43 @@ function CollageCard({ entry, onOpen }: { entry: VibeEntry; onOpen: () => void }
   )
 }
 
-function Collage({ entries, layout, onOpen }: { entries: VibeEntry[]; layout: LayoutPattern; onOpen: (e: VibeEntry) => void }) {
+const collageContainer: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } } }
+const collageItem: Variants = {
+  hidden: { opacity: 0, y: 12, scale: 0.94 },
+  show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] } },
+}
+
+export function Collage({
+  entries,
+  layout,
+  onOpen,
+  animated,
+}: {
+  entries: VibeEntry[]
+  layout: LayoutPattern
+  onOpen: (e: VibeEntry) => void
+  animated?: boolean
+}) {
   if (entries.length === 0) return null
   return (
     <div className="px-4 pb-2 pt-4">
-      <div
+      <motion.div
         className="grid w-full gap-1.5"
         style={{ aspectRatio: '1/1', gridTemplateColumns: layout.columns, gridTemplateRows: layout.rows }}
+        variants={animated ? collageContainer : undefined}
+        initial={animated ? 'hidden' : undefined}
+        animate={animated ? 'show' : undefined}
       >
         {entries.map((entry, i) => (
-          <div key={entry.key} style={{ gridColumn: layout.slots[i].col, gridRow: layout.slots[i].row }}>
+          <motion.div
+            key={entry.key}
+            style={{ gridColumn: layout.slots[i].col, gridRow: layout.slots[i].row }}
+            variants={animated ? collageItem : undefined}
+          >
             <CollageCard entry={entry} onOpen={() => onOpen(entry)} />
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </div>
   )
 }

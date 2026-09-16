@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { motion, type Variants } from 'framer-motion'
+import { AnimatePresence, motion, type Variants } from 'framer-motion'
 import { Images, Network, UserSearch } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
-import { Button, BottomSheet } from '@/components/ui'
+import { Button } from '@/components/ui'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
 import { JIMIN_PROFILE, SAMPLE_PROFILE, getPublicProfileByUsername } from '@/lib/mocks/publicProfiles'
 import {
@@ -128,36 +128,53 @@ function PreviewSNS() {
 function PreviewContact() {
   const [sheetOpen, setSheetOpen] = useState(false)
   useEffect(() => {
-    // 시트가 전체 화면(z-[80])을 덮어 가이드 하단 이전/다음 버튼까지 가리므로,
-    // 데모로 잠깐 보여준 뒤 자동으로 닫아 버튼을 다시 누를 수 있게 한다.
     const openTimer = setTimeout(() => setSheetOpen(true), 1300)
-    const closeTimer = setTimeout(() => setSheetOpen(false), 3300)
-    return () => {
-      clearTimeout(openTimer)
-      clearTimeout(closeTimer)
-    }
+    return () => clearTimeout(openTimer)
   }, [])
   return (
     <div className="px-5">
-      <ProfileHeroCard
-        profile={{ ...JIMIN_PROFILE, mbti: JIMIN_PROFILE.whoIAm.mbti }}
-        heroTheme={JIMIN_PROFILE.heroTheme}
-        activeImage={JIMIN_PROFILE.profileImages[0]}
-        onContactClick={() => {}}
-        demoPulseContact
-      />
-      <BottomSheet open={sheetOpen} onClose={() => setSheetOpen(false)}>
-        <div className="px-5 pb-6">
-          <div className="mb-5 text-[18px] font-bold text-[#0D0D0D]">
-            {JIMIN_PROFILE.name}님에게 연락하기
-          </div>
-          <div className="flex justify-around">
-            {JIMIN_PROFILE.contactChannels.map((channel) => (
-              <ContactActionButton key={channel.id} channel={channel} onClick={() => {}} />
-            ))}
-          </div>
-        </div>
-      </BottomSheet>
+      {/* 실제 BottomSheet(z-[80], 전체화면)는 가이드 하단 이전/다음 버튼까지 덮어버리므로,
+          데모에서는 히어로 카드 영역 안에서만 슬라이드업하는 축소 버전을 보여준다. */}
+      <div className="relative overflow-hidden rounded-[var(--radius-hero)]">
+        <ProfileHeroCard
+          profile={{ ...JIMIN_PROFILE, mbti: JIMIN_PROFILE.whoIAm.mbti }}
+          heroTheme={JIMIN_PROFILE.heroTheme}
+          activeImage={JIMIN_PROFILE.profileImages[0]}
+          onContactClick={() => {}}
+          demoPulseContact
+        />
+        <AnimatePresence>
+          {sheetOpen && (
+            <>
+              <motion.div
+                className="absolute inset-0 z-10 bg-black/45"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              />
+              <motion.div
+                className="absolute inset-x-0 bottom-0 z-10 rounded-t-2xl px-5 pb-6 pt-3"
+                style={{ backgroundColor: 'var(--color-bg-surface)' }}
+                initial={{ y: '100%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '100%' }}
+                transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+              >
+                <div className="mx-auto mb-3 h-1 w-8 rounded-full bg-[var(--color-border-default)]" />
+                <div className="mb-5 text-[18px] font-bold text-[#0D0D0D]">
+                  {JIMIN_PROFILE.name}님에게 연락하기
+                </div>
+                <div className="flex justify-around">
+                  {JIMIN_PROFILE.contactChannels.map((channel) => (
+                    <ContactActionButton key={channel.id} channel={channel} onClick={() => {}} />
+                  ))}
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   )
 }

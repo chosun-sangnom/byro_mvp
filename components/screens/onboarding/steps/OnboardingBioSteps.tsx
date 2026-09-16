@@ -118,6 +118,8 @@ function PreviewSNS() {
       linkedinConnected
       instagram={{ username: JIMIN_PROFILE.instagram.username, profileUrl: JIMIN_PROFILE.instagram.profileUrl }}
       linkedin={{ profileUrl: 'https://www.linkedin.com/in/jiminlee' }}
+      revealOnMount
+      hideArrowIcon
     />
   )
 }

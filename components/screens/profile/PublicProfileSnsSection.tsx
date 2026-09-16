@@ -5,6 +5,9 @@ import { ArrowUpRight } from 'lucide-react'
 import { AnimatedSection, SectionTitle } from '@/components/screens/profile/PublicProfileSections'
 
 const snsListContainer: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.08 } } }
+// 온보딩 가이드 데모 전용(revealOnMount) — 카드가 먼저 드러난 뒤, 인스타그램 다음
+// 링크드인이 0.5초 뒤에 올라오는 게 뚜렷이 보이도록 간격을 크게 벌림
+const snsListContainerSlow: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.5, delayChildren: 0.45 } } }
 const snsListItem: Variants = {
   hidden: { opacity: 0, y: 10 },
   show: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } },
@@ -26,6 +29,8 @@ export function ProfileSnsSection({
   linkedin,
   youtube,
   tiktok,
+  revealOnMount,
+  hideArrowIcon,
 }: {
   instagramConnected: boolean
   linkedinConnected: boolean
@@ -35,6 +40,10 @@ export function ProfileSnsSection({
   linkedin: { profileUrl: string }
   youtube?: { channelName: string; channelUrl: string }
   tiktok?: { username: string; profileUrl: string }
+  /** 온보딩 가이드 데모 전용 — 뷰포트 진입(whileInView) 대신 마운트 즉시, 0.5초 간격으로 재생 */
+  revealOnMount?: boolean
+  /** 온보딩 가이드 데모 전용 — 바로가기(외부 링크) 아이콘 숨김 */
+  hideArrowIcon?: boolean
 }) {
   const items: SnsItem[] = [
     instagramConnected && {
@@ -72,14 +81,13 @@ export function ProfileSnsSection({
   if (items.length === 0) return null
 
   return (
-    <AnimatedSection className="px-5 pt-6 pb-2">
+    <AnimatedSection className="px-5 pt-6 pb-2" revealOnMount={revealOnMount}>
       <SectionTitle title="SNS" />
       <motion.div
         className="divide-y divide-[var(--color-border-soft)]"
-        variants={snsListContainer}
+        variants={revealOnMount ? snsListContainerSlow : snsListContainer}
         initial="hidden"
-        whileInView="show"
-        viewport={{ once: true, margin: '-40px' }}
+        {...(revealOnMount ? { animate: 'show' } : { whileInView: 'show', viewport: { once: true, margin: '-40px' } })}
       >
         {items.map((item) => (
           <motion.a
@@ -94,7 +102,9 @@ export function ProfileSnsSection({
               {item.icon}
             </span>
             <p className="flex-1 text-[14px] font-semibold text-[var(--color-text-primary)]">{item.title}</p>
-            <ArrowUpRight size={15} className="flex-shrink-0 text-[var(--color-text-tertiary)] opacity-40" />
+            {!hideArrowIcon && (
+              <ArrowUpRight size={15} className="flex-shrink-0 text-[var(--color-text-tertiary)] opacity-40" />
+            )}
           </motion.a>
         ))}
       </motion.div>

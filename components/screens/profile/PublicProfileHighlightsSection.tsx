@@ -94,9 +94,10 @@ export function ProfileHighlightsSection({
               <div key={`${entry.categoryId}-${group.id}`}>
                 <button
                   onClick={() => onToggleHighlight(groupToggleKey)}
-                  className="flex w-full items-center gap-3.5 py-3.5 text-left"
+                  className="flex w-full items-start gap-3.5 py-3.5 text-left"
                 >
-                  <span className="flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center text-[var(--color-text-secondary)]">
+                  {/* 토글 펼침/접힘으로 미리보기 줄 수가 바뀌어도 아이콘이 밀리지 않도록 상단 고정 */}
+                  <span className="mt-0.5 flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center text-[var(--color-text-secondary)]">
                     <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={16} />
                   </span>
                   <div className="min-w-0 flex-1">
@@ -126,7 +127,9 @@ export function ProfileHighlightsSection({
                       )}
                     </AnimatePresence>
                   </div>
-                  {isGroupOpen ? <ChevronUp size={14} color="var(--color-text-tertiary)" /> : <ChevronDown size={14} color="var(--color-text-tertiary)" />}
+                  <span className="mt-0.5 flex-shrink-0">
+                    {isGroupOpen ? <ChevronUp size={14} color="var(--color-text-tertiary)" /> : <ChevronDown size={14} color="var(--color-text-tertiary)" />}
+                  </span>
                 </button>
                 <AnimatePresence initial={false}>
                   {isGroupOpen && (

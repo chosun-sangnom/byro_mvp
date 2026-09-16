@@ -74,11 +74,7 @@ function PreviewBasicInfo() {
   const bio = useTypewriter(bioSource, { startDelay: 200, speed: TYPE_SPEED })
   const personalityDelay = 200 + bioSource.length * TYPE_SPEED + 300
   const personality = useTypewriter(personalitySource, { startDelay: personalityDelay, speed: TYPE_SPEED })
-  return (
-    <div className="-mx-5">
-      <PublicProfileWhoIAmSection bio={bio} whoIAm={{ mbti: JIMIN_PROFILE.whoIAm.mbti, personality }} />
-    </div>
-  )
+  return <PublicProfileWhoIAmSection bio={bio} whoIAm={{ mbti: JIMIN_PROFILE.whoIAm.mbti, personality }} />
 }
 
 // 하이라이트 — 실제 ProfileHighlightsSection 재사용(이지민 경력·학력) + 잠시 후 토글이 저절로 펼쳐지는 데모
@@ -90,52 +86,42 @@ function PreviewHighlight() {
   }, [])
   const groupedHighlights = buildGroupedHighlights(JIMIN_PROFILE.manualHighlights)
   return (
-    <div className="-mx-5">
-      <ProfileHighlightsSection
-        groupedHighlights={groupedHighlights}
-        username="jiminlee"
-        primaryHighlightOverrides={{}}
-        getHighlightOpen={(key) => openKeys.has(key)}
-        onToggleHighlight={() => {}}
-      />
-    </div>
+    <ProfileHighlightsSection
+      groupedHighlights={groupedHighlights}
+      username="jiminlee"
+      primaryHighlightOverrides={{}}
+      getHighlightOpen={(key) => openKeys.has(key)}
+      onToggleHighlight={() => {}}
+    />
   )
 }
 
 // 바이브보드 — 실제 PublicProfileLifeSection 재사용 (이지민 무드보드·취향 데이터 그대로)
 function PreviewLife() {
-  return (
-    <div className="-mx-5 -mt-2">
-      <PublicProfileLifeSection life={JIMIN_PROFILE.life} />
-    </div>
-  )
+  return <PublicProfileLifeSection life={JIMIN_PROFILE.life} />
 }
 
 // SNS — 실제 ProfileSnsSection 재사용 (이지민 Instagram 연동)
 function PreviewSNS() {
   return (
-    <div className="-mx-5">
-      <ProfileSnsSection
-        instagramConnected
-        linkedinConnected={false}
-        instagram={{ username: JIMIN_PROFILE.instagram.username, profileUrl: JIMIN_PROFILE.instagram.profileUrl }}
-        linkedin={{ profileUrl: '' }}
-      />
-    </div>
+    <ProfileSnsSection
+      instagramConnected
+      linkedinConnected={false}
+      instagram={{ username: JIMIN_PROFILE.instagram.username, profileUrl: JIMIN_PROFILE.instagram.profileUrl }}
+      linkedin={{ profileUrl: '' }}
+    />
   )
 }
 
 // 연락수단 — 실제 ProfileConnectSection 재사용 (이지민 전화·이메일·카카오)
 function PreviewContact() {
   return (
-    <div className="-mx-5">
-      <ProfileConnectSection
-        isOwnerMode={false}
-        contactChannels={JIMIN_PROFILE.contactChannels}
-        onRequestFeedback={() => {}}
-        onChannelClick={() => {}}
-      />
-    </div>
+    <ProfileConnectSection
+      isOwnerMode={false}
+      contactChannels={JIMIN_PROFILE.contactChannels}
+      onRequestFeedback={() => {}}
+      onChannelClick={() => {}}
+    />
   )
 }
 
@@ -143,18 +129,16 @@ function PreviewContact() {
 function PreviewNetwork() {
   const r = JIMIN_PROFILE.rememberHighlight
   return (
-    <div className="-mx-5">
-      <ProfileRememberSection
-        total={r.total}
-        industries={r.industries}
-        isLoggedIn={false}
-        isOwner={false}
-        mutualCompanies={r.mutualCompanies}
-        topCompany={r.topCompany}
-        topIndustry={r.topIndustry}
-        topRole={r.topRole}
-      />
-    </div>
+    <ProfileRememberSection
+      total={r.total}
+      industries={r.industries}
+      isLoggedIn={false}
+      isOwner={false}
+      mutualCompanies={r.mutualCompanies}
+      topCompany={r.topCompany}
+      topIndustry={r.topIndustry}
+      topRole={r.topRole}
+    />
   )
 }
 
@@ -167,7 +151,7 @@ function PreviewFeedback() {
   const totalKeywordCount = keywordCounts.reduce((sum, item) => sum + item.count, 0)
   const featuredGuestbook = JIMIN_PROFILE.guestbook.slice(0, 3)
   return (
-    <div className="-mx-5">
+    <>
       <ProfileReputationSummarySection keywordCounts={keywordCounts} totalKeywordCount={totalKeywordCount} />
       <ProfileFeedbackSection
         profile={{ guestbook: { length: JIMIN_PROFILE.guestbook.length } }}
@@ -176,7 +160,7 @@ function PreviewFeedback() {
         onGuestbookEntryClick={() => {}}
         onOpenGuestbook={() => {}}
       />
-    </div>
+    </>
   )
 }
 

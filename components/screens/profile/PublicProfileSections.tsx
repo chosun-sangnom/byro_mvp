@@ -8,6 +8,10 @@ import type { ContactChannel, Experience, RememberTopValue } from '@/types'
 const SECTION_EASE = [0.22, 1, 0.36, 1] as const
 
 const staggerContainer = { hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.08 } } }
+// 온보딩 가이드 데모 전용(revealOnMount) — 카드 자체가 먼저 다 드러난 뒤 항목이
+// 하나씩 올라오는 게 보이도록, 카드 페이드인이 끝나는 시점 이후로 시작을 늦추고
+// 항목 간 간격도 더 벌림(기본값은 실제 프로필 페이지의 스크롤 진입용, 손대지 않음)
+const staggerContainerSlow = { hidden: {}, show: { transition: { staggerChildren: 0.14, delayChildren: 0.45 } } }
 const staggerItem = {
   hidden: { opacity: 0, y: 10 },
   show: { opacity: 1, y: 0, transition: { duration: 0.3, ease: SECTION_EASE } },
@@ -69,7 +73,7 @@ export function ProfileReputationSummarySection({
         ) : (
           <motion.div
             className="mt-4 flex flex-wrap gap-2"
-            variants={staggerContainer}
+            variants={revealOnMount ? staggerContainerSlow : staggerContainer}
             initial="hidden"
             {...(revealOnMount ? { animate: 'show' } : { whileInView: 'show', viewport: { once: true, margin: '-40px' } })}
           >
@@ -130,7 +134,7 @@ export function ProfileFeedbackSection({
         ) : (
           <motion.div
             className="mt-4 space-y-4"
-            variants={staggerContainer}
+            variants={revealOnMount ? staggerContainerSlow : staggerContainer}
             initial="hidden"
             {...(revealOnMount ? { animate: 'show' } : { whileInView: 'show', viewport: { once: true, margin: '-40px' } })}
           >

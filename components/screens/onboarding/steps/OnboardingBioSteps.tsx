@@ -73,9 +73,9 @@ const TYPE_SPEED = 11 // 기존 22ms/글자 대비 2배 빠르게
 function PreviewBasicInfo() {
   const bioSource = JIMIN_PROFILE.bio
   const personalitySource = JIMIN_PROFILE.whoIAm.personality
+  // 자기소개·성향이 동시에 올라와서 나란히 채워지도록 같은 시점에 시작
   const bio = useTypewriter(bioSource, { startDelay: 200, speed: TYPE_SPEED })
-  const personalityDelay = 200 + bioSource.length * TYPE_SPEED + 300
-  const personality = useTypewriter(personalitySource, { startDelay: personalityDelay, speed: TYPE_SPEED })
+  const personality = useTypewriter(personalitySource, { startDelay: 200, speed: TYPE_SPEED })
   return <PublicProfileWhoIAmSection bio={bio} whoIAm={{ mbti: JIMIN_PROFILE.whoIAm.mbti, personality }} />
 }
 

@@ -1,10 +1,62 @@
 'use client'
 
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { motion, type Variants } from 'framer-motion'
 import { Brain, Images, Network, Sparkles, UserSearch } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
-import { Button } from '@/components/ui'
+import { Avatar, Button } from '@/components/ui'
+import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
+import { JIMIN_PROFILE, SAMPLE_PROFILE, getPublicProfileByUsername } from '@/lib/mocks/publicProfiles'
+import {
+  ProfileConnectSection,
+  ProfileFeedbackSection,
+  ProfileRememberSection,
+  ProfileReputationSummarySection,
+} from '@/components/screens/profile/PublicProfileSections'
+import { ProfileHighlightsSection } from '@/components/screens/profile/PublicProfileHighlightsSection'
+import { ProfileSnsSection } from '@/components/screens/profile/PublicProfileSnsSection'
+import type { Highlight } from '@/types'
+
+// SCRUM-148: 온보딩 가이드 미리보기는 이지민(/jiminlee) 실제 목업 데이터를 그대로 써서
+// 실제 서비스 화면과 같은 컴포넌트를 재사용한다 (스크린샷이 아니라 라이브 컴포넌트 + 진입 애니메이션).
+function buildGroupedHighlights(manualHighlights: Highlight[]) {
+  return HIGHLIGHT_GROUPS.map((group) => {
+    const manualItems = manualHighlights.filter(
+      (item) => HIGHLIGHT_CATEGORIES.find((category) => category.id === item.categoryId)?.group === group.id,
+    )
+    const manualGroups = Array.from(new Map(
+      manualItems.map((item) => [item.categoryId, manualItems.filter((manual) => manual.categoryId === item.categoryId)]),
+    ).entries()).map(([categoryId, items]) => ({
+      kind: 'manual-group' as const,
+      categoryId,
+      items,
+    }))
+    return { ...group, items: manualGroups }
+  }).filter((group) => group.items.length > 0)
+}
+
+// 타이핑 애니메이션 — 기본정보 슬라이드에서 예시 문구가 한 글자씩 써지는 느낌
+function useTypewriter(text: string, { speed = 28, startDelay = 0 }: { speed?: number; startDelay?: number } = {}) {
+  const [output, setOutput] = useState('')
+  useEffect(() => {
+    let i = 0
+    let interval: ReturnType<typeof setInterval> | null = null
+    setOutput('')
+    const start = setTimeout(() => {
+      interval = setInterval(() => {
+        i += 1
+        setOutput(text.slice(0, i))
+        if (i >= text.length && interval) clearInterval(interval)
+      }, speed)
+    }, startDelay)
+    return () => {
+      clearTimeout(start)
+      if (interval) clearInterval(interval)
+    }
+  }, [text, speed, startDelay])
+  return output
+}
 
 // ─── Shared "menu" list card (하이라이트/SNS/연락수단/저장한 프로필 공통 패턴) ──────────
 
@@ -39,86 +91,206 @@ function MenuRow({ icon, boxed = true, title, sub, trailing }: { icon: ReactNode
   )
 }
 
-function StatusChip({ label, active }: { label: string; active: boolean }) {
-  return (
-    <span
-      className="flex-shrink-0 rounded-[6px] px-1.5 py-1 text-xs font-bold"
-      style={{ backgroundColor: active ? '#EEFBF2' : '#F5F6F7', color: active ? '#11C34B' : '#6C7786' }}
-    >
-      {label}
-    </span>
-  )
-}
-
 // ─── Mini preview components (Figma "온보딩 가이드" 목업 기준) ──────────────────
 
+// 기본정보 — 예시 문구가 한 글자씩 써지는 타이핑 애니메이션 (MBTI → 성향 순서로)
+const MBTI_EXAMPLE = 'ENFP · 재기발랄한 활동가'
+const PERSONALITY_EXAMPLE = '관계·소통 스타일을 알려줘요'
+const TYPE_SPEED = 28
+
 function PreviewBasicInfo() {
+  const mbti = useTypewriter(MBTI_EXAMPLE, { startDelay: 200, speed: TYPE_SPEED })
+  const personalityDelay = 200 + MBTI_EXAMPLE.length * TYPE_SPEED + 300
+  const personality = useTypewriter(PERSONALITY_EXAMPLE, { startDelay: personalityDelay, speed: TYPE_SPEED })
   return (
     <MenuCard>
-      <MenuRow icon={<Brain size={18} className="text-[#6C7786]" />} title="MBTI" sub="예: ENFP · 재기발랄한 활동가" />
+      <MenuRow icon={<Brain size={18} className="text-[#6C7786]" />} title="MBTI" sub={mbti || ' '} />
       <MenuDivider />
-      <MenuRow icon={<Sparkles size={18} className="text-[#6C7786]" />} title="성향" sub="관계·소통 스타일을 알려줘요" />
+      <MenuRow icon={<Sparkles size={18} className="text-[#6C7786]" />} title="성향" sub={personality || ' '} />
     </MenuCard>
   )
 }
 
-// SCRUM-148: 손그림 UI 안내 대신 실제 화면 스크린샷 사용
-function ScreenshotFrame({ src, alt }: { src: string; alt: string }) {
+// 하이라이트 — 실제 ProfileHighlightsSection 재사용(이지민 경력·학력) + 잠시 후 토글이 저절로 펼쳐지는 데모
+function PreviewHighlight() {
+  const [openKeys, setOpenKeys] = useState<Set<string>>(new Set())
+  useEffect(() => {
+    const t = setTimeout(() => setOpenKeys(new Set(['group_career-role_jiminlee'])), 900)
+    return () => clearTimeout(t)
+  }, [])
+  const groupedHighlights = buildGroupedHighlights(JIMIN_PROFILE.manualHighlights)
   return (
-    <div className="w-full overflow-hidden rounded-[12px] border" style={{ borderColor: '#DEE4EC' }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt={alt} className="block w-full" />
+    <div className="-mx-5">
+      <ProfileHighlightsSection
+        groupedHighlights={groupedHighlights}
+        username="jiminlee"
+        primaryHighlightOverrides={{}}
+        getHighlightOpen={(key) => openKeys.has(key)}
+        onToggleHighlight={() => {}}
+      />
     </div>
   )
 }
 
-function PreviewHighlight() {
-  return <ScreenshotFrame src="/images/onboarding-guide-screens/highlight.png" alt="하이라이트 화면 예시" />
+// 바이브보드 — 이지민의 실제 취향 데이터로 카드가 하나씩 떠오르는 스태거 애니메이션
+const vibeContainer = { hidden: {}, show: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } } }
+const vibeItem: Variants = {
+  hidden: { opacity: 0, scale: 0.85, y: 8 },
+  show: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] } },
 }
 
 function PreviewLife() {
-  return <ScreenshotFrame src="/images/onboarding-guide-screens/vibe.png" alt="바이브보드 화면 예시" />
-}
-
-function PreviewSNS() {
-  return <ScreenshotFrame src="/images/onboarding-guide-screens/sns.png" alt="SNS 연동 화면 예시" />
-}
-
-function PreviewContact() {
-  const rows = [
-    { icon: '/images/onboarding-guide/contact-phone.svg', title: '전화', sub: '비활성화됨', status: '비활성', active: false },
-    { icon: '/images/onboarding-guide/contact-email.svg', title: '이메일', sub: 'gangminjun@byro.io', status: '활성', active: true },
-    { icon: '/images/onboarding-guide/contact-kakao.svg', title: '카카오', sub: '비활성화됨', status: '활성', active: true },
+  const { daily, tastes } = JIMIN_PROFILE.life
+  const items = [
+    { key: 'exercise', color: '#11C34B', label: '운동', name: daily.exercise[0].label, sub: undefined, src: daily.exercise[0].posterUrl },
+    { key: 'movie', color: '#6541F2', label: '영화', name: tastes.movies[0].label, sub: tastes.movies[0].sublabel, src: tastes.movies[0].posterUrl },
+    { key: 'music', color: '#F4832F', label: '음악', name: tastes.music[0].label, sub: tastes.music[0].sublabel, src: tastes.music[0].posterUrl },
+    { key: 'book', color: '#0657FF', label: '책', name: tastes.books[0].label, sub: tastes.books[0].sublabel, src: tastes.books[0].posterUrl },
+    { key: 'restaurant', color: '#FF6B00', label: '맛집', name: tastes.restaurants[0].label, sub: tastes.restaurants[0].sublabel, src: tastes.restaurants[0].posterUrl },
+    { key: 'cafe', color: '#1DAEFF', label: '카페', name: tastes.cafes[0].label, sub: tastes.cafes[0].sublabel, src: tastes.cafes[0].posterUrl },
   ]
   return (
-    <MenuCard>
-      {rows.map((row, i) => (
-        <div key={row.title} className="contents">
-          {i > 0 && <MenuDivider />}
-          <MenuRow
-            // eslint-disable-next-line @next/next/no-img-element
-            icon={<img src={row.icon} alt="" className="h-10 w-10" />}
-            boxed={false}
-            title={row.title}
-            sub={row.sub}
-            trailing={<StatusChip label={row.status} active={row.active} />}
-          />
-        </div>
-      ))}
-    </MenuCard>
+    <div>
+      <p className="mb-2 text-[13.5px] font-bold text-[#0D0D0D]">무드보드</p>
+      <motion.div variants={vibeContainer} initial="hidden" animate="show" className="grid grid-cols-2 gap-2">
+        {items.map((item) => (
+          <motion.div key={item.key} variants={vibeItem} className="relative aspect-square overflow-hidden rounded-[14px]">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={item.src} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 from-[10%] to-transparent to-[60%]" />
+            <span
+              className="absolute left-2 top-2 rounded-[6px] px-1.5 py-0.5 text-[9px] font-bold text-white"
+              style={{ backgroundColor: item.color }}
+            >
+              {item.label}
+            </span>
+            <div className="absolute bottom-2 left-2 right-2">
+              <p className="truncate text-[11px] font-semibold text-white">{item.name}</p>
+              {item.sub && <p className="truncate text-[10px] text-white/85">{item.sub}</p>}
+            </div>
+          </motion.div>
+        ))}
+      </motion.div>
+    </div>
   )
 }
 
-function PreviewNetwork() {
-  return <ScreenshotFrame src="/images/onboarding-guide-screens/network.png" alt="리멤버 네트워크 화면 예시" />
+// SNS — 실제 ProfileSnsSection 재사용 (이지민 Instagram 연동)
+function PreviewSNS() {
+  return (
+    <div className="-mx-5">
+      <ProfileSnsSection
+        instagramConnected
+        linkedinConnected={false}
+        instagram={{ username: JIMIN_PROFILE.instagram.username, profileUrl: JIMIN_PROFILE.instagram.profileUrl }}
+        linkedin={{ profileUrl: '' }}
+      />
+    </div>
+  )
 }
 
+// 연락수단 — 실제 ProfileConnectSection 재사용 (이지민 전화·이메일·카카오)
+function PreviewContact() {
+  return (
+    <div className="-mx-5">
+      <ProfileConnectSection
+        isOwnerMode={false}
+        contactChannels={JIMIN_PROFILE.contactChannels}
+        onRequestFeedback={() => {}}
+        onChannelClick={() => {}}
+      />
+    </div>
+  )
+}
+
+// 네트워크 — 실제 ProfileRememberSection 재사용 (이지민 리멤버 네트워크 통계)
+function PreviewNetwork() {
+  const r = JIMIN_PROFILE.rememberHighlight
+  return (
+    <div className="-mx-5">
+      <ProfileRememberSection
+        total={r.total}
+        industries={r.industries}
+        isLoggedIn={false}
+        isOwner={false}
+        mutualCompanies={r.mutualCompanies}
+        topCompany={r.topCompany}
+        topIndustry={r.topIndustry}
+        topRole={r.topRole}
+      />
+    </div>
+  )
+}
+
+// 피드백 — 실제 ProfileReputationSummarySection + ProfileFeedbackSection 재사용 (이지민 평판·방명록)
 function PreviewFeedback() {
-  return <ScreenshotFrame src="/images/onboarding-guide-screens/feedback.png" alt="평판·피드백 화면 예시" />
+  const keywordCounts = [...JIMIN_PROFILE.reputationKeywords]
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5)
+    .map((item) => ({ keyword: item.keyword, count: item.count }))
+  const totalKeywordCount = keywordCounts.reduce((sum, item) => sum + item.count, 0)
+  const featuredGuestbook = JIMIN_PROFILE.guestbook.slice(0, 3)
+  return (
+    <div className="-mx-5">
+      <ProfileReputationSummarySection keywordCounts={keywordCounts} totalKeywordCount={totalKeywordCount} />
+      <ProfileFeedbackSection
+        profile={{ guestbook: { length: JIMIN_PROFILE.guestbook.length } }}
+        featuredGuestbook={featuredGuestbook}
+        getProfileAvatar={(linkId) => getPublicProfileByUsername(linkId)?.avatarImage ?? ''}
+        onGuestbookEntryClick={() => {}}
+        onOpenGuestbook={() => {}}
+      />
+    </div>
+  )
+}
+
+// 저장한 프로필 — 실제 아카이브 화면과 같은 카드로 하나씩 나타나는 스태거 애니메이션
+const connectContainer = { hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } } }
+const connectItem: Variants = {
+  hidden: { opacity: 0, y: 10 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } },
 }
 
 function PreviewConnect() {
-  return <ScreenshotFrame src="/images/onboarding-guide-screens/connect.png" alt="저장한 프로필 화면 예시" />
+  const profiles = SAMPLE_PROFILE.savedProfiles.slice(0, 4)
+  return (
+    <motion.div
+      variants={connectContainer}
+      initial="hidden"
+      animate="show"
+      className="overflow-hidden rounded-[24px] border-[0.66px] border-[#DEE4EC]"
+    >
+      {profiles.map((p, i) => {
+        const meta = getPublicProfileByUsername(p.linkId)
+        return (
+          <motion.div
+            key={p.id}
+            variants={connectItem}
+            className={['flex flex-col gap-3 px-4 py-4', i < profiles.length - 1 ? 'border-b border-[#DEE4EC]' : ''].join(' ')}
+          >
+            <div className="flex items-center gap-2.5">
+              <Avatar
+                name={p.name}
+                src={meta?.avatarImage}
+                color={meta?.avatarColor}
+                textColor={meta?.avatarImage ? undefined : '#6C7786'}
+                size={44}
+              />
+              <div className="min-w-0">
+                <p className="truncate text-[14px] font-semibold text-[#0D0D0D]">{p.name}</p>
+                {p.title && <p className="truncate text-[12px] font-medium text-[#6C7786]">{p.title}</p>}
+              </div>
+            </div>
+            {p.memo && (
+              <div className="flex items-center rounded-lg bg-[#F0F5FF] py-2.5 pl-3 pr-4">
+                <span className="truncate text-[12px] font-medium text-[#25313D]">{p.memo}</span>
+              </div>
+            )}
+          </motion.div>
+        )
+      })}
+    </motion.div>
+  )
 }
 
 const WELCOME_FEATURES = [
@@ -272,6 +444,25 @@ export function Step9Complete() {
   const [slide, setSlide] = useState(Number.isFinite(initialGuide) ? Math.min(Math.max(initialGuide, 0), TOTAL - 1) : 0)
   const [showIntroText, setShowIntroText] = useState(false)
   const [showIntroPreview, setShowIntroPreview] = useState(false)
+  const scrollRef = useRef<HTMLDivElement>(null)
+
+  // SCRUM-148: 미리보기가 재사용하는 실제 섹션들은 whileInView로 등장 애니메이션을 트리거하는데,
+  // 슬라이드가 이미 화면 안에 있는 채로 마운트되면 최초 교차 판정이 누락되는 경우가 있다.
+  // window를 1px 살짝 흔들어 IntersectionObserver가 다시 판정하게 만든다 — 하이라이트처럼
+  // 마운트 후 토글이 열려 내용이 길어지는 경우까지 잡도록 약간의 지연을 두고 한 번 더 흔든다.
+  useEffect(() => {
+    const nudge = () => {
+      window.scrollBy(0, 1)
+      window.scrollBy(0, -1)
+      scrollRef.current?.dispatchEvent(new Event('scroll'))
+    }
+    const raf = requestAnimationFrame(nudge)
+    const t = setTimeout(nudge, 1100)
+    return () => {
+      cancelAnimationFrame(raf)
+      clearTimeout(t)
+    }
+  }, [slide])
 
   useEffect(() => {
     if (!store.isLoggedIn) {
@@ -310,7 +501,7 @@ export function Step9Complete() {
 
   return (
     <div className="flex flex-1 flex-col min-h-0 px-5 py-7">
-      <div className="flex-1 overflow-y-auto">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto">
         {slide === 0 ? (
           <div className="pt-5">
             <div className={`transition-all duration-500 ${showIntroText ? 'translate-y-0 opacity-100' : 'translate-y-2 opacity-0'}`}>

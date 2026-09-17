@@ -261,8 +261,8 @@ export function PublicProfileLifeSection({
       <div className="flex items-center gap-2 px-5 pb-1 pt-6">
         <span className="text-[18px] font-bold text-[#0D0D0D] shrink-0">무드보드</span>
         {isOwner && onAdd && (
-          <>
-            <div className="h-px flex-1 bg-[#DEE4EC]" aria-hidden />
+          <div className="ml-auto flex items-center gap-2">
+            <div className="h-px w-6 bg-[#DEE4EC]" aria-hidden />
             <button
               type="button"
               onClick={onAdd}
@@ -271,7 +271,7 @@ export function PublicProfileLifeSection({
             >
               <Pencil size={14} />
             </button>
-          </>
+          </div>
         )}
       </div>
       <Collage entries={collage.entries} layout={collage.layout} onOpen={setOpened} />

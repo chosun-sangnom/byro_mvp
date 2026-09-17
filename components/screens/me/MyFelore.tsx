@@ -66,6 +66,7 @@ export default function MyFelore() {
     sectionParam === 'highlight'  ? 'editHighlight'  :
     sectionParam === 'vibe'       ? 'editLife'        :
     sectionParam === 'sns'        ? 'editSNS'         :
+    sectionParam === 'network'    ? 'editNetwork'     :
     sectionParam === 'contact'    ? 'editContact'     :
     sectionParam === 'visibility' ? 'editVisibility'  :
     sectionParam === 'whoiam'     ? 'editWhoIAm'      :
@@ -82,8 +83,14 @@ export default function MyFelore() {
     : [...profile.manualHighlights, ...store.highlights]
   // ── 화면 분기 ──────────────────────────────────────────────
   if (screen === 'preview') {
-    const goEditSection = (key: 'highlight' | 'vibe' | 'whoiam') => {
-      setScreen(key === 'highlight' ? 'editHighlight' : key === 'vibe' ? 'editLife' : 'editWhoIAm')
+    const goEditSection = (key: 'highlight' | 'vibe' | 'whoiam' | 'sns' | 'network') => {
+      setScreen(
+        key === 'highlight' ? 'editHighlight' :
+        key === 'vibe' ? 'editLife' :
+        key === 'whoiam' ? 'editWhoIAm' :
+        key === 'sns' ? 'editSNS' :
+        'editNetwork'
+      )
     }
     return (
       <PublicProfileShell
@@ -94,7 +101,7 @@ export default function MyFelore() {
       >
         {activeTab === 'who' && <PublicProfileWhoTabPage username={user.linkId} onEditSection={goEditSection} />}
         {activeTab === 'vibe' && <PublicProfileLifeTabPage username={user.linkId} onEditSection={goEditSection} />}
-        {activeTab === 'network' && <PublicProfileReputationTabPage username={user.linkId} />}
+        {activeTab === 'network' && <PublicProfileReputationTabPage username={user.linkId} onEditSection={goEditSection} />}
       </PublicProfileShell>
     )
   }

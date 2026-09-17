@@ -78,8 +78,8 @@ function usePublicProfileTabData(username: string) {
   }
 }
 
-/** 프로필 섹션(하이라이트·바이브·성향)이 비어 있을 때 오너가 편집 화면으로 바로 진입 */
-export type ProfileSectionEditKey = 'highlight' | 'vibe' | 'whoiam'
+/** 프로필 섹션(하이라이트·바이브·성향·SNS·리멤버)의 편집 화면으로 바로 진입 */
+export type ProfileSectionEditKey = 'highlight' | 'vibe' | 'whoiam' | 'sns' | 'network'
 
 function LockedTabContent() {
   return (
@@ -148,6 +148,8 @@ export function PublicProfileWhoTabPage({
         linkedin={profile.linkedin}
         youtube={profile.youtube}
         tiktok={profile.tiktok}
+        isOwner={isOwner}
+        onEdit={onEditSection && (() => onEditSection('sns'))}
       />
     </>
   )
@@ -185,8 +187,10 @@ export function PublicProfileLifeTabPage({
 
 export function PublicProfileReputationTabPage({
   username,
+  onEditSection,
 }: {
   username: string
+  onEditSection?: (key: ProfileSectionEditKey) => void
 }) {
   const router = useRouter()
   const { store, profile, keywordCounts, totalKeywordCount, featuredGuestbook, tabAccess } = usePublicProfileTabData(username)
@@ -220,6 +224,7 @@ export function PublicProfileReputationTabPage({
         topCompany={profile.rememberHighlight.topCompany}
         topIndustry={profile.rememberHighlight.topIndustry}
         topRole={profile.rememberHighlight.topRole}
+        onEdit={onEditSection && (() => onEditSection('network'))}
       />
       <ProfileReputationSummarySection
         keywordCounts={keywordCounts}

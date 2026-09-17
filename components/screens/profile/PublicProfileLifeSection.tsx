@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion, type Variants } from 'framer-motion'
+import { Pencil } from 'lucide-react'
 import { BottomSheet } from '@/components/ui'
 import type { PublicProfileLife } from '@/types'
 import { ProfileEmptyAddBlock } from '@/components/screens/profile/ProfileEmptyAddBlock'
@@ -257,8 +258,18 @@ export function PublicProfileLifeSection({
 
   return (
     <div className="pb-32 pt-2">
-      <div className="px-5 pb-1 pt-6">
+      <div className="flex items-center justify-between gap-2 px-5 pb-1 pt-6">
         <span className="text-[18px] font-bold text-[#0D0D0D]">무드보드</span>
+        {isOwner && onAdd && (
+          <button
+            type="button"
+            onClick={onAdd}
+            aria-label="바이브 편집"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[#A8B1BD] active:bg-[#F5F6F7]"
+          >
+            <Pencil size={14} />
+          </button>
+        )}
       </div>
       <Collage entries={collage.entries} layout={collage.layout} onOpen={setOpened} />
 

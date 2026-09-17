@@ -2,7 +2,7 @@
 
 import { type ReactNode } from 'react'
 import { motion } from 'framer-motion'
-import { ChevronRight, Lock } from 'lucide-react'
+import { ChevronRight, Lock, Pencil } from 'lucide-react'
 import type { ContactChannel, Experience, RememberTopValue } from '@/types'
 
 const SECTION_EASE = [0.22, 1, 0.36, 1] as const
@@ -34,13 +34,28 @@ type KeywordCount = {
 export function SectionTitle({
   title,
   subtitle,
+  onEdit,
 }: {
   title: string
   subtitle?: string
+  /** 오너 전용 — 섹션에 내용이 있을 때 타이틀 옆에 노출되는 편집 진입점 */
+  onEdit?: () => void
 }) {
   return (
     <div className="mb-4">
-      <div className="text-[18px] font-bold text-[#0D0D0D]">{title}</div>
+      <div className="flex items-center justify-between gap-2">
+        <div className="text-[18px] font-bold text-[#0D0D0D]">{title}</div>
+        {onEdit && (
+          <button
+            type="button"
+            onClick={onEdit}
+            aria-label={`${title} 편집`}
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[#A8B1BD] active:bg-[#F5F6F7]"
+          >
+            <Pencil size={14} />
+          </button>
+        )}
+      </div>
       {subtitle && <div className="mt-1 text-[14px] text-[#6C7786]">{subtitle}</div>}
     </div>
   )
@@ -306,6 +321,7 @@ export function ProfileRememberSection({
   topIndustry,
   topRole,
   hidePersonalizedNudge,
+  onEdit,
 }: {
   total: number
   industries: Array<{ name: string; ratio: number; count?: number }>
@@ -319,6 +335,8 @@ export function ProfileRememberSection({
   topRole?: RememberTopValue
   /** 온보딩 가이드 데모 전용 — "로그인하면 맞춤 인사이트를 볼 수 있어요" 블러 넛지 숨김 */
   hidePersonalizedNudge?: boolean
+  /** 오너 전용 — 리멤버 네트워크에 내용이 있을 때 타이틀 옆 편집 진입점 */
+  onEdit?: () => void
 }) {
   const topValueRows = [
     { label: '회사', value: topCompany },
@@ -357,6 +375,7 @@ export function ProfileRememberSection({
       <SectionTitle
         title="리멤버 네트워크"
         subtitle={isEmpty ? undefined : `지금까지 ${total.toLocaleString()}명을 리멤버했어요`}
+        onEdit={!isEmpty && isOwner ? onEdit : undefined}
       />
 
       {isEmpty ? (

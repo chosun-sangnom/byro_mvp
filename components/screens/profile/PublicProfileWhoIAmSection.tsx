@@ -58,6 +58,7 @@ export function PublicProfileWhoIAmSection({
       <SectionTitle
         title="나"
         subtitle="MBTI와 생활감 있는 정보로 프로필의 기본 결을 정리합니다."
+        onEdit={!isEmpty && isOwner ? onAdd : undefined}
       />
       {isEmpty ? (
         <ProfileEmptyAddBlock label="성향 정보가" onAdd={onAdd!} />

@@ -44,7 +44,7 @@ export default function UserProfilePage({ params }: { params: { username: string
     >
       {activeTab === 'who' && <PublicProfileWhoTabPage username={params.username} onEditSection={goEditSection} />}
       {activeTab === 'vibe' && <PublicProfileLifeTabPage username={params.username} onEditSection={goEditSection} />}
-      {activeTab === 'network' && <PublicProfileReputationTabPage username={params.username} />}
+      {activeTab === 'network' && <PublicProfileReputationTabPage username={params.username} onEditSection={goEditSection} />}
     </PublicProfileShell>
   )
 }

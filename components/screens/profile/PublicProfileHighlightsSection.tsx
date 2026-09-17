@@ -78,7 +78,7 @@ export function ProfileHighlightsSection({
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06}>
       <VerifiedBadgeGradientDefs />
-      <SectionTitle title="하이라이트" />
+      <SectionTitle title="하이라이트" onEdit={isOwner ? onAdd : undefined} />
       <div className="space-y-5">
         {groupedHighlights.map((group) => (
           <div key={group.id}>

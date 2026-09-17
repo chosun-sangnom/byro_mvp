@@ -31,6 +31,8 @@ export function ProfileSnsSection({
   tiktok,
   revealOnMount,
   hideArrowIcon,
+  isOwner,
+  onEdit,
 }: {
   instagramConnected: boolean
   linkedinConnected: boolean
@@ -44,6 +46,9 @@ export function ProfileSnsSection({
   revealOnMount?: boolean
   /** 온보딩 가이드 데모 전용 — 바로가기(외부 링크) 아이콘 숨김 */
   hideArrowIcon?: boolean
+  isOwner?: boolean
+  /** 오너 전용 — SNS에 연결된 계정이 있을 때 타이틀 옆 편집 진입점 */
+  onEdit?: () => void
 }) {
   const items: SnsItem[] = [
     instagramConnected && {
@@ -82,7 +87,7 @@ export function ProfileSnsSection({
 
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" revealOnMount={revealOnMount}>
-      <SectionTitle title="SNS" />
+      <SectionTitle title="SNS" onEdit={isOwner ? onEdit : undefined} />
       <motion.div
         className="divide-y divide-[var(--color-border-soft)]"
         variants={revealOnMount ? snsListContainerSlow : snsListContainer}

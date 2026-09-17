@@ -262,7 +262,7 @@ export function PublicProfileLifeSection({
         <span className="text-[18px] font-bold text-[#0D0D0D] shrink-0">무드보드</span>
         {isOwner && onAdd && (
           <div className="ml-auto flex items-center gap-2">
-            <div className="h-px w-6 bg-[#DEE4EC]" aria-hidden />
+            <div className="h-px w-12 bg-[#DEE4EC]" aria-hidden />
             <button
               type="button"
               onClick={onAdd}

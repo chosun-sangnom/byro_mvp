@@ -43,17 +43,20 @@ export function SectionTitle({
 }) {
   return (
     <div className="mb-4">
-      <div className="flex items-center justify-between gap-2">
-        <div className="text-[18px] font-bold text-[#0D0D0D]">{title}</div>
+      <div className="flex items-center gap-2">
+        <div className="text-[18px] font-bold text-[#0D0D0D] shrink-0">{title}</div>
         {onEdit && (
-          <button
-            type="button"
-            onClick={onEdit}
-            aria-label={`${title} 편집`}
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[#A8B1BD] active:bg-[#F5F6F7]"
-          >
-            <Pencil size={14} />
-          </button>
+          <>
+            <div className="h-px flex-1 bg-[#DEE4EC]" aria-hidden />
+            <button
+              type="button"
+              onClick={onEdit}
+              aria-label={`${title} 편집`}
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[#A8B1BD] active:bg-[#F5F6F7]"
+            >
+              <Pencil size={14} />
+            </button>
+          </>
         )}
       </div>
       {subtitle && <div className="mt-1 text-[14px] text-[#6C7786]">{subtitle}</div>}

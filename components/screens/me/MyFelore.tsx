@@ -46,7 +46,15 @@ export default function MyFelore() {
   // returnTo를 무시하고 항상 manage 허브로 돌아감. returnTo 자체는 값을 바꾸지
   // 않고 유지하므로, 허브로 돌아온 뒤 허브 자체의 뒤로가기는 여전히 정상 동작함
   const returnTo = searchParams.get('returnTo')
+  // 프로필 미리보기(preview)에서 섹션 타이틀 옆 연필 버튼으로 바로 들어온 경우,
+  // 뒤로가기는 manage 허브가 아니라 곧장 미리보기로 돌아가야 함
+  const cameFromPreviewRef = useRef(false)
   const handleBackToManage = () => {
+    if (cameFromPreviewRef.current) {
+      cameFromPreviewRef.current = false
+      setScreen('preview')
+      return
+    }
     if (returnTo && screen === initialScreenRef.current) {
       router.replace(returnTo)
       return
@@ -84,6 +92,7 @@ export default function MyFelore() {
   // ── 화면 분기 ──────────────────────────────────────────────
   if (screen === 'preview') {
     const goEditSection = (key: 'highlight' | 'vibe' | 'whoiam' | 'sns' | 'network') => {
+      cameFromPreviewRef.current = true
       setScreen(
         key === 'highlight' ? 'editHighlight' :
         key === 'vibe' ? 'editLife' :

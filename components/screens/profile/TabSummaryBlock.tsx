@@ -34,7 +34,7 @@ export function TabSummaryBlock({
 
   return (
     <div className="px-5 pt-4">
-      <div className="rounded-[16px] bg-[#F5F6F7] px-4 py-3">
+      <div className="rounded-[16px] border border-[#DEE4EC] bg-white px-4 py-3">
         <div className="flex items-start gap-2">
           <p className="flex-1 text-[14px] font-semibold leading-[1.5] text-[#0D0D0D]">{text}</p>
           {isOwner && (
@@ -42,17 +42,22 @@ export function TabSummaryBlock({
               type="button"
               onClick={openEditor}
               aria-label="한 줄 요약 편집"
-              className="-mr-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[#A8B1BD] active:bg-white"
+              className="-mr-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[#A8B1BD] active:bg-[#F5F6F7]"
             >
               <Pencil size={13} />
             </button>
           )}
         </div>
         {isOwner && !summary && (
-          <p className="mt-1 flex items-center gap-1 text-[11px] font-medium text-[#A8B1BD]">
-            <Sparkles size={10} />
-            AI가 자동으로 요약했어요
-          </p>
+          <div className="mt-1.5 flex items-center gap-1">
+            <span
+              className="flex shrink-0 items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[10px] font-medium text-white"
+              style={{ backgroundImage: 'linear-gradient(110deg, #0088FF 0%, #34C759 100%)' }}
+            >
+              <Sparkles size={9} />AI
+            </span>
+            <span className="text-[11px] font-medium text-[#A8B1BD]">자동으로 요약했어요</span>
+          </div>
         )}
       </div>
 

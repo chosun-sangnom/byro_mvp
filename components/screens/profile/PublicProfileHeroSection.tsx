@@ -6,7 +6,10 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { BadgeCheck, Bookmark, BookmarkCheck, Check, ChevronLeft, ChevronRight, MessageCircle, Pencil, Share2, Sparkles, X } from 'lucide-react'
 import { ActionMenu, ActionMenuItem, BottomSheet, TextArea, showToast } from '@/components/ui'
 import { shareOrCopy } from '@/lib/share'
+import { useFeloreStore } from '@/store/useFeloreStore'
 import type { PersonaReason } from '@/lib/personaGen'
+
+const CUSTOM_LINK_ID_REGEX = /^[a-z0-9_]{2,20}$/
 
 type HeroTheme = {
   cover: string
@@ -251,6 +254,34 @@ export function ProfileHeroCard({
   const [personaSheetOpen, setPersonaSheetOpen] = useState(false)
   const [personaSharing, setPersonaSharing] = useState(false)
   const personaCardRef = useRef<HTMLDivElement>(null)
+
+  const store = useFeloreStore()
+  const [linkEditSheetOpen, setLinkEditSheetOpen] = useState(false)
+  const [customLinkInput, setCustomLinkInput] = useState('')
+  const [customLinkError, setCustomLinkError] = useState(false)
+  const randomLinkId = store.user?.randomLinkId ?? store.user?.linkId ?? profile.linkId ?? ''
+
+  const handleOpenLinkEdit = () => {
+    if (!profile.isPaidUser) {
+      showToast('유료 플랜에서만 사용할 수 있는 기능이에요.', 'error')
+      return
+    }
+    setCustomLinkInput(store.user?.customLinkId ?? '')
+    setCustomLinkError(false)
+    setLinkEditSheetOpen(true)
+  }
+
+  const handleSaveCustomLinkId = () => {
+    const trimmed = customLinkInput.trim().toLowerCase()
+    if (trimmed && !CUSTOM_LINK_ID_REGEX.test(trimmed)) {
+      setCustomLinkError(true)
+      return
+    }
+    setCustomLinkError(false)
+    store.setCustomLinkId(trimmed || null)
+    setLinkEditSheetOpen(false)
+    showToast(trimmed ? '링크가 변경됐어요!' : '기본 링크로 복원했어요')
+  }
 
   const handlePersonaShare = async () => {
     if (!personaCardRef.current || personaSharing) return
@@ -618,10 +649,95 @@ export function ProfileHeroCard({
             )
           )}
 
-          <div className="mt-2.5 text-[11px] font-semibold text-white/38">
-            felore.io/{profile.linkId}
+          <div className="mt-2.5 flex items-center gap-1">
+            <span className="text-[11px] font-semibold text-white/38">
+              felore.io/{profile.linkId}
+            </span>
+            {isOwner && (
+              <button
+                type="button"
+                onClick={handleOpenLinkEdit}
+                className="flex h-4 w-4 items-center justify-center text-white/38 active:opacity-60"
+                aria-label="프로필 링크 편집"
+              >
+                <Pencil size={11} />
+              </button>
+            )}
           </div>
         </div>
+
+        {isOwner && createPortal(
+          <BottomSheet
+            open={linkEditSheetOpen}
+            onClose={() => { setLinkEditSheetOpen(false); setCustomLinkError(false) }}
+          >
+          <div className="flex flex-col gap-6 px-4 pb-6 pt-3">
+            <div className="flex flex-col gap-2 w-full">
+              <p className="text-[18px] font-bold text-[#0D0D0D]">프로필 링크 편집</p>
+              <p className="text-[14px] font-medium leading-[1.5] text-[#475058]">
+                나만의 링크를 설정하면 felore.io/내이름 형태로 프로필을 공유할 수 있어요. 유료 이용 종료 시 기본 링크로 자동 복원돼요.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2 w-full">
+              <p className="text-[14px] font-semibold text-[#0D0D0D]">
+                기본 링크<span className="text-[#6C7786]">(변경 불가)</span>
+              </p>
+              <div className="flex items-center gap-2.5 rounded-full border border-[#DEE4EC] bg-[#F5F6F7] px-4 py-3">
+                <span className="text-[14px] font-medium text-[#A8B1BD]">felore.io/{randomLinkId}</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2 w-full">
+              <p className="text-[14px] font-semibold text-[#0D0D0D]">커스텀 링크</p>
+              <div
+                className={[
+                  'flex items-center gap-2.5 rounded-full border bg-white px-4 py-3',
+                  customLinkError ? 'border-[#FF4242]' : 'border-[#DEE4EC]',
+                ].join(' ')}
+              >
+                <span className="text-[14px] font-medium text-[#A8B1BD] flex-shrink-0">felore.io/</span>
+                <input
+                  type="text"
+                  value={customLinkInput}
+                  onChange={(e) => { setCustomLinkInput(e.target.value.toLowerCase()); setCustomLinkError(false) }}
+                  placeholder="예: gangminjun"
+                  maxLength={20}
+                  className="flex-1 min-w-0 bg-transparent text-[14px] font-medium text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
+                />
+              </div>
+              {customLinkError && (
+                <p className="text-[12px] font-medium text-[#FF4242]">올바른 커스텀 링크 형식을 입력해주세요.</p>
+              )}
+              <p className="text-[12px] font-medium text-[#6C7786]">영문 소문자, 숫자, _만 사용, 2~20자</p>
+            </div>
+
+            <div className="flex items-start gap-2 w-full">
+              <button
+                onClick={() => { setLinkEditSheetOpen(false); setCustomLinkError(false) }}
+                className="flex-1 rounded-full border border-[#DEE4EC] px-6 py-3 text-[14px] font-bold text-[#25313D]"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleSaveCustomLinkId}
+                className="flex-1 rounded-full bg-black px-6 py-3 text-[14px] font-bold text-white"
+              >
+                저장
+              </button>
+            </div>
+            {store.user?.customLinkId && (
+              <button
+                onClick={() => { store.setCustomLinkId(null); setCustomLinkInput(''); setCustomLinkError(false); setLinkEditSheetOpen(false); showToast('기본 링크로 복원했어요') }}
+                className="-mt-2 w-full text-center text-[13px] font-medium text-[#A8B1BD]"
+              >
+                기본 링크로 복원
+              </button>
+            )}
+          </div>
+          </BottomSheet>,
+          document.body
+        )}
       </div>
   )
 }

@@ -34,11 +34,9 @@ export default function AppHeader() {
   return (
     <>
       <header className="flex items-center justify-between px-5 h-14 bg-[var(--color-bg-page)] border-b border-[var(--color-border-soft)] flex-shrink-0">
-        <button
-          onClick={() => router.push('/')}
-          className="text-[18px] font-black tracking-tight text-[var(--color-text-strong)]"
-        >
-          Felore
+        <button onClick={() => router.push('/')} aria-label="Felore">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/brand/felore-wordmark.svg" alt="Felore" className="h-[18px] w-auto" />
         </button>
 
         <div className="flex items-center gap-1">

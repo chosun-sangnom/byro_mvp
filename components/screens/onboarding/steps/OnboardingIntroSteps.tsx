@@ -692,7 +692,8 @@ export function Step1Login({
     <>
       <div className="flex flex-1 flex-col min-h-0 px-5">
         <div className="flex flex-col items-center pt-16 text-center">
-          <div className="text-4xl font-black tracking-tight">Felore</div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/brand/felore-wordmark.svg" alt="Felore" className="h-9 w-auto" />
           <div className="meta-text mt-3">가장 나다운 네트워킹의 시작, 펠로어</div>
         </div>
         <div className="flex-1" />

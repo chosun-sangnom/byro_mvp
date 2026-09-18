@@ -21,7 +21,8 @@ interface HighlightFormValues {
   hlDesc: string
   isCareerRole: boolean
   isEducationHistory: boolean
-  isPublish: boolean
+  isActivity: boolean
+  isAchievement: boolean
   educationNeedsDegree: boolean
   educationNeedsMajor: boolean
   yearPickerTarget: YearPickerTarget | null
@@ -172,7 +173,8 @@ export function HighlightManageFormView({
     hlDesc,
     isCareerRole,
     isEducationHistory,
-    isPublish,
+    isActivity,
+    isAchievement,
     educationNeedsDegree,
     educationNeedsMajor,
     yearPickerTarget,
@@ -269,10 +271,10 @@ export function HighlightManageFormView({
             />
           </div>
 
-          {isPublish && (
+          {(isActivity || isAchievement) && (
             <div>
-              <FieldLabel label="출판사 또는 매체명" />
-              <TextField value={hlSourceLabel} onChange={setHlSourceLabel} placeholder="출판사 또는 매체명" maxLength={30} />
+              <FieldLabel label="기관 · 매체명" />
+              <TextField value={hlSourceLabel} onChange={setHlSourceLabel} placeholder="예: OO일보, OO협회, OO컨퍼런스" maxLength={30} />
             </div>
           )}
 
@@ -340,14 +342,14 @@ export function HighlightManageFormView({
             </div>
           )}
 
-          {isPublish && (
+          {(isActivity || isAchievement) && (
             <div>
               <FieldLabel label="연도" required />
               <YearField value={hlEducationYear} placeholder="YYYY." onClick={() => setYearPickerTarget('education-year')} />
             </div>
           )}
 
-          {isPublish && (
+          {(isActivity || isAchievement) && (
             <div>
               <FieldLabel label="관련 링크" />
               <TextField value={hlLinkUrl} onChange={setHlLinkUrl} placeholder="기사, 특허, 출판물 등의 링크" />
@@ -364,9 +366,11 @@ export function HighlightManageFormView({
                   placeholder={
                     isCareerRole
                       ? '어떤 일을 했는지 적어주세요.'
-                      : isPublish
-                        ? '어떤 출판·기고·특허인지 적어주세요.'
-                        : '어떤 경험인지 간단히 적어주세요.'
+                      : isAchievement
+                        ? '어떤 수상 · 자격증 · 출판 · 특허인지 적어주세요.'
+                        : isActivity
+                          ? '어떤 활동인지 적어주세요.'
+                          : '어떤 경험인지 간단히 적어주세요.'
                   }
                   maxLength={150}
                   rows={4}

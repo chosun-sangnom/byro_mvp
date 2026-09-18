@@ -1,4 +1,21 @@
+import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
 import type { Highlight } from '@/types'
+
+export interface HighlightSection {
+  categoryId: Highlight['categoryId']
+  label: string
+  items: Highlight[]
+}
+
+export function buildHighlightSections(manualHighlights: Highlight[]): HighlightSection[] {
+  return HIGHLIGHT_CATEGORIES
+    .map((category) => ({
+      categoryId: category.id,
+      label: category.label,
+      items: manualHighlights.filter((item) => item.categoryId === category.id),
+    }))
+    .filter((section) => section.items.length > 0)
+}
 
 export function isPrimaryHighlight(highlight: Highlight, overrideId?: string): boolean {
   if (overrideId) return highlight.id === overrideId
@@ -23,10 +40,10 @@ export function getHighlightMetaParts(highlight: Highlight): string[] {
       return [role, status, year].filter(Boolean)
     case 'education-history':
       return [role, degree !== '해당없음' ? degree : '', status, year].filter(Boolean)
-    case 'publish':
+    case 'activity':
       return [sourceLabel, year].filter(Boolean)
-    case 'award':
-      return [issuer, year].filter(Boolean)
+    case 'achievement':
+      return [sourceLabel || issuer, year].filter(Boolean)
     default:
       return [role, degree !== '해당없음' ? degree : '', status, year].filter(Boolean)
   }

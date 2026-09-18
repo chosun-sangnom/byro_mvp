@@ -2,12 +2,12 @@ import { ChevronRight, Zap } from 'lucide-react'
 import { NavBar, Button } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import type { HighlightIconId } from '@/types'
-import type { HighlightCategoryCardGroup, HighlightManageCategory } from './constants'
+import type { HighlightCategorySection, HighlightManageCategory } from './constants'
 
 const HIGHLIGHT_FREE_LIMIT = 3
 
 interface HighlightManageListViewProps {
-  groupedCategoryCards: HighlightCategoryCardGroup[]
+  categorySections: HighlightCategorySection[]
   onBack: () => void
   onOpenCategory: (category: HighlightManageCategory) => void
   onOpenPicker: () => void
@@ -19,7 +19,7 @@ interface HighlightManageListViewProps {
 }
 
 export function HighlightManageListView({
-  groupedCategoryCards,
+  categorySections,
   onBack,
   onOpenCategory,
   onOpenPicker,
@@ -54,7 +54,7 @@ export function HighlightManageListView({
       )}
 
       <div className="flex-1 overflow-y-auto px-5 py-4 pb-4">
-        <div className="flex flex-col gap-9">
+        <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-5 rounded-[24px] border border-[#DEE4EC] p-4">
             <div className="flex flex-col gap-1">
               <p className="text-[16px] font-bold text-[#0D0D0D]">하이라이트 관리</p>
@@ -81,41 +81,36 @@ export function HighlightManageListView({
             </button>
           </div>
 
-          {groupedCategoryCards.map((group) => (
-            <div key={group.id} className="flex flex-col gap-3">
-              <p className="text-[16px] font-bold text-[#0D0D0D]">{group.label}</p>
-              {group.items.length > 0 ? (
-                <div className="overflow-hidden rounded-[24px] border border-[#DEE4EC] px-4">
-                  {group.items.map((entry, index) => (
-                    <button
-                      key={`${entry.category.id}-${group.id}`}
-                      onClick={() => onOpenCategory(entry.category)}
-                      className={[
-                        'flex w-full items-center gap-5 py-4 text-left',
-                        index < group.items.length - 1 ? 'border-b border-[#DEE4EC]' : '',
-                      ].join(' ')}
-                    >
-                      <span className="flex size-10 shrink-0 items-center justify-center text-[#0D0D0D]">
-                        <HighlightIcon id={entry.category.icon as HighlightIconId} size={22} />
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[12px] font-semibold text-[#475058]">{entry.category.label}</p>
-                        <p className="mt-0.5 truncate text-[14px] font-semibold text-[#0D0D0D]">{entry.title}</p>
-                        <p className="mt-0.5 text-[12px] leading-[1.5] text-[#6C7786]">
-                          {entry.meta} <span className="font-semibold text-[#25313D]">{entry.countLabel}</span>
-                        </p>
-                      </div>
-                      <ChevronRight size={24} className="shrink-0 text-[#A8B1BD]" />
-                    </button>
-                  ))}
+          <div className="overflow-hidden rounded-[24px] border border-[#DEE4EC] px-4">
+            {categorySections.map((section, index) => (
+              <button
+                key={section.category.id}
+                onClick={() => onOpenCategory(section.category)}
+                className={[
+                  'flex w-full items-center gap-4 py-4 text-left',
+                  index < categorySections.length - 1 ? 'border-b border-[#DEE4EC]' : '',
+                ].join(' ')}
+              >
+                <span className="flex size-9 shrink-0 items-center justify-center text-[#25313D]">
+                  <HighlightIcon id={section.category.icon as HighlightIconId} size={20} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[12px] font-semibold text-[#475058]">{section.category.label}</p>
+                  {section.card ? (
+                    <>
+                      <p className="mt-0.5 truncate text-[14px] font-semibold text-[#0D0D0D]">{section.card.title}</p>
+                      <p className="mt-0.5 text-[12px] leading-[1.5] text-[#6C7786]">
+                        {section.card.meta} <span className="font-semibold text-[#25313D]">{section.card.countLabel}</span>
+                      </p>
+                    </>
+                  ) : (
+                    <p className="mt-0.5 text-[13px] text-[#A8B1BD]">아직 추가한 항목이 없어요</p>
+                  )}
                 </div>
-              ) : (
-                <div className="rounded-[24px] border border-dashed border-[#DEE4EC] px-4 py-10 text-center text-[13px] text-[#A8B1BD]">
-                  아직 {group.label.toLowerCase()} 하이라이트가 없어요
-                </div>
-              )}
-            </div>
-          ))}
+                <ChevronRight size={20} className="shrink-0 text-[#A8B1BD]" />
+              </button>
+            ))}
+          </div>
         </div>
 
         {!isPro && (

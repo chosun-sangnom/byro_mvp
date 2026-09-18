@@ -3,7 +3,7 @@
 import { Lock } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useFeloreStore } from '@/store/useFeloreStore'
-import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
+import { buildHighlightSections } from '@/lib/highlightMeta'
 
 
 import { getNormalizedPublicProfile, computeTabAccess } from '@/components/screens/profile/publicProfileData'
@@ -37,24 +37,7 @@ function usePublicProfileTabData(username: string) {
     network: computeTabAccess(profile.tabVisibility, 'network', tabAccessCtx),
   }
 
-  const groupedHighlights = HIGHLIGHT_GROUPS.map((group) => {
-    const manualItems = profile.manualHighlights.filter(
-      (item) => HIGHLIGHT_CATEGORIES.find((category) => category.id === item.categoryId)?.group === group.id,
-    )
-
-    const manualGroups = Array.from(new Map(
-      manualItems.map((item) => [item.categoryId, manualItems.filter((manual) => manual.categoryId === item.categoryId)]),
-    ).entries()).map(([categoryId, items]) => ({
-      kind: 'manual-group' as const,
-      categoryId,
-      items,
-    }))
-
-    return {
-      ...group,
-      items: manualGroups,
-    }
-  }).filter((group) => group.items.length > 0)
+  const highlightSections = buildHighlightSections(profile.manualHighlights)
 
   const keywordCounts = [...profile.reputationKeywords]
     .sort((a, b) => b.count - a.count)
@@ -70,7 +53,7 @@ function usePublicProfileTabData(username: string) {
     store,
     profile,
     isOwner: isOwnerMode,
-    groupedHighlights,
+    highlightSections,
     keywordCounts,
     totalKeywordCount,
     featuredGuestbook,
@@ -110,7 +93,7 @@ export function PublicProfileWhoTabPage({
   username: string
   onEditSection?: (key: ProfileSectionEditKey) => void
 }) {
-  const { store, profile, isOwner, groupedHighlights, tabAccess } = usePublicProfileTabData(username)
+  const { store, profile, isOwner, highlightSections, tabAccess } = usePublicProfileTabData(username)
 
   if (tabAccess.who !== 'visible') {
     return <LockedTabContent />
@@ -131,7 +114,7 @@ export function PublicProfileWhoTabPage({
         onAdd={onEditSection && (() => onEditSection('whoiam'))}
       />
       <ProfileHighlightsSection
-        groupedHighlights={groupedHighlights}
+        highlightSections={highlightSections}
         username={username}
         primaryHighlightOverrides={store.primaryHighlightOverrides}
         getHighlightOpen={(key) => store.hlOpenStates[key] ?? false}

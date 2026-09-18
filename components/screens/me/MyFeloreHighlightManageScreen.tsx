@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { showToast } from '@/components/ui'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import type { Highlight, HighlightIconId } from '@/types'
-import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
+import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
 import { getGroupedHighlightPreview, sortHighlightsByPrimary } from '@/lib/highlightMeta'
 import { HighlightManageCategoryView } from '@/components/screens/me/highlight-manage/HighlightManageCategoryView'
@@ -15,7 +15,7 @@ import { HighlightManagePickerView } from '@/components/screens/me/highlight-man
 import { HighlightManageVerifyView } from '@/components/screens/me/highlight-manage/HighlightManageVerifyView'
 import { HighlightLlmImportSheet } from '@/components/screens/me/highlight-manage/HighlightLlmImportSheet'
 import {
-  type HighlightCategoryCardGroup,
+  type HighlightCategorySection,
   type HighlightManageCategory,
   type HighlightManageMode,
   type YearPickerTarget,
@@ -65,7 +65,8 @@ export function HighlightManageScreen({
 
   const isCareerRole = selectedCat?.id === 'career-role'
   const isEducationHistory = selectedCat?.id === 'education-history'
-  const isPublish = selectedCat?.id === 'publish'
+  const isActivity = selectedCat?.id === 'activity'
+  const isAchievement = selectedCat?.id === 'achievement'
   const educationNeedsDegree = hlSchoolType === '대학교' || hlSchoolType === '대학원'
   const educationNeedsMajor = hlSchoolType !== '고등학교'
   const currentYear = new Date().getFullYear()
@@ -78,7 +79,7 @@ export function HighlightManageScreen({
   const selectedCategoryHighlights = selectedCat
     ? allManualHighlights.filter((item) => item.categoryId === selectedCat.id)
     : []
-  const groupedCategoryCards = buildGroupedCategoryCards(allManualHighlights, store.primaryHighlightOverrides)
+  const categorySections = buildCategorySections(allManualHighlights, store.primaryHighlightOverrides)
   const freeRemaining = Math.max(0, HIGHLIGHT_FREE_LIMIT - allManualHighlights.length)
   const saveDisabled = !selectedCat
     || !hlTitle.trim()
@@ -244,8 +245,8 @@ export function HighlightManageScreen({
           ? `${hlEducationStartYear} - ${hlStatus === '재학' ? '현재' : hlEducationEndYear}`
           : hlEducationYear,
       metadata,
-      sourceLabel: isPublish ? hlSourceLabel.trim() : undefined,
-      linkUrl: isPublish && hlLinkUrl.trim() ? hlLinkUrl.trim() : undefined,
+      sourceLabel: (isActivity || isAchievement) ? hlSourceLabel.trim() : undefined,
+      linkUrl: (isActivity || isAchievement) && hlLinkUrl.trim() ? hlLinkUrl.trim() : undefined,
     }
 
     if (editingHl && store.highlights.some((highlight) => highlight.id === editingHl.id)) {
@@ -320,7 +321,8 @@ export function HighlightManageScreen({
           hlDesc,
           isCareerRole,
           isEducationHistory,
-          isPublish,
+          isActivity,
+          isAchievement,
           educationNeedsDegree,
           educationNeedsMajor,
           yearPickerTarget,
@@ -364,7 +366,7 @@ export function HighlightManageScreen({
   return (
     <>
       <HighlightManageListView
-        groupedCategoryCards={groupedCategoryCards}
+        categorySections={categorySections}
         onBack={onBack}
         onOpenCategory={openCategory}
         onOpenPicker={() => {
@@ -387,31 +389,27 @@ export function HighlightManageScreen({
   )
 }
 
-function buildGroupedCategoryCards(
+function buildCategorySections(
   allManualHighlights: Highlight[],
   primaryHighlightOverrides: Record<string, string>,
-): HighlightCategoryCardGroup[] {
-  return HIGHLIGHT_GROUPS.map((group) => ({
-    ...group,
-    items: HIGHLIGHT_CATEGORIES
-      .filter((category) => category.group === group.id)
-      .map((category) => {
-        const items = sortHighlightsByPrimary(
-          allManualHighlights.filter((item) => item.categoryId === category.id),
-          primaryHighlightOverrides[category.id],
-        )
-        return { category, items }
-      })
-      .filter(({ items }) => items.length > 0)
-      .map(({ category, items }) => {
-        const preview = getGroupedHighlightPreview(items, primaryHighlightOverrides[category.id])
-        return {
-          kind: 'manual' as const,
-          category,
-          title: preview.title,
-          meta: preview.meta,
-          countLabel: `${items.length}개 항목`,
-        }
-      }),
-  }))
+): HighlightCategorySection[] {
+  return HIGHLIGHT_CATEGORIES.map((category) => {
+    const items = sortHighlightsByPrimary(
+      allManualHighlights.filter((item) => item.categoryId === category.id),
+      primaryHighlightOverrides[category.id],
+    )
+    if (items.length === 0) {
+      return { category, card: null }
+    }
+    const preview = getGroupedHighlightPreview(items, primaryHighlightOverrides[category.id])
+    return {
+      category,
+      card: {
+        category,
+        title: preview.title,
+        meta: preview.meta,
+        countLabel: `${items.length}개 항목`,
+      },
+    }
+  })
 }

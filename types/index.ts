@@ -12,16 +12,11 @@ export type HighlightIconId =
   | 'pencil'
   | 'badge-check'
 
-export type HighlightGroupId = 'career' | 'achievement' | 'lifestyle'
-
 export type HighlightCategoryId =
   | 'career-role'
   | 'education-history'
-  | 'talk'
-  | 'collab'
-  | 'publish'
-  | 'award'
-  | 'volunteer'
+  | 'activity'
+  | 'achievement'
 
 export type OnboardingStep = 'login' | 'verify' | 'basicinfo' | 'profile' | 'complete'
 

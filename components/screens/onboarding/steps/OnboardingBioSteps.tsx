@@ -6,7 +6,7 @@ import { AnimatePresence, motion, type Variants } from 'framer-motion'
 import { Images, Network, UserSearch } from 'lucide-react'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { Button } from '@/components/ui'
-import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
+import { buildHighlightSections } from '@/lib/highlightMeta'
 import { JIMIN_PROFILE, SAMPLE_PROFILE, getPublicProfileByUsername } from '@/lib/mocks/publicProfiles'
 import {
   ContactActionButton,
@@ -21,25 +21,9 @@ import { ProfileHeroCard } from '@/components/screens/profile/PublicProfileHeroS
 import { PublicProfileWhoIAmSection } from '@/components/screens/profile/PublicProfileWhoIAmSection'
 import { SavedProfileRow } from '@/components/screens/archive/Archive'
 import { flattenVibe } from '@/lib/vibeItems'
-import type { Highlight } from '@/types'
 
 // SCRUM-148: 온보딩 가이드 미리보기는 이지민(/jiminlee) 실제 목업 데이터를 그대로 써서
 // 실제 서비스 화면과 같은 컴포넌트를 재사용한다 (스크린샷이 아니라 라이브 컴포넌트 + 진입 애니메이션).
-function buildGroupedHighlights(manualHighlights: Highlight[]) {
-  return HIGHLIGHT_GROUPS.map((group) => {
-    const manualItems = manualHighlights.filter(
-      (item) => HIGHLIGHT_CATEGORIES.find((category) => category.id === item.categoryId)?.group === group.id,
-    )
-    const manualGroups = Array.from(new Map(
-      manualItems.map((item) => [item.categoryId, manualItems.filter((manual) => manual.categoryId === item.categoryId)]),
-    ).entries()).map(([categoryId, items]) => ({
-      kind: 'manual-group' as const,
-      categoryId,
-      items,
-    }))
-    return { ...group, items: manualGroups }
-  }).filter((group) => group.items.length > 0)
-}
 
 // 타이핑 애니메이션 — 기본정보 슬라이드에서 예시 문구가 한 글자씩 써지는 느낌
 function useTypewriter(text: string, { speed = 28, startDelay = 0 }: { speed?: number; startDelay?: number } = {}) {
@@ -86,10 +70,10 @@ function PreviewHighlight() {
     const t = setTimeout(() => setOpenKeys(new Set(['group_career-role_jiminlee'])), 900)
     return () => clearTimeout(t)
   }, [])
-  const groupedHighlights = buildGroupedHighlights(JIMIN_PROFILE.manualHighlights)
+  const highlightSections = buildHighlightSections(JIMIN_PROFILE.manualHighlights)
   return (
     <ProfileHighlightsSection
-      groupedHighlights={groupedHighlights}
+      highlightSections={highlightSections}
       username="jiminlee"
       primaryHighlightOverrides={{}}
       getHighlightOpen={(key) => openKeys.has(key)}

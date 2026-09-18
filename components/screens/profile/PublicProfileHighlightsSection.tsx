@@ -5,9 +5,9 @@ import { BadgeCheck, ChevronDown, ChevronUp, ShieldCheck } from 'lucide-react'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { AnimatedSection, SectionTitle } from '@/components/screens/profile/PublicProfileSections'
 import { ProfileEmptyAddBlock } from '@/components/screens/profile/ProfileEmptyAddBlock'
-import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
 import { getGroupedHighlightPreview, getHighlightDetailFootnote, getHighlightMetaParts } from '@/lib/highlightMeta'
-import type { Highlight, HighlightIconId } from '@/types'
+import type { HighlightSection } from '@/lib/highlightMeta'
+import type { HighlightIconId } from '@/types'
 
 
 function VerifiedBadgeGradientDefs() {
@@ -36,16 +36,8 @@ function VerifiedBadge({ size, shape = 'circle' }: { size: number; shape?: 'circ
   )
 }
 
-type HighlightGroupEntry = { kind: 'manual-group'; categoryId: string; items: Highlight[] }
-
-type HighlightGroupSection = {
-  id: string
-  label: string
-  items: HighlightGroupEntry[]
-}
-
 export function ProfileHighlightsSection({
-  groupedHighlights,
+  highlightSections,
   username,
   primaryHighlightOverrides,
   getHighlightOpen,
@@ -53,7 +45,7 @@ export function ProfileHighlightsSection({
   isOwner,
   onAdd,
 }: {
-  groupedHighlights: HighlightGroupSection[]
+  highlightSections: HighlightSection[]
   username: string
   primaryHighlightOverrides: Record<string, string>
   getHighlightOpen: (key: string) => boolean
@@ -61,7 +53,7 @@ export function ProfileHighlightsSection({
   isOwner?: boolean
   onAdd?: () => void
 }) {
-  const isEmpty = groupedHighlights.length === 0
+  const isEmpty = highlightSections.length === 0
 
   // 방문자에게는 빈 섹션을 숨기고, 오너에게만 추가 진입점을 노출.
   if (isEmpty && !(isOwner && onAdd)) return null
@@ -79,30 +71,25 @@ export function ProfileHighlightsSection({
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06}>
       <VerifiedBadgeGradientDefs />
       <SectionTitle title="하이라이트" onEdit={isOwner ? onAdd : undefined} />
-      <div className="space-y-5">
-        {groupedHighlights.map((group) => (
-          <div key={group.id}>
-            <div className="mb-2 text-[15px] font-bold text-[#0D0D0D]">{group.label}</div>
-            <div className="divide-y divide-[var(--color-border-soft)]">
-              {group.items.map((entry) => {
-            const category = HIGHLIGHT_CATEGORIES.find((item) => item.id === entry.categoryId)
-            const groupToggleKey = `group_${entry.categoryId}_${username}`
+      <div className="divide-y divide-[var(--color-border-soft)]">
+        {highlightSections.map((section) => {
+            const groupToggleKey = `group_${section.categoryId}_${username}`
             const isGroupOpen = getHighlightOpen(groupToggleKey)
-            const preview = getGroupedHighlightPreview(entry.items, primaryHighlightOverrides[entry.categoryId])
+            const preview = getGroupedHighlightPreview(section.items, primaryHighlightOverrides[section.categoryId])
 
             return (
-              <div key={`${entry.categoryId}-${group.id}`}>
+              <div key={section.categoryId}>
                 <button
                   onClick={() => onToggleHighlight(groupToggleKey)}
                   className="flex w-full items-start gap-3.5 py-3.5 text-left"
                 >
                   {/* 토글 펼침/접힘으로 미리보기 줄 수가 바뀌어도 아이콘이 밀리지 않도록 상단 고정 */}
                   <span className="mt-0.5 flex h-[18px] w-[18px] flex-shrink-0 items-center justify-center text-[var(--color-text-secondary)]">
-                    <HighlightIcon id={(entry.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={16} />
+                    <HighlightIcon id={(section.items[0]?.icon ?? 'briefcase') as HighlightIconId} size={16} />
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="mb-0.5 text-[11px] text-[var(--color-text-tertiary)]">
-                      {category?.label ?? '직접 입력'}
+                      {section.label}
                     </div>
                     {/* 대표 항목 미리보기 — 펼치면 사라지고, 접으면 다시 올라온다 */}
                     <AnimatePresence mode="wait" initial={false}>
@@ -116,8 +103,8 @@ export function ProfileHighlightsSection({
                         >
                           <div className="flex items-center gap-1">
                             <div className="text-[14px] font-semibold text-[var(--color-text-primary)]">{preview.title}</div>
-                            {entry.items.some((h) => h.verified) && (
-                              <VerifiedBadge size={20} shape={entry.categoryId === 'career-role' ? 'shield' : 'circle'} />
+                            {section.items.some((h) => h.verified) && (
+                              <VerifiedBadge size={20} shape={section.categoryId === 'career-role' ? 'shield' : 'circle'} />
                             )}
                           </div>
                           {preview.meta && (
@@ -142,7 +129,7 @@ export function ProfileHighlightsSection({
                     >
                       <div className="pb-4 pl-14">
                         <div className="divide-y divide-[var(--color-border-soft)]">
-                          {entry.items.map((hl) => {
+                          {section.items.map((hl) => {
                             const metaParts = getHighlightMetaParts(hl)
                             return (
                               <div key={hl.id} className="py-3 first:pt-0 last:pb-0">
@@ -203,7 +190,7 @@ export function ProfileHighlightsSection({
                                         </div>
                                       </a>
                                     )}
-                                    <div className="micro-text">{getHighlightDetailFootnote(hl, category?.label)}</div>
+                                    <div className="micro-text">{getHighlightDetailFootnote(hl, section.label)}</div>
                                   </div>
                                 )}
                               </div>
@@ -216,10 +203,7 @@ export function ProfileHighlightsSection({
                 </AnimatePresence>
               </div>
             )
-              })}
-            </div>
-          </div>
-        ))}
+        })}
       </div>
     </AnimatedSection>
   )

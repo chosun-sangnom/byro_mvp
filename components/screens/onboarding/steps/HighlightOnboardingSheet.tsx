@@ -5,7 +5,7 @@ import { BottomSheet, Button, TextArea, YearPickerSheet, showToast } from '@/com
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import type { Highlight, HighlightIconId } from '@/types'
-import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
+import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
 import { getHighlightMetaParts, isPrimaryHighlight, sortHighlightsByPrimary } from '@/lib/highlightMeta'
 
 
@@ -227,31 +227,29 @@ export function HighlightOnboardingSheet({ open, onClose }: HighlightOnboardingS
               프로필에 보여줄 경험을 선택하세요.
             </div>
 
-            <div className="space-y-6">
-              {HIGHLIGHT_GROUPS.map((group, groupIndex) => (
-                <div key={group.id} className={groupIndex > 0 ? 'border-t border-[var(--color-border-soft)] pt-5' : ''}>
-                  <div className="mb-3 flex items-center gap-3">
-                    <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[var(--color-text-secondary)]">{group.label}</div>
-                    <div className="h-px flex-1 bg-[var(--color-border-soft)]" />
+            <div className="overflow-hidden rounded-[22px] border border-[var(--color-border-default)]">
+              {HIGHLIGHT_CATEGORIES.map((category, index) => (
+                <button
+                  key={category.id}
+                  onClick={() => {
+                    setSelectedCat(category)
+                    setSheetMode('group')
+                  }}
+                  className={[
+                    'flex w-full items-center gap-3 px-4 py-4 text-left',
+                    index < HIGHLIGHT_CATEGORIES.length - 1 ? 'border-b border-[var(--color-border-soft)]' : '',
+                  ].join(' ')}
+                >
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center text-[var(--color-text-secondary)]">
+                    <HighlightIcon id={category.icon as HighlightIconId} size={18} />
                   </div>
-                  <div className="grid grid-cols-4 gap-3">
-                    {HIGHLIGHT_CATEGORIES.filter((category) => category.group === group.id).map((category) => (
-                      <button
-                        key={category.id}
-                        onClick={() => {
-                          setSelectedCat(category)
-                          setSheetMode('group')
-                        }}
-                        className="relative overflow-visible rounded-[22px] border border-[var(--color-border-default)] bg-[var(--color-bg-soft)] px-3 py-4 text-center"
-                      >
-                        <div className="mx-auto mb-2 flex items-center justify-center text-[var(--color-text-secondary)]">
-                          <HighlightIcon id={category.icon as HighlightIconId} size={16} />
-                        </div>
-                        <div className="text-[12px] font-bold leading-[1.4] text-[var(--color-text-primary)] break-keep">{category.label}</div>
-                      </button>
-                    ))}
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[14px] font-bold text-[var(--color-text-primary)]">{category.label}</div>
+                    {category.examples && (
+                      <div className="mt-0.5 truncate text-[11px] text-[var(--color-text-tertiary)]">{category.examples}</div>
+                    )}
                   </div>
-                </div>
+                </button>
               ))}
             </div>
           </div>

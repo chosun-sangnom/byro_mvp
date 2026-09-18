@@ -66,7 +66,6 @@ export function HighlightManageScreen({
   const isCareerRole = selectedCat?.id === 'career-role'
   const isEducationHistory = selectedCat?.id === 'education-history'
   const isPublish = selectedCat?.id === 'publish'
-  const isArticleInterview = selectedCat?.id === 'article-interview'
   const educationNeedsDegree = hlSchoolType === '대학교' || hlSchoolType === '대학원'
   const educationNeedsMajor = hlSchoolType !== '고등학교'
   const currentYear = new Date().getFullYear()
@@ -245,8 +244,8 @@ export function HighlightManageScreen({
           ? `${hlEducationStartYear} - ${hlStatus === '재학' ? '현재' : hlEducationEndYear}`
           : hlEducationYear,
       metadata,
-      sourceLabel: isPublish || isArticleInterview ? hlSourceLabel.trim() : undefined,
-      linkUrl: isArticleInterview && hlLinkUrl.trim() ? hlLinkUrl.trim() : undefined,
+      sourceLabel: isPublish ? hlSourceLabel.trim() : undefined,
+      linkUrl: isPublish && hlLinkUrl.trim() ? hlLinkUrl.trim() : undefined,
     }
 
     if (editingHl && store.highlights.some((highlight) => highlight.id === editingHl.id)) {
@@ -322,7 +321,6 @@ export function HighlightManageScreen({
           isCareerRole,
           isEducationHistory,
           isPublish,
-          isArticleInterview,
           educationNeedsDegree,
           educationNeedsMajor,
           yearPickerTarget,

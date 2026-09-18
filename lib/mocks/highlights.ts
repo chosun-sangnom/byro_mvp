@@ -7,7 +7,7 @@ import type { HighlightCategoryId, HighlightGroupId, HighlightIconId } from '@/t
 export const HIGHLIGHT_GROUPS: Array<{ id: HighlightGroupId; label: string }> = [
   { id: 'career', label: '커리어' },
   { id: 'achievement', label: '업적' },
-  { id: 'lifestyle', label: '라이프스타일' },
+  { id: 'lifestyle', label: '기타' },
 ]
 
 export const HIGHLIGHT_CATEGORIES: Array<{
@@ -18,14 +18,9 @@ export const HIGHLIGHT_CATEGORIES: Array<{
 }> = [
   { id: 'career-role', icon: 'briefcase', label: '경력', group: 'career' },
   { id: 'education-history', icon: 'book-open', label: '학력', group: 'career' },
-  { id: 'talk', icon: 'mic', label: '강연 / 연설', group: 'career' },
+  { id: 'talk', icon: 'mic', label: '강연 · 강의 · 교육', group: 'career' },
   { id: 'collab', icon: 'handshake', label: '협업 프로젝트', group: 'career' },
-  { id: 'education', icon: 'book-open', label: '강의 / 교육', group: 'career' },
-  { id: 'publish', icon: 'book-open', label: '출판 / 기고', group: 'achievement' },
-  { id: 'article-interview', icon: 'file-text', label: '기사 / 인터뷰', group: 'achievement' },
-  { id: 'award', icon: 'trophy', label: '수상 / 표창', group: 'achievement' },
-  { id: 'patent', icon: 'book-open', label: '특허 / 연구', group: 'achievement' },
-  { id: 'license', icon: 'badge-check', label: '자격증 / 수료', group: 'achievement' },
-  { id: 'volunteer', icon: 'globe', label: '봉사 / 사회공헌', group: 'lifestyle' },
-  { id: 'other', icon: 'pencil', label: '기타', group: 'lifestyle' },
+  { id: 'award', icon: 'trophy', label: '수상 · 자격증', group: 'achievement' },
+  { id: 'publish', icon: 'file-text', label: '출판 · 기고 · 특허', group: 'achievement' },
+  { id: 'volunteer', icon: 'globe', label: '봉사 · 기타', group: 'lifestyle' },
 ]

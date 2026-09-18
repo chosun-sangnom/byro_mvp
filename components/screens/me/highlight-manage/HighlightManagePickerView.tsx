@@ -1,3 +1,4 @@
+import { ChevronRight } from 'lucide-react'
 import { NavBar } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { HIGHLIGHT_CATEGORIES, HIGHLIGHT_GROUPS } from '@/lib/mocks/highlights'
@@ -19,31 +20,32 @@ export function HighlightManagePickerView({
 
       <div className="flex-1 overflow-y-auto px-5 py-5 pb-8">
         <div className="flex flex-col gap-6">
-          {HIGHLIGHT_GROUPS.map((group, groupIndex) => (
-            <div key={group.id}>
-              <div className="mb-4 flex items-center justify-between">
-                <p className="text-[18px] font-bold text-[#0D0D0D]">{group.label}</p>
-                <p className="text-[14px] font-medium text-[#6C7786]">
-                  {HIGHLIGHT_CATEGORIES.filter((cat) => cat.group === group.id).length}개 항목
-                </p>
+          {HIGHLIGHT_GROUPS.map((group) => {
+            const categories = HIGHLIGHT_CATEGORIES.filter((cat) => cat.group === group.id)
+            return (
+              <div key={group.id}>
+                <p className="mb-3 text-[16px] font-bold text-[#0D0D0D]">{group.label}</p>
+                <div className="overflow-hidden rounded-[24px] border border-[#DEE4EC] px-4">
+                  {categories.map((cat, index) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => onOpenCategory(cat)}
+                      className={[
+                        'flex w-full items-center gap-4 py-4 text-left',
+                        index < categories.length - 1 ? 'border-b border-[#DEE4EC]' : '',
+                      ].join(' ')}
+                    >
+                      <span className="flex size-9 shrink-0 items-center justify-center text-[#25313D]">
+                        <HighlightIcon id={cat.icon as HighlightIconId} size={20} />
+                      </span>
+                      <span className="flex-1 text-[14px] font-semibold text-[#0D0D0D]">{cat.label}</span>
+                      <ChevronRight size={20} className="shrink-0 text-[#A8B1BD]" />
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="grid grid-cols-4 gap-2">
-                {HIGHLIGHT_CATEGORIES.filter((cat) => cat.group === group.id).map((cat) => (
-                  <button
-                    key={cat.id}
-                    onClick={() => onOpenCategory(cat)}
-                    className="flex h-[84px] flex-col items-center justify-center gap-1.5 rounded-[16px] border border-[#DEE4EC] px-2 text-center"
-                  >
-                    <span className="flex items-center justify-center text-[#25313D]">
-                      <HighlightIcon id={cat.icon as HighlightIconId} size={20} />
-                    </span>
-                    <span className="text-[12px] font-medium leading-[1.4] text-[#25313D] break-keep">{cat.label}</span>
-                  </button>
-                ))}
-              </div>
-              {groupIndex < HIGHLIGHT_GROUPS.length - 1 && <div className="mt-6 h-px bg-[#DEE4EC]" />}
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     </div>

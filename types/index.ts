@@ -20,13 +20,8 @@ export type HighlightCategoryId =
   | 'talk'
   | 'collab'
   | 'publish'
-  | 'article-interview'
-  | 'education'
   | 'award'
-  | 'patent'
-  | 'license'
   | 'volunteer'
-  | 'other'
 
 export type OnboardingStep = 'login' | 'verify' | 'basicinfo' | 'profile' | 'complete'
 

@@ -1,115 +1,16 @@
-import { Mail, Plus, Upload, Zap } from 'lucide-react'
-import { NavBar, showToast } from '@/components/ui'
+import { ChevronRight, Zap } from 'lucide-react'
+import { NavBar, Button } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
-import { getHighlightMetaParts, isPrimaryHighlight } from '@/lib/highlightMeta'
-import type { Highlight, HighlightIconId } from '@/types'
+import type { HighlightIconId } from '@/types'
 import type { HighlightCategorySection, HighlightManageCategory } from './constants'
 
 const HIGHLIGHT_FREE_LIMIT = 3
 
-function VerifyButton({ icon, label, onClick }: { icon: React.ReactNode; label: string; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex w-full items-center justify-center gap-2.5 rounded-[10px] bg-white py-3 pl-3 pr-4"
-      style={{
-        border: '1px solid transparent',
-        backgroundImage: 'linear-gradient(#fff, #fff), linear-gradient(90deg, #00ADFF, #0657FF)',
-        backgroundOrigin: 'border-box',
-        backgroundClip: 'padding-box, border-box',
-      }}
-    >
-      {icon}
-      <span className="text-[14px] font-bold text-[#0D0D0D]">{label}</span>
-    </button>
-  )
-}
-
-function HighlightRow({
-  item,
-  isPrimary,
-  isEditable,
-  onSetPrimary,
-  onEdit,
-  onDelete,
-}: {
-  item: Highlight
-  isPrimary: boolean
-  isEditable: boolean
-  onSetPrimary: () => void
-  onEdit: () => void
-  onDelete: () => void
-}) {
-  const metaParts = getHighlightMetaParts(item)
-
-  return (
-    <div className="flex flex-col gap-3 border-b border-[#DEE4EC] py-4">
-      <div className="flex flex-col gap-1">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex min-w-0 items-center gap-1">
-            <p className="truncate text-[14px] font-semibold text-[#0D0D0D]">{item.title}</p>
-            {item.verified && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src="/images/ai-tools/exp-verified-badge.svg" alt="" className="h-3 w-3 shrink-0" />
-            )}
-          </div>
-          {isPrimary ? (
-            <span className="shrink-0 rounded-[6px] bg-[#F0F5FF] px-1.5 py-1 text-[12px] font-bold text-[#25313D]">메인 노출 중</span>
-          ) : (
-            <button
-              onClick={onSetPrimary}
-              className="shrink-0 rounded-[6px] border border-[#DEE4EC] bg-white px-1.5 py-1 text-[12px] font-medium text-[#25313D]"
-            >
-              메인으로 설정
-            </button>
-          )}
-        </div>
-        {metaParts.length > 0 && <p className="text-[12px] font-semibold text-[#6C7786]">{metaParts.join(' · ')}</p>}
-        {item.description?.trim() && (
-          <p className="mt-1 text-[14px] leading-[1.6] text-[#475058]">{item.description}</p>
-        )}
-      </div>
-      <div className="flex gap-1">
-        <button
-          onClick={() => {
-            if (isEditable) {
-              onEdit()
-              return
-            }
-            showToast('기본 목업 항목은 수정하지 않습니다', 'error')
-          }}
-          className="rounded-[6px] border border-[#DEE4EC] bg-white px-3 py-1.5 text-[12px] font-bold text-[#25313D]"
-        >
-          수정
-        </button>
-        <button
-          onClick={() => {
-            if (isEditable) {
-              onDelete()
-              return
-            }
-            showToast('기본 목업 항목은 삭제하지 않습니다', 'error')
-          }}
-          className="rounded-[6px] border border-[#DEE4EC] bg-white px-3 py-1.5 text-[12px] font-bold text-[#FF4242]"
-        >
-          삭제
-        </button>
-      </div>
-    </div>
-  )
-}
-
 interface HighlightManageListViewProps {
   categorySections: HighlightCategorySection[]
-  editableHighlightIds: Set<string>
-  primaryHighlightOverrides: Record<string, string>
   onBack: () => void
-  onAdd: (category: HighlightManageCategory) => void
-  onSetPrimary: (category: HighlightManageCategory, highlightId: string) => void
-  onEdit: (highlight: Highlight) => void
-  onDelete: (highlight: Highlight) => void
-  onVerify: (category: HighlightManageCategory, method?: 'ocr' | 'email') => void
+  onOpenCategory: (category: HighlightManageCategory) => void
+  onOpenPicker: () => void
   // [임시] OCR 클립보드 브릿지 — 스크린샷으로 경력/학력 자동 입력
   onLlmImport: () => void
   isPro: boolean
@@ -119,14 +20,9 @@ interface HighlightManageListViewProps {
 
 export function HighlightManageListView({
   categorySections,
-  editableHighlightIds,
-  primaryHighlightOverrides,
   onBack,
-  onAdd,
-  onSetPrimary,
-  onEdit,
-  onDelete,
-  onVerify,
+  onOpenCategory,
+  onOpenPicker,
   onLlmImport,
   isPro,
   freeRemaining,
@@ -157,8 +53,8 @@ export function HighlightManageListView({
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto px-5 pt-4 pb-10">
-        <div className="flex flex-col gap-8">
+      <div className="flex-1 overflow-y-auto px-5 py-4 pb-4">
+        <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-5 rounded-[24px] border border-[#DEE4EC] p-4">
             <div className="flex flex-col gap-1">
               <p className="text-[16px] font-bold text-[#0D0D0D]">하이라이트 관리</p>
@@ -185,65 +81,40 @@ export function HighlightManageListView({
             </button>
           </div>
 
-          {categorySections.map(({ category, items }) => {
-            // 명시적으로 메인 설정된 항목이 없으면 최상단 항목을 기본 메인으로 표시
-            const effectivePrimaryId = primaryHighlightOverrides[category.id] ?? items[0]?.id
-
-            return (
-              <section key={category.id} className="flex flex-col gap-3">
-                <div className="flex items-center gap-2">
-                  <span className="flex shrink-0 items-center justify-center text-[#25313D]">
-                    <HighlightIcon id={category.icon as HighlightIconId} size={18} />
-                  </span>
-                  <h2 className="text-[16px] font-bold text-[#0D0D0D]">{category.label}</h2>
-                  {items.length > 0 && (
-                    <span className="text-[14px] font-semibold text-[#A8B1BD]">{items.length}</span>
+          <div className="overflow-hidden rounded-[24px] border border-[#DEE4EC] px-4">
+            {categorySections.map((section, index) => (
+              <button
+                key={section.category.id}
+                onClick={() => onOpenCategory(section.category)}
+                className={[
+                  'flex w-full items-center gap-4 py-4 text-left',
+                  index < categorySections.length - 1 ? 'border-b border-[#DEE4EC]' : '',
+                ].join(' ')}
+              >
+                <span className="flex size-9 shrink-0 items-center justify-center text-[#25313D]">
+                  <HighlightIcon id={section.category.icon as HighlightIconId} size={20} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[12px] font-semibold text-[#475058]">{section.category.label}</p>
+                  {section.card ? (
+                    <>
+                      <p className="mt-0.5 truncate text-[14px] font-semibold text-[#0D0D0D]">{section.card.title}</p>
+                      <p className="mt-0.5 text-[12px] leading-[1.5] text-[#6C7786]">
+                        {section.card.meta} <span className="font-semibold text-[#25313D]">{section.card.countLabel}</span>
+                      </p>
+                    </>
+                  ) : (
+                    <p className="mt-0.5 text-[13px] text-[#A8B1BD]">아직 추가한 항목이 없어요</p>
                   )}
                 </div>
-
-                {category.id === 'career-role' && (
-                  <VerifyButton
-                    onClick={() => onVerify(category)}
-                    // eslint-disable-next-line @next/next/no-img-element
-                    icon={<img src="/images/ai-tools/exp-security.svg" alt="" className="h-4 w-[13px]" />}
-                    label="건강보험 공단으로 경력 인증"
-                  />
-                )}
-                {category.id === 'education-history' && (
-                  <div className="flex flex-col gap-2">
-                    <VerifyButton onClick={() => onVerify(category, 'ocr')} icon={<Upload size={16} className="text-[#0657FF]" />} label="졸업증명서로 학력 확인" />
-                    <VerifyButton onClick={() => onVerify(category, 'email')} icon={<Mail size={16} className="text-[#0657FF]" />} label="학교 이메일로 학력 확인" />
-                  </div>
-                )}
-
-                <div className="rounded-[24px] border border-[#DEE4EC] px-4">
-                  {items.map((item) => (
-                    <HighlightRow
-                      key={item.id}
-                      item={item}
-                      isPrimary={isPrimaryHighlight(item, effectivePrimaryId)}
-                      isEditable={editableHighlightIds.has(item.id)}
-                      onSetPrimary={() => onSetPrimary(category, item.id)}
-                      onEdit={() => onEdit(item)}
-                      onDelete={() => onDelete(item)}
-                    />
-                  ))}
-                  <button
-                    type="button"
-                    onClick={() => onAdd(category)}
-                    className="flex w-full items-center justify-center gap-1.5 py-4 text-[14px] font-semibold text-[#25313D]"
-                  >
-                    <Plus size={16} />
-                    {items.length > 0 ? `${category.label} 추가` : `첫 ${category.label} 추가하기`}
-                  </button>
-                </div>
-              </section>
-            )
-          })}
+                <ChevronRight size={20} className="shrink-0 text-[#A8B1BD]" />
+              </button>
+            ))}
+          </div>
         </div>
 
         {!isPro && (
-          <div className="mt-8 flex items-center justify-between rounded-xl bg-[var(--color-bg-soft)] px-4 py-3">
+          <div className="mt-6 flex items-center justify-between rounded-xl bg-[var(--color-bg-soft)] px-4 py-3">
             <div>
               <p className="text-[12px] font-semibold text-[var(--color-text-secondary)]">Free · {HIGHLIGHT_FREE_LIMIT}개 슬롯</p>
               <p className="text-[11px] text-[var(--color-text-tertiary)]">최대 {HIGHLIGHT_FREE_LIMIT}개까지 하이라이트를 추가할 수 있어요</p>
@@ -259,6 +130,10 @@ export function HighlightManageListView({
             </button>
           </div>
         )}
+      </div>
+
+      <div className="px-5 pb-6">
+        <Button onClick={onOpenPicker}>+ 하이라이트 추가하기</Button>
       </div>
     </div>
   )

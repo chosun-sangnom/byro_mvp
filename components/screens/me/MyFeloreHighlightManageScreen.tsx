@@ -7,8 +7,11 @@ import { useFeloreStore } from '@/store/useFeloreStore'
 import type { Highlight, HighlightIconId } from '@/types'
 import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
+import { getGroupedHighlightPreview, sortHighlightsByPrimary } from '@/lib/highlightMeta'
+import { HighlightManageCategoryView } from '@/components/screens/me/highlight-manage/HighlightManageCategoryView'
 import { HighlightManageFormView } from '@/components/screens/me/highlight-manage/HighlightManageFormView'
 import { HighlightManageListView } from '@/components/screens/me/highlight-manage/HighlightManageListView'
+import { HighlightManagePickerView } from '@/components/screens/me/highlight-manage/HighlightManagePickerView'
 import { HighlightManageVerifyView } from '@/components/screens/me/highlight-manage/HighlightManageVerifyView'
 import { HighlightLlmImportSheet } from '@/components/screens/me/highlight-manage/HighlightLlmImportSheet'
 import {
@@ -76,10 +79,7 @@ export function HighlightManageScreen({
   const selectedCategoryHighlights = selectedCat
     ? allManualHighlights.filter((item) => item.categoryId === selectedCat.id)
     : []
-  const categorySections: HighlightCategorySection[] = HIGHLIGHT_CATEGORIES.map((category) => ({
-    category,
-    items: allManualHighlights.filter((item) => item.categoryId === category.id),
-  }))
+  const categorySections = buildCategorySections(allManualHighlights, store.primaryHighlightOverrides)
   const freeRemaining = Math.max(0, HIGHLIGHT_FREE_LIMIT - allManualHighlights.length)
   const saveDisabled = !selectedCat
     || !hlTitle.trim()
@@ -116,22 +116,21 @@ export function HighlightManageScreen({
     setSelectedCat(null)
   }
 
-  const backToList = () => {
-    resetAll()
-    setMode('list')
+  const openCategory = (category: HighlightManageCategory) => {
+    setSelectedCat(category)
+    setMode('group')
   }
 
   const handleUpgrade = () => {
     router.push('/settings?screen=upgrade')
   }
 
-  const openAddForm = (category: HighlightManageCategory) => {
+  const openAddForm = () => {
     if (!isPro && freeRemaining <= 0) {
       showToast('Free 플랜은 하이라이트를 최대 3개까지 추가할 수 있어요', 'error')
       return
     }
     resetFormFields()
-    setSelectedCat(category)
     setMode('form')
   }
 
@@ -256,7 +255,8 @@ export function HighlightManageScreen({
       store.addHighlight(payload)
     }
 
-    backToList()
+    resetFormFields()
+    setMode('group')
     showToast(`${selectedCat.label}${pickIGa(selectedCat.label)} 저장되었어요`)
   }
 
@@ -266,10 +266,36 @@ export function HighlightManageScreen({
         selectedCat={selectedCat}
         existingHighlights={selectedCategoryHighlights}
         initialMethod={verifyMethod}
-        onBack={backToList}
+        onBack={() => setMode('group')}
         onImportCareers={(items) => items.forEach((item) => store.addHighlight(item))}
         onVerifyHighlight={(id) => store.verifyHighlight(id)}
         onAddHighlight={(item) => store.addHighlight(item)}
+      />
+    )
+  }
+
+  if (mode === 'group' && selectedCat) {
+    return (
+      <HighlightManageCategoryView
+        selectedCat={selectedCat}
+        selectedCategoryHighlights={selectedCategoryHighlights}
+        editableHighlightIds={editableHighlightIds}
+        primaryHighlightId={store.primaryHighlightOverrides[selectedCat.id]}
+        onBack={() => {
+          resetAll()
+          setMode('list')
+        }}
+        onSetPrimary={(highlightId) => {
+          store.setHighlightPrimary(selectedCat.id, highlightId)
+          showToast('메인 항목으로 설정했어요')
+        }}
+        onEdit={openEditSheet}
+        onDelete={(highlight) => {
+          store.removeHighlight(highlight.id)
+          showToast('삭제됐어요')
+        }}
+        onAdd={openAddForm}
+        onVerify={(method) => { setVerifyMethod(method); setMode('verify') }}
       />
     )
   }
@@ -304,7 +330,10 @@ export function HighlightManageScreen({
           saveDisabled,
         }}
         actions={{
-          onBack: backToList,
+          onBack: () => {
+            resetFormFields()
+            setMode(selectedCat ? 'group' : 'picker')
+          },
           onSave: handleSave,
           setHlTitle,
           setHlRole,
@@ -325,27 +354,24 @@ export function HighlightManageScreen({
     )
   }
 
+  if (mode === 'picker') {
+    return (
+      <HighlightManagePickerView
+        onBack={() => setMode('list')}
+        onOpenCategory={openCategory}
+      />
+    )
+  }
+
   return (
     <>
       <HighlightManageListView
         categorySections={categorySections}
-        editableHighlightIds={editableHighlightIds}
-        primaryHighlightOverrides={store.primaryHighlightOverrides}
         onBack={onBack}
-        onAdd={openAddForm}
-        onSetPrimary={(category, highlightId) => {
-          store.setHighlightPrimary(category.id, highlightId)
-          showToast('메인 항목으로 설정했어요')
-        }}
-        onEdit={openEditSheet}
-        onDelete={(highlight) => {
-          store.removeHighlight(highlight.id)
-          showToast('삭제됐어요')
-        }}
-        onVerify={(category, method) => {
-          setSelectedCat(category)
-          setVerifyMethod(method)
-          setMode('verify')
+        onOpenCategory={openCategory}
+        onOpenPicker={() => {
+          resetAll()
+          setMode('picker')
         }}
         onLlmImport={() => setLlmImportOpen(true)}
         isPro={isPro}
@@ -361,4 +387,29 @@ export function HighlightManageScreen({
       />
     </>
   )
+}
+
+function buildCategorySections(
+  allManualHighlights: Highlight[],
+  primaryHighlightOverrides: Record<string, string>,
+): HighlightCategorySection[] {
+  return HIGHLIGHT_CATEGORIES.map((category) => {
+    const items = sortHighlightsByPrimary(
+      allManualHighlights.filter((item) => item.categoryId === category.id),
+      primaryHighlightOverrides[category.id],
+    )
+    if (items.length === 0) {
+      return { category, card: null }
+    }
+    const preview = getGroupedHighlightPreview(items, primaryHighlightOverrides[category.id])
+    return {
+      category,
+      card: {
+        category,
+        title: preview.title,
+        meta: preview.meta,
+        countLabel: `${items.length}개 항목`,
+      },
+    }
+  })
 }

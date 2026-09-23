@@ -139,7 +139,7 @@ export function ProfileHighlightsSection({
                                     <span className="flex items-center gap-1">
                                       <VerifiedBadge size={20} shape={hl.categoryId === 'career-role' ? 'shield' : 'circle'} />
                                       <span className="text-[13px] font-bold" style={{ color: 'var(--color-accent-dark)' }}>
-                                        {hl.categoryId === 'career-role' ? '검증됨' : '확인됨'}
+                                        {hl.categoryId === 'career-role' ? '인증됨' : '확인됨'}
                                       </span>
                                     </span>
                                   )}

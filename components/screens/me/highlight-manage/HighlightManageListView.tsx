@@ -6,6 +6,13 @@ import type { HighlightCategorySection, HighlightManageCategory } from './consta
 
 const HIGHLIGHT_FREE_LIMIT = 3
 
+const SECTION_HELPERS: Record<string, string> = {
+  'career-role': '회사명과 직함, 재직 기간을 적어주세요. 지금 다니는 회사와 이전 회사 모두 넣을 수 있어요.',
+  'education-history': '학교명과 전공, 입학과 졸업 연도를 적어주세요. 고등학교부터 대학원까지 넣을 수 있어요.',
+  activity: '인터뷰나 기사, 강연, 방송처럼 밖으로 알려진 활동을 넣어주세요. 커뮤니티나 봉사 활동도 좋아요.',
+  achievement: '수상 경력이나 자격증, 출판물, 특허처럼 인정받은 결과를 넣어주세요.',
+}
+
 interface HighlightManageListViewProps {
   categorySections: HighlightCategorySection[]
   onBack: () => void
@@ -83,7 +90,10 @@ export function HighlightManageListView({
 
           {categorySections.map((section) => (
             <section key={section.category.id} className="flex flex-col gap-3">
-              <h2 className="text-[16px] font-bold text-[#0D0D0D]">{section.category.label}</h2>
+              <div className="flex flex-col gap-1">
+                <h2 className="text-[16px] font-bold text-[#0D0D0D]">{section.category.label}</h2>
+                <p className="break-keep text-[13px] leading-[1.5] text-[#6C7786]">{SECTION_HELPERS[section.category.id]}</p>
+              </div>
               <div className="overflow-hidden rounded-[24px] border border-[#DEE4EC] px-4">
                 {section.card ? (
                   <button

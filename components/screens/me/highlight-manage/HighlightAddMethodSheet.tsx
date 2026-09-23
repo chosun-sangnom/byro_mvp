@@ -29,7 +29,7 @@ export function HighlightAddMethodSheet({ category, open, onClose, onDirectInput
             // eslint-disable-next-line @next/next/no-img-element
             icon: <img src="/images/ai-tools/exp-security.svg" alt="" className="h-[18px] w-[15px]" />,
             title: '건강보험공단으로 불러오기',
-            description: '직장 이력을 한 번에 불러오고 인증 표시가 붙어요',
+            description: "직장 이력을 한 번에 불러오고 '인증됨' 뱃지가 붙어요",
             onSelect: () => onVerify(),
           },
         ]
@@ -38,15 +38,15 @@ export function HighlightAddMethodSheet({ category, open, onClose, onDirectInput
             {
               key: 'ocr',
               icon: <Upload size={18} className="text-[#0657FF]" />,
-              title: '졸업증명서로 인증하기',
-              description: '증명서 사진을 올리면 학교 정보가 채워지고 인증 표시가 붙어요',
+              title: '졸업증명서로 확인하기',
+              description: "졸업했다면 증명서 사진을 올려주세요. 학교 정보가 채워지고 '확인됨' 뱃지가 붙어요",
               onSelect: () => onVerify('ocr'),
             },
             {
               key: 'email',
               icon: <Mail size={18} className="text-[#0657FF]" />,
-              title: '학교 이메일로 인증하기',
-              description: '학교 메일로 받은 코드를 입력하면 인증 표시가 붙어요',
+              title: '학교 이메일로 확인하기',
+              description: "재학 중이라면 학교 메일로 받은 코드를 입력해주세요. '확인됨' 뱃지가 붙어요",
               onSelect: () => onVerify('email'),
             },
           ]
@@ -58,7 +58,7 @@ export function HighlightAddMethodSheet({ category, open, onClose, onDirectInput
       key: 'direct',
       icon: <PenLine size={18} className="text-[#25313D]" />,
       title: '직접 입력하기',
-      description: '인증 없이 바로 입력해요',
+      description: '뱃지 없이 바로 입력해요',
       onSelect: onDirectInput,
     },
   ]

@@ -11,7 +11,7 @@ import { getGroupedHighlightPreview, sortHighlightsByPrimary } from '@/lib/highl
 import { HighlightManageCategoryView } from '@/components/screens/me/highlight-manage/HighlightManageCategoryView'
 import { HighlightManageFormView } from '@/components/screens/me/highlight-manage/HighlightManageFormView'
 import { HighlightManageListView } from '@/components/screens/me/highlight-manage/HighlightManageListView'
-import { HighlightManagePickerView } from '@/components/screens/me/highlight-manage/HighlightManagePickerView'
+import { HighlightAddMethodSheet } from '@/components/screens/me/highlight-manage/HighlightAddMethodSheet'
 import { HighlightManageVerifyView } from '@/components/screens/me/highlight-manage/HighlightManageVerifyView'
 import { HighlightLlmImportSheet } from '@/components/screens/me/highlight-manage/HighlightLlmImportSheet'
 import {
@@ -22,6 +22,7 @@ import {
 } from '@/components/screens/me/highlight-manage/constants'
 
 const HIGHLIGHT_FREE_LIMIT = 3
+const VERIFIABLE_CATEGORY_IDS = ['career-role', 'education-history']
 
 // 한글 마지막 음절의 받침 유무에 따라 '이'/'가' 조사를 고른다.
 function pickIGa(label: string): '이' | '가' {
@@ -62,6 +63,9 @@ export function HighlightManageScreen({
   const [verifyMethod, setVerifyMethod] = useState<'ocr' | 'email' | undefined>(undefined)
   // [임시] LLM 임포트 시트 상태
   const [llmImportOpen, setLlmImportOpen] = useState(false)
+  const [addMethodOpen, setAddMethodOpen] = useState(false)
+  // 추가·수정·인증을 마치거나 취소했을 때 돌아갈 화면
+  const [returnMode, setReturnMode] = useState<'list' | 'group'>('list')
 
   const isCareerRole = selectedCat?.id === 'career-role'
   const isEducationHistory = selectedCat?.id === 'education-history'
@@ -118,7 +122,18 @@ export function HighlightManageScreen({
 
   const openCategory = (category: HighlightManageCategory) => {
     setSelectedCat(category)
+    setReturnMode('group')
     setMode('group')
+  }
+
+  const returnToOrigin = () => {
+    if (returnMode === 'group') {
+      resetFormFields()
+      setMode('group')
+      return
+    }
+    resetAll()
+    setMode('list')
   }
 
   const handleUpgrade = () => {
@@ -133,6 +148,33 @@ export function HighlightManageScreen({
     resetFormFields()
     setMode('form')
   }
+
+  const startAdd = (category: HighlightManageCategory, from: 'list' | 'group') => {
+    setSelectedCat(category)
+    setReturnMode(from)
+    if (VERIFIABLE_CATEGORY_IDS.includes(category.id)) {
+      setAddMethodOpen(true)
+      return
+    }
+    openAddForm()
+  }
+
+  const addMethodSheet = (
+    <HighlightAddMethodSheet
+      category={selectedCat}
+      open={addMethodOpen}
+      onClose={() => setAddMethodOpen(false)}
+      onDirectInput={() => {
+        setAddMethodOpen(false)
+        openAddForm()
+      }}
+      onVerify={(method) => {
+        setAddMethodOpen(false)
+        setVerifyMethod(method)
+        setMode('verify')
+      }}
+    />
+  )
 
   const openEditSheet = (highlight: Highlight) => {
     const category = HIGHLIGHT_CATEGORIES.find((item) => item.id === highlight.categoryId) ?? null
@@ -255,8 +297,7 @@ export function HighlightManageScreen({
       store.addHighlight(payload)
     }
 
-    resetFormFields()
-    setMode('group')
+    returnToOrigin()
     showToast(`${selectedCat.label}${pickIGa(selectedCat.label)} 저장되었어요`)
   }
 
@@ -266,7 +307,7 @@ export function HighlightManageScreen({
         selectedCat={selectedCat}
         existingHighlights={selectedCategoryHighlights}
         initialMethod={verifyMethod}
-        onBack={() => setMode('group')}
+        onBack={returnToOrigin}
         onImportCareers={(items) => items.forEach((item) => store.addHighlight(item))}
         onVerifyHighlight={(id) => store.verifyHighlight(id)}
         onAddHighlight={(item) => store.addHighlight(item)}
@@ -276,27 +317,30 @@ export function HighlightManageScreen({
 
   if (mode === 'group' && selectedCat) {
     return (
-      <HighlightManageCategoryView
-        selectedCat={selectedCat}
-        selectedCategoryHighlights={selectedCategoryHighlights}
-        editableHighlightIds={editableHighlightIds}
-        primaryHighlightId={store.primaryHighlightOverrides[selectedCat.id]}
-        onBack={() => {
-          resetAll()
-          setMode('list')
-        }}
-        onSetPrimary={(highlightId) => {
-          store.setHighlightPrimary(selectedCat.id, highlightId)
-          showToast('메인 항목으로 설정했어요')
-        }}
-        onEdit={openEditSheet}
-        onDelete={(highlight) => {
-          store.removeHighlight(highlight.id)
-          showToast('삭제됐어요')
-        }}
-        onAdd={openAddForm}
-        onVerify={(method) => { setVerifyMethod(method); setMode('verify') }}
-      />
+      <>
+        <HighlightManageCategoryView
+          selectedCat={selectedCat}
+          selectedCategoryHighlights={selectedCategoryHighlights}
+          editableHighlightIds={editableHighlightIds}
+          primaryHighlightId={store.primaryHighlightOverrides[selectedCat.id]}
+          onBack={() => {
+            resetAll()
+            setMode('list')
+          }}
+          onSetPrimary={(highlightId) => {
+            store.setHighlightPrimary(selectedCat.id, highlightId)
+            showToast('메인 항목으로 설정했어요')
+          }}
+          onEdit={openEditSheet}
+          onDelete={(highlight) => {
+            store.removeHighlight(highlight.id)
+            showToast('삭제됐어요')
+          }}
+          onAdd={() => startAdd(selectedCat, 'group')}
+          onVerify={(method) => { setVerifyMethod(method); setMode('verify') }}
+        />
+        {addMethodSheet}
+      </>
     )
   }
 
@@ -330,10 +374,7 @@ export function HighlightManageScreen({
           saveDisabled,
         }}
         actions={{
-          onBack: () => {
-            resetFormFields()
-            setMode(selectedCat ? 'group' : 'picker')
-          },
+          onBack: returnToOrigin,
           onSave: handleSave,
           setHlTitle,
           setHlRole,
@@ -354,25 +395,13 @@ export function HighlightManageScreen({
     )
   }
 
-  if (mode === 'picker') {
-    return (
-      <HighlightManagePickerView
-        onBack={() => setMode('list')}
-        onOpenCategory={openCategory}
-      />
-    )
-  }
-
   return (
     <>
       <HighlightManageListView
         categorySections={categorySections}
         onBack={onBack}
         onOpenCategory={openCategory}
-        onOpenPicker={() => {
-          resetAll()
-          setMode('picker')
-        }}
+        onAdd={(category) => startAdd(category, 'list')}
         onLlmImport={() => setLlmImportOpen(true)}
         isPro={isPro}
         freeRemaining={freeRemaining}
@@ -385,6 +414,7 @@ export function HighlightManageScreen({
         isPro={isPro}
         freeRemaining={freeRemaining}
       />
+      {addMethodSheet}
     </>
   )
 }

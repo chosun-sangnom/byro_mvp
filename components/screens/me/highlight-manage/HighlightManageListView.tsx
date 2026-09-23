@@ -1,5 +1,5 @@
-import { ChevronRight, Zap } from 'lucide-react'
-import { NavBar, Button } from '@/components/ui'
+import { ChevronRight, Plus, Zap } from 'lucide-react'
+import { NavBar } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import type { HighlightIconId } from '@/types'
 import type { HighlightCategorySection, HighlightManageCategory } from './constants'
@@ -10,7 +10,7 @@ interface HighlightManageListViewProps {
   categorySections: HighlightCategorySection[]
   onBack: () => void
   onOpenCategory: (category: HighlightManageCategory) => void
-  onOpenPicker: () => void
+  onAdd: (category: HighlightManageCategory) => void
   // [임시] OCR 클립보드 브릿지 — 스크린샷으로 경력/학력 자동 입력
   onLlmImport: () => void
   isPro: boolean
@@ -22,7 +22,7 @@ export function HighlightManageListView({
   categorySections,
   onBack,
   onOpenCategory,
-  onOpenPicker,
+  onAdd,
   onLlmImport,
   isPro,
   freeRemaining,
@@ -81,36 +81,46 @@ export function HighlightManageListView({
             </button>
           </div>
 
-          <div className="overflow-hidden rounded-[24px] border border-[#DEE4EC] px-4">
-            {categorySections.map((section, index) => (
-              <button
-                key={section.category.id}
-                onClick={() => onOpenCategory(section.category)}
-                className={[
-                  'flex w-full items-center gap-4 py-4 text-left',
-                  index < categorySections.length - 1 ? 'border-b border-[#DEE4EC]' : '',
-                ].join(' ')}
-              >
-                <span className="flex size-9 shrink-0 items-center justify-center text-[#25313D]">
-                  <HighlightIcon id={section.category.icon as HighlightIconId} size={20} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[12px] font-semibold text-[#475058]">{section.category.label}</p>
-                  {section.card ? (
-                    <>
-                      <p className="mt-0.5 truncate text-[14px] font-semibold text-[#0D0D0D]">{section.card.title}</p>
+          {categorySections.map((section) => (
+            <section key={section.category.id} className="flex flex-col gap-3">
+              <h2 className="text-[16px] font-bold text-[#0D0D0D]">{section.category.label}</h2>
+              <div className="overflow-hidden rounded-[24px] border border-[#DEE4EC] px-4">
+                {section.card ? (
+                  <button
+                    type="button"
+                    onClick={() => onOpenCategory(section.category)}
+                    className="flex w-full items-center gap-4 border-b border-[#DEE4EC] py-4 text-left"
+                  >
+                    <span className="flex size-9 shrink-0 items-center justify-center text-[#25313D]">
+                      <HighlightIcon id={section.category.icon as HighlightIconId} size={20} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[14px] font-semibold text-[#0D0D0D]">{section.card.title}</p>
                       <p className="mt-0.5 text-[12px] leading-[1.5] text-[#6C7786]">
                         {section.card.meta} <span className="font-semibold text-[#25313D]">{section.card.countLabel}</span>
                       </p>
-                    </>
-                  ) : (
-                    <p className="mt-0.5 text-[13px] text-[#A8B1BD]">아직 추가한 항목이 없어요</p>
-                  )}
-                </div>
-                <ChevronRight size={20} className="shrink-0 text-[#A8B1BD]" />
-              </button>
-            ))}
-          </div>
+                    </div>
+                    <ChevronRight size={20} className="shrink-0 text-[#A8B1BD]" />
+                  </button>
+                ) : (
+                  <div className="flex items-center gap-4 border-b border-[#DEE4EC] py-4">
+                    <span className="flex size-9 shrink-0 items-center justify-center text-[#A8B1BD]">
+                      <HighlightIcon id={section.category.icon as HighlightIconId} size={20} />
+                    </span>
+                    <p className="text-[13px] text-[#A8B1BD]">아직 추가한 {section.category.label} 항목이 없어요</p>
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={() => onAdd(section.category)}
+                  className="flex w-full items-center justify-center gap-1 py-3.5 text-[14px] font-semibold text-[#25313D]"
+                >
+                  <Plus size={16} />
+                  {section.category.label} 추가
+                </button>
+              </div>
+            </section>
+          ))}
         </div>
 
         {!isPro && (
@@ -130,10 +140,6 @@ export function HighlightManageListView({
             </button>
           </div>
         )}
-      </div>
-
-      <div className="px-5 pb-6">
-        <Button onClick={onOpenPicker}>+ 하이라이트 추가하기</Button>
       </div>
     </div>
   )

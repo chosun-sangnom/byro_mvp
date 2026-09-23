@@ -7,8 +7,7 @@ import { useFeloreStore } from '@/store/useFeloreStore'
 import type { Highlight, HighlightIconId } from '@/types'
 import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
-import { getGroupedHighlightPreview, sortHighlightsByPrimary } from '@/lib/highlightMeta'
-import { HighlightManageCategoryView } from '@/components/screens/me/highlight-manage/HighlightManageCategoryView'
+import { sortHighlightsByPrimary } from '@/lib/highlightMeta'
 import { HighlightManageFormView } from '@/components/screens/me/highlight-manage/HighlightManageFormView'
 import { HighlightManageListView } from '@/components/screens/me/highlight-manage/HighlightManageListView'
 import { HighlightAddMethodSheet } from '@/components/screens/me/highlight-manage/HighlightAddMethodSheet'
@@ -64,8 +63,6 @@ export function HighlightManageScreen({
   // [임시] LLM 임포트 시트 상태
   const [llmImportOpen, setLlmImportOpen] = useState(false)
   const [addMethodOpen, setAddMethodOpen] = useState(false)
-  // 추가·수정·인증을 마치거나 취소했을 때 돌아갈 화면
-  const [returnMode, setReturnMode] = useState<'list' | 'group'>('list')
 
   const isCareerRole = selectedCat?.id === 'career-role'
   const isEducationHistory = selectedCat?.id === 'education-history'
@@ -115,24 +112,9 @@ export function HighlightManageScreen({
     setYearPickerTarget(null)
   }
 
-  const resetAll = () => {
+  const backToList = () => {
     resetFormFields()
     setSelectedCat(null)
-  }
-
-  const openCategory = (category: HighlightManageCategory) => {
-    setSelectedCat(category)
-    setReturnMode('group')
-    setMode('group')
-  }
-
-  const returnToOrigin = () => {
-    if (returnMode === 'group') {
-      resetFormFields()
-      setMode('group')
-      return
-    }
-    resetAll()
     setMode('list')
   }
 
@@ -149,9 +131,8 @@ export function HighlightManageScreen({
     setMode('form')
   }
 
-  const startAdd = (category: HighlightManageCategory, from: 'list' | 'group') => {
+  const startAdd = (category: HighlightManageCategory) => {
     setSelectedCat(category)
-    setReturnMode(from)
     if (VERIFIABLE_CATEGORY_IDS.includes(category.id)) {
       setAddMethodOpen(true)
       return
@@ -297,7 +278,7 @@ export function HighlightManageScreen({
       store.addHighlight(payload)
     }
 
-    returnToOrigin()
+    backToList()
     showToast(`${selectedCat.label}${pickIGa(selectedCat.label)} 저장되었어요`)
   }
 
@@ -307,40 +288,11 @@ export function HighlightManageScreen({
         selectedCat={selectedCat}
         existingHighlights={selectedCategoryHighlights}
         initialMethod={verifyMethod}
-        onBack={returnToOrigin}
+        onBack={backToList}
         onImportCareers={(items) => items.forEach((item) => store.addHighlight(item))}
         onVerifyHighlight={(id) => store.verifyHighlight(id)}
         onAddHighlight={(item) => store.addHighlight(item)}
       />
-    )
-  }
-
-  if (mode === 'group' && selectedCat) {
-    return (
-      <>
-        <HighlightManageCategoryView
-          selectedCat={selectedCat}
-          selectedCategoryHighlights={selectedCategoryHighlights}
-          editableHighlightIds={editableHighlightIds}
-          primaryHighlightId={store.primaryHighlightOverrides[selectedCat.id]}
-          onBack={() => {
-            resetAll()
-            setMode('list')
-          }}
-          onSetPrimary={(highlightId) => {
-            store.setHighlightPrimary(selectedCat.id, highlightId)
-            showToast('메인 항목으로 설정했어요')
-          }}
-          onEdit={openEditSheet}
-          onDelete={(highlight) => {
-            store.removeHighlight(highlight.id)
-            showToast('삭제됐어요')
-          }}
-          onAdd={() => startAdd(selectedCat, 'group')}
-          onVerify={(method) => { setVerifyMethod(method); setMode('verify') }}
-        />
-        {addMethodSheet}
-      </>
     )
   }
 
@@ -374,7 +326,7 @@ export function HighlightManageScreen({
           saveDisabled,
         }}
         actions={{
-          onBack: returnToOrigin,
+          onBack: backToList,
           onSave: handleSave,
           setHlTitle,
           setHlRole,
@@ -400,8 +352,18 @@ export function HighlightManageScreen({
       <HighlightManageListView
         categorySections={categorySections}
         onBack={onBack}
-        onOpenCategory={openCategory}
-        onAdd={(category) => startAdd(category, 'list')}
+        editableHighlightIds={editableHighlightIds}
+        onAdd={startAdd}
+        onEdit={openEditSheet}
+        onDelete={(highlight) => {
+          store.removeHighlight(highlight.id)
+          showToast('삭제됐어요')
+        }}
+        onSetPrimary={(category, highlightId) => {
+          store.setHighlightPrimary(category.id, highlightId)
+          showToast('메인 항목으로 설정했어요')
+        }}
+        onBlockedMockItem={(action) => showToast(`기본 목업 항목은 ${action}하지 않습니다`, 'error')}
         onLlmImport={() => setLlmImportOpen(true)}
         isPro={isPro}
         freeRemaining={freeRemaining}
@@ -428,18 +390,6 @@ function buildCategorySections(
       allManualHighlights.filter((item) => item.categoryId === category.id),
       primaryHighlightOverrides[category.id],
     )
-    if (items.length === 0) {
-      return { category, card: null }
-    }
-    const preview = getGroupedHighlightPreview(items, primaryHighlightOverrides[category.id])
-    return {
-      category,
-      card: {
-        category,
-        title: preview.title,
-        meta: preview.meta,
-        countLabel: `${items.length}개 항목`,
-      },
-    }
+    return { category, items, primaryId: items[0]?.id }
   })
 }

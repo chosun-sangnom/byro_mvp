@@ -1,7 +1,8 @@
-import { ChevronRight, Plus, Zap } from 'lucide-react'
+import { Plus, Zap } from 'lucide-react'
 import { NavBar } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
-import type { HighlightIconId } from '@/types'
+import { getHighlightMetaParts } from '@/lib/highlightMeta'
+import type { Highlight, HighlightIconId } from '@/types'
 import type { HighlightCategorySection, HighlightManageCategory } from './constants'
 
 const HIGHLIGHT_FREE_LIMIT = 3
@@ -16,8 +17,12 @@ const SECTION_HELPERS: Record<string, string> = {
 interface HighlightManageListViewProps {
   categorySections: HighlightCategorySection[]
   onBack: () => void
-  onOpenCategory: (category: HighlightManageCategory) => void
+  editableHighlightIds: Set<string>
   onAdd: (category: HighlightManageCategory) => void
+  onEdit: (highlight: Highlight) => void
+  onDelete: (highlight: Highlight) => void
+  onSetPrimary: (category: HighlightManageCategory, highlightId: string) => void
+  onBlockedMockItem: (action: '수정' | '삭제') => void
   // [임시] OCR 클립보드 브릿지 — 스크린샷으로 경력/학력 자동 입력
   onLlmImport: () => void
   isPro: boolean
@@ -28,13 +33,22 @@ interface HighlightManageListViewProps {
 export function HighlightManageListView({
   categorySections,
   onBack,
-  onOpenCategory,
+  editableHighlightIds,
   onAdd,
+  onEdit,
+  onDelete,
+  onSetPrimary,
+  onBlockedMockItem,
   onLlmImport,
   isPro,
   freeRemaining,
   onUpgrade,
 }: HighlightManageListViewProps) {
+  const runOnEditable = (item: Highlight, action: '수정' | '삭제', run: () => void) => {
+    if (editableHighlightIds.has(item.id)) run()
+    else onBlockedMockItem(action)
+  }
+
   return (
     <div className="flex flex-col h-full">
       <NavBar title="하이라이트 관리" onBack={onBack} />
@@ -95,30 +109,67 @@ export function HighlightManageListView({
                 <p className="break-keep text-[13px] leading-[1.5] text-[#6C7786]">{SECTION_HELPERS[section.category.id]}</p>
               </div>
               <div className="overflow-hidden rounded-[24px] border border-[#DEE4EC] px-4">
-                {section.card ? (
-                  <button
-                    type="button"
-                    onClick={() => onOpenCategory(section.category)}
-                    className="flex w-full items-center gap-4 border-b border-[#DEE4EC] py-4 text-left"
-                  >
-                    <span className="flex size-9 shrink-0 items-center justify-center text-[#25313D]">
-                      <HighlightIcon id={section.category.icon as HighlightIconId} size={20} />
-                    </span>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-[14px] font-semibold text-[#0D0D0D]">{section.card.title}</p>
-                      <p className="mt-0.5 text-[12px] leading-[1.5] text-[#6C7786]">
-                        {section.card.meta} <span className="font-semibold text-[#25313D]">{section.card.countLabel}</span>
-                      </p>
-                    </div>
-                    <ChevronRight size={20} className="shrink-0 text-[#A8B1BD]" />
-                  </button>
-                ) : (
+                {section.items.length === 0 ? (
                   <div className="flex items-center gap-4 border-b border-[#DEE4EC] py-4">
                     <span className="flex size-9 shrink-0 items-center justify-center text-[#A8B1BD]">
                       <HighlightIcon id={section.category.icon as HighlightIconId} size={20} />
                     </span>
                     <p className="text-[13px] text-[#A8B1BD]">아직 추가한 {section.category.label} 항목이 없어요</p>
                   </div>
+                ) : (
+                  section.items.map((item) => {
+                    const isPrimary = item.id === section.primaryId
+                    const metaParts = getHighlightMetaParts(item)
+                    return (
+                      <div key={item.id} className="flex flex-col gap-3 border-b border-[#DEE4EC] py-4">
+                        <div className="flex flex-col gap-1">
+                          <div className="flex min-w-0 items-center gap-1.5">
+                            <p className="truncate text-[14px] font-semibold text-[#0D0D0D]">{item.title}</p>
+                            {item.verified && (
+                              <span className="flex shrink-0 items-center gap-0.5">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src="/images/ai-tools/exp-verified-badge.svg" alt="" className="h-3 w-3" />
+                                <span className="text-[11px] font-bold text-[#25313D]">
+                                  {item.categoryId === 'career-role' ? '인증됨' : '확인됨'}
+                                </span>
+                              </span>
+                            )}
+                          </div>
+                          {metaParts.length > 0 && <p className="text-[12px] font-semibold text-[#6C7786]">{metaParts.join(' · ')}</p>}
+                          {item.description?.trim() && (
+                            <p className="mt-1 text-[13px] leading-[1.6] text-[#475058]">{item.description}</p>
+                          )}
+                        </div>
+                        <div className="flex gap-1">
+                          {isPrimary ? (
+                            <span className="rounded-[6px] bg-[#F0F5FF] px-3 py-1.5 text-[12px] font-bold text-[#25313D]">메인 노출 중</span>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => onSetPrimary(section.category, item.id)}
+                              className="rounded-[6px] border border-[#DEE4EC] bg-white px-3 py-1.5 text-[12px] font-medium text-[#25313D]"
+                            >
+                              메인으로 설정
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => runOnEditable(item, '수정', () => onEdit(item))}
+                            className="rounded-[6px] border border-[#DEE4EC] bg-white px-3 py-1.5 text-[12px] font-bold text-[#25313D]"
+                          >
+                            수정
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => runOnEditable(item, '삭제', () => onDelete(item))}
+                            className="rounded-[6px] border border-[#DEE4EC] bg-white px-3 py-1.5 text-[12px] font-bold text-[#FF4242]"
+                          >
+                            삭제
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  })
                 )}
                 <button
                   type="button"

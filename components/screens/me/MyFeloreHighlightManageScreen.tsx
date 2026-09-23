@@ -7,7 +7,7 @@ import { useFeloreStore } from '@/store/useFeloreStore'
 import type { Highlight, HighlightIconId } from '@/types'
 import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
-import { sortHighlightsByPrimary } from '@/lib/highlightMeta'
+import { isPrimaryHighlight } from '@/lib/highlightMeta'
 import { HighlightManageFormView } from '@/components/screens/me/highlight-manage/HighlightManageFormView'
 import { HighlightManageListView } from '@/components/screens/me/highlight-manage/HighlightManageListView'
 import { HighlightAddMethodSheet } from '@/components/screens/me/highlight-manage/HighlightAddMethodSheet'
@@ -386,10 +386,11 @@ function buildCategorySections(
   primaryHighlightOverrides: Record<string, string>,
 ): HighlightCategorySection[] {
   return HIGHLIGHT_CATEGORIES.map((category) => {
-    const items = sortHighlightsByPrimary(
-      allManualHighlights.filter((item) => item.categoryId === category.id),
-      primaryHighlightOverrides[category.id],
-    )
-    return { category, items, primaryId: items[0]?.id }
+    // 메인으로 설정해도 항목 순서는 그대로 두고, 메인 표시만 옮긴다
+    const items = allManualHighlights.filter((item) => item.categoryId === category.id)
+    const primaryId = primaryHighlightOverrides[category.id]
+      ?? items.find((item) => isPrimaryHighlight(item))?.id
+      ?? items[0]?.id
+    return { category, items, primaryId }
   })
 }

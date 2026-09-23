@@ -6,10 +6,16 @@ import type { HighlightCategorySection, HighlightManageCategory } from './consta
 
 const HIGHLIGHT_FREE_LIMIT = 3
 
+const EMPTY_HINTS: Record<string, string> = {
+  'career-role': '회사 · 직무 · 재직 기간',
+  'education-history': '학교 · 전공 · 학위',
+}
+
 interface HighlightManageListViewProps {
   categorySections: HighlightCategorySection[]
   onBack: () => void
   onOpenCategory: (category: HighlightManageCategory) => void
+  onAddToCategory: (category: HighlightManageCategory) => void
   onOpenPicker: () => void
   // [임시] OCR 클립보드 브릿지 — 스크린샷으로 경력/학력 자동 입력
   onLlmImport: () => void
@@ -22,6 +28,7 @@ export function HighlightManageListView({
   categorySections,
   onBack,
   onOpenCategory,
+  onAddToCategory,
   onOpenPicker,
   onLlmImport,
   isPro,
@@ -82,34 +89,81 @@ export function HighlightManageListView({
           </div>
 
           <div className="overflow-hidden rounded-[24px] border border-[#DEE4EC] px-4">
-            {categorySections.map((section, index) => (
-              <button
-                key={section.category.id}
-                onClick={() => onOpenCategory(section.category)}
-                className={[
-                  'flex w-full items-center gap-4 py-4 text-left',
-                  index < categorySections.length - 1 ? 'border-b border-[#DEE4EC]' : '',
-                ].join(' ')}
-              >
-                <span className="flex size-9 shrink-0 items-center justify-center text-[#25313D]">
-                  <HighlightIcon id={section.category.icon as HighlightIconId} size={20} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[12px] font-semibold text-[#475058]">{section.category.label}</p>
-                  {section.card ? (
-                    <>
-                      <p className="mt-0.5 truncate text-[14px] font-semibold text-[#0D0D0D]">{section.card.title}</p>
-                      <p className="mt-0.5 text-[12px] leading-[1.5] text-[#6C7786]">
-                        {section.card.meta} <span className="font-semibold text-[#25313D]">{section.card.countLabel}</span>
-                      </p>
-                    </>
+            {categorySections.map((section, index) => {
+              const hasItems = section.totalCount > 0
+              const hiddenCount = section.totalCount - section.previewItems.length
+              return (
+                <div
+                  key={section.category.id}
+                  className={['py-4', index < categorySections.length - 1 ? 'border-b border-[#DEE4EC]' : ''].join(' ')}
+                >
+                  <button
+                    type="button"
+                    onClick={() => onOpenCategory(section.category)}
+                    className="flex w-full items-center gap-3 text-left"
+                  >
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-full bg-[#F2F4F7] text-[#25313D]">
+                      <HighlightIcon id={section.category.icon as HighlightIconId} size={20} />
+                    </span>
+                    <span className="flex min-w-0 flex-1 items-center gap-1.5">
+                      <span className="text-[16px] font-bold text-[#0D0D0D]">{section.category.label}</span>
+                      {hasItems && (
+                        <span className="rounded-full bg-[#F2F4F7] px-2 py-0.5 text-[12px] font-semibold text-[#475058]">
+                          {section.totalCount}
+                        </span>
+                      )}
+                    </span>
+                    <ChevronRight size={20} className="shrink-0 text-[#A8B1BD]" />
+                  </button>
+
+                  {hasItems ? (
+                    <button
+                      type="button"
+                      onClick={() => onOpenCategory(section.category)}
+                      className="mt-2 flex w-full flex-col pl-[52px] text-left"
+                    >
+                      {section.previewItems.map((item, itemIndex) => (
+                        <span
+                          key={item.id}
+                          className={[
+                            'flex flex-col py-2',
+                            itemIndex > 0 ? 'border-t border-[#EEF1F5]' : '',
+                          ].join(' ')}
+                        >
+                          <span className="flex min-w-0 items-center gap-1.5">
+                            <span className="truncate text-[14px] font-semibold text-[#0D0D0D]">{item.title}</span>
+                            {item.isPrimary && (
+                              <span className="shrink-0 rounded-[4px] bg-[#25313D] px-1.5 py-[1px] text-[10px] font-bold text-white">
+                                대표
+                              </span>
+                            )}
+                          </span>
+                          {item.meta && (
+                            <span className="mt-0.5 truncate text-[12px] leading-[1.5] text-[#6C7786]">{item.meta}</span>
+                          )}
+                        </span>
+                      ))}
+                      {hiddenCount > 0 && (
+                        <span className="pt-1 text-[12px] font-semibold text-[#475058]">+ {hiddenCount}개 더보기</span>
+                      )}
+                    </button>
                   ) : (
-                    <p className="mt-0.5 text-[13px] text-[#A8B1BD]">아직 추가한 항목이 없어요</p>
+                    <div className="mt-1.5 pl-[52px]">
+                      <p className="text-[13px] leading-[1.5] text-[#6C7786]">
+                        {section.category.examples || EMPTY_HINTS[section.category.id]}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => onAddToCategory(section.category)}
+                        className="mt-2.5 rounded-full border border-[#DEE4EC] px-3.5 py-1.5 text-[13px] font-semibold text-[#25313D]"
+                      >
+                        + {section.category.label} 추가
+                      </button>
+                    </div>
                   )}
                 </div>
-                <ChevronRight size={20} className="shrink-0 text-[#A8B1BD]" />
-              </button>
-            ))}
+              )
+            })}
           </div>
         </div>
 

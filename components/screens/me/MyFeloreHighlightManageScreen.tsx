@@ -7,7 +7,7 @@ import { useFeloreStore } from '@/store/useFeloreStore'
 import type { Highlight, HighlightIconId } from '@/types'
 import { HIGHLIGHT_CATEGORIES } from '@/lib/mocks/highlights'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
-import { getGroupedHighlightPreview, sortHighlightsByPrimary } from '@/lib/highlightMeta'
+import { getHighlightMetaParts, sortHighlightsByPrimary } from '@/lib/highlightMeta'
 import { HighlightManageCategoryView } from '@/components/screens/me/highlight-manage/HighlightManageCategoryView'
 import { HighlightManageFormView } from '@/components/screens/me/highlight-manage/HighlightManageFormView'
 import { HighlightManageListView } from '@/components/screens/me/highlight-manage/HighlightManageListView'
@@ -369,6 +369,10 @@ export function HighlightManageScreen({
         categorySections={categorySections}
         onBack={onBack}
         onOpenCategory={openCategory}
+        onAddToCategory={(category) => {
+          setSelectedCat(category)
+          openAddForm()
+        }}
         onOpenPicker={() => {
           resetAll()
           setMode('picker')
@@ -394,22 +398,20 @@ function buildCategorySections(
   primaryHighlightOverrides: Record<string, string>,
 ): HighlightCategorySection[] {
   return HIGHLIGHT_CATEGORIES.map((category) => {
+    const overrideId = primaryHighlightOverrides[category.id]
     const items = sortHighlightsByPrimary(
       allManualHighlights.filter((item) => item.categoryId === category.id),
-      primaryHighlightOverrides[category.id],
+      overrideId,
     )
-    if (items.length === 0) {
-      return { category, card: null }
-    }
-    const preview = getGroupedHighlightPreview(items, primaryHighlightOverrides[category.id])
     return {
       category,
-      card: {
-        category,
-        title: preview.title,
-        meta: preview.meta,
-        countLabel: `${items.length}개 항목`,
-      },
+      totalCount: items.length,
+      previewItems: items.slice(0, 3).map((item, index) => ({
+        id: item.id,
+        title: item.title,
+        meta: getHighlightMetaParts(item).join(' · '),
+        isPrimary: items.length > 1 && index === 0,
+      })),
     }
   })
 }

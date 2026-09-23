@@ -1,4 +1,5 @@
-import { Plus, Zap } from 'lucide-react'
+import { useState } from 'react'
+import { ChevronDown, ChevronUp, Plus, Zap } from 'lucide-react'
 import { NavBar } from '@/components/ui'
 import { HighlightIcon } from '@/components/highlights/HighlightIcon'
 import { getHighlightMetaParts } from '@/lib/highlightMeta'
@@ -6,6 +7,7 @@ import type { Highlight, HighlightIconId } from '@/types'
 import type { HighlightCategorySection, HighlightManageCategory } from './constants'
 
 const HIGHLIGHT_FREE_LIMIT = 3
+const COLLAPSED_ITEM_COUNT = 3
 
 const SECTION_HELPERS: Record<string, string> = {
   'career-role': "회사명과 직함, 재직 기간을 적어주세요. 건강보험공단 인증으로 직장 이력을 한 번에 불러오면 '인증됨' 뱃지가 붙어요.",
@@ -44,6 +46,16 @@ export function HighlightManageListView({
   freeRemaining,
   onUpgrade,
 }: HighlightManageListViewProps) {
+  const [expandedCategoryIds, setExpandedCategoryIds] = useState<Set<string>>(new Set())
+  const toggleExpanded = (categoryId: string) => {
+    setExpandedCategoryIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(categoryId)) next.delete(categoryId)
+      else next.add(categoryId)
+      return next
+    })
+  }
+
   const runOnEditable = (item: Highlight, action: '수정' | '삭제', run: () => void) => {
     if (editableHighlightIds.has(item.id)) run()
     else onBlockedMockItem(action)
@@ -102,86 +114,110 @@ export function HighlightManageListView({
             </button>
           </div>
 
-          {categorySections.map((section) => (
-            <section key={section.category.id} className="flex flex-col gap-3">
-              <div className="flex flex-col gap-1">
-                <h2 className="text-[16px] font-bold text-[#0D0D0D]">{section.category.label}</h2>
-                <p className="break-keep text-[13px] leading-[1.5] text-[#6C7786]">{SECTION_HELPERS[section.category.id]}</p>
-              </div>
-              <div className="overflow-hidden rounded-[24px] border border-[#DEE4EC] px-4">
-                {section.items.length === 0 ? (
-                  <div className="flex items-center gap-4 border-b border-[#DEE4EC] py-4">
-                    <span className="flex size-9 shrink-0 items-center justify-center text-[#A8B1BD]">
-                      <HighlightIcon id={section.category.icon as HighlightIconId} size={20} />
+          {categorySections.map((section) => {
+            const isCollapsible = section.items.length > COLLAPSED_ITEM_COUNT
+            const isExpanded = expandedCategoryIds.has(section.category.id)
+            const visibleItems = isCollapsible && !isExpanded ? section.items.slice(0, COLLAPSED_ITEM_COUNT) : section.items
+            return (
+              <section key={section.category.id} className="flex flex-col gap-3">
+                <div className="flex flex-col gap-1">
+                  <h2 className="flex items-center gap-1.5 text-[16px] font-bold text-[#0D0D0D]">
+                    <span className="text-[#25313D]">
+                      <HighlightIcon id={section.category.icon as HighlightIconId} size={18} />
                     </span>
-                    <p className="text-[13px] text-[#A8B1BD]">아직 추가한 {section.category.label} 항목이 없어요</p>
-                  </div>
-                ) : (
-                  section.items.map((item) => {
-                    const isPrimary = item.id === section.primaryId
-                    const metaParts = getHighlightMetaParts(item)
-                    return (
-                      <div key={item.id} className="flex flex-col gap-3 border-b border-[#DEE4EC] py-4">
-                        <div className="flex flex-col gap-1">
-                          <div className="flex min-w-0 items-center gap-1.5">
-                            <p className="truncate text-[14px] font-semibold text-[#0D0D0D]">{item.title}</p>
-                            {item.verified && (
-                              <span className="flex shrink-0 items-center gap-0.5">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src="/images/ai-tools/exp-verified-badge.svg" alt="" className="h-3 w-3" />
-                                <span className="text-[11px] font-bold text-[#25313D]">
-                                  {item.categoryId === 'career-role' ? '인증됨' : '확인됨'}
+                    {section.category.label}
+                  </h2>
+                  <p className="break-keep text-[13px] leading-[1.5] text-[#6C7786]">{SECTION_HELPERS[section.category.id]}</p>
+                </div>
+                <div className="overflow-hidden rounded-[24px] border border-[#DEE4EC] px-4">
+                  {section.items.length === 0 ? (
+                    <p className="border-b border-[#DEE4EC] py-4 text-[13px] text-[#A8B1BD]">아직 추가한 {section.category.label} 항목이 없어요</p>
+                  ) : (
+                    visibleItems.map((item) => {
+                      const isPrimary = item.id === section.primaryId
+                      const metaParts = getHighlightMetaParts(item)
+                      return (
+                        <div key={item.id} className="flex flex-col gap-3 border-b border-[#DEE4EC] py-4">
+                          <div className="flex flex-col gap-1">
+                            <div className="flex min-w-0 items-center gap-1.5">
+                              <p className="truncate text-[14px] font-semibold text-[#0D0D0D]">{item.title}</p>
+                              {item.verified && (
+                                <span className="flex shrink-0 items-center gap-0.5">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img src="/images/ai-tools/exp-verified-badge.svg" alt="" className="h-3 w-3" />
+                                  <span className="text-[11px] font-bold text-[#25313D]">
+                                    {item.categoryId === 'career-role' ? '인증됨' : '확인됨'}
+                                  </span>
                                 </span>
-                              </span>
+                              )}
+                            </div>
+                            {metaParts.length > 0 && <p className="text-[12px] font-semibold text-[#6C7786]">{metaParts.join(' · ')}</p>}
+                            {item.description?.trim() && (
+                              <p className="mt-1 text-[13px] leading-[1.6] text-[#475058]">{item.description}</p>
                             )}
                           </div>
-                          {metaParts.length > 0 && <p className="text-[12px] font-semibold text-[#6C7786]">{metaParts.join(' · ')}</p>}
-                          {item.description?.trim() && (
-                            <p className="mt-1 text-[13px] leading-[1.6] text-[#475058]">{item.description}</p>
-                          )}
-                        </div>
-                        <div className="flex gap-1">
-                          {isPrimary ? (
-                            <span className="rounded-[6px] bg-[#F0F5FF] px-3 py-1.5 text-[12px] font-bold text-[#25313D]">메인 노출 중</span>
-                          ) : (
+                          <div className="flex gap-1">
+                            {isPrimary ? (
+                              <span className="rounded-[6px] bg-[#F0F5FF] px-3 py-1.5 text-[12px] font-bold text-[#25313D]">메인 노출 중</span>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => onSetPrimary(section.category, item.id)}
+                                className="rounded-[6px] border border-[#DEE4EC] bg-white px-3 py-1.5 text-[12px] font-medium text-[#25313D]"
+                              >
+                                메인으로 설정
+                              </button>
+                            )}
                             <button
                               type="button"
-                              onClick={() => onSetPrimary(section.category, item.id)}
-                              className="rounded-[6px] border border-[#DEE4EC] bg-white px-3 py-1.5 text-[12px] font-medium text-[#25313D]"
+                              onClick={() => runOnEditable(item, '수정', () => onEdit(item))}
+                              className="rounded-[6px] border border-[#DEE4EC] bg-white px-3 py-1.5 text-[12px] font-bold text-[#25313D]"
                             >
-                              메인으로 설정
+                              수정
                             </button>
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => runOnEditable(item, '수정', () => onEdit(item))}
-                            className="rounded-[6px] border border-[#DEE4EC] bg-white px-3 py-1.5 text-[12px] font-bold text-[#25313D]"
-                          >
-                            수정
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => runOnEditable(item, '삭제', () => onDelete(item))}
-                            className="rounded-[6px] border border-[#DEE4EC] bg-white px-3 py-1.5 text-[12px] font-bold text-[#FF4242]"
-                          >
-                            삭제
-                          </button>
+                            <button
+                              type="button"
+                              onClick={() => runOnEditable(item, '삭제', () => onDelete(item))}
+                              className="rounded-[6px] border border-[#DEE4EC] bg-white px-3 py-1.5 text-[12px] font-bold text-[#FF4242]"
+                            >
+                              삭제
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    )
-                  })
-                )}
-                <button
-                  type="button"
-                  onClick={() => onAdd(section.category)}
-                  className="flex w-full items-center justify-center gap-1 py-3.5 text-[14px] font-semibold text-[#25313D]"
-                >
-                  <Plus size={16} />
-                  {section.category.label} 추가
-                </button>
-              </div>
-            </section>
-          ))}
+                      )
+                    })
+                  )}
+                  {isCollapsible && (
+                    <button
+                      type="button"
+                      onClick={() => toggleExpanded(section.category.id)}
+                      className="flex w-full items-center justify-center gap-1 border-b border-[#DEE4EC] py-3 text-[13px] font-semibold text-[#6C7786]"
+                    >
+                      {isExpanded ? (
+                        <>
+                          접기
+                          <ChevronUp size={16} />
+                        </>
+                      ) : (
+                        <>
+                          전체보기 {section.items.length}개
+                          <ChevronDown size={16} />
+                        </>
+                      )}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => onAdd(section.category)}
+                    className="flex w-full items-center justify-center gap-1 py-3.5 text-[14px] font-semibold text-[#25313D]"
+                  >
+                    <Plus size={16} />
+                    {section.category.label} 추가
+                  </button>
+                </div>
+              </section>
+            )
+          })}
         </div>
 
         {!isPro && (

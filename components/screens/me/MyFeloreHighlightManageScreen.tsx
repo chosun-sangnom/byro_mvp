@@ -12,7 +12,7 @@ import { HighlightManageFormView } from '@/components/screens/me/highlight-manag
 import { HighlightManageListView } from '@/components/screens/me/highlight-manage/HighlightManageListView'
 import { HighlightAddMethodSheet } from '@/components/screens/me/highlight-manage/HighlightAddMethodSheet'
 import { HighlightManageVerifyView } from '@/components/screens/me/highlight-manage/HighlightManageVerifyView'
-import { HighlightLlmImportSheet } from '@/components/screens/me/highlight-manage/HighlightLlmImportSheet'
+import { HighlightScreenshotImportFlow } from '@/components/screens/me/highlight-manage/HighlightScreenshotImportFlow'
 import {
   type HighlightCategorySection,
   type HighlightManageCategory,
@@ -369,13 +369,14 @@ export function HighlightManageScreen({
         freeRemaining={freeRemaining}
         onUpgrade={handleUpgrade}
       />
-      {/* [임시] LLM 클립보드 브릿지 임포트 시트 */}
-      <HighlightLlmImportSheet
-        open={llmImportOpen}
-        onClose={() => setLlmImportOpen(false)}
-        isPro={isPro}
-        freeRemaining={freeRemaining}
-      />
+      {/* [임시] 스크린샷 OCR 자동 채우기 */}
+      {llmImportOpen && (
+        <HighlightScreenshotImportFlow
+          isPro={isPro}
+          freeRemaining={freeRemaining}
+          onClose={() => setLlmImportOpen(false)}
+        />
+      )}
       {addMethodSheet}
     </>
   )

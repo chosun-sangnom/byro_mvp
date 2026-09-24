@@ -107,33 +107,39 @@ export function PublicProfileWhoTabPage({
         autoSummary={autoWhoSummary(profile)}
         onSave={(text) => store.updateTabSummary('who', text)}
       />
-      <PublicProfileWhoIAmSection
-        whoIAm={profile.whoIAm}
-        bio={profile.bio}
-        isOwner={isOwner}
-        onAdd={onEditSection && (() => onEditSection('whoiam'))}
-      />
-      <ProfileHighlightsSection
-        highlightSections={highlightSections}
-        username={username}
-        primaryHighlightOverrides={store.primaryHighlightOverrides}
-        getHighlightOpen={(key) => store.hlOpenStates[key] ?? false}
-        onToggleHighlight={(key) => store.toggleHlOpen(key)}
-        isOwner={isOwner}
-        onAdd={onEditSection && (() => onEditSection('highlight'))}
-      />
-      <ProfileSnsSection
-        instagramConnected={profile.instagramConnected}
-        linkedinConnected={profile.linkedinConnected}
-        youtubeConnected={profile.youtubeConnected}
-        tiktokConnected={profile.tiktokConnected}
-        instagram={profile.instagram}
-        linkedin={profile.linkedin}
-        youtube={profile.youtube}
-        tiktok={profile.tiktok}
-        isOwner={isOwner}
-        onEdit={onEditSection && (() => onEditSection('sns'))}
-      />
+      <div data-tour="whoiam">
+        <PublicProfileWhoIAmSection
+          whoIAm={profile.whoIAm}
+          bio={profile.bio}
+          isOwner={isOwner}
+          onAdd={onEditSection && (() => onEditSection('whoiam'))}
+        />
+      </div>
+      <div data-tour="highlight">
+        <ProfileHighlightsSection
+          highlightSections={highlightSections}
+          username={username}
+          primaryHighlightOverrides={store.primaryHighlightOverrides}
+          getHighlightOpen={(key) => store.hlOpenStates[key] ?? false}
+          onToggleHighlight={(key) => store.toggleHlOpen(key)}
+          isOwner={isOwner}
+          onAdd={onEditSection && (() => onEditSection('highlight'))}
+        />
+      </div>
+      <div data-tour="sns">
+        <ProfileSnsSection
+          instagramConnected={profile.instagramConnected}
+          linkedinConnected={profile.linkedinConnected}
+          youtubeConnected={profile.youtubeConnected}
+          tiktokConnected={profile.tiktokConnected}
+          instagram={profile.instagram}
+          linkedin={profile.linkedin}
+          youtube={profile.youtube}
+          tiktok={profile.tiktok}
+          isOwner={isOwner}
+          onEdit={onEditSection && (() => onEditSection('sns'))}
+        />
+      </div>
     </>
   )
 }
@@ -159,11 +165,13 @@ export function PublicProfileLifeTabPage({
         autoSummary={autoVibeSummary(profile.life)}
         onSave={(text) => store.updateTabSummary('vibe', text)}
       />
-      <PublicProfileLifeSection
-        life={profile.life}
-        isOwner={isOwner}
-        onAdd={onEditSection && (() => onEditSection('vibe'))}
-      />
+      <div data-tour="vibe">
+        <PublicProfileLifeSection
+          life={profile.life}
+          isOwner={isOwner}
+          onAdd={onEditSection && (() => onEditSection('vibe'))}
+        />
+      </div>
     </>
   )
 }
@@ -196,19 +204,21 @@ export function PublicProfileReputationTabPage({
         autoSummary={autoNetworkSummary(profile.rememberHighlight, profile.reputationKeywords)}
         onSave={(text) => store.updateTabSummary('network', text)}
       />
-      <ProfileRememberSection
-        total={profile.rememberHighlight.total}
-        industries={profile.rememberHighlight.industries}
-        isLoggedIn={store.isLoggedIn}
-        viewerNetworkDomains={store.user?.networkDomains}
-        viewerName={store.user?.name}
-        isOwner={isOwner}
-        mutualCompanies={profile.rememberHighlight.mutualCompanies}
-        topCompany={profile.rememberHighlight.topCompany}
-        topIndustry={profile.rememberHighlight.topIndustry}
-        topRole={profile.rememberHighlight.topRole}
-        onEdit={onEditSection && (() => onEditSection('network'))}
-      />
+      <div data-tour="network">
+        <ProfileRememberSection
+          total={profile.rememberHighlight.total}
+          industries={profile.rememberHighlight.industries}
+          isLoggedIn={store.isLoggedIn}
+          viewerNetworkDomains={store.user?.networkDomains}
+          viewerName={store.user?.name}
+          isOwner={isOwner}
+          mutualCompanies={profile.rememberHighlight.mutualCompanies}
+          topCompany={profile.rememberHighlight.topCompany}
+          topIndustry={profile.rememberHighlight.topIndustry}
+          topRole={profile.rememberHighlight.topRole}
+          onEdit={onEditSection && (() => onEditSection('network'))}
+        />
+      </div>
       <ProfileReputationSummarySection
         keywordCounts={keywordCounts}
         totalKeywordCount={totalKeywordCount}

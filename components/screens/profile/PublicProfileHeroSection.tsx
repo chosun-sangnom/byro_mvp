@@ -506,6 +506,7 @@ export function ProfileHeroCard({
                 <button
                   type="button"
                   onClick={(e) => { e.stopPropagation(); onBookmarkClick() }}
+                  data-tour="bookmark"
                   className="absolute left-4 top-4 z-10 flex size-10 items-center justify-center rounded-full border border-[rgba(255,255,255,0.8)] bg-[rgba(102,102,102,0.4)] backdrop-blur-[10px]"
                 >
                   {isBookmarked
@@ -632,6 +633,7 @@ export function ProfileHeroCard({
               <button
                 type="button"
                 onClick={() => setPersonaSheetOpen(true)}
+                data-tour="persona"
                 className="border-beam mt-2 flex w-full items-center gap-2 rounded-[16px] border border-white/50 bg-[rgba(102,102,102,0.4)] py-3 pl-3 pr-4 backdrop-blur-[10px]"
               >
                 <span className="min-w-0 flex-1 text-left text-[14px] font-medium leading-[1.35] text-white">{personaText}</span>
@@ -643,7 +645,7 @@ export function ProfileHeroCard({
                 </span>
               </button>
             ) : (
-              <div className="mt-2 flex w-full items-center gap-2 rounded-[16px] border border-white/20 bg-[rgba(102,102,102,0.25)] py-3 pl-3 pr-4 backdrop-blur-[10px]">
+              <div data-tour="persona" className="mt-2 flex w-full items-center gap-2 rounded-[16px] border border-white/20 bg-[rgba(102,102,102,0.25)] py-3 pl-3 pr-4 backdrop-blur-[10px]">
                 <span className="min-w-0 flex-1 text-left text-[14px] font-medium text-white/40">{personaText}</span>
               </div>
             )

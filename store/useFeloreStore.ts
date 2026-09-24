@@ -78,6 +78,14 @@ interface FeloreStore {
   // 케미
   kemiComputedProfiles: string[]
 
+  // 가입 직후 첫 프로필 진입 기능 소개 투어
+  profileTourPending: boolean
+  profileTourStep: number
+  setProfileTourStep(step: number): void
+  endProfileTour(): void
+  // [임시] 투어 다시 보기 (?tour=1)
+  restartProfileTour(): void
+
   // Actions
   nextStep(): void
   prevStep(): void
@@ -216,12 +224,25 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
   // 케미
   kemiComputedProfiles: [],
 
+  profileTourPending: false,
+  profileTourStep: 0,
+  setProfileTourStep(step) {
+    set({ profileTourStep: step })
+  },
+  endProfileTour() {
+    set({ profileTourPending: false, profileTourStep: 0 })
+  },
+  restartProfileTour() {
+    set({ profileTourPending: true, profileTourStep: 0 })
+  },
+
   // Actions
   nextStep() {
     const current = get().step
     const idx = STEP_ORDER.indexOf(current)
     if (idx < STEP_ORDER.length - 1) {
-      set({ step: STEP_ORDER[idx + 1] })
+      const next = STEP_ORDER[idx + 1]
+      set(next === 'complete' ? { step: next, profileTourPending: true, profileTourStep: 0 } : { step: next })
     }
   },
 
@@ -493,6 +514,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
       isLoggedIn: false,
       user: null,
       step: 'login',
+      profileTourPending: false,
       agreedTerms: false,
       agreedPrivacy: false,
       agreedMarketing: false,
@@ -688,6 +710,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
       isLoggedIn: false,
       user: null,
       step: 'login',
+      profileTourPending: false,
       agreedTerms: false,
       agreedPrivacy: false,
       agreedMarketing: false,
@@ -778,6 +801,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
     isLoggedIn: state.isLoggedIn,
     user: normalizeSampleUser(state.user),
     step: state.step,
+    profileTourPending: state.profileTourPending,
     agreedTerms: state.agreedTerms,
     agreedPrivacy: state.agreedPrivacy,
     agreedMarketing: state.agreedMarketing,

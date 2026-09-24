@@ -191,7 +191,7 @@ export function PublicProfileOwnerMatchZone({
   return (
     <>
       <div className="px-5 pb-3">
-        <div className="rounded-[20px] p-4" style={cardBorderStyle}>
+        <div data-tour="kemi" className="rounded-[20px] p-4" style={cardBorderStyle}>
           <div className="flex items-start gap-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/kemi-report-icon.svg" alt="" className="size-[40px] shrink-0" />

@@ -28,6 +28,7 @@ import { LoginModal } from '@/components/screens/profile/LoginModal'
 import { ExperienceBottomSheet, ExperienceDoneModal } from '@/components/screens/profile/PublicProfileOverlays'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import { useProfileOwner } from '@/hooks/useProfileOwner'
+import { PROFILE_TOUR_DEMO_LINK_ID, PROFILE_TOUR_DEMO_START, ProfileTour } from '@/components/screens/profile/ProfileTour'
 
 
 export function PublicProfileShell({
@@ -57,6 +58,24 @@ export function PublicProfileShell({
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
   const isLoggedIn = mounted && store.isLoggedIn
+
+  // [임시] ?tour=1 로 가입 직후 기능 소개 투어 다시 보기
+  useEffect(() => {
+    if (isOwnerMode && new URLSearchParams(window.location.search).get('tour') === '1') store.restartProfileTour()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOwnerMode])
+
+  const tourActive = mounted && store.profileTourPending
+  const tourStepIsDemo = store.profileTourStep >= PROFILE_TOUR_DEMO_START
+  const showOwnerTour = tourActive && isOwnerMode
+  const showDemoTour = tourActive && !isOwnerMode && isLoggedIn && tourStepIsDemo && username === PROFILE_TOUR_DEMO_LINK_ID
+
+  // 데모 프로필 단계에서 뒤로가기로 내 프로필에 새로 들어오면 투어를 끝낸 것으로 처리.
+  // "다음"으로 데모에 넘어가는 순간엔 이미 마운트된 상태라 isOwnerMode가 안 바뀌어 발동하지 않음
+  useEffect(() => {
+    const { profileTourPending, profileTourStep, endProfileTour } = useFeloreStore.getState()
+    if (isOwnerMode && profileTourPending && profileTourStep >= PROFILE_TOUR_DEMO_START) endProfileTour()
+  }, [isOwnerMode])
 
   // [임시] 오너 모드에서만 페르소나 생성 (목업 데이터 기반)
   const persona = generatePersona(profile)
@@ -102,7 +121,7 @@ export function PublicProfileShell({
   const hasContactChannels = profile.contactChannels.some((channel) => channel.enabled)
 
   return (
-    <div className="flex h-full flex-col">
+    <div data-tour-frame className="flex h-full flex-col">
 
 
       {/* ── 고정 헤더 영역 ── */}
@@ -173,6 +192,7 @@ export function PublicProfileShell({
               if (alreadySubmitted) { showToast('오늘 이미 경험을 남겼어요. 내일 다시 남길 수 있어요'); return }
               setExpSheetOpen(true)
             }}
+            data-tour="experience"
             className="flex-1 rounded-full py-3 text-[13px] font-semibold whitespace-nowrap"
             style={alreadySubmitted
               ? { border: '1px solid var(--color-border-default)', color: 'var(--color-text-secondary)' }
@@ -369,6 +389,9 @@ export function PublicProfileShell({
 
       <LoginModal open={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
 
+      {(showOwnerTour || showDemoTour) && (
+        <ProfileTour mode={showOwnerTour ? 'owner' : 'demo'} onTabChange={onTabChange} />
+      )}
     </div>
   )
 }

@@ -393,7 +393,7 @@ export function PublicProfileShell({
       <LoginModal open={loginModalOpen} onClose={() => setLoginModalOpen(false)} />
 
       {(showOwnerTour || showDemoTour) && (
-        <ProfileTour mode={showOwnerTour ? 'owner' : 'demo'} onTabChange={onTabChange} />
+        <ProfileTour mode={showOwnerTour ? 'owner' : 'demo'} activeTab={activeTab} onTabChange={onTabChange} />
       )}
     </div>
   )

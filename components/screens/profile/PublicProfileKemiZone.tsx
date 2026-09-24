@@ -61,7 +61,7 @@ export function PublicProfileKemiZone({
 
   if (isLoading) {
     return (
-      <div className="px-5 pb-3">
+      <div data-tour="visitor-kemi" className="px-5 pb-3">
         <div className="rounded-[20px] p-4" style={cardBorderStyle}>
           <div className="mb-3 flex items-center gap-1.5">
             <Sparkles size={13} style={{ color: 'var(--color-accent-dark)' }} className="animate-pulse" />
@@ -86,7 +86,7 @@ export function PublicProfileKemiZone({
   }
 
   return (
-    <div className="px-5 pb-3 space-y-3">
+    <div data-tour="visitor-kemi" className="px-5 pb-3 space-y-3">
       {/* 케미(공통점) — 케미 리포트와 별개 카드로 분리 노출 */}
       <div className="rounded-[20px] p-4" style={cardBorderStyle}>
         <div className="mb-3 flex items-center gap-1.5">

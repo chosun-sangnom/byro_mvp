@@ -33,6 +33,7 @@ export function PublicProfileTabBar({
               <button
                 key={tab.id}
                 type="button"
+                data-tour-tab={tab.id}
                 onClick={() => onTabChange(tab.id)}
                 className="relative overflow-hidden rounded-full px-6 py-2 text-center text-[14px] font-semibold"
               >

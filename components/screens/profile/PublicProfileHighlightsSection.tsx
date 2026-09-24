@@ -44,6 +44,7 @@ export function ProfileHighlightsSection({
   onToggleHighlight,
   isOwner,
   onAdd,
+  revealOnMount,
 }: {
   highlightSections: HighlightSection[]
   username: string
@@ -52,6 +53,8 @@ export function ProfileHighlightsSection({
   onToggleHighlight: (key: string) => void
   isOwner?: boolean
   onAdd?: () => void
+  /** 데모 미리보기 전용 — 뷰포트 진입(whileInView) 대신 마운트 즉시 재생 */
+  revealOnMount?: boolean
 }) {
   const isEmpty = highlightSections.length === 0
 
@@ -60,7 +63,7 @@ export function ProfileHighlightsSection({
 
   if (isEmpty) {
     return (
-      <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06}>
+      <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06} revealOnMount={revealOnMount}>
         <SectionTitle title="하이라이트" />
         <ProfileEmptyAddBlock label="하이라이트가" onAdd={onAdd!} />
       </AnimatedSection>
@@ -68,7 +71,7 @@ export function ProfileHighlightsSection({
   }
 
   return (
-    <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06}>
+    <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06} revealOnMount={revealOnMount}>
       <VerifiedBadgeGradientDefs />
       <SectionTitle title="하이라이트" onEdit={isOwner ? onAdd : undefined} />
       <div className="divide-y divide-[var(--color-border-soft)]">

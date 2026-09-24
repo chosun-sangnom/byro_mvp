@@ -324,6 +324,7 @@ export function ProfileRememberSection({
   topIndustry,
   topRole,
   hidePersonalizedNudge,
+  revealOnMount,
   onEdit,
 }: {
   total: number
@@ -338,6 +339,8 @@ export function ProfileRememberSection({
   topRole?: RememberTopValue
   /** 온보딩 가이드 데모 전용 — "로그인하면 맞춤 인사이트를 볼 수 있어요" 블러 넛지 숨김 */
   hidePersonalizedNudge?: boolean
+  /** 데모 미리보기 전용 — 뷰포트 진입(whileInView) 대신 마운트 즉시 재생 */
+  revealOnMount?: boolean
   /** 오너 전용 — 리멤버 네트워크에 내용이 있을 때 타이틀 옆 편집 진입점 */
   onEdit?: () => void
 }) {
@@ -374,7 +377,7 @@ export function ProfileRememberSection({
   const isEmpty = total === 0
 
   return (
-    <AnimatedSection className="px-5 pt-6 pb-2" delay={0.02}>
+    <AnimatedSection className="px-5 pt-6 pb-2" delay={0.02} revealOnMount={revealOnMount}>
       <SectionTitle
         title="리멤버 네트워크"
         subtitle={isEmpty ? undefined : `지금까지 ${total.toLocaleString()}명을 리멤버했어요`}

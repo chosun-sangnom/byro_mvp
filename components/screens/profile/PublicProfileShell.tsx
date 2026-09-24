@@ -28,7 +28,8 @@ import { LoginModal } from '@/components/screens/profile/LoginModal'
 import { ExperienceBottomSheet, ExperienceDoneModal } from '@/components/screens/profile/PublicProfileOverlays'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import { useProfileOwner } from '@/hooks/useProfileOwner'
-import { PROFILE_TOUR_DEMO_LINK_ID, PROFILE_TOUR_DEMO_START, ProfileTour } from '@/components/screens/profile/ProfileTour'
+import { toTourEmptyProfile, useTourEmptyPreview } from '@/components/screens/profile/profileTourPreview'
+import { PROFILE_TOUR_DEMO_LINK_ID, PROFILE_TOUR_DEMO_START, PROFILE_TOUR_FINISH_STEP, ProfileTour } from '@/components/screens/profile/ProfileTour'
 
 
 export function PublicProfileShell({
@@ -46,7 +47,7 @@ export function PublicProfileShell({
 }) {
   const router = useRouter()
   const store = useFeloreStore()
-  const profile = getNormalizedPublicProfile({
+  const baseProfile = getNormalizedPublicProfile({
     username,
     user: store.user,
     ownerHighlights: store.highlights,
@@ -54,6 +55,8 @@ export function PublicProfileShell({
   })
 
   const { isOwner: isOwnerMode } = useProfileOwner(username)
+  const tourEmptyPreview = useTourEmptyPreview(isOwnerMode)
+  const profile = tourEmptyPreview ? toTourEmptyProfile(baseProfile) : baseProfile
   // localStorage 기반 로그인 상태는 SSR에서 항상 false라 마운트 전엔 guest 값으로 고정 (hydration mismatch 방지)
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
@@ -66,15 +69,15 @@ export function PublicProfileShell({
   }, [isOwnerMode])
 
   const tourActive = mounted && store.profileTourPending
-  const tourStepIsDemo = store.profileTourStep >= PROFILE_TOUR_DEMO_START
   const showOwnerTour = tourActive && isOwnerMode
-  const showDemoTour = tourActive && !isOwnerMode && isLoggedIn && tourStepIsDemo && username === PROFILE_TOUR_DEMO_LINK_ID
+  const showDemoTour = tourActive && !isOwnerMode && isLoggedIn && store.profileTourStep >= PROFILE_TOUR_DEMO_START && username === PROFILE_TOUR_DEMO_LINK_ID
 
   // 데모 프로필 단계에서 뒤로가기로 내 프로필에 새로 들어오면 투어를 끝낸 것으로 처리.
   // "다음"으로 데모에 넘어가는 순간엔 이미 마운트된 상태라 isOwnerMode가 안 바뀌어 발동하지 않음
   useEffect(() => {
     const { profileTourPending, profileTourStep, endProfileTour } = useFeloreStore.getState()
-    if (isOwnerMode && profileTourPending && profileTourStep >= PROFILE_TOUR_DEMO_START) endProfileTour()
+    const leftDemoMidway = profileTourStep >= PROFILE_TOUR_DEMO_START && profileTourStep < PROFILE_TOUR_FINISH_STEP
+    if (isOwnerMode && profileTourPending && leftDemoMidway) endProfileTour()
   }, [isOwnerMode])
 
   // [임시] 오너 모드에서만 페르소나 생성 (목업 데이터 기반)

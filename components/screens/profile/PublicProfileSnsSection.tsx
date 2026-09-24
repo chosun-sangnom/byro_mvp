@@ -3,6 +3,7 @@
 import { motion, type Variants } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
 import { AnimatedSection, SectionTitle } from '@/components/screens/profile/PublicProfileSections'
+import { ProfileEmptyAddBlock } from '@/components/screens/profile/ProfileEmptyAddBlock'
 
 const snsListContainer: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.08 } } }
 // 온보딩 가이드 데모 전용(revealOnMount) — 카드가 먼저 드러난 뒤, 인스타그램 다음
@@ -83,7 +84,16 @@ export function ProfileSnsSection({
     },
   ].filter(Boolean) as SnsItem[]
 
-  if (items.length === 0) return null
+  if (items.length === 0) {
+    // 방문자에게는 빈 섹션을 숨기고, 오너에게만 추가 진입점을 노출
+    if (!(isOwner && onEdit)) return null
+    return (
+      <AnimatedSection className="px-5 pt-6 pb-2" revealOnMount={revealOnMount}>
+        <SectionTitle title="SNS" />
+        <ProfileEmptyAddBlock label="연결된 SNS가" onAdd={onEdit} />
+      </AnimatedSection>
+    )
+  }
 
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" revealOnMount={revealOnMount}>

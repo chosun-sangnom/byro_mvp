@@ -186,8 +186,6 @@ export function PublicProfileOwnerMatchZone({
 }) {
   const [reportOpen, setReportOpen] = useState(false)
 
-  if (!whoIAm) return null
-
   return (
     <>
       <div className="px-5 pb-3">
@@ -238,7 +236,7 @@ function OwnerKemiReportSheet({
 }: {
   open: boolean
   onClose: () => void
-  whoIAm: PublicProfileWhoIAm
+  whoIAm?: PublicProfileWhoIAm
   life?: PublicProfileLife
   title: string
   manualHighlights: Highlight[]

@@ -18,18 +18,21 @@ import { ProfileSnsSection } from '@/components/screens/profile/PublicProfileSns
 import { ProfileHighlightsSection } from '@/components/screens/profile/PublicProfileHighlightsSection'
 import { PublicProfileLifeSection } from '@/components/screens/profile/PublicProfileLifeSection'
 import { PublicProfileWhoIAmSection } from '@/components/screens/profile/PublicProfileWhoIAmSection'
+import { toTourEmptyProfile, useTourEmptyPreview } from '@/components/screens/profile/profileTourPreview'
 import { TabSummaryBlock } from '@/components/screens/profile/TabSummaryBlock'
 import { autoNetworkSummary, autoVibeSummary, autoWhoSummary } from '@/lib/tabSummaryAuto'
 
 function usePublicProfileTabData(username: string) {
   const store = useFeloreStore()
   const { isOwner: isOwnerMode, isLoggedIn } = useProfileOwner(username)
-  const profile = getNormalizedPublicProfile({
+  const baseProfile = getNormalizedPublicProfile({
     username,
     user: store.user,
     ownerHighlights: store.highlights,
     ownerTabVisibility: store.tabVisibility,
   })
+  const tourEmptyPreview = useTourEmptyPreview(isOwnerMode)
+  const profile = tourEmptyPreview ? toTourEmptyProfile(baseProfile) : baseProfile
   const tabAccessCtx = { isOwner: isOwnerMode, isLoggedIn }
   const tabAccess = {
     who: computeTabAccess(profile.tabVisibility, 'who', tabAccessCtx),

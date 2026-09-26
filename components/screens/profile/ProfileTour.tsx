@@ -64,8 +64,8 @@ export const PROFILE_TOUR_STEPS: TourStep[] = [
     desc: '나는 어떤 사람인지 짧게 소개하는 자리예요.',
     Example: PreviewBasicInfo,
     howLabel: '채우는 법',
-    how: 'MBTI를 고르고 성격을 한두 문장으로 적어요.',
-    benefit: '결이 맞는 사람을 더 잘 찾아줘요.',
+    how: 'MBTI를 고르고 성격을 적어요. 하이라이트를 먼저 채우면 자기소개는 AI가 알아서 써줘요.',
+    benefit: 'MBTI부터 성격, 자기소개까지 나를 폭넓게 표현할 수 있는 공간이에요.',
   },
   {
     target: 'highlight',
@@ -74,8 +74,8 @@ export const PROFILE_TOUR_STEPS: TourStep[] = [
     desc: '경력과 학력을 말로 설명하지 않아도 돼요.',
     Example: PreviewHighlight,
     howLabel: '채우는 법',
-    how: '이력서나 링크드인 화면을 캡처해 올리면 자동으로 채워져요.',
-    benefit: '처음 만난 자리에서 이력을 설명할 필요가 없어요.',
+    how: '직접 입력해도 되고, 이력서나 링크드인 화면을 캡처해 올리면 자동으로 채워져요.',
+    benefit: '내 경력과 학력을 인증받거나 한눈에 보여줄 수 있어요.',
   },
   {
     target: 'sns',
@@ -85,7 +85,7 @@ export const PROFILE_TOUR_STEPS: TourStep[] = [
     Example: PreviewSNS,
     howLabel: '채우는 법',
     how: '연결할 계정을 골라 연동하면 끝이에요.',
-    benefit: '관심 있는 사람이 내 계정으로 바로 찾아와요.',
+    benefit: '여기저기 흩어진 내 SNS를 한눈에 보여주고, 상대가 바로 내 SNS로 찾아올 수 있어요.',
   },
   {
     target: 'vibe',
@@ -96,7 +96,7 @@ export const PROFILE_TOUR_STEPS: TourStep[] = [
     exampleScale: 0.5,
     howLabel: '채우는 법',
     how: '좋아하는 걸 카드로 올리고 이유를 한 줄 남겨요.',
-    benefit: '취향이 겹치는 사람과 대화가 쉽게 시작돼요.',
+    benefit: '겉으로는 알 수 없던 공통점을 찾아, 처음 만난 사람과도 대화가 쉽게 시작돼요.',
   },
   {
     target: 'network',
@@ -128,15 +128,15 @@ export const PROFILE_TOUR_STEPS: TourStep[] = [
     desc: '상대와 내가 얼마나 잘 맞는지 바로 보여줘요.',
     howLabel: '보는 법',
     how: '리포트 보기를 누르면 자세한 분석이 열려요.',
-    benefit: '내가 여태 채운 정보가 함께 반영돼, 채울수록 공통점을 더 정확히 찾아줘요.',
+    benefit: '취향과 동네, 라이프스타일에서 나와 겹치는 공통점을 짚어주고, 어떤 이야기로 말을 걸면 좋을지도 알려줘요. 내가 채운 정보가 많을수록 더 정확해져요.',
   },
   {
     target: 'experience',
     title: '경험 남기기',
     desc: '함께한 사람에게 평판 키워드와 피드백을 남겨요.',
     howLabel: '남기는 법',
-    how: '키워드를 고르고 한 줄 적으면 끝이에요. 익명도 돼요.',
-    benefit: '주고받은 경험이 쌓여 서로의 신뢰가 돼요.',
+    how: '키워드를 고르고 한 줄 적으면 끝이에요. 익명으로도 남길 수 있어요.',
+    benefit: '남긴 경험은 상대 프로필의 평판 키워드와 피드백으로 쌓여요. 나도 경험을 받으면 가장 많이 받은 평판 키워드가 내 프로필에 보여 신뢰를 더해줘요.',
   },
 ]
 
@@ -434,9 +434,9 @@ export function ProfileTour({
           </span>
           <p className="mt-4 text-[20px] font-bold leading-[1.4] text-[#0D0D0D]">이제 나를 채워볼 차례예요</p>
           <p className="mt-2 text-[14px] leading-[1.6] text-[#475058]">
-            방금 본 것들을 하나씩 채우면
+            방금 본 것들을 하나씩 채워
             <br />
-            프로필이 완성돼요.
+            멋진 Felore 프로필을 만들어보세요.
           </p>
           <div className="mt-6 w-full">
             <Button onClick={start}>시작하기</Button>
@@ -551,7 +551,7 @@ export function ProfileTour({
                 <dt className="w-[64px] shrink-0 text-[12px] font-bold leading-[1.6] text-[#0D0D0D]">{step.howLabel}</dt>
                 <dd className="text-[13px] leading-[1.5] text-[#475058]">{step.how}</dd>
               </div>
-              <div className={Array.isArray(step.benefit) ? 'rounded-[12px] bg-[#F4F6F8] px-3 py-2' : 'flex gap-2'}>
+              <div className={Array.isArray(step.benefit) ? '' : 'flex gap-2'}>
                 <dt className={Array.isArray(step.benefit) ? 'mb-1 text-[12px] font-bold text-[var(--color-accent-dark)]' : 'w-[64px] shrink-0 text-[12px] font-bold leading-[1.6] text-[var(--color-accent-dark)]'}>좋은 점</dt>
                 <dd className="text-[13px] font-medium leading-[1.5] text-[var(--color-accent-dark)]">
                   {Array.isArray(step.benefit) ? (

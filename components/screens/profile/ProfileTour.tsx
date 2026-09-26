@@ -30,6 +30,8 @@ type TourStep = {
   exampleScale?: number
   /** 히어로 카드처럼 아래쪽(이름·페르소나)이 핵심인 예시는 아래 기준으로 자름 */
   exampleAnchor?: 'top' | 'bottom'
+  /** 예시 칸 높이. 이미지가 큰 예시는 'square'로 정방형 */
+  exampleSize?: number | 'square'
   howLabel: string
   /** 방법·장점이 여러 개면 목록으로 표시 */
   how: string | string[]
@@ -42,8 +44,9 @@ export const PROFILE_TOUR_STEPS: TourStep[] = [
     title: 'AI 페르소나',
     desc: '내 프로필에서 가장 먼저 읽히는 한 문장이에요.',
     Example: PreviewPersona,
-    exampleScale: 0.62,
+    exampleScale: 0.8,
     exampleAnchor: 'bottom',
+    exampleSize: 'square',
     howLabel: '만드는 법',
     how: '직함과 바이브, 받은 평판을 바탕으로 AI가 알아서 써줘요.',
     benefit: '프로필을 채울수록 여태 채운 정보가 반영돼 나를 더 멋지게 소개해줘요.',
@@ -63,6 +66,7 @@ export const PROFILE_TOUR_STEPS: TourStep[] = [
     title: '나',
     desc: '나는 어떤 사람인지 짧게 소개하는 자리예요.',
     Example: PreviewBasicInfo,
+    exampleSize: 180,
     howLabel: '채우는 법',
     how: 'MBTI를 고르고 성격을 적어요. 하이라이트를 먼저 채우면 자기소개는 AI가 알아서 써줘요.',
     benefit: 'MBTI부터 성격, 자기소개까지 나를 폭넓게 표현할 수 있는 공간이에요.',
@@ -73,6 +77,8 @@ export const PROFILE_TOUR_STEPS: TourStep[] = [
     title: '하이라이트',
     desc: '경력과 학력을 말로 설명하지 않아도 돼요.',
     Example: PreviewHighlight,
+    exampleScale: 0.9,
+    exampleSize: 'square',
     howLabel: '채우는 법',
     how: [
       '경력은 건강보험공단에서 한 번에 불러와요.',
@@ -98,7 +104,8 @@ export const PROFILE_TOUR_STEPS: TourStep[] = [
     title: '바이브',
     desc: '좋아하는 것들로 나를 보여주는 공간이에요.',
     Example: PreviewLife,
-    exampleScale: 0.5,
+    exampleScale: 0.72,
+    exampleSize: 'square',
     howLabel: '채우는 법',
     how: '좋아하는 걸 카드로 올리고 이유를 한 줄 남겨요.',
     benefit: '겉으로는 알 수 없던 공통점을 찾아, 처음 만난 사람과도 대화가 쉽게 시작돼요.',
@@ -109,6 +116,7 @@ export const PROFILE_TOUR_STEPS: TourStep[] = [
     title: '리멤버 네트워크',
     desc: '내 인맥이 어느 회사와 업계에 모여 있는지 보여줘요.',
     Example: PreviewNetwork,
+    exampleSize: 180,
     howLabel: '채우는 법',
     how: '리멤버에서 명함을 엑셀로 내보내 올리면 돼요.',
     benefit: [
@@ -154,6 +162,18 @@ const PAD = 8
 const GAP = 12
 const DIM = 'rgba(13,13,13,0.62)'
 const EXAMPLE_HEIGHT = 120
+
+// 온점(물음표·느낌표 포함)마다 줄을 바꿔 한 문장씩 읽히게
+function SentenceLines({ text }: { text: string }) {
+  const sentences = text.split(/(?<=[.!?])\s+/)
+  return (
+    <>
+      {sentences.map((sentence, i) => (
+        <span key={i} className="block">{sentence}</span>
+      ))}
+    </>
+  )
+}
 
 type Rect = { top: number; left: number; width: number; height: number }
 type Frame = { left: number; width: number }
@@ -230,7 +250,10 @@ function TourExample({ step }: { step: TourStep }) {
   const scale = step.exampleScale ?? 0.8
   const anchorBottom = step.exampleAnchor === 'bottom'
   return (
-    <div className="relative mt-3 overflow-hidden rounded-[14px] bg-[#F4F6F8]" style={{ height: EXAMPLE_HEIGHT }}>
+    <div
+      className="relative mt-3 overflow-hidden rounded-[14px] bg-[#F4F6F8]"
+      style={step.exampleSize === 'square' ? { aspectRatio: '1 / 1' } : { height: step.exampleSize ?? EXAMPLE_HEIGHT }}
+    >
       <div
         className="pointer-events-none absolute left-0"
         style={{
@@ -265,11 +288,11 @@ function TourInfoRow({ label, content, accent }: { label: string; content: strin
             {content.map((line) => (
               <li key={line} className="flex gap-1.5">
                 <span className="mt-[8px] size-1 shrink-0 rounded-full bg-current" />
-                <span>{line}</span>
+                <span><SentenceLines text={line} /></span>
               </li>
             ))}
           </ul>
-        ) : content}
+        ) : <SentenceLines text={content} />}
       </dd>
     </div>
   )
@@ -572,7 +595,7 @@ export function ProfileTour({
               </span>
             </div>
             <p className="mt-1 text-[17px] font-bold text-[#0D0D0D]">{step.title}</p>
-            <p className="mt-0.5 text-[13px] leading-[1.5] text-[#475058]">{step.desc}</p>
+            <p className="mt-0.5 text-[13px] leading-[1.5] text-[#475058]"><SentenceLines text={step.desc} /></p>
             <TourExample step={step} />
             <dl className="mt-3 space-y-2.5">
               <TourInfoRow label={step.howLabel} content={step.how} />

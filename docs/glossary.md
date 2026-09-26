@@ -12,6 +12,8 @@
 | 피드백 요청 | 지인에게 피드백 작성을 요청하는 기능 | — | `onRequestFeedback` |
 | 회원가입 | 계정 생성 절차: 소셜 로그인 → 약관 동의 → 본인인증 | 온보딩 (이 구간에 사용 금지) | `Step1Login`, `StepTermsAgreement`, `Step2Verify` |
 | 온보딩 | 회원가입 완료 후 프로필 초기 설정: 기본정보 → 프로필 → SNS → 연락 수단 → 하이라이트 → 자기소개 | 회원가입 (이 구간에 사용 금지) | `Step2BasicInfo` ~ `Step9Complete` |
+| 온보딩 가이드 | 온보딩 마지막 단계(`Step9Complete`)의 기능 소개 슬라이드 | — | `Step9Complete`, `GUIDE_SLIDES` |
+| 온보딩 투어 | 온보딩을 마치고 내 프로필에 처음 들어왔을 때 1회 뜨는 스포트라이트 안내. 실제 화면의 섹션을 차례로 강조하고 데모 프로필(이지민)에서 저장하기, 나와의 케미, 경험 남기기까지 보여준다 | 코치마크 투어, 프로필 투어, 기능 소개 투어 | `ProfileTour`, `profileTourPending` |
 
 ## 폐기 개념
 

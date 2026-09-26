@@ -253,13 +253,14 @@ function TourExample({ step }: { step: TourStep }) {
 }
 
 function TourInfoRow({ label, content, accent }: { label: string; content: string | string[]; accent?: boolean }) {
-  const color = accent ? 'text-[var(--color-accent-dark)]' : 'text-[#475058]'
+  const color = accent ? 'text-[var(--color-accent-dark)] font-medium' : 'text-[#475058]'
   const labelColor = accent ? 'text-[var(--color-accent-dark)]' : 'text-[#0D0D0D]'
-  if (Array.isArray(content)) {
-    return (
-      <div>
-        <dt className={`mb-1 text-[12px] font-bold ${labelColor}`}>{label}</dt>
-        <dd className={`text-[13px] leading-[1.5] ${color} ${accent ? 'font-medium' : ''}`}>
+  // 채우는 법과 좋은 점 모두 라벨은 위, 내용은 아래 카드 폭 전체로 통일
+  return (
+    <div>
+      <dt className={`mb-0.5 text-[12px] font-bold ${labelColor}`}>{label}</dt>
+      <dd className={`text-[13px] leading-[1.5] ${color}`}>
+        {Array.isArray(content) ? (
           <ul className="space-y-1">
             {content.map((line) => (
               <li key={line} className="flex gap-1.5">
@@ -268,14 +269,8 @@ function TourInfoRow({ label, content, accent }: { label: string; content: strin
               </li>
             ))}
           </ul>
-        </dd>
-      </div>
-    )
-  }
-  return (
-    <div className="flex gap-2">
-      <dt className={`w-[64px] shrink-0 text-[12px] font-bold leading-[1.6] ${labelColor}`}>{label}</dt>
-      <dd className={`text-[13px] leading-[1.5] ${color} ${accent ? 'font-medium' : ''}`}>{content}</dd>
+        ) : content}
+      </dd>
     </div>
   )
 }
@@ -579,7 +574,7 @@ export function ProfileTour({
             <p className="mt-1 text-[17px] font-bold text-[#0D0D0D]">{step.title}</p>
             <p className="mt-0.5 text-[13px] leading-[1.5] text-[#475058]">{step.desc}</p>
             <TourExample step={step} />
-            <dl className="mt-3 space-y-1.5">
+            <dl className="mt-3 space-y-2.5">
               <TourInfoRow label={step.howLabel} content={step.how} />
               <TourInfoRow label="좋은 점" content={step.benefit} accent />
             </dl>

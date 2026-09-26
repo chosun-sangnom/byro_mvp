@@ -589,7 +589,7 @@ export function ProfileTour({
             궁금한 기능은 프로필에서 하나씩 눌러보며 확인할 수 있어요.
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => setSkipConfirmOpen(false)}>계속 볼게요</Button>
+            <Button variant="outline" onClick={() => setSkipConfirmOpen(false)} style={{ borderRadius: 9999 }}>계속 볼게요</Button>
             <Button
               onClick={() => {
                 setSkipConfirmOpen(false)

@@ -62,9 +62,10 @@ export function PublicProfileShell({
   useEffect(() => { setMounted(true) }, [])
   const isLoggedIn = mounted && store.isLoggedIn
 
-  // [임시] ?tour=1 로 가입 직후 기능 소개 투어 다시 보기
+  // [임시] ?tour=1 로 가입 직후 기능 소개 투어 다시 보기, ?tour=7 처럼 n번째 단계(내 프로필 단계만)부터 보기
   useEffect(() => {
-    if (isOwnerMode && new URLSearchParams(window.location.search).get('tour') === '1') store.restartProfileTour()
+    const tourParam = Number(new URLSearchParams(window.location.search).get('tour'))
+    if (isOwnerMode && tourParam >= 1 && tourParam <= PROFILE_TOUR_DEMO_START) store.restartProfileTour(tourParam - 1)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOwnerMode])
 

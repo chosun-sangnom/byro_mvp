@@ -83,8 +83,8 @@ interface FeloreStore {
   profileTourStep: number
   setProfileTourStep(step: number): void
   endProfileTour(): void
-  // [임시] 투어 다시 보기 (?tour=1)
-  restartProfileTour(): void
+  // [임시] 투어 다시 보기 (?tour=1, ?tour=7 처럼 n번째 단계부터)
+  restartProfileTour(step?: number): void
 
   // Actions
   nextStep(): void
@@ -232,8 +232,8 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
   endProfileTour() {
     set({ profileTourPending: false, profileTourStep: 0 })
   },
-  restartProfileTour() {
-    set({ profileTourPending: true, profileTourStep: 0 })
+  restartProfileTour(step = 0) {
+    set({ profileTourPending: true, profileTourStep: step })
   },
 
   // Actions

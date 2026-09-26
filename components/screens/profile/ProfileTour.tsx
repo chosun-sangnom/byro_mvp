@@ -31,8 +31,8 @@ type TourStep = {
   /** 히어로 카드처럼 아래쪽(이름·페르소나)이 핵심인 예시는 아래 기준으로 자름 */
   exampleAnchor?: 'top' | 'bottom'
   howLabel: string
-  how: string
-  /** 장점이 여러 개면 목록으로 표시 */
+  /** 방법·장점이 여러 개면 목록으로 표시 */
+  how: string | string[]
   benefit: string | string[]
 }
 
@@ -74,8 +74,13 @@ export const PROFILE_TOUR_STEPS: TourStep[] = [
     desc: '경력과 학력을 말로 설명하지 않아도 돼요.',
     Example: PreviewHighlight,
     howLabel: '채우는 법',
-    how: '직접 입력해도 되고, 이력서나 링크드인 화면을 캡처해 올리면 자동으로 채워져요.',
-    benefit: '내 경력과 학력을 인증받거나 한눈에 보여줄 수 있어요.',
+    how: [
+      '경력은 건강보험공단에서 한 번에 불러와요.',
+      '학력은 졸업증명서 사진이나 학교 이메일로 확인해요.',
+      '이력서나 링크드인 화면을 캡처해 올려도 자동으로 채워져요.',
+      '물론 직접 입력할 수도 있어요.',
+    ],
+    benefit: '불러오거나 확인한 경력과 학력에는 인증 뱃지가 붙어, 내 이력을 믿을 수 있게 한눈에 보여줄 수 있어요.',
   },
   {
     target: 'sns',
@@ -243,6 +248,34 @@ function TourExample({ step }: { step: TourStep }) {
       <span className="absolute right-2 top-2 rounded-full bg-[#0D0D0D]/75 px-2 py-0.5 text-[11px] font-semibold text-white">
         예시
       </span>
+    </div>
+  )
+}
+
+function TourInfoRow({ label, content, accent }: { label: string; content: string | string[]; accent?: boolean }) {
+  const color = accent ? 'text-[var(--color-accent-dark)]' : 'text-[#475058]'
+  const labelColor = accent ? 'text-[var(--color-accent-dark)]' : 'text-[#0D0D0D]'
+  if (Array.isArray(content)) {
+    return (
+      <div>
+        <dt className={`mb-1 text-[12px] font-bold ${labelColor}`}>{label}</dt>
+        <dd className={`text-[13px] leading-[1.5] ${color} ${accent ? 'font-medium' : ''}`}>
+          <ul className="space-y-1">
+            {content.map((line) => (
+              <li key={line} className="flex gap-1.5">
+                <span className="mt-[8px] size-1 shrink-0 rounded-full bg-current" />
+                <span>{line}</span>
+              </li>
+            ))}
+          </ul>
+        </dd>
+      </div>
+    )
+  }
+  return (
+    <div className="flex gap-2">
+      <dt className={`w-[64px] shrink-0 text-[12px] font-bold leading-[1.6] ${labelColor}`}>{label}</dt>
+      <dd className={`text-[13px] leading-[1.5] ${color} ${accent ? 'font-medium' : ''}`}>{content}</dd>
     </div>
   )
 }
@@ -547,25 +580,8 @@ export function ProfileTour({
             <p className="mt-0.5 text-[13px] leading-[1.5] text-[#475058]">{step.desc}</p>
             <TourExample step={step} />
             <dl className="mt-3 space-y-1.5">
-              <div className="flex gap-2">
-                <dt className="w-[64px] shrink-0 text-[12px] font-bold leading-[1.6] text-[#0D0D0D]">{step.howLabel}</dt>
-                <dd className="text-[13px] leading-[1.5] text-[#475058]">{step.how}</dd>
-              </div>
-              <div className={Array.isArray(step.benefit) ? '' : 'flex gap-2'}>
-                <dt className={Array.isArray(step.benefit) ? 'mb-1 text-[12px] font-bold text-[var(--color-accent-dark)]' : 'w-[64px] shrink-0 text-[12px] font-bold leading-[1.6] text-[var(--color-accent-dark)]'}>좋은 점</dt>
-                <dd className="text-[13px] font-medium leading-[1.5] text-[var(--color-accent-dark)]">
-                  {Array.isArray(step.benefit) ? (
-                    <ul className="space-y-1">
-                      {step.benefit.map((line) => (
-                        <li key={line} className="flex gap-1.5">
-                          <span className="mt-[8px] size-1 shrink-0 rounded-full bg-current" />
-                          <span>{line}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : step.benefit}
-                </dd>
-              </div>
+              <TourInfoRow label={step.howLabel} content={step.how} />
+              <TourInfoRow label="좋은 점" content={step.benefit} accent />
             </dl>
             <div className="mt-3.5 flex items-center justify-between">
               <button type="button" onClick={() => setSkipConfirmOpen(true)} className="text-[13px] font-medium text-[#8A949E]">

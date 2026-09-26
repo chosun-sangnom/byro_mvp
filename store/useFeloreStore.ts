@@ -241,8 +241,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
     const current = get().step
     const idx = STEP_ORDER.indexOf(current)
     if (idx < STEP_ORDER.length - 1) {
-      const next = STEP_ORDER[idx + 1]
-      set(next === 'complete' ? { step: next, profileTourPending: true, profileTourStep: 0 } : { step: next })
+      set({ step: STEP_ORDER[idx + 1] })
     }
   },
 
@@ -476,6 +475,9 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
       highlights: highlightsInitialized ? highlights : SAMPLE_PROFILE.manualHighlights as Highlight[],
       highlightsInitialized: true,
       step: 'login',
+      // 가입 직후 첫 프로필 진입 때 온보딩 투어를 딱 1번 띄움 (온보딩을 건너뛰어도 동일)
+      profileTourPending: true,
+      profileTourStep: 0,
     })
     void instagramConnected
     void linkedinConnected

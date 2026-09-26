@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type ComponentType } from 'react'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Sparkles } from 'lucide-react'
-import { Button } from '@/components/ui'
+import { Button, Modal } from '@/components/ui'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import type { PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
 import {
@@ -268,6 +268,7 @@ export function ProfileTour({
   const waitingForDemo = mode === 'owner' && stepIndex >= PROFILE_TOUR_DEMO_START && !isFinish
 
   const [phase, setPhase] = useState<Phase>('move')
+  const [skipConfirmOpen, setSkipConfirmOpen] = useState(false)
   const [pressKey, setPressKey] = useState<number | null>(null)
   const [pressPoint, setPressPoint] = useState<PressPoint | null>(null)
   const pressElRef = useRef<HTMLElement | null>(null)
@@ -567,7 +568,7 @@ export function ProfileTour({
               </div>
             </dl>
             <div className="mt-3.5 flex items-center justify-between">
-              <button type="button" onClick={finish} className="text-[13px] font-medium text-[#8A949E]">
+              <button type="button" onClick={() => setSkipConfirmOpen(true)} className="text-[13px] font-medium text-[#8A949E]">
                 건너뛰기
               </button>
               <Button size="sm" fullWidth={false} onClick={goNext}>
@@ -577,6 +578,29 @@ export function ProfileTour({
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* 오버레이(z-95) 안에 둬야 딤과 안내 카드 위로 뜸 */}
+      <Modal open={skipConfirmOpen} onClose={() => setSkipConfirmOpen(false)} widthClassName="w-[calc(100%-40px)]">
+        <div className="text-left">
+          <div className="mb-2 text-lg font-black">온보딩 투어를 종료할까요?</div>
+          <div className="meta-text mb-5 leading-relaxed">
+            지금 종료하면 이 안내는 다시 볼 수 없어요.
+            <br />
+            궁금한 기능은 프로필에서 하나씩 눌러보며 확인할 수 있어요.
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setSkipConfirmOpen(false)}>계속 볼게요</Button>
+            <Button
+              onClick={() => {
+                setSkipConfirmOpen(false)
+                finish()
+              }}
+            >
+              종료하기
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

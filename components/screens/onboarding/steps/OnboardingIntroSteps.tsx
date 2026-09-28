@@ -32,7 +32,7 @@ import {
 export type Mode = 'choose' | 'signup' | 'login'
 type LoginView = 'main' | 'oauth' | 'phone' | 'reset'
 type OAuthProvider = 'google'
-type OAuthStep = 'pending' | 'done'
+type OAuthStep = 'pending' | 'done' | 'terms'
 type ResetMethod = 'choose' | 'sms' | 'email'
 type ResetStage = 'verify' | 'newPassword' | 'done'
 
@@ -194,25 +194,10 @@ export function Step1Login({
     const meta = OAUTH_META[oauthProvider]
 
     if (oauthStep === 'done') {
-      if (mode === 'login') {
-        return (
-          <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
-            <div className="flex-1 flex flex-col items-center justify-center text-center">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mb-5"
-                style={{ backgroundColor: 'var(--color-state-success-bg)' }}>
-                <CheckCircle2 size={32} style={{ color: 'var(--color-state-success-text)' }} />
-              </div>
-              <div className="text-xl font-black text-[var(--color-text-strong)] mb-2">
-                {meta.label} 로그인 완료
-              </div>
-              <p className="meta-text leading-relaxed">펠로어에 오신 걸 환영해요!</p>
-            </div>
-            {/* [임시] 실제 로그인 API 미연동 */}
-            <Button onClick={handleLoginComplete}>내 Felore 보기</Button>
-          </div>
-        )
-      }
-
+      // [임시] SCRUM-207 — "로그인" > "구글로 로그인"을 눌러도 실제로는 연동된 계정이 없어
+      // 곧바로 회원가입으로 이어지는 경우를 재현. 이 경우 기존엔 이용약관 동의 없이 바로
+      // 기본정보 입력으로 넘어갔는데, 연결 완료 후 이용약관 동의(신규 가입자의 "1단계")를
+      // 반드시 거치도록 수정.
       return (
         <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
           <div className="flex-1 flex flex-col items-center justify-center text-center">
@@ -223,9 +208,66 @@ export function Step1Login({
             <div className="text-xl font-black text-[var(--color-text-strong)] mb-2">
               {meta.label} 연결 완료
             </div>
-            <p className="meta-text leading-relaxed">이제 프로필을 만들어볼게요.</p>
+            <p className="meta-text leading-relaxed">
+              {mode === 'login'
+                ? '연동된 Felore 계정이 없어요. 회원가입을 진행할게요.'
+                : '이제 프로필을 만들어볼게요.'}
+            </p>
           </div>
-          <Button onClick={() => store.nextStep()}>계속하기</Button>
+          <Button onClick={() => setOauthStep('terms')}>계속하기</Button>
+        </div>
+      )
+    }
+
+    if (oauthStep === 'terms') {
+      const allAgreed = store.agreedTerms && store.agreedPrivacy && store.agreedMarketing
+      const canProceed = store.agreedTerms && store.agreedPrivacy
+      return (
+        <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
+          <div className="mb-6">
+            <div className="text-xl font-black text-[var(--color-text-strong)] leading-tight mb-2">
+              이용약관에<br />동의해주세요
+            </div>
+            <p className="meta-text leading-relaxed">펠로어를 시작하려면 약관 동의가 필요해요.</p>
+          </div>
+
+          <div className="flex-1">
+            <div className="pb-4 mb-2 border-b border-[var(--color-border-default)]">
+              <TermsCheckRow
+                label="전체 동의"
+                checked={allAgreed}
+                onToggle={() => store.toggleAllAgreed()}
+              />
+            </div>
+
+            <TermsCheckRow
+              badge="필수"
+              label="이용약관"
+              checked={store.agreedTerms}
+              onToggle={() => store.setAgreedTerms(!store.agreedTerms)}
+              onDetail={() => showToast('준비 중인 페이지예요')}
+            />
+            <TermsCheckRow
+              badge="필수"
+              label="개인정보 수집 및 이용"
+              checked={store.agreedPrivacy}
+              onToggle={() => store.setAgreedPrivacy(!store.agreedPrivacy)}
+              onDetail={() => showToast('준비 중인 페이지예요')}
+            />
+            <TermsCheckRow
+              badge="선택"
+              label="마케팅 정보 수신 동의"
+              checked={store.agreedMarketing}
+              onToggle={() => store.setAgreedMarketing(!store.agreedMarketing)}
+            />
+            <div className="flex items-center gap-3 mt-1 pl-8 text-[11px] text-[var(--color-text-tertiary)]">
+              <span>✓ 앱 푸시</span>
+              <span>✓ 문자</span>
+              <span>✓ 이메일</span>
+            </div>
+          </div>
+
+          <Button disabled={!canProceed} onClick={() => store.nextStep()}>동의하고 계속하기</Button>
         </div>
       )
     }

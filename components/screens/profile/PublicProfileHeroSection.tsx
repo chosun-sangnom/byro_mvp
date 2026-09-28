@@ -677,7 +677,7 @@ export function ProfileHeroCard({
             <div className="flex flex-col gap-2 w-full">
               <p className="text-[18px] font-bold text-[#0D0D0D]">프로필 링크 편집</p>
               <p className="text-[14px] font-medium leading-[1.5] text-[#475058]">
-                나만의 링크를 설정하면 felore.io/내이름 형태로 프로필을 공유할 수 있어요. 유료 이용 종료 시 기본 링크로 자동 복원돼요.
+                나만의 링크를 설정하면 felore.io/내이름 형태로 프로필을 공유할 수 있어요.
               </p>
             </div>
 

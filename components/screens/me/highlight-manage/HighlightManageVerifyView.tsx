@@ -68,6 +68,8 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
   const [importedCount, setImportedCount] = useState(0)
   const [authMethod, setAuthMethod] = useState<'kakao' | 'pass'>('kakao')
   const [realName, setRealName] = useState(storeUser?.realName ?? '')
+  // 가입 때 입력한 실명이 있으면 그대로 사용하고 수정할 수 없게 잠근다 (인증은 실명 기준)
+  const realNameLocked = Boolean(storeUser?.realName?.trim())
   const [birthDateInput, setBirthDateInput] = useState((storeUser?.birthDate ?? '').replace(/\D/g, ''))
   const [phoneInput, setPhoneInput] = useState(
     (storeUser?.contactChannels?.find((c) => c.id === 'phone')?.value ?? '').replace(/\D/g, ''),
@@ -209,8 +211,12 @@ function CareerVerifyFlow({ selectedCat, onBack, onImportCareers }: VerifyViewPr
                     value={realName}
                     onChange={(e) => setRealName(e.target.value)}
                     placeholder="실명"
-                    className="w-full rounded-full border border-[#DEE4EC] bg-white px-4 py-3 text-[14px] text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
+                    disabled={realNameLocked}
+                    className="w-full rounded-full border border-[#DEE4EC] bg-white px-4 py-3 text-[14px] text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD] disabled:bg-[#F5F6F7] disabled:text-[#A8B1BD]"
                   />
+                  {realNameLocked && (
+                    <p className="mt-2 text-[12px] leading-[1.5] text-[#6C7786]">가입할 때 입력한 실명으로 인증돼요</p>
+                  )}
                 </div>
                 <div>
                   <p className="mb-2 text-[14px] font-semibold text-[#0D0D0D]">생년월일</p>
@@ -426,6 +432,7 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
   const [codeInput, setCodeInput] = useState('')
   const [codeError, setCodeError] = useState(false)
   const ocrResult = MOCK_OCR_EDUCATION
+  const storeUser = useFeloreStore().user
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
@@ -588,6 +595,11 @@ function EducationVerifyFlow({ selectedCat, existingHighlights, initialMethod, o
                 </div>
               ))}
             </div>
+            {storeUser?.realName?.trim() && (
+              <p className="-mt-3 px-1 text-[13px] font-medium leading-[1.5] text-[#6C7786]">
+                가입할 때 입력한 실명({storeUser.realName})과 증명서의 성명이 같아야 인증돼요
+              </p>
+            )}
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}

@@ -279,7 +279,8 @@ export function Step9Complete() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const linkId = store.user?.linkId || store.linkId || 'myongkoo'
-  const welcomeName = store.user?.realName || store.onboardingName || '회원'
+  // 환영 문구는 프로필에 노출되는 이름(활동명 우선) 기준
+  const welcomeName = store.user?.activityName || store.user?.realName || store.onboardingName || '회원'
   const initialGuide = Number(searchParams.get('guide') ?? '0')
   const [slide, setSlide] = useState(Number.isFinite(initialGuide) ? Math.min(Math.max(initialGuide, 0), TOTAL - 1) : 0)
   const [showIntroText, setShowIntroText] = useState(false)

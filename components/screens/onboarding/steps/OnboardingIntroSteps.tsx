@@ -933,7 +933,7 @@ export function Step2BasicInfo() {
       <div className="flex-1 overflow-y-auto px-5 pt-6 pb-4">
         <div className="mb-6">
           <h2 className="text-[22px] font-bold leading-[1.35] tracking-[-0.03em] text-[#0D0D0D]">기본정보 입력</h2>
-          <p className="mt-2 text-[15px] font-medium leading-[1.5] tracking-[-0.02em] text-[#475058]">언제든지 설정에서 바꿀 수 있어요</p>
+          <p className="mt-2 text-[15px] font-medium leading-[1.5] tracking-[-0.02em] text-[#475058]">실명은 가입 후 바꿀 수 없어요. 생년월일과 활동명은 설정에서 바꿀 수 있어요.</p>
         </div>
 
         {/* 이름 (필수) */}
@@ -951,6 +951,14 @@ export function Step2BasicInfo() {
             style={{ borderColor: nameError ? '#FF4242' : '#DEE4EC', color: '#0D0D0D' }}
           />
           {nameError && <p className="mt-1.5 text-xs text-[#FF4242]">20자 이내로 입력해주세요.</p>}
+
+          {/* 실명 중요성 안내 — 실명은 가입 후 수정할 수 없고, 인증 기능이 실명 기준으로 동작함 */}
+          <div className="mt-2 rounded-[16px] bg-[#F5F6F7] px-4 py-3">
+            <p className="text-[13px] font-bold text-[#25313D]">꼭 실명으로 입력해주세요</p>
+            <p className="mt-1 text-xs leading-relaxed text-[#6C7786]">
+              경력 인증과 학력 인증은 실명이 일치해야 이용할 수 있어요. 실명은 가입 후에는 수정할 수 없어요.
+            </p>
+          </div>
 
           <button
             type="button"
@@ -980,7 +988,7 @@ export function Step2BasicInfo() {
           )}
 
           <p className="mt-2 text-xs leading-relaxed text-[#6C7786]">
-            유튜버·크리에이터 등 활동명으로 활동하시는 분들을 위한 선택 기능이에요. 활동명을 설정하면 실명 대신 활동명으로 프로필에 노출돼요.
+            유튜버·크리에이터 등 활동명으로 활동하시는 분들을 위한 선택 기능이에요. 활동명을 설정하면 실명 대신 활동명으로 프로필에 노출돼요. 인증에는 실명이 사용돼요.
           </p>
         </div>
 

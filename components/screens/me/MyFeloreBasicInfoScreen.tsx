@@ -743,6 +743,9 @@ export function BasicInfoEditScreen({
                   disabled
                   className="w-full truncate rounded-full border border-[#DEE4EC] bg-[#F5F6F7] px-4 py-3 text-[14px] text-[#A8B1BD] outline-none"
                 />
+                <p className="mt-2 text-[12px] leading-[1.5] text-[#6C7786]">
+                  실명은 가입 후 수정할 수 없어요. 경력 인증과 학력 인증에는 이 실명이 사용돼요.
+                </p>
               </div>
 
               {/* 활동명 */}

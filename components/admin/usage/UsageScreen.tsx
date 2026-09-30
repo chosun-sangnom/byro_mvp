@@ -364,8 +364,13 @@ function Dashboard({
                 </Td>
                 <Td>
                   <div className="flex flex-wrap gap-1.5">
-                    <LinkButton href={r.consoleUrl} label="대시보드" />
+                    {r.consoleUrl && <LinkButton href={r.consoleUrl} label="대시보드" />}
                     {r.billingUrl && r.billingLabel && <LinkButton href={r.billingUrl} label={r.billingLabel} />}
+                    {r.billingNote && (
+                      <span className="text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>
+                        {r.billingNote}
+                      </span>
+                    )}
                   </div>
                 </Td>
               </tr>

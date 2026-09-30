@@ -25,7 +25,10 @@ export interface UsageService {
   /** 관리자 테스트 호출분 (토글로 제외) */
   adminTestCalls?: number
   adminTestCostKrw?: number
-  consoleUrl: string
+  /** 관리 콘솔. 틸코처럼 관리자 페이지가 없는 서비스는 없음 */
+  consoleUrl?: string
+  /** 링크 대신 표시할 안내 */
+  billingNote?: string
   /** 충전·결제 페이지. 무료 서비스는 없음 */
   billingUrl?: string
   billingLabel?: string
@@ -55,9 +58,8 @@ export const USAGE_SERVICES: UsageService[] = [
     calls: 74,
     costKrw: 100_000,
     lastMonthCostKrw: 100_000,
-    consoleUrl: 'https://tilko.net',
-    billingUrl: 'https://tilko.net',
-    billingLabel: '구독 관리',
+    // 틸코는 관리자 페이지가 없음. 매월 초 메일로 API 사용내역 엑셀과 세금계산서가 옴
+    billingNote: '관리자 페이지 없음, 월초 메일로 청구서 수신',
   },
   {
     id: 'ncp_sens',

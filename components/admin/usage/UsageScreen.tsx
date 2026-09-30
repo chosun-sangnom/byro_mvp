@@ -9,6 +9,8 @@ import {
   DAILY_COSTS,
   FEATURE_COSTS,
   FIXED_COSTS,
+  OCI_COST_ANALYSIS_URL,
+  OCI_CREDIT_URL,
   PREPAID_BALANCES,
   UNIT_PRICES,
   USAGE_QUOTAS,
@@ -384,7 +386,9 @@ function Dashboard({
                 <Td>-</Td>
                 <Td>
                   <div className="flex flex-wrap gap-1.5">
-                    <LinkButton href="https://cloud.oracle.com/account-management/cost-analysis?region=ap-seoul-1" label="비용 분석" />
+                    <LinkButton href={f.consoleUrl} label="대시보드" />
+                    <LinkButton href={OCI_COST_ANALYSIS_URL} label="비용 분석" />
+                    <LinkButton href={OCI_CREDIT_URL} label="크레딧" />
                   </div>
                 </Td>
               </tr>

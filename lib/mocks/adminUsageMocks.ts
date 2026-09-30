@@ -115,9 +115,9 @@ export const USAGE_SERVICES: UsageService[] = [
     calls: 9,
     costKrw: 190,
     lastMonthCostKrw: 120,
-    consoleUrl: 'https://cloud.oracle.com/ai-services/document-understanding?region=ap-seoul-1',
-    billingUrl: 'https://cloud.oracle.com/account-management/cost-analysis?region=ap-seoul-1',
-    billingLabel: '비용 분석',
+    consoleUrl: 'https://cloud.oracle.com/account-management/cost-analysis?region=ap-seoul-1',
+    billingUrl: 'https://cloud.oracle.com/billing/subscriptions?region=ap-seoul-1',
+    billingLabel: '크레딧',
   },
   {
     id: 'google_maps',
@@ -144,10 +144,13 @@ export const USAGE_SERVICES: UsageService[] = [
 ]
 
 /** 호출 단위가 아닌 월 고정비 — 서버, 디스크 (Oracle 비용 분석 실제 청구) */
+export const OCI_COST_ANALYSIS_URL = 'https://cloud.oracle.com/account-management/cost-analysis?region=ap-seoul-1'
+export const OCI_CREDIT_URL = 'https://cloud.oracle.com/billing/subscriptions?region=ap-seoul-1'
+
 export const FIXED_COSTS = [
-  { id: 'oci_compute', name: 'Oracle 서버 (Compute)', costKrw: 46_350, note: 'VM 1대, 1 OCPU 16GB' },
-  { id: 'oci_block', name: 'Oracle 디스크 (Block Storage)', costKrw: 55_350, note: '부트 47GB + 데이터 1TB' },
-  { id: 'oci_object', name: 'Oracle 이미지 저장 (Object Storage)', costKrw: 420, note: '프로필, 페르소나 이미지' },
+  { id: 'oci_compute', name: 'Oracle 서버 (Compute)', costKrw: 46_350, note: 'VM 1대, 1 OCPU 16GB', consoleUrl: 'https://cloud.oracle.com/compute/instances?region=ap-seoul-1' },
+  { id: 'oci_block', name: 'Oracle 디스크 (Block Storage)', costKrw: 55_350, note: '부트 47GB + 데이터 1TB', consoleUrl: 'https://cloud.oracle.com/block-storage/volumes?region=ap-seoul-1' },
+  { id: 'oci_object', name: 'Oracle 이미지 저장 (Object Storage)', costKrw: 420, note: '프로필, 페르소나 이미지', consoleUrl: 'https://cloud.oracle.com/object-storage/buckets?region=ap-seoul-1' },
 ]
 
 export type QuotaPeriod = 'day' | 'month'
@@ -193,7 +196,7 @@ export const PREPAID_BALANCES: PrepaidBalance[] = [
     balanceKrw: 511_713,
     monthlyBurnKrw: 102_310,
     expiresAt: '2026-12-02',
-    billingUrl: 'https://cloud.oracle.com/billing/subscriptions',
+    billingUrl: 'https://cloud.oracle.com/billing/subscriptions?region=ap-seoul-1',
     note: '약정 400만 원 중 잔액, 만료 시 소멸',
   },
   {

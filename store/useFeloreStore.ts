@@ -35,6 +35,8 @@ interface FeloreStore {
   // 온보딩
   step: OnboardingStep
   agreedTerms: boolean
+  /** 만 14세 이상 확인 (필수) */
+  agreedAge14: boolean
   agreedPrivacy: boolean
   agreedMarketing: boolean
   onboardingName: string
@@ -91,6 +93,7 @@ interface FeloreStore {
   prevStep(): void
   goToStep(step: OnboardingStep): void
   setAgreedTerms(v: boolean): void
+  setAgreedAge14(v: boolean): void
   setAgreedPrivacy(v: boolean): void
   setAgreedMarketing(v: boolean): void
   toggleAllAgreed(): void
@@ -181,6 +184,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
   // 온보딩
   step: 'login',
   agreedTerms: false,
+  agreedAge14: false,
   agreedPrivacy: false,
   agreedMarketing: false,
   onboardingName: '',
@@ -261,6 +265,10 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
     set({ agreedTerms: v })
   },
 
+  setAgreedAge14(v) {
+    set({ agreedAge14: v })
+  },
+
   setAgreedPrivacy(v) {
     set({ agreedPrivacy: v })
   },
@@ -270,9 +278,10 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
   },
 
   toggleAllAgreed() {
-    const { agreedTerms, agreedPrivacy, agreedMarketing } = get()
-    const allChecked = agreedTerms && agreedPrivacy && agreedMarketing
+    const { agreedAge14, agreedTerms, agreedPrivacy, agreedMarketing } = get()
+    const allChecked = agreedAge14 && agreedTerms && agreedPrivacy && agreedMarketing
     set({
+      agreedAge14: !allChecked,
       agreedTerms: !allChecked,
       agreedPrivacy: !allChecked,
       agreedMarketing: !allChecked,
@@ -518,6 +527,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
       step: 'login',
       profileTourPending: false,
       agreedTerms: false,
+      agreedAge14: false,
       agreedPrivacy: false,
       agreedMarketing: false,
       onboardingTitle: SAMPLE_PROFILE.title,
@@ -714,6 +724,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
       step: 'login',
       profileTourPending: false,
       agreedTerms: false,
+      agreedAge14: false,
       agreedPrivacy: false,
       agreedMarketing: false,
       onboardingName: '',
@@ -805,6 +816,7 @@ export const useFeloreStore = create<FeloreStore>()(persist((set, get) => ({
     step: state.step,
     profileTourPending: state.profileTourPending,
     agreedTerms: state.agreedTerms,
+    agreedAge14: state.agreedAge14,
     agreedPrivacy: state.agreedPrivacy,
     agreedMarketing: state.agreedMarketing,
     onboardingName: state.onboardingName,

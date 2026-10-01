@@ -220,8 +220,8 @@ export function Step1Login({
     }
 
     if (oauthStep === 'terms') {
-      const allAgreed = store.agreedTerms && store.agreedPrivacy && store.agreedMarketing
-      const canProceed = store.agreedTerms && store.agreedPrivacy
+      const allAgreed = store.agreedAge14 && store.agreedTerms && store.agreedPrivacy && store.agreedMarketing
+      const canProceed = store.agreedAge14 && store.agreedTerms && store.agreedPrivacy
       return (
         <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
           <div className="mb-6">
@@ -239,6 +239,18 @@ export function Step1Login({
                 onToggle={() => store.toggleAllAgreed()}
               />
             </div>
+
+            <TermsCheckRow
+
+              badge="필수"
+
+              label="만 14세 이상입니다"
+
+              checked={store.agreedAge14}
+
+              onToggle={() => store.setAgreedAge14(!store.agreedAge14)}
+
+            />
 
             <TermsCheckRow
               badge="필수"
@@ -823,8 +835,8 @@ function TermsAgreementSheet({
   onAgree: () => void
 }) {
   const store = useFeloreStore()
-  const allAgreed = store.agreedTerms && store.agreedPrivacy && store.agreedMarketing
-  const canProceed = store.agreedTerms && store.agreedPrivacy
+  const allAgreed = store.agreedAge14 && store.agreedTerms && store.agreedPrivacy && store.agreedMarketing
+  const canProceed = store.agreedAge14 && store.agreedTerms && store.agreedPrivacy
 
   return (
     <BottomSheet open={open} onClose={onClose}>
@@ -840,6 +852,18 @@ function TermsAgreementSheet({
             onToggle={() => store.toggleAllAgreed()}
           />
         </div>
+
+        <TermsCheckRow
+
+          badge="필수"
+
+          label="만 14세 이상입니다"
+
+          checked={store.agreedAge14}
+
+          onToggle={() => store.setAgreedAge14(!store.agreedAge14)}
+
+        />
 
         <TermsCheckRow
           badge="필수"

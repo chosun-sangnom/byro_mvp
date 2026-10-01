@@ -12,10 +12,11 @@
  * TODO(real API): GAP-8 — kemiReport.ts의 목업 규칙 생성을 서버/LLM으로 교체.
  */
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronLeft, Download, Share2 } from 'lucide-react'
 import { showToast } from '@/components/ui'
+import { shareOrCopy } from '@/lib/share'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { useProfileOwner } from '@/hooks/useProfileOwner'
 import { getNormalizedPublicProfile } from '@/components/screens/profile/publicProfileData'
@@ -23,7 +24,14 @@ import {
   AXIS_ORDER,
   buildKemiReport,
   computeKemiScore,
+  type KemiViewer,
 } from '@/components/screens/profile/kemiReport'
+import {
+  isKemiShareOptedOut,
+  kemiShareUrl,
+  maskKemiName,
+  saveKemiShare,
+} from '@/components/screens/profile/kemiShare'
 import type { KemiAxisReport, KemiPurpose } from '@/types'
 
 import {
@@ -188,6 +196,7 @@ function AvatarCircle({
   size,
   fontSize,
   ring,
+  masked,
 }: {
   src?: string
   name: string
@@ -195,11 +204,26 @@ function AvatarCircle({
   fontSize: number
   /** 히어로처럼 컬러 배경 위에 올릴 때 — 흰 링 + 그림자로 아바타를 띄운다 */
   ring?: boolean
+  /** SCRUM-159 — 상대가 공유 노출을 꺼둔 경우 사진 대신 기본 이미지 */
+  masked?: boolean
 }) {
   const shell = ring
     ? { border: '2.5px solid rgba(255,255,255,0.92)', boxShadow: '0 6px 18px rgba(9, 34, 82, 0.28)' }
     : { border: '0.66px solid rgba(255,255,255,0.85)' }
 
+  if (masked) {
+    return (
+      <div style={{
+        width: size, height: size, borderRadius: '50%', background: '#DCE6F2',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, ...shell,
+      }}>
+        <svg viewBox="0 0 24 24" width={size * 0.6} height={size * 0.6} fill="#9AAABD" aria-hidden>
+          <circle cx="12" cy="8.5" r="4.2" />
+          <path d="M3.8 21c.6-4.4 4-7 8.2-7s7.6 2.6 8.2 7z" />
+        </svg>
+      </div>
+    )
+  }
   if (src) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
@@ -228,6 +252,7 @@ function ShareCard({
   viewerAvatar,
   profileName,
   profileAvatar,
+  profileMasked,
   score,
   tags,
   offscreen,
@@ -237,6 +262,7 @@ function ShareCard({
   viewerAvatar?: string
   profileName: string
   profileAvatar?: string
+  profileMasked?: boolean
   score: number
   tags: string[]
   offscreen?: boolean
@@ -273,7 +299,7 @@ function ShareCard({
             <span style={{ fontSize: '12px', fontWeight: 700, color: '#fff' }}>{viewerName}</span>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
-            <AvatarCircle src={profileAvatar} name={profileName} size={64} fontSize={22} />
+            <AvatarCircle src={profileAvatar} name={profileName} size={64} fontSize={22} masked={profileMasked} />
             <span style={{ fontSize: '12px', fontWeight: 700, color: '#fff' }}>{profileName}</span>
           </div>
         </div>
@@ -346,49 +372,38 @@ function KemiAnalyzing({ targetName, onBack, onDone }: { targetName: string; onB
 }
 
 // ── 메인 스크린 ─────────────────────────────────────────────────────────
-export default function KemiReportScreen({ username }: { username: string }) {
-  const router = useRouter()
-  const store = useFeloreStore()
-  const { isOwner, isLoggedIn, user } = useProfileOwner(username)
+type KemiNormalizedProfile = ReturnType<typeof getNormalizedPublicProfile>
 
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => { setMounted(true) }, [])
+export type KemiReportFooterContext = {
+  score: number
+  strongTags: string[]
+  archetypeName: string
+  verdict: string
+}
 
-  useEffect(() => {
-    if (!mounted) return
-    if (isOwner || !isLoggedIn) router.replace(`/${username}`)
-  }, [mounted, isOwner, isLoggedIn, router, username])
-
-  const profile = getNormalizedPublicProfile({
-    username,
-    user: store.user,
-    ownerHighlights: store.highlights,
-    ownerTabVisibility: store.tabVisibility,
-  })
-
+/**
+ * 리포트 본문(히어로~종합). 내 리포트 화면과 공유 링크 화면(SCRUM-159)이 같이 쓴다.
+ * 하단 버튼 영역만 footer로 받아 화면마다 다르게 붙인다.
+ */
+export function KemiReportBody({
+  viewer,
+  viewerAvatar,
+  profile,
+  profileAvatar,
+  profileMasked,
+  forceLifeLock,
+  footer,
+}: {
+  viewer: KemiViewer
+  viewerAvatar?: string
+  profile: KemiNormalizedProfile
+  profileAvatar?: string
+  profileMasked?: boolean
+  forceLifeLock?: boolean
+  footer: (ctx: KemiReportFooterContext) => ReactNode
+}) {
   const [purpose, setPurpose] = useState<KemiPurpose>('work')
-  const [sharing, setSharing] = useState(false)
-  const [analyzing, setAnalyzing] = useState(true)
-  const cardRef = useRef<HTMLDivElement>(null)
-
-  const viewerName = user?.name ?? '나'
-  const viewerAvatar = user?.profileImages?.[0] ?? user?.avatarImage
-  const profileAvatar = profile.profileImages?.[0] ?? profile.avatarImage
-
-  const report = buildKemiReport(
-    purpose,
-    { name: viewerName, title: user?.title ?? '', whoIAm: user?.whoIAm, life: user?.life },
-    profile,
-    // [임시] 강명구 리포트에선 생활 축 잠금(뷰어 미입력) 패턴을 목업으로 보여준다
-    { forceLifeLock: username === 'mk' },
-  )
-
-  if (!mounted || isOwner || !isLoggedIn) return null
-
-  if (analyzing) {
-    return <KemiAnalyzing targetName={profile.name} onBack={() => router.back()} onDone={() => setAnalyzing(false)} />
-  }
-
+  const report = buildKemiReport(purpose, viewer, profile, { forceLifeLock })
   const archetype = report.archetype
   const score = computeKemiScore(report.axes, purpose)
   const strongTags = [...report.axes]
@@ -397,53 +412,7 @@ export default function KemiReportScreen({ username }: { username: string }) {
     .slice(0, 3)
     .map((a) => a.label)
 
-  const handleShare = async () => {
-    if (!cardRef.current || sharing) return
-    setSharing(true)
-    try {
-      const html2canvas = (await import('html2canvas')).default
-      const canvas = await html2canvas(cardRef.current, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true, logging: false })
-      await new Promise<void>((resolve) => {
-        canvas.toBlob(async (blob) => {
-          if (!blob) { resolve(); return }
-          const file = new File([blob], `felore-kemi-${profile.name}.png`, { type: 'image/png' })
-          try {
-            if (navigator.canShare?.({ files: [file] })) {
-              await navigator.share({ files: [file], title: `${profile.name}님과의 케미 리포트`, text: `felore에서 ${profile.name}님과의 케미를 확인했어요!` })
-            } else {
-              const url = URL.createObjectURL(blob)
-              const a = document.createElement('a')
-              a.href = url
-              a.download = `felore-kemi-${profile.name}.png`
-              a.click()
-              URL.revokeObjectURL(url)
-              showToast('이미지가 저장됐어요')
-            }
-          } catch {
-            // 사용자가 공유 시트를 취소한 경우 등 — 에러로 취급하지 않음
-          }
-          resolve()
-        }, 'image/png')
-      })
-    } catch {
-      showToast('공유에 실패했어요', 'error')
-    } finally {
-      setSharing(false)
-    }
-  }
-
   return (
-    <div className="font-pretendard flex h-full flex-col bg-white">
-      <style>{KEMI_ANIM_CSS}</style>
-      {/* 헤더 */}
-      <div className="flex h-12 flex-shrink-0 items-center justify-between border-b px-2" style={{ borderColor: HAIRLINE }}>
-        <button onClick={() => router.back()} className="flex items-center p-2" style={{ color: '#0D0D0D' }}>
-          <ChevronLeft size={20} />
-        </button>
-        <span className="text-[16px] font-bold" style={{ color: '#0D0D0D' }}>{profile.name}님과의 케미</span>
-        <div className="w-9" />
-      </div>
-
       <div className="flex-1 overflow-y-auto" data-kemi-report>
         {/* 히어로 — 전면 배경이 아니라 카드로 띄워서 앱의 카드 언어와 맞춘다 */}
         <div className="px-5 pt-3">
@@ -471,8 +440,8 @@ export default function KemiReportScreen({ username }: { username: string }) {
                   data-kemi-anim
                   style={{ animation: 'kemiCrossL .55s cubic-bezier(.22,1,.36,1) both' }}
                 >
-                  <AvatarCircle src={viewerAvatar} name={viewerName} size={62} fontSize={22} ring />
-                  <span className="line-clamp-1 text-[12.5px] font-bold text-white">{viewerName}</span>
+                  <AvatarCircle src={viewerAvatar} name={viewer.name} size={62} fontSize={22} ring />
+                  <span className="line-clamp-1 text-[12.5px] font-bold text-white">{viewer.name}</span>
                 </div>
                 <span
                   className="mt-[22px] flex size-[22px] shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white/90"
@@ -490,7 +459,7 @@ export default function KemiReportScreen({ username }: { username: string }) {
                   data-kemi-anim
                   style={{ animation: 'kemiCrossR .55s cubic-bezier(.22,1,.36,1) both' }}
                 >
-                  <AvatarCircle src={profileAvatar} name={profile.name} size={62} fontSize={22} ring />
+                  <AvatarCircle src={profileAvatar} name={profile.name} size={62} fontSize={22} ring masked={profileMasked} />
                   <span className="line-clamp-1 text-[12.5px] font-bold text-white">{profile.name}</span>
                 </div>
               </div>
@@ -630,42 +599,164 @@ export default function KemiReportScreen({ username }: { username: string }) {
           </div>
         </div>
 
-        {/* 저장/공유 — 미니 카드는 상단 히어로와 중복이라 화면엔 숨기고 캡처용으로만 렌더 */}
-        <div className="px-5 pb-9 pt-7">
-          <ShareCard
-            cardRef={cardRef}
-            viewerName={viewerName}
-            viewerAvatar={viewerAvatar}
-            profileName={profile.name}
-            profileAvatar={profileAvatar}
-            score={score}
-            tags={strongTags}
-            offscreen
-          />
-          <div className="flex gap-2.5">
-            <button
-              type="button"
-              onClick={handleShare}
-              disabled={sharing}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-full py-[13px] text-[14px] font-bold transition-opacity active:opacity-70 disabled:opacity-50"
-              style={{ border: `1px solid ${HAIRLINE}`, color: ACCENT }}
-            >
-              <Download size={16} />
-              {sharing ? '저장 중…' : '저장'}
-            </button>
-            <button
-              type="button"
-              onClick={handleShare}
-              disabled={sharing}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-full py-[13px] text-[14px] font-bold text-white transition-opacity active:opacity-80 disabled:opacity-50"
-              style={{ background: INK, boxShadow: '0 4px 14px rgba(13,13,13,0.16)' }}
-            >
-              <Share2 size={16} />
-              {sharing ? '공유 중…' : '공유'}
-            </button>
-          </div>
-        </div>
+        {footer({ score, strongTags, archetypeName: archetype.name, verdict: archetype.verdict })}
       </div>
+  )
+}
+
+export default function KemiReportScreen({ username }: { username: string }) {
+  const router = useRouter()
+  const store = useFeloreStore()
+  const { isOwner, isLoggedIn, user } = useProfileOwner(username)
+
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => { setMounted(true) }, [])
+
+  useEffect(() => {
+    if (!mounted) return
+    if (isOwner || !isLoggedIn) router.replace(`/${username}`)
+  }, [mounted, isOwner, isLoggedIn, router, username])
+
+  const profile = getNormalizedPublicProfile({
+    username,
+    user: store.user,
+    ownerHighlights: store.highlights,
+    ownerTabVisibility: store.tabVisibility,
+  })
+
+  const [sharing, setSharing] = useState(false)
+  const [analyzing, setAnalyzing] = useState(true)
+  // SCRUM-159 — 리포트 생성 시각(만료 기준)과 같은 리포트 재공유 시 재사용할 토큰
+  const [generatedAt] = useState(() => Date.now())
+  const shareTokenRef = useRef<string | null>(null)
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  const viewer: KemiViewer = { name: user?.name ?? '나', title: user?.title ?? '', whoIAm: user?.whoIAm, life: user?.life }
+  const viewerAvatar = user?.profileImages?.[0] ?? user?.avatarImage
+  const profileAvatar = profile.profileImages?.[0] ?? profile.avatarImage
+  const targetMasked = isKemiShareOptedOut(username)
+  const shareTargetName = targetMasked ? maskKemiName(profile.name) : profile.name
+
+  if (!mounted || isOwner || !isLoggedIn) return null
+
+  if (analyzing) {
+    return <KemiAnalyzing targetName={profile.name} onBack={() => router.back()} onDone={() => setAnalyzing(false)} />
+  }
+
+  // 이미지 저장 — 공유 카드를 캡처해 저장 (공유 버튼은 링크 공유로 분리, SCRUM-159)
+  const handleSave = async () => {
+    if (!cardRef.current || sharing) return
+    setSharing(true)
+    try {
+      const html2canvas = (await import('html2canvas')).default
+      const canvas = await html2canvas(cardRef.current, { scale: 2, backgroundColor: '#FFFFFF', useCORS: true, logging: false })
+      await new Promise<void>((resolve) => {
+        canvas.toBlob(async (blob) => {
+          if (!blob) { resolve(); return }
+          const file = new File([blob], `felore-kemi-${shareTargetName}.png`, { type: 'image/png' })
+          try {
+            if (navigator.canShare?.({ files: [file] })) {
+              await navigator.share({ files: [file] })
+            } else {
+              const url = URL.createObjectURL(blob)
+              const a = document.createElement('a')
+              a.href = url
+              a.download = file.name
+              a.click()
+              URL.revokeObjectURL(url)
+              showToast('이미지가 저장됐어요')
+            }
+          } catch {
+            // 사용자가 공유 시트를 취소한 경우 등 — 에러로 취급하지 않음
+          }
+          resolve()
+        }, 'image/png')
+      })
+    } catch {
+      showToast('저장에 실패했어요', 'error')
+    } finally {
+      setSharing(false)
+    }
+  }
+
+  const handleShareLink = async (ctx: KemiReportFooterContext) => {
+    if (!shareTokenRef.current) {
+      shareTokenRef.current = saveKemiShare({
+        viewer: { ...viewer, linkId: user?.linkId, avatar: viewerAvatar },
+        targetUsername: username,
+        targetMasked,
+        generatedAt,
+      })
+    }
+    await shareOrCopy({
+      title: `${viewer.name}님과 ${shareTargetName}님의 케미 리포트`,
+      text: `${ctx.archetypeName}, ${ctx.verdict}`,
+      url: kemiShareUrl(shareTokenRef.current),
+    })
+  }
+
+  return (
+    <div className="font-pretendard flex h-full flex-col bg-white">
+      <style>{KEMI_ANIM_CSS}</style>
+      {/* 헤더 */}
+      <div className="flex h-12 flex-shrink-0 items-center justify-between border-b px-2" style={{ borderColor: HAIRLINE }}>
+        <button onClick={() => router.back()} className="flex items-center p-2" style={{ color: '#0D0D0D' }}>
+          <ChevronLeft size={20} />
+        </button>
+        <span className="text-[16px] font-bold" style={{ color: '#0D0D0D' }}>{profile.name}님과의 케미</span>
+        <div className="w-9" />
+      </div>
+
+      <KemiReportBody
+        viewer={viewer}
+        viewerAvatar={viewerAvatar}
+        profile={profile}
+        profileAvatar={profileAvatar}
+        // [임시] 강명구 리포트에선 생활 축 잠금(뷰어 미입력) 패턴을 목업으로 보여준다
+        forceLifeLock={username === 'mk'}
+        footer={(ctx) => (
+          // 저장/공유 — 미니 카드는 상단 히어로와 중복이라 화면엔 숨기고 캡처용으로만 렌더
+          <div className="px-5 pb-9 pt-7">
+            <ShareCard
+              cardRef={cardRef}
+              viewerName={viewer.name}
+              viewerAvatar={viewerAvatar}
+              profileName={shareTargetName}
+              profileAvatar={targetMasked ? undefined : profileAvatar}
+              profileMasked={targetMasked}
+              score={ctx.score}
+              tags={ctx.strongTags}
+              offscreen
+            />
+            <div className="flex gap-2.5">
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={sharing}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-full py-[13px] text-[14px] font-bold transition-opacity active:opacity-70 disabled:opacity-50"
+                style={{ border: `1px solid ${HAIRLINE}`, color: ACCENT }}
+              >
+                <Download size={16} />
+                {sharing ? '저장 중…' : '저장'}
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleShareLink(ctx)}
+                className="flex flex-1 items-center justify-center gap-1.5 rounded-full py-[13px] text-[14px] font-bold text-white transition-opacity active:opacity-80"
+                style={{ background: INK, boxShadow: '0 4px 14px rgba(13,13,13,0.16)' }}
+              >
+                <Share2 size={16} />
+                공유
+              </button>
+            </div>
+            <p className="mt-3 text-center text-[11.5px] font-medium leading-[1.5]" style={{ color: FAINT }}>
+              {targetMasked
+                ? `${profile.name}님이 이름, 사진 공유를 꺼둬서 공유할 땐 ${shareTargetName}로 가려져요`
+                : '공유 링크는 리포트가 만들어진 뒤 24시간 동안 열 수 있어요'}
+            </p>
+          </div>
+        )}
+      />
     </div>
   )
 }

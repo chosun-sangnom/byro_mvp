@@ -23,6 +23,7 @@ import { Sparkles } from 'lucide-react'
 import { BottomSheet } from '@/components/ui'
 import type { Highlight, KemiData, PublicProfileLife, PublicProfileWhoIAm, ReputationKeyword } from '@/types'
 import { AXIS_ORDER, buildSelfKemiAxes, type SelfKemiAxis } from '@/components/screens/profile/kemiReport'
+import type { KemiSavedReport } from '@/components/screens/profile/kemiSavedReports'
 import {
   BODY,
   INK,
@@ -50,12 +51,15 @@ export function PublicProfileKemiZone({
   isLoading,
   onCompatibilityOpen,
   onLoginRequest,
+  savedReport,
 }: {
   kemi?: KemiData
   isLoggedIn: boolean
   isLoading?: boolean
   onCompatibilityOpen?: () => void
   onLoginRequest?: () => void
+  /** SCRUM-252 — 이미 본 리포트 요약. 있으면 점수와 요약을 카드에 바로 보여준다 (테스트 모드 꺼짐일 때만 전달) */
+  savedReport?: KemiSavedReport | null
 }) {
   if (!kemi && !isLoading) return null
 
@@ -151,11 +155,30 @@ export function PublicProfileKemiZone({
           <div className="flex items-start gap-4">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/images/kemi-report-icon.svg" alt="" className="size-[40px] shrink-0" />
-            <div>
+            <div className="min-w-0 flex-1">
               <span className="text-[15px] font-bold text-[#0D0D0D]">케미 리포트</span>
-              <p className="mt-1 text-[13px] leading-[1.5] text-[#475058]">
-                두 사람이 나눈 경험과 공통점을 바탕으로 나와의 관계 흐름을 분석해줘요.
-              </p>
+              {savedReport ? (
+                <div className="mt-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[24px] font-bold leading-none tracking-[-0.03em] text-[#0D0D0D]">
+                      {savedReport.score}
+                      <span className="ml-0.5 text-[13px] font-semibold text-[#6C7786]">점</span>
+                    </span>
+                    <span
+                      className="rounded-full px-2.5 py-1 text-[11px] font-bold"
+                      style={{ background: 'var(--color-accent-soft)', color: 'var(--color-accent-dark)' }}
+                    >
+                      {savedReport.grade}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-[14px] font-bold text-[#0D0D0D]">{savedReport.archetypeName}</p>
+                  <p className="mt-0.5 text-[13px] leading-[1.5] text-[#475058]">{savedReport.verdict}</p>
+                </div>
+              ) : (
+                <p className="mt-1 text-[13px] leading-[1.5] text-[#475058]">
+                  두 사람이 나눈 경험과 공통점을 바탕으로 나와의 관계 흐름을 분석해줘요.
+                </p>
+              )}
               <button
                 type="button"
                 onClick={onCompatibilityOpen}

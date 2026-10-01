@@ -510,6 +510,8 @@ export const MOCK_AI_KEMI_CONFIG: AiKemiConfig = {
   ],
   dailyLimitFree: 1,
   proUnlimited: true,
+  testMode: true,
+  dailyLimitEnabled: false,
   updatedBy: '박관리',
   updatedAt: '2026-06-25 16:00',
 }

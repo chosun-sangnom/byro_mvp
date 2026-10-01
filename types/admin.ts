@@ -256,6 +256,10 @@ export interface AiKemiConfig {
   blocks: KemiBlockConfig[]
   dailyLimitFree: number
   proUnlimited: boolean
+  /** SCRUM-250 — 켜면 리포트를 열 때마다 새로 계산, 끄면 이미 본 상대는 결과 카드 (예전 저장값엔 없어 undefined = 켜짐) */
+  testMode?: boolean
+  /** SCRUM-253 — Free 일일 한도 적용 여부, 유료 모델 시점까지 꺼둠 (undefined = 꺼짐) */
+  dailyLimitEnabled?: boolean
   updatedBy?: string
   updatedAt?: string
 }

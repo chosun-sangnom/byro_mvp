@@ -27,6 +27,11 @@ import {
   type KemiViewer,
 } from '@/components/screens/profile/kemiReport'
 import {
+  loadKemiReportSummary,
+  saveKemiReportSummary,
+  useKemiTestMode,
+} from '@/components/screens/profile/kemiSavedReports'
+import {
   isKemiShareOptedOut,
   kemiShareUrl,
   maskKemiName,
@@ -626,8 +631,12 @@ export default function KemiReportScreen({ username }: { username: string }) {
 
   const [sharing, setSharing] = useState(false)
   const [analyzing, setAnalyzing] = useState(true)
+  // SCRUM-252 — 테스트 모드가 꺼져 있고 유효한 저장 결과가 있으면 분석 없이 바로 연다
+  const testMode = useKemiTestMode()
+  const savedSummary = mounted && !testMode ? loadKemiReportSummary(user?.linkId, username) : null
   // SCRUM-159 — 리포트 생성 시각(만료 기준)과 같은 리포트 재공유 시 재사용할 토큰
-  const [generatedAt] = useState(() => Date.now())
+  const [freshGeneratedAt] = useState(() => Date.now())
+  const generatedAt = savedSummary?.generatedAt ?? freshGeneratedAt
   const shareTokenRef = useRef<string | null>(null)
   const cardRef = useRef<HTMLDivElement>(null)
 
@@ -639,8 +648,27 @@ export default function KemiReportScreen({ username }: { username: string }) {
 
   if (!mounted || isOwner || !isLoggedIn) return null
 
-  if (analyzing) {
-    return <KemiAnalyzing targetName={profile.name} onBack={() => router.back()} onDone={() => setAnalyzing(false)} />
+  const forceLifeLock = username === 'mk'
+
+  // 새로 분석한 결과를 요약으로 저장 — 테스트 모드를 끄면 이 요약으로 결과 카드를 보여준다 (협업 관점 기준)
+  const handleAnalyzed = () => {
+    const workReport = buildKemiReport('work', viewer, profile, { forceLifeLock })
+    if (user?.linkId) {
+      saveKemiReportSummary({
+        viewerLinkId: user.linkId,
+        targetUsername: username,
+        score: computeKemiScore(workReport.axes, 'work'),
+        archetypeName: workReport.archetype.name,
+        grade: workReport.archetype.grade,
+        verdict: workReport.archetype.verdict,
+        generatedAt: freshGeneratedAt,
+      })
+    }
+    setAnalyzing(false)
+  }
+
+  if (analyzing && !savedSummary) {
+    return <KemiAnalyzing targetName={profile.name} onBack={() => router.back()} onDone={handleAnalyzed} />
   }
 
   // 이미지 저장 — 공유 카드를 캡처해 저장 (공유 버튼은 링크 공유로 분리, SCRUM-159)
@@ -713,7 +741,7 @@ export default function KemiReportScreen({ username }: { username: string }) {
         profile={profile}
         profileAvatar={profileAvatar}
         // [임시] 강명구 리포트에선 생활 축 잠금(뷰어 미입력) 패턴을 목업으로 보여준다
-        forceLifeLock={username === 'mk'}
+        forceLifeLock={forceLifeLock}
         footer={(ctx) => (
           // 저장/공유 — 미니 카드는 상단 히어로와 중복이라 화면엔 숨기고 캡처용으로만 렌더
           <div className="px-5 pb-9 pt-7">

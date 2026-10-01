@@ -24,6 +24,7 @@ import { ContactActionButton } from '@/components/screens/profile/PublicProfileS
 import { ProfileHeroSection } from '@/components/screens/profile/PublicProfileHeroSection'
 import { PublicProfileTabBar, type PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
 import { PublicProfileKemiZone, PublicProfileOwnerMatchZone } from '@/components/screens/profile/PublicProfileKemiZone'
+import { loadKemiReportSummary, useKemiTestMode } from '@/components/screens/profile/kemiSavedReports'
 import { LoginModal } from '@/components/screens/profile/LoginModal'
 import { ExperienceBottomSheet, ExperienceDoneModal } from '@/components/screens/profile/PublicProfileOverlays'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
@@ -96,6 +97,11 @@ export function PublicProfileShell({
   // 케미 로딩 트리거: 비로그인이거나 오너이면 케미 없음
   const kemiAlreadyComputed = store.kemiComputedProfiles.includes(profile.linkId)
   const shouldComputeKemi = isLoggedIn && !isOwnerMode && !!profile.kemi
+  // SCRUM-252 — 테스트 모드가 꺼져 있으면 이미 본 리포트 요약을 케미 리포트 칸에 보여준다
+  const kemiTestMode = useKemiTestMode()
+  const savedKemiReport = isLoggedIn && !isOwnerMode && !kemiTestMode
+    ? loadKemiReportSummary(store.user?.linkId, username)
+    : null
   const [kemiLoading, setKemiLoading] = useState(shouldComputeKemi && !kemiAlreadyComputed)
 
   useEffect(() => {
@@ -170,6 +176,7 @@ export function PublicProfileShell({
             isLoading={kemiLoading}
             onCompatibilityOpen={profile.kemi ? () => router.push(`/${username}/kemi-report`) : undefined}
             onLoginRequest={() => setLoginModalOpen(true)}
+            savedReport={savedKemiReport}
           />
         )}
 

@@ -331,6 +331,18 @@ function KemiPanel() {
             onChange={(v) => updateKemiConfig({ cacheInvalidateOnProfileEdit: v }, `캐시 무효화 ${v ? 'ON' : 'OFF'}`)}
           />
         </div>
+        <div className="mt-3 flex items-center justify-between">
+          <div>
+            <div className="text-[13.5px] font-bold" style={{ color: 'var(--color-text-primary)' }}>테스트 모드</div>
+            <div className="text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>
+              켜면 리포트를 열 때마다 새로 계산해요. 끄면 이미 본 상대는 저장된 결과를 다시 보여줘요
+            </div>
+          </div>
+          <ToggleSwitch
+            checked={config.testMode !== false}
+            onChange={(v) => updateKemiConfig({ testMode: v }, `테스트 모드 ${v ? 'ON' : 'OFF'}`)}
+          />
+        </div>
       </AdminCard>
 
       <AdminCard className="mb-4">
@@ -369,6 +381,16 @@ function KemiPanel() {
             style={{ borderColor: 'var(--color-border-default)' }}
           />
           <div className="text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>매일 자정 초기화</div>
+        </div>
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <div className="text-[13px]" style={{ color: 'var(--color-text-secondary)' }}>Free 일일 한도 적용</div>
+            <div className="text-[12px]" style={{ color: 'var(--color-text-tertiary)' }}>유료 모델 오픈 전까지 꺼두세요</div>
+          </div>
+          <ToggleSwitch
+            checked={config.dailyLimitEnabled === true}
+            onChange={(v) => updateKemiConfig({ dailyLimitEnabled: v }, `Free 일일 한도 적용 ${v ? 'ON' : 'OFF'}`)}
+          />
         </div>
         <div className="flex items-center justify-between">
           <div className="text-[13px]" style={{ color: 'var(--color-text-secondary)' }}>Pro 무제한</div>

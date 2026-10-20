@@ -12,7 +12,7 @@ import type { PersonaReason } from '@/lib/personaGen'
 
 const CUSTOM_LINK_ID_REGEX = /^[a-z0-9_]{2,20}$/
 
-// [임시] 매거진 커버 시안 — 표지 제호와 인용문 서체
+// [임시] 매거진 커버 시안 — 페르소나 인용문 서체
 const coverSerif = Bodoni_Moda({ subsets: ['latin'], style: ['normal', 'italic'], display: 'swap' })
 
 export type CoverStat = { value: number; unit: string; label: string }
@@ -110,7 +110,7 @@ export function ProfileHeroSection({
 
   return (
     <motion.div
-      className={variant === 'cover' ? 'relative' : variant === 'swipe' ? 'relative px-5 pt-3 pb-2' : 'relative px-5 pt-4 pb-3'}
+      className={variant === 'cover' ? 'relative px-5 pt-3' : variant === 'swipe' ? 'relative px-5 pt-3 pb-2' : 'relative px-5 pt-4 pb-3'}
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
@@ -593,7 +593,7 @@ export function ProfileHeroCard({
 
   return (
     <div className={isCover
-      ? 'relative h-[560px] overflow-hidden bg-[#121212] text-white'
+      ? 'relative h-[540px] overflow-hidden rounded-[var(--radius-hero)] bg-[#121212] text-white'
       : 'relative h-[468px] overflow-hidden rounded-[var(--radius-hero)] bg-[#121212] text-white'}>
 
 
@@ -856,7 +856,7 @@ const coverEase = [0.16, 1, 0.3, 1] as const
 
 /**
  * [임시] 매거진 커버 시안의 사진 위 글자들.
- * 위: 제호 / 왼쪽: 숫자 요약(카운트업) / 아래: AI 페르소나 인용문, 이름, 직함
+ * 왼쪽 위: 숫자 요약(카운트업) / 아래: AI 페르소나 인용문(탭하면 근거 시트), 이름, MBTI·나이 칩
  */
 function ProfileCoverOverlay({
   profile,
@@ -865,7 +865,7 @@ function ProfileCoverOverlay({
   personaText,
   onPersonaOpen,
 }: {
-  profile: { name: string; title?: string; age?: number; mbti?: string; isVerified?: boolean }
+  profile: { name: string; age?: number; mbti?: string; isVerified?: boolean }
   showAge: boolean
   stats: CoverStat[]
   personaText?: string
@@ -873,18 +873,8 @@ function ProfileCoverOverlay({
 }) {
   return (
     <>
-      <motion.div
-        className="pointer-events-none absolute inset-x-0 top-[62px] z-[5] text-center"
-        initial={{ opacity: 0, y: -12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, delay: 0.15, ease: coverEase }}
-      >
-        <div className={`${coverSerif.className} text-[60px] font-medium leading-[0.9] tracking-[-0.01em]`}>Felore</div>
-        <div className="mt-1.5 text-[10px] font-semibold tracking-[0.32em] text-white/85">PEOPLE ISSUE</div>
-      </motion.div>
-
       {stats.length > 0 && (
-        <div className="pointer-events-none absolute left-5 top-[170px] z-[5] flex max-w-[130px] flex-col gap-3.5">
+        <div className="pointer-events-none absolute left-5 top-[76px] z-[5] flex max-w-[130px] flex-col gap-3.5">
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
@@ -914,28 +904,45 @@ function ProfileCoverOverlay({
             onClick={onPersonaOpen}
             disabled={!onPersonaOpen}
             data-tour="persona"
-            className="flex max-w-[300px] items-start gap-2 text-left"
+            className="group flex max-w-[300px] flex-col items-start gap-1.5 text-left"
           >
+            {/* 누를 수 있다는 걸 보여주는 라벨 — AI 그라데이션 칩 + 근거 보기 */}
+            {onPersonaOpen && (
+              <span className="flex items-center gap-1.5">
+                <span
+                  className="flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[11px] font-semibold text-white"
+                  style={{ backgroundImage: 'linear-gradient(110deg, #0088FF 0%, #34C759 100%)' }}
+                >
+                  <Sparkles size={10} />AI 페르소나
+                </span>
+                <span className="flex items-center text-[11px] font-medium text-white/75 group-active:opacity-60">
+                  어떻게 나왔는지 보기<ChevronRight size={12} />
+                </span>
+              </span>
+            )}
             <span className={`${coverSerif.className} text-[17px] italic leading-[1.35] text-white/95`}>
               “{personaText}”
             </span>
-            {onPersonaOpen && (
-              <span
-                className="mt-0.5 flex shrink-0 items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[11px] font-semibold text-white"
-                style={{ backgroundImage: 'linear-gradient(110deg, #0088FF 0%, #34C759 100%)' }}
-              >
-                <Sparkles size={10} />AI
-              </span>
-            )}
           </button>
         )}
-        <div className="text-[clamp(44px,16vw,64px)] font-black leading-[0.95] tracking-[-0.04em]">{profile.name}</div>
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] font-medium text-white/90">
-          {profile.isVerified && <BadgeCheck size={15} className="shrink-0 fill-[#3B82F6] text-white" strokeWidth={2.5} />}
-          {profile.title && <span>{profile.title}</span>}
-          {profile.mbti && <span className="text-white/70">{profile.mbti}</span>}
-          {showAge && <span className="text-white/70">{profile.age}세</span>}
+        <div className="flex items-end gap-2">
+          <span className="text-[clamp(44px,16vw,60px)] font-black leading-[0.95] tracking-[-0.04em]">{profile.name}</span>
+          {profile.isVerified && <BadgeCheck size={22} className="mb-1.5 shrink-0 fill-[#3B82F6] text-white" strokeWidth={2.5} />}
         </div>
+        {(profile.mbti || showAge) && (
+          <div className="flex items-center gap-1.5">
+            {profile.mbti && (
+              <span className="rounded-full border border-white/30 bg-white/15 px-2.5 py-1 text-[12px] font-semibold tracking-[0.04em] text-white backdrop-blur-[10px]">
+                {profile.mbti}
+              </span>
+            )}
+            {showAge && (
+              <span className="rounded-full border border-white/30 bg-white/15 px-2.5 py-1 text-[12px] font-semibold text-white backdrop-blur-[10px]">
+                {profile.age}세
+              </span>
+            )}
+          </div>
+        )}
       </motion.div>
     </>
   )

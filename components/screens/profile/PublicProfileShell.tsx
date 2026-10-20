@@ -159,11 +159,8 @@ export function PublicProfileShell({
 
 
       {/* ── 고정 헤더 영역 (v2 시안에선 헤더와 탭 콘텐츠가 함께 스크롤) ── */}
-      {/* cover 시안은 스크롤 영역을 화면 끝까지 넓히고 같은 만큼 안쪽 여백을 줘서, 커버만 화면 끝까지 채울 수 있게 한다 */}
-      <div className={isCover
-        ? 'scrollbar-hide -mx-3 min-h-0 flex-1 overflow-y-auto px-3 sm:-mx-5 sm:px-5'
-        : isV2 ? 'scrollbar-hide min-h-0 flex-1 overflow-y-auto' : 'flex-shrink-0'}>
-        <div className={isCover ? 'relative -mx-3 mb-4 sm:-mx-5' : 'relative pb-1'}>
+      <div className={isV2 ? 'scrollbar-hide min-h-0 flex-1 overflow-y-auto' : 'flex-shrink-0'}>
+        <div className={isCover ? 'relative mb-2' : 'relative pb-1'}>
           <ProfileHeroSection
             variant={isCover ? 'cover' : isV2 ? 'swipe' : 'card'}
             coverStats={coverStats}

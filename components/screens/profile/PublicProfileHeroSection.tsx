@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, animate, motion, useReducedMotion } from 'framer-motion'
+import { Bodoni_Moda } from 'next/font/google'
 import { BadgeCheck, Bookmark, BookmarkCheck, Check, ChevronLeft, ChevronRight, MessageCircle, Pencil, Share2, Sparkles, X } from 'lucide-react'
 import { ActionMenu, ActionMenuItem, BottomSheet, TextArea, showToast } from '@/components/ui'
 import { shareOrCopy } from '@/lib/share'
@@ -10,6 +11,28 @@ import { useFeloreStore } from '@/store/useFeloreStore'
 import type { PersonaReason } from '@/lib/personaGen'
 
 const CUSTOM_LINK_ID_REGEX = /^[a-z0-9_]{2,20}$/
+
+// [임시] 매거진 커버 시안 — 표지 제호와 인용문 서체
+const coverSerif = Bodoni_Moda({ subsets: ['latin'], style: ['normal', 'italic'], display: 'swap' })
+
+export type CoverStat = { value: number; unit: string; label: string }
+
+// 0에서 목표 숫자까지 올라가는 카운트업 (모션 줄이기 설정이면 바로 최종값)
+function CountUp({ value, delay = 0 }: { value: number; delay?: number }) {
+  const reduceMotion = useReducedMotion()
+  const [display, setDisplay] = useState(reduceMotion ? value : 0)
+  useEffect(() => {
+    if (reduceMotion) { setDisplay(value); return }
+    const controls = animate(0, value, {
+      duration: 1.6,
+      delay,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate: (v) => setDisplay(Math.round(v)),
+    })
+    return () => controls.stop()
+  }, [value, delay, reduceMotion])
+  return <>{display.toLocaleString()}</>
+}
 
 type HeroTheme = {
   cover: string
@@ -41,6 +64,7 @@ export function ProfileHeroSection({
   onContactClick,
   onOwnerEdit,
   variant = 'card',
+  coverStats,
 }: {
   profile: {
     name: string
@@ -65,8 +89,11 @@ export function ProfileHeroSection({
   onBookmarkClick?: () => void
   onContactClick?: () => void
   onOwnerEdit?: () => void
-  /** [임시] UI 개편 시안 — 'swipe'는 카드 아래 작은 사진 칸 없이 카드 안에서 사진을 좌우로 넘긴다 */
-  variant?: 'card' | 'swipe'
+  /** [임시] UI 개편 시안 — 'swipe'는 카드 아래 작은 사진 칸 없이 카드 안에서 사진을 좌우로 넘긴다.
+   *  'cover'는 카드 테두리 없이 사진이 화면 폭을 채우는 잡지 표지형 */
+  variant?: 'card' | 'swipe' | 'cover'
+  /** cover 전용 — 표지 왼쪽에 카운트업으로 보여줄 숫자 요약 */
+  coverStats?: CoverStat[]
 }) {
   const galleryImages = normalizeProfileImages(profile.profileImages, profile.avatarImage)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
@@ -79,21 +106,22 @@ export function ProfileHeroSection({
 
   const mainImage = galleryImages[0]
   const activeImage = galleryImages[activeImageIndex] ?? mainImage
-  const isSwipe = variant === 'swipe'
+  const isCard = variant === 'card'
 
   return (
     <motion.div
-      className={isSwipe ? 'relative px-5 pt-3 pb-2' : 'relative px-5 pt-4 pb-3'}
+      className={variant === 'cover' ? 'relative' : variant === 'swipe' ? 'relative px-5 pt-3 pb-2' : 'relative px-5 pt-4 pb-3'}
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
-      {!isSwipe && (
+      {isCard && (
         <div className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,var(--color-accent-bg-subtle)_0%,transparent_68%)]" />
       )}
       <ProfileHeroCard
         variant={variant}
         galleryImages={galleryImages}
+        coverStats={coverStats}
         profile={profile}
         heroTheme={heroTheme}
         activeImage={mainImage}
@@ -111,7 +139,7 @@ export function ProfileHeroSection({
         onOwnerEdit={onOwnerEdit}
       />
 
-      {!isSwipe && galleryImages.length > 1 && (
+      {isCard && galleryImages.length > 1 && (
         <div className="mt-3 grid grid-cols-3 gap-2 px-1">
           {[1, 2, 3].map((index) => {
             const image = galleryImages[index]
@@ -231,6 +259,7 @@ export function ProfileHeroCard({
   demoPulseContact,
   variant = 'card',
   galleryImages,
+  coverStats,
 }: {
   profile: {
     name: string
@@ -258,8 +287,9 @@ export function ProfileHeroCard({
   onBookmarkClick?: () => void
   onContactClick?: () => void
   onOwnerEdit?: () => void
-  /** [임시] UI 개편 시안 — 'swipe'면 카드 안에서 사진을 좌우로 넘긴다 */
-  variant?: 'card' | 'swipe'
+  /** [임시] UI 개편 시안 — 'swipe'면 카드 안에서 사진을 좌우로 넘긴다, 'cover'는 잡지 표지형 */
+  variant?: 'card' | 'swipe' | 'cover'
+  coverStats?: CoverStat[]
   /** swipe 전용 — 넘겨볼 전체 사진 목록 */
   galleryImages?: string[]
   /** [임시] 온보딩 가이드 데모 전용 — 연락하기 아이콘을 탭한 것처럼 한 번 스케일 펄스 */
@@ -334,6 +364,7 @@ export function ProfileHeroCard({
   const [reportDetail, setReportDetail] = useState('')
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
+  const isCover = variant === 'cover'
   const showAge = typeof profile.age === 'number' && profile.showAge !== false
   const hasPersonaData = !!personaReasons && personaReasons.length > 0
 
@@ -561,15 +592,20 @@ export function ProfileHeroCard({
   )
 
   return (
-    <div className="relative h-[468px] overflow-hidden rounded-[var(--radius-hero)] bg-[#121212] text-white">
+    <div className={isCover
+      ? 'relative h-[560px] overflow-hidden bg-[#121212] text-white'
+      : 'relative h-[468px] overflow-hidden rounded-[var(--radius-hero)] bg-[#121212] text-white'}>
 
 
         {sheets}
 
         <div className="relative h-full">
-          {variant === 'swipe' && galleryImages && galleryImages.length > 1 ? (
+          {variant !== 'card' && galleryImages && galleryImages.length > 1 ? (
             <>
-              <div
+              <motion.div
+                initial={isCover ? { scale: 1.08 } : false}
+                animate={{ scale: 1 }}
+                transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
                 onScroll={(e) => {
                   const el = e.currentTarget
                   setSwipeIndex(Math.round(el.scrollLeft / el.clientWidth))
@@ -584,13 +620,15 @@ export function ProfileHeroCard({
                     className="relative h-full w-full shrink-0 snap-center"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={src} alt={`${profile.name} 사진 ${i + 1}`} className="h-full w-full object-cover" />
-                    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.10)_58%,rgba(0,0,0,0.74)_100%)]" />
+                    <img src={src} alt={`${profile.name} 사진 ${i + 1}`} className={isCover ? 'h-full w-full object-cover object-[50%_18%]' : 'h-full w-full object-cover'} />
+                    <div className={isCover
+                      ? 'absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.40)_0%,rgba(0,0,0,0)_28%,rgba(0,0,0,0.05)_50%,rgba(0,0,0,0.78)_100%)]'
+                      : 'absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.10)_58%,rgba(0,0,0,0.74)_100%)]'} />
                   </button>
                 ))}
-              </div>
+              </motion.div>
               {/* 사진 개수 표시 — 카드 위쪽 가운데 (아래쪽은 이름과 소개가 차지) */}
-              <div className="pointer-events-none absolute inset-x-0 top-3 z-10 flex justify-center gap-1">
+              <div className={`pointer-events-none absolute inset-x-0 z-10 flex justify-center gap-1 ${isCover ? 'bottom-3' : 'top-3'}`}>
                 {galleryImages.map((_, i) => (
                   <span key={i} className={`h-[3px] rounded-full transition-all ${i === swipeIndex ? 'w-5 bg-white' : 'w-2 bg-white/45'}`} />
                 ))}
@@ -603,8 +641,17 @@ export function ProfileHeroCard({
               className="relative block h-full w-full overflow-hidden"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={activeImage} alt={`${profile.name} 프로필 사진`} className="h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.10)_58%,rgba(0,0,0,0.74)_100%)]" />
+              <motion.img
+                src={activeImage}
+                alt={`${profile.name} 프로필 사진`}
+                className={isCover ? 'h-full w-full object-cover object-[50%_18%]' : 'h-full w-full object-cover'}
+                initial={isCover ? { scale: 1.08 } : false}
+                animate={{ scale: 1 }}
+                transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
+              />
+              <div className={isCover
+                ? 'absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.40)_0%,rgba(0,0,0,0)_28%,rgba(0,0,0,0.05)_50%,rgba(0,0,0,0.78)_100%)]'
+                : 'absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.10)_0%,rgba(255,255,255,0.04)_24%,rgba(0,0,0,0.10)_58%,rgba(0,0,0,0.74)_100%)]'} />
             </button>
           ) : (
             <div className="relative h-full overflow-hidden">
@@ -703,6 +750,15 @@ export function ProfileHeroCard({
           )}
         </div>
 
+        {isCover ? (
+          <ProfileCoverOverlay
+            profile={profile}
+            showAge={showAge}
+            stats={coverStats ?? []}
+            personaText={personaText}
+            onPersonaOpen={hasPersonaData ? () => setPersonaSheetOpen(true) : undefined}
+          />
+        ) : (
         <div className="absolute inset-x-0 bottom-0 p-5">
           <div className="flex items-end gap-2">
             <div
@@ -790,8 +846,98 @@ export function ProfileHeroCard({
             )}
           </div>
         </div>
+        )}
 
       </div>
+  )
+}
+
+const coverEase = [0.16, 1, 0.3, 1] as const
+
+/**
+ * [임시] 매거진 커버 시안의 사진 위 글자들.
+ * 위: 제호 / 왼쪽: 숫자 요약(카운트업) / 아래: AI 페르소나 인용문, 이름, 직함
+ */
+function ProfileCoverOverlay({
+  profile,
+  showAge,
+  stats,
+  personaText,
+  onPersonaOpen,
+}: {
+  profile: { name: string; title?: string; age?: number; mbti?: string; isVerified?: boolean }
+  showAge: boolean
+  stats: CoverStat[]
+  personaText?: string
+  onPersonaOpen?: () => void
+}) {
+  return (
+    <>
+      <motion.div
+        className="pointer-events-none absolute inset-x-0 top-[62px] z-[5] text-center"
+        initial={{ opacity: 0, y: -12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.9, delay: 0.15, ease: coverEase }}
+      >
+        <div className={`${coverSerif.className} text-[60px] font-medium leading-[0.9] tracking-[-0.01em]`}>Felore</div>
+        <div className="mt-1.5 text-[10px] font-semibold tracking-[0.32em] text-white/85">PEOPLE ISSUE</div>
+      </motion.div>
+
+      {stats.length > 0 && (
+        <div className="pointer-events-none absolute left-5 top-[170px] z-[5] flex max-w-[130px] flex-col gap-3.5">
+          {stats.map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              className="flex flex-col gap-0.5"
+              initial={{ opacity: 0, x: -14 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.45 + i * 0.15, ease: coverEase }}
+            >
+              <span className="text-[24px] font-black leading-none tabular-nums" style={{ textShadow: '0 1px 12px rgba(0,0,0,0.35)' }}>
+                <CountUp value={stat.value} delay={0.45 + i * 0.15} />{stat.unit}
+              </span>
+              <span className="text-[11px] font-medium leading-[1.35] text-white/90">{stat.label}</span>
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      <motion.div
+        className="absolute inset-x-0 bottom-0 z-[5] flex flex-col gap-2 px-5 pb-7"
+        initial={{ opacity: 0, y: 24 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.9, delay: 0.3, ease: coverEase }}
+      >
+        {personaText && (
+          <button
+            type="button"
+            onClick={onPersonaOpen}
+            disabled={!onPersonaOpen}
+            data-tour="persona"
+            className="flex max-w-[300px] items-start gap-2 text-left"
+          >
+            <span className={`${coverSerif.className} text-[17px] italic leading-[1.35] text-white/95`}>
+              “{personaText}”
+            </span>
+            {onPersonaOpen && (
+              <span
+                className="mt-0.5 flex shrink-0 items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[11px] font-semibold text-white"
+                style={{ backgroundImage: 'linear-gradient(110deg, #0088FF 0%, #34C759 100%)' }}
+              >
+                <Sparkles size={10} />AI
+              </span>
+            )}
+          </button>
+        )}
+        <div className="text-[clamp(44px,16vw,64px)] font-black leading-[0.95] tracking-[-0.04em]">{profile.name}</div>
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12px] font-medium text-white/90">
+          {profile.isVerified && <BadgeCheck size={15} className="shrink-0 fill-[#3B82F6] text-white" strokeWidth={2.5} />}
+          {profile.title && <span>{profile.title}</span>}
+          {profile.mbti && <span className="text-white/70">{profile.mbti}</span>}
+          {showAge && <span className="text-white/70">{profile.age}세</span>}
+        </div>
+      </motion.div>
+    </>
   )
 }
 

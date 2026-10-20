@@ -21,7 +21,7 @@ import { BottomSheet, TextArea, showToast } from '@/components/ui'
 import { getNormalizedPublicProfile, computeTabAccess } from '@/components/screens/profile/publicProfileData'
 import { generatePersona } from '@/lib/personaGen'
 import { ContactActionButton } from '@/components/screens/profile/PublicProfileSections'
-import { ProfileHeroSection } from '@/components/screens/profile/PublicProfileHeroSection'
+import { ProfileHeroSection, type CoverStat } from '@/components/screens/profile/PublicProfileHeroSection'
 import { PublicProfileTabBar, type PublicProfileTabId } from '@/components/screens/profile/PublicProfileTabBar'
 import { PublicProfileKemiZone, PublicProfileOwnerMatchZone } from '@/components/screens/profile/PublicProfileKemiZone'
 import { loadKemiReportSummary, useKemiTestMode } from '@/components/screens/profile/kemiSavedReports'
@@ -47,10 +47,12 @@ export function PublicProfileShell({
   onOwnerEdit?: () => void
   /** [임시] UI 개편 시안 — 'v2'는 고정 헤더 없이 한 화면 전체가 스크롤되고 탭만 위에 붙는다.
    *  히어로 카드는 유지하되 사진은 카드 안에서 넘기고, 케미는 한 줄로 줄인다 */
-  layout?: 'card' | 'v2'
+  layout?: 'card' | 'v2' | 'cover'
   children: ReactNode
 }) {
-  const isV2 = layout === 'v2'
+  // v2와 cover 시안은 둘 다 화면 전체가 스크롤되고 탭만 위에 붙는다
+  const isV2 = layout !== 'card'
+  const isCover = layout === 'cover'
   const router = useRouter()
   const store = useFeloreStore()
   const baseProfile = getNormalizedPublicProfile({
@@ -135,15 +137,36 @@ export function PublicProfileShell({
 
   const hasContactChannels = profile.contactChannels.some((channel) => channel.enabled)
 
+  // [임시] 매거진 커버 시안 — 표지 왼쪽 숫자 요약. 값이 없는 항목은 뺀다
+  const coverStats: CoverStat[] = []
+  if (isCover) {
+    const careerStartYears = profile.manualHighlights
+      .filter((h) => h.categoryId?.startsWith('career'))
+      .map((h) => Number(String(h.year ?? '').match(/\d{4}/)?.[0]))
+      .filter((y) => y > 1900)
+    if (careerStartYears.length > 0) {
+      const years = new Date().getFullYear() - Math.min(...careerStartYears)
+      if (years > 0) coverStats.push({ value: years, unit: '년', label: '일해온 시간' })
+    }
+    const networkTotal = profile.rememberHighlight?.total ?? 0
+    if (networkTotal > 0) coverStats.push({ value: networkTotal, unit: '명', label: '명함으로 이어진 사람들' })
+    const feedbackTotal = profile.reputationKeywords.reduce((sum, k) => sum + k.count, 0)
+    if (feedbackTotal > 0) coverStats.push({ value: feedbackTotal, unit: '개', label: '함께 일한 사람들의 피드백' })
+  }
+
   return (
     <div data-tour-frame className="flex h-full flex-col">
 
 
       {/* ── 고정 헤더 영역 (v2 시안에선 헤더와 탭 콘텐츠가 함께 스크롤) ── */}
-      <div className={isV2 ? 'scrollbar-hide min-h-0 flex-1 overflow-y-auto' : 'flex-shrink-0'}>
-        <div className="relative pb-1">
+      {/* cover 시안은 스크롤 영역을 화면 끝까지 넓히고 같은 만큼 안쪽 여백을 줘서, 커버만 화면 끝까지 채울 수 있게 한다 */}
+      <div className={isCover
+        ? 'scrollbar-hide -mx-3 min-h-0 flex-1 overflow-y-auto px-3 sm:-mx-5 sm:px-5'
+        : isV2 ? 'scrollbar-hide min-h-0 flex-1 overflow-y-auto' : 'flex-shrink-0'}>
+        <div className={isCover ? 'relative -mx-3 mb-4 sm:-mx-5' : 'relative pb-1'}>
           <ProfileHeroSection
-            variant={isV2 ? 'swipe' : 'card'}
+            variant={isCover ? 'cover' : isV2 ? 'swipe' : 'card'}
+            coverStats={coverStats}
             profile={{ ...profile, mbti: profile.whoIAm?.mbti }}
             heroTheme={profile.heroTheme}
             personaText={persona?.text}

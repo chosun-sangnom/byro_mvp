@@ -30,10 +30,10 @@ import {
 export default function UserProfilePage({ params }: { params: { username: string } }) {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<PublicProfileTabId>('who')
-  // [임시] UI 개편 시안 A — ?layout=editorial 로 에디토리얼 배치 미리보기
-  const [layout, setLayout] = useState<'card' | 'editorial'>('card')
+  // [임시] UI 개편 시안 — ?layout=v2 로 새 배치 미리보기
+  const [layout, setLayout] = useState<'card' | 'v2'>('card')
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get('layout') === 'editorial') setLayout('editorial')
+    if (new URLSearchParams(window.location.search).get('layout') === 'v2') setLayout('v2')
   }, [])
 
   // 오너가 자기 공개 링크에서 빈 섹션 "추가하기"를 누르면 편집 허브의 해당 화면으로

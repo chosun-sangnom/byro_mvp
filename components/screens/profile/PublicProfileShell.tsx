@@ -45,11 +45,12 @@ export function PublicProfileShell({
   activeTab: PublicProfileTabId
   onTabChange: (tab: PublicProfileTabId) => void
   onOwnerEdit?: () => void
-  /** [임시] UI 개편 시안 — 'editorial'은 고정 헤더 없이 한 화면 전체가 스크롤되고 탭만 위에 붙는다 */
-  layout?: 'card' | 'editorial'
+  /** [임시] UI 개편 시안 — 'v2'는 고정 헤더 없이 한 화면 전체가 스크롤되고 탭만 위에 붙는다.
+   *  히어로 카드는 유지하되 사진은 카드 안에서 넘기고, 케미는 한 줄로 줄인다 */
+  layout?: 'card' | 'v2'
   children: ReactNode
 }) {
-  const isEditorial = layout === 'editorial'
+  const isV2 = layout === 'v2'
   const router = useRouter()
   const store = useFeloreStore()
   const baseProfile = getNormalizedPublicProfile({
@@ -138,11 +139,11 @@ export function PublicProfileShell({
     <div data-tour-frame className="flex h-full flex-col">
 
 
-      {/* ── 고정 헤더 영역 (에디토리얼 시안에선 헤더와 탭 콘텐츠가 함께 스크롤) ── */}
-      <div className={isEditorial ? 'scrollbar-hide min-h-0 flex-1 overflow-y-auto' : 'flex-shrink-0'}>
+      {/* ── 고정 헤더 영역 (v2 시안에선 헤더와 탭 콘텐츠가 함께 스크롤) ── */}
+      <div className={isV2 ? 'scrollbar-hide min-h-0 flex-1 overflow-y-auto' : 'flex-shrink-0'}>
         <div className="relative pb-1">
           <ProfileHeroSection
-            variant={isEditorial ? 'editorial' : 'card'}
+            variant={isV2 ? 'swipe' : 'card'}
             profile={{ ...profile, mbti: profile.whoIAm?.mbti }}
             heroTheme={profile.heroTheme}
             personaText={persona?.text}
@@ -182,11 +183,12 @@ export function PublicProfileShell({
             onCompatibilityOpen={profile.kemi ? () => router.push(`/${username}/kemi-report`) : undefined}
             onLoginRequest={() => setLoginModalOpen(true)}
             savedReport={savedKemiReport}
+            compact={isV2}
           />
         )}
 
         {/* 나 / 라이프 / 관계 탭 */}
-        {isEditorial ? (
+        {isV2 ? (
           <>
             <div className="sticky top-0 z-20 mt-2 bg-[var(--color-bg-page)]">
               <PublicProfileTabBar activeTab={activeTab} onTabChange={onTabChange} tabAccess={tabAccess} variant="underline" />
@@ -199,7 +201,7 @@ export function PublicProfileShell({
       </div>
 
       {/* ── 탭 콘텐츠 스크롤 영역 ── */}
-      {!isEditorial && (
+      {!isV2 && (
         <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto">
           {children}
         </div>

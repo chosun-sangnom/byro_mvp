@@ -755,7 +755,8 @@ export function ProfileHeroCard({
             profile={profile}
             showAge={showAge}
             stats={coverStats ?? []}
-            personaText={personaText}
+            // 데이터가 없을 때의 안내 문구는 본인이 한 말처럼 보이므로 표지에선 숨긴다
+            personaText={hasPersonaData ? personaText : undefined}
             onPersonaOpen={hasPersonaData ? () => setPersonaSheetOpen(true) : undefined}
           />
         ) : (

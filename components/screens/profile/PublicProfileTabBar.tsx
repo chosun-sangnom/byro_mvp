@@ -16,11 +16,44 @@ export function PublicProfileTabBar({
   activeTab,
   onTabChange,
   tabAccess,
+  variant = 'pill',
 }: {
   activeTab: PublicProfileTabId
   onTabChange: (tab: PublicProfileTabId) => void
   tabAccess?: Partial<Record<PublicProfileTabId, TabAccessLevel>>
+  /** [임시] UI 개편 시안 — 'underline'은 알약 대신 글자 아래 밑줄로 선택 표시 */
+  variant?: 'pill' | 'underline'
 }) {
+  if (variant === 'underline') {
+    return (
+      <div className="flex border-b border-[#DEE4EC] px-5">
+        {TABS.map((tab) => {
+          const selected = tab.id === activeTab
+          const isLocked = (tabAccess?.[tab.id] ?? 'visible') === 'locked'
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              data-tour-tab={tab.id}
+              onClick={() => onTabChange(tab.id)}
+              className={`relative flex flex-1 items-center justify-center gap-1 py-3.5 text-[14px] font-semibold ${selected ? 'text-[#0D0D0D]' : 'text-[#A8B1BD]'}`}
+            >
+              {tab.label}
+              {isLocked && <Lock size={10} className="opacity-60" />}
+              {selected && (
+                <motion.div
+                  layoutId="public-profile-tab-underline"
+                  className="absolute inset-x-0 -bottom-px h-[2px] bg-[#0D0D0D]"
+                  transition={{ type: 'spring', stiffness: 420, damping: 34 }}
+                />
+              )}
+            </button>
+          )
+        })}
+      </div>
+    )
+  }
+
   return (
     <div className="px-5 pt-3 pb-3">
       <div className="rounded-full bg-[#F5F6F7] p-1">

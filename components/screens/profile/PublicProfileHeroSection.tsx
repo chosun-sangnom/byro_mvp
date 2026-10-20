@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { BadgeCheck, Bookmark, BookmarkCheck, Check, ChevronLeft, ChevronRight, MessageCircle, Pencil, Share2, Sparkles, X } from 'lucide-react'
@@ -40,6 +40,7 @@ export function ProfileHeroSection({
   onBookmarkClick,
   onContactClick,
   onOwnerEdit,
+  variant = 'card',
 }: {
   profile: {
     name: string
@@ -64,6 +65,8 @@ export function ProfileHeroSection({
   onBookmarkClick?: () => void
   onContactClick?: () => void
   onOwnerEdit?: () => void
+  /** [임시] UI 개편 시안 — 'editorial'은 사진을 화면 폭 끝까지 쓰고 이름과 소개를 사진 아래로 내린 배치 */
+  variant?: 'card' | 'editorial'
 }) {
   const galleryImages = normalizeProfileImages(profile.profileImages, profile.avatarImage)
   const [activeImageIndex, setActiveImageIndex] = useState(0)
@@ -76,21 +79,26 @@ export function ProfileHeroSection({
 
   const mainImage = galleryImages[0]
   const activeImage = galleryImages[activeImageIndex] ?? mainImage
+  const isEditorial = variant === 'editorial'
 
   return (
     <motion.div
-      className="relative px-5 pt-4 pb-3"
+      className={isEditorial ? 'relative' : 'relative px-5 pt-4 pb-3'}
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,var(--color-accent-bg-subtle)_0%,transparent_68%)]" />
+      {!isEditorial && (
+        <div className="pointer-events-none absolute left-1/2 top-0 h-[480px] w-[480px] -translate-x-1/2 rounded-full bg-[radial-gradient(circle,var(--color-accent-bg-subtle)_0%,transparent_68%)]" />
+      )}
       <ProfileHeroCard
+        variant={variant}
+        galleryImages={galleryImages}
         profile={profile}
         heroTheme={heroTheme}
         activeImage={mainImage}
-        onOpenGallery={() => {
-          setActiveImageIndex(0)
+        onOpenGallery={(index = 0) => {
+          setActiveImageIndex(index)
           setGalleryOpen(true)
         }}
         personaText={personaText}
@@ -103,7 +111,7 @@ export function ProfileHeroSection({
         onOwnerEdit={onOwnerEdit}
       />
 
-      {galleryImages.length > 1 && (
+      {!isEditorial && galleryImages.length > 1 && (
         <div className="mt-3 grid grid-cols-3 gap-2 px-1">
           {[1, 2, 3].map((index) => {
             const image = galleryImages[index]
@@ -221,6 +229,8 @@ export function ProfileHeroCard({
   onContactClick,
   onOwnerEdit,
   demoPulseContact,
+  variant = 'card',
+  galleryImages,
 }: {
   profile: {
     name: string
@@ -239,7 +249,7 @@ export function ProfileHeroCard({
   }
   heroTheme: HeroTheme
   activeImage?: string
-  onOpenGallery?: () => void
+  onOpenGallery?: (index?: number) => void
   personaText?: string
   personaReasons?: PersonaReason[]
   personaImage?: string
@@ -248,6 +258,10 @@ export function ProfileHeroCard({
   onBookmarkClick?: () => void
   onContactClick?: () => void
   onOwnerEdit?: () => void
+  /** [임시] UI 개편 시안 배치 */
+  variant?: 'card' | 'editorial'
+  /** editorial 전용 — 사진 넘기기에 쓰는 전체 사진 목록 */
+  galleryImages?: string[]
   /** [임시] 온보딩 가이드 데모 전용 — 연락하기 아이콘을 탭한 것처럼 한 번 스케일 펄스 */
   demoPulseContact?: boolean
 }) {
@@ -340,10 +354,9 @@ export function ProfileHeroCard({
     showToast('신고가 접수됐어요')
   }
 
-  return (
-    <div className="relative h-[468px] overflow-hidden rounded-[var(--radius-hero)] bg-[#121212] text-white">
-
-
+  // 카드형과 에디토리얼형이 같은 시트(페르소나, 신고, 링크 편집)를 공유한다
+  const sheets = (
+    <>
         {/* AI 페르소나 바텀시트 — createPortal로 transform 컨텍스트 탈출 */}
         {hasPersonaData && mounted && createPortal(
           <BottomSheet open={personaSheetOpen} onClose={() => setPersonaSheetOpen(false)}>
@@ -471,12 +484,133 @@ export function ProfileHeroCard({
           </BottomSheet>,
           document.body
         )}
+        {isOwner && createPortal(
+          <BottomSheet
+            open={linkEditSheetOpen}
+            onClose={() => { setLinkEditSheetOpen(false); setCustomLinkError(false) }}
+          >
+          <div className="flex flex-col gap-6 px-4 pb-6 pt-3">
+            <div className="flex flex-col gap-2 w-full">
+              <p className="text-[18px] font-bold text-[#0D0D0D]">프로필 링크 편집</p>
+              <p className="text-[14px] font-medium leading-[1.5] text-[#475058]">
+                나만의 링크를 설정하면 felore.io/내이름 형태로 프로필을 공유할 수 있어요.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2 w-full">
+              <p className="text-[14px] font-semibold text-[#0D0D0D]">
+                기본 링크<span className="text-[#6C7786]">(변경 불가)</span>
+              </p>
+              <div className="flex items-center gap-2.5 rounded-full border border-[#DEE4EC] bg-[#F5F6F7] px-4 py-3">
+                <span className="text-[14px] font-medium text-[#A8B1BD]">felore.io/{randomLinkId}</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2 w-full">
+              <p className="text-[14px] font-semibold text-[#0D0D0D]">커스텀 링크</p>
+              <div
+                className={[
+                  'flex items-center gap-2.5 rounded-full border bg-white px-4 py-3',
+                  customLinkError ? 'border-[#FF4242]' : 'border-[#DEE4EC]',
+                ].join(' ')}
+              >
+                <span className="text-[14px] font-medium text-[#A8B1BD] flex-shrink-0">felore.io/</span>
+                <input
+                  type="text"
+                  value={customLinkInput}
+                  onChange={(e) => { setCustomLinkInput(e.target.value.toLowerCase()); setCustomLinkError(false) }}
+                  placeholder="예: gangminjun"
+                  maxLength={20}
+                  className="flex-1 min-w-0 bg-transparent text-[14px] font-medium text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
+                />
+              </div>
+              {customLinkError && (
+                <p className="text-[12px] font-medium text-[#FF4242]">올바른 커스텀 링크 형식을 입력해주세요.</p>
+              )}
+              <p className="text-[12px] font-medium text-[#6C7786]">영문 소문자, 숫자, _만 사용, 2~20자</p>
+            </div>
+
+            <div className="flex items-start gap-2 w-full">
+              <button
+                onClick={() => { setLinkEditSheetOpen(false); setCustomLinkError(false) }}
+                className="flex-1 rounded-full border border-[#DEE4EC] px-6 py-3 text-[14px] font-bold text-[#25313D]"
+              >
+                취소
+              </button>
+              <button
+                onClick={handleSaveCustomLinkId}
+                className="flex-1 rounded-full bg-black px-6 py-3 text-[14px] font-bold text-white"
+              >
+                저장
+              </button>
+            </div>
+            {store.user?.customLinkId && (
+              <button
+                onClick={() => { store.setCustomLinkId(null); setCustomLinkInput(''); setCustomLinkError(false); setLinkEditSheetOpen(false); showToast('기본 링크로 복원했어요') }}
+                className="-mt-2 w-full text-center text-[13px] font-medium text-[#A8B1BD]"
+              >
+                기본 링크로 복원
+              </button>
+            )}
+          </div>
+          </BottomSheet>,
+          document.body
+        )}
+    </>
+  )
+
+  if (variant === 'editorial') {
+    return (
+      <ProfileEditorialHero
+        profile={profile}
+        heroTheme={heroTheme}
+        images={galleryImages ?? (activeImage ? [activeImage] : [])}
+        onOpenGallery={onOpenGallery}
+        personaText={personaText}
+        hasPersonaData={hasPersonaData}
+        onPersonaOpen={() => setPersonaSheetOpen(true)}
+        showAge={showAge}
+        isOwner={isOwner}
+        isBookmarked={isBookmarked}
+        onBookmarkClick={onBookmarkClick}
+        onContactClick={onContactClick}
+        onOwnerEdit={onOwnerEdit}
+        onMoreClick={() => setMoreSheetOpen((v) => !v)}
+        moreMenu={
+          <ActionMenu open={moreSheetOpen} onClose={() => setMoreSheetOpen(false)}>
+            <ActionMenuItem
+              label="공유하기"
+              onClick={async () => {
+                await shareOrCopy({ title: `${profile.name}의 펠로어`, url: window.location.href })
+                setMoreSheetOpen(false)
+              }}
+            />
+            {!isOwner && (
+              <ActionMenuItem
+                label="프로필 신고"
+                danger
+                onClick={() => { setMoreSheetOpen(false); setReportSheetOpen(true) }}
+              />
+            )}
+          </ActionMenu>
+        }
+        onLinkEdit={isOwner ? handleOpenLinkEdit : undefined}
+        sheets={sheets}
+      />
+    )
+  }
+
+  return (
+    <div className="relative h-[468px] overflow-hidden rounded-[var(--radius-hero)] bg-[#121212] text-white">
+
+
+        {sheets}
 
         <div className="relative h-full">
           {activeImage ? (
             <button
               type="button"
-              onClick={onOpenGallery}
+              onClick={() => onOpenGallery?.()}
               className="relative block h-full w-full overflow-hidden"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -668,80 +802,214 @@ export function ProfileHeroCard({
           </div>
         </div>
 
-        {isOwner && createPortal(
-          <BottomSheet
-            open={linkEditSheetOpen}
-            onClose={() => { setLinkEditSheetOpen(false); setCustomLinkError(false) }}
-          >
-          <div className="flex flex-col gap-6 px-4 pb-6 pt-3">
-            <div className="flex flex-col gap-2 w-full">
-              <p className="text-[18px] font-bold text-[#0D0D0D]">프로필 링크 편집</p>
-              <p className="text-[14px] font-medium leading-[1.5] text-[#475058]">
-                나만의 링크를 설정하면 felore.io/내이름 형태로 프로필을 공유할 수 있어요.
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-2 w-full">
-              <p className="text-[14px] font-semibold text-[#0D0D0D]">
-                기본 링크<span className="text-[#6C7786]">(변경 불가)</span>
-              </p>
-              <div className="flex items-center gap-2.5 rounded-full border border-[#DEE4EC] bg-[#F5F6F7] px-4 py-3">
-                <span className="text-[14px] font-medium text-[#A8B1BD]">felore.io/{randomLinkId}</span>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-2 w-full">
-              <p className="text-[14px] font-semibold text-[#0D0D0D]">커스텀 링크</p>
-              <div
-                className={[
-                  'flex items-center gap-2.5 rounded-full border bg-white px-4 py-3',
-                  customLinkError ? 'border-[#FF4242]' : 'border-[#DEE4EC]',
-                ].join(' ')}
-              >
-                <span className="text-[14px] font-medium text-[#A8B1BD] flex-shrink-0">felore.io/</span>
-                <input
-                  type="text"
-                  value={customLinkInput}
-                  onChange={(e) => { setCustomLinkInput(e.target.value.toLowerCase()); setCustomLinkError(false) }}
-                  placeholder="예: gangminjun"
-                  maxLength={20}
-                  className="flex-1 min-w-0 bg-transparent text-[14px] font-medium text-[#0D0D0D] outline-none placeholder:text-[#A8B1BD]"
-                />
-              </div>
-              {customLinkError && (
-                <p className="text-[12px] font-medium text-[#FF4242]">올바른 커스텀 링크 형식을 입력해주세요.</p>
-              )}
-              <p className="text-[12px] font-medium text-[#6C7786]">영문 소문자, 숫자, _만 사용, 2~20자</p>
-            </div>
-
-            <div className="flex items-start gap-2 w-full">
-              <button
-                onClick={() => { setLinkEditSheetOpen(false); setCustomLinkError(false) }}
-                className="flex-1 rounded-full border border-[#DEE4EC] px-6 py-3 text-[14px] font-bold text-[#25313D]"
-              >
-                취소
-              </button>
-              <button
-                onClick={handleSaveCustomLinkId}
-                className="flex-1 rounded-full bg-black px-6 py-3 text-[14px] font-bold text-white"
-              >
-                저장
-              </button>
-            </div>
-            {store.user?.customLinkId && (
-              <button
-                onClick={() => { store.setCustomLinkId(null); setCustomLinkInput(''); setCustomLinkError(false); setLinkEditSheetOpen(false); showToast('기본 링크로 복원했어요') }}
-                className="-mt-2 w-full text-center text-[13px] font-medium text-[#A8B1BD]"
-              >
-                기본 링크로 복원
-              </button>
-            )}
-          </div>
-          </BottomSheet>,
-          document.body
-        )}
       </div>
   )
 }
 
 
+
+/**
+ * ProfileEditorialHero
+ *
+ * [임시] UI 개편 시안 A(에디토리얼). 카드형 히어로와 같은 데이터, 같은 시트를 쓰고 배치만 다르다.
+ * - 사진: 화면 폭 끝까지, 좌우로 넘기는 4:5 사진 (탭하면 기존 라이트박스)
+ * - 이름, 직함, AI 한 줄 소개는 사진 위가 아니라 사진 아래 흰 바탕에 큰 글씨로
+ * - 연락하기, 저장은 사진 위 아이콘이 아니라 이름 아래 버튼으로
+ */
+function ProfileEditorialHero({
+  profile,
+  heroTheme,
+  images,
+  onOpenGallery,
+  personaText,
+  hasPersonaData,
+  onPersonaOpen,
+  showAge,
+  isOwner,
+  isBookmarked,
+  onBookmarkClick,
+  onContactClick,
+  onOwnerEdit,
+  onMoreClick,
+  moreMenu,
+  onLinkEdit,
+  sheets,
+}: {
+  profile: {
+    name: string
+    title?: string
+    linkId?: string
+    age?: number
+    mbti?: string
+    avatarColor?: string
+    isVerified?: boolean
+  }
+  heroTheme: HeroTheme
+  images: string[]
+  onOpenGallery?: (index?: number) => void
+  personaText?: string
+  hasPersonaData: boolean
+  onPersonaOpen: () => void
+  showAge: boolean
+  isOwner?: boolean
+  isBookmarked?: boolean
+  onBookmarkClick?: () => void
+  onContactClick?: () => void
+  onOwnerEdit?: () => void
+  onMoreClick: () => void
+  moreMenu: ReactNode
+  onLinkEdit?: () => void
+  sheets: ReactNode
+}) {
+  const [index, setIndex] = useState(0)
+  const trackRef = useRef<HTMLDivElement>(null)
+  const meta = [profile.mbti, showAge ? `${profile.age}세` : null].filter(Boolean).join(' · ')
+
+  const glassButton = 'flex size-10 items-center justify-center rounded-full bg-black/25 text-white backdrop-blur-[10px]'
+
+  return (
+    <div className="relative">
+      {sheets}
+
+      {/* 사진 */}
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-[var(--color-bg-soft)]">
+        {images.length > 0 ? (
+          <div
+            ref={trackRef}
+            onScroll={(e) => {
+              const el = e.currentTarget
+              setIndex(Math.round(el.scrollLeft / el.clientWidth))
+            }}
+            className="scrollbar-hide flex h-full w-full snap-x snap-mandatory overflow-x-auto"
+          >
+            {images.map((src, i) => (
+              <button
+                key={src + i}
+                type="button"
+                onClick={() => onOpenGallery?.(i)}
+                className="relative h-full w-full shrink-0 snap-center"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={src} alt={`${profile.name} 사진 ${i + 1}`} className="h-full w-full object-cover" />
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="relative flex h-full items-center justify-center">
+            <div className={`absolute inset-0 bg-gradient-to-b ${heroTheme.cover}`} />
+            <div className="relative text-[96px] font-bold text-white/70">{profile.name.charAt(0)}</div>
+          </div>
+        )}
+
+        {/* 위쪽 버튼이 사진 위에서도 보이도록 옅은 그림자 */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/25 to-transparent" />
+
+        <div className="absolute right-4 top-4 z-10 flex gap-2">
+          {isOwner && onOwnerEdit && (
+            <button type="button" aria-label="프로필 편집" onClick={onOwnerEdit} className={glassButton}>
+              <Pencil size={18} />
+            </button>
+          )}
+          <div className="relative">
+            <button type="button" aria-label="더보기" onClick={onMoreClick} className={`${glassButton} text-[18px] font-bold leading-none`}>
+              ···
+            </button>
+            {moreMenu}
+          </div>
+        </div>
+
+        {images.length > 1 && (
+          <div className="absolute inset-x-0 bottom-4 flex justify-center gap-1.5">
+            {images.map((_, i) => (
+              <span
+                key={i}
+                className={`h-1.5 rounded-full transition-all ${i === index ? 'w-4 bg-white' : 'w-1.5 bg-white/50'}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* 이름과 소개 */}
+      <div className="px-5 pt-6">
+        <div className="flex items-center gap-1.5">
+          <h1 className="text-[28px] font-bold leading-[1.15] tracking-[-0.03em] text-[#0D0D0D]">{profile.name}</h1>
+          {profile.isVerified && <BadgeCheck size={20} className="shrink-0 fill-[#3B82F6] text-white" strokeWidth={2.5} />}
+        </div>
+        {profile.title && (
+          <p className="mt-1.5 text-[16px] font-medium text-[#475058]">{profile.title}</p>
+        )}
+        {meta && <p className="mt-1 text-[14px] text-[#6C7786]">{meta}</p>}
+
+        {personaText && (
+          <button
+            type="button"
+            data-tour="persona"
+            onClick={hasPersonaData ? onPersonaOpen : undefined}
+            className="mt-5 flex w-full gap-3 text-left"
+          >
+            <span className="w-[3px] shrink-0 rounded-full" style={{ backgroundImage: 'linear-gradient(180deg, #0088FF 0%, #34C759 100%)' }} />
+            <span className="min-w-0 flex-1">
+              <span
+                className="flex items-center gap-1 text-[12px] font-semibold"
+                style={{ backgroundImage: 'linear-gradient(110deg, #0088FF 0%, #34C759 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}
+              >
+                AI 페르소나
+              </span>
+              <span className={`mt-1 block text-[16px] font-medium leading-[1.5] ${hasPersonaData ? 'text-[#0D0D0D]' : 'text-[#A8B1BD]'}`}>
+                {personaText}
+              </span>
+            </span>
+            {hasPersonaData && <ChevronRight size={18} className="mt-5 shrink-0 text-[#A8B1BD]" />}
+          </button>
+        )}
+
+        {/* 주요 버튼 */}
+        {(isOwner || onContactClick || onBookmarkClick) && <div className="mt-6 flex gap-2">
+          {isOwner ? (
+            <button
+              type="button"
+              onClick={async () => { await shareOrCopy({ title: `${profile.name}의 펠로어`, url: window.location.href }) }}
+              className="flex h-12 flex-1 items-center justify-center gap-1.5 rounded-full bg-[#0D0D0D] text-[15px] font-semibold text-white"
+            >
+              <Share2 size={16} />내 프로필 공유
+            </button>
+          ) : (
+            <>
+              {onContactClick && (
+                <button
+                  type="button"
+                  onClick={onContactClick}
+                  className="flex h-12 flex-1 items-center justify-center gap-1.5 rounded-full bg-[#0D0D0D] text-[15px] font-semibold text-white"
+                >
+                  <MessageCircle size={16} />연락하기
+                </button>
+              )}
+              {onBookmarkClick && (
+                <button
+                  type="button"
+                  data-tour="bookmark"
+                  aria-label={isBookmarked ? '저장됨' : '저장'}
+                  onClick={onBookmarkClick}
+                  className={`flex h-12 items-center justify-center gap-1.5 rounded-full border border-[#DEE4EC] text-[15px] font-semibold text-[#25313D] ${onContactClick ? 'w-12' : 'flex-1'}`}
+                >
+                  {isBookmarked ? <BookmarkCheck size={18} /> : <Bookmark size={18} />}
+                  {!onContactClick && (isBookmarked ? '저장됨' : '저장')}
+                </button>
+              )}
+            </>
+          )}
+        </div>}
+
+        <div className="mt-3 flex items-center justify-center gap-1">
+          <span className="text-[12px] text-[#A8B1BD]">felore.io/{profile.linkId}</span>
+          {onLinkEdit && (
+            <button type="button" onClick={onLinkEdit} aria-label="프로필 링크 편집" className="text-[#A8B1BD]">
+              <Pencil size={11} />
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -38,14 +38,18 @@ export function PublicProfileShell({
   activeTab,
   onTabChange,
   onOwnerEdit,
+  layout = 'card',
   children,
 }: {
   username: string
   activeTab: PublicProfileTabId
   onTabChange: (tab: PublicProfileTabId) => void
   onOwnerEdit?: () => void
+  /** [임시] UI 개편 시안 — 'editorial'은 고정 헤더 없이 한 화면 전체가 스크롤되고 탭만 위에 붙는다 */
+  layout?: 'card' | 'editorial'
   children: ReactNode
 }) {
+  const isEditorial = layout === 'editorial'
   const router = useRouter()
   const store = useFeloreStore()
   const baseProfile = getNormalizedPublicProfile({
@@ -134,10 +138,11 @@ export function PublicProfileShell({
     <div data-tour-frame className="flex h-full flex-col">
 
 
-      {/* ── 고정 헤더 영역 ── */}
-      <div className="flex-shrink-0">
+      {/* ── 고정 헤더 영역 (에디토리얼 시안에선 헤더와 탭 콘텐츠가 함께 스크롤) ── */}
+      <div className={isEditorial ? 'scrollbar-hide min-h-0 flex-1 overflow-y-auto' : 'flex-shrink-0'}>
         <div className="relative pb-1">
           <ProfileHeroSection
+            variant={isEditorial ? 'editorial' : 'card'}
             profile={{ ...profile, mbti: profile.whoIAm?.mbti }}
             heroTheme={profile.heroTheme}
             personaText={persona?.text}
@@ -181,13 +186,24 @@ export function PublicProfileShell({
         )}
 
         {/* 나 / 라이프 / 관계 탭 */}
-        <PublicProfileTabBar activeTab={activeTab} onTabChange={onTabChange} tabAccess={tabAccess} />
+        {isEditorial ? (
+          <>
+            <div className="sticky top-0 z-20 mt-2 bg-[var(--color-bg-page)]">
+              <PublicProfileTabBar activeTab={activeTab} onTabChange={onTabChange} tabAccess={tabAccess} variant="underline" />
+            </div>
+            <div className="pt-2">{children}</div>
+          </>
+        ) : (
+          <PublicProfileTabBar activeTab={activeTab} onTabChange={onTabChange} tabAccess={tabAccess} />
+        )}
       </div>
 
       {/* ── 탭 콘텐츠 스크롤 영역 ── */}
-      <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto">
-        {children}
-      </div>
+      {!isEditorial && (
+        <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto">
+          {children}
+        </div>
+      )}
 
       {/* ── 고정 푸터 (visitor 전용, 전 탭 공통) ── */}
       {!isOwnerMode && (

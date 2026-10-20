@@ -220,8 +220,8 @@ export function Step1Login({
     }
 
     if (oauthStep === 'terms') {
-      const allAgreed = store.agreedAge14 && store.agreedTerms && store.agreedPrivacy && store.agreedMarketing
-      const canProceed = store.agreedAge14 && store.agreedTerms && store.agreedPrivacy
+      const allAgreed = store.agreedAge14 && store.agreedTerms && store.agreedPrivacy && store.agreedOverseas && store.agreedMarketing
+      const canProceed = store.agreedAge14 && store.agreedTerms && store.agreedPrivacy && store.agreedOverseas
       return (
         <div className="flex flex-col h-full overflow-y-auto px-5 py-6">
           <div className="mb-6">
@@ -264,6 +264,13 @@ export function Step1Login({
               label="개인정보 수집 및 이용"
               checked={store.agreedPrivacy}
               onToggle={() => store.setAgreedPrivacy(!store.agreedPrivacy)}
+              onDetail={() => showToast('준비 중인 페이지예요')}
+            />
+            <TermsCheckRow
+              badge="필수"
+              label="개인정보 국외 이전 동의"
+              checked={store.agreedOverseas}
+              onToggle={() => store.setAgreedOverseas(!store.agreedOverseas)}
               onDetail={() => showToast('준비 중인 페이지예요')}
             />
             <TermsCheckRow
@@ -835,8 +842,8 @@ function TermsAgreementSheet({
   onAgree: () => void
 }) {
   const store = useFeloreStore()
-  const allAgreed = store.agreedAge14 && store.agreedTerms && store.agreedPrivacy && store.agreedMarketing
-  const canProceed = store.agreedAge14 && store.agreedTerms && store.agreedPrivacy
+  const allAgreed = store.agreedAge14 && store.agreedTerms && store.agreedPrivacy && store.agreedOverseas && store.agreedMarketing
+  const canProceed = store.agreedAge14 && store.agreedTerms && store.agreedPrivacy && store.agreedOverseas
 
   return (
     <BottomSheet open={open} onClose={onClose}>
@@ -877,6 +884,13 @@ function TermsAgreementSheet({
           label="개인정보 수집 및 이용"
           checked={store.agreedPrivacy}
           onToggle={() => store.setAgreedPrivacy(!store.agreedPrivacy)}
+          onDetail={() => showToast('준비 중인 페이지예요')}
+        />
+        <TermsCheckRow
+          badge="필수"
+          label="개인정보 국외 이전 동의"
+          checked={store.agreedOverseas}
+          onToggle={() => store.setAgreedOverseas(!store.agreedOverseas)}
           onDetail={() => showToast('준비 중인 페이지예요')}
         />
         <TermsCheckRow

@@ -293,6 +293,12 @@ export function ProfileHeroCard({
 }) {
   const [personaSheetOpen, setPersonaSheetOpen] = useState(false)
   const [swipeIndex, setSwipeIndex] = useState(0)
+  const swipeRef = useRef<HTMLDivElement>(null)
+  // 커버 사진 좌우 버튼 — 한 장씩 넘김
+  const swipeTo = (index: number) => {
+    const el = swipeRef.current
+    if (el) el.scrollTo({ left: index * el.clientWidth, behavior: 'smooth' })
+  }
   const [personaSharing, setPersonaSharing] = useState(false)
   const personaCardRef = useRef<HTMLDivElement>(null)
 
@@ -599,6 +605,7 @@ export function ProfileHeroCard({
           {variant !== 'card' && galleryImages && galleryImages.length > 1 ? (
             <>
               <motion.div
+                ref={swipeRef}
                 initial={isCover ? { scale: 1.08 } : false}
                 animate={{ scale: 1 }}
                 transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
@@ -623,12 +630,42 @@ export function ProfileHeroCard({
                   </button>
                 ))}
               </motion.div>
-              {/* 사진 개수 표시 — 카드 위쪽 가운데 (아래쪽은 이름과 소개가 차지) */}
-              <div className={`pointer-events-none absolute inset-x-0 z-10 flex justify-center gap-1 ${isCover ? 'bottom-3' : 'top-3'}`}>
-                {galleryImages.map((_, i) => (
-                  <span key={i} className={`h-[3px] rounded-full transition-all ${i === swipeIndex ? 'w-5 bg-white' : 'w-2 bg-white/45'}`} />
-                ))}
-              </div>
+              {isCover ? (
+                /* 커버: 위쪽 가운데(저장·연락하기 버튼 사이)에 이전 버튼, 장 수, 다음 버튼.
+                   아래쪽은 이름·페르소나, 왼쪽은 숫자 요약이 차지해서 겹치지 않는 자리 */
+                <div className="absolute inset-x-0 top-4 z-10 flex h-10 items-center justify-center gap-2.5 pointer-events-none">
+                  <button
+                    type="button"
+                    aria-label="이전 사진"
+                    disabled={swipeIndex === 0}
+                    onClick={(e) => { e.stopPropagation(); swipeTo(swipeIndex - 1) }}
+                    className="pointer-events-auto flex size-8 items-center justify-center rounded-full bg-black/25 backdrop-blur-[10px] transition-opacity active:scale-95 disabled:opacity-30"
+                  >
+                    <ChevronLeft size={18} className="text-white" />
+                  </button>
+                  <div className="flex gap-1">
+                    {galleryImages.map((_, i) => (
+                      <span key={i} className={`h-[3px] rounded-full transition-all ${i === swipeIndex ? 'w-5 bg-white' : 'w-2 bg-white/45'}`} />
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    aria-label="다음 사진"
+                    disabled={swipeIndex === galleryImages.length - 1}
+                    onClick={(e) => { e.stopPropagation(); swipeTo(swipeIndex + 1) }}
+                    className="pointer-events-auto flex size-8 items-center justify-center rounded-full bg-black/25 backdrop-blur-[10px] transition-opacity active:scale-95 disabled:opacity-30"
+                  >
+                    <ChevronRight size={18} className="text-white" />
+                  </button>
+                </div>
+              ) : (
+                /* 사진 개수 표시 — 카드 위쪽 가운데 (아래쪽은 이름과 소개가 차지) */
+                <div className="pointer-events-none absolute inset-x-0 top-3 z-10 flex justify-center gap-1">
+                  {galleryImages.map((_, i) => (
+                    <span key={i} className={`h-[3px] rounded-full transition-all ${i === swipeIndex ? 'w-5 bg-white' : 'w-2 bg-white/45'}`} />
+                  ))}
+                </div>
+              )}
             </>
           ) : activeImage ? (
             <button

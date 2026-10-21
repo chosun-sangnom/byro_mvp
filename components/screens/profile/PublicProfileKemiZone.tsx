@@ -68,8 +68,6 @@ export function PublicProfileKemiZone({
 
   if (compact) {
     const loggedOut = !isLoggedIn
-    // 겹치는 항목이 없으면 "0가지" 대신 리포트로 들어가는 문구
-    const hasMatches = !!kemi && kemi.matchCount > 0
     return (
       <div data-tour="visitor-kemi" className="px-5 pb-1">
         <button
@@ -80,7 +78,7 @@ export function PublicProfileKemiZone({
           <Sparkles size={16} className={`shrink-0 text-[#25313D] ${isLoading ? 'animate-pulse' : ''}`} />
           <span className="min-w-0 flex-1">
             <span className="block text-[14px] font-semibold text-[#0D0D0D]">
-              {isLoading ? '케미 분석 중...' : hasMatches ? `나와 ${kemi!.matchCount}가지 케미` : '나와의 케미 보기'}
+              {isLoading ? '케미 분석 중...' : `나와 ${kemi!.matchCount}가지 케미`}
             </span>
             {!isLoading && (
               <span className="mt-0.5 block truncate text-[13px] text-[#6C7786]">
@@ -88,9 +86,7 @@ export function PublicProfileKemiZone({
                   ? '로그인하면 어떤 점이 통하는지 보여요'
                   : savedReport
                     ? `케미 리포트 ${savedReport.score}점, ${savedReport.archetypeName}`
-                    : hasMatches
-                      ? kemi!.matchItems.map((item) => item.label).join(', ')
-                      : '케미 리포트에서 자세히 보여요'}
+                    : kemi!.matchItems.map((item) => item.label).join(', ')}
               </span>
             )}
           </span>

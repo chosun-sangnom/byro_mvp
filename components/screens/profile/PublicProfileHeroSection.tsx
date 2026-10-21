@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, animate, motion, useReducedMotion } from 'framer-motion'
-import { Bodoni_Moda } from 'next/font/google'
 import { BadgeCheck, Bookmark, BookmarkCheck, Check, ChevronLeft, ChevronRight, MessageCircle, Pencil, Share2, Sparkles, X } from 'lucide-react'
 import { ActionMenu, ActionMenuItem, BottomSheet, TextArea, showToast } from '@/components/ui'
 import { shareOrCopy } from '@/lib/share'
@@ -11,9 +10,6 @@ import { useFeloreStore } from '@/store/useFeloreStore'
 import type { PersonaReason } from '@/lib/personaGen'
 
 const CUSTOM_LINK_ID_REGEX = /^[a-z0-9_]{2,20}$/
-
-// [임시] 매거진 커버 시안 — 페르소나 인용문 서체
-const coverSerif = Bodoni_Moda({ subsets: ['latin'], style: ['normal', 'italic'], display: 'swap' })
 
 export type CoverStat = { value: number; unit: string; label: string }
 
@@ -755,8 +751,7 @@ export function ProfileHeroCard({
             profile={profile}
             showAge={showAge}
             stats={coverStats ?? []}
-            // 데이터가 없을 때의 안내 문구는 본인이 한 말처럼 보이므로 표지에선 숨긴다
-            personaText={hasPersonaData ? personaText : undefined}
+            personaText={personaText}
             onPersonaOpen={hasPersonaData ? () => setPersonaSheetOpen(true) : undefined}
           />
         ) : (
@@ -854,10 +849,12 @@ export function ProfileHeroCard({
 }
 
 const coverEase = [0.16, 1, 0.3, 1] as const
+// 어두운 사진 위에서도 읽히도록 기존 AI 그라데이션(#0088FF→#34C759)을 한 단계 밝게
+const COVER_AI_GRADIENT = 'linear-gradient(100deg, #4DA8FF 0%, #5EDB86 100%)'
 
 /**
  * [임시] 매거진 커버 시안의 사진 위 글자들.
- * 왼쪽 위: 숫자 요약(카운트업) / 아래: AI 페르소나 인용문(탭하면 근거 시트), 이름, MBTI·나이 칩
+ * 왼쪽 위: 숫자 요약(카운트업) / 아래: 이름, AI 페르소나 부제(탭하면 근거 시트), MBTI·나이 칩
  */
 function ProfileCoverOverlay({
   profile,
@@ -899,37 +896,39 @@ function ProfileCoverOverlay({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.9, delay: 0.3, ease: coverEase }}
       >
-        {personaText && (
-          <button
-            type="button"
-            onClick={onPersonaOpen}
-            disabled={!onPersonaOpen}
-            data-tour="persona"
-            className="group flex max-w-[300px] flex-col items-start gap-1.5 text-left"
-          >
-            {/* 누를 수 있다는 걸 보여주는 라벨 — AI 그라데이션 칩 + 근거 보기 */}
-            {onPersonaOpen && (
-              <span className="flex items-center gap-1.5">
-                <span
-                  className="flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[11px] font-semibold text-white"
-                  style={{ backgroundImage: 'linear-gradient(110deg, #0088FF 0%, #34C759 100%)' }}
-                >
-                  <Sparkles size={10} />AI 페르소나
-                </span>
-                <span className="flex items-center text-[11px] font-medium text-white/75 group-active:opacity-60">
-                  어떻게 나왔는지 보기<ChevronRight size={12} />
-                </span>
-              </span>
-            )}
-            <span className={`${coverSerif.className} text-[17px] italic leading-[1.35] text-white/95`}>
-              “{personaText}”
-            </span>
-          </button>
-        )}
         <div className="flex items-end gap-2">
           <span className="text-[clamp(44px,16vw,60px)] font-black leading-[0.95] tracking-[-0.04em]">{profile.name}</span>
           {profile.isVerified && <BadgeCheck size={22} className="mb-1.5 shrink-0 fill-[#3B82F6] text-white" strokeWidth={2.5} />}
         </div>
+
+        {/* 이름 아래 부제 — AI 그라데이션 짧은 선 + 라벨, 그 아래 페르소나 문장과 화살표 */}
+        {personaText && onPersonaOpen && (
+          <button
+            type="button"
+            onClick={onPersonaOpen}
+            data-tour="persona"
+            className="mt-1 flex max-w-[310px] flex-col items-start gap-1.5 text-left active:opacity-70"
+          >
+            <span className="flex items-center gap-2">
+              <span className="h-[2px] w-4 rounded-full" style={{ backgroundImage: COVER_AI_GRADIENT }} />
+              <span
+                className="text-[11px] font-bold tracking-[0.02em]"
+                style={{ backgroundImage: COVER_AI_GRADIENT, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
+              >
+                AI 페르소나
+              </span>
+            </span>
+            <span className="line-clamp-2 text-[16px] font-semibold leading-[1.4] tracking-[-0.02em] text-white" style={{ wordBreak: 'keep-all' }}>
+              {personaText}
+              <ChevronRight size={16} className="mb-0.5 ml-0.5 inline-block text-white/60" />
+            </span>
+          </button>
+        )}
+        {/* 페르소나 데이터가 없을 땐 안내 문구만 흐리게 (기존 카드와 같은 처리) */}
+        {personaText && !onPersonaOpen && (
+          <p data-tour="persona" className="mt-1 text-[14px] font-medium text-white/50">{personaText}</p>
+        )}
+
         {(profile.mbti || showAge) && (
           <div className="flex items-center gap-1.5">
             {profile.mbti && (

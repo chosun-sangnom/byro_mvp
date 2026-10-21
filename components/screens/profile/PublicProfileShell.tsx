@@ -151,7 +151,7 @@ export function PublicProfileShell({
     const networkTotal = profile.rememberHighlight?.total ?? 0
     if (networkTotal > 0) coverStats.push({ value: networkTotal, unit: '명', label: '명함으로 이어진 사람들' })
     const feedbackTotal = profile.reputationKeywords.reduce((sum, k) => sum + k.count, 0)
-    if (feedbackTotal > 0) coverStats.push({ value: feedbackTotal, unit: '개', label: '함께 일한 사람들의 피드백' })
+    if (feedbackTotal > 0) coverStats.push({ value: feedbackTotal, unit: '개', label: '만난 사람들의 피드백' })
   }
 
   return (
@@ -203,7 +203,7 @@ export function PublicProfileShell({
             onCompatibilityOpen={profile.kemi ? () => router.push(`/${username}/kemi-report`) : undefined}
             onLoginRequest={() => setLoginModalOpen(true)}
             savedReport={savedKemiReport}
-            compact={isV2}
+            compact={isV2 && !isCover}
           />
         )}
 

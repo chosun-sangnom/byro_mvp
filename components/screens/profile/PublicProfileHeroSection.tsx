@@ -904,9 +904,10 @@ function ProfileCoverOverlay({
         transition={{ duration: 0.9, delay: 0.3, ease: coverEase }}
       >
         {/* 인증 뱃지 자리에 나이 (나이 공개 설정을 따름) */}
-        <div className="flex items-end gap-2">
-          <span className="text-[clamp(44px,16vw,60px)] font-black leading-[0.95] tracking-[-0.04em]">{profile.name}</span>
-          {showAge && <span className="mb-1 shrink-0 text-[20px] font-semibold text-white/80">{profile.age}세</span>}
+        {/* 이름 굵게 + 나이는 같은 줄에 가는 숫자만 (틴더식, '세' 없이) */}
+        <div className="flex items-baseline gap-2.5">
+          <span className="min-w-0 truncate text-[34px] font-bold leading-[1.1] tracking-[-0.03em]">{profile.name}</span>
+          {showAge && <span className="shrink-0 text-[28px] font-light leading-[1.1] tabular-nums text-white/85">{profile.age}</span>}
         </div>
 
         {/* 이름 아래 부제 — 누를 수 있는 걸 보이도록 글래스 버튼 안에 라벨+문장, 오른쪽에 원형 화살표.

@@ -901,26 +901,31 @@ function ProfileCoverOverlay({
           {profile.isVerified && <BadgeCheck size={22} className="mb-1.5 shrink-0 fill-[#3B82F6] text-white" strokeWidth={2.5} />}
         </div>
 
-        {/* 이름 아래 부제 — AI 그라데이션 짧은 선 + 라벨, 그 아래 페르소나 문장과 화살표 */}
+        {/* 이름 아래 부제 — 누를 수 있는 걸 보이도록 글래스 버튼 안에 라벨+문장, 오른쪽에 원형 화살표.
+            테두리는 기존 카드의 border-beam(AI 표시) 그대로 */}
         {personaText && onPersonaOpen && (
           <button
             type="button"
             onClick={onPersonaOpen}
             data-tour="persona"
-            className="mt-1 flex max-w-[310px] flex-col items-start gap-1.5 text-left active:opacity-70"
+            className="border-beam mt-1.5 flex w-full items-center gap-3 rounded-[16px] border border-white/35 bg-white/[0.12] py-3 pl-3.5 pr-3 text-left backdrop-blur-[10px] transition-transform active:scale-[0.98]"
           >
-            <span className="flex items-center gap-2">
-              <span className="h-[2px] w-4 rounded-full" style={{ backgroundImage: COVER_AI_GRADIENT }} />
-              <span
-                className="text-[11px] font-bold tracking-[0.02em]"
-                style={{ backgroundImage: COVER_AI_GRADIENT, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
-              >
-                AI 페르소나
+            <span className="flex min-w-0 flex-1 flex-col gap-1">
+              <span className="flex items-center gap-2">
+                <span className="h-[2px] w-4 rounded-full" style={{ backgroundImage: COVER_AI_GRADIENT }} />
+                <span
+                  className="text-[11px] font-bold tracking-[0.02em]"
+                  style={{ backgroundImage: COVER_AI_GRADIENT, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
+                >
+                  AI 페르소나
+                </span>
+              </span>
+              <span className="line-clamp-2 text-[15px] font-semibold leading-[1.4] tracking-[-0.02em] text-white" style={{ wordBreak: 'keep-all' }}>
+                {personaText}
               </span>
             </span>
-            <span className="line-clamp-2 text-[16px] font-semibold leading-[1.4] tracking-[-0.02em] text-white" style={{ wordBreak: 'keep-all' }}>
-              {personaText}
-              <ChevronRight size={16} className="mb-0.5 ml-0.5 inline-block text-white/60" />
+            <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-white/20">
+              <ChevronRight size={16} className="text-white" />
             </span>
           </button>
         )}

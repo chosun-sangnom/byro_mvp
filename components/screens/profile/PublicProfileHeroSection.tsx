@@ -753,6 +753,8 @@ export function ProfileHeroCard({
             stats={coverStats ?? []}
             personaText={personaText}
             onPersonaOpen={hasPersonaData ? () => setPersonaSheetOpen(true) : undefined}
+            linkId={profile.linkId}
+            onLinkEdit={isOwner ? handleOpenLinkEdit : undefined}
           />
         ) : (
         <div className="absolute inset-x-0 bottom-0 p-5">
@@ -854,7 +856,7 @@ const COVER_AI_GRADIENT = 'linear-gradient(100deg, #4DA8FF 0%, #5EDB86 100%)'
 
 /**
  * [임시] 매거진 커버 시안의 사진 위 글자들.
- * 왼쪽 위: 숫자 요약(카운트업) / 아래: 이름, AI 페르소나 부제(탭하면 근거 시트), MBTI·나이 칩
+ * 왼쪽 위: 숫자 요약(카운트업) / 아래: 이름과 나이, AI 페르소나 버튼(탭하면 근거 시트), MBTI 칩, 프로필 링크
  */
 function ProfileCoverOverlay({
   profile,
@@ -862,12 +864,17 @@ function ProfileCoverOverlay({
   stats,
   personaText,
   onPersonaOpen,
+  linkId,
+  onLinkEdit,
 }: {
-  profile: { name: string; age?: number; mbti?: string; isVerified?: boolean }
+  profile: { name: string; age?: number; mbti?: string }
   showAge: boolean
   stats: CoverStat[]
   personaText?: string
   onPersonaOpen?: () => void
+  linkId?: string
+  /** 본인일 때만 — 링크 옆 연필로 프로필 링크 편집 시트 */
+  onLinkEdit?: () => void
 }) {
   return (
     <>
@@ -896,9 +903,10 @@ function ProfileCoverOverlay({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.9, delay: 0.3, ease: coverEase }}
       >
+        {/* 인증 뱃지 자리에 나이 (나이 공개 설정을 따름) */}
         <div className="flex items-end gap-2">
           <span className="text-[clamp(44px,16vw,60px)] font-black leading-[0.95] tracking-[-0.04em]">{profile.name}</span>
-          {profile.isVerified && <BadgeCheck size={22} className="mb-1.5 shrink-0 fill-[#3B82F6] text-white" strokeWidth={2.5} />}
+          {showAge && <span className="mb-1 shrink-0 text-[20px] font-semibold text-white/80">{profile.age}세</span>}
         </div>
 
         {/* 이름 아래 부제 — 누를 수 있는 걸 보이도록 글래스 버튼 안에 라벨+문장, 오른쪽에 원형 화살표.
@@ -934,17 +942,27 @@ function ProfileCoverOverlay({
           <p data-tour="persona" className="mt-1 text-[14px] font-medium text-white/50">{personaText}</p>
         )}
 
-        {(profile.mbti || showAge) && (
+        {profile.mbti && (
           <div className="flex items-center gap-1.5">
-            {profile.mbti && (
-              <span className="rounded-full border border-white/30 bg-white/15 px-2.5 py-1 text-[12px] font-semibold tracking-[0.04em] text-white backdrop-blur-[10px]">
-                {profile.mbti}
-              </span>
-            )}
-            {showAge && (
-              <span className="rounded-full border border-white/30 bg-white/15 px-2.5 py-1 text-[12px] font-semibold text-white backdrop-blur-[10px]">
-                {profile.age}세
-              </span>
+            <span className="rounded-full border border-white/30 bg-white/15 px-2.5 py-1 text-[12px] font-semibold tracking-[0.04em] text-white backdrop-blur-[10px]">
+              {profile.mbti}
+            </span>
+          </div>
+        )}
+
+        {/* 프로필 링크 — 기존 카드와 같은 흐린 글씨, 본인은 연필로 링크 편집 */}
+        {linkId && (
+          <div className="mt-0.5 flex items-center gap-1">
+            <span className="text-[11px] font-semibold text-white/40">felore.io/{linkId}</span>
+            {onLinkEdit && (
+              <button
+                type="button"
+                onClick={onLinkEdit}
+                className="flex h-4 w-4 items-center justify-center text-white/40 active:opacity-60"
+                aria-label="프로필 링크 편집"
+              >
+                <Pencil size={11} />
+              </button>
             )}
           </div>
         )}

@@ -867,7 +867,7 @@ function ProfileCoverOverlay({
   linkId,
   onLinkEdit,
 }: {
-  profile: { name: string; age?: number; mbti?: string }
+  profile: { name: string; age?: number; birthDate?: string; mbti?: string }
   showAge: boolean
   stats: CoverStat[]
   personaText?: string
@@ -903,11 +903,15 @@ function ProfileCoverOverlay({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.9, delay: 0.3, ease: coverEase }}
       >
-        {/* 인증 뱃지 자리에 나이 (나이 공개 설정을 따름) */}
-        {/* 이름 굵게 + 나이는 같은 줄에 가는 숫자만 (틴더식, '세' 없이) */}
-        <div className="flex items-baseline gap-2.5">
+        {/* 이름 굵게, 나이는 이름 아래 '34세 (1992.06.14)' (나이 공개 설정을 따름) */}
+        <div className="flex flex-col gap-1">
           <span className="min-w-0 truncate text-[34px] font-bold leading-[1.1] tracking-[-0.03em]">{profile.name}</span>
-          {showAge && <span className="shrink-0 text-[28px] font-light leading-[1.1] tabular-nums text-white/85">{profile.age}</span>}
+          {showAge && (
+            <span className="text-[14px] text-white/85">
+              {profile.age}세
+              {profile.birthDate && <span className="ml-1">({profile.birthDate.replace(/-/g, '.')})</span>}
+            </span>
+          )}
         </div>
 
         {/* 이름 아래 부제 — 누를 수 있는 걸 보이도록 글래스 버튼 안에 라벨+문장, 오른쪽에 원형 화살표.

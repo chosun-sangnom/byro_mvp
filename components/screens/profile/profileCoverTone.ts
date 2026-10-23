@@ -15,3 +15,6 @@ export function useCoverTone() {
 
 /** 커버의 AI 페르소나 줄과 같은 그라데이션 — 탭 안 AI 표시도 이 색으로 맞춘다 */
 export const COVER_AI_GRADIENT = 'linear-gradient(100deg, #4DA8FF 0%, #5EDB86 100%)'
+
+/** 같은 그라데이션을 아주 옅게 — AI가 만든 내용을 담는 박스 배경 */
+export const COVER_AI_TINT = 'linear-gradient(100deg, rgba(77,168,255,0.07) 0%, rgba(94,219,134,0.07) 100%)'

@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Pencil, Sparkles } from 'lucide-react'
 import { BottomSheet, Button, TextArea, showToast } from '@/components/ui'
-import { COVER_AI_GRADIENT, useCoverTone } from '@/components/screens/profile/profileCoverTone'
+import { COVER_AI_GRADIENT, COVER_AI_TINT, useCoverTone } from '@/components/screens/profile/profileCoverTone'
 
 const SUMMARY_MAX_LENGTH = 80
 
@@ -48,22 +48,24 @@ export function TabSummaryBlock({
   return (
     <div className="px-5 pt-4">
       {coverTone ? (
-        // 탭의 리드 문장 — 박스 없이 커버 페르소나 줄과 같은 그라데이션 선 + 큰 문장
-        <div className="pt-2">
-          <div className="flex items-center gap-1.5">
-            <span className="h-[2px] w-4 rounded-full" style={{ backgroundImage: COVER_AI_GRADIENT }} />
-            {/* 기존과 같이 AI 표시는 오너에게만, 직접 고친 문장이면 숨김 */}
-            {isOwner && !summary && (
-              <span
-                className="text-[11px] font-bold"
-                style={{ backgroundImage: COVER_AI_GRADIENT, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
-              >
-                AI가 자동으로 요약했어요
-              </span>
-            )}
+        // 탭 요약 카드 — AI 그라데이션을 옅게 깐 박스로 아래 섹션들과 구역을 나눈다
+        <div
+          className="rounded-[16px] border px-4 pb-3.5 pt-3"
+          style={{ background: COVER_AI_TINT, borderColor: 'rgba(77,168,255,0.18)' }}
+        >
+          <div className="flex items-center gap-1">
+            <Sparkles size={12} className="text-[#4DA8FF]" />
+            <span
+              className="text-[12px] font-bold"
+              style={{ backgroundImage: COVER_AI_GRADIENT, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
+            >
+              한 줄 요약
+            </span>
+            {/* 기존과 같이 자동 요약 안내는 오너에게만, 직접 고친 문장이면 숨김 */}
+            {isOwner && !summary && <span className="ml-1 text-[11px] font-medium text-[#A8B1BD]">AI가 자동으로 요약했어요</span>}
             <span className="ml-auto">{editButton}</span>
           </div>
-          <p className="mt-2 text-[19px] font-bold leading-[1.45] tracking-[-0.02em] text-[#0D0D0D]" style={{ wordBreak: 'keep-all' }}>
+          <p className="mt-1.5 text-[15px] font-semibold leading-[1.5] tracking-[-0.01em] text-[#0D0D0D]" style={{ wordBreak: 'keep-all' }}>
             {text}
           </p>
         </div>

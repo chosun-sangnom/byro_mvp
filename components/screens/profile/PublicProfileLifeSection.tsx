@@ -126,18 +126,21 @@ export function Collage({
   layout,
   onOpen,
   animated,
+  compact,
 }: {
   entries: VibeEntry[]
   layout: LayoutPattern
   onOpen: (e: VibeEntry) => void
   animated?: boolean
+  /** 커버 톤 요약 카드 안에 넣을 때 — 바깥 여백 없이 조금 납작하게 */
+  compact?: boolean
 }) {
   if (entries.length === 0) return null
   return (
-    <div className="px-4 pb-2 pt-4">
+    <div className={compact ? '' : 'px-4 pb-2 pt-4'}>
       <motion.div
-        className="grid w-full gap-1.5"
-        style={{ aspectRatio: '1/1', gridTemplateColumns: layout.columns, gridTemplateRows: layout.rows }}
+        className={`grid w-full ${compact ? 'gap-1' : 'gap-1.5'}`}
+        style={{ aspectRatio: compact ? '4/3' : '1/1', gridTemplateColumns: layout.columns, gridTemplateRows: layout.rows }}
         variants={animated ? collageContainer : undefined}
         initial={animated ? 'hidden' : undefined}
         animate={animated ? 'show' : undefined}
@@ -268,10 +271,29 @@ export function PublicProfileLifeSection({
   return (
     <div className="pb-32 pt-2">
       {coverTone ? (
-        <div className="px-5 pt-6">
-          <SectionTitle title="무드보드" onEdit={isOwner ? onAdd : undefined} />
+        // 무드보드는 아래 전체 목록의 요약본 — 회색 카드 하나에 담아 목록 섹션과 구분한다
+        <div className="px-5 pt-4">
+          <div className="rounded-[20px] bg-[#F3F5F8] p-3">
+            <div className="flex items-center gap-1.5 px-1 pb-2.5 pt-0.5">
+              <span className="text-[14px] font-bold text-[#0D0D0D]">무드보드</span>
+              <span className="text-[12px] text-[#6C7786]">취향 한눈에 보기</span>
+              <span className="ml-auto text-[12px] font-semibold text-[#6C7786]">전체 {entries.length}개</span>
+              {isOwner && onAdd && (
+                <button
+                  type="button"
+                  onClick={onAdd}
+                  aria-label="바이브 편집"
+                  className="-mr-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[#A8B1BD] active:bg-white"
+                >
+                  <Pencil size={13} />
+                </button>
+              )}
+            </div>
+            <Collage entries={collage.entries} layout={collage.layout} onOpen={setOpened} compact />
+          </div>
         </div>
       ) : (
+      <>
       <div className="flex items-center gap-2 px-5 pb-1 pt-6">
         <span className="text-[18px] font-bold text-[#0D0D0D] shrink-0">무드보드</span>
         {isOwner && onAdd && (
@@ -288,8 +310,9 @@ export function PublicProfileLifeSection({
           </div>
         )}
       </div>
-      )}
       <Collage entries={collage.entries} layout={collage.layout} onOpen={setOpened} />
+      </>
+      )}
 
       {sections.map((section) => (
         <section key={section.id} className={coverTone ? 'pt-6' : 'pt-8'}>

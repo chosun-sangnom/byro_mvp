@@ -66,10 +66,9 @@ export function TabSummaryBlock({
                 >
                   한 줄 요약
                 </span>
+                <span className="ml-1 text-[11px] font-medium text-[#A8B1BD]">자동으로 요약했어요</span>
               </>
             )}
-            {/* 자동 요약 안내는 기존과 같이 오너에게만 */}
-            {isOwner && !summary && <span className="ml-1 text-[11px] font-medium text-[#A8B1BD]">AI가 자동으로 요약했어요</span>}
             <span className="ml-auto">{editButton}</span>
           </div>
           <p className="mt-1.5 text-[15px] font-semibold leading-[1.5] tracking-[-0.01em] text-[#0D0D0D]" style={{ wordBreak: 'keep-all' }}>

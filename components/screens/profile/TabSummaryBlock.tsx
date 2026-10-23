@@ -54,14 +54,21 @@ export function TabSummaryBlock({
           style={{ background: COVER_AI_TINT, borderColor: 'rgba(77,168,255,0.18)' }}
         >
           <div className="flex items-center gap-1">
-            <Sparkles size={12} className="text-[#4DA8FF]" />
-            <span
-              className="text-[12px] font-bold"
-              style={{ backgroundImage: COVER_AI_GRADIENT, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
-            >
-              한 줄 요약
-            </span>
-            {/* 기존과 같이 자동 요약 안내는 오너에게만, 직접 고친 문장이면 숨김 */}
+            {/* ✦는 AI가 쓴 문장일 때만 — 오너가 직접 고친 문장은 아이콘 없이 라벨만 */}
+            {summary ? (
+              <span className="text-[12px] font-bold text-[#6C7786]">한 줄 요약</span>
+            ) : (
+              <>
+                <Sparkles size={12} className="text-[#4DA8FF]" />
+                <span
+                  className="text-[12px] font-bold"
+                  style={{ backgroundImage: COVER_AI_GRADIENT, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
+                >
+                  한 줄 요약
+                </span>
+              </>
+            )}
+            {/* 자동 요약 안내는 기존과 같이 오너에게만 */}
             {isOwner && !summary && <span className="ml-1 text-[11px] font-medium text-[#A8B1BD]">AI가 자동으로 요약했어요</span>}
             <span className="ml-auto">{editButton}</span>
           </div>

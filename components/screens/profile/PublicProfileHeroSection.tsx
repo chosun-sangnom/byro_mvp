@@ -8,6 +8,7 @@ import { ActionMenu, ActionMenuItem, BottomSheet, TextArea, showToast } from '@/
 import { shareOrCopy } from '@/lib/share'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import type { PersonaReason } from '@/lib/personaGen'
+import { COVER_AI_GRADIENT } from '@/components/screens/profile/profileCoverTone'
 
 const CUSTOM_LINK_ID_REGEX = /^[a-z0-9_]{2,20}$/
 
@@ -889,8 +890,6 @@ export function ProfileHeroCard({
 
 const coverEase = [0.16, 1, 0.3, 1] as const
 // 어두운 사진 위에서도 읽히도록 기존 AI 그라데이션(#0088FF→#34C759)을 한 단계 밝게
-const COVER_AI_GRADIENT = 'linear-gradient(100deg, #4DA8FF 0%, #5EDB86 100%)'
-
 /**
  * [임시] 매거진 커버 시안의 사진 위 글자들.
  * 왼쪽 위: 숫자 요약(카운트업) / 아래: 이름과 나이, AI 페르소나 버튼(탭하면 근거 시트), MBTI 칩, 프로필 링크

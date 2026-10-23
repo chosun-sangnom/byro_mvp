@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Pencil, Sparkles } from 'lucide-react'
 import { BottomSheet, Button, TextArea, showToast } from '@/components/ui'
+import { COVER_AI_GRADIENT, useCoverTone } from '@/components/screens/profile/profileCoverTone'
 
 const SUMMARY_MAX_LENGTH = 80
 
@@ -24,6 +25,7 @@ export function TabSummaryBlock({
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState('')
   const text = summary ?? autoSummary
+  const coverTone = useCoverTone()
 
   if (!text) return null
 
@@ -32,21 +34,44 @@ export function TabSummaryBlock({
     setEditing(true)
   }
 
+  const editButton = isOwner && (
+    <button
+      type="button"
+      onClick={openEditor}
+      aria-label="한 줄 요약 편집"
+      className="-mr-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[#A8B1BD] active:bg-[#F5F6F7]"
+    >
+      <Pencil size={13} />
+    </button>
+  )
+
   return (
     <div className="px-5 pt-4">
+      {coverTone ? (
+        // 탭의 리드 문장 — 박스 없이 커버 페르소나 줄과 같은 그라데이션 선 + 큰 문장
+        <div className="pt-2">
+          <div className="flex items-center gap-1.5">
+            <span className="h-[2px] w-4 rounded-full" style={{ backgroundImage: COVER_AI_GRADIENT }} />
+            {/* 기존과 같이 AI 표시는 오너에게만, 직접 고친 문장이면 숨김 */}
+            {isOwner && !summary && (
+              <span
+                className="text-[11px] font-bold"
+                style={{ backgroundImage: COVER_AI_GRADIENT, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
+              >
+                AI가 자동으로 요약했어요
+              </span>
+            )}
+            <span className="ml-auto">{editButton}</span>
+          </div>
+          <p className="mt-2 text-[19px] font-bold leading-[1.45] tracking-[-0.02em] text-[#0D0D0D]" style={{ wordBreak: 'keep-all' }}>
+            {text}
+          </p>
+        </div>
+      ) : (
       <div className="rounded-[16px] border border-[#DEE4EC] bg-white px-4 py-3">
         <div className="flex items-start gap-2">
           <p className="flex-1 text-[14px] font-semibold leading-[1.5] text-[#0D0D0D]">{text}</p>
-          {isOwner && (
-            <button
-              type="button"
-              onClick={openEditor}
-              aria-label="한 줄 요약 편집"
-              className="-mr-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[#A8B1BD] active:bg-[#F5F6F7]"
-            >
-              <Pencil size={13} />
-            </button>
-          )}
+          {editButton}
         </div>
         {isOwner && !summary && (
           <div className="mt-1.5 flex items-center gap-1">
@@ -60,6 +85,7 @@ export function TabSummaryBlock({
           </div>
         )}
       </div>
+      )}
 
       <BottomSheet open={editing} onClose={() => setEditing(false)}>
         <div className="flex flex-col gap-4 px-5 pb-6">

@@ -6,6 +6,8 @@ import { Pencil } from 'lucide-react'
 import { BottomSheet } from '@/components/ui'
 import type { PublicProfileLife } from '@/types'
 import { ProfileEmptyAddBlock } from '@/components/screens/profile/ProfileEmptyAddBlock'
+import { SectionTitle } from '@/components/screens/profile/PublicProfileSections'
+import { useCoverTone } from '@/components/screens/profile/profileCoverTone'
 import { VibeImage, VibeKindBadge } from '@/components/screens/profile/vibeCardParts'
 import { flattenVibe, groupVibeEntries, type VibeEntry } from '@/lib/vibeItems'
 
@@ -235,6 +237,7 @@ export function PublicProfileLifeSection({
 }) {
   const entries = flattenVibe(life)
   const [opened, setOpened] = useState<VibeEntry | null>(null)
+  const coverTone = useCoverTone()
   const [collage] = useState(() => ({
     entries: pickCollageEntries(entries),
     layout: LAYOUTS[Math.floor(Math.random() * LAYOUTS.length)],
@@ -244,9 +247,15 @@ export function PublicProfileLifeSection({
     if (!(isOwner && onAdd)) return null
     return (
       <div className="pb-32">
-        <div className="px-5 pb-3 pt-6">
-          <span className="text-[18px] font-bold text-[#0D0D0D]">무드보드</span>
-        </div>
+        {coverTone ? (
+          <div className="px-5 pt-6">
+            <SectionTitle title="무드보드" />
+          </div>
+        ) : (
+          <div className="px-5 pb-3 pt-6">
+            <span className="text-[18px] font-bold text-[#0D0D0D]">무드보드</span>
+          </div>
+        )}
         <div className="px-5">
           <ProfileEmptyAddBlock label="바이브가" onAdd={onAdd} />
         </div>
@@ -258,6 +267,11 @@ export function PublicProfileLifeSection({
 
   return (
     <div className="pb-32 pt-2">
+      {coverTone ? (
+        <div className="px-5 pt-6">
+          <SectionTitle title="무드보드" onEdit={isOwner ? onAdd : undefined} />
+        </div>
+      ) : (
       <div className="flex items-center gap-2 px-5 pb-1 pt-6">
         <span className="text-[18px] font-bold text-[#0D0D0D] shrink-0">무드보드</span>
         {isOwner && onAdd && (
@@ -274,14 +288,21 @@ export function PublicProfileLifeSection({
           </div>
         )}
       </div>
+      )}
       <Collage entries={collage.entries} layout={collage.layout} onOpen={setOpened} />
 
       {sections.map((section) => (
-        <section key={section.id} className="pt-8">
-          <div className="flex items-baseline gap-1.5 px-5 pb-3">
-            <h3 className="text-[18px] font-bold text-[#0D0D0D]">{section.label}</h3>
-            <span className="text-[14px] font-semibold text-[#A8B1BD]">{section.entries.length}</span>
-          </div>
+        <section key={section.id} className={coverTone ? 'pt-6' : 'pt-8'}>
+          {coverTone ? (
+            <div className="px-5">
+              <SectionTitle title={section.label} meta={`${section.entries.length}개`} />
+            </div>
+          ) : (
+            <div className="flex items-baseline gap-1.5 px-5 pb-3">
+              <h3 className="text-[18px] font-bold text-[#0D0D0D]">{section.label}</h3>
+              <span className="text-[14px] font-semibold text-[#A8B1BD]">{section.entries.length}</span>
+            </div>
+          )}
           <div className="grid grid-cols-3 gap-x-2 gap-y-3 px-5">
             {section.entries.map((entry) => (
               <GridCard key={entry.key} entry={entry} showBadge={section.mixedKinds} onOpen={() => setOpened(entry)} />

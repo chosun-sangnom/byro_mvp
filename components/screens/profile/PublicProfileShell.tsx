@@ -26,6 +26,7 @@ import { PublicProfileTabBar, type PublicProfileTabId } from '@/components/scree
 import { PublicProfileKemiZone, PublicProfileOwnerMatchZone } from '@/components/screens/profile/PublicProfileKemiZone'
 import { loadKemiReportSummary, useKemiTestMode } from '@/components/screens/profile/kemiSavedReports'
 import { LoginModal } from '@/components/screens/profile/LoginModal'
+import { ProfileCoverToneContext } from '@/components/screens/profile/profileCoverTone'
 import { ExperienceBottomSheet, ExperienceDoneModal } from '@/components/screens/profile/PublicProfileOverlays'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import { useProfileOwner } from '@/hooks/useProfileOwner'
@@ -213,7 +214,9 @@ export function PublicProfileShell({
             <div className="sticky top-0 z-20 mt-2 bg-[var(--color-bg-page)]">
               <PublicProfileTabBar activeTab={activeTab} onTabChange={onTabChange} tabAccess={tabAccess} variant="underline" />
             </div>
-            <div className="pt-2">{children}</div>
+            <div className="pt-2">
+              <ProfileCoverToneContext.Provider value={isCover}>{children}</ProfileCoverToneContext.Provider>
+            </div>
           </>
         ) : (
           <PublicProfileTabBar activeTab={activeTab} onTabChange={onTabChange} tabAccess={tabAccess} />

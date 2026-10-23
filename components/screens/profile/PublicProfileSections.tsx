@@ -4,6 +4,7 @@ import { type ReactNode } from 'react'
 import { motion } from 'framer-motion'
 import { ChevronRight, Lock, Pencil } from 'lucide-react'
 import type { ContactChannel, Experience, RememberTopValue } from '@/types'
+import { useCoverTone } from '@/components/screens/profile/profileCoverTone'
 
 const SECTION_EASE = [0.22, 1, 0.36, 1] as const
 
@@ -35,12 +36,40 @@ export function SectionTitle({
   title,
   subtitle,
   onEdit,
+  meta,
 }: {
   title: string
   subtitle?: string
   /** 오너 전용 — 섹션에 내용이 있을 때 타이틀 옆에 노출되는 편집 진입점 */
   onEdit?: () => void
+  /** 커버 톤 전용 — 제목 오른쪽 숫자(예: "총 23개") */
+  meta?: ReactNode
 }) {
+  const coverTone = useCoverTone()
+
+  if (coverTone) {
+    // 매거진 섹션 구분 — 굵은 선 아래 큰 제목, 박스 없이 본문이 바로 이어진다
+    return (
+      <div className="mb-4 mt-2 border-t-[1.5px] border-[#0D0D0D] pt-3">
+        <div className="flex items-center gap-2">
+          <div className="shrink-0 text-[20px] font-bold tracking-[-0.02em] text-[#0D0D0D]">{title}</div>
+          {meta && <div className="ml-auto text-[13px] font-semibold text-[#6C7786]">{meta}</div>}
+          {onEdit && (
+            <button
+              type="button"
+              onClick={onEdit}
+              aria-label={`${title} 편집`}
+              className={`${meta ? '' : 'ml-auto'} -mr-1.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[#A8B1BD] active:bg-[#F5F6F7]`}
+            >
+              <Pencil size={14} />
+            </button>
+          )}
+        </div>
+        {subtitle && <div className="mt-1 text-[13px] text-[#6C7786]">{subtitle}</div>}
+      </div>
+    )
+  }
+
   return (
     <div className="mb-4">
       <div className="flex items-center gap-2">
@@ -75,6 +104,49 @@ export function ProfileReputationSummarySection({
   revealOnMount?: boolean
 }) {
   const isEmpty = keywordCounts.length === 0
+  const coverTone = useCoverTone()
+
+  if (coverTone) {
+    // 순위 목록 — 칩 대신 번호·키워드·횟수를 한 줄씩, 아래 막대로 많고 적음을 보여준다
+    const maxCount = Math.max(1, ...keywordCounts.map((item) => item.count))
+    return (
+      <AnimatedSection className="px-5 pt-6 pb-2" delay={0.04} revealOnMount={revealOnMount}>
+        <SectionTitle title="누적 평판" meta={isEmpty ? undefined : `총 ${totalKeywordCount}개`} />
+        {isEmpty ? (
+          <p className="py-2 text-[13px] text-[#A8B1BD]">아직 받은 평판이 없어요</p>
+        ) : (
+          <motion.ol
+            className="space-y-4"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: '-40px' }}
+          >
+            {keywordCounts.map((item, i) => (
+              <motion.li key={item.keyword} variants={staggerItem}>
+                <div className="flex items-baseline gap-3">
+                  <span className="w-5 shrink-0 text-[13px] font-semibold tabular-nums text-[#A8B1BD]">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <span className="min-w-0 flex-1 text-[15px] font-semibold text-[#0D0D0D]">{item.keyword}</span>
+                  <span className="shrink-0 text-[15px] font-bold tabular-nums text-[#0D0D0D]">{item.count}</span>
+                </div>
+                <div className="ml-8 mt-2 h-[3px] overflow-hidden rounded-full bg-[#EDF1F6]">
+                  <motion.div
+                    className="h-full rounded-full bg-[#0D0D0D]"
+                    initial={{ width: 0 }}
+                    whileInView={{ width: `${(item.count / maxCount) * 100}%` }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.8, ease: SECTION_EASE, delay: 0.1 + i * 0.07 }}
+                  />
+                </div>
+              </motion.li>
+            ))}
+          </motion.ol>
+        )}
+      </AnimatedSection>
+    )
+  }
 
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.04} revealOnMount={revealOnMount}>
@@ -116,6 +188,25 @@ export function ProfileReputationSummarySection({
 // 실제 프로필 사진이 없는 작성자는 이니셜 아바타로 표시 — 순서대로 이 팔레트를 순환
 const FEEDBACK_AVATAR_PALETTE = ['#F4F2FE', '#EFF9FF', '#F5F6F7']
 
+function FeedbackAvatar({ src, name, index, size }: { src: string; name: string; index: number; size: number }) {
+  if (src) {
+    return (
+      <div className="flex-shrink-0 overflow-hidden rounded-full" style={{ width: size, height: size }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={src} alt={name} className="h-full w-full object-cover" />
+      </div>
+    )
+  }
+  return (
+    <div
+      className="flex flex-shrink-0 items-center justify-center rounded-full"
+      style={{ width: size, height: size, background: FEEDBACK_AVATAR_PALETTE[index % FEEDBACK_AVATAR_PALETTE.length] }}
+    >
+      <span className="font-bold" style={{ color: '#6C7786', fontSize: Math.round(size * 0.32) }}>{name.charAt(0)}</span>
+    </div>
+  )
+}
+
 export function ProfileFeedbackSection({
   profile,
   featuredGuestbook,
@@ -137,6 +228,65 @@ export function ProfileFeedbackSection({
   /** 온보딩 가이드 데모 전용 — "피드백 전체 보기" 버튼 숨김(데모에선 눌러도 아무 동작 안 함) */
   hideViewAllButton?: boolean
 }) {
+  const coverTone = useCoverTone()
+
+  if (coverTone) {
+    // 인용문 목록 — 남긴 말을 먼저 크게, 누가 남겼는지는 아래 작은 줄로
+    return (
+      <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06} revealOnMount={revealOnMount}>
+        <SectionTitle
+          title="함께한 사람들이 남긴 피드백"
+          meta={profile.guestbook.length > 0 ? `총 ${profile.guestbook.length}개` : undefined}
+        />
+        {profile.guestbook.length === 0 ? (
+          <p className="py-2 text-[13px] text-[#A8B1BD]">아직 받은 피드백이 없어요</p>
+        ) : (
+          <motion.div
+            className="divide-y divide-[#EDF1F6]"
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: '-40px' }}
+          >
+            {featuredGuestbook.map((entry, i) => {
+              const avatar = getProfileAvatar(entry.linkId)
+              return (
+                <motion.div key={entry.id} variants={staggerItem}>
+                  <button
+                    onClick={() => onGuestbookEntryClick(entry.linkId)}
+                    className="block w-full py-4 text-left"
+                  >
+                    <p className="text-[16px] font-medium leading-[1.5] tracking-[-0.01em] text-[#25313D]" style={{ wordBreak: 'keep-all' }}>
+                      “{entry.message}”
+                    </p>
+                    <div className="mt-2.5 flex items-center gap-2">
+                      <FeedbackAvatar src={avatar} name={entry.authorName} index={i} size={24} />
+                      <span className="text-[13px] font-semibold text-[#0D0D0D]">{entry.authorName}</span>
+                      {avatar && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src="/images/reputation-verified-badge.svg" alt="" className="-ml-1 h-3 w-3" />
+                      )}
+                      <span className="text-[12px] text-[#A8B1BD]">{entry.date}</span>
+                    </div>
+                  </button>
+                </motion.div>
+              )
+            })}
+          </motion.div>
+        )}
+        {profile.guestbook.length > 0 && !hideViewAllButton && (
+          <button
+            onClick={onOpenGuestbook}
+            className="flex w-full items-center justify-between border-t border-[#DEE4EC] pt-3.5 text-[14px] font-semibold text-[#0D0D0D]"
+          >
+            피드백 전체 보기
+            <ChevronRight size={18} className="text-[#6C7786]" />
+          </button>
+        )}
+      </AnimatedSection>
+    )
+  }
+
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.06} revealOnMount={revealOnMount}>
       <div className="rounded-3xl border p-4" style={{ borderColor: '#DEE4EC' }}>
@@ -164,19 +314,7 @@ export function ProfileFeedbackSection({
                     onClick={() => onGuestbookEntryClick(entry.linkId)}
                     className="flex w-full items-start gap-2.5 text-left"
                   >
-                    {avatar ? (
-                      <div className="h-11 w-11 flex-shrink-0 overflow-hidden rounded-full">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={avatar} alt={entry.authorName} className="h-full w-full object-cover" />
-                      </div>
-                    ) : (
-                      <div
-                        className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full"
-                        style={{ background: FEEDBACK_AVATAR_PALETTE[i % FEEDBACK_AVATAR_PALETTE.length] }}
-                      >
-                        <span className="text-[14px] font-bold" style={{ color: '#6C7786' }}>{entry.authorName.charAt(0)}</span>
-                      </div>
-                    )}
+                    <FeedbackAvatar src={avatar} name={entry.authorName} index={i} size={44} />
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-1">
                         <span className="text-[14px] font-semibold" style={{ color: '#0D0D0D' }}>{entry.authorName}</span>
@@ -214,12 +352,13 @@ export function ProfileFeedbackSection({
 // ─── ProfileRememberSection ────────────────────────────────────────────────────
 
 function MutualCompaniesCard({ companies }: { companies: string[] }) {
+  const coverTone = useCoverTone()
   if (companies.length === 0) return null
   const visible = companies.slice(0, 5)
   const remaining = companies.length - visible.length
 
   return (
-    <div className="rounded-[16px] border border-[#DEE4EC] px-4 py-3">
+    <div className={coverTone ? 'py-1' : 'rounded-[16px] border border-[#DEE4EC] px-4 py-3'}>
       <p className="text-[14px] font-bold text-[#0D0D0D]">
         두 분 모두 연결된 회사 {companies.length}곳
       </p>
@@ -277,7 +416,37 @@ function RememberTopValuesCard({
   total: number
   rows: Array<{ label: string; value: RememberTopValue }>
 }) {
+  const coverTone = useCoverTone()
   if (rows.length === 0 || total === 0) return null
+
+  if (coverTone) {
+    // 숫자를 크게 — 커버의 숫자 3칸과 같은 읽힘. 세 칸은 따로 센 값이라 세로선으로만 나눈다
+    return (
+      <div className="py-1">
+        <p className="text-[14px] font-bold text-[#0D0D0D]">이런 사람을 많이 알아요</p>
+        <p className="mt-1 text-[12px] text-[#6C7786]">
+          회사·산업군·직함을 각각 따로 세었어요
+        </p>
+        <div className="mt-4 flex">
+          {rows.map(({ label, value }, i) => (
+            <div
+              key={label}
+              className={`min-w-0 flex-1 ${i > 0 ? 'border-l border-[#DEE4EC] pl-3' : ''} ${i < rows.length - 1 ? 'pr-3' : ''}`}
+            >
+              <p className="text-[11px] font-semibold text-[#A8B1BD]">{label}</p>
+              <p className="mt-1 text-[26px] font-bold leading-none tracking-[-0.03em] tabular-nums text-[#0D0D0D]">
+                {value.count.toLocaleString()}
+                <span className="ml-0.5 text-[13px] font-semibold tracking-normal text-[#6C7786]">명</span>
+              </p>
+              <p className="mt-2 break-keep text-[13px] font-semibold leading-[1.35] text-[#25313D]">
+                {value.name}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="rounded-[16px] border border-[#DEE4EC] px-4 pb-4 pt-3.5">
@@ -375,6 +544,7 @@ export function ProfileRememberSection({
 
   const showPersonalized = isLoggedIn && (viewerNetworkDomains?.length ?? 0) > 0
   const isEmpty = total === 0
+  const coverTone = useCoverTone()
 
   return (
     <AnimatedSection className="px-5 pt-6 pb-2" delay={0.02} revealOnMount={revealOnMount}>
@@ -389,7 +559,7 @@ export function ProfileRememberSection({
           아직 리멤버 활동이 없어요
         </p>
       ) : (
-        <div className="space-y-3">
+        <div className={coverTone ? 'space-y-6' : 'space-y-3'}>
           {!isOwner && mutualCompanies && mutualCompanies.length > 0 && (
             <MutualCompaniesCard companies={mutualCompanies} />
           )}

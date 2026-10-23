@@ -4,6 +4,7 @@ import { Sparkles } from 'lucide-react'
 import type { PublicProfileWhoIAm } from '@/types'
 import { SectionTitle } from '@/components/screens/profile/PublicProfileSections'
 import { ProfileEmptyAddBlock } from '@/components/screens/profile/ProfileEmptyAddBlock'
+import { COVER_AI_GRADIENT, useCoverTone } from '@/components/screens/profile/profileCoverTone'
 
 function AiBadge() {
   return (
@@ -37,6 +38,26 @@ function PersonalityBlock({ text }: { text: string }) {
   )
 }
 
+// 커버 톤 — 박스 없이 라벨 + 본문, 항목 사이는 가는 선
+function CoverToneRow({ label, text, ai }: { label: string; text: string; ai?: boolean }) {
+  return (
+    <div className="py-3.5 first:pt-0 last:pb-0">
+      <div className="flex items-center gap-1.5">
+        <span className="text-[12px] font-semibold text-[#6C7786]">{label}</span>
+        {ai && (
+          <span
+            className="text-[11px] font-bold"
+            style={{ backgroundImage: COVER_AI_GRADIENT, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}
+          >
+            AI
+          </span>
+        )}
+      </div>
+      <p className="mt-1.5 text-[15px] leading-[1.6] text-[#25313D]" style={{ wordBreak: 'keep-all' }}>{text}</p>
+    </div>
+  )
+}
+
 export function PublicProfileWhoIAmSection({
   whoIAm,
   bio,
@@ -49,6 +70,7 @@ export function PublicProfileWhoIAmSection({
   onAdd?: () => void
 }) {
   const isEmpty = !bio && !whoIAm?.personality && !whoIAm?.mbti
+  const coverTone = useCoverTone()
 
   // 방문자에게는 빈 섹션을 숨긴다. 오너에게만 추가 진입점을 노출.
   if (isEmpty && !(isOwner && onAdd)) return null
@@ -62,6 +84,11 @@ export function PublicProfileWhoIAmSection({
       />
       {isEmpty ? (
         <ProfileEmptyAddBlock label="성향 정보가" onAdd={onAdd!} />
+      ) : coverTone ? (
+        <div className="divide-y divide-[#EDF1F6]">
+          {bio && <CoverToneRow label="자기 소개" text={bio} />}
+          {whoIAm?.personality && <CoverToneRow label="성향" text={whoIAm.personality} ai />}
+        </div>
       ) : (
         <div className="grid grid-cols-1 gap-3">
           {bio && <BioBlock text={bio} />}

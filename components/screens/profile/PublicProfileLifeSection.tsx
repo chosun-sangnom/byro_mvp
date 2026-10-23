@@ -271,10 +271,10 @@ export function PublicProfileLifeSection({
   return (
     <div className="pb-32 pt-2">
       {coverTone ? (
-        // 무드보드는 아래 전체 목록의 요약본 — 회색 카드 하나에 담아 목록 섹션과 구분한다
-        <div className="px-5 pt-4">
-          <div className="rounded-[20px] bg-[#F3F5F8] p-3">
-            <div className="flex items-center gap-1.5 px-1 pb-2.5 pt-0.5">
+        // 무드보드는 아래 전체 목록의 요약본 — 박스 없이, 목록 섹션의 굵은 선 제목 대신 작은 머리줄로 구분한다
+        <div className="px-5 pt-6">
+          <div>
+            <div className="flex items-center gap-1.5 pb-2.5">
               <span className="text-[14px] font-bold text-[#0D0D0D]">무드보드</span>
               <span className="text-[12px] text-[#6C7786]">취향 한눈에 보기</span>
               <span className="ml-auto text-[12px] font-semibold text-[#6C7786]">전체 {entries.length}개</span>
@@ -283,7 +283,7 @@ export function PublicProfileLifeSection({
                   type="button"
                   onClick={onAdd}
                   aria-label="바이브 편집"
-                  className="-mr-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[#A8B1BD] active:bg-white"
+                  className="-mr-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[#A8B1BD] active:bg-[#F5F6F7]"
                 >
                   <Pencil size={13} />
                 </button>

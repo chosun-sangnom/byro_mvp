@@ -276,7 +276,7 @@ export const SAMPLE_PROFILE = {
     { id: 'g11', linkId: 'hansanghoon', authorName: '한상훈', message: '글로벌 감각이 뛰어나고 배울 점이 많았어요.', date: '2개월 전' },
     { id: 'g12', linkId: 'ohyerim', authorName: '오예림', message: '아이디어를 실행으로 빠르게 옮기는 분이에요.', date: '3개월 전' },
   ],
-  tabVisibility: { who: 'public', vibe: 'private', network: 'public' },
+  tabVisibility: { who: 'public', vibe: 'public', network: 'public' },
 }
 
 export const MK_PROFILE = {

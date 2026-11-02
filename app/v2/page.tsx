@@ -10,8 +10,8 @@ import { useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import {
   Bell, Settings, Home, Search, Plus, Users, User, ChevronRight, ChevronLeft,
-  Mic, PenLine, Camera, Lock, CalendarClock, Sparkles, MessageCircle, Send,
-  QrCode, Link2, BarChart3, Coins, Eye, ShieldCheck, BadgeCheck, Gift, Contact, X,
+  Mic, PenLine, Lock, CalendarClock, Sparkles, MessageCircle, Send,
+  QrCode, Link2, BarChart3, Coins, Eye, ShieldCheck, BadgeCheck, Gift, X, UserPlus, Check, Square,
 } from 'lucide-react'
 
 type Tab = 'home' | 'search' | 'people' | 'me'
@@ -30,7 +30,7 @@ type Person = {
 const PEOPLE: Person[] = [
   { id: 'p1', name: '한서윤', title: '루프벤처스 심사역', member: true, met: '10/29 성수 네트워킹', tags: ['투자'], note: '헬스케어 관심, 다음 달 IR 자료 요청' },
   { id: 'p2', name: '도민혁', title: '오르빗랩 대표', member: true, met: '10/24 판교 미팅', tags: ['고객'], note: '러닝 크루 운영, 둘째 입학 준비 중' },
-  { id: 'p3', name: '윤채린', title: '브랜드 디렉터', member: false, met: '10/18 지인 소개 (명함)', tags: ['협업'] },
+  { id: 'p3', name: '윤채린', title: '브랜드 디렉터', member: false, met: '10/18 지인 소개', tags: ['협업'] },
   { id: 'p4', name: '서지환', title: '그린필드 파트너', member: true, met: '7/02 저녁 모임', tags: ['투자'] },
   { id: 'p5', name: '마예린', title: '프리랜서 PD', member: false, met: '9/11 행사 (직접 입력)', tags: [] },
 ]
@@ -159,9 +159,8 @@ function HomeTab({ mode, openPerson, goTab }: { mode: Mode; openPerson: (p: Pers
         <div className="mt-5 space-y-2">
           {[
             { icon: <Link2 size={18} />, t: '내 프로필 링크 보내기', d: '받은 사람이 가입하면 서로 저장돼요' },
-            { icon: <Camera size={18} />, t: '명함 촬영하기', d: '펠로어를 안 쓰는 사람도 저장할 수 있어요' },
             { icon: <Search size={18} />, t: '아는 사람 검색하기', d: '펠로어 회원과 공개 인물을 찾아요', tab: 'search' as Tab },
-            { icon: <Contact size={18} />, t: '리멤버 명함 가져오기', d: '저장된 명함을 한 번에 불러와요' },
+            { icon: <UserPlus size={18} />, t: '직접 추가하기', d: '펠로어를 안 쓰는 사람도 이름만으로 저장해요' },
           ].map((x) => (
             <Card key={x.t} onClick={x.tab ? () => goTab(x.tab!) : undefined}>
               <div className="flex items-center gap-3">
@@ -366,10 +365,9 @@ function PeopleTab({ mode, openPerson, fromLink }: { mode: Mode; openPerson: (p:
       <div className="px-5 pb-8 pt-16 text-center">
         <Users size={40} className="mx-auto text-neutral-300" />
         <p className="mt-4 text-[16px] font-bold">아직 저장한 사람이 없어요</p>
-        <p className="mt-1 text-[13px] text-neutral-500">프로필을 저장하거나 명함을 찍으면 여기에 쌓여요</p>
+        <p className="mt-1 text-[13px] text-neutral-500">프로필을 저장하거나 직접 추가하면 여기에 쌓여요</p>
         <div className="mx-auto mt-6 flex max-w-[260px] flex-col gap-2">
-          <PrimaryButton>명함 촬영하기</PrimaryButton>
-          <button className="rounded-full border border-neutral-200 py-3 text-[14px]">리멤버 명함 가져오기</button>
+          <PrimaryButton>직접 추가하기</PrimaryButton>
         </div>
       </div>
     )
@@ -389,10 +387,7 @@ function PeopleTab({ mode, openPerson, fromLink }: { mode: Mode; openPerson: (p:
       <div className="mt-3 space-y-2">
         {list.map((p) => <PersonRow key={p.id} p={p} onClick={() => openPerson(p)} />)}
       </div>
-      <div className="mt-4 grid grid-cols-2 gap-2">
-        <Card className="!p-3 text-center text-[12px]"><Camera size={18} className="mx-auto mb-1" />명함 촬영<Tag kind="new" /></Card>
-        <Card className="!p-3 text-center text-[12px]"><Contact size={18} className="mx-auto mb-1" />리멤버 가져오기<Tag kind="old" /></Card>
-      </div>
+      <Card className="mt-4 !p-3 text-center text-[13px]"><UserPlus size={18} className="mx-auto mb-1" />직접 추가하기<Tag kind="new" /></Card>
       <p className="mt-3 text-[11px] text-neutral-400">기존 저장(아카이브)을 확장. 저장하는 순간 인물 카드가 생김</p>
     </div>
   )
@@ -416,7 +411,7 @@ function PersonDetail({ p, onBack }: { p: Person; onBack: () => void }) {
             <div className="text-[13px] text-neutral-500">{p.title}</div>
             {p.member
               ? <Link href="/" className="mt-1 inline-flex items-center text-[12px] font-medium text-[#25313D]">공개 프로필 보기 <ChevronRight size={12} /></Link>
-              : <span className="mt-1 inline-block text-[12px] text-neutral-400">비회원 (명함으로 저장)</span>}
+              : <span className="mt-1 inline-block text-[12px] text-neutral-400">비회원 (직접 추가)</span>}
           </div>
         </div>
 
@@ -430,7 +425,11 @@ function PersonDetail({ p, onBack }: { p: Person; onBack: () => void }) {
         <div className="space-y-3 border-l-2 border-neutral-100 pl-4">
           <div>
             <div className="text-[12px] text-neutral-400">{p.met}</div>
-            <p className="mt-0.5 text-[13px]">{p.note ?? '처음 만남. 명함 교환'}</p>
+            <p className="mt-0.5 text-[13px]">{p.note ?? '처음 만남. 서로 하는 일 소개'}</p>
+          </div>
+          <div>
+            <div className="flex items-center gap-1 text-[12px] text-neutral-400"><Mic size={12} /> 녹음 요약 (32분)</div>
+            <p className="mt-0.5 text-[13px]">다음 분기 협업 범위를 이야기함. 1월 중 제안서를 보내기로 함</p>
           </div>
           <div>
             <div className="text-[12px] text-neutral-400">할 일</div>
@@ -448,10 +447,10 @@ function PersonDetail({ p, onBack }: { p: Person; onBack: () => void }) {
         )}
 
         <SectionTitle tag="old">연락처</SectionTitle>
-        <Card className="text-[13px] text-neutral-600">{p.member ? '공개 프로필에 등록된 연락처' : '명함에서 읽은 전화번호, 이메일'}</Card>
+        <Card className="text-[13px] text-neutral-600">{p.member ? '공개 프로필에 등록된 연락처' : '직접 입력한 전화번호, 이메일'}</Card>
 
         <SectionTitle tag="later">연동 정보</SectionTitle>
-        <Card className="text-[13px] text-neutral-400">캘린더 일정, 대화 녹음 요약이 쌓이는 자리</Card>
+        <Card className="text-[13px] text-neutral-400">캘린더 일정이 쌓이는 자리</Card>
       </div>
     </div>
   )
@@ -491,7 +490,7 @@ function MeTab({ mode }: { mode: Mode }) {
 
       <SectionTitle tag="old">내 프로필</SectionTitle>
       <Card className="!py-1 divide-y divide-[var(--color-border-soft)]">
-        <Row icon={<PenLine size={18} />} label="프로필 관리" desc="기본정보, 하이라이트, SNS, 바이브, 연락처, 리멤버" href="/me?edit=true" />
+        <Row icon={<PenLine size={18} />} label="프로필 관리" desc="기본정보, 하이라이트, SNS, 바이브, 연락처, 리멤버 네트워크" href="/me?edit=true" />
         <Row icon={<ShieldCheck size={18} />} label="인증" desc="본인인증, 경력, 학력" />
         <Row icon={<MessageCircle size={18} />} label="받은 이야기" desc="방명록, 피드백, 평판을 하나로" tag="review" />
         <Row icon={<Eye size={18} />} label="공개범위" href="/me?section=visibility" />
@@ -514,31 +513,170 @@ function MeTab({ mode }: { mode: Mode }) {
 
 /* ───────── 기록 시트 ───────── */
 
+/**
+ * 기록은 "누구와"를 먼저 고른다. 녹음은 대화 상대가 정해져야 시작되고,
+ * 끝나면 고른 사람들의 인물 카드에 요약과 할 일이 붙는다.
+ */
 function RecordSheet({ mode, onClose }: { mode: Mode; onClose: () => void }) {
+  const isGuest = mode === 'guest'
+  // 사용 중 회원은 지금 진행 중인 일정(오늘 오후 3시 도민혁)을 미리 골라둔다
+  const [picked, setPicked] = useState<string[]>(mode === 'active' ? [PEOPLE[1].id] : [])
+  const [newNames, setNewNames] = useState<string[]>([])
+  const [query, setQuery] = useState('')
+  const [step, setStep] = useState<'pick' | 'memo' | 'recording' | 'done'>('pick')
+
+  const candidates = mode === 'active' ? PEOPLE : []
+  const filtered = query ? candidates.filter((p) => p.name.includes(query)) : candidates.slice(0, 4)
+  const pickedNames = [
+    ...candidates.filter((p) => picked.includes(p.id)).map((p) => p.name),
+    ...newNames,
+  ]
+  const hasPick = pickedNames.length > 0
+  const toggle = (id: string) => setPicked((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+  const addNew = () => {
+    const name = query.trim()
+    if (!name) return
+    setNewNames((prev) => [...prev, name])
+    setQuery('')
+  }
+
   return (
     <div className="absolute inset-0 z-30 flex items-end bg-black/40" onClick={onClose}>
-      <div className="w-full rounded-t-3xl bg-white px-5 pb-8 pt-4" onClick={(e) => e.stopPropagation()}>
+      <div className="max-h-[92%] w-full overflow-y-auto rounded-t-3xl bg-white px-5 pb-8 pt-4" onClick={(e) => e.stopPropagation()}>
         <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-neutral-200" />
-        <div className="flex items-center justify-between">
-          <h3 className="flex items-center text-[17px] font-bold">기록하기<Tag kind="new" /></h3>
-          <button onClick={onClose}><X size={20} /></button>
-        </div>
-        <div className="mt-1"><PrivateBadge /></div>
-        <div className="mt-4 grid grid-cols-3 gap-2 text-center text-[13px]">
-          {[
-            { i: <PenLine size={22} />, t: '메모' },
-            { i: <Mic size={22} />, t: '음성 메모' },
-            { i: <Camera size={22} />, t: '명함 촬영' },
-          ].map((x) => (
-            <button key={x.t} className="rounded-2xl bg-neutral-50 py-5">
-              <span className="mx-auto mb-2 flex justify-center">{x.i}</span>{x.t}
+
+        {step === 'pick' && (
+          <>
+            <div className="flex items-center justify-between">
+              <h3 className="flex items-center text-[17px] font-bold">누구와 이야기하나요?<Tag kind="new" /></h3>
+              <button onClick={onClose}><X size={20} /></button>
+            </div>
+            <div className="mt-1"><PrivateBadge /></div>
+
+            {mode === 'active' && (
+              <div className="mt-4 flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2 text-[12px] text-neutral-600">
+                <CalendarClock size={14} /> 지금 일정: 오후 3시 {PEOPLE[1].name}님과 미팅
+              </div>
+            )}
+
+            {hasPick && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {pickedNames.map((n) => (
+                  <span key={n} className="inline-flex items-center gap-1 rounded-full bg-[#25313D] px-3 py-1 text-[12px] text-white">
+                    {n}
+                    <button
+                      onClick={() => {
+                        const hit = candidates.find((p) => p.name === n)
+                        if (hit) toggle(hit.id)
+                        else setNewNames((prev) => prev.filter((x) => x !== n))
+                      }}
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <div className="mt-3 flex items-center gap-2 rounded-full bg-neutral-100 px-4 py-2.5">
+              <Search size={16} className="text-neutral-400" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder={isGuest ? '상대 이름 입력' : '내 사람에서 찾거나 이름 입력'}
+                className="flex-1 bg-transparent text-[13px] outline-none"
+              />
+            </div>
+
+            <div className="mt-2 space-y-1">
+              {filtered.map((p) => (
+                <button key={p.id} onClick={() => toggle(p.id)} className="flex w-full items-center gap-3 rounded-xl px-1 py-2 text-left">
+                  <Avatar name={p.name} size={32} member={p.member} />
+                  <div className="flex-1">
+                    <div className="text-[13px] font-semibold">{p.name}</div>
+                    <div className="text-[11px] text-neutral-500">{p.title}</div>
+                  </div>
+                  <span className={`flex h-5 w-5 items-center justify-center rounded-full border ${picked.includes(p.id) ? 'border-[#25313D] bg-[#25313D] text-white' : 'border-neutral-300'}`}>
+                    {picked.includes(p.id) && <Check size={12} />}
+                  </span>
+                </button>
+              ))}
+              {query.trim() && !candidates.some((p) => p.name === query.trim()) && (
+                <button onClick={addNew} className="flex w-full items-center gap-3 rounded-xl px-1 py-2 text-left text-[13px]">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full border border-dashed border-neutral-300"><UserPlus size={14} /></span>
+                  &lsquo;{query.trim()}&rsquo; 새 사람으로 추가
+                </button>
+              )}
+            </div>
+
+            <p className="mt-2 text-[11px] text-neutral-400">여러 명과 함께 있으면 모두 골라요. 기록이 각자의 인물 카드에 붙어요.</p>
+
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <button
+                disabled={!hasPick}
+                onClick={() => setStep('memo')}
+                className="flex items-center justify-center gap-1.5 rounded-full border border-neutral-200 py-3 text-[14px] disabled:opacity-40"
+              >
+                <PenLine size={16} /> 메모
+              </button>
+              <button
+                disabled={!hasPick}
+                onClick={() => setStep('recording')}
+                className="flex items-center justify-center gap-1.5 rounded-full bg-[#0D0D0D] py-3 text-[14px] font-semibold text-white disabled:opacity-40"
+              >
+                <Mic size={16} /> 녹음 시작
+              </button>
+            </div>
+            {!hasPick && <p className="mt-2 text-center text-[11px] text-neutral-400">대화 상대를 먼저 골라주세요</p>}
+          </>
+        )}
+
+        {step === 'memo' && (
+          <>
+            <h3 className="text-[17px] font-bold">{pickedNames.join(', ')}님과의 메모</h3>
+            <div className="mt-1"><PrivateBadge /></div>
+            <div className="mt-4 h-32 rounded-2xl border border-neutral-200 p-3 text-[13px] text-neutral-400">
+              아무렇게나 적어도 AI가 정리하고 할 일을 뽑아요
+            </div>
+            <div className="mt-4"><PrimaryButton onClick={() => setStep('done')}>{isGuest ? '로그인하고 저장' : '저장'}</PrimaryButton></div>
+          </>
+        )}
+
+        {step === 'recording' && (
+          <div className="text-center">
+            <div className="flex items-center justify-center gap-2 text-[13px] text-rose-500">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-rose-500" /> 녹음 중 03:12
+            </div>
+            <div className="mt-4 flex justify-center -space-x-2">
+              {pickedNames.map((n) => <div key={n} className="rounded-full ring-2 ring-white"><Avatar name={n} size={44} /></div>)}
+            </div>
+            <p className="mt-2 text-[15px] font-bold">{pickedNames.join(', ')}님과 대화 중</p>
+            <p className="mt-1 text-[12px] text-neutral-500">화면을 켜둔 상태에서 녹음돼요</p>
+            <div className="mx-auto mt-4 flex h-12 max-w-[240px] items-end justify-center gap-1">
+              {[6, 14, 22, 10, 30, 18, 8, 26, 12, 20, 9, 16].map((h, i) => (
+                <span key={i} className="w-1.5 rounded-full bg-neutral-300" style={{ height: h }} />
+              ))}
+            </div>
+            <div className="mt-5 rounded-xl bg-amber-50 px-3 py-2 text-left text-[11px] leading-relaxed text-amber-700">
+              대화에 참여한 사람만 녹음할 수 있어요. 상대에게 녹음 사실을 알려주세요.
+            </div>
+            <button onClick={() => setStep('done')} className="mx-auto mt-5 flex h-16 w-16 items-center justify-center rounded-full bg-rose-500 text-white">
+              <Square size={22} fill="white" />
             </button>
-          ))}
-        </div>
-        <div className="mt-4 rounded-2xl border border-neutral-200 p-3 text-[13px] text-neutral-400">
-          누구를 만났나요? 아무렇게나 적어도 AI가 정리해요
-        </div>
-        {mode === 'guest' && <p className="mt-3 text-center text-[12px] text-neutral-500">저장할 때 로그인해요. 쓴 내용은 그대로 남아요</p>}
+            <p className="mt-2 text-[12px] text-neutral-500">끝내기</p>
+          </div>
+        )}
+
+        {step === 'done' && (
+          <div className="text-center">
+            <Sparkles size={28} className="mx-auto text-[#25313D]" />
+            <p className="mt-3 text-[16px] font-bold">{isGuest ? '로그인하면 저장돼요' : 'AI가 정리하고 있어요'}</p>
+            <p className="mt-1 text-[13px] text-neutral-500">
+              {pickedNames.join(', ')}님 인물 카드에 요약과 할 일이 붙어요
+            </p>
+            <div className="mt-5"><PrimaryButton onClick={onClose}>확인</PrimaryButton></div>
+          </div>
+        )}
       </div>
     </div>
   )

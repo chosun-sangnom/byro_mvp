@@ -7,18 +7,18 @@
  * 데이터는 전부 허구 인물. 기존 화면으로 가는 링크는 실제 목업 화면으로 연결된다.
  */
 
-import { useState, type ReactNode } from 'react'
+import { createContext, useContext, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import {
   Bell, Settings, Sparkles, Users, User, ChevronRight, ChevronLeft, Search,
   Mic, PenLine, Lock, CalendarClock, MessageCircle, Send, Upload, Plus,
   QrCode, BarChart3, Coins, Eye, ShieldCheck, BadgeCheck, X, UserPlus, Check, Square,
-  Clock, GitMerge, ArrowUp, FileText, Image as ImageIcon,
+  Clock, GitMerge, ArrowUp, FileText, Image as ImageIcon, RefreshCw, CalendarDays, Mail, TriangleAlert,
 } from 'lucide-react'
 
 type Tab = 'today' | 'people' | 'me'
 type Mode = 'guest' | 'new' | 'importing' | 'active'
-type Channel = 'ig' | 'in' | 'kakao' | 'tg' | 'mail'
+type Channel = 'ig' | 'in' | 'kakao' | 'tg' | 'mail' | 'cal'
 
 type Person = {
   id: string
@@ -63,9 +63,66 @@ const CH: Record<Channel, { label: string; cls: string }> = {
   kakao: { label: '카톡', cls: 'bg-yellow-50 text-yellow-700' },
   tg: { label: '텔레그램', cls: 'bg-blue-50 text-blue-600' },
   mail: { label: '메일', cls: 'bg-neutral-100 text-neutral-600' },
+  cal: { label: '캘린더', cls: 'bg-violet-50 text-violet-600' },
 }
 
 const personById = (id: string) => PEOPLE.find((p) => p.id === id)!
+
+/* ───────── 연결 ─────────
+ * 인스타, 링크드인은 펠로어 화면에서 직접 로그인(서버에서 웹 접속), 텔레그램은 공식 API,
+ * 지메일, 구글 캘린더는 구글 동의 화면으로 권한을 하나씩 받는다. 카톡은 대화 파일 올리기만.
+ */
+
+type Src = 'ig' | 'in' | 'tg' | 'kakao' | 'gmail' | 'gcal'
+type Level = 'read' | 'draft' | 'send'
+type Conn = { status: 'on' | 'off' | 'broken'; level: Level; last?: string }
+type ConnMap = Record<Src, Conn>
+
+const ALL_LEVELS: Level[] = ['read', 'draft', 'send']
+
+const SRC: Record<Src, { label: string; ch: Channel; group: 'talk' | 'google'; how: 'web' | 'api' | 'google' | 'file'; desc: string; levels: Level[]; note?: string }> = {
+  ig: { label: '인스타그램', ch: 'ig', group: 'talk', how: 'web', desc: 'DM과 댓글을 남긴 사람', levels: ALL_LEVELS },
+  in: { label: '링크드인', ch: 'in', group: 'talk', how: 'web', desc: '1촌과 메시지 상대', levels: ALL_LEVELS },
+  tg: { label: '텔레그램', ch: 'tg', group: 'talk', how: 'api', desc: '대화 상대', levels: ALL_LEVELS },
+  kakao: { label: '카톡', ch: 'kakao', group: 'talk', how: 'file', desc: '내보낸 대화 파일', levels: ['read', 'draft'], note: '카톡은 대화 파일만 읽을 수 있어요. 보낼 때는 초안을 복사하거나 카톡 공유로 보내요' },
+  gmail: { label: '지메일', ch: 'mail', group: 'google', how: 'google', desc: '주고받은 메일 상대', levels: ALL_LEVELS },
+  gcal: { label: '구글 캘린더', ch: 'cal', group: 'google', how: 'google', desc: '일정과 참석자', levels: ['read'], note: '일정 만들기는 다음 단계예요' },
+}
+
+const LEVEL: Record<Level, { t: string; d: string }> = {
+  read: { t: '읽기만', d: '사람과 대화를 정리만 해요' },
+  draft: { t: '초안까지', d: '답장 초안을 만들어 오늘의 제안에 올려요' },
+  send: { t: '보내기까지', d: '내가 승인한 초안을 이 계정으로 보내요' },
+}
+
+const off = (level: Level = 'draft'): Conn => ({ status: 'off', level })
+
+function initConn(mode: Mode): ConnMap {
+  const base: ConnMap = { ig: off(), in: off(), tg: off(), kakao: off(), gmail: off(), gcal: off('read') }
+  if (mode === 'importing') {
+    return { ...base, ig: { status: 'on', level: 'draft', last: '방금' }, kakao: { status: 'on', level: 'draft', last: '방금' }, in: { status: 'on', level: 'draft', last: '가져오는 중' } }
+  }
+  if (mode === 'active') {
+    return {
+      ...base,
+      ig: { status: 'on', level: 'send', last: '10분 전' },
+      in: { status: 'broken', level: 'send', last: '어제 밤' },
+      tg: { status: 'on', level: 'send', last: '10분 전' },
+      kakao: { status: 'on', level: 'draft', last: '어제 파일 올림' },
+      gmail: { status: 'on', level: 'draft', last: '10분 전' },
+    }
+  }
+  return base
+}
+
+const ConnectCtx = createContext<{
+  conn: ConnMap
+  start: (s: Src) => void
+  update: (s: Src, patch: Partial<Conn>) => void
+  openHub: () => void
+}>({ conn: initConn('new'), start: () => {}, update: () => {}, openHub: () => {} })
+
+const useConnect = () => useContext(ConnectCtx)
 
 /* ───────── 공통 조각 ───────── */
 
@@ -130,9 +187,9 @@ function PrimaryButton({ children, onClick, disabled }: { children: ReactNode; o
   )
 }
 
-function Row({ icon, label, desc, href, tag, right }: { icon: ReactNode; label: string; desc?: string; href?: string; tag?: 'old' | 'new' | 'later' | 'review'; right?: ReactNode }) {
+function Row({ icon, label, desc, href, tag, right, onClick }: { icon: ReactNode; label: string; desc?: ReactNode; href?: string; tag?: 'old' | 'new' | 'later' | 'review'; right?: ReactNode; onClick?: () => void }) {
   const body = (
-    <div className="flex items-center gap-3 py-3">
+    <div onClick={onClick} className={`flex items-center gap-3 py-3 ${onClick ? 'cursor-pointer' : ''}`}>
       <span className="text-neutral-500">{icon}</span>
       <div className="min-w-0 flex-1">
         <div className="flex items-center text-[14px] font-medium text-[var(--color-text-strong)]">
@@ -292,19 +349,255 @@ function BriefingCard({ person, sample, onOpen }: { person: Person; sample?: boo
   )
 }
 
+/** 가입 직후 화면용. 캘린더를 맨 위에 두고, 하나만 골라도 되게 한다 */
 function ConnectList() {
-  const items: { ch: Channel; t: string; d: string }[] = [
-    { ch: 'ig', t: '인스타그램 연결', d: 'DM과 댓글을 남긴 사람을 가져와요' },
-    { ch: 'in', t: '링크드인 연결', d: '1촌과 메시지 상대를 가져와요' },
-    { ch: 'kakao', t: '카톡 대화 올리기', d: '대화방 내보내기 파일을 올려요' },
-    { ch: 'tg', t: '텔레그램 연결', d: '대화 상대를 가져와요' },
-    { ch: 'mail', t: '메일 연결', d: '주고받은 메일 상대를 가져와요' },
-  ]
+  const { conn, start } = useConnect()
+  const order: Src[] = ['gcal', 'ig', 'in', 'kakao', 'tg', 'gmail']
   return (
     <Card className="!py-1 divide-y divide-[var(--color-border-soft)]">
-      {items.map((x) => (
-        <Row key={x.ch} icon={<ChannelBadge ch={x.ch} />} label={x.t} desc={x.d} />
+      {order.map((s) => (
+        <Row
+          key={s}
+          icon={<ChannelBadge ch={SRC[s].ch} />}
+          label={s === 'kakao' ? '카톡 대화 올리기' : `${SRC[s].label} 연결`}
+          desc={SRC[s].desc}
+          tag={s === 'gcal' ? 'new' : undefined}
+          onClick={conn[s].status === 'on' ? undefined : () => start(s)}
+          right={conn[s].status === 'on' ? <Check size={16} className="text-emerald-600" /> : undefined}
+        />
       ))}
+    </Card>
+  )
+}
+
+function ConnStatus({ c }: { c: Conn }) {
+  if (c.status === 'broken') return <span className="text-rose-500">다시 연결이 필요해요</span>
+  if (c.status === 'off') return <span>연결 안 함</span>
+  return <span>{LEVEL[c.level].t}{c.last && <span className="text-neutral-400">, 마지막 확인 {c.last}</span>}</span>
+}
+
+/** 내 소개 > 연결. 곳마다 상태와 비서가 할 수 있는 일을 보여준다 */
+function ConnectScreen({ onBack, onDetail }: { onBack: () => void; onDetail: (s: Src) => void }) {
+  const { conn, start } = useConnect()
+  const groups: { id: 'talk' | 'google'; t: string }[] = [
+    { id: 'talk', t: '대화' },
+    { id: 'google', t: '메일과 일정' },
+  ]
+  return (
+    <div className="pb-28">
+      <div className="flex items-center gap-2 px-3 py-3">
+        <button onClick={onBack}><ChevronLeft size={24} /></button>
+        <span className="text-[15px] font-semibold">연결</span>
+        <Tag kind="new" />
+        <span className="ml-auto"><PrivateBadge /></span>
+      </div>
+      <div className="px-5">
+        <p className="text-[13px] leading-relaxed text-neutral-500">연결한 곳의 대화와 일정으로 내 사람들을 정리해요. 곳마다 비서가 어디까지 할지 정할 수 있어요.</p>
+        {groups.map((g) => (
+          <div key={g.id}>
+            <SectionTitle>{g.t}</SectionTitle>
+            <Card className="!py-1 divide-y divide-[var(--color-border-soft)]">
+              {(Object.keys(SRC) as Src[]).filter((s) => SRC[s].group === g.id).map((s) => {
+                const c = conn[s]
+                return (
+                  <Row
+                    key={s}
+                    icon={<ChannelBadge ch={SRC[s].ch} />}
+                    label={SRC[s].label}
+                    desc={<ConnStatus c={c} />}
+                    onClick={() => (c.status === 'on' ? onDetail(s) : start(s))}
+                    right={
+                      c.status === 'on' ? undefined
+                        : c.status === 'broken'
+                          ? <span className="rounded-full bg-rose-500 px-3 py-1 text-[12px] font-semibold text-white">다시 연결</span>
+                          : <span className="rounded-full border border-neutral-200 px-3 py-1 text-[12px]">{s === 'kakao' ? '올리기' : '연결'}</span>
+                    }
+                  />
+                )
+              })}
+            </Card>
+          </div>
+        ))}
+        <div className="mt-6 space-y-1.5 rounded-2xl bg-neutral-50 px-4 py-3 text-[12px] leading-relaxed text-neutral-500">
+          <p>비밀번호는 펠로어에 저장하지 않아요. 로그인 상태만 암호화해서 보관해요.</p>
+          <p>보내기까지 골라도 내가 승인한 초안만 보내요.</p>
+          <p>연결을 끊으면 그곳에서 가져온 대화도 함께 지워요.</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function LevelPicker({ src, value, onChange }: { src: Src; value: Level; onChange: (l: Level) => void }) {
+  return (
+    <div className="space-y-2">
+      {SRC[src].levels.map((l) => (
+        <button
+          key={l}
+          onClick={() => onChange(l)}
+          className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-left ${value === l ? 'border-[#25313D] bg-[#25313D]/5' : 'border-neutral-200'}`}
+        >
+          <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border ${value === l ? 'border-[#25313D] bg-[#25313D]' : 'border-neutral-300'}`}>
+            {value === l && <span className="h-1.5 w-1.5 rounded-full bg-white" />}
+          </span>
+          <span>
+            <span className="block text-[13px] font-semibold">{LEVEL[l].t}</span>
+            <span className="block text-[12px] text-neutral-500">{LEVEL[l].d}</span>
+          </span>
+        </button>
+      ))}
+      {SRC[src].note && <p className="text-[11px] text-neutral-400">{SRC[src].note}</p>}
+    </div>
+  )
+}
+
+/** 연결된 곳을 눌렀을 때: 할 수 있는 일 바꾸기, 연결 끊기 */
+function ConnectDetailSheet({ src, onClose }: { src: Src; onClose: () => void }) {
+  const { conn, update } = useConnect()
+  const c = conn[src]
+  return (
+    <Sheet onClose={onClose}>
+      <div className="flex items-center justify-between">
+        <h3 className="flex items-center gap-2 text-[17px] font-bold"><ChannelBadge ch={SRC[src].ch} />{SRC[src].label}</h3>
+        <button onClick={onClose}><X size={20} /></button>
+      </div>
+      <p className="mt-1 text-[12px] text-neutral-500">연결됨, 마지막 확인 {c.last ?? '방금'}</p>
+      <p className="mb-2 mt-5 text-[13px] font-semibold">비서가 할 수 있는 일</p>
+      <LevelPicker src={src} value={c.level} onChange={(l) => update(src, { level: l })} />
+      <button onClick={() => { update(src, { status: 'off', last: undefined }); onClose() }} className="mt-6 w-full text-center text-[13px] text-rose-500">연결 끊기</button>
+    </Sheet>
+  )
+}
+
+/**
+ * 연결 흐름. 인스타, 링크드인은 펠로어 화면에서 로그인한 뒤 계정 제한 고지에 동의한다.
+ * 끊겼다가 다시 연결할 때는 동의를 건너뛴다. 구글은 구글 동의 화면에서 이 항목 권한만 받는다.
+ */
+function ConnectFlowSheet({ src, onClose }: { src: Src; onClose: () => void }) {
+  const { conn, update } = useConnect()
+  const meta = SRC[src]
+  const reconnect = conn[src].status === 'broken'
+  const [step, setStep] = useState<'login' | 'consent' | 'google' | 'done'>(meta.how === 'google' ? 'google' : 'login')
+  const [agree, setAgree] = useState(false)
+  const [level, setLevel] = useState<Level>(conn[src].level)
+  const otherGoogle = (['gmail', 'gcal'] as Src[]).find((s) => s !== src && conn[s].status === 'on')
+
+  const finish = () => { update(src, { status: 'on', level, last: '방금' }); setStep('done') }
+
+  const doneText: Record<Src, string> = {
+    ig: '대화 상대를 가져오고 있어요. 다 되면 내 사람들에 쌓여요',
+    in: '대화 상대를 가져오고 있어요. 다 되면 내 사람들에 쌓여요',
+    tg: '대화 상대를 가져오고 있어요. 다 되면 내 사람들에 쌓여요',
+    kakao: '',
+    gmail: '주고받은 메일을 인물 카드에 이어 붙여요',
+    gcal: '내일부터 아침마다 그날 만날 사람을 미리 정리해 드려요',
+  }
+
+  return (
+    <Sheet onClose={onClose}>
+      <div className="flex items-center justify-between">
+        <h3 className="flex items-center gap-2 text-[17px] font-bold"><ChannelBadge ch={meta.ch} />{reconnect ? '다시 연결' : `${meta.label} 연결`}</h3>
+        <button onClick={onClose}><X size={20} /></button>
+      </div>
+
+      {step === 'login' && (
+        <>
+          <div className="mt-4 rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 px-4 py-8 text-center">
+            <Lock size={22} className="mx-auto text-neutral-400" />
+            <p className="mt-2 text-[13px] font-semibold">{meta.label} 로그인 화면</p>
+            <p className="mt-1 text-[12px] text-neutral-500">
+              {meta.how === 'api' ? '텔레그램 앱으로 받은 로그인 코드를 입력해요' : `${meta.label} 공식 로그인 화면이 펠로어 안에서 열려요`}
+            </p>
+          </div>
+          <p className="mt-3 text-[12px] text-neutral-500">비밀번호는 펠로어에 저장하지 않아요. 로그인 상태만 암호화해서 보관해요.</p>
+          <div className="mt-5">
+            <PrimaryButton onClick={() => (meta.how === 'web' && !reconnect ? setStep('consent') : finish())}>로그인했어요 (목업)</PrimaryButton>
+          </div>
+        </>
+      )}
+
+      {step === 'consent' && (
+        <>
+          <p className="mt-4 text-[15px] font-bold">연결 전에 알아두세요</p>
+          <ul className="mt-3 space-y-2.5 text-[13px] leading-relaxed text-neutral-600">
+            <li className="flex gap-2"><TriangleAlert size={15} className="mt-0.5 shrink-0 text-amber-500" />{meta.label}은 자동 이용을 막고 있어서, 드물게 계정이 잠시 제한될 수 있어요.</li>
+            <li className="flex gap-2"><Clock size={15} className="mt-0.5 shrink-0 text-neutral-400" />펠로어는 사람처럼 천천히, 하루 정해진 양만 읽고 보내요.</li>
+            <li className="flex gap-2"><RefreshCw size={15} className="mt-0.5 shrink-0 text-neutral-400" />보안 확인이 뜨면 연결이 풀릴 수 있어요. 그때는 다시 연결만 누르면 돼요.</li>
+          </ul>
+          <p className="mb-2 mt-5 text-[13px] font-semibold">비서가 할 수 있는 일</p>
+          <LevelPicker src={src} value={level} onChange={setLevel} />
+          <label className="mt-4 flex items-center gap-2 text-[13px]">
+            <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} /> 위 내용을 확인했어요
+          </label>
+          <div className="mt-4"><PrimaryButton disabled={!agree} onClick={finish}>연결하기</PrimaryButton></div>
+        </>
+      )}
+
+      {step === 'google' && (
+        <>
+          <div className="mt-4 rounded-2xl border border-neutral-200 p-4">
+            <p className="text-[11px] text-neutral-400">구글 동의 화면 (구글이 보여줘요)</p>
+            <p className="mt-2 text-[14px] font-semibold">펠로어가 요청하는 권한</p>
+            <ul className="mt-2 space-y-1.5 text-[13px] text-neutral-600">
+              {src === 'gcal' ? (
+                <li className="flex items-center gap-2"><CalendarDays size={14} />캘린더 일정과 참석자 보기</li>
+              ) : (
+                <>
+                  <li className="flex items-center gap-2"><Mail size={14} />메일 읽기</li>
+                  {level !== 'read' && <li className="flex items-center gap-2"><PenLine size={14} />메일 초안 만들기</li>}
+                  {level === 'send' && <li className="flex items-center gap-2"><Send size={14} />메일 보내기</li>}
+                </>
+              )}
+            </ul>
+          </div>
+          {otherGoogle && <p className="mt-2 text-[12px] text-neutral-500">이미 연결한 구글 계정에 {meta.label} 권한만 더해요</p>}
+          {meta.levels.length > 1 && (
+            <>
+              <p className="mb-2 mt-5 text-[13px] font-semibold">비서가 할 수 있는 일</p>
+              <LevelPicker src={src} value={level} onChange={setLevel} />
+            </>
+          )}
+          {meta.note && meta.levels.length === 1 && <p className="mt-2 text-[11px] text-neutral-400">{meta.note}</p>}
+          <div className="mt-5"><PrimaryButton onClick={finish}>구글로 계속하기 (목업)</PrimaryButton></div>
+        </>
+      )}
+
+      {step === 'done' && (
+        <div className="py-4 text-center">
+          <Check size={28} className="mx-auto text-emerald-600" />
+          <p className="mt-3 text-[16px] font-bold">{reconnect ? '다시 연결됐어요' : '연결됐어요'}</p>
+          <p className="mt-1 text-[13px] text-neutral-500">{reconnect ? '그 사이 온 메시지를 정리해서 다음 묶음에 올릴게요' : doneText[src]}</p>
+          <div className="mt-5"><PrimaryButton onClick={onClose}>확인</PrimaryButton></div>
+        </div>
+      )}
+    </Sheet>
+  )
+}
+
+/** 필요한 순간에 띄우는 연결 제안 */
+function ConnectSuggest({ src, icon, text }: { src: Src; icon: ReactNode; text: string }) {
+  const { start } = useConnect()
+  return (
+    <Card className="border-dashed">
+      <div className="flex items-start gap-3">
+        <span className="mt-0.5 text-[#25313D]">{icon}</span>
+        <p className="flex-1 text-[13px] leading-relaxed text-neutral-600">{text}</p>
+      </div>
+      <button onClick={() => start(src)} className="mt-3 w-full rounded-full bg-[#25313D] py-2 text-[13px] font-semibold text-white">{SRC[src].label} 연결</button>
+    </Card>
+  )
+}
+
+/** 끊긴 연결은 오류 배너 대신 오늘의 제안 맨 위 할 일로 */
+function ReconnectCard({ src }: { src: Src }) {
+  const { start } = useConnect()
+  return (
+    <Card className="mt-3 border-rose-100 bg-rose-50/40">
+      <div className="flex items-center gap-2 text-[13px] font-semibold">
+        <RefreshCw size={15} className="text-rose-500" /> {SRC[src].label} 연결이 잠깐 풀렸어요
+      </div>
+      <p className="mt-1 text-[12px] leading-relaxed text-neutral-600">보안 확인 때문에 로그인이 풀렸어요. 그 사이 온 메시지 2개는 다시 연결하면 바로 정리해 둘게요.</p>
+      <button onClick={() => start(src)} className="mt-3 rounded-full bg-[#0D0D0D] px-4 py-2 text-[12px] font-semibold text-white">다시 연결</button>
     </Card>
   )
 }
@@ -333,6 +626,8 @@ function MergeCandidate({ a, b, reason }: { a: string; b: string; reason: string
 }
 
 function TodayTab({ mode, openPerson }: { mode: Mode; openPerson: (p: Person) => void }) {
+  const { conn } = useConnect()
+  const broken = (Object.keys(conn) as Src[]).filter((s) => conn[s].status === 'broken')
   if (mode === 'guest') {
     return (
       <div className="px-5 pb-28">
@@ -362,8 +657,8 @@ function TodayTab({ mode, openPerson }: { mode: Mode; openPerson: (p: Person) =>
     return (
       <div className="px-5 pb-28">
         <p className="mt-4 text-[22px] font-bold leading-snug text-[var(--color-text-strong)]">내 사람들을<br />가져와 볼까요?</p>
-        <p className="mt-2 text-[13px] text-neutral-500">연결한 곳의 대화 상대가 인물 카드로 만들어져요. 연결한 내용은 나만 봐요.</p>
-        <SectionTitle tag="new">계정 연결</SectionTitle>
+        <p className="mt-2 text-[13px] text-neutral-500">연결한 곳의 대화 상대가 인물 카드로 만들어져요. 하나만 먼저 연결해도 충분해요.</p>
+        <SectionTitle tag="new">연결</SectionTitle>
         <ConnectList />
         <SectionTitle>다른 방법</SectionTitle>
         <Card className="!py-1 divide-y divide-[var(--color-border-soft)]">
@@ -397,6 +692,7 @@ function TodayTab({ mode, openPerson }: { mode: Mode; openPerson: (p: Person) =>
 
   return (
     <div className="px-5 pb-28">
+      {broken.map((s) => <ReconnectCard key={s} src={s} />)}
       <div className="mt-2 flex items-center gap-2 text-[12px] text-neutral-500">
         <Clock size={13} /> 다음 묶음 오후 6시
         <span className="ml-auto">하루 두 번 (오전 10시, 오후 6시)</span>
@@ -424,7 +720,9 @@ function TodayTab({ mode, openPerson }: { mode: Mode; openPerson: (p: Person) =>
       </Card>
 
       <SectionTitle tag="new">오늘 만날 사람</SectionTitle>
-      <BriefingCard person={PEOPLE[1]} onOpen={() => openPerson(PEOPLE[1])} />
+      {conn.gcal.status === 'on'
+        ? <BriefingCard person={PEOPLE[1]} onOpen={() => openPerson(PEOPLE[1])} />
+        : <ConnectSuggest src="gcal" icon={<CalendarDays size={18} />} text="캘린더를 연결하면 그날 만날 사람과 지난 대화를 아침에 미리 정리해 드려요" />}
 
       <SectionTitle tag="new">챙길 사람</SectionTitle>
       <Card onClick={() => openPerson(PEOPLE[3])}>
@@ -580,6 +878,7 @@ function PeopleTab({ mode, openPerson, fromLink }: { mode: Mode; openPerson: (p:
 }
 
 function PersonDetail({ p, onBack }: { p: Person; onBack: () => void }) {
+  const { conn } = useConnect()
   const [tone, setTone] = useState(p.tone ?? '')
   const [editingTone, setEditingTone] = useState(false)
   return (
@@ -631,6 +930,11 @@ function PersonDetail({ p, onBack }: { p: Person; onBack: () => void }) {
             <p className="mt-0.5 text-[13px]">{p.note ?? '처음 만남. 서로 하는 일 소개'}</p>
           </div>
         </div>
+        {conn.gmail.status !== 'on' && (
+          <div className="mt-3">
+            <ConnectSuggest src="gmail" icon={<Mail size={18} />} text={`지메일을 연결하면 ${p.name}님과 주고받은 메일도 여기 모아요`} />
+          </div>
+        )}
 
         {p.member && (
           <>
@@ -651,6 +955,7 @@ function PersonDetail({ p, onBack }: { p: Person; onBack: () => void }) {
 /* ───────── 내 소개 ───────── */
 
 function MeTab({ mode }: { mode: Mode }) {
+  const { conn, openHub } = useConnect()
   if (mode === 'guest') {
     return (
       <div className="px-5 pb-28 pt-10 text-center">
@@ -663,7 +968,9 @@ function MeTab({ mode }: { mode: Mode }) {
       </div>
     )
   }
-  const connected: Channel[] = mode === 'new' ? [] : mode === 'importing' ? ['ig', 'kakao', 'in'] : ['ig', 'kakao', 'in', 'tg', 'mail']
+  const srcs = Object.keys(conn) as Src[]
+  const onList = srcs.filter((s) => conn[s].status === 'on')
+  const brokenCount = srcs.filter((s) => conn[s].status === 'broken').length
   return (
     <div className="px-5 pb-28">
       <Card className="mt-3">
@@ -693,9 +1000,14 @@ function MeTab({ mode }: { mode: Mode }) {
       <Card className="!py-1 divide-y divide-[var(--color-border-soft)]">
         <Row
           icon={<MessageCircle size={18} />}
-          label="연결된 계정"
-          desc={connected.length ? `${connected.length}개 연결됨` : '아직 없어요'}
-          right={<span className="flex gap-1">{connected.slice(0, 3).map((c) => <ChannelBadge key={c} ch={c} />)}</span>}
+          label="연결"
+          desc={
+            onList.length || brokenCount
+              ? <>{srcs.length}곳 중 {onList.length}곳 연결됨{brokenCount > 0 && <span className="text-rose-500">, {brokenCount}곳 다시 연결 필요</span>}</>
+              : '인스타, 링크드인, 지메일, 캘린더 등'
+          }
+          onClick={openHub}
+          right={<span className="flex items-center gap-1">{onList.slice(0, 3).map((s) => <ChannelBadge key={s} ch={SRC[s].ch} />)}<ChevronRight size={16} className="text-neutral-300" /></span>}
         />
         <Row icon={<Clock size={18} />} label="묶음 처리 시간" desc="오전 10시, 오후 6시" tag="review" />
       </Card>
@@ -1017,8 +1329,20 @@ export default function V2IaPage() {
   const [person, setPerson] = useState<Person | null>(null)
   const [fabOpen, setFabOpen] = useState(false)
   const [action, setAction] = useState<FabAction | null>(null)
+  const [conn, setConn] = useState<ConnMap>(() => initConn('active'))
+  const [hub, setHub] = useState(false)
+  const [flow, setFlow] = useState<Src | null>(null)
+  const [detail, setDetail] = useState<Src | null>(null)
 
-  const goTab = (t: Tab) => { setPerson(null); setTab(t) }
+  const connectCtx = {
+    conn,
+    start: (s: Src) => (s === 'kakao' ? setAction('upload') : setFlow(s)),
+    update: (s: Src, patch: Partial<Conn>) => setConn((c) => ({ ...c, [s]: { ...c[s], ...patch } })),
+    openHub: () => { setPerson(null); setHub(true) },
+  }
+
+  const changeMode = (m: Mode) => { setMode(m); setPerson(null); setHub(false); setConn(initConn(m)) }
+  const goTab = (t: Tab) => { setPerson(null); setHub(false); setTab(t) }
   const titles: Record<Tab, string> = { today: '오늘의 제안', people: '내 사람들', me: '내 소개' }
 
   const tabs: { id: Tab; label: string; icon: ReactNode }[] = [
@@ -1036,7 +1360,7 @@ export default function V2IaPage() {
       <div className="mx-auto mb-3 flex max-w-[390px] flex-wrap items-center gap-2 px-3 text-[12px]">
         <span className="font-semibold text-neutral-600">상태</span>
         {([['guest', '비회원'], ['new', '가입 직후'], ['importing', '가져오는 중'], ['active', '사용 중']] as [Mode, string][]).map(([m, l]) => (
-          <button key={m} onClick={() => { setMode(m); setPerson(null) }} className={`rounded-full px-3 py-1 ${mode === m ? 'bg-[#25313D] text-white' : 'bg-white'}`}>{l}</button>
+          <button key={m} onClick={() => changeMode(m)} className={`rounded-full px-3 py-1 ${mode === m ? 'bg-[#25313D] text-white' : 'bg-white'}`}>{l}</button>
         ))}
         {mode === 'guest' && (
           <label className="ml-1 flex items-center gap-1 text-neutral-600">
@@ -1045,10 +1369,13 @@ export default function V2IaPage() {
         )}
       </div>
 
+      <ConnectCtx.Provider value={connectCtx}>
       <div className="relative mx-auto flex h-[800px] max-w-[390px] flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl max-sm:h-[calc(100dvh-44px)] max-sm:rounded-none max-sm:shadow-none">
         <div className="flex-1 overflow-y-auto">
           {person ? (
             <PersonDetail key={person.id} p={person} onBack={() => setPerson(null)} />
+          ) : hub ? (
+            <ConnectScreen onBack={() => setHub(false)} onDetail={setDetail} />
           ) : (
             <>
               <Header title={titles[tab]} />
@@ -1073,7 +1400,7 @@ export default function V2IaPage() {
             <button
               key={t.id}
               onClick={() => goTab(t.id)}
-              className={`flex w-20 flex-col items-center gap-0.5 text-[11px] ${tab === t.id && !person ? 'font-semibold text-[#0D0D0D]' : 'text-neutral-400'}`}
+              className={`flex w-20 flex-col items-center gap-0.5 text-[11px] ${tab === t.id && !person && !hub ? 'font-semibold text-[#0D0D0D]' : 'text-neutral-400'}`}
             >
               {t.icon}
               {t.label}
@@ -1090,7 +1417,10 @@ export default function V2IaPage() {
             {action === 'upload' && <UploadSheet onClose={closeAction} />}
           </>
         )}
+        {flow && <ConnectFlowSheet key={flow} src={flow} onClose={() => setFlow(null)} />}
+        {detail && <ConnectDetailSheet src={detail} onClose={() => setDetail(null)} />}
       </div>
+      </ConnectCtx.Provider>
 
       <p className="mx-auto mt-3 max-w-[390px] px-3 text-[11px] leading-relaxed text-neutral-500">
         기획 확인용 와이어프레임 (니즈·기능 정의서 v0.2). 태그: 기존(지금 있는 기능을 옮김), 신규, 다음 단계, 검토(결정 필요). 채널별 가져오기와 보내기 가능 범위는 기술 검토 중.

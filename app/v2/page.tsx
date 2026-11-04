@@ -30,14 +30,35 @@ type Person = {
   accounts: { ch: Channel; handle: string }[]
   tone?: string
   note?: string
+  /** 회원 본인이 프로필에 쓴 정보. 비회원은 가입한 뒤에 붙는다 */
+  self?: string[]
+  /** AI가 모은 공개 정보와 내가 고친 내용, 출처와 함께 */
+  facts?: Fact[]
+  /** 대화와 기록에서 새로 알게 된 것. 확인해야 카드에 붙는다 */
+  pending?: Fact[]
 }
 
+type Fact = { t: string; src: string }
+
 const PEOPLE: Person[] = [
-  { id: 'p1', name: '한서윤', title: '루프벤처스 심사역', member: true, met: '10/29 성수 네트워킹', tags: ['투자'], accounts: [{ ch: 'kakao', handle: '한서윤' }, { ch: 'in', handle: 'seoyun-han' }], tone: '존댓말, 일 얘기 위주', note: '헬스케어 관심, 다음 달 IR 자료 요청' },
-  { id: 'p2', name: '도민혁', title: '오르빗랩 대표', member: true, met: '10/24 판교 미팅', tags: ['고객'], accounts: [{ ch: 'ig', handle: '@minhyuk.run' }, { ch: 'kakao', handle: '민혁' }], tone: '반말, 친한 사이', note: '러닝 크루 운영, 둘째 입학 준비 중' },
-  { id: 'p3', name: '윤채린', title: '브랜드 디렉터', member: false, met: '10/18 지인 소개', tags: ['협업'], accounts: [{ ch: 'mail', handle: 'chaerin@studio-yun.kr' }], tone: '존댓말' },
+  { id: 'p1', name: '한서윤', title: '루프벤처스 심사역', member: true, met: '10/29 성수 네트워킹', tags: ['투자'], accounts: [{ ch: 'kakao', handle: '한서윤' }, { ch: 'in', handle: 'seoyun-han' }], tone: '존댓말, 일 얘기 위주', note: '헬스케어 관심, 다음 달 IR 자료 요청', self: ['루프벤처스 심사역, 헬스케어와 바이오 초기 투자', '주말엔 와인 모임', '연락은 카톡이 편해요'] },
+  { id: 'p2', name: '도민혁', title: '오르빗랩 대표', member: true, met: '10/24 판교 미팅', tags: ['고객'], accounts: [{ ch: 'ig', handle: '@minhyuk.run' }, { ch: 'kakao', handle: '민혁' }], tone: '반말, 친한 사이', note: '러닝 크루 운영, 둘째 입학 준비 중', self: ['오르빗랩 대표, B2B 물류 SaaS', '러닝 크루 운영 중'], pending: [{ t: '주말 하프 마라톤 완주', src: '인스타 게시물' }] },
+  { id: 'p3', name: '윤채린', title: '브랜드 디렉터', member: false, met: '10/18 지인 소개', tags: ['협업'], accounts: [{ ch: 'mail', handle: 'chaerin@studio-yun.kr' }], tone: '존댓말',
+    facts: [{ t: '스튜디오 윤 브랜드 디렉터', src: '메일 서명' }, { t: '010-2718-****', src: '메일 서명' }, { t: '지인 소개로 만남, 협업 검토 중', src: '내 메모' }],
+    pending: [{ t: '12월에 성수에서 팝업 전시 준비 중', src: '10/31 메일' }, { t: '브랜드 리뉴얼 프로젝트를 맡을 파트너를 찾는 중', src: '10/31 메일' }],
+    self: ['스튜디오 윤 브랜드 디렉터, 패션과 리빙 브랜드 전문', '협업 문의는 메일로 받아요'] },
   { id: 'p4', name: '서지환', title: '그린필드 파트너', member: true, met: '7/02 저녁 모임', tags: ['투자'], accounts: [{ ch: 'tg', handle: '@jihwan_s' }] },
-  { id: 'p5', name: '마예린', title: '프리랜서 PD', member: false, met: '9/11 행사', tags: [], accounts: [{ ch: 'ig', handle: '@yerin.pd' }] },
+  { id: 'p5', name: '마예린', title: '프리랜서 PD', member: false, met: '9/11 행사', tags: [], accounts: [{ ch: 'ig', handle: '@yerin.pd' }],
+    facts: [{ t: '프리랜서 PD, 유튜브 예능', src: '인스타 소개글' }], pending: [{ t: '다음 달 부산 촬영', src: '인스타 DM' }] },
+]
+
+/** 자동으로 가져왔지만 아직 내 사람으로 올리지 않은 사람 */
+const IMPORTED: (Person & { why: string; spam?: boolean })[] = [
+  { id: 'i1', name: '@soyeon.film', title: '', member: false, met: '', tags: [], accounts: [{ ch: 'ig', handle: '@soyeon.film' }], why: '인스타 댓글 1회' },
+  { id: 'i2', name: '권도윤', title: '', member: true, met: '', tags: [], accounts: [{ ch: 'kakao', handle: '권도윤' }], why: '카톡 단체방 \'성수 네트워킹\'에서' },
+  { id: 'i3', name: '박시온', title: '', member: false, met: '', tags: [], accounts: [{ ch: 'cal', handle: 'sion@bluetide.io' }], why: '11/12 일정 참석자' },
+  { id: 'i4', name: '@growth.hack.kr', title: '', member: false, met: '', tags: [], accounts: [{ ch: 'ig', handle: '@growth.hack.kr' }], why: '인스타 DM 1회', spam: true },
+  { id: 'i5', name: '이준호', title: '', member: false, met: '', tags: [], accounts: [{ ch: 'in', handle: 'junho-lee' }], why: '링크드인 1촌, 대화 없음' },
 ]
 
 type Draft = {
@@ -48,12 +69,14 @@ type Draft = {
   original: string
   context: string
   text: string
+  /** 상대가 비회원이면 내 프로필 링크를 붙일지 묻는다 */
+  profileLink?: boolean
 }
 
 const DRAFTS: Draft[] = [
   { id: 'd1', ch: 'ig', personId: 'p2', kind: '댓글', original: '형 러닝 사진 미쳤다 🔥', context: '친한 사이, 러닝 크루 같이 함', text: 'ㅋㅋ 고마워! 이번 주말에 같이 뛰자' },
   { id: 'd2', ch: 'kakao', personId: 'p1', kind: '메시지', original: '대표님, 말씀하신 IR 자료 언제쯤 받아볼 수 있을까요?', context: '10/29 미팅에서 자료 보내기로 약속함', text: '서윤님, 금요일까지 정리해서 보내드릴게요. 기다려 주셔서 감사합니다.' },
-  { id: 'd3', ch: 'mail', personId: 'p3', kind: '메일', original: '포트폴리오 첨부드립니다. 편하실 때 보시고 의견 주세요.', context: '10/18 지인 소개로 만남, 협업 검토 중', text: '채린님, 포트폴리오 잘 받았습니다. 이번 주 안에 보고 의견 드릴게요.' },
+  { id: 'd3', ch: 'mail', personId: 'p3', kind: '메일', original: '포트폴리오 첨부드립니다. 편하실 때 보시고 의견 주세요.', context: '10/18 지인 소개로 만남, 협업 검토 중', text: '채린님, 포트폴리오 잘 받았습니다. 이번 주 안에 보고 의견 드릴게요.', profileLink: true },
   { id: 'd4', ch: 'tg', personId: 'p4', kind: '메시지', original: '다음 주에 저녁 한번 할까요?', context: '7월 이후 연락 없었음', text: '좋아요! 다음 주 목요일 저녁 어떠세요?' },
 ]
 
@@ -226,9 +249,9 @@ function Header({ title }: { title: string }) {
 
 /* ───────── 오늘의 제안 ───────── */
 
-function DraftItem({ d, include, text, editing, onToggle, onEdit, onChange, openPerson }: {
-  d: Draft; include: boolean; text: string; editing: boolean
-  onToggle: () => void; onEdit: () => void; onChange: (v: string) => void; openPerson: (p: Person) => void
+function DraftItem({ d, include, text, editing, link, onToggle, onEdit, onChange, onLink, openPerson }: {
+  d: Draft; include: boolean; text: string; editing: boolean; link: boolean
+  onToggle: () => void; onEdit: () => void; onChange: (v: string) => void; onLink: () => void; openPerson: (p: Person) => void
 }) {
   const p = personById(d.personId)
   const edited = text !== d.text
@@ -262,6 +285,17 @@ function DraftItem({ d, include, text, editing, onToggle, onEdit, onChange, open
         </button>
       )}
       {edited && <p className="mt-1 text-[11px] text-emerald-600">고친 내용은 {p.name}님 말투로 기억해요</p>}
+      {d.profileLink && (
+        <button onClick={onLink} className="mt-2 flex w-full items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2 text-left">
+          <span className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${link ? 'border-[#25313D] bg-[#25313D] text-white' : 'border-neutral-300 bg-white'}`}>
+            {link && <Check size={10} />}
+          </span>
+          <span className="flex-1">
+            <span className="flex items-center text-[12px] font-medium">내 프로필 링크 붙이기<Tag kind="new" /></span>
+            <span className="block text-[11px] text-neutral-500">{p.name}님은 아직 펠로어 회원이 아니에요. 링크로 가입하면 서로 저장돼요</span>
+          </span>
+        </button>
+      )}
     </div>
   )
 }
@@ -270,6 +304,7 @@ function DraftBatch({ openPerson }: { openPerson: (p: Person) => void }) {
   const [include, setInclude] = useState<Record<string, boolean>>(Object.fromEntries(DRAFTS.map((d) => [d.id, true])))
   const [texts, setTexts] = useState<Record<string, string>>(Object.fromEntries(DRAFTS.map((d) => [d.id, d.text])))
   const [editing, setEditing] = useState<string | null>(null)
+  const [links, setLinks] = useState<Record<string, boolean>>(Object.fromEntries(DRAFTS.map((d) => [d.id, !!d.profileLink])))
   const [sent, setSent] = useState(false)
 
   const count = DRAFTS.filter((d) => include[d.id]).length
@@ -304,6 +339,8 @@ function DraftBatch({ openPerson }: { openPerson: (p: Person) => void }) {
             include={include[d.id]}
             text={texts[d.id]}
             editing={editing === d.id}
+            link={links[d.id]}
+            onLink={() => setLinks((s) => ({ ...s, [d.id]: !s[d.id] }))}
             onToggle={() => setInclude((s) => ({ ...s, [d.id]: !s[d.id] }))}
             onEdit={() => setEditing(d.id)}
             onChange={(v) => setTexts((s) => ({ ...s, [d.id]: v }))}
@@ -779,9 +816,96 @@ function SearchResults({ query, mode, openPerson }: { query: string; mode: Mode;
   )
 }
 
+/**
+ * 자동으로 가져온 사람은 바로 내 사람이 되지 않는다. 대화하거나 기록하거나 고정하면 내 사람으로 올라가고,
+ * 필요 없는 사람은 숨긴다. 비회원에게는 이게 "저장" 버튼 역할.
+ */
+function ImportedList({ openPerson }: { openPerson: (p: Person) => void }) {
+  const [state, setState] = useState<Record<string, 'mine' | 'hidden'>>({})
+  const set = (id: string, v: 'mine' | 'hidden') => setState((s) => ({ ...s, [id]: v }))
+  const hiddenCount = Object.values(state).filter((v) => v === 'hidden').length
+  return (
+    <>
+      <p className="mt-3 text-[12px] leading-relaxed text-neutral-500">연결한 곳에서 가져왔지만 아직 정리하지 않은 사람이에요. 대화하거나 기록하거나 내 사람으로 올리면 목록으로 옮겨요.</p>
+      <div className="mt-2 divide-y divide-[var(--color-border-soft)]">
+        {IMPORTED.map((p) => {
+          const v = state[p.id]
+          return (
+            <div key={p.id} className="py-3">
+              <div className="flex items-center gap-3">
+                <button onClick={() => openPerson(p)}><Avatar name={p.name} size={36} member={p.member} /></button>
+                <button onClick={() => openPerson(p)} className="min-w-0 flex-1 text-left">
+                  <div className="flex items-center gap-1.5 text-[14px] font-semibold">{p.name}<ChannelBadge ch={p.accounts[0].ch} /></div>
+                  <div className={`text-[12px] ${p.spam ? 'text-rose-500' : 'text-neutral-500'}`}>{p.spam ? `${p.why}, 광고 계정으로 보여요` : p.why}</div>
+                </button>
+              </div>
+              {v ? (
+                <p className="mt-2 pl-12 text-[12px] font-medium text-emerald-600">{v === 'mine' ? '내 사람으로 옮겼어요' : '숨겼어요. 다시 연락이 오면 알려드려요'}</p>
+              ) : (
+                <div className="mt-2 flex gap-2 pl-12">
+                  <button onClick={() => set(p.id, 'hidden')} className="rounded-full border border-neutral-200 px-3 py-1 text-[12px]">숨기기</button>
+                  <button onClick={() => set(p.id, 'mine')} className="rounded-full bg-[#25313D] px-3 py-1 text-[12px] font-semibold text-white">내 사람으로</button>
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+      <p className="mt-3 text-center text-[12px] text-neutral-400">숨긴 사람 {12 + hiddenCount}명</p>
+    </>
+  )
+}
+
+/** 사람 추가: 프로필 링크 붙여넣기 또는 이름만으로 */
+function AddPersonSheet({ onClose }: { onClose: () => void }) {
+  const [way, setWay] = useState<'link' | 'name'>('link')
+  const [value, setValue] = useState('')
+  const [done, setDone] = useState(false)
+  const fromLink = way === 'link'
+  return (
+    <Sheet onClose={onClose}>
+      {done ? (
+        <div className="text-center">
+          <Check size={28} className="mx-auto text-emerald-600" />
+          <p className="mt-3 text-[16px] font-bold">인물 카드를 만들었어요</p>
+          <p className="mt-1 text-[13px] text-neutral-500">
+            {fromLink ? '공개된 소개글과 직함을 출처와 함께 넣어뒀어요. 틀린 건 카드에서 고칠 수 있어요' : '메모나 녹음을 남기면 카드가 채워져요'}
+          </p>
+          <div className="mt-5"><PrimaryButton onClick={onClose}>확인</PrimaryButton></div>
+        </div>
+      ) : (
+        <>
+          <div className="flex items-center justify-between">
+            <h3 className="flex items-center text-[17px] font-bold">사람 추가<Tag kind="new" /></h3>
+            <button onClick={onClose}><X size={20} /></button>
+          </div>
+          <div className="mt-1"><PrivateBadge /></div>
+          <div className="mt-4 grid grid-cols-2 rounded-full bg-neutral-100 p-1 text-[13px]">
+            {([['link', '프로필 링크로'], ['name', '이름으로']] as const).map(([id, label]) => (
+              <button key={id} onClick={() => { setWay(id); setValue('') }} className={`rounded-full py-1.5 ${way === id ? 'bg-white font-semibold shadow-sm' : 'text-neutral-500'}`}>{label}</button>
+            ))}
+          </div>
+          <input
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            placeholder={fromLink ? '인스타나 링크드인 프로필 주소 붙여넣기' : '이름'}
+            className="mt-3 w-full rounded-xl border border-neutral-200 px-3 py-3 text-[13px] outline-none focus:border-[#25313D]"
+          />
+          <p className="mt-2 text-[12px] text-neutral-500">
+            {fromLink ? '인스타나 링크드인 앱에서 공유를 누르고 펠로어를 골라도 돼요' : '이름만 있어도 돼요. 나머지는 기록하면서 채워져요'}
+          </p>
+          <div className="mt-5"><PrimaryButton disabled={!value.trim()} onClick={() => setDone(true)}>만들기</PrimaryButton></div>
+        </>
+      )}
+    </Sheet>
+  )
+}
+
 function PeopleTab({ mode, openPerson, fromLink }: { mode: Mode; openPerson: (p: Person) => void; fromLink: boolean }) {
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState('전체')
+  const [view, setView] = useState<'mine' | 'imported'>('mine')
+  const [adding, setAdding] = useState(false)
 
   const search = (
     <div className="mt-1 flex items-center gap-2 rounded-full bg-neutral-100 px-4 py-2.5">
@@ -849,9 +973,37 @@ function PeopleTab({ mode, openPerson, fromLink }: { mode: Mode; openPerson: (p:
   const filters = ['전체', '투자', '고객', '협업', '최근 연락']
   const list = filter === '전체' || filter === '최근 연락' ? PEOPLE : PEOPLE.filter((p) => p.tags.includes(filter))
 
+  const segment = (
+    <div className="mt-3 grid grid-cols-2 rounded-full bg-neutral-100 p-1 text-[13px]">
+      {([['mine', '내 사람', mode === 'importing' ? 42 : 214], ['imported', '가져온 사람', mode === 'importing' ? 128 : 86]] as const).map(([id, label, n]) => (
+        <button key={id} onClick={() => setView(id)} className={`rounded-full py-1.5 ${view === id ? 'bg-white font-semibold shadow-sm' : 'text-neutral-500'}`}>
+          {label} <span className="text-[11px] text-neutral-400">{n}</span>
+        </button>
+      ))}
+    </div>
+  )
+
+  const addButton = (
+    <button onClick={() => setAdding(true)} className="flex items-center gap-1 rounded-full border border-neutral-200 px-3 py-1 text-[12px]">
+      <UserPlus size={13} /> 추가
+    </button>
+  )
+
+  if (view === 'imported') {
+    return (
+      <div className="px-5 pb-28">
+        {search}
+        {segment}
+        <ImportedList openPerson={openPerson} />
+        {adding && <AddPersonSheet onClose={() => setAdding(false)} />}
+      </div>
+    )
+  }
+
   return (
     <div className="px-5 pb-28">
       {search}
+      {segment}
       {mode === 'importing' ? (
         <div className="mt-3 rounded-2xl bg-neutral-50 px-4 py-3 text-[12px] text-neutral-600">170명 가져옴, 링크드인 가져오는 중</div>
       ) : (
@@ -867,12 +1019,13 @@ function PeopleTab({ mode, openPerson, fromLink }: { mode: Mode; openPerson: (p:
         ))}
       </div>
       <div className="mt-2 flex items-center justify-between">
-        <span className="text-[12px] text-neutral-400">{mode === 'importing' ? 170 : 214}명</span>
         <PrivateBadge />
+        {addButton}
       </div>
       <div className="divide-y divide-[var(--color-border-soft)]">
         {list.map((p) => <PersonRow key={p.id} p={p} onClick={() => openPerson(p)} />)}
       </div>
+      {adding && <AddPersonSheet onClose={() => setAdding(false)} />}
     </div>
   )
 }
@@ -881,6 +1034,20 @@ function PersonDetail({ p, onBack }: { p: Person; onBack: () => void }) {
   const { conn } = useConnect()
   const [tone, setTone] = useState(p.tone ?? '')
   const [editingTone, setEditingTone] = useState(false)
+  // 목업: 비회원이 가입한 뒤 모습을 보여주기 위한 상태
+  const [joined, setJoined] = useState(false)
+  const [invited, setInvited] = useState(false)
+  const [facts, setFacts] = useState<Fact[]>(p.facts ?? [])
+  const [pending, setPending] = useState<Fact[]>(p.pending ?? [])
+  const [editingFact, setEditingFact] = useState<number | null>(null)
+  const member = p.member || joined
+
+  const confirm = (f: Fact, ok: boolean) => {
+    setPending((list) => list.filter((x) => x !== f))
+    if (ok) setFacts((list) => [...list, f])
+  }
+  const editFact = (i: number, t: string) => setFacts((list) => list.map((f, j) => (j === i ? { t, src: '내가 고침' } : f)))
+
   return (
     <div className="pb-28">
       <div className="flex items-center gap-2 px-3 py-3">
@@ -891,21 +1058,81 @@ function PersonDetail({ p, onBack }: { p: Person; onBack: () => void }) {
       </div>
       <div className="px-5">
         <div className="flex items-center gap-4">
-          <Avatar name={p.name} size={64} member={p.member} />
+          <Avatar name={p.name} size={64} member={member} />
           <div>
             <div className="text-[20px] font-bold">{p.name}</div>
-            <div className="text-[13px] text-neutral-500">{p.title}</div>
-            {p.member
+            <div className="text-[13px] text-neutral-500">{p.title || facts[0]?.t}</div>
+            {member
               ? <Link href="/" className="mt-1 inline-flex items-center text-[12px] font-medium text-[#25313D]">공개 프로필 보기 <ChevronRight size={12} /></Link>
               : <span className="mt-1 inline-block text-[12px] text-neutral-400">펠로어 회원 아님</span>}
           </div>
         </div>
+
+        {joined && (
+          <div className="mt-4 rounded-2xl bg-emerald-50 px-4 py-3 text-[12px] leading-relaxed text-emerald-700">
+            {p.name}님이 펠로어에 가입했어요. 본인이 쓴 프로필이 카드에 붙었어요. 내 메모와 알게 된 정보는 그대로 나만 봐요.
+          </div>
+        )}
 
         <SectionTitle tag="new">연결된 계정</SectionTitle>
         <div className="flex flex-wrap gap-1.5">
           {p.accounts.map((a) => <ChannelBadge key={a.ch} ch={a.ch} handle={a.handle} />)}
           <button className="inline-flex items-center gap-0.5 rounded-full border border-dashed border-neutral-300 px-2 py-0.5 text-[11px] text-neutral-500"><Plus size={11} /> 계정 합치기</button>
         </div>
+
+        {member && p.self && (
+          <>
+            <SectionTitle tag="new" right={<span className="text-[11px] text-neutral-400">{p.name}님이 직접 관리해요</span>}>본인이 쓴 정보</SectionTitle>
+            <Card className="!py-2">
+              <ul className="divide-y divide-[var(--color-border-soft)] text-[13px]">
+                {p.self.map((t) => <li key={t} className="py-2">{t}</li>)}
+              </ul>
+            </Card>
+          </>
+        )}
+
+        {(!member || facts.length > 0) && (
+          <>
+            <SectionTitle tag="new" right={<span className="text-[11px] text-neutral-400">눌러서 고치기</span>}>알게 된 정보</SectionTitle>
+            <Card className="!py-2">
+              {facts.length === 0 ? (
+                <p className="py-2 text-[13px] text-neutral-400">아직 없어요. 대화하거나 기록하면 채워져요</p>
+              ) : (
+                <ul className="divide-y divide-[var(--color-border-soft)]">
+                  {facts.map((f, i) => (
+                    <li key={i} className="flex items-center gap-2 py-2">
+                      {editingFact === i ? (
+                        <input autoFocus value={f.t} onChange={(e) => editFact(i, e.target.value)} onBlur={() => setEditingFact(null)} className="flex-1 text-[13px] outline-none" />
+                      ) : (
+                        <button onClick={() => setEditingFact(i)} className="flex-1 text-left text-[13px]">{f.t}</button>
+                      )}
+                      <span className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] ${f.src === '내가 고침' ? 'bg-[#25313D]/10 text-[#25313D]' : 'bg-neutral-100 text-neutral-500'}`}>{f.src}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Card>
+            <p className="mt-1.5 text-[11px] text-neutral-400">공개된 소개글, 메일 서명, 내 기록에서 모았어요. 내가 고친 내용이 우선이에요</p>
+          </>
+        )}
+
+        {pending.length > 0 && (
+          <>
+            <SectionTitle tag="new" right={<span className="text-[12px] text-neutral-400">{pending.length}건</span>}>새로 알게 된 것</SectionTitle>
+            <div className="space-y-2">
+              {pending.map((f) => (
+                <Card key={f.t}>
+                  <p className="text-[13px]">{f.t}</p>
+                  <p className="mt-0.5 text-[11px] text-neutral-400">{f.src}에서</p>
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    <button onClick={() => confirm(f, false)} className="rounded-full border border-neutral-200 py-1.5 text-[12px]">아니에요</button>
+                    <button onClick={() => confirm(f, true)} className="rounded-full bg-[#25313D] py-1.5 text-[12px] font-semibold text-white">맞아요, 붙이기</button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </>
+        )}
 
         <SectionTitle tag="new">관계와 말투</SectionTitle>
         <Card>
@@ -936,17 +1163,30 @@ function PersonDetail({ p, onBack }: { p: Person; onBack: () => void }) {
           </div>
         )}
 
-        {p.member && (
+        {member && (
           <>
             <SectionTitle tag="old">케미</SectionTitle>
             <Card><div className="flex items-center gap-2 text-[13px]"><Sparkles size={15} /> 나와의 케미 리포트 <ChevronRight size={14} className="ml-auto text-neutral-300" /></div></Card>
-            <SectionTitle tag="old">이 사람의 프로필 요약</SectionTitle>
-            <Card><p className="text-[13px] leading-relaxed text-neutral-600">AI 탭 요약을 그대로 보여줌. 경력, 취향, 받은 피드백 요약</p></Card>
           </>
         )}
 
         <SectionTitle tag="old">연락처</SectionTitle>
-        <Card className="text-[13px] text-neutral-600">{p.member ? '공개 프로필에 등록된 연락처' : '직접 입력한 전화번호, 이메일'}</Card>
+        <Card className="text-[13px] text-neutral-600">{member ? '공개 프로필에 등록된 연락처' : '메일 서명에서 가져온 것과 직접 입력한 전화번호, 이메일'}</Card>
+
+        {!member && (
+          <Card className="mt-6 bg-neutral-50">
+            <p className="text-[13px] font-semibold">{p.name}님은 아직 펠로어 회원이 아니에요</p>
+            <p className="mt-1 text-[12px] leading-relaxed text-neutral-500">가입하면 이 카드에 {p.name}님이 직접 쓴 프로필이 붙고, 연락처도 본인이 최신으로 유지해요. 케미 리포트도 볼 수 있어요.</p>
+            <button
+              onClick={() => setInvited(true)}
+              disabled={invited}
+              className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-full bg-[#0D0D0D] py-2.5 text-[13px] font-semibold text-white disabled:opacity-50"
+            >
+              <Send size={14} />{invited ? '다음 답장에 링크를 붙여둘게요' : '내 프로필 링크 보내기'}
+            </button>
+            {p.self && <button onClick={() => setJoined(true)} className="mt-2 w-full text-center text-[11px] text-neutral-400 underline">가입한 뒤 모습 보기 (목업)</button>}
+          </Card>
+        )}
       </div>
     </div>
   )

@@ -13,7 +13,7 @@ import {
   Bell, Settings, Sparkles, Users, User, ChevronRight, ChevronLeft, Search,
   Mic, PenLine, Lock, CalendarClock, MessageCircle, Send, Upload, Plus,
   QrCode, BarChart3, Coins, Eye, ShieldCheck, BadgeCheck, X, UserPlus, Check, Square,
-  Clock, GitMerge, ArrowUp, FileText, Image as ImageIcon, RefreshCw, CalendarDays, Mail, TriangleAlert,
+  Clock, GitMerge, ArrowUp, FileText, Image as ImageIcon, RefreshCw, CalendarDays, Mail, TriangleAlert, Menu,
 } from 'lucide-react'
 
 type Tab = 'today' | 'people' | 'me'
@@ -138,7 +138,7 @@ function initConn(mode: Mode): ConnMap {
       ig: { status: 'on', level: 'send', last: '10분 전' },
       in: { status: 'broken', level: 'send', last: '어제 밤' },
       tg: { status: 'on', level: 'send', last: '10분 전' },
-      kakao: { status: 'on', level: 'draft', last: '어제 파일 올림' },
+      kakao: { status: 'on', level: 'draft', last: '어제' },
       gmail: { status: 'on', level: 'draft', last: '10분 전' },
     }
   }
@@ -244,13 +244,18 @@ function PrivateBadge() {
   )
 }
 
-function Header({ title }: { title: string }) {
+/** 헤더 오른쪽: 펠로어 사람 검색, 알림, 앱 전체 설정. 내 사람들 탭 안의 검색은 내 사람 안에서만 찾는다 */
+function Header({ title, onSearch }: { title: string; onSearch: () => void }) {
   return (
     <div className="flex items-center justify-between px-5 pb-2 pt-3">
       <h1 className="text-[20px] font-bold text-[var(--color-text-strong)]">{title}</h1>
-      <div className="relative text-neutral-700">
-        <Bell size={22} />
-        <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-rose-500" />
+      <div className="flex items-center gap-4 text-neutral-700">
+        <button onClick={onSearch} aria-label="펠로어에서 사람 찾기"><Search size={22} /></button>
+        <span className="relative">
+          <Bell size={22} />
+          <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-rose-500" />
+        </span>
+        <Link href="/settings" aria-label="설정"><Menu size={22} /></Link>
       </div>
     </div>
   )
@@ -301,7 +306,7 @@ function DraftItem({ d, include, text, editing, link, onToggle, onEdit, onChange
           </span>
           <span className="flex-1">
             <span className="flex items-center text-[12px] font-medium">내 프로필 링크 붙이기<Tag kind="new" /></span>
-            <span className="block text-[11px] text-neutral-500">{p.name}님은 아직 펠로어 회원이 아니에요. 링크로 가입하면 서로 저장돼요</span>
+            <span className="block text-[11px] text-neutral-500">{p.name}님은 아직 펠로어 회원이 아니에요. 링크로 가입하면 서로 내 사람에 추가돼요</span>
           </span>
         </button>
       )}
@@ -367,11 +372,11 @@ function DraftBatch({ openPerson }: { openPerson: (p: Person) => void }) {
   )
 }
 
-function BriefingCard({ person, sample, onOpen }: { person: Person; sample?: boolean; onOpen?: () => void }) {
+function BriefingCard({ person, sample, onOpen, from }: { person: Person; sample?: boolean; onOpen?: () => void; from?: string }) {
   return (
     <Card className="!p-0 overflow-hidden" onClick={onOpen}>
       <div className="flex items-center gap-2 bg-neutral-50 px-4 py-2.5 text-[12px] text-neutral-600">
-        <CalendarClock size={14} /> 오후 3시 {person.name}님과 미팅 {sample && <span className="ml-auto text-neutral-400">예시</span>}
+        <CalendarClock size={14} /> 오후 3시 {person.name}님과 미팅 {sample ? <span className="ml-auto text-neutral-400">예시</span> : from && <span className="ml-auto text-neutral-400">{from}</span>}
       </div>
       <div className="p-4">
         <div className="flex items-center gap-3">
@@ -419,9 +424,11 @@ function ConnectList() {
   )
 }
 
-function ConnStatus({ c }: { c: Conn }) {
+function ConnStatus({ c, file }: { c: Conn; file?: boolean }) {
   if (c.status === 'broken') return <span className="text-rose-500">다시 연결이 필요해요</span>
-  if (c.status === 'off') return <span>연결 안 함</span>
+  if (c.status === 'off') return <span>{file ? '아직 올리지 않음' : '연결 안 함'}</span>
+  // 카톡은 계속 연결되는 게 아니라 올린 파일까지만 반영된다
+  if (file) return <span>{LEVEL[c.level].t}<span className="text-neutral-400">, 마지막으로 올린 날 {c.last ?? '오늘'}</span></span>
   return <span>{LEVEL[c.level].t}{c.last && <span className="text-neutral-400">, 마지막 확인 {c.last}</span>}</span>
 }
 
@@ -454,10 +461,11 @@ function ConnectScreen({ onBack, onDetail }: { onBack: () => void; onDetail: (s:
                     key={s}
                     icon={<ChannelBadge ch={SRC[s].ch} />}
                     label={SRC[s].label}
-                    desc={<ConnStatus c={c} />}
-                    onClick={() => (c.status === 'on' ? onDetail(s) : start(s))}
+                    desc={<ConnStatus c={c} file={SRC[s].how === 'file'} />}
+                    onClick={() => (c.status === 'on' && SRC[s].how !== 'file' ? onDetail(s) : start(s))}
                     right={
-                      c.status === 'on' ? undefined
+                      SRC[s].how === 'file' ? <span className="rounded-full border border-neutral-200 px-3 py-1 text-[12px]">{c.status === 'on' ? '새로 올리기' : '올리기'}</span>
+                        : c.status === 'on' ? undefined
                         : c.status === 'broken'
                           ? <span className="rounded-full bg-rose-500 px-3 py-1 text-[12px] font-semibold text-white">다시 연결</span>
                           : <span className="rounded-full border border-neutral-200 px-3 py-1 text-[12px]">{s === 'kakao' ? '올리기' : s === 'contacts' ? '허용' : '연결'}</span>
@@ -696,7 +704,9 @@ const AUTO_MERGED: { name: string; member: boolean; chs: Channel[]; why: string 
   { name: '윤채린', member: false, chs: ['mail', 'phone'], why: '메일 서명의 번호가 연락처와 같아요' },
 ]
 
-const ASK: { a: { ch: Channel; h: string }; b: { ch: Channel; h: string }; why: string; talk: string }[] = [
+type MergeQ = { a: { ch: Channel; h: string }; b: { ch: Channel; h: string }; why: string; talk?: string }
+
+const ASK: MergeQ[] = [
   { a: { ch: 'kakao', h: '민혁' }, b: { ch: 'phone', h: '도민혁' }, why: '카톡 대화방 이름이 연락처의 이름과 비슷해요', talk: '대화 312개' },
   { a: { ch: 'kakao', h: '채린 디렉터님' }, b: { ch: 'mail', h: '윤채린' }, why: '대화방 이름에 같은 이름과 직함이 있어요', talk: '대화 48개' },
   { a: { ch: 'ig', h: '@yerin.pd' }, b: { ch: 'phone', h: '마예린 PD' }, why: '아이디와 연락처 이름이 비슷해요', talk: 'DM 21개' },
@@ -714,14 +724,69 @@ function AccountFace({ x }: { x: { ch: Channel; h: string } }) {
   )
 }
 
+type MergeAnswer = 'same' | 'diff' | 'later'
+
+/** 같은 사람인지 묻는 카드. 사람 정리, 내 사람들 후보, 인물 카드, 말하기 어디서 열든 이 모양 하나 */
+function MergeAskCard({ q, onAnswer, done }: { q: MergeQ; onAnswer: (v: MergeAnswer) => void; done?: MergeAnswer }) {
+  return (
+    <Card>
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-center">
+        <AccountFace x={q.a} />
+        <GitMerge size={18} className="text-neutral-300" />
+        <AccountFace x={q.b} />
+      </div>
+      <p className="mt-4 rounded-xl bg-neutral-50 px-3 py-2 text-[12px] text-neutral-600">{q.why}</p>
+      {q.talk && <p className="mt-1 text-[11px] text-neutral-400">{q.talk}</p>}
+      {done ? (
+        <p className="mt-3 text-center text-[12px] font-medium text-emerald-600">{done === 'same' ? '한 사람으로 합쳤어요' : done === 'diff' ? '다른 사람으로 둘게요' : '나중에 다시 물어볼게요'}</p>
+      ) : (
+        <>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <button onClick={() => onAnswer('diff')} className="rounded-full border border-neutral-200 py-2.5 text-[13px]">다른 사람</button>
+            <button onClick={() => onAnswer('same')} className="rounded-full bg-[#25313D] py-2.5 text-[13px] font-semibold text-white">같은 사람</button>
+          </div>
+          <button onClick={() => onAnswer('later')} className="mt-3 w-full text-center text-[12px] text-neutral-400">모르겠어요, 나중에</button>
+        </>
+      )}
+    </Card>
+  )
+}
+
+/** 사람 정리 밖에서 합치기 후보를 열 때 쓰는 시트 */
+function MergeSheet({ cands, onClose }: { cands: MergeQ[]; onClose: () => void }) {
+  const [i, setI] = useState(0)
+  const q = cands[i]
+  return (
+    <Sheet onClose={onClose}>
+      <div className="flex items-center justify-between">
+        <h3 className="flex items-center text-[17px] font-bold">같은 사람일까요?<Tag kind="new" /></h3>
+        <button onClick={onClose}><X size={20} /></button>
+      </div>
+      {q ? (
+        <>
+          {cands.length > 1 && <p className="mt-1 text-[12px] text-neutral-400">{i + 1} / {cands.length}</p>}
+          <div className="mt-3"><MergeAskCard key={i} q={q} onAnswer={() => setI(i + 1)} /></div>
+        </>
+      ) : (
+        <div className="py-4 text-center">
+          <Check size={28} className="mx-auto text-emerald-600" />
+          <p className="mt-3 text-[15px] font-bold">{cands.length ? '다 확인했어요' : '합칠 후보가 없어요'}</p>
+          <p className="mt-1 text-[13px] text-neutral-500">모르는 계정이 같은 사람이면 말하기로 알려주세요</p>
+          <div className="mt-5"><PrimaryButton onClick={onClose}>확인</PrimaryButton></div>
+        </div>
+      )}
+    </Sheet>
+  )
+}
+
 function SortFlow({ onBack, onDone }: { onBack: () => void; onDone: () => void }) {
   const { conn } = useConnect()
   const [step, setStep] = useState<'gather' | 'auto' | 'ask' | 'split'>('gather')
   const [i, setI] = useState(0)
-  const [answers, setAnswers] = useState<('same' | 'diff' | 'later')[]>([])
+  const [answers, setAnswers] = useState<MergeAnswer[]>([])
   const got = (Object.keys(GATHER) as Src[]).filter((s) => conn[s].status === 'on')
   const total = got.reduce((n, s) => n + GATHER[s]!.n, 0)
-  const answer = (v: 'same' | 'diff' | 'later') => {
+  const answer = (v: MergeAnswer) => {
     setAnswers((a) => [...a, v])
     if (i + 1 >= ASK.length) setStep('split')
     else setI(i + 1)
@@ -796,20 +861,7 @@ function SortFlow({ onBack, onDone }: { onBack: () => void; onDone: () => void }
               <span className="text-[12px] text-neutral-400">{i + 1} / {ASK.length}</span>
             </div>
             <p className="mt-1 text-[12px] text-neutral-500">대화를 많이 나눈 사람부터 물어봐요. 나머지는 쓰면서 천천히 정리돼요.</p>
-            <Card key={i} className="mt-4">
-              <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 text-center">
-                <AccountFace x={q.a} />
-                <GitMerge size={18} className="text-neutral-300" />
-                <AccountFace x={q.b} />
-              </div>
-              <p className="mt-4 rounded-xl bg-neutral-50 px-3 py-2 text-[12px] text-neutral-600">{q.why}</p>
-              <p className="mt-1 text-[11px] text-neutral-400">{q.talk}</p>
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                <button onClick={() => answer('diff')} className="rounded-full border border-neutral-200 py-2.5 text-[13px]">다른 사람</button>
-                <button onClick={() => answer('same')} className="rounded-full bg-[#25313D] py-2.5 text-[13px] font-semibold text-white">같은 사람</button>
-              </div>
-              <button onClick={() => answer('later')} className="mt-3 w-full text-center text-[12px] text-neutral-400">모르겠어요, 나중에</button>
-            </Card>
+            <div className="mt-4"><MergeAskCard key={i} q={q} onAnswer={answer} /></div>
           </>
         )}
 
@@ -820,7 +872,7 @@ function SortFlow({ onBack, onDone }: { onBack: () => void; onDone: () => void }
             <div className="mt-4 space-y-2">
               {[
                 { t: '내 사람', n: 58, d: '서로 대화했거나 내가 기록을 남긴 사람', strong: true },
-                { t: '가져온 사람', n: 449, d: '연락처에만 있거나 댓글, 단체방으로만 아는 사람. 대화하면 내 사람으로 옮겨요' },
+                { t: '가져온 사람', n: 449, d: '연락처에만 있거나 댓글, 단체방으로만 아는 사람. 대화가 생기면 내 사람에 추가돼요' },
                 { t: '숨김', n: 13, d: '광고나 스팸으로 보이는 계정' },
               ].map((x) => (
                 <Card key={x.t} className={x.strong ? 'border-[#25313D]' : ''}>
@@ -859,7 +911,7 @@ function SortEntryCard() {
 }
 
 function TodayTab({ mode, openPerson }: { mode: Mode; openPerson: (p: Person) => void }) {
-  const { conn } = useConnect()
+  const { conn, start } = useConnect()
   const broken = (Object.keys(conn) as Src[]).filter((s) => conn[s].status === 'broken')
   if (mode === 'guest') {
     return (
@@ -896,7 +948,7 @@ function TodayTab({ mode, openPerson }: { mode: Mode; openPerson: (p: Person) =>
         <ConnectList />
         <SectionTitle>다른 방법</SectionTitle>
         <Card className="!py-1 divide-y divide-[var(--color-border-soft)]">
-          <Row icon={<Send size={18} />} label="내 프로필 링크 보내기" desc="받은 사람이 가입하면 서로 저장돼요" tag="old" />
+          <Row icon={<Send size={18} />} label="내 프로필 링크 보내기" desc="받은 사람이 가입하면 서로 내 사람에 추가돼요" tag="old" />
           <Row icon={<UserPlus size={18} />} label="직접 추가하기" desc="이름만으로도 인물 카드를 만들어요" />
         </Card>
       </div>
@@ -951,9 +1003,13 @@ function TodayTab({ mode, openPerson }: { mode: Mode; openPerson: (p: Person) =>
       </Card>
 
       <SectionTitle tag="new">오늘 만날 사람</SectionTitle>
-      {conn.gcal.status === 'on'
-        ? <BriefingCard person={PEOPLE[1]} onOpen={() => openPerson(PEOPLE[1])} />
-        : <ConnectSuggest src="gcal" icon={<CalendarDays size={18} />} text="캘린더를 연결하면 그날 만날 사람과 지난 대화를 아침에 미리 정리해 드려요" />}
+      {/* 약속은 대화에서 먼저 찾는다. 캘린더는 있으면 더 정확해지는 보조 */}
+      <BriefingCard person={PEOPLE[1]} onOpen={() => openPerson(PEOPLE[1])} from={conn.gcal.status === 'on' ? '캘린더' : '카톡 대화에서 찾은 약속'} />
+      {conn.gcal.status !== 'on' && (
+        <button onClick={() => start('gcal')} className="mt-2 flex w-full items-center gap-1.5 text-[12px] text-neutral-500">
+          <CalendarDays size={13} /> 캘린더도 연결하면 대화에 없는 약속까지 챙겨요 <ChevronRight size={12} />
+        </button>
+      )}
 
       <SectionTitle tag="new">챙길 사람</SectionTitle>
       <Card onClick={() => openPerson(PEOPLE[3])}>
@@ -986,8 +1042,77 @@ function PersonRow({ p, onClick, saveable }: { p: Person; onClick?: () => void; 
         )}
       </div>
       {saveable
-        ? <button className="rounded-full border border-neutral-200 px-3 py-1 text-[12px]">저장</button>
+        ? <button className="shrink-0 rounded-full border border-neutral-200 px-3 py-1 text-[12px]">내 사람에 추가</button>
         : <ChevronRight size={16} className="text-neutral-300" />}
+    </div>
+  )
+}
+
+/**
+ * 헤더 돋보기. 펠로어 회원과 공개 인물을 찾는다. 추가해도 나만 보는 내 사람에 들어갈 뿐이라
+ * 상대에게 알림이 가지 않고, 다른 사람이 내 목록을 볼 수도 없다.
+ */
+function FeloreSearch({ mode, onBack, openPerson }: { mode: Mode; onBack: () => void; openPerson: (p: Person) => void }) {
+  const [query, setQuery] = useState('')
+  const [added, setAdded] = useState<string[]>([])
+  const q = query.trim()
+  const mine = q && mode === 'active' ? PEOPLE.filter((p) => p.name.includes(q)) : []
+  const others: (Person & { kind: string })[] = q ? [
+    { id: 'x1', name: `${q}수`, title: '제품 디자이너, 스튜디오 하루', member: true, met: '', tags: [], accounts: [], kind: '펠로어 회원' },
+    { id: 'x3', name: `${q}민`, title: '마케터, 브릿지랩', member: true, met: '', tags: [], accounts: [], kind: '펠로어 회원' },
+    { id: 'x2', name: `${q}영`, title: '공개 정보로 만든 프로필', member: false, met: '', tags: [], accounts: [], kind: '공개 인물' },
+  ] : []
+  const addButton = (id: string) => (
+    added.includes(id)
+      ? <span className="shrink-0 text-[12px] font-medium text-emerald-600">{mode === 'guest' ? '가입하면 추가돼요' : '추가했어요'}</span>
+      : <button onClick={() => setAdded((a) => [...a, id])} className="shrink-0 rounded-full border border-neutral-200 px-3 py-1 text-[12px]">내 사람에 추가</button>
+  )
+  return (
+    <div className="pb-28">
+      <div className="flex items-center gap-2 px-3 py-3">
+        <button onClick={onBack}><ChevronLeft size={24} /></button>
+        <div className="flex flex-1 items-center gap-2 rounded-full bg-neutral-100 px-4 py-2.5">
+          <Search size={16} className="text-neutral-400" />
+          <input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="이름, 회사, 아이디로 펠로어에서 찾기" className="flex-1 bg-transparent text-[13px] outline-none" />
+          {query && <button onClick={() => setQuery('')}><X size={14} className="text-neutral-400" /></button>}
+        </div>
+      </div>
+      <div className="px-5">
+        {!q ? (
+          <>
+            <SectionTitle tag="old">최근 본 프로필</SectionTitle>
+            <div className="divide-y divide-[var(--color-border-soft)]">
+              {[PEOPLE[0], PEOPLE[3]].map((p) => <PersonRow key={p.id} p={p} onClick={() => openPerson(p)} />)}
+            </div>
+            <p className="mt-6 rounded-2xl bg-neutral-50 px-4 py-3 text-[12px] leading-relaxed text-neutral-500">추가한 사람은 나만 보는 내 사람에 들어가요. 상대에게 알림이 가지 않아요.</p>
+          </>
+        ) : (
+          <>
+            {mine.length > 0 && (
+              <>
+                <SectionTitle>이미 내 사람</SectionTitle>
+                {mine.map((p) => <PersonRow key={p.id} p={p} onClick={() => openPerson(p)} />)}
+              </>
+            )}
+            {(['펠로어 회원', '공개 인물'] as const).map((k) => (
+              <div key={k}>
+                <SectionTitle tag="old">{k}</SectionTitle>
+                {others.filter((o) => o.kind === k).map((o) => (
+                  <div key={o.id} className="flex items-center gap-3 py-2.5">
+                    <Avatar name={o.name} member={o.member} />
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[14px] font-semibold">{o.name}</div>
+                      <div className="truncate text-[12px] text-neutral-500">{o.title}</div>
+                    </div>
+                    {addButton(o.id)}
+                  </div>
+                ))}
+              </div>
+            ))}
+            <p className="mt-4 text-center text-[11px] text-neutral-400">추가해도 상대에게 알림이 가지 않아요</p>
+          </>
+        )}
+      </div>
     </div>
   )
 }
@@ -1011,41 +1136,26 @@ function SearchResults({ query, mode, openPerson }: { query: string; mode: Mode;
 }
 
 /**
- * 자동으로 가져온 사람은 바로 내 사람이 되지 않는다. 대화하거나 기록하거나 고정하면 내 사람으로 올라가고,
- * 필요 없는 사람은 숨긴다. 비회원에게는 이게 "저장" 버튼 역할.
+ * 가져온 사람은 정리할 목록이 아니라 필요할 때 꺼내 쓰는 보관함. 줄마다 버튼을 달지 않고,
+ * 눌러서 들어간 인물 카드에서 추가하거나 숨긴다. 대화가 생기면 알아서 내 사람에 추가된다.
  */
 function ImportedList({ openPerson }: { openPerson: (p: Person) => void }) {
-  const [state, setState] = useState<Record<string, 'mine' | 'hidden'>>({})
-  const set = (id: string, v: 'mine' | 'hidden') => setState((s) => ({ ...s, [id]: v }))
-  const hiddenCount = Object.values(state).filter((v) => v === 'hidden').length
   return (
     <>
-      <p className="mt-3 text-[12px] leading-relaxed text-neutral-500">연결한 곳에서 가져왔지만 아직 정리하지 않은 사람이에요. 대화하거나 기록하거나 내 사람으로 올리면 목록으로 옮겨요.</p>
+      <p className="mt-3 text-[12px] leading-relaxed text-neutral-500">연결한 곳에서 가져온 사람을 모아둔 곳이에요. 하나씩 정리하지 않아도 돼요. 대화가 생기면 알아서 내 사람에 추가되고, 필요할 때 검색해서 꺼내 쓰면 돼요.</p>
       <div className="mt-2 divide-y divide-[var(--color-border-soft)]">
-        {IMPORTED.map((p) => {
-          const v = state[p.id]
-          return (
-            <div key={p.id} className="py-3">
-              <div className="flex items-center gap-3">
-                <button onClick={() => openPerson(p)}><Avatar name={p.name} size={36} member={p.member} /></button>
-                <button onClick={() => openPerson(p)} className="min-w-0 flex-1 text-left">
-                  <div className="flex items-center gap-1.5 text-[14px] font-semibold">{p.name}<ChannelBadge ch={p.accounts[0].ch} /></div>
-                  <div className={`text-[12px] ${p.spam ? 'text-rose-500' : 'text-neutral-500'}`}>{p.spam ? `${p.why}, 광고 계정으로 보여요` : p.why}</div>
-                </button>
-              </div>
-              {v ? (
-                <p className="mt-2 pl-12 text-[12px] font-medium text-emerald-600">{v === 'mine' ? '내 사람으로 옮겼어요' : '숨겼어요. 다시 연락이 오면 알려드려요'}</p>
-              ) : (
-                <div className="mt-2 flex gap-2 pl-12">
-                  <button onClick={() => set(p.id, 'hidden')} className="rounded-full border border-neutral-200 px-3 py-1 text-[12px]">숨기기</button>
-                  <button onClick={() => set(p.id, 'mine')} className="rounded-full bg-[#25313D] px-3 py-1 text-[12px] font-semibold text-white">내 사람으로</button>
-                </div>
-              )}
+        {IMPORTED.filter((p) => !p.spam).map((p) => (
+          <button key={p.id} onClick={() => openPerson(p)} className="flex w-full items-center gap-3 py-3 text-left">
+            <Avatar name={p.name} size={36} member={p.member} />
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5 text-[14px] font-semibold">{p.name}<ChannelBadge ch={p.accounts[0].ch} /></div>
+              <div className="text-[12px] text-neutral-500">{p.why}</div>
             </div>
-          )
-        })}
+            <ChevronRight size={16} className="text-neutral-300" />
+          </button>
+        ))}
       </div>
-      <p className="mt-3 text-center text-[12px] text-neutral-400">숨긴 사람 {12 + hiddenCount}명</p>
+      <p className="mt-3 text-center text-[12px] text-neutral-400">광고로 보여 숨긴 계정 13개</p>
     </>
   )
 }
@@ -1063,14 +1173,14 @@ function AddPersonSheet({ onClose }: { onClose: () => void }) {
           <Check size={28} className="mx-auto text-emerald-600" />
           <p className="mt-3 text-[16px] font-bold">인물 카드를 만들었어요</p>
           <p className="mt-1 text-[13px] text-neutral-500">
-            {fromLink ? '공개된 소개글과 직함을 출처와 함께 넣어뒀어요. 틀린 건 카드에서 고칠 수 있어요' : '메모나 녹음을 남기면 카드가 채워져요'}
+            {fromLink ? '내 사람에 추가했어요. 공개된 소개글과 직함은 출처와 함께 넣어뒀어요' : '내 사람에 추가했어요. 메모나 녹음을 남기면 카드가 채워져요'}
           </p>
           <div className="mt-5"><PrimaryButton onClick={onClose}>확인</PrimaryButton></div>
         </div>
       ) : (
         <>
           <div className="flex items-center justify-between">
-            <h3 className="flex items-center text-[17px] font-bold">사람 추가<Tag kind="new" /></h3>
+            <h3 className="flex items-center text-[17px] font-bold">내 사람에 추가<Tag kind="new" /></h3>
             <button onClick={onClose}><X size={20} /></button>
           </div>
           <div className="mt-1"><PrivateBadge /></div>
@@ -1100,6 +1210,7 @@ function PeopleTab({ mode, openPerson, fromLink }: { mode: Mode; openPerson: (p:
   const [filter, setFilter] = useState('전체')
   const [view, setView] = useState<'mine' | 'imported'>('mine')
   const [adding, setAdding] = useState(false)
+  const [merging, setMerging] = useState(false)
 
   const search = (
     <div className="mt-1 flex items-center gap-2 rounded-full bg-neutral-100 px-4 py-2.5">
@@ -1132,10 +1243,10 @@ function PeopleTab({ mode, openPerson, fromLink }: { mode: Mode; openPerson: (p:
                   <div className="text-[12px] text-neutral-500">방금 프로필을 봤어요</div>
                 </div>
               </div>
-              <p className="mt-3 text-[13px] text-neutral-600">가입하면 {PEOPLE[0].name}님이 내 사람에 저장돼요.</p>
+              <p className="mt-3 text-[13px] text-neutral-600">가입하면 {PEOPLE[0].name}님이 내 사람에 추가돼요.</p>
             </Card>
             <div className="mt-3 rounded-2xl bg-amber-50 px-4 py-3 text-[12px] text-amber-700">링크를 받고 24시간 안에 가입하면 보너스 재화 5개를 드려요</div>
-            <div className="mt-4"><PrimaryButton>가입하고 저장하기</PrimaryButton></div>
+            <div className="mt-4"><PrimaryButton>가입하고 내 사람에 추가</PrimaryButton></div>
           </>
         ) : (
           <>
@@ -1170,7 +1281,7 @@ function PeopleTab({ mode, openPerson, fromLink }: { mode: Mode; openPerson: (p:
 
   const segment = (
     <div className="mt-3 grid grid-cols-2 rounded-full bg-neutral-100 p-1 text-[13px]">
-      {([['mine', '내 사람', mode === 'importing' ? 42 : 214], ['imported', '가져온 사람', mode === 'importing' ? 128 : 86]] as const).map(([id, label, n]) => (
+      {([['mine', '내 사람', mode === 'importing' ? 37 : 58], ['imported', '가져온 사람', mode === 'importing' ? 483 : 449]] as const).map(([id, label, n]) => (
         <button key={id} onClick={() => setView(id)} className={`rounded-full py-1.5 ${view === id ? 'bg-white font-semibold shadow-sm' : 'text-neutral-500'}`}>
           {label} <span className="text-[11px] text-neutral-400">{n}</span>
         </button>
@@ -1200,13 +1311,13 @@ function PeopleTab({ mode, openPerson, fromLink }: { mode: Mode; openPerson: (p:
       {search}
       {segment}
       {mode === 'importing' ? (
-        <div className="mt-3 rounded-2xl bg-neutral-50 px-4 py-3 text-[12px] text-neutral-600">170명 가져옴, 링크드인 가져오는 중</div>
+        <div className="mt-3 rounded-2xl bg-neutral-50 px-4 py-3 text-[12px] text-neutral-600">확실한 37명만 먼저 묶었어요. 사람 정리를 마치면 나머지도 나눠요</div>
       ) : (
-        <div className="mt-3 flex items-center gap-2 rounded-2xl bg-[#25313D]/5 px-4 py-3 text-[12px]">
+        <button onClick={() => setMerging(true)} className="mt-3 flex w-full items-center gap-2 rounded-2xl bg-[#25313D]/5 px-4 py-3 text-left text-[12px]">
           <GitMerge size={14} className="text-[#25313D]" />
           <span>같은 사람일 수 있는 계정 <b>3건</b></span>
           <ChevronRight size={14} className="ml-auto text-neutral-400" />
-        </div>
+        </button>
       )}
       <div className="mt-3 flex gap-1.5 overflow-x-auto">
         {filters.map((f) => (
@@ -1221,6 +1332,7 @@ function PeopleTab({ mode, openPerson, fromLink }: { mode: Mode; openPerson: (p:
         {list.map((p) => <PersonRow key={p.id} p={p} onClick={() => openPerson(p)} />)}
       </div>
       {adding && <AddPersonSheet onClose={() => setAdding(false)} />}
+      {merging && <MergeSheet cands={ASK.slice(2)} onClose={() => setMerging(false)} />}
     </div>
   )
 }
@@ -1235,6 +1347,9 @@ function PersonDetail({ p, onBack }: { p: Person; onBack: () => void }) {
   const [facts, setFacts] = useState<Fact[]>(p.facts ?? [])
   const [pending, setPending] = useState<Fact[]>(p.pending ?? [])
   const [editingFact, setEditingFact] = useState<number | null>(null)
+  const [merging, setMerging] = useState(false)
+  const imported = IMPORTED.find((x) => x.id === p.id)
+  const [keep, setKeep] = useState<'mine' | 'hidden' | null>(null)
   const member = p.member || joined
 
   const confirm = (f: Fact, ok: boolean) => {
@@ -1271,6 +1386,23 @@ function PersonDetail({ p, onBack }: { p: Person; onBack: () => void }) {
 
         {p.origin === 'felore' && <p className="mt-3 text-[12px] text-neutral-500">펠로어에서 프로필을 보고 저장한 사람이에요</p>}
 
+        {imported && (
+          <Card className="mt-4 bg-neutral-50">
+            {keep ? (
+              <p className="text-[13px] font-medium text-emerald-600">{keep === 'mine' ? '내 사람에 추가했어요' : '숨겼어요. 다시 연락이 오면 알려드려요'}</p>
+            ) : (
+              <>
+                <p className="text-[13px] font-semibold">가져온 사람이에요</p>
+                <p className="mt-1 text-[12px] text-neutral-500">{imported.why}. 대화가 생기면 알아서 내 사람에 추가돼요.</p>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <button onClick={() => setKeep('hidden')} className="rounded-full border border-neutral-200 bg-white py-2 text-[12px]">숨기기</button>
+                  <button onClick={() => setKeep('mine')} className="rounded-full bg-[#25313D] py-2 text-[12px] font-semibold text-white">내 사람에 추가</button>
+                </div>
+              </>
+            )}
+          </Card>
+        )}
+
         <SectionTitle tag="new" right={<span className="text-[11px] text-neutral-400">{p.accounts.length}곳</span>}>모인 곳</SectionTitle>
         <Card className="!py-1 divide-y divide-[var(--color-border-soft)]">
           {p.accounts.map((a) => (
@@ -1279,7 +1411,7 @@ function PersonDetail({ p, onBack }: { p: Person; onBack: () => void }) {
               {a.why && <p className="mt-1 text-[11px] text-neutral-400">{a.why}</p>}
             </div>
           ))}
-          <button className="flex w-full items-center gap-1 py-2.5 text-[12px] text-neutral-500"><Plus size={12} /> 다른 계정 합치기</button>
+          <button onClick={() => setMerging(true)} className="flex w-full items-center gap-1 py-2.5 text-[12px] text-neutral-500"><Plus size={12} /> 다른 계정 합치기</button>
         </Card>
 
         {member && p.self && (
@@ -1390,6 +1522,7 @@ function PersonDetail({ p, onBack }: { p: Person; onBack: () => void }) {
           </Card>
         )}
       </div>
+      {merging && <MergeSheet cands={ASK.filter((q) => q.a.h.includes(p.name.slice(1)) || q.b.h.includes(p.name))} onClose={() => setMerging(false)} />}
     </div>
   )
 }
@@ -1454,11 +1587,11 @@ function MeTab({ mode }: { mode: Mode }) {
         <Row icon={<Clock size={18} />} label="묶음 처리 시간" desc="오전 10시, 오후 6시" tag="review" />
       </Card>
 
-      <SectionTitle>재화와 설정</SectionTitle>
-      <Card className="!py-1 divide-y divide-[var(--color-border-soft)]">
+      <SectionTitle>재화</SectionTitle>
+      <Card className="!py-1">
         <Row icon={<Coins size={18} />} label="내 재화" desc="12개 보유 (이름 미정)" tag="new" />
-        <Row icon={<Settings size={18} />} label="계정, 언어, 약관, 문의" href="/settings" tag="old" />
       </Card>
+      <p className="mt-3 text-center text-[11px] text-neutral-400">계정, 언어, 약관, 문의는 위의 설정 버튼에 있어요</p>
     </div>
   )
 }
@@ -1518,19 +1651,20 @@ function LoginNotice({ onClose }: { onClose: () => void }) {
 /**
  * 메모와 녹음은 "누구와"를 먼저 고른다. 끝나면 고른 사람들의 인물 카드에 요약과 할 일이 붙고,
  * 후속 연락 초안은 다음 묶음 때 오늘의 제안에 올라온다.
- * 고르는 대상은 네 갈래: 내 사람(펠로어에서 저장한 사람 포함), 가져온 사람(고르면 내 사람으로 옮김),
- * 펠로어 회원(고르면 저장), 처음 보는 사람(이름만으로 새 카드).
+ * 고르는 대상은 네 갈래: 내 사람(펠로어에서 저장한 사람 포함), 가져온 사람과 펠로어 회원(고르면 내 사람에 추가),
+ * 처음 보는 사람(이름만으로 새 카드).
  */
 type PickKind = 'mine' | 'imported' | 'member' | 'new'
 type Pick = { key: string; name: string; kind: PickKind; member: boolean }
 
 const PICK_NOTE: Record<Exclude<PickKind, 'mine'>, { chip: string; after: (n: string) => string }> = {
-  imported: { chip: '가져온 사람', after: (n) => `${n}님은 내 사람으로 옮겨요` },
-  member: { chip: '펠로어 회원', after: (n) => `${n}님은 펠로어 회원이라 저장하고, 본인이 쓴 프로필이 카드에 붙어요` },
+  imported: { chip: '가져온 사람', after: (n) => `${n}님을 내 사람에 추가해요` },
+  member: { chip: '펠로어 회원', after: (n) => `${n}님을 내 사람에 추가하고, 본인이 쓴 프로필이 카드에 붙어요` },
   new: { chip: '새 사람', after: (n) => `${n}님은 새 인물 카드를 만들어요. 나중에 연결한 곳에서 같은 사람이 보이면 합칠지 물어볼게요` },
 }
 
 function RecordSheet({ kind, onClose }: { kind: 'memo' | 'record'; onClose: () => void }) {
+  const { conn } = useConnect()
   // 지금 진행 중인 일정(오늘 오후 3시 도민혁)을 미리 골라둔다
   const [picked, setPicked] = useState<Pick[]>([{ key: PEOPLE[1].id, name: PEOPLE[1].name, kind: 'mine', member: true }])
   const [query, setQuery] = useState('')
@@ -1573,7 +1707,7 @@ function RecordSheet({ kind, onClose }: { kind: 'memo' | 'record'; onClose: () =
           <div className="mt-1"><PrivateBadge /></div>
 
           <div className="mt-4 flex items-center gap-2 rounded-xl bg-neutral-50 px-3 py-2 text-[12px] text-neutral-600">
-            <CalendarClock size={14} /> 지금 일정: 오후 3시 {PEOPLE[1].name}님과 미팅
+            <CalendarClock size={14} /> {conn.gcal.status === 'on' ? '지금 일정' : '카톡에서 잡은 약속'}: 오후 3시 {PEOPLE[1].name}님과 미팅
           </div>
 
           {hasPick && (
@@ -1604,13 +1738,13 @@ function RecordSheet({ kind, onClose }: { kind: 'memo' | 'record'; onClose: () =
             {imported.length > 0 && (
               <>
                 <p className="px-1 pt-3 text-[11px] font-semibold text-neutral-400">가져온 사람</p>
-                {imported.map((p) => option({ key: p.id, name: p.name, kind: 'imported', member: p.member }, `${p.why}. 고르면 내 사람으로 옮겨요`))}
+                {imported.map((p) => option({ key: p.id, name: p.name, kind: 'imported', member: p.member }, `${p.why}. 고르면 내 사람에 추가해요`))}
               </>
             )}
             {memberHit && (
               <>
                 <p className="px-1 pt-3 text-[11px] font-semibold text-neutral-400">펠로어 회원</p>
-                {option(memberHit, '제품 디자이너. 고르면 내 사람에 저장해요')}
+                {option(memberHit, '제품 디자이너. 고르면 내 사람에 추가해요')}
               </>
             )}
             {q && !exact && (
@@ -1738,18 +1872,18 @@ function UploadSheet({ onClose }: { onClose: () => void }) {
 
 /* ───────── 말하기 (채팅) ───────── */
 
-type Msg = { from: 'me' | 'ai'; text: string; merge?: { a: string; b: string } }
+type Msg = { from: 'me' | 'ai'; text: string; merge?: MergeQ }
 
 const CHAT_SEED: Msg[] = [
   { from: 'me', text: '도민혁이랑 인스타 @minhyuk.run 같은 사람이야, 합쳐줘' },
-  { from: 'ai', text: '이렇게 합칠게요. 맞으면 눌러주세요.', merge: { a: '도민혁 (카톡)', b: '@minhyuk.run (인스타)' } },
+  { from: 'ai', text: '이렇게 합칠게요. 맞으면 눌러주세요.', merge: { a: { ch: 'kakao', h: '도민혁' }, b: { ch: 'ig', h: '@minhyuk.run' }, why: '말씀하신 두 계정이에요' } },
   { from: 'me', text: '민혁이한테는 반말로 해. 대학 동기야' },
   { from: 'ai', text: '도민혁님 관계를 "반말, 대학 동기"로 저장했어요. 다음 답장 초안부터 반영할게요.' },
 ]
 
 function ChatScreen({ onClose }: { onClose: () => void }) {
   const [msgs, setMsgs] = useState<Msg[]>(CHAT_SEED)
-  const [merged, setMerged] = useState(false)
+  const [merged, setMerged] = useState<MergeAnswer | undefined>()
   const [input, setInput] = useState('')
   const send = (text: string) => {
     if (!text.trim()) return
@@ -1770,13 +1904,7 @@ function ChatScreen({ onClose }: { onClose: () => void }) {
             <div className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed ${m.from === 'me' ? 'bg-[#25313D] text-white' : 'bg-neutral-100'}`}>
               {m.text}
               {m.merge && (
-                <div className="mt-2 rounded-xl bg-white p-3">
-                  <div className="flex items-center gap-2 text-[12px]"><GitMerge size={13} /> {m.merge.a}</div>
-                  <div className="ml-5 text-[12px] text-neutral-500">+ {m.merge.b}</div>
-                  {merged
-                    ? <p className="mt-2 text-[12px] font-medium text-emerald-600">합쳤어요</p>
-                    : <button onClick={() => setMerged(true)} className="mt-2 w-full rounded-full bg-[#25313D] py-1.5 text-[12px] font-semibold text-white">합치기</button>}
-                </div>
+                <div className="mt-2"><MergeAskCard q={m.merge} onAnswer={setMerged} done={merged} /></div>
               )}
             </div>
           </div>
@@ -1815,6 +1943,7 @@ export default function V2IaPage() {
   const [flow, setFlow] = useState<Src | null>(null)
   const [detail, setDetail] = useState<Src | null>(null)
   const [sort, setSort] = useState(false)
+  const [searching, setSearching] = useState(false)
 
   const connectCtx = {
     conn,
@@ -1824,8 +1953,8 @@ export default function V2IaPage() {
     openSort: mode === 'new' || mode === 'importing' ? () => { setPerson(null); setHub(false); setSort(true) } : undefined,
   }
 
-  const changeMode = (m: Mode) => { setMode(m); setPerson(null); setHub(false); setSort(false); setConn(initConn(m)) }
-  const goTab = (t: Tab) => { setPerson(null); setHub(false); setSort(false); setTab(t) }
+  const changeMode = (m: Mode) => { setMode(m); setPerson(null); setHub(false); setSort(false); setSearching(false); setConn(initConn(m)) }
+  const goTab = (t: Tab) => { setPerson(null); setHub(false); setSort(false); setSearching(false); setTab(t) }
   const titles: Record<Tab, string> = { today: '오늘의 제안', people: '내 사람들', me: '내 소개' }
 
   const tabs: { id: Tab; label: string; icon: ReactNode }[] = [
@@ -1857,13 +1986,15 @@ export default function V2IaPage() {
         <div className="flex-1 overflow-y-auto">
           {person ? (
             <PersonDetail key={person.id} p={person} onBack={() => setPerson(null)} />
+          ) : searching ? (
+            <FeloreSearch mode={mode} onBack={() => setSearching(false)} openPerson={setPerson} />
           ) : sort ? (
             <SortFlow onBack={() => setSort(false)} onDone={() => { setSort(false); setMode('active'); setTab('people') }} />
           ) : hub ? (
             <ConnectScreen onBack={() => setHub(false)} onDetail={setDetail} />
           ) : (
             <>
-              <Header title={titles[tab]} />
+              <Header title={titles[tab]} onSearch={() => setSearching(true)} />
               {tab === 'today' && <TodayTab mode={mode} openPerson={setPerson} />}
               {tab === 'people' && <PeopleTab mode={mode} openPerson={setPerson} fromLink={fromLink} />}
               {tab === 'me' && <MeTab mode={mode} />}
@@ -1885,7 +2016,7 @@ export default function V2IaPage() {
             <button
               key={t.id}
               onClick={() => goTab(t.id)}
-              className={`flex w-20 flex-col items-center gap-0.5 text-[11px] ${tab === t.id && !person && !hub && !sort ? 'font-semibold text-[#0D0D0D]' : 'text-neutral-400'}`}
+              className={`flex w-20 flex-col items-center gap-0.5 text-[11px] ${tab === t.id && !person && !hub && !sort && !searching ? 'font-semibold text-[#0D0D0D]' : 'text-neutral-400'}`}
             >
               {t.icon}
               {t.label}

@@ -7,18 +7,19 @@
  * 데이터는 전부 허구 인물. 기존 화면으로 가는 링크는 실제 목업 화면으로 연결된다.
  */
 
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import {
   Bell, Settings, Sparkles, Users, User, ChevronRight, ChevronLeft, Search,
   Mic, PenLine, Lock, CalendarClock, MessageCircle, Send, Upload, Plus,
   QrCode, BarChart3, Coins, Eye, ShieldCheck, BadgeCheck, X, UserPlus, Check, Square,
   Clock, GitMerge, ArrowUp, FileText, Image as ImageIcon, RefreshCw, CalendarDays, Mail, TriangleAlert, Menu,
+  Phone, KeyRound, Copy, Link2,
 } from 'lucide-react'
 
 type Tab = 'today' | 'people' | 'me'
 type Mode = 'guest' | 'new' | 'importing' | 'active'
-type Channel = 'ig' | 'in' | 'kakao' | 'tg' | 'mail' | 'cal' | 'phone'
+type Channel = 'ig' | 'in' | 'kakao' | 'tg' | 'mail' | 'cal' | 'phone' | 'call'
 
 type Person = {
   id: string
@@ -91,29 +92,34 @@ const CH: Record<Channel, { label: string; cls: string }> = {
   mail: { label: '메일', cls: 'bg-neutral-100 text-neutral-600' },
   cal: { label: '캘린더', cls: 'bg-violet-50 text-violet-600' },
   phone: { label: '연락처', cls: 'bg-emerald-50 text-emerald-700' },
+  call: { label: '통화', cls: 'bg-teal-50 text-teal-700' },
 }
 
 const personById = (id: string) => PEOPLE.find((p) => p.id === id)!
 
 /* ───────── 연결 ─────────
- * 인스타, 링크드인은 펠로어 화면에서 직접 로그인(서버에서 웹 접속), 텔레그램은 공식 API,
- * 지메일, 구글 캘린더는 구글 동의 화면으로 권한을 하나씩 받는다. 카톡은 대화 파일 올리기만.
- * 휴대폰 연락처는 앱 권한으로 이름과 번호만 읽는다. 카톡 대화방 이름과 메일 서명을 사람으로 묶는 기준이 된다.
+ * 인스타, 링크드인 에이전트 대행은 로그인 정보를 받아 사용자가 만든 암호화 키로 잠가 보관하고 서버에서 로그인한다(피클 방식).
+ * 인스타 프로필 연동(본인 확인, 피드 분석)은 내 소개에서 DM 코드로 따로 한다(망원동 이자카야 방식).
+ * 텔레그램은 공식 API, 지메일, 구글 캘린더는 구글 동의 화면으로 권한을 하나씩 받는다.
+ * 카톡은 대화방의 대화 내보내기를 공유하기로 받는다. 자동 내보내기는 하지 않는다.
+ * 휴대폰 연락처는 이름과 번호를 읽고 계속 동기화한다. 통화 녹음은 갤럭시는 녹음 파일 권한, 아이폰은 공유하기로 받는다.
+ * 원천 대화와 녹음은 요약을 만든 뒤 지운다.
  */
 
-type Src = 'contacts' | 'ig' | 'in' | 'tg' | 'kakao' | 'gmail' | 'gcal'
+type Src = 'contacts' | 'calls' | 'ig' | 'in' | 'tg' | 'kakao' | 'gmail' | 'gcal'
 type Level = 'read' | 'draft' | 'send'
 type Conn = { status: 'on' | 'off' | 'broken'; level: Level; last?: string }
 type ConnMap = Record<Src, Conn>
 
 const ALL_LEVELS: Level[] = ['read', 'draft', 'send']
 
-const SRC: Record<Src, { label: string; ch: Channel; group: 'phone' | 'talk' | 'google'; how: 'device' | 'web' | 'api' | 'google' | 'file'; desc: string; levels: Level[]; note?: string }> = {
-  contacts: { label: '휴대폰 연락처', ch: 'phone', group: 'phone', how: 'device', desc: '저장된 이름과 번호', levels: ['read'], note: '이름과 번호만 읽어요. 연락처를 고치거나 지우지 않아요' },
-  ig: { label: '인스타그램', ch: 'ig', group: 'talk', how: 'web', desc: 'DM과 댓글을 남긴 사람', levels: ALL_LEVELS },
-  in: { label: '링크드인', ch: 'in', group: 'talk', how: 'web', desc: '1촌과 메시지 상대', levels: ALL_LEVELS },
+const SRC: Record<Src, { label: string; ch: Channel; group: 'phone' | 'talk' | 'google'; how: 'device' | 'web' | 'api' | 'google' | 'share'; desc: string; levels: Level[]; note?: string }> = {
+  contacts: { label: '휴대폰 연락처', ch: 'phone', group: 'phone', how: 'device', desc: '이름과 번호, 바뀌면 계속 맞춰요', levels: ['read'], note: '이름과 번호만 읽고, 추가하거나 바꾼 연락처는 계속 맞춰요. 연락처를 고치거나 지우지 않아요' },
+  calls: { label: '통화 녹음', ch: 'call', group: 'phone', how: 'device', desc: '휴대폰이 녹음한 통화', levels: ['read'], note: '고른 녹음만 요약해서 인물 카드에 붙이고, 녹음은 지워요' },
+  ig: { label: '인스타그램', ch: 'ig', group: 'talk', how: 'web', desc: 'DM과 댓글을 대신 읽고 답해요', levels: ALL_LEVELS },
+  in: { label: '링크드인', ch: 'in', group: 'talk', how: 'web', desc: '1촌과 메시지를 대신 읽고 답해요', levels: ALL_LEVELS },
   tg: { label: '텔레그램', ch: 'tg', group: 'talk', how: 'api', desc: '대화 상대', levels: ALL_LEVELS },
-  kakao: { label: '카톡', ch: 'kakao', group: 'talk', how: 'file', desc: '내보낸 대화 파일', levels: ['read', 'draft'], note: '카톡은 대화 파일만 읽을 수 있어요. 보낼 때는 초안을 복사하거나 카톡 공유로 보내요' },
+  kakao: { label: '카톡', ch: 'kakao', group: 'talk', how: 'share', desc: '대화방에서 내보낸 대화', levels: ['read', 'draft'], note: '카톡은 대화방에서 내보낸 대화만 읽어요. 보낼 때는 초안을 복사하거나 카톡 공유로 보내요' },
   gmail: { label: '지메일', ch: 'mail', group: 'google', how: 'google', desc: '주고받은 메일 상대', levels: ALL_LEVELS },
   gcal: { label: '구글 캘린더', ch: 'cal', group: 'google', how: 'google', desc: '일정과 참석자', levels: ['read'], note: '일정 만들기는 다음 단계예요' },
 }
@@ -127,7 +133,7 @@ const LEVEL: Record<Level, { t: string; d: string }> = {
 const off = (level: Level = 'draft'): Conn => ({ status: 'off', level })
 
 function initConn(mode: Mode): ConnMap {
-  const base: ConnMap = { contacts: off('read'), ig: off(), in: off(), tg: off(), kakao: off(), gmail: off(), gcal: off('read') }
+  const base: ConnMap = { contacts: off('read'), calls: off('read'), ig: off(), in: off(), tg: off(), kakao: off(), gmail: off(), gcal: off('read') }
   if (mode === 'importing') {
     return { ...base, contacts: { status: 'on', level: 'read', last: '방금' }, ig: { status: 'on', level: 'draft', last: '방금' }, kakao: { status: 'on', level: 'draft', last: '방금' }, in: { status: 'on', level: 'draft', last: '가져오는 중' } }
   }
@@ -135,6 +141,7 @@ function initConn(mode: Mode): ConnMap {
     return {
       ...base,
       contacts: { status: 'on', level: 'read', last: '오늘 아침' },
+      calls: { status: 'on', level: 'read', last: '오후 4시' },
       ig: { status: 'on', level: 'send', last: '10분 전' },
       in: { status: 'broken', level: 'send', last: '어제 밤' },
       tg: { status: 'on', level: 'send', last: '10분 전' },
@@ -152,7 +159,9 @@ const ConnectCtx = createContext<{
   openHub: () => void
   /** 가져온 계정을 사람으로 묶고 나누는 화면. 가입 직후와 가져오는 중에만 */
   openSort?: () => void
-}>({ conn: initConn('new'), start: () => {}, update: () => {}, openHub: () => {} })
+  /** 내 소개 > 인스타 연동. DM 코드로 내 계정을 확인하고 피드를 분석한다 */
+  openInsta: () => void
+}>({ conn: initConn('new'), start: () => {}, update: () => {}, openHub: () => {}, openInsta: () => {} })
 
 const useConnect = () => useContext(ConnectCtx)
 
@@ -406,16 +415,16 @@ function BriefingCard({ person, sample, onOpen, from }: { person: Person; sample
  */
 function ConnectList() {
   const { conn, start } = useConnect()
-  const order: Src[] = ['contacts', 'ig', 'kakao', 'in', 'gmail', 'tg', 'gcal']
+  const order: Src[] = ['contacts', 'calls', 'ig', 'kakao', 'in', 'gmail', 'tg', 'gcal']
   return (
     <Card className="!py-1 divide-y divide-[var(--color-border-soft)]">
       {order.map((s) => (
         <Row
           key={s}
           icon={<ChannelBadge ch={SRC[s].ch} />}
-          label={s === 'kakao' ? '카톡 대화 올리기' : `${SRC[s].label} 연결`}
+          label={s === 'kakao' ? '카톡 대화 보내기' : s === 'calls' ? '통화 녹음 가져오기' : `${SRC[s].label} 연결`}
           desc={SRC[s].desc}
-          tag={s === 'contacts' ? 'new' : undefined}
+          tag={s === 'contacts' || s === 'calls' ? 'new' : undefined}
           onClick={conn[s].status === 'on' ? undefined : () => start(s)}
           right={conn[s].status === 'on' ? <Check size={16} className="text-emerald-600" /> : undefined}
         />
@@ -461,14 +470,14 @@ function ConnectScreen({ onBack, onDetail }: { onBack: () => void; onDetail: (s:
                     key={s}
                     icon={<ChannelBadge ch={SRC[s].ch} />}
                     label={SRC[s].label}
-                    desc={<ConnStatus c={c} file={SRC[s].how === 'file'} />}
-                    onClick={() => (c.status === 'on' && SRC[s].how !== 'file' ? onDetail(s) : start(s))}
+                    desc={<ConnStatus c={c} file={SRC[s].how === 'share'} />}
+                    onClick={() => (c.status === 'on' && SRC[s].how !== 'share' ? onDetail(s) : start(s))}
                     right={
-                      SRC[s].how === 'file' ? <span className="rounded-full border border-neutral-200 px-3 py-1 text-[12px]">{c.status === 'on' ? '새로 올리기' : '올리기'}</span>
+                      SRC[s].how === 'share' ? <span className="rounded-full border border-neutral-200 px-3 py-1 text-[12px]">{c.status === 'on' ? '새로 올리기' : '올리기'}</span>
                         : c.status === 'on' ? undefined
                         : c.status === 'broken'
                           ? <span className="rounded-full bg-rose-500 px-3 py-1 text-[12px] font-semibold text-white">다시 연결</span>
-                          : <span className="rounded-full border border-neutral-200 px-3 py-1 text-[12px]">{s === 'kakao' ? '올리기' : s === 'contacts' ? '허용' : '연결'}</span>
+                          : <span className="rounded-full border border-neutral-200 px-3 py-1 text-[12px]">{s === 'contacts' || s === 'calls' ? '허용' : '연결'}</span>
                     }
                   />
                 )
@@ -477,7 +486,8 @@ function ConnectScreen({ onBack, onDetail }: { onBack: () => void; onDetail: (s:
           </div>
         ))}
         <div className="mt-6 space-y-1.5 rounded-2xl bg-neutral-50 px-4 py-3 text-[12px] leading-relaxed text-neutral-500">
-          <p>비밀번호는 펠로어에 저장하지 않아요. 로그인 상태만 암호화해서 보관해요.</p>
+          <p>로그인 정보는 내가 만든 암호화 키로 잠가서 보관해요. 펠로어도 열어볼 수 없어요.</p>
+          <p>대화와 녹음은 정리한 뒤 지우고 요약만 남겨요.</p>
           <p>보내기까지 골라도 내가 승인한 초안만 보내요.</p>
           <p>연결을 끊으면 그곳에서 가져온 대화도 함께 지워요.</p>
         </div>
@@ -528,22 +538,29 @@ function ConnectDetailSheet({ src, onClose }: { src: Src; onClose: () => void })
 }
 
 /**
- * 연결 흐름. 인스타, 링크드인은 펠로어 화면에서 로그인한 뒤 계정 제한 고지에 동의한다.
- * 끊겼다가 다시 연결할 때는 동의를 건너뛴다. 구글은 구글 동의 화면에서 이 항목 권한만 받는다.
+ * 연결 흐름.
+ * 인스타, 링크드인(에이전트 대행)은 피클 방식: 처음이면 암호화 키를 만들고, 로그인 정보를 넣고, 2단계 인증은 안내대로 승인한 뒤
+ * 계정 제한 고지에 동의한다. 다시 연결할 때는 키 만들기와 동의를 건너뛴다.
+ * 통화 녹음은 갤럭시는 녹음 파일 권한, 아이폰은 공유하기 안내. 구글은 구글 동의 화면에서 이 항목 권한만 받는다.
  */
 function ConnectFlowSheet({ src, onClose }: { src: Src; onClose: () => void }) {
   const { conn, update, openSort } = useConnect()
   const meta = SRC[src]
   const reconnect = conn[src].status === 'broken'
-  const [step, setStep] = useState<'device' | 'login' | 'consent' | 'google' | 'done'>(meta.how === 'google' ? 'google' : meta.how === 'device' ? 'device' : 'login')
+  // 목업: 다른 곳을 이미 로그인 정보로 연결했다면 암호화 키가 있다
+  const hasKey = reconnect || (['ig', 'in'] as Src[]).some((s) => s !== src && conn[s].status !== 'off')
+  const first = meta.how === 'google' ? 'google' : meta.how === 'device' ? 'device' : meta.how === 'web' && !hasKey ? 'key' : 'login'
+  const [step, setStep] = useState<'device' | 'key' | 'login' | 'verify' | 'consent' | 'google' | 'done'>(first)
   const [agree, setAgree] = useState(false)
   const [level, setLevel] = useState<Level>(conn[src].level)
+  const [phone, setPhone] = useState<'galaxy' | 'iphone'>('galaxy')
   const otherGoogle = (['gmail', 'gcal'] as Src[]).find((s) => s !== src && conn[s].status === 'on')
 
   const finish = () => { update(src, { status: 'on', level, last: '방금' }); setStep('done') }
 
   const doneText: Record<Src, string> = {
-    contacts: '연락처의 이름과 번호로 카톡, 메일 상대가 누구인지 알아볼게요',
+    contacts: '연락처의 이름과 번호로 카톡, 메일 상대가 누구인지 알아볼게요. 바뀐 연락처는 계속 맞춰요',
+    calls: phone === 'galaxy' ? '새 통화 녹음이 생기면 가져올지 물어볼게요' : '통화 녹음을 공유하면 그 사람 카드에 요약을 붙여요',
     ig: '대화 상대를 가져오고 있어요. 다 되면 내 사람들에 쌓여요',
     in: '대화 상대를 가져오고 있어요. 다 되면 내 사람들에 쌓여요',
     tg: '대화 상대를 가져오고 있어요. 다 되면 내 사람들에 쌓여요',
@@ -559,35 +576,81 @@ function ConnectFlowSheet({ src, onClose }: { src: Src; onClose: () => void }) {
         <button onClick={onClose}><X size={20} /></button>
       </div>
 
-      {step === 'device' && (
+      {step === 'device' && src === 'contacts' && (
         <>
           <p className="mt-3 text-[13px] leading-relaxed text-neutral-600">연락처 이름과 번호가 있으면 카톡 대화방 이름, 메일 서명, 펠로어 회원 번호로 같은 사람을 정확하게 묶을 수 있어요.</p>
-          <div className="mx-auto mt-4 max-w-[270px] overflow-hidden rounded-2xl bg-neutral-100 text-center">
-            <p className="px-4 pt-4 text-[11px] text-neutral-400">휴대폰이 보여주는 창</p>
-            <p className="px-4 pt-1 text-[14px] font-semibold">&lsquo;펠로어&rsquo;가 연락처에 접근하려고 해요</p>
-            <p className="px-4 pb-4 pt-1 text-[12px] text-neutral-500">{meta.note}</p>
-            <div className="grid grid-cols-2 border-t border-neutral-200 text-[14px]">
-              <button onClick={onClose} className="py-3 text-neutral-500">허용 안 함</button>
-              <button onClick={finish} className="border-l border-neutral-200 py-3 font-semibold text-blue-600">허용</button>
-            </div>
-          </div>
+          <OsDialog title="‘펠로어’가 연락처에 접근하려고 해요" body={meta.note} onDeny={onClose} onAllow={finish} />
           <p className="mt-4 text-center text-[11px] text-neutral-400">앱에서 열려요. 웹에서는 연락처 파일(vcf)을 올려요</p>
         </>
       )}
 
-      {step === 'login' && (
+      {step === 'device' && src === 'calls' && (
+        <>
+          <p className="mt-3 text-[13px] leading-relaxed text-neutral-600">펠로어가 통화를 직접 녹음하지는 않아요. 휴대폰이 녹음한 통화 중 고른 것만 요약해서 그 사람 카드에 붙여요.</p>
+          <div className="mt-4 grid grid-cols-2 rounded-full bg-neutral-100 p-1 text-[13px]">
+            {([['galaxy', '갤럭시'], ['iphone', '아이폰']] as const).map(([k, l]) => (
+              <button key={k} onClick={() => setPhone(k)} className={`rounded-full py-2 ${phone === k ? 'bg-white font-semibold shadow-sm' : 'text-neutral-500'}`}>{l}</button>
+            ))}
+          </div>
+          {phone === 'galaxy' ? (
+            <>
+              <p className="mt-4 text-[12px] leading-relaxed text-neutral-500">전화 앱 설정에서 통화 자동 녹음을 켜 두면, 녹음 파일을 읽어 새 녹음이 생길 때마다 가져올지 물어봐요.</p>
+              <OsDialog title="‘펠로어’에서 기기의 음악 및 오디오에 액세스하도록 허용하시겠습니까?" body="통화 녹음 파일을 찾는 데만 써요" onDeny={onClose} onAllow={finish} />
+            </>
+          ) : (
+            <>
+              <p className="mt-4 text-[12px] leading-relaxed text-neutral-500">아이폰은 다른 앱이 통화 녹음을 가져갈 수 없어서, 녹음할 때마다 직접 보내 주셔야 해요.</p>
+              <ShareSteps steps={['통화 중 왼쪽 위 녹음 버튼으로 녹음 (상대에게 안내가 나가요)', '메모 앱에 저장된 통화 녹음 열기', '공유 버튼 누르기', '펠로어 고르기']} />
+              <div className="mt-5"><PrimaryButton onClick={finish}>알겠어요</PrimaryButton></div>
+            </>
+          )}
+        </>
+      )}
+
+      {step === 'key' && (
+        <>
+          <div className="mt-4 flex items-center gap-2 text-[15px] font-bold"><KeyRound size={18} />먼저 암호화 키를 만들어요</div>
+          <p className="mt-2 text-[13px] leading-relaxed text-neutral-600">로그인 정보는 이 키로 잠가서 보관해요. 키는 나만 알고, 펠로어도 열어볼 수 없어요. 한 번 만들면 다른 곳을 연결할 때도 써요.</p>
+          <input type="password" placeholder="암호화 키 (6자 이상)" className="mt-4 w-full rounded-xl border border-neutral-200 px-3 py-3 text-[13px] outline-none" />
+          <input type="password" placeholder="한 번 더 입력" className="mt-2 w-full rounded-xl border border-neutral-200 px-3 py-3 text-[13px] outline-none" />
+          <p className="mt-2 text-[11px] text-neutral-400">키를 잊으면 연결한 곳을 다시 로그인해야 해요</p>
+          <div className="mt-5"><PrimaryButton onClick={() => setStep('login')}>키 만들기</PrimaryButton></div>
+        </>
+      )}
+
+      {step === 'login' && meta.how === 'api' && (
         <>
           <div className="mt-4 rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 px-4 py-8 text-center">
             <Lock size={22} className="mx-auto text-neutral-400" />
-            <p className="mt-2 text-[13px] font-semibold">{meta.label} 로그인 화면</p>
-            <p className="mt-1 text-[12px] text-neutral-500">
-              {meta.how === 'api' ? '텔레그램 앱으로 받은 로그인 코드를 입력해요' : `${meta.label} 공식 로그인 화면이 펠로어 안에서 열려요`}
-            </p>
+            <p className="mt-2 text-[13px] font-semibold">{meta.label} 로그인</p>
+            <p className="mt-1 text-[12px] text-neutral-500">텔레그램 앱으로 받은 로그인 코드를 입력해요</p>
           </div>
-          <p className="mt-3 text-[12px] text-neutral-500">비밀번호는 펠로어에 저장하지 않아요. 로그인 상태만 암호화해서 보관해요.</p>
-          <div className="mt-5">
-            <PrimaryButton onClick={() => (meta.how === 'web' && !reconnect ? setStep('consent') : finish())}>로그인했어요 (목업)</PrimaryButton>
-          </div>
+          <div className="mt-5"><PrimaryButton onClick={finish}>로그인했어요 (목업)</PrimaryButton></div>
+        </>
+      )}
+
+      {step === 'login' && meta.how === 'web' && (
+        <>
+          <p className="mt-4 text-[13px] text-neutral-600">{meta.label} 로그인 정보를 넣어 주세요. 펠로어 서버가 이 계정으로 로그인해서 대신 읽고 답해요.</p>
+          <input
+            defaultValue={src === 'ig' ? 'kimfelo' : ''}
+            placeholder={src === 'ig' ? '인스타그램 아이디' : '링크드인 이메일'}
+            className="mt-4 w-full rounded-xl border border-neutral-200 px-3 py-3 text-[13px] outline-none"
+          />
+          {src === 'ig' && <p className="mt-1 text-[11px] text-emerald-700">내 소개에서 확인한 계정이라 미리 채웠어요</p>}
+          <input type="password" placeholder="비밀번호" className="mt-2 w-full rounded-xl border border-neutral-200 px-3 py-3 text-[13px] outline-none" />
+          <p className="mt-2 flex items-center gap-1 text-[11px] text-neutral-500"><KeyRound size={12} />내 암호화 키로 잠가서 보관해요</p>
+          <div className="mt-5"><PrimaryButton onClick={() => setStep('verify')}>로그인</PrimaryButton></div>
+        </>
+      )}
+
+      {step === 'verify' && (
+        <>
+          <p className="mt-4 text-[15px] font-bold">{meta.label}에서 로그인 확인을 요청했어요</p>
+          <p className="mt-2 text-[13px] leading-relaxed text-neutral-600">휴대폰의 {meta.label} 앱이나 문자로 온 확인 요청을 승인하거나, 받은 코드를 넣어 주세요. 새 기기에서 로그인했다는 알림이 갈 수 있어요.</p>
+          <input placeholder="인증 코드 6자리" className="mt-4 w-full rounded-xl border border-neutral-200 px-3 py-3 text-center text-[16px] tracking-[0.3em] outline-none" />
+          <div className="mt-5"><PrimaryButton onClick={() => (reconnect ? finish() : setStep('consent'))}>확인했어요</PrimaryButton></div>
+          <p className="mt-2 text-center text-[11px] text-neutral-400">말하기에서 연결을 요청해도 같은 순서로 채팅 안에서 안내해요</p>
         </>
       )}
 
@@ -642,7 +705,7 @@ function ConnectFlowSheet({ src, onClose }: { src: Src; onClose: () => void }) {
           <Check size={28} className="mx-auto text-emerald-600" />
           <p className="mt-3 text-[16px] font-bold">{reconnect ? '다시 연결됐어요' : '연결됐어요'}</p>
           <p className="mt-1 text-[13px] text-neutral-500">{reconnect ? '그 사이 온 메시지를 정리해서 다음 묶음에 올릴게요' : doneText[src]}</p>
-          {openSort && !reconnect && src !== 'gcal' ? (
+          {openSort && !reconnect && src !== 'gcal' && src !== 'calls' ? (
             <>
               <div className="mt-5"><PrimaryButton onClick={() => { onClose(); openSort() }}>사람 정리 시작</PrimaryButton></div>
               <button onClick={onClose} className="mt-3 w-full text-center text-[13px] text-neutral-500">다른 곳도 연결하기</button>
@@ -653,6 +716,66 @@ function ConnectFlowSheet({ src, onClose }: { src: Src; onClose: () => void }) {
         </div>
       )}
     </Sheet>
+  )
+}
+
+/** 휴대폰이 보여주는 권한 창 흉내 */
+function OsDialog({ title, body, onDeny, onAllow }: { title: string; body?: string; onDeny: () => void; onAllow: () => void }) {
+  return (
+    <div className="mx-auto mt-4 max-w-[270px] overflow-hidden rounded-2xl bg-neutral-100 text-center">
+      <p className="px-4 pt-4 text-[11px] text-neutral-400">휴대폰이 보여주는 창</p>
+      <p className="px-4 pt-1 text-[14px] font-semibold">{title}</p>
+      {body && <p className="px-4 pb-4 pt-1 text-[12px] text-neutral-500">{body}</p>}
+      <div className="grid grid-cols-2 border-t border-neutral-200 text-[14px]">
+        <button onClick={onDeny} className="py-3 text-neutral-500">허용 안 함</button>
+        <button onClick={onAllow} className="border-l border-neutral-200 py-3 font-semibold text-blue-600">허용</button>
+      </div>
+    </div>
+  )
+}
+
+/** 다른 앱에서 공유하기로 펠로어에 보내는 순서 */
+function ShareSteps({ steps }: { steps: string[] }) {
+  return (
+    <ol className="mt-3 space-y-2">
+      {steps.map((t, i) => (
+        <li key={t} className="flex items-start gap-3 rounded-xl bg-neutral-50 px-3 py-2.5 text-[13px]">
+          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#25313D] text-[11px] font-semibold text-white">{i + 1}</span>
+          {t}
+        </li>
+      ))}
+    </ol>
+  )
+}
+
+/** 분석하는 동안 확인 단계를 하나씩 체크해 보여준다 (망원동 이자카야 방식) */
+function ProgressSteps({ steps, onDone }: { steps: string[]; onDone?: () => void }) {
+  const [n, setN] = useState(0)
+  const doneRef = useRef(onDone)
+  doneRef.current = onDone
+  useEffect(() => {
+    if (n >= steps.length) {
+      const t = setTimeout(() => doneRef.current?.(), 500)
+      return () => clearTimeout(t)
+    }
+    const t = setTimeout(() => setN(n + 1), 800)
+    return () => clearTimeout(t)
+  }, [n, steps.length])
+  return (
+    <ul className="space-y-2.5">
+      {steps.map((t, i) => (
+        <li key={t} className={`flex items-center gap-2.5 text-[14px] ${i < n ? 'text-[var(--color-text-strong)]' : i === n ? 'text-neutral-600' : 'text-neutral-300'}`}>
+          {i < n ? (
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500 text-white"><Check size={12} /></span>
+          ) : i === n ? (
+            <span className="h-5 w-5 animate-spin rounded-full border-2 border-neutral-200 border-t-[#25313D]" />
+          ) : (
+            <span className="h-5 w-5 rounded-full border-2 border-neutral-200" />
+          )}
+          {t}
+        </li>
+      ))}
+    </ul>
   )
 }
 
@@ -692,7 +815,7 @@ function ReconnectCard({ src }: { src: Src }) {
 const GATHER: Partial<Record<Src, { n: number; unit: string }>> = {
   contacts: { n: 486, unit: '연락처 486개' },
   ig: { n: 128, unit: 'DM과 댓글 상대 128명' },
-  kakao: { n: 42, unit: '대화 파일 3개에서 42명' },
+  kakao: { n: 42, unit: '대화방 3개에서 42명' },
   in: { n: 97, unit: '1촌과 메시지 상대 97명' },
   gmail: { n: 210, unit: '메일 상대 210명' },
   tg: { n: 31, unit: '대화 상대 31명' },
@@ -910,6 +1033,74 @@ function SortEntryCard() {
   )
 }
 
+/** 휴대폰이 녹음한 통화를 가져올지 묻는 카드. 고르면 요약하고 녹음은 지운다 */
+function CallImportCard({ openPerson }: { openPerson: (p: Person) => void }) {
+  const p = PEOPLE[1]
+  const [state, setState] = useState<'ask' | 'working' | 'done' | 'skip'>('ask')
+  if (state === 'skip') return null
+  return (
+    <Card className="mt-2">
+      <div className="flex items-center gap-3">
+        <Avatar name={p.name} size={36} member={p.member} />
+        <div className="min-w-0 flex-1">
+          <div className="text-[13px]"><span className="font-semibold">{p.name}</span>님과 통화한 녹음이 있어요</div>
+          <div className="flex items-center gap-1 text-[11px] text-neutral-400"><Phone size={11} />오늘 오후 4:12, 12분</div>
+        </div>
+      </div>
+      {state === 'ask' && (
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <button onClick={() => setState('skip')} className="rounded-full border border-neutral-200 py-2 text-[13px]">괜찮아요</button>
+          <button onClick={() => setState('working')} className="rounded-full bg-[#25313D] py-2 text-[13px] font-semibold text-white">가져오기</button>
+        </div>
+      )}
+      {state === 'working' && (
+        <div className="mt-4">
+          <ProgressSteps steps={['받아쓰기', '약속과 할 일 찾기', `${p.name}님 카드에 요약 붙이기`, '녹음 지우기']} onDone={() => setState('done')} />
+        </div>
+      )}
+      {state === 'done' && (
+        <div className="mt-3 rounded-xl bg-neutral-50 px-3 py-2.5 text-[12px] leading-relaxed text-neutral-600">
+          <p>다음 주 화요일 판교에서 다시 만나기로 했어요. 물류 데모 자료를 먼저 보내기로 했어요.</p>
+          <button onClick={() => openPerson(p)} className="mt-1.5 flex items-center gap-0.5 font-semibold text-[#25313D]">카드에서 보기<ChevronRight size={12} /></button>
+          <p className="mt-1 text-[11px] text-neutral-400">녹음은 지웠어요</p>
+        </div>
+      )}
+    </Card>
+  )
+}
+
+/** 오래 안 보낸 카톡 방을 다시 보내자고 묻는 카드 */
+function KakaoStaleCard() {
+  const { start } = useConnect()
+  const [skip, setSkip] = useState(false)
+  if (skip) return null
+  return (
+    <Card className="mt-2">
+      <div className="flex items-center gap-3">
+        <ChannelBadge ch="kakao" />
+        <div className="min-w-0 flex-1 text-[13px]"><span className="font-semibold">한서윤</span>님 방, 마지막으로 보낸 지 2주 지났어요</div>
+      </div>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <button onClick={() => setSkip(true)} className="rounded-full border border-neutral-200 py-2 text-[13px]">나중에</button>
+        <button onClick={() => start('kakao')} className="rounded-full bg-[#25313D] py-2 text-[13px] font-semibold text-white">새로 보내기</button>
+      </div>
+    </Card>
+  )
+}
+
+/** 가입 직후 맨 위. 인스타로 내 소개부터 채우게 한다 */
+function InstaStartCard() {
+  const { openInsta } = useConnect()
+  return (
+    <Card className="mt-4 !border-transparent !bg-[#25313D] text-white" onClick={openInsta}>
+      <p className="text-[12px] opacity-70">1분이면 돼요</p>
+      <p className="mt-1 text-[17px] font-bold leading-snug">인스타로 내 소개부터 채워요</p>
+      <p className="mt-1.5 text-[12px] leading-relaxed opacity-80">DM 코드로 내 계정만 확인하면, 피드에서 사진과 관심사를 골라 프로필과 페르소나 초안을 만들어 드려요.</p>
+      <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-[12px] font-semibold text-[#0D0D0D]">시작하기<ChevronRight size={12} /></span>
+    </Card>
+  )
+}
+
 function TodayTab({ mode, openPerson }: { mode: Mode; openPerson: (p: Person) => void }) {
   const { conn, start } = useConnect()
   const broken = (Object.keys(conn) as Src[]).filter((s) => conn[s].status === 'broken')
@@ -941,7 +1132,8 @@ function TodayTab({ mode, openPerson }: { mode: Mode; openPerson: (p: Person) =>
   if (mode === 'new') {
     return (
       <div className="px-5 pb-28">
-        <p className="mt-4 text-[22px] font-bold leading-snug text-[var(--color-text-strong)]">내 사람들을<br />가져와 볼까요?</p>
+        <InstaStartCard />
+        <p className="mt-6 text-[22px] font-bold leading-snug text-[var(--color-text-strong)]">내 사람들을<br />가져와 볼까요?</p>
         <p className="mt-2 text-[13px] text-neutral-500">연결한 곳의 계정을 같은 사람끼리 묶어 인물 카드로 만들어요. 하나만 먼저 연결해도 충분해요.</p>
         <SortEntryCard />
         <SectionTitle tag="new">연결</SectionTitle>
@@ -963,7 +1155,7 @@ function TodayTab({ mode, openPerson }: { mode: Mode; openPerson: (p: Person) =>
           <div className="mt-3 space-y-2 text-[13px]">
             <div className="flex items-center gap-2"><ChannelBadge ch="phone" /> 연락처 486개 <Check size={14} className="ml-auto text-emerald-600" /></div>
             <div className="flex items-center gap-2"><ChannelBadge ch="ig" /> 128명 <Check size={14} className="ml-auto text-emerald-600" /></div>
-            <div className="flex items-center gap-2"><ChannelBadge ch="kakao" /> 대화 파일 3개에서 42명 <Check size={14} className="ml-auto text-emerald-600" /></div>
+            <div className="flex items-center gap-2"><ChannelBadge ch="kakao" /> 대화방 3개에서 42명 <Check size={14} className="ml-auto text-emerald-600" /></div>
             <div className="flex items-center gap-2"><ChannelBadge ch="in" /> 가져오는 중 <span className="ml-auto h-1.5 w-16 overflow-hidden rounded-full bg-neutral-100"><span className="block h-full w-2/3 bg-[#25313D]" /></span></div>
           </div>
         </Card>
@@ -980,6 +1172,10 @@ function TodayTab({ mode, openPerson }: { mode: Mode; openPerson: (p: Person) =>
         <Clock size={13} /> 다음 묶음 오후 6시
         <span className="ml-auto">하루 두 번 (오전 10시, 오후 6시)</span>
       </div>
+
+      <SectionTitle tag="new">가져올 기록</SectionTitle>
+      {conn.calls.status === 'on' && <CallImportCard openPerson={openPerson} />}
+      {conn.kakao.status === 'on' && <KakaoStaleCard />}
 
       <SectionTitle tag="new">답장할 메시지</SectionTitle>
       <DraftBatch openPerson={openPerson} />
@@ -1530,7 +1726,7 @@ function PersonDetail({ p, onBack }: { p: Person; onBack: () => void }) {
 /* ───────── 내 소개 ───────── */
 
 function MeTab({ mode }: { mode: Mode }) {
-  const { conn, openHub } = useConnect()
+  const { conn, openHub, openInsta } = useConnect()
   if (mode === 'guest') {
     return (
       <div className="px-5 pb-28 pt-10 text-center">
@@ -1566,6 +1762,7 @@ function MeTab({ mode }: { mode: Mode }) {
       <SectionTitle tag="old">내 프로필</SectionTitle>
       <Card className="!py-1 divide-y divide-[var(--color-border-soft)]">
         <Row icon={<PenLine size={18} />} label="프로필 관리" desc="기본정보, 하이라이트, SNS, 바이브, 연락처, 리멤버 네트워크" href="/me?edit=true" />
+        <Row icon={<ChannelBadge ch="ig" />} label="인스타 연동" desc="DM 코드로 내 계정 확인, 피드로 앨범과 페르소나 채우기" tag="new" onClick={openInsta} />
         <Row icon={<ShieldCheck size={18} />} label="인증" desc="본인인증, 경력, 학력" />
         <Row icon={<Eye size={18} />} label="공개범위" href="/me?section=visibility" />
         <Row icon={<BarChart3 size={18} />} label="내 프로필 본 사람" />
@@ -1579,12 +1776,13 @@ function MeTab({ mode }: { mode: Mode }) {
           desc={
             onList.length || brokenCount
               ? <>{srcs.length}곳 중 {onList.length}곳 연결됨{brokenCount > 0 && <span className="text-rose-500">, {brokenCount}곳 다시 연결 필요</span>}</>
-              : '인스타, 링크드인, 지메일, 캘린더 등'
+              : '연락처, 통화 녹음, 인스타, 링크드인, 메일 등'
           }
           onClick={openHub}
           right={<span className="flex items-center gap-1">{onList.slice(0, 3).map((s) => <ChannelBadge key={s} ch={SRC[s].ch} />)}<ChevronRight size={16} className="text-neutral-300" /></span>}
         />
         <Row icon={<Clock size={18} />} label="묶음 처리 시간" desc="오전 10시, 오후 6시" tag="review" />
+        <Row icon={<Link2 size={18} />} label="내 약속 링크" desc="상대가 비어 있는 시간을 골라 약속을 잡아요. 평일 10시~18시, 30분" tag="review" />
       </Card>
 
       <SectionTitle>재화</SectionTitle>
@@ -1605,7 +1803,7 @@ function FabMenu({ onPick, onClose }: { onPick: (a: FabAction) => void; onClose:
     { a: 'chat', icon: <MessageCircle size={18} />, t: '말하기', d: '합치기, 관계 고치기, 궁금한 것 묻기' },
     { a: 'memo', icon: <PenLine size={18} />, t: '메모', d: '누구와 있었는지 고르고 적기' },
     { a: 'record', icon: <Mic size={18} />, t: '녹음', d: '대화를 녹음하면 요약과 할 일이 생겨요' },
-    { a: 'upload', icon: <Upload size={18} />, t: '올리기', d: '대화 캡처, 카톡 대화 파일' },
+    { a: 'upload', icon: <Upload size={18} />, t: '올리기', d: '카톡 대화, 아이폰 통화 녹음, 대화 캡처' },
   ]
   return (
     <div className="absolute inset-0 z-30 bg-black/40" onClick={onClose}>
@@ -1824,18 +2022,33 @@ function RecordSheet({ kind, onClose }: { kind: 'memo' | 'record'; onClose: () =
   )
 }
 
-function UploadSheet({ onClose }: { onClose: () => void }) {
-  const [done, setDone] = useState(false)
+function UploadSheet({ onClose, init }: { onClose: () => void; init?: 'kakao' }) {
+  const { update } = useConnect()
+  const [view, setView] = useState<'menu' | 'kakao' | 'call' | 'done'>(init ?? 'menu')
+  const item = (icon: ReactNode, t: string, d: string, onClick: () => void) => (
+    <Card onClick={onClick}>
+      <div className="flex items-center gap-3">
+        <span className="text-neutral-500">{icon}</span>
+        <div className="flex-1">
+          <div className="text-[14px] font-semibold">{t}</div>
+          <div className="text-[12px] text-neutral-500">{d}</div>
+        </div>
+        <ChevronRight size={16} className="text-neutral-300" />
+      </div>
+    </Card>
+  )
   return (
     <Sheet onClose={onClose}>
-      {done ? (
+      {view === 'done' && (
         <div className="text-center">
           <Sparkles size={28} className="mx-auto text-[#25313D]" />
           <p className="mt-3 text-[16px] font-bold">대화를 읽고 있어요</p>
-          <p className="mt-1 text-[13px] text-neutral-500">대화 상대를 인물 카드에 연결하고, 같은 사람 후보가 있으면 알려드릴게요</p>
+          <p className="mt-1 text-[13px] text-neutral-500">대화 상대를 인물 카드에 연결하고, 같은 사람 후보가 있으면 알려드릴게요. 다 읽으면 대화는 지우고 요약만 남겨요</p>
           <div className="mt-5"><PrimaryButton onClick={onClose}>확인</PrimaryButton></div>
         </div>
-      ) : (
+      )}
+
+      {view === 'menu' && (
         <>
           <div className="flex items-center justify-between">
             <h3 className="flex items-center text-[17px] font-bold">무엇을 올릴까요?<Tag kind="new" /></h3>
@@ -1843,27 +2056,139 @@ function UploadSheet({ onClose }: { onClose: () => void }) {
           </div>
           <div className="mt-1"><PrivateBadge /></div>
           <div className="mt-4 space-y-2">
-            <Card onClick={() => setDone(true)}>
-              <div className="flex items-center gap-3">
-                <FileText size={20} className="text-neutral-500" />
-                <div className="flex-1">
-                  <div className="text-[14px] font-semibold">카톡 대화 파일</div>
-                  <div className="text-[12px] text-neutral-500">대화방 설정에서 대화 내보내기로 받은 파일</div>
-                </div>
-                <ChevronRight size={16} className="text-neutral-300" />
-              </div>
-            </Card>
-            <Card onClick={() => setDone(true)}>
-              <div className="flex items-center gap-3">
-                <ImageIcon size={20} className="text-neutral-500" />
-                <div className="flex-1">
-                  <div className="text-[14px] font-semibold">대화 캡처</div>
-                  <div className="text-[12px] text-neutral-500">어느 앱이든 대화 화면 스크린샷</div>
-                </div>
-                <ChevronRight size={16} className="text-neutral-300" />
-              </div>
-            </Card>
+            {item(<FileText size={20} />, '카톡 대화', '대화방에서 내보내기를 펠로어로 공유', () => setView('kakao'))}
+            {item(<Phone size={20} />, '아이폰 통화 녹음', '메모 앱의 통화 녹음을 펠로어로 공유', () => setView('call'))}
+            {item(<ImageIcon size={20} />, '대화 캡처', '어느 앱이든 대화 화면 스크린샷', () => setView('done'))}
           </div>
+        </>
+      )}
+
+      {view === 'kakao' && (
+        <>
+          <div className="flex items-center justify-between">
+            <h3 className="flex items-center gap-2 text-[17px] font-bold"><ChannelBadge ch="kakao" />카톡 대화 보내기</h3>
+            <button onClick={onClose}><X size={20} /></button>
+          </div>
+          <p className="mt-2 text-[13px] leading-relaxed text-neutral-600">카톡은 펠로어가 직접 들어갈 수 없어요. 대화방에서 내보내기를 누르면 파일을 저장하지 않고 바로 펠로어로 보낼 수 있어요.</p>
+          <ShareSteps steps={['카톡 대화방 오른쪽 위 메뉴에서 설정 열기', '대화 내용 내보내기 > 텍스트만 보내기', '공유 창에서 펠로어 고르기']} />
+          <p className="mt-3 text-[11px] leading-relaxed text-neutral-400">같은 방을 다시 보내면 새로 나눈 대화만 읽어요. 오래 안 보낸 방은 오늘의 제안에서 알려드려요.</p>
+          <div className="mt-5"><PrimaryButton onClick={() => { update('kakao', { status: 'on', last: '오늘' }); setView('done') }}>보냈어요 (목업)</PrimaryButton></div>
+        </>
+      )}
+
+      {view === 'call' && (
+        <>
+          <div className="flex items-center justify-between">
+            <h3 className="flex items-center gap-2 text-[17px] font-bold"><ChannelBadge ch="call" />아이폰 통화 녹음 보내기</h3>
+            <button onClick={onClose}><X size={20} /></button>
+          </div>
+          <ShareSteps steps={['메모 앱에서 통화 녹음 열기', '공유 버튼 누르기', '펠로어 고르기']} />
+          <p className="mt-3 text-[11px] leading-relaxed text-neutral-400">통화한 번호로 인물 카드를 찾아 요약을 붙이고, 녹음은 지워요.</p>
+          <div className="mt-5"><PrimaryButton onClick={() => setView('done')}>보냈어요 (목업)</PrimaryButton></div>
+        </>
+      )}
+    </Sheet>
+  )
+}
+
+/* ───────── 인스타 연동 (내 소개) ─────────
+ * 망원동 이자카야 방식. 아이디를 넣으면 코드를 주고, 펠로어 공식 계정에 DM으로 보내면 본인 확인이 끝난다.
+ * 공개 계정이면 피드를 한 번 분석해 앨범 사진, 키워드, 페르소나 초안을 채우고 한마디를 건넨다.
+ * 비공개 계정은 본인 확인만 하고, 에이전트 대행을 연결한 뒤 분석한다.
+ */
+
+const FEED_TONES = ['#E9D8C4', '#C9D7E3', '#D8E3C9', '#E3C9D2', '#CFC9E3', '#E3DDC9', '#C9E3DF', '#E3CFC9', '#D4D4D4']
+
+function InstaLinkSheet({ onClose }: { onClose: () => void }) {
+  const { start } = useConnect()
+  const [step, setStep] = useState<'id' | 'code' | 'analyze' | 'result'>('id')
+  const [isPrivate, setIsPrivate] = useState(false)
+  const [picked, setPicked] = useState<number[]>([0, 1, 3, 4, 6, 7])
+  const toggle = (i: number) => setPicked((p) => (p.includes(i) ? p.filter((x) => x !== i) : [...p, i]))
+  return (
+    <Sheet onClose={onClose}>
+      <div className="flex items-center justify-between">
+        <h3 className="flex items-center gap-2 text-[17px] font-bold"><ChannelBadge ch="ig" />인스타 연동<Tag kind="new" /></h3>
+        <button onClick={onClose}><X size={20} /></button>
+      </div>
+
+      {step === 'id' && (
+        <>
+          <p className="mt-3 text-[20px] font-bold leading-snug">인스타로 내 소개를<br />채워 볼까요?</p>
+          <p className="mt-2 text-[13px] text-neutral-500">로그인은 필요 없어요. 내 계정인지만 DM으로 확인하고, 공개된 피드를 한 번 읽어요.</p>
+          <div className="mt-4 flex items-center rounded-xl border border-neutral-200 px-3">
+            <span className="text-[14px] text-neutral-400">@</span>
+            <input defaultValue="kimfelo" className="flex-1 bg-transparent px-1 py-3 text-[14px] outline-none" />
+          </div>
+          <label className="mt-3 flex items-center gap-2 text-[12px] text-neutral-500">
+            <input type="checkbox" checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} /> 비공개 계정으로 보기 (목업)
+          </label>
+          <div className="mt-5"><PrimaryButton onClick={() => setStep('code')}>다음</PrimaryButton></div>
+        </>
+      )}
+
+      {step === 'code' && (
+        <>
+          <p className="mt-3 text-[15px] font-bold">이 코드를 DM으로 보내 주세요</p>
+          <div className="mt-3 rounded-2xl bg-[#25313D] px-4 py-5 text-center text-white">
+            <p className="text-[12px] opacity-70">인증 코드</p>
+            <p className="mt-1 text-[28px] font-bold tracking-[0.25em]">FL4821</p>
+            <p className="mt-1 text-[11px] opacity-60">10분 동안 쓸 수 있어요</p>
+          </div>
+          <ShareSteps steps={['코드 복사하고 인스타 열기', '@felore.app 에 코드를 DM으로 보내기', '확인됐다는 답장이 오면 펠로어로 돌아오기']} />
+          <div className="mt-5"><PrimaryButton onClick={() => setStep('analyze')}><span className="inline-flex items-center gap-1.5"><Copy size={14} />코드 복사하고 인스타 열기</span></PrimaryButton></div>
+          <p className="mt-2 text-center text-[11px] text-neutral-400">목업에서는 누르면 확인된 것으로 넘어가요</p>
+        </>
+      )}
+
+      {step === 'analyze' && (
+        <div className="py-2">
+          <p className="mt-2 text-[15px] font-bold">@kimfelo 확인됐어요</p>
+          <p className="mt-1 text-[13px] text-neutral-500">{isPrivate ? '비공개 계정이라 피드는 볼 수 없어요' : '피드를 읽고 있어요'}</p>
+          <div className="mt-5">
+            <ProgressSteps
+              steps={isPrivate ? ['내 계정 확인'] : ['내 계정 확인', '사진 속 분위기', '관심사 키워드', '앨범에 넣을 사진 고르기', '페르소나 초안']}
+              onDone={() => setStep('result')}
+            />
+          </div>
+        </div>
+      )}
+
+      {step === 'result' && isPrivate && (
+        <div className="py-2 text-center">
+          <Check size={28} className="mx-auto text-emerald-600" />
+          <p className="mt-3 text-[16px] font-bold">내 인스타로 확인했어요</p>
+          <p className="mt-1 text-[13px] leading-relaxed text-neutral-500">프로필에 인스타가 연결됐어요. 비공개 계정은 피드를 볼 수 없어서, 인스타 에이전트를 연결하면 그때 분석해요.</p>
+          <div className="mt-5"><PrimaryButton onClick={() => { onClose(); start('ig') }}>인스타 에이전트 연결</PrimaryButton></div>
+          <button onClick={onClose} className="mt-3 w-full text-center text-[13px] text-neutral-500">나중에</button>
+        </div>
+      )}
+
+      {step === 'result' && !isPrivate && (
+        <>
+          <div className="mt-3 rounded-2xl bg-neutral-50 px-4 py-4">
+            <p className="text-[11px] text-neutral-400">펠로어의 한마디</p>
+            <p className="mt-1 text-[16px] font-bold leading-snug">&ldquo;평일엔 성수에서 일하고, 주말엔 한강을 달리는 대표님. 맞죠?&rdquo;</p>
+          </div>
+          <p className="mt-5 text-[13px] font-semibold">앨범에 넣을 사진</p>
+          <p className="text-[11px] text-neutral-500">고른 사진만 앨범에 들어가요. 나머지는 저장하지 않아요</p>
+          <div className="mt-2 grid grid-cols-3 gap-1.5">
+            {FEED_TONES.map((c, i) => (
+              <button key={c} onClick={() => toggle(i)} className="relative aspect-square rounded-lg" style={{ background: c }}>
+                <span className={`absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full border ${picked.includes(i) ? 'border-[#25313D] bg-[#25313D] text-white' : 'border-white bg-white/60'}`}>
+                  {picked.includes(i) && <Check size={12} />}
+                </span>
+              </button>
+            ))}
+          </div>
+          <p className="mt-5 text-[13px] font-semibold">관심사 키워드</p>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {['러닝', '성수', '스타트업', '커피', '전시'].map((k) => <span key={k} className="rounded-full bg-neutral-100 px-3 py-1 text-[12px]">{k}</span>)}
+          </div>
+          <p className="mt-5 text-[13px] font-semibold">페르소나 초안</p>
+          <p className="mt-1 rounded-xl border border-neutral-200 p-3 text-[13px] leading-relaxed">사람을 만나며 일을 넓히는 실행형 대표. 주말 러닝으로 리듬을 지키고, 새로운 공간과 전시에서 영감을 얻어요.</p>
+          <div className="mt-5"><PrimaryButton onClick={onClose}>프로필에 넣기 (사진 {picked.length}장)</PrimaryButton></div>
+          <button className="mt-3 w-full text-center text-[13px] text-neutral-500">한마디 공유하기</button>
         </>
       )}
     </Sheet>
@@ -1872,16 +2197,19 @@ function UploadSheet({ onClose }: { onClose: () => void }) {
 
 /* ───────── 말하기 (채팅) ───────── */
 
-type Msg = { from: 'me' | 'ai'; text: string; merge?: MergeQ }
+type Msg = { from: 'me' | 'ai'; text: string; merge?: MergeQ; connect?: Src }
 
 const CHAT_SEED: Msg[] = [
   { from: 'me', text: '도민혁이랑 인스타 @minhyuk.run 같은 사람이야, 합쳐줘' },
   { from: 'ai', text: '이렇게 합칠게요. 맞으면 눌러주세요.', merge: { a: { ch: 'kakao', h: '도민혁' }, b: { ch: 'ig', h: '@minhyuk.run' }, why: '말씀하신 두 계정이에요' } },
   { from: 'me', text: '민혁이한테는 반말로 해. 대학 동기야' },
   { from: 'ai', text: '도민혁님 관계를 "반말, 대학 동기"로 저장했어요. 다음 답장 초안부터 반영할게요.' },
+  { from: 'me', text: '링크드인도 연결해 줘' },
+  { from: 'ai', text: '링크드인 로그인 정보를 넣어 주세요. 내 암호화 키로 잠가서 보관하고, 로그인 확인이 오면 여기서 안내할게요.', connect: 'in' },
 ]
 
 function ChatScreen({ onClose }: { onClose: () => void }) {
+  const { start } = useConnect()
   const [msgs, setMsgs] = useState<Msg[]>(CHAT_SEED)
   const [merged, setMerged] = useState<MergeAnswer | undefined>()
   const [input, setInput] = useState('')
@@ -1905,6 +2233,13 @@ function ChatScreen({ onClose }: { onClose: () => void }) {
               {m.text}
               {m.merge && (
                 <div className="mt-2"><MergeAskCard q={m.merge} onAnswer={setMerged} done={merged} /></div>
+              )}
+              {m.connect && (
+                <button onClick={() => start(m.connect!)} className="mt-2 flex w-full items-center gap-2 rounded-xl bg-white px-3 py-2.5 text-left">
+                  <ChannelBadge ch={SRC[m.connect].ch} />
+                  <span className="flex-1 text-[13px] font-semibold">{SRC[m.connect].label} 로그인</span>
+                  <KeyRound size={14} className="text-neutral-400" />
+                </button>
               )}
             </div>
           </div>
@@ -1944,16 +2279,21 @@ export default function V2IaPage() {
   const [detail, setDetail] = useState<Src | null>(null)
   const [sort, setSort] = useState(false)
   const [searching, setSearching] = useState(false)
+  const [insta, setInsta] = useState(false)
+  const [uploadInit, setUploadInit] = useState<'kakao' | undefined>()
 
   const connectCtx = {
     conn,
-    start: (s: Src) => (s === 'kakao' ? setAction('upload') : setFlow(s)),
+    start: (s: Src) => {
+      if (s === 'kakao') { setUploadInit('kakao'); setAction('upload') } else setFlow(s)
+    },
     update: (s: Src, patch: Partial<Conn>) => setConn((c) => ({ ...c, [s]: { ...c[s], ...patch } })),
     openHub: () => { setPerson(null); setHub(true) },
     openSort: mode === 'new' || mode === 'importing' ? () => { setPerson(null); setHub(false); setSort(true) } : undefined,
+    openInsta: () => setInsta(true),
   }
 
-  const changeMode = (m: Mode) => { setMode(m); setPerson(null); setHub(false); setSort(false); setSearching(false); setConn(initConn(m)) }
+  const changeMode = (m: Mode) => { setMode(m); setPerson(null); setHub(false); setSort(false); setSearching(false); setFlow(null); setDetail(null); setInsta(false); setAction(null); setConn(initConn(m)) }
   const goTab = (t: Tab) => { setPerson(null); setHub(false); setSort(false); setSearching(false); setTab(t) }
   const titles: Record<Tab, string> = { today: '오늘의 제안', people: '내 사람들', me: '내 소개' }
 
@@ -1963,7 +2303,7 @@ export default function V2IaPage() {
     { id: 'me', label: '내 소개', icon: <User size={22} /> },
   ]
 
-  const pick = (a: FabAction) => { setFabOpen(false); setAction(a) }
+  const pick = (a: FabAction) => { setFabOpen(false); setUploadInit(undefined); setAction(a) }
   const closeAction = () => setAction(null)
 
   return (
@@ -2030,11 +2370,12 @@ export default function V2IaPage() {
           <>
             {action === 'chat' && <ChatScreen onClose={closeAction} />}
             {(action === 'memo' || action === 'record') && <RecordSheet kind={action} onClose={closeAction} />}
-            {action === 'upload' && <UploadSheet onClose={closeAction} />}
+            {action === 'upload' && <UploadSheet key={uploadInit ?? 'menu'} init={uploadInit} onClose={closeAction} />}
           </>
         )}
         {flow && <ConnectFlowSheet key={flow} src={flow} onClose={() => setFlow(null)} />}
         {detail && <ConnectDetailSheet src={detail} onClose={() => setDetail(null)} />}
+        {insta && <InstaLinkSheet onClose={() => setInsta(false)} />}
       </div>
       </ConnectCtx.Provider>
 

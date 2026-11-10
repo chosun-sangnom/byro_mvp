@@ -161,7 +161,12 @@ const ConnectCtx = createContext<{
   openSort?: () => void
   /** 내 소개 > 인스타 연동. DM 코드로 내 계정을 확인하고 피드를 분석한다 */
   openInsta: () => void
-}>({ conn: initConn('new'), start: () => {}, update: () => {}, openHub: () => {}, openInsta: () => {} })
+  /** 인스타 연동을 마쳤는지와 앨범에 넣은 사진 수 */
+  instaDone: boolean
+  instaPhotos: number
+  finishInsta: (photos: number) => void
+  openMeetLink: () => void
+}>({ conn: initConn('new'), start: () => {}, update: () => {}, openHub: () => {}, openInsta: () => {}, instaDone: false, instaPhotos: 6, finishInsta: () => {}, openMeetLink: () => {} })
 
 const useConnect = () => useContext(ConnectCtx)
 
@@ -1101,8 +1106,152 @@ function InstaStartCard() {
   )
 }
 
-function TodayTab({ mode, openPerson }: { mode: Mode; openPerson: (p: Person) => void }) {
-  const { conn, start } = useConnect()
+/* ───────── 온보딩 (가입 직후) ─────────
+ * 망원동 이자카야 방식. 펠로어가 말을 걸고, 한 화면에 한 가지만 묻는다. 건너뛰면 목록 화면으로 간다.
+ */
+
+type ObStep = 'hello' | 'insta' | 'contacts' | 'calls' | 'talk' | 'end'
+const OB_STEPS: ObStep[] = ['hello', 'insta', 'contacts', 'calls', 'talk', 'end']
+
+function OnboardingFlow({ onDone }: { onDone: () => void }) {
+  const { conn, start, openInsta, instaDone, openSort } = useConnect()
+  const [i, setI] = useState(0)
+  const [talkPick, setTalkPick] = useState<Src | null>(null)
+  const step = OB_STEPS[i]
+  const next = () => (i + 1 < OB_STEPS.length ? setI(i + 1) : onDone())
+  const got = (Object.keys(GATHER) as Src[]).filter((s) => conn[s].status === 'on')
+
+  const talkDone = (['ig', 'kakao', 'in', 'gmail', 'tg'] as Src[]).find((s) => conn[s].status === 'on')
+  const done: Record<ObStep, boolean> = {
+    hello: false,
+    insta: instaDone,
+    contacts: conn.contacts.status === 'on',
+    calls: conn.calls.status === 'on',
+    talk: !!talkDone,
+    end: false,
+  }
+
+  const copy: Record<ObStep, { t: ReactNode; d: string; cta: string; act?: () => void; doneText?: string }> = {
+    hello: { t: <>안녕하세요,<br />펠로어예요</>, d: '흩어진 연락을 사람 단위로 모으고, 답장은 미리 써 둘게요. 몇 가지만 같이 정해요.', cta: '시작하기' },
+    insta: { t: <>인스타로 내 소개부터<br />채워 볼까요?</>, d: 'DM 코드로 내 계정인지만 확인하고, 피드에서 사진과 관심사를 골라 프로필과 페르소나 초안을 만들어요. 로그인은 필요 없어요.', cta: '인스타 아이디 넣기', act: openInsta, doneText: '내 소개에 앨범과 페르소나 초안을 넣었어요' },
+    contacts: { t: <>연락처를<br />읽어도 될까요?</>, d: '이름과 번호로 카톡, 메일, 펠로어 회원이 같은 사람인지 알아봐요. 바뀐 연락처는 계속 맞춰요.', cta: '연락처 허용', act: () => start('contacts'), doneText: '연락처를 읽고 있어요' },
+    calls: { t: <>통화한 뒤에<br />요약을 남겨 드릴까요?</>, d: '펠로어가 통화를 녹음하지는 않아요. 휴대폰이 녹음한 통화 중 고른 것만 요약해서 그 사람 카드에 붙여요.', cta: '통화 녹음 가져오기', act: () => start('calls'), doneText: '새 통화 녹음이 생기면 물어볼게요' },
+    talk: { t: <>연락이 오는 곳을<br />하나 골라 주세요</>, d: '하나만 연결해도 충분해요. 나머지는 내 소개 > 연결에서 언제든 더할 수 있어요.', cta: '연결하기', act: () => talkPick && start(talkPick), doneText: `${talkDone ? SRC[talkDone].label : ''}을 연결했어요` },
+    end: { t: got.length ? <>{got.length}곳에서<br />계정을 모았어요</> : <>준비됐어요</>, d: got.length ? '같은 사람끼리 묶고 내 사람을 골라 볼게요. 확인할 것은 몇 건 안 돼요.' : '연결은 나중에 해도 돼요. 오늘의 제안에서 하나씩 이어 갈 수 있어요.', cta: got.length && openSort ? '사람 정리 시작' : '오늘의 제안 보기', act: got.length && openSort ? openSort : undefined },
+  }
+  const c = copy[step]
+
+  return (
+    <div className="flex min-h-full flex-col px-5 pb-28 pt-2">
+      <div className="flex h-5 items-center justify-between">
+        <div className="flex gap-1">
+          {OB_STEPS.map((s, j) => <span key={s} className={`h-1 rounded-full ${j === i ? 'w-6 bg-[#25313D]' : 'w-1.5 bg-neutral-200'}`} />)}
+        </div>
+        {step !== 'end' && <button onClick={onDone} className="text-[12px] text-neutral-400">건너뛰기</button>}
+      </div>
+
+      <div className="mt-10 flex items-start gap-3">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#25313D] text-white"><Sparkles size={18} /></span>
+        <div className="rounded-2xl rounded-tl-sm bg-neutral-100 px-4 py-3">
+          <p className="text-[20px] font-bold leading-snug">{c.t}</p>
+        </div>
+      </div>
+      <p className="mt-5 text-[14px] leading-relaxed text-neutral-600">{c.d}</p>
+
+      {step === 'insta' && !instaDone && (
+        <div className="mt-6 grid grid-cols-3 gap-1.5 opacity-70">
+          {FEED_TONES.slice(0, 6).map((bg) => <div key={bg} className="aspect-square rounded-lg" style={{ background: bg }} />)}
+        </div>
+      )}
+
+      {step === 'talk' && !talkDone && (
+        <div className="mt-6 space-y-2">
+          {(['ig', 'kakao', 'in'] as Src[]).map((s) => (
+            <button key={s} onClick={() => setTalkPick(s)} className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-left ${talkPick === s ? 'border-[#25313D] bg-[#25313D]/5' : 'border-neutral-200'}`}>
+              <ChannelBadge ch={SRC[s].ch} />
+              <span className="flex-1">
+                <span className="block text-[13px] font-semibold">{SRC[s].label}</span>
+                <span className="block text-[11px] text-neutral-500">{SRC[s].desc}</span>
+              </span>
+              {talkPick === s && <Check size={16} className="text-[#25313D]" />}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {done[step] && (
+        <p className="mt-6 flex items-center gap-1.5 text-[13px] font-medium text-emerald-700"><Check size={14} />{c.doneText}</p>
+      )}
+
+      <div className="mt-auto pt-8">
+        {done[step] || !c.act ? (
+          <PrimaryButton onClick={next}>{done[step] ? '다음' : c.cta}</PrimaryButton>
+        ) : (
+          <>
+            <PrimaryButton disabled={step === 'talk' && !talkPick} onClick={c.act}>{c.cta}</PrimaryButton>
+            <button onClick={next} className="mt-3 w-full text-center text-[13px] text-neutral-500">나중에</button>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+/** 내 약속 링크 (모이닷 참고). 상대가 비어 있는 시간을 골라 약속을 잡는다 */
+function MeetLinkSheet({ onClose }: { onClose: () => void }) {
+  const { conn } = useConnect()
+  const [on, setOn] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const calOn = conn.gcal.status === 'on'
+  return (
+    <Sheet onClose={onClose}>
+      <div className="flex items-center justify-between">
+        <h3 className="flex items-center gap-2 text-[17px] font-bold"><Link2 size={18} />내 약속 링크<Tag kind="review" /></h3>
+        <button onClick={onClose}><X size={20} /></button>
+      </div>
+      <p className="mt-2 text-[13px] text-neutral-500">링크를 보내면 상대가 비어 있는 시간을 골라 약속을 잡아요. 잡힌 약속은 오늘 만날 사람에 올라와요.</p>
+      <div className="mt-4 rounded-2xl bg-neutral-50 px-4 py-3">
+        <p className="break-all text-[13px] font-semibold">felore.app/meet/kimfelo</p>
+        <p className="mt-0.5 text-[11px] text-neutral-400">{on ? '켜짐' : '꺼짐. 복사하거나 공유하면 켜져요'}</p>
+        <div className="mt-2 space-y-0.5 text-[12px] text-neutral-600">
+          <p>월~금 10:00~18:00</p>
+          <p>30분, 직접 만나기 또는 화상</p>
+          <p>{calOn ? '구글 캘린더의 일정과 겹치지 않게 보여줘요' : '캘린더를 연결하면 이미 있는 일정은 빼고 보여줘요'}</p>
+        </div>
+      </div>
+      <div className="mt-4">
+        <PrimaryButton onClick={() => { setOn(true); setCopied(true) }}><span className="inline-flex items-center gap-1.5"><Copy size={14} />{copied ? '복사했어요' : on ? '링크 복사' : '켜고 복사'}</span></PrimaryButton>
+      </div>
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        <button onClick={() => setOn(true)} className="rounded-full border border-neutral-200 py-2.5 text-[13px]">공유</button>
+        <button className="rounded-full border border-neutral-200 py-2.5 text-[13px]">시간 바꾸기</button>
+      </div>
+      <p className="mt-3 text-center text-[11px] text-neutral-400">비회원에게 보내는 답장 초안에 프로필 링크 대신 붙일 수 있어요</p>
+    </Sheet>
+  )
+}
+
+/** 인스타 분석 결과가 붙은 내 소개 카드 조각 */
+function InstaProfileBlock({ photos }: { photos: number }) {
+  return (
+    <div className="mt-4 border-t border-[var(--color-border-soft)] pt-3">
+      <div className="flex items-center justify-between">
+        <span className="flex items-center gap-1.5 text-[12px] font-semibold"><ChannelBadge ch="ig" />@kimfelo 연동됨</span>
+        <span className="text-[11px] text-neutral-400">피드에서 가져온 사진 {photos}장</span>
+      </div>
+      <div className="mt-2 flex gap-1.5 overflow-x-auto">
+        {FEED_TONES.slice(0, photos).map((bg) => <div key={bg} className="h-14 w-14 shrink-0 rounded-lg" style={{ background: bg }} />)}
+      </div>
+      <p className="mt-3 text-[11px] text-neutral-400">페르소나 초안</p>
+      <p className="mt-0.5 text-[13px] leading-relaxed">사람을 만나며 일을 넓히는 실행형 대표. 주말 러닝으로 리듬을 지키고, 새로운 공간과 전시에서 영감을 얻어요.</p>
+      <div className="mt-2 flex flex-wrap gap-1">{['러닝', '성수', '스타트업', '커피', '전시'].map((k) => <span key={k} className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px]">{k}</span>)}</div>
+      <button className="mt-3 flex items-center gap-1 text-[12px] font-medium text-[#25313D]"><Send size={12} />한마디 공유하기 <span className="font-normal text-neutral-400">&ldquo;평일엔 성수, 주말엔 한강&rdquo;</span></button>
+    </div>
+  )
+}
+
+function TodayTab({ mode, openPerson, onboarding, onOnboardDone }: { mode: Mode; openPerson: (p: Person) => void; onboarding?: boolean; onOnboardDone?: () => void }) {
+  const { conn, start, instaDone } = useConnect()
   const broken = (Object.keys(conn) as Src[]).filter((s) => conn[s].status === 'broken')
   if (mode === 'guest') {
     return (
@@ -1129,10 +1278,12 @@ function TodayTab({ mode, openPerson }: { mode: Mode; openPerson: (p: Person) =>
     )
   }
 
+  if (mode === 'new' && onboarding && onOnboardDone) return <OnboardingFlow onDone={onOnboardDone} />
+
   if (mode === 'new') {
     return (
       <div className="px-5 pb-28">
-        <InstaStartCard />
+        {!instaDone && <InstaStartCard />}
         <p className="mt-6 text-[22px] font-bold leading-snug text-[var(--color-text-strong)]">내 사람들을<br />가져와 볼까요?</p>
         <p className="mt-2 text-[13px] text-neutral-500">연결한 곳의 계정을 같은 사람끼리 묶어 인물 카드로 만들어요. 하나만 먼저 연결해도 충분해요.</p>
         <SortEntryCard />
@@ -1682,11 +1833,18 @@ function PersonDetail({ p, onBack }: { p: Person; onBack: () => void }) {
             <div className="flex items-center gap-1.5 text-[12px] text-neutral-400"><ChannelBadge ch={p.accounts[0]?.ch ?? 'kakao'} /> 오늘 오전</div>
             <p className="mt-1 text-[13px]">받은 메시지에 답장함 (초안 고쳐서 보냄)</p>
           </div>
+          {p.id === 'p2' && conn.calls.status === 'on' && (
+            <div>
+              <div className="flex items-center gap-1 text-[12px] text-neutral-400"><Phone size={12} /> 오늘 오후 4:12 통화 요약 (12분)</div>
+              <p className="mt-0.5 text-[13px]">다음 주 화요일 판교에서 다시 만나기로 함. 물류 데모 자료를 먼저 보내기로 함</p>
+            </div>
+          )}
           <div>
             <div className="flex items-center gap-1 text-[12px] text-neutral-400"><Mic size={12} /> {p.met} 녹음 요약 (32분)</div>
             <p className="mt-0.5 text-[13px]">{p.note ?? '처음 만남. 서로 하는 일 소개'}</p>
           </div>
         </div>
+        <p className="mt-2 text-[11px] text-neutral-400">요약만 남기고 대화 원문과 녹음은 지워요</p>
         {conn.gmail.status !== 'on' && (
           <div className="mt-3">
             <ConnectSuggest src="gmail" icon={<Mail size={18} />} text={`지메일을 연결하면 ${p.name}님과 주고받은 메일도 여기 모아요`} />
@@ -1726,7 +1884,7 @@ function PersonDetail({ p, onBack }: { p: Person; onBack: () => void }) {
 /* ───────── 내 소개 ───────── */
 
 function MeTab({ mode }: { mode: Mode }) {
-  const { conn, openHub, openInsta } = useConnect()
+  const { conn, openHub, openInsta, instaDone, instaPhotos, openMeetLink } = useConnect()
   if (mode === 'guest') {
     return (
       <div className="px-5 pb-28 pt-10 text-center">
@@ -1757,12 +1915,13 @@ function MeTab({ mode }: { mode: Mode }) {
           <button className="flex items-center justify-center gap-1.5 rounded-full bg-[#0D0D0D] py-2.5 text-[13px] font-semibold text-white"><Send size={14} />링크 공유</button>
           <button className="flex items-center justify-center gap-1.5 rounded-full border border-neutral-200 py-2.5 text-[13px]"><QrCode size={14} />QR 보여주기</button>
         </div>
+        {instaDone && <InstaProfileBlock photos={instaPhotos} />}
       </Card>
 
       <SectionTitle tag="old">내 프로필</SectionTitle>
       <Card className="!py-1 divide-y divide-[var(--color-border-soft)]">
         <Row icon={<PenLine size={18} />} label="프로필 관리" desc="기본정보, 하이라이트, SNS, 바이브, 연락처, 리멤버 네트워크" href="/me?edit=true" />
-        <Row icon={<ChannelBadge ch="ig" />} label="인스타 연동" desc="DM 코드로 내 계정 확인, 피드로 앨범과 페르소나 채우기" tag="new" onClick={openInsta} />
+        <Row icon={<ChannelBadge ch="ig" />} label="인스타 연동" desc={instaDone ? '@kimfelo 연동됨. 다시 분석하거나 사진 바꾸기' : 'DM 코드로 내 계정 확인, 피드로 앨범과 페르소나 채우기'} tag="new" onClick={openInsta} right={instaDone ? <Check size={16} className="text-emerald-600" /> : undefined} />
         <Row icon={<ShieldCheck size={18} />} label="인증" desc="본인인증, 경력, 학력" />
         <Row icon={<Eye size={18} />} label="공개범위" href="/me?section=visibility" />
         <Row icon={<BarChart3 size={18} />} label="내 프로필 본 사람" />
@@ -1782,7 +1941,7 @@ function MeTab({ mode }: { mode: Mode }) {
           right={<span className="flex items-center gap-1">{onList.slice(0, 3).map((s) => <ChannelBadge key={s} ch={SRC[s].ch} />)}<ChevronRight size={16} className="text-neutral-300" /></span>}
         />
         <Row icon={<Clock size={18} />} label="묶음 처리 시간" desc="오전 10시, 오후 6시" tag="review" />
-        <Row icon={<Link2 size={18} />} label="내 약속 링크" desc="상대가 비어 있는 시간을 골라 약속을 잡아요. 평일 10시~18시, 30분" tag="review" />
+        <Row icon={<Link2 size={18} />} label="내 약속 링크" desc="상대가 비어 있는 시간을 골라 약속을 잡아요. 평일 10시~18시, 30분" tag="review" onClick={openMeetLink} />
       </Card>
 
       <SectionTitle>재화</SectionTitle>
@@ -2100,7 +2259,7 @@ function UploadSheet({ onClose, init }: { onClose: () => void; init?: 'kakao' })
 const FEED_TONES = ['#E9D8C4', '#C9D7E3', '#D8E3C9', '#E3C9D2', '#CFC9E3', '#E3DDC9', '#C9E3DF', '#E3CFC9', '#D4D4D4']
 
 function InstaLinkSheet({ onClose }: { onClose: () => void }) {
-  const { start } = useConnect()
+  const { start, finishInsta } = useConnect()
   const [step, setStep] = useState<'id' | 'code' | 'analyze' | 'result'>('id')
   const [isPrivate, setIsPrivate] = useState(false)
   const [picked, setPicked] = useState<number[]>([0, 1, 3, 4, 6, 7])
@@ -2187,7 +2346,7 @@ function InstaLinkSheet({ onClose }: { onClose: () => void }) {
           </div>
           <p className="mt-5 text-[13px] font-semibold">페르소나 초안</p>
           <p className="mt-1 rounded-xl border border-neutral-200 p-3 text-[13px] leading-relaxed">사람을 만나며 일을 넓히는 실행형 대표. 주말 러닝으로 리듬을 지키고, 새로운 공간과 전시에서 영감을 얻어요.</p>
-          <div className="mt-5"><PrimaryButton onClick={onClose}>프로필에 넣기 (사진 {picked.length}장)</PrimaryButton></div>
+          <div className="mt-5"><PrimaryButton onClick={() => { finishInsta(picked.length); onClose() }}>프로필에 넣기 (사진 {picked.length}장)</PrimaryButton></div>
           <button className="mt-3 w-full text-center text-[13px] text-neutral-500">한마디 공유하기</button>
         </>
       )}
@@ -2280,6 +2439,10 @@ export default function V2IaPage() {
   const [sort, setSort] = useState(false)
   const [searching, setSearching] = useState(false)
   const [insta, setInsta] = useState(false)
+  const [instaDone, setInstaDone] = useState(true)
+  const [instaPhotos, setInstaPhotos] = useState(6)
+  const [meetLink, setMeetLink] = useState(false)
+  const [onboarding, setOnboarding] = useState(false)
   const [uploadInit, setUploadInit] = useState<'kakao' | undefined>()
 
   const connectCtx = {
@@ -2289,11 +2452,15 @@ export default function V2IaPage() {
     },
     update: (s: Src, patch: Partial<Conn>) => setConn((c) => ({ ...c, [s]: { ...c[s], ...patch } })),
     openHub: () => { setPerson(null); setHub(true) },
-    openSort: mode === 'new' || mode === 'importing' ? () => { setPerson(null); setHub(false); setSort(true) } : undefined,
+    openSort: mode === 'new' || mode === 'importing' ? () => { setPerson(null); setHub(false); setOnboarding(false); setSort(true) } : undefined,
     openInsta: () => setInsta(true),
+    instaDone,
+    instaPhotos,
+    finishInsta: (n: number) => { setInstaPhotos(n); setInstaDone(true) },
+    openMeetLink: () => setMeetLink(true),
   }
 
-  const changeMode = (m: Mode) => { setMode(m); setPerson(null); setHub(false); setSort(false); setSearching(false); setFlow(null); setDetail(null); setInsta(false); setAction(null); setConn(initConn(m)) }
+  const changeMode = (m: Mode) => { setMode(m); setPerson(null); setHub(false); setSort(false); setSearching(false); setFlow(null); setDetail(null); setInsta(false); setMeetLink(false); setAction(null); setConn(initConn(m)); setInstaDone(m === 'active' || m === 'importing'); setOnboarding(m === 'new') }
   const goTab = (t: Tab) => { setPerson(null); setHub(false); setSort(false); setSearching(false); setTab(t) }
   const titles: Record<Tab, string> = { today: '오늘의 제안', people: '내 사람들', me: '내 소개' }
 
@@ -2335,7 +2502,7 @@ export default function V2IaPage() {
           ) : (
             <>
               <Header title={titles[tab]} onSearch={() => setSearching(true)} />
-              {tab === 'today' && <TodayTab mode={mode} openPerson={setPerson} />}
+              {tab === 'today' && <TodayTab mode={mode} openPerson={setPerson} onboarding={onboarding} onOnboardDone={() => setOnboarding(false)} />}
               {tab === 'people' && <PeopleTab mode={mode} openPerson={setPerson} fromLink={fromLink} />}
               {tab === 'me' && <MeTab mode={mode} />}
             </>
@@ -2376,6 +2543,7 @@ export default function V2IaPage() {
         {flow && <ConnectFlowSheet key={flow} src={flow} onClose={() => setFlow(null)} />}
         {detail && <ConnectDetailSheet src={detail} onClose={() => setDetail(null)} />}
         {insta && <InstaLinkSheet onClose={() => setInsta(false)} />}
+        {meetLink && <MeetLinkSheet onClose={() => setMeetLink(false)} />}
       </div>
       </ConnectCtx.Provider>
 

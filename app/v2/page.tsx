@@ -2,13 +2,14 @@
 
 /**
  * [임시] UI/UX 전면 개편 IA 와이어프레임 (니즈·기능 정의서 v0.2 6장)
- * 하단 탭 3개(오늘의 제안 / 내 사람들 / 내 소개) + 어느 탭에서든 떠 있는 플로팅 버튼(말하기, 메모, 녹음, 올리기).
+ * 하단 탭 3개(오늘의 제안 / 내 사람들 / 마이페이지) + 어느 탭에서든 떠 있는 플로팅 버튼(말하기, 메모, 녹음, 올리기).
  * 상태별(비회원 / 가입 직후 / 가져오는 중 / 사용 중) 화면을 대충 보여주는 용도.
  * 데이터는 전부 허구 인물. 기존 화면으로 가는 링크는 실제 목업 화면으로 연결된다.
  */
 
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import Link from 'next/link'
+import { clearV2Flow } from '@/lib/v2Flow'
 import {
   Bell, Settings, Sparkles, Users, User, ChevronRight, ChevronLeft, Search,
   Mic, PenLine, Lock, CalendarClock, MessageCircle, Send, Upload, Plus,
@@ -26,6 +27,9 @@ type Person = {
   name: string
   title: string
   member: boolean
+  /** [임시] 기존 프로필 서비스의 공개 프로필 주소와 사진 */
+  linkId?: string
+  img?: string
   met: string
   tags: string[]
   /** why: 이 계정이 왜 이 사람으로 묶였는지 */
@@ -45,6 +49,7 @@ type Person = {
 type Fact = { t: string; src: string }
 
 const PEOPLE: Person[] = [
+  { id: 'p6', name: '이지민', title: '스타트업 마케터', member: true, linkId: 'jiminlee', img: '/images/jimin-profile-5x4.jpg', met: '3월 비즈니스 살롱', tags: ['협업'], origin: 'felore', accounts: [{ ch: 'ig', handle: '@jimin.mkt', why: '본인 프로필에 적은 인스타예요' }], tone: '존댓말, 편한 사이', note: '마케팅 인사이트가 좋음. 커뮤니티 행사 같이 해보기로 함', self: ['Brand Lab 스타트업 마케터, 브랜드와 커뮤니티', '러닝하고 혁오 듣는 편'] },
   { id: 'p1', name: '한서윤', title: '루프벤처스 심사역', member: true, met: '10/29 성수 네트워킹', tags: ['투자'], accounts: [{ ch: 'phone', handle: '010-3321-****', why: '펠로어 회원 인증 번호와 같아요' }, { ch: 'kakao', handle: '한서윤', why: '연락처 이름과 같아요' }, { ch: 'in', handle: 'seoyun-han', why: '본인 프로필에 적은 링크드인이에요' }], tone: '존댓말, 일 얘기 위주', note: '헬스케어 관심, 다음 달 IR 자료 요청', self: ['루프벤처스 심사역, 헬스케어와 바이오 초기 투자', '주말엔 와인 모임', '연락은 카톡이 편해요'] },
   { id: 'p2', name: '도민혁', title: '오르빗랩 대표', member: true, met: '10/24 판교 미팅', tags: ['고객'], accounts: [{ ch: 'phone', handle: '010-5590-****', why: '펠로어 회원 인증 번호와 같아요' }, { ch: 'ig', handle: '@minhyuk.run', why: '본인 프로필에 적은 인스타예요' }, { ch: 'kakao', handle: '민혁', why: '내가 같은 사람이라고 했어요' }], tone: '반말, 친한 사이', note: '러닝 크루 운영, 둘째 입학 준비 중', self: ['오르빗랩 대표, B2B 물류 SaaS', '러닝 크루 운영 중'], pending: [{ t: '주말 하프 마라톤 완주', src: '인스타 게시물' }] },
   { id: 'p3', name: '윤채린', title: '브랜드 디렉터', member: false, met: '10/18 지인 소개', tags: ['협업'], accounts: [{ ch: 'mail', handle: 'chaerin@studio-yun.kr' }, { ch: 'phone', handle: '010-2718-****', why: '메일 서명의 번호가 연락처와 같아요' }], tone: '존댓말',
@@ -79,7 +84,7 @@ type Draft = {
 
 const DRAFTS: Draft[] = [
   { id: 'd1', ch: 'ig', personId: 'p2', kind: '댓글', original: '형 러닝 사진 미쳤다 🔥', context: '친한 사이, 러닝 크루 같이 함', text: 'ㅋㅋ 고마워! 이번 주말에 같이 뛰자' },
-  { id: 'd2', ch: 'kakao', personId: 'p1', kind: '메시지', original: '대표님, 말씀하신 IR 자료 언제쯤 받아볼 수 있을까요?', context: '10/29 미팅에서 자료 보내기로 약속함', text: '서윤님, 금요일까지 정리해서 보내드릴게요. 기다려 주셔서 감사합니다.' },
+  { id: 'd2', ch: 'kakao', personId: 'p1', kind: '메시지', original: '민준님, 말씀하신 IR 자료 언제쯤 받아볼 수 있을까요?', context: '10/29 미팅에서 자료 보내기로 약속함', text: '서윤님, 금요일까지 정리해서 보내드릴게요. 기다려 주셔서 감사합니다.' },
   { id: 'd3', ch: 'mail', personId: 'p3', kind: '메일', original: '포트폴리오 첨부드립니다. 편하실 때 보시고 의견 주세요.', context: '10/18 지인 소개로 만남, 협업 검토 중', text: '채린님, 포트폴리오 잘 받았습니다. 이번 주 안에 보고 의견 드릴게요.', profileLink: true },
   { id: 'd4', ch: 'tg', personId: 'p4', kind: '메시지', original: '다음 주에 저녁 한번 할까요?', context: '7월 이후 연락 없었음', text: '좋아요! 다음 주 목요일 저녁 어떠세요?' },
 ]
@@ -95,11 +100,14 @@ const CH: Record<Channel, { label: string; cls: string }> = {
   call: { label: '통화', cls: 'bg-teal-50 text-teal-700' },
 }
 
+/** [임시] 나. 기존 프로필 서비스의 강민준 프로필과 이어진다 */
+const ME = { name: '강민준', title: 'B2B SaaS Product Owner', linkId: 'gangminjun', img: '/images/mj1.jpg' }
+
 const personById = (id: string) => PEOPLE.find((p) => p.id === id)!
 
 /* ───────── 연결 ─────────
  * 인스타, 링크드인 에이전트 대행은 로그인 정보를 받아 사용자가 만든 암호화 키로 잠가 보관하고 서버에서 로그인한다(피클 방식).
- * 인스타 프로필 연동(본인 확인, 피드 분석)은 내 소개에서 DM 코드로 따로 한다(망원동 이자카야 방식).
+ * 인스타 프로필 연동(본인 확인, 피드 분석)은 마이페이지에서 DM 코드로 따로 한다(망원동 이자카야 방식).
  * 텔레그램은 공식 API, 지메일, 구글 캘린더는 구글 동의 화면으로 권한을 하나씩 받는다.
  * 카톡은 대화방의 대화 내보내기를 공유하기로 받는다. 자동 내보내기는 하지 않는다.
  * 휴대폰 연락처는 이름과 번호를 읽고 계속 동기화한다. 통화 녹음은 갤럭시는 녹음 파일 권한, 아이폰은 공유하기로 받는다.
@@ -159,14 +167,17 @@ const ConnectCtx = createContext<{
   openHub: () => void
   /** 가져온 계정을 사람으로 묶고 나누는 화면. 가입 직후와 가져오는 중에만 */
   openSort?: () => void
-  /** 내 소개 > 인스타 연동. DM 코드로 내 계정을 확인하고 피드를 분석한다 */
+  /** 비회원이 가입한다. viaLink면 링크로 본 프로필의 주인이 내 사람에 들어간다 */
+  join: (viaLink?: boolean) => void
+  joinedViaLink: boolean
+  /** 마이페이지 > 인스타 연동. DM 코드로 내 계정을 확인하고 피드를 분석한다 */
   openInsta: () => void
   /** 인스타 연동을 마쳤는지와 앨범에 넣은 사진 수 */
   instaDone: boolean
   instaPhotos: number
   finishInsta: (photos: number) => void
   openMeetLink: () => void
-}>({ conn: initConn('new'), start: () => {}, update: () => {}, openHub: () => {}, openInsta: () => {}, instaDone: false, instaPhotos: 6, finishInsta: () => {}, openMeetLink: () => {} })
+}>({ conn: initConn('new'), start: () => {}, update: () => {}, openHub: () => {}, join: () => {}, joinedViaLink: false, openInsta: () => {}, instaDone: false, instaPhotos: 6, finishInsta: () => {}, openMeetLink: () => {} })
 
 const useConnect = () => useContext(ConnectCtx)
 
@@ -214,7 +225,9 @@ function Card({ children, className = '', onClick }: { children: ReactNode; clas
   )
 }
 
-function Avatar({ name, size = 40, member = true }: { name: string; size?: number; member?: boolean }) {
+function Avatar({ name, size = 40, member = true, img }: { name: string; size?: number; member?: boolean; img?: string }) {
+  // eslint-disable-next-line @next/next/no-img-element
+  if (img) return <img src={img} alt={name} className="shrink-0 rounded-full object-cover" style={{ width: size, height: size }} />
   return (
     <div
       className={`flex shrink-0 items-center justify-center rounded-full font-semibold ${member ? 'bg-[#25313D] text-white' : 'border border-dashed border-neutral-300 bg-neutral-50 text-neutral-500'}`}
@@ -287,7 +300,7 @@ function DraftItem({ d, include, text, editing, link, onToggle, onEdit, onChange
     <div className={`py-3 ${include ? '' : 'opacity-50'}`}>
       <div className="flex items-center gap-2">
         <button onClick={() => openPerson(p)} className="flex items-center gap-2">
-          <Avatar name={p.name} size={28} member={p.member} />
+          <Avatar name={p.name} size={28} member={p.member} img={p.img} />
           <span className="text-[13px] font-semibold">{p.name}</span>
         </button>
         <ChannelBadge ch={d.ch} />
@@ -446,7 +459,7 @@ function ConnStatus({ c, file }: { c: Conn; file?: boolean }) {
   return <span>{LEVEL[c.level].t}{c.last && <span className="text-neutral-400">, 마지막 확인 {c.last}</span>}</span>
 }
 
-/** 내 소개 > 연결. 곳마다 상태와 비서가 할 수 있는 일을 보여준다 */
+/** 마이페이지 > 연결. 곳마다 상태와 비서가 할 수 있는 일을 보여준다 */
 function ConnectScreen({ onBack, onDetail }: { onBack: () => void; onDetail: (s: Src) => void }) {
   const { conn, start } = useConnect()
   const groups: { id: 'phone' | 'talk' | 'google'; t: string }[] = [
@@ -638,11 +651,11 @@ function ConnectFlowSheet({ src, onClose }: { src: Src; onClose: () => void }) {
         <>
           <p className="mt-4 text-[13px] text-neutral-600">{meta.label} 로그인 정보를 넣어 주세요. 펠로어 서버가 이 계정으로 로그인해서 대신 읽고 답해요.</p>
           <input
-            defaultValue={src === 'ig' ? 'kimfelo' : ''}
+            defaultValue={src === 'ig' ? 'minjun.k' : ''}
             placeholder={src === 'ig' ? '인스타그램 아이디' : '링크드인 이메일'}
             className="mt-4 w-full rounded-xl border border-neutral-200 px-3 py-3 text-[13px] outline-none"
           />
-          {src === 'ig' && <p className="mt-1 text-[11px] text-emerald-700">내 소개에서 확인한 계정이라 미리 채웠어요</p>}
+          {src === 'ig' && <p className="mt-1 text-[11px] text-emerald-700">마이페이지에서 확인한 계정이라 미리 채웠어요</p>}
           <input type="password" placeholder="비밀번호" className="mt-2 w-full rounded-xl border border-neutral-200 px-3 py-3 text-[13px] outline-none" />
           <p className="mt-2 flex items-center gap-1 text-[11px] text-neutral-500"><KeyRound size={12} />내 암호화 키로 잠가서 보관해요</p>
           <div className="mt-5"><PrimaryButton onClick={() => setStep('verify')}>로그인</PrimaryButton></div>
@@ -1046,7 +1059,7 @@ function CallImportCard({ openPerson }: { openPerson: (p: Person) => void }) {
   return (
     <Card className="mt-2">
       <div className="flex items-center gap-3">
-        <Avatar name={p.name} size={36} member={p.member} />
+        <Avatar name={p.name} size={36} member={p.member} img={p.img} />
         <div className="min-w-0 flex-1">
           <div className="text-[13px]"><span className="font-semibold">{p.name}</span>님과 통화한 녹음이 있어요</div>
           <div className="flex items-center gap-1 text-[11px] text-neutral-400"><Phone size={11} />오늘 오후 4:12, 12분</div>
@@ -1093,13 +1106,13 @@ function KakaoStaleCard() {
   )
 }
 
-/** 가입 직후 맨 위. 인스타로 내 소개부터 채우게 한다 */
+/** 가입 직후 맨 위. 인스타로 내 프로필부터 채우게 한다 */
 function InstaStartCard() {
   const { openInsta } = useConnect()
   return (
     <Card className="mt-4 !border-transparent !bg-[#25313D] text-white" onClick={openInsta}>
       <p className="text-[12px] opacity-70">1분이면 돼요</p>
-      <p className="mt-1 text-[17px] font-bold leading-snug">인스타로 내 소개부터 채워요</p>
+      <p className="mt-1 text-[17px] font-bold leading-snug">인스타로 내 프로필부터 채워요</p>
       <p className="mt-1.5 text-[12px] leading-relaxed opacity-80">DM 코드로 내 계정만 확인하면, 피드에서 사진과 관심사를 골라 프로필과 페르소나 초안을 만들어 드려요.</p>
       <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-[12px] font-semibold text-[#0D0D0D]">시작하기<ChevronRight size={12} /></span>
     </Card>
@@ -1133,10 +1146,10 @@ function OnboardingFlow({ onDone }: { onDone: () => void }) {
 
   const copy: Record<ObStep, { t: ReactNode; d: string; cta: string; act?: () => void; doneText?: string }> = {
     hello: { t: <>안녕하세요,<br />펠로어예요</>, d: '흩어진 연락을 사람 단위로 모으고, 답장은 미리 써 둘게요. 몇 가지만 같이 정해요.', cta: '시작하기' },
-    insta: { t: <>인스타로 내 소개부터<br />채워 볼까요?</>, d: 'DM 코드로 내 계정인지만 확인하고, 피드에서 사진과 관심사를 골라 프로필과 페르소나 초안을 만들어요. 로그인은 필요 없어요.', cta: '인스타 아이디 넣기', act: openInsta, doneText: '내 소개에 앨범과 페르소나 초안을 넣었어요' },
+    insta: { t: <>인스타로 내 프로필부터<br />채워 볼까요?</>, d: 'DM 코드로 내 계정인지만 확인하고, 피드에서 사진과 관심사를 골라 프로필과 페르소나 초안을 만들어요. 로그인은 필요 없어요.', cta: '인스타 아이디 넣기', act: openInsta, doneText: '내 프로필에 앨범과 페르소나 초안을 넣었어요' },
     contacts: { t: <>연락처를<br />읽어도 될까요?</>, d: '이름과 번호로 카톡, 메일, 펠로어 회원이 같은 사람인지 알아봐요. 바뀐 연락처는 계속 맞춰요.', cta: '연락처 허용', act: () => start('contacts'), doneText: '연락처를 읽고 있어요' },
     calls: { t: <>통화한 뒤에<br />요약을 남겨 드릴까요?</>, d: '펠로어가 통화를 녹음하지는 않아요. 휴대폰이 녹음한 통화 중 고른 것만 요약해서 그 사람 카드에 붙여요.', cta: '통화 녹음 가져오기', act: () => start('calls'), doneText: '새 통화 녹음이 생기면 물어볼게요' },
-    talk: { t: <>연락이 오는 곳을<br />하나 골라 주세요</>, d: '하나만 연결해도 충분해요. 나머지는 내 소개 > 연결에서 언제든 더할 수 있어요.', cta: '연결하기', act: () => talkPick && start(talkPick), doneText: `${talkDone ? SRC[talkDone].label : ''}을 연결했어요` },
+    talk: { t: <>연락이 오는 곳을<br />하나 골라 주세요</>, d: '하나만 연결해도 충분해요. 나머지는 마이페이지 > 연결에서 언제든 더할 수 있어요.', cta: '연결하기', act: () => talkPick && start(talkPick), doneText: `${talkDone ? SRC[talkDone].label : ''}을 연결했어요` },
     end: { t: got.length ? <>{got.length}곳에서<br />계정을 모았어요</> : <>준비됐어요</>, d: got.length ? '같은 사람끼리 묶고 내 사람을 골라 볼게요. 확인할 것은 몇 건 안 돼요.' : '연결은 나중에 해도 돼요. 오늘의 제안에서 하나씩 이어 갈 수 있어요.', cta: got.length && openSort ? '사람 정리 시작' : '오늘의 제안 보기', act: got.length && openSort ? openSort : undefined },
   }
   const c = copy[step]
@@ -1211,7 +1224,7 @@ function MeetLinkSheet({ onClose }: { onClose: () => void }) {
       </div>
       <p className="mt-2 text-[13px] text-neutral-500">링크를 보내면 상대가 비어 있는 시간을 골라 약속을 잡아요. 잡힌 약속은 오늘 만날 사람에 올라와요.</p>
       <div className="mt-4 rounded-2xl bg-neutral-50 px-4 py-3">
-        <p className="break-all text-[13px] font-semibold">felore.app/meet/kimfelo</p>
+        <p className="break-all text-[13px] font-semibold">felore.app/meet/gangminjun</p>
         <p className="mt-0.5 text-[11px] text-neutral-400">{on ? '켜짐' : '꺼짐. 복사하거나 공유하면 켜져요'}</p>
         <div className="mt-2 space-y-0.5 text-[12px] text-neutral-600">
           <p>월~금 10:00~18:00</p>
@@ -1231,19 +1244,19 @@ function MeetLinkSheet({ onClose }: { onClose: () => void }) {
   )
 }
 
-/** 인스타 분석 결과가 붙은 내 소개 카드 조각 */
+/** 인스타 분석 결과가 붙은 마이페이지 카드 조각 */
 function InstaProfileBlock({ photos }: { photos: number }) {
   return (
     <div className="mt-4 border-t border-[var(--color-border-soft)] pt-3">
       <div className="flex items-center justify-between">
-        <span className="flex items-center gap-1.5 text-[12px] font-semibold"><ChannelBadge ch="ig" />@kimfelo 연동됨</span>
+        <span className="flex items-center gap-1.5 text-[12px] font-semibold"><ChannelBadge ch="ig" />@minjun.k 연동됨</span>
         <span className="text-[11px] text-neutral-400">피드에서 가져온 사진 {photos}장</span>
       </div>
       <div className="mt-2 flex gap-1.5 overflow-x-auto">
         {FEED_TONES.slice(0, photos).map((bg) => <div key={bg} className="h-14 w-14 shrink-0 rounded-lg" style={{ background: bg }} />)}
       </div>
       <p className="mt-3 text-[11px] text-neutral-400">페르소나 초안</p>
-      <p className="mt-0.5 text-[13px] leading-relaxed">사람을 만나며 일을 넓히는 실행형 대표. 주말 러닝으로 리듬을 지키고, 새로운 공간과 전시에서 영감을 얻어요.</p>
+      <p className="mt-0.5 text-[13px] leading-relaxed">사람을 만나며 일을 넓히는 실행형 프로덕트 오너. 주말 러닝으로 리듬을 지키고, 새로운 공간과 전시에서 영감을 얻어요.</p>
       <div className="mt-2 flex flex-wrap gap-1">{['러닝', '성수', '스타트업', '커피', '전시'].map((k) => <span key={k} className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px]">{k}</span>)}</div>
       <button className="mt-3 flex items-center gap-1 text-[12px] font-medium text-[#25313D]"><Send size={12} />한마디 공유하기 <span className="font-normal text-neutral-400">&ldquo;평일엔 성수, 주말엔 한강&rdquo;</span></button>
     </div>
@@ -1251,7 +1264,7 @@ function InstaProfileBlock({ photos }: { photos: number }) {
 }
 
 function TodayTab({ mode, openPerson, onboarding, onOnboardDone }: { mode: Mode; openPerson: (p: Person) => void; onboarding?: boolean; onOnboardDone?: () => void }) {
-  const { conn, start, instaDone } = useConnect()
+  const { conn, start, instaDone, join } = useConnect()
   const broken = (Object.keys(conn) as Src[]).filter((s) => conn[s].status === 'broken')
   if (mode === 'guest') {
     return (
@@ -1272,7 +1285,7 @@ function TodayTab({ mode, openPerson, onboarding, onOnboardDone }: { mode: Mode;
           <p className="mt-2 rounded-xl bg-neutral-50 px-3 py-2 text-[12px] text-neutral-600">&ldquo;형 러닝 사진 미쳤다 🔥&rdquo;</p>
           <p className="mt-2 rounded-xl border border-neutral-200 p-3 text-[13px]">ㅋㅋ 고마워! 이번 주말에 같이 뛰자</p>
         </Card>
-        <div className="mt-6"><PrimaryButton>펠로어 시작하기</PrimaryButton></div>
+        <div className="mt-6"><PrimaryButton onClick={() => join()}>펠로어 시작하기</PrimaryButton></div>
         <Link href="/landing" className="mt-3 block text-center text-[13px] text-neutral-500 underline">서비스 소개 더 보기</Link>
       </div>
     )
@@ -1361,7 +1374,7 @@ function TodayTab({ mode, openPerson, onboarding, onOnboardDone }: { mode: Mode;
       <SectionTitle tag="new">챙길 사람</SectionTitle>
       <Card onClick={() => openPerson(PEOPLE[3])}>
         <div className="flex items-center gap-3">
-          <Avatar name={PEOPLE[3].name} size={36} />
+          <Avatar name={personById('p4').name} size={36} />
           <div className="flex-1">
             <div className="text-[13px] font-semibold">{PEOPLE[3].name}</div>
             <div className="text-[12px] text-neutral-500">4개월째 연락이 없어요. 최근 새 펀드 결성 소식이 있어요</div>
@@ -1378,7 +1391,7 @@ function TodayTab({ mode, openPerson, onboarding, onOnboardDone }: { mode: Mode;
 function PersonRow({ p, onClick, saveable }: { p: Person; onClick?: () => void; saveable?: boolean }) {
   return (
     <div onClick={onClick} className="flex cursor-pointer items-center gap-3 py-2.5">
-      <Avatar name={p.name} member={p.member} />
+      <Avatar name={p.name} member={p.member} img={p.img} />
       <div className="min-w-0 flex-1">
         <div className="text-[14px] font-semibold">{p.name}</div>
         <div className="truncate text-[12px] text-neutral-500">{p.title}{p.origin === 'felore' && <span className="text-[#25313D]">, 펠로어에서 저장</span>}</div>
@@ -1493,7 +1506,7 @@ function ImportedList({ openPerson }: { openPerson: (p: Person) => void }) {
       <div className="mt-2 divide-y divide-[var(--color-border-soft)]">
         {IMPORTED.filter((p) => !p.spam).map((p) => (
           <button key={p.id} onClick={() => openPerson(p)} className="flex w-full items-center gap-3 py-3 text-left">
-            <Avatar name={p.name} size={36} member={p.member} />
+            <Avatar name={p.name} size={36} member={p.member} img={p.img} />
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5 text-[14px] font-semibold">{p.name}<ChannelBadge ch={p.accounts[0].ch} /></div>
               <div className="text-[12px] text-neutral-500">{p.why}</div>
@@ -1558,6 +1571,7 @@ function PeopleTab({ mode, openPerson, fromLink }: { mode: Mode; openPerson: (p:
   const [view, setView] = useState<'mine' | 'imported'>('mine')
   const [adding, setAdding] = useState(false)
   const [merging, setMerging] = useState(false)
+  const { joinedViaLink, join } = useConnect()
 
   const search = (
     <div className="mt-1 flex items-center gap-2 rounded-full bg-neutral-100 px-4 py-2.5">
@@ -1584,16 +1598,17 @@ function PeopleTab({ mode, openPerson, fromLink }: { mode: Mode; openPerson: (p:
           <>
             <Card className="mt-4">
               <div className="flex items-center gap-3">
-                <Avatar name={PEOPLE[0].name} size={48} />
+                <Avatar name={PEOPLE[0].name} size={48} img={PEOPLE[0].img} />
                 <div className="flex-1">
                   <div className="text-[15px] font-bold">{PEOPLE[0].name}</div>
                   <div className="text-[12px] text-neutral-500">방금 프로필을 봤어요</div>
                 </div>
+                <Link href={`/${PEOPLE[0].linkId}?from=v2`} className="rounded-full border border-neutral-200 px-3 py-1.5 text-[12px]">프로필 보기</Link>
               </div>
               <p className="mt-3 text-[13px] text-neutral-600">가입하면 {PEOPLE[0].name}님이 내 사람에 추가돼요.</p>
             </Card>
             <div className="mt-3 rounded-2xl bg-amber-50 px-4 py-3 text-[12px] text-amber-700">링크를 받고 24시간 안에 가입하면 보너스 재화 5개를 드려요</div>
-            <div className="mt-4"><PrimaryButton>가입하고 내 사람에 추가</PrimaryButton></div>
+            <div className="mt-4"><PrimaryButton onClick={() => join(true)}>가입하고 내 사람에 추가</PrimaryButton></div>
           </>
         ) : (
           <>
@@ -1601,7 +1616,7 @@ function PeopleTab({ mode, openPerson, fromLink }: { mode: Mode; openPerson: (p:
             <Card className="mt-2 !py-1 divide-y divide-[var(--color-border-soft)]">
               {PEOPLE.slice(0, 3).map((p) => <PersonRow key={p.id} p={p} />)}
             </Card>
-            <div className="mt-4"><PrimaryButton>펠로어 시작하기</PrimaryButton></div>
+            <div className="mt-4"><PrimaryButton onClick={() => join()}>펠로어 시작하기</PrimaryButton></div>
           </>
         )}
       </div>
@@ -1612,9 +1627,15 @@ function PeopleTab({ mode, openPerson, fromLink }: { mode: Mode; openPerson: (p:
     return (
       <div className="px-5 pb-28">
         {search}
-        <div className="pt-14 text-center">
+        {joinedViaLink && (
+          <>
+            <p className="mt-5 text-[13px] font-semibold">프로필 링크로 추가한 사람</p>
+            <Card className="mt-2 !py-1"><PersonRow p={PEOPLE[0]} onClick={() => openPerson(PEOPLE[0])} /></Card>
+          </>
+        )}
+        <div className={joinedViaLink ? 'pt-8 text-center' : 'pt-14 text-center'}>
           <Users size={40} className="mx-auto text-neutral-300" />
-          <p className="mt-4 text-[16px] font-bold">아직 내 사람이 없어요</p>
+          <p className="mt-4 text-[16px] font-bold">{joinedViaLink ? '다른 사람들도 가져와 볼까요?' : '아직 내 사람이 없어요'}</p>
           <p className="mt-1 text-[13px] text-neutral-500">계정을 연결하면 대화 상대가 여기에 쌓여요</p>
         </div>
         <SortEntryCard />
@@ -1715,12 +1736,12 @@ function PersonDetail({ p, onBack }: { p: Person; onBack: () => void }) {
       </div>
       <div className="px-5">
         <div className="flex items-center gap-4">
-          <Avatar name={p.name} size={64} member={member} />
+          <Avatar name={p.name} size={64} member={member} img={p.img} />
           <div>
             <div className="text-[20px] font-bold">{p.name}</div>
             <div className="text-[13px] text-neutral-500">{p.title || facts[0]?.t}</div>
             {member
-              ? <Link href="/" className="mt-1 inline-flex items-center text-[12px] font-medium text-[#25313D]">공개 프로필 보기 <ChevronRight size={12} /></Link>
+              ? <Link href={p.linkId ? `/${p.linkId}?from=v2&person=${p.id}` : '/'} className="mt-1 inline-flex items-center text-[12px] font-medium text-[#25313D]">공개 프로필 보기 <ChevronRight size={12} /></Link>
               : <span className="mt-1 inline-block text-[12px] text-neutral-400">펠로어 회원 아님</span>}
           </div>
         </div>
@@ -1881,16 +1902,16 @@ function PersonDetail({ p, onBack }: { p: Person; onBack: () => void }) {
   )
 }
 
-/* ───────── 내 소개 ───────── */
+/* ───────── 마이페이지 ───────── */
 
 function MeTab({ mode }: { mode: Mode }) {
-  const { conn, openHub, openInsta, instaDone, instaPhotos, openMeetLink } = useConnect()
+  const { conn, openHub, openInsta, instaDone, instaPhotos, openMeetLink, join } = useConnect()
   if (mode === 'guest') {
     return (
       <div className="px-5 pb-28 pt-10 text-center">
         <User size={40} className="mx-auto text-neutral-300" />
         <p className="mt-4 text-[16px] font-bold">로그인하고 내 프로필을 만들어요</p>
-        <div className="mx-auto mt-6 max-w-[260px]"><PrimaryButton>로그인 / 회원가입</PrimaryButton></div>
+        <div className="mx-auto mt-6 max-w-[260px]"><PrimaryButton onClick={() => join()}>로그인 / 회원가입</PrimaryButton></div>
         <div className="mt-8 text-left">
           <Row icon={<Settings size={18} />} label="언어" desc="한국어" href="/settings" tag="old" />
         </div>
@@ -1904,12 +1925,12 @@ function MeTab({ mode }: { mode: Mode }) {
     <div className="px-5 pb-28">
       <Card className="mt-3">
         <div className="flex items-center gap-3">
-          <Avatar name="김" size={52} />
-          <div className="flex-1">
-            <div className="flex items-center gap-1 text-[16px] font-bold">김펠로 <BadgeCheck size={15} className="text-[#25313D]" /></div>
-            <div className="text-[12px] text-neutral-500">스타트업 대표</div>
+          <Avatar name={ME.name} size={52} img={ME.img} />
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1 text-[16px] font-bold">{ME.name} <BadgeCheck size={15} className="text-[#25313D]" /></div>
+            <div className="truncate text-[12px] text-neutral-500">{ME.title}</div>
           </div>
-          <Link href="/me" className="rounded-full border border-neutral-200 px-3 py-1.5 text-[12px]">프로필 보기</Link>
+          <Link href={`/${ME.linkId}?from=v2`} className="rounded-full border border-neutral-200 px-3 py-1.5 text-[12px]">프로필 보기</Link>
         </div>
         <div className="mt-4 grid grid-cols-2 gap-2">
           <button className="flex items-center justify-center gap-1.5 rounded-full bg-[#0D0D0D] py-2.5 text-[13px] font-semibold text-white"><Send size={14} />링크 공유</button>
@@ -1920,10 +1941,10 @@ function MeTab({ mode }: { mode: Mode }) {
 
       <SectionTitle tag="old">내 프로필</SectionTitle>
       <Card className="!py-1 divide-y divide-[var(--color-border-soft)]">
-        <Row icon={<PenLine size={18} />} label="프로필 관리" desc="기본정보, 하이라이트, SNS, 바이브, 연락처, 리멤버 네트워크" href="/me?edit=true" />
-        <Row icon={<ChannelBadge ch="ig" />} label="인스타 연동" desc={instaDone ? '@kimfelo 연동됨. 다시 분석하거나 사진 바꾸기' : 'DM 코드로 내 계정 확인, 피드로 앨범과 페르소나 채우기'} tag="new" onClick={openInsta} right={instaDone ? <Check size={16} className="text-emerald-600" /> : undefined} />
+        <Row icon={<PenLine size={18} />} label="프로필 관리" desc="기본정보, 하이라이트, SNS, 바이브, 연락처, 리멤버 네트워크" href="/me?edit=true&from=v2" />
+        <Row icon={<ChannelBadge ch="ig" />} label="인스타 연동" desc={instaDone ? '@minjun.k 연동됨. 다시 분석하거나 사진 바꾸기' : 'DM 코드로 내 계정 확인, 피드로 앨범과 페르소나 채우기'} tag="new" onClick={openInsta} right={instaDone ? <Check size={16} className="text-emerald-600" /> : undefined} />
         <Row icon={<ShieldCheck size={18} />} label="인증" desc="본인인증, 경력, 학력" />
-        <Row icon={<Eye size={18} />} label="공개범위" href="/me?section=visibility" />
+        <Row icon={<Eye size={18} />} label="공개범위" href="/me?section=visibility&from=v2" />
         <Row icon={<BarChart3 size={18} />} label="내 프로필 본 사람" />
       </Card>
 
@@ -2250,7 +2271,7 @@ function UploadSheet({ onClose, init }: { onClose: () => void; init?: 'kakao' })
   )
 }
 
-/* ───────── 인스타 연동 (내 소개) ─────────
+/* ───────── 인스타 연동 (마이페이지) ─────────
  * 망원동 이자카야 방식. 아이디를 넣으면 코드를 주고, 펠로어 공식 계정에 DM으로 보내면 본인 확인이 끝난다.
  * 공개 계정이면 피드를 한 번 분석해 앨범 사진, 키워드, 페르소나 초안을 채우고 한마디를 건넨다.
  * 비공개 계정은 본인 확인만 하고, 에이전트 대행을 연결한 뒤 분석한다.
@@ -2273,11 +2294,11 @@ function InstaLinkSheet({ onClose }: { onClose: () => void }) {
 
       {step === 'id' && (
         <>
-          <p className="mt-3 text-[20px] font-bold leading-snug">인스타로 내 소개를<br />채워 볼까요?</p>
+          <p className="mt-3 text-[20px] font-bold leading-snug">인스타로 내 프로필을<br />채워 볼까요?</p>
           <p className="mt-2 text-[13px] text-neutral-500">로그인은 필요 없어요. 내 계정인지만 DM으로 확인하고, 공개된 피드를 한 번 읽어요.</p>
           <div className="mt-4 flex items-center rounded-xl border border-neutral-200 px-3">
             <span className="text-[14px] text-neutral-400">@</span>
-            <input defaultValue="kimfelo" className="flex-1 bg-transparent px-1 py-3 text-[14px] outline-none" />
+            <input defaultValue="minjun.k" className="flex-1 bg-transparent px-1 py-3 text-[14px] outline-none" />
           </div>
           <label className="mt-3 flex items-center gap-2 text-[12px] text-neutral-500">
             <input type="checkbox" checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} /> 비공개 계정으로 보기 (목업)
@@ -2302,7 +2323,7 @@ function InstaLinkSheet({ onClose }: { onClose: () => void }) {
 
       {step === 'analyze' && (
         <div className="py-2">
-          <p className="mt-2 text-[15px] font-bold">@kimfelo 확인됐어요</p>
+          <p className="mt-2 text-[15px] font-bold">@minjun.k 확인됐어요</p>
           <p className="mt-1 text-[13px] text-neutral-500">{isPrivate ? '비공개 계정이라 피드는 볼 수 없어요' : '피드를 읽고 있어요'}</p>
           <div className="mt-5">
             <ProgressSteps
@@ -2327,7 +2348,7 @@ function InstaLinkSheet({ onClose }: { onClose: () => void }) {
         <>
           <div className="mt-3 rounded-2xl bg-neutral-50 px-4 py-4">
             <p className="text-[11px] text-neutral-400">펠로어의 한마디</p>
-            <p className="mt-1 text-[16px] font-bold leading-snug">&ldquo;평일엔 성수에서 일하고, 주말엔 한강을 달리는 대표님. 맞죠?&rdquo;</p>
+            <p className="mt-1 text-[16px] font-bold leading-snug">&ldquo;평일엔 성수에서 일하고, 주말엔 한강을 달리는 민준님. 맞죠?&rdquo;</p>
           </div>
           <p className="mt-5 text-[13px] font-semibold">앨범에 넣을 사진</p>
           <p className="text-[11px] text-neutral-500">고른 사진만 앨범에 들어가요. 나머지는 저장하지 않아요</p>
@@ -2345,7 +2366,7 @@ function InstaLinkSheet({ onClose }: { onClose: () => void }) {
             {['러닝', '성수', '스타트업', '커피', '전시'].map((k) => <span key={k} className="rounded-full bg-neutral-100 px-3 py-1 text-[12px]">{k}</span>)}
           </div>
           <p className="mt-5 text-[13px] font-semibold">페르소나 초안</p>
-          <p className="mt-1 rounded-xl border border-neutral-200 p-3 text-[13px] leading-relaxed">사람을 만나며 일을 넓히는 실행형 대표. 주말 러닝으로 리듬을 지키고, 새로운 공간과 전시에서 영감을 얻어요.</p>
+          <p className="mt-1 rounded-xl border border-neutral-200 p-3 text-[13px] leading-relaxed">사람을 만나며 일을 넓히는 실행형 프로덕트 오너. 주말 러닝으로 리듬을 지키고, 새로운 공간과 전시에서 영감을 얻어요.</p>
           <div className="mt-5"><PrimaryButton onClick={() => { finishInsta(picked.length); onClose() }}>프로필에 넣기 (사진 {picked.length}장)</PrimaryButton></div>
           <button className="mt-3 w-full text-center text-[13px] text-neutral-500">한마디 공유하기</button>
         </>
@@ -2429,6 +2450,7 @@ export default function V2IaPage() {
   const [tab, setTab] = useState<Tab>('today')
   const [mode, setMode] = useState<Mode>('active')
   const [fromLink, setFromLink] = useState(true)
+  const [joinedViaLink, setJoinedViaLink] = useState(false)
   const [person, setPerson] = useState<Person | null>(null)
   const [fabOpen, setFabOpen] = useState(false)
   const [action, setAction] = useState<FabAction | null>(null)
@@ -2454,20 +2476,34 @@ export default function V2IaPage() {
     openHub: () => { setPerson(null); setHub(true) },
     openSort: mode === 'new' || mode === 'importing' ? () => { setPerson(null); setHub(false); setOnboarding(false); setSort(true) } : undefined,
     openInsta: () => setInsta(true),
+    join: (viaLink?: boolean) => join(viaLink),
+    joinedViaLink,
     instaDone,
     instaPhotos,
     finishInsta: (n: number) => { setInstaPhotos(n); setInstaDone(true) },
     openMeetLink: () => setMeetLink(true),
   }
 
-  const changeMode = (m: Mode) => { setMode(m); setPerson(null); setHub(false); setSort(false); setSearching(false); setFlow(null); setDetail(null); setInsta(false); setMeetLink(false); setAction(null); setConn(initConn(m)); setInstaDone(m === 'active' || m === 'importing'); setOnboarding(m === 'new') }
+  const changeMode = (m: Mode) => { setMode(m); setPerson(null); setHub(false); setSort(false); setSearching(false); setFlow(null); setDetail(null); setInsta(false); setMeetLink(false); setAction(null); setConn(initConn(m)); setInstaDone(m === 'active' || m === 'importing'); setOnboarding(m === 'new'); setJoinedViaLink(false) }
+  const join = (viaLink?: boolean) => { changeMode('new'); setJoinedViaLink(!!viaLink); setTab('today') }
+
+  // [임시] 기존 프로필 화면에서 돌아올 때 보던 탭과 인물 카드를 다시 연다 (/v2?tab=people&person=p6)
+  useEffect(() => {
+    clearV2Flow()
+    const q = new URLSearchParams(window.location.search)
+    const t = q.get('tab')
+    if (t === 'today' || t === 'people' || t === 'me') setTab(t)
+    const back = PEOPLE.find((x) => x.id === q.get('person'))
+    if (back) setPerson(back)
+  }, [])
+
   const goTab = (t: Tab) => { setPerson(null); setHub(false); setSort(false); setSearching(false); setTab(t) }
-  const titles: Record<Tab, string> = { today: '오늘의 제안', people: '내 사람들', me: '내 소개' }
+  const titles: Record<Tab, string> = { today: '오늘의 제안', people: '내 사람들', me: '마이페이지' }
 
   const tabs: { id: Tab; label: string; icon: ReactNode }[] = [
     { id: 'today', label: '오늘의 제안', icon: <Sparkles size={22} /> },
     { id: 'people', label: '내 사람들', icon: <Users size={22} /> },
-    { id: 'me', label: '내 소개', icon: <User size={22} /> },
+    { id: 'me', label: '마이페이지', icon: <User size={22} /> },
   ]
 
   const pick = (a: FabAction) => { setFabOpen(false); setUploadInit(undefined); setAction(a) }

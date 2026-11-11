@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Bell, BookOpen, Menu, Search, Star, X } from 'lucide-react'
+import { Bell, BookOpen, ChevronLeft, Menu, Search, Star, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { SAMPLE_PROFILE } from '@/lib/mocks/publicProfiles'
+import { useV2Flow } from '@/lib/v2Flow'
 
 // [임시] 방명록·피드백 알림 목업 — API 연동 후 교체
 const MOCK_NOTIFS = [
@@ -26,6 +27,8 @@ export default function AppHeader() {
   const router = useRouter()
   const { isLoggedIn } = useAuth()
   const [notiOpen, setNotiOpen] = useState(false)
+  // [임시] /v2에서 넘어온 흐름이면 돌아가는 줄을 보여주고 로고도 /v2로 보낸다
+  const v2 = useV2Flow()
 
   const hasUnread = MOCK_NOTIFS.length > 0
 
@@ -33,8 +36,16 @@ export default function AppHeader() {
 
   return (
     <>
+      {v2.active && (
+        <button
+          onClick={() => router.push(v2.backHref)}
+          className="flex h-9 flex-shrink-0 items-center gap-0.5 border-b border-[var(--color-border-soft)] bg-[var(--color-bg-page)] px-3 text-[12px] font-medium text-[var(--color-text-secondary)]"
+        >
+          <ChevronLeft size={16} />{v2.backLabel}
+        </button>
+      )}
       <header className="flex items-center justify-between px-5 h-14 bg-[var(--color-bg-page)] border-b border-[var(--color-border-soft)] flex-shrink-0">
-        <button onClick={() => router.push('/')} aria-label="Felore">
+        <button onClick={() => router.push(v2.active ? '/v2' : '/')} aria-label="Felore">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/images/brand/felore-wordmark.svg" alt="Felore" className="h-[18px] w-auto" />
         </button>

@@ -30,6 +30,7 @@ import { ProfileCoverToneContext } from '@/components/screens/profile/profileCov
 import { ExperienceBottomSheet, ExperienceDoneModal } from '@/components/screens/profile/PublicProfileOverlays'
 import { REPUTATION_KEYWORD_GROUPS } from '@/lib/mocks/reputationKeywords'
 import { useProfileOwner } from '@/hooks/useProfileOwner'
+import { useV2Flow } from '@/lib/v2Flow'
 import { toTourEmptyProfile, useTourEmptyPreview } from '@/components/screens/profile/profileTourPreview'
 import { PROFILE_TOUR_DEMO_LINK_ID, PROFILE_TOUR_DEMO_START, PROFILE_TOUR_FINISH_STEP, ProfileTour } from '@/components/screens/profile/ProfileTour'
 
@@ -56,6 +57,8 @@ export function PublicProfileShell({
   const isCover = layout === 'cover'
   const router = useRouter()
   const store = useFeloreStore()
+  // [임시] /v2에서 넘어온 흐름이면 저장을 '내 사람에 추가'로 부른다
+  const v2 = useV2Flow()
   const baseProfile = getNormalizedPublicProfile({
     username,
     user: store.user,
@@ -283,10 +286,10 @@ export function PublicProfileShell({
         <BottomSheet open={bookmarkSheetOpen} onClose={() => setBookmarkSheetOpen(false)}>
           <div className="px-5 pb-6">
             <div className="mb-1 text-[18px] font-black text-[var(--color-text-strong)]">
-              {profile.name}님 저장
+              {v2.active ? `${profile.name}님을 내 사람에 추가` : `${profile.name}님 저장`}
             </div>
             <p className="mb-5 text-[13px] leading-[1.65] text-[var(--color-text-secondary)]">
-              저장한 프로필에 추가하고 메모를 남길 수 있어요.
+              {v2.active ? '내 사람들에 추가하고 나만 보는 메모를 남길 수 있어요. 상대에게 알림은 가지 않아요.' : '저장한 프로필에 추가하고 메모를 남길 수 있어요.'}
             </p>
             <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[0.08em] text-[var(--color-text-tertiary)]">
               메모 <span className="font-normal normal-case tracking-normal">(선택)</span>
@@ -306,12 +309,12 @@ export function PublicProfileShell({
               onClick={() => {
                 store.saveProfile(profile.linkId, profile.name, profile.title, bookmarkMemo)
                 setBookmarkSheetOpen(false)
-                showToast(`${profile.name}님을 저장했어요`)
+                showToast(v2.active ? `${profile.name}님을 내 사람에 추가했어요` : `${profile.name}님을 저장했어요`)
               }}
               className="w-full rounded-full py-3.5 text-[14px] font-semibold text-white whitespace-nowrap"
               style={{ backgroundColor: 'var(--color-accent-dark)' }}
             >
-              저장하기
+              {v2.active ? '내 사람에 추가' : '저장하기'}
             </button>
           </div>
         </BottomSheet>
@@ -322,22 +325,22 @@ export function PublicProfileShell({
         <BottomSheet open={unsaveSheetOpen} onClose={() => setUnsaveSheetOpen(false)}>
           <div className="px-5 pb-6">
             <div className="mb-1 text-[18px] font-black text-[var(--color-text-strong)]">
-              저장을 취소할까요?
+              {v2.active ? '내 사람에서 뺄까요?' : '저장을 취소할까요?'}
             </div>
             <p className="mb-6 text-[13px] leading-[1.65] text-[var(--color-text-secondary)]">
-              {profile.name}님이 저장한 프로필에서 삭제돼요.
+              {v2.active ? `${profile.name}님이 내 사람들에서 빠져요. 남긴 메모도 함께 지워져요.` : `${profile.name}님이 저장한 프로필에서 삭제돼요.`}
             </p>
             <div className="space-y-2">
               <button
                 onClick={() => {
                   store.unsaveProfile(profile.linkId)
                   setUnsaveSheetOpen(false)
-                  showToast(`${profile.name}님을 저장 목록에서 삭제했어요`)
+                  showToast(v2.active ? `${profile.name}님을 내 사람에서 뺐어요` : `${profile.name}님을 저장 목록에서 삭제했어요`)
                 }}
                 className="w-full rounded-full border py-3.5 text-[14px] font-semibold whitespace-nowrap"
                 style={{ borderColor: 'rgba(198,40,40,0.28)', color: 'var(--color-state-danger-text)' }}
               >
-                저장 취소
+                {v2.active ? '내 사람에서 빼기' : '저장 취소'}
               </button>
               <button
                 onClick={() => setUnsaveSheetOpen(false)}

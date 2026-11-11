@@ -865,10 +865,10 @@ function ConnStatus({ c, file }: { c: Conn; file?: boolean }) {
 function ConnectScreen({ onBack, onDetail }: { onBack: () => void; onDetail: (s: Src) => void }) {
   const { conn, start } = useConnect()
   const groups: { id: 'phone' | 'talk' | 'google' | 'card'; t: string }[] = [
-    { id: 'card', t: '명함' },
     { id: 'phone', t: '휴대폰' },
     { id: 'talk', t: '대화' },
     { id: 'google', t: '메일과 일정' },
+    { id: 'card', t: '명함' },
   ]
   return (
     <div className="pb-28">
@@ -879,7 +879,7 @@ function ConnectScreen({ onBack, onDetail }: { onBack: () => void; onDetail: (s:
         <span className="ml-auto"><PrivateBadge /></span>
       </div>
       <div className="px-5">
-        <p className="text-[13px] leading-relaxed text-neutral-500">연결한 곳의 대화와 일정으로 내 사람들을 정리해요. 곳마다 비서가 어디까지 할지 정할 수 있어요.</p>
+        <p className="pt-3 text-[13px] leading-relaxed text-neutral-500">연결한 곳의 대화와 일정으로 내 사람들을 정리해요. 곳마다 비서가 어디까지 할지 정할 수 있어요.</p>
         {groups.map((g) => (
           <div key={g.id}>
             <SectionTitle>{g.t}</SectionTitle>

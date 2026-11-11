@@ -437,7 +437,7 @@ export function PublicProfileShell({
         profileName={profile.name}
         isLoggedIn={store.isLoggedIn}
         onRequestExperience={() => { setExpDoneModal(false); setFeedbackRequestOpen(true) }}
-        onCreateFelore={() => { setExpDoneModal(false); router.push('/signup') }}
+        onCreateFelore={() => { setExpDoneModal(false); router.push(v2.active ? '/v2?signup=1&via=1' : '/signup') }}
         onLogin={() => { setExpDoneModal(false); store.login() }}
         onClose={() => setExpDoneModal(false)}
       />

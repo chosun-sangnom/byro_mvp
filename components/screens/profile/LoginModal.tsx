@@ -3,10 +3,13 @@
 import { useRouter } from 'next/navigation'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import { Button, GoogleIcon, Modal } from '@/components/ui'
+import { useV2Flow } from '@/lib/v2Flow'
 
 export function LoginModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const store = useFeloreStore()
   const router = useRouter()
+  // [임시] /v2에서 넘어온 흐름이면 가입은 /v2의 가입 화면으로 잇는다
+  const v2 = useV2Flow()
 
   // [임시] 실제 OAuth 미연동 - 클릭 시 mock 로그인 처리
   const handleLogin = () => {
@@ -29,7 +32,7 @@ export function LoginModal({ open, onClose }: { open: boolean; onClose: () => vo
       </div>
       <button
         type="button"
-        onClick={() => { onClose(); router.push('/signup') }}
+        onClick={() => { onClose(); router.push(v2.active ? '/v2?signup=1&via=1' : '/signup') }}
         className="w-full text-center text-[12px] text-[var(--color-text-tertiary)]"
       >
         전화번호로 로그인 / 회원가입 →

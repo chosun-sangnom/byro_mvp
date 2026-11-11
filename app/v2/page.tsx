@@ -23,7 +23,7 @@ import {
 
 type Tab = 'today' | 'people' | 'me'
 type Mode = 'guest' | 'new' | 'importing' | 'active'
-type Channel = 'ig' | 'in' | 'kakao' | 'tg' | 'mail' | 'cal' | 'phone' | 'call' | 'memo'
+type Channel = 'ig' | 'in' | 'kakao' | 'tg' | 'mail' | 'cal' | 'phone' | 'call' | 'memo' | 'card'
 
 type Person = {
   id: string
@@ -141,6 +141,7 @@ const CH: Record<Channel, { label: string; cls: string }> = {
   phone: { label: '연락처', cls: 'bg-emerald-50 text-emerald-700' },
   call: { label: '통화', cls: 'bg-teal-50 text-teal-700' },
   memo: { label: '메모', cls: 'bg-neutral-100 text-neutral-600' },
+  card: { label: '명함', cls: 'bg-orange-50 text-orange-700' },
 }
 
 /** 초안을 보내는 채널이 어느 연결에 달려 있는지 */
@@ -154,6 +155,91 @@ const ME = { name: '강민준', title: 'B2B SaaS Product Owner', linkId: 'gangmi
 
 const personById = (id: string) => PEOPLE.find((p) => p.id === id)!
 
+/* ───────── 한 장짜리 프로필 ─────────
+ * 에이전트가 중심이 되면 프로필은 직접 채우는 긴 이력서가 아니라 처음 만난 사람이 30초에 훑는 소개 한 장이면 된다.
+ * 탭 없이 페르소나, 케미, 명함(경력과 학력), 연결된 사람들, 평판만 둔다. 취향과 근황은 인스타에서 고른 사진과 키워드로 대신한다.
+ * 통화나 대화에서 나온 정보는 여기에 나오지 않고 각자의 인물 카드에만 쌓인다.
+ */
+type ProfSec = 'persona' | 'card' | 'net' | 'rep'
+type Job = { org: string; role: string; when: string; ok?: boolean }
+type Prof = {
+  /** 한 줄 소개 */
+  line: string
+  /** 펠로어가 인스타를 보고 건넨 한마디 */
+  word?: string
+  persona: string
+  keywords: string[]
+  /** 인스타에서 고른 사진. 주소가 없으면 색 블록 */
+  photos: string[]
+  career: Job[]
+  edu: Job[]
+  net: { total: number; from: string; groups: [string, number][] }
+  mutual: string[]
+  rep: [string, number][]
+  quotes: { from: string; text: string }[]
+  kemi: { score: number; rows: [string, string][] }
+}
+
+const MY_PROF: Prof = {
+  line: '커뮤니티로 성장을 만드는 B2B SaaS 빌더',
+  word: '평일엔 성수, 주말엔 한강',
+  persona: '사람을 만나며 일을 넓히는 실행형 프로덕트 오너. 주말 러닝으로 리듬을 지키고, 새로운 공간과 전시에서 영감을 얻어요.',
+  keywords: ['러닝', '성수', '스타트업', '커피', '전시'],
+  photos: ['/images/mj1.jpg', '/images/mj2.jpg', '#C9D7E3', '#D8E3C9'],
+  career: [
+    { org: 'Felore', role: 'B2B SaaS Product Owner', when: '2022 ~ 지금', ok: true },
+    { org: '스타트업 공동창업', role: '제품 총괄', when: '2019 ~ 2022' },
+  ],
+  edu: [{ org: 'KAIST', role: '경영학과', when: '졸업', ok: true }],
+  net: { total: 312, from: '리멤버 명함', groups: [['스타트업', 128], ['투자', 54], ['마케팅', 47], ['그 밖', 83]] },
+  mutual: [],
+  rep: [['추진력이 좋아요', 12], ['큰 방향을 빨리 잡아요', 9], ['인사이트가 많아요', 7]],
+  quotes: [
+    { from: '이지민', text: '큰 방향을 빠르게 정리하고 실제 실행으로 옮기는 힘이 분명한 분이에요.' },
+    { from: '한서윤', text: '생각이 깊은데 실행이 느리지 않아서 같이 일할 때 추진력이 좋았습니다.' },
+  ],
+  kemi: { score: 0, rows: [['커리어', '제품을 만드는 사람, 사업을 넓히는 사람과 잘 맞아요'], ['성격', '결정이 빠른 편이라 꼼꼼한 사람과 균형이 맞아요'], ['취향', '러닝과 새로운 공간을 좋아하는 사람과 금방 친해져요']] },
+}
+
+/** 막 가입한 사람의 프로필. 인스타와 리멤버를 연결하기 전이라 직접 적은 것만 있다 */
+const FRESH_PROF: Prof = { ...MY_PROF, line: '', career: [], edu: [], rep: [], quotes: [] }
+
+const PROFS: Record<string, Prof> = {
+  p6: {
+    line: '러닝하고 혁오 듣는 스타트업 마케터',
+    word: '브랜드 얘기엔 진심, 주말엔 한남동',
+    persona: '브랜드와 사람을 잇는 마케터. 처음엔 거리를 두지만 신뢰가 쌓이면 깊이 연결되는 편이에요. 방향을 먼저 잡고 실행은 빠르게 가요.',
+    keywords: ['러닝', '혁오', '브랜드', '커뮤니티', '한남동'],
+    photos: ['/images/jimin-photo-2.jpg', '/images/jimin-photo-3.jpg', '/images/jimin-photo-4.jpg'],
+    career: [{ org: 'Brand Lab', role: '스타트업 마케터', when: '2022 ~ 지금', ok: true }],
+    edu: [{ org: '연세대학교', role: '경영학', when: '2021 졸업', ok: true }],
+    net: { total: 184, from: '리멤버 명함', groups: [['스타트업', 71], ['브랜드', 46], ['미디어', 30], ['그 밖', 37]] },
+    mutual: ['한서윤', '도민혁'],
+    rep: [['대화하면 생각이 넓어져요', 8], ['전문성이 느껴져요', 6], ['끝까지 챙겨요', 5]],
+    quotes: [{ from: '한서윤', text: '행사를 같이 준비했는데 끝까지 챙기는 분이에요.' }],
+    kemi: { score: 82, rows: [['커리어', 'B2B 제품과 브랜드 마케팅, 서로의 일에 바로 도움이 돼요'], ['취향', '둘 다 러닝을 해요. 주말 한강에서 만나기 좋아요'], ['성격', '방향을 먼저 잡는 사람과 사람을 잇는 사람이 만나요']] },
+  },
+}
+
+/** 예시 인물은 인물 카드에 있는 정보로 간단한 프로필을 만든다 */
+function profOf(p: Person): Prof {
+  if (PROFS[p.id]) return PROFS[p.id]
+  const [org, ...role] = p.title.split(' ')
+  return {
+    line: p.self?.[0] ?? p.title ?? '',
+    persona: p.self?.length ? `${p.self.join('. ')}.` : `${p.title || p.name}. 공개된 정보로 만든 소개예요.`,
+    keywords: p.tags.length ? p.tags : ['스타트업'],
+    photos: ['#E9D8C4', '#C9D7E3', '#D8E3C9'],
+    career: p.title ? [{ org, role: role.join(' ') || p.title, when: '지금', ok: p.member }] : [],
+    edu: [],
+    net: { total: 96, from: '리멤버 명함', groups: [['스타트업', 41], ['투자', 22], ['그 밖', 33]] },
+    mutual: [],
+    rep: [['믿고 맡길 수 있어요', 4], ['말이 잘 통해요', 3]],
+    quotes: [],
+    kemi: { score: 74, rows: [['커리어', '서로의 일에 바로 도움이 되는 사이예요'], ['성격', '결정이 빠른 쪽과 꼼꼼한 쪽이 만나 균형이 맞아요'], ['취향', '새로운 공간을 좋아하는 점이 겹쳐요']] },
+  }
+}
+
 /* ───────── 화면끼리 이어지는 상태 ───────── */
 
 type MergeQ = { a: { ch: Channel; h: string }; b: { ch: Channel; h: string }; why: string; talk?: string }
@@ -161,7 +247,9 @@ type MergeAnswer = 'same' | 'diff' | 'later'
 type ShareSpec = { title: string; url?: string; text?: string }
 type Panel =
   | { k: 'qr' | 'verify' | 'viewers' | 'batch' | 'coin' | 'noti' | 'hidden' | 'add' }
-  | { k: 'profile' | 'kemi'; p: Person }
+  | { k: 'kemi'; p: Person | null }
+  | { k: 'editProf' | 'vis' }
+  | { k: 'feedback'; p: Person }
   | { k: 'compose'; personId: string; title: string; text: string; todoId?: string }
 type FabAction = 'chat' | 'memo' | 'record' | 'upload'
 /** 내 약속 링크 설정 */
@@ -186,6 +274,14 @@ type Msg = {
   connect?: Src
   record?: string
   tips?: boolean
+  /** 채팅 안에서 받는 로그인 정보 카드 (피클 방식) */
+  login?: { src: Src; stage: 'key' | 'form' | 'saved' }
+  /** 가운데에 뜨는 처리 알림 */
+  chip?: string
+  /** 눌러서 바로 답하는 말 */
+  quick?: string[]
+  /** 어디까지 맡길지 고르기 */
+  levels?: { src: Src; picked?: Level }
 }
 
 type App = {
@@ -240,6 +336,18 @@ type App = {
   openPanel: (p: Panel) => void
   goTab: (t: Tab) => void
   onboarding: boolean
+  /** 한 장짜리 프로필 열기. 'me'는 내 프로필 */
+  openProfile: (t: Person | 'me') => void
+  myProf: Prof
+  setMyProf: (p: Prof) => void
+  /** 내 프로필에서 구역별로 공개할지 */
+  vis: Record<ProfSec, boolean>
+  setVis: (v: Record<ProfSec, boolean>) => void
+  /** 기획 확인용 태그(신규, 기존, 검토)를 보일지 */
+  planTags: boolean
+  /** 말하기를 열면서 바로 한마디 건넨다 */
+  ask: string | null
+  askAgent: (text: string | null) => void
 }
 
 const AppCtx = createContext<App>(null as unknown as App)
@@ -264,14 +372,14 @@ const freshBatch = (drafts: Draft[], label: string): BatchSt => ({
  * 원천 대화와 녹음은 요약을 만든 뒤 지운다.
  */
 
-type Src = 'contacts' | 'calls' | 'ig' | 'in' | 'tg' | 'kakao' | 'gmail' | 'gcal'
+type Src = 'contacts' | 'calls' | 'ig' | 'in' | 'tg' | 'kakao' | 'gmail' | 'gcal' | 'remember'
 type Level = 'read' | 'draft' | 'send'
 type Conn = { status: 'on' | 'off' | 'broken'; level: Level; last?: string }
 type ConnMap = Record<Src, Conn>
 
 const ALL_LEVELS: Level[] = ['read', 'draft', 'send']
 
-const SRC: Record<Src, { label: string; ch: Channel; group: 'phone' | 'talk' | 'google'; how: 'device' | 'web' | 'api' | 'google' | 'share'; desc: string; levels: Level[]; note?: string }> = {
+const SRC: Record<Src, { label: string; ch: Channel; group: 'phone' | 'talk' | 'google' | 'card'; how: 'device' | 'web' | 'api' | 'google' | 'share'; desc: string; levels: Level[]; note?: string }> = {
   contacts: { label: '휴대폰 연락처', ch: 'phone', group: 'phone', how: 'device', desc: '이름과 번호, 바뀌면 계속 맞춰요', levels: ['read'], note: '이름과 번호만 읽고, 추가하거나 바꾼 연락처는 계속 맞춰요. 연락처를 고치거나 지우지 않아요' },
   calls: { label: '통화 녹음', ch: 'call', group: 'phone', how: 'device', desc: '휴대폰이 녹음한 통화', levels: ['read'], note: '고른 녹음만 요약해서 인물 카드에 붙이고, 녹음은 지워요' },
   ig: { label: '인스타그램', ch: 'ig', group: 'talk', how: 'web', desc: 'DM과 댓글을 대신 읽고 답해요', levels: ALL_LEVELS },
@@ -280,6 +388,7 @@ const SRC: Record<Src, { label: string; ch: Channel; group: 'phone' | 'talk' | '
   kakao: { label: '카톡', ch: 'kakao', group: 'talk', how: 'share', desc: '대화방에서 내보낸 대화', levels: ['read', 'draft'], note: '카톡은 대화방에서 내보낸 대화만 읽어요. 보낼 때는 초안을 복사하거나 카톡 공유로 보내요' },
   gmail: { label: '지메일', ch: 'mail', group: 'google', how: 'google', desc: '주고받은 메일 상대', levels: ALL_LEVELS },
   gcal: { label: '구글 캘린더', ch: 'cal', group: 'google', how: 'google', desc: '일정과 참석자', levels: ['read'], note: '일정 만들기는 다음 단계예요' },
+  remember: { label: '리멤버', ch: 'card', group: 'card', how: 'web', desc: '받은 명함과 내 경력', levels: ['read'], note: '받은 명함으로 연결된 사람들을 채우고, 내 프로필의 명함에 경력을 넣어요' },
 }
 
 const LEVEL: Record<Level, { t: string; d: string }> = {
@@ -291,13 +400,14 @@ const LEVEL: Record<Level, { t: string; d: string }> = {
 const off = (level: Level = 'draft'): Conn => ({ status: 'off', level })
 
 function initConn(mode: Mode): ConnMap {
-  const base: ConnMap = { contacts: off('read'), calls: off('read'), ig: off(), in: off(), tg: off(), kakao: off(), gmail: off(), gcal: off('read') }
+  const base: ConnMap = { contacts: off('read'), calls: off('read'), ig: off(), in: off(), tg: off(), kakao: off(), gmail: off(), gcal: off('read'), remember: off('read') }
   if (mode === 'importing') {
     return { ...base, contacts: { status: 'on', level: 'read', last: '방금' }, ig: { status: 'on', level: 'draft', last: '방금' }, kakao: { status: 'on', level: 'draft', last: '방금' }, in: { status: 'on', level: 'draft', last: '가져오는 중' } }
   }
   if (mode === 'active') {
     return {
       ...base,
+      remember: { status: 'on', level: 'read', last: '어제' },
       contacts: { status: 'on', level: 'read', last: '오늘 아침' },
       calls: { status: 'on', level: 'read', last: '오후 4시' },
       ig: { status: 'on', level: 'send', last: '10분 전' },
@@ -334,12 +444,15 @@ const useConnect = () => useContext(ConnectCtx)
 /* ───────── 공통 조각 ───────── */
 
 function Tag({ kind }: { kind: 'old' | 'new' | 'later' | 'review' }) {
+  const app = useApp()
   const map = {
     old: ['기존', 'bg-neutral-100 text-neutral-500'],
     new: ['신규', 'bg-emerald-50 text-emerald-600'],
     later: ['다음 단계', 'bg-amber-50 text-amber-600'],
     review: ['검토', 'bg-rose-50 text-rose-500'],
   } as const
+  // 기획 확인용 표시. 맨 위 줄에서 켰을 때만 보인다
+  if (!app?.planTags) return null
   const [label, cls] = map[kind]
   return <span className={`ml-1.5 rounded px-1.5 py-0.5 text-[10px] font-semibold ${cls}`}>{label}</span>
 }
@@ -722,7 +835,7 @@ function BriefingCard({ person, sample, onOpen, from }: { person: Person; sample
  */
 function ConnectList() {
   const { conn, start } = useConnect()
-  const order: Src[] = ['contacts', 'calls', 'ig', 'kakao', 'in', 'gmail', 'tg', 'gcal']
+  const order: Src[] = ['contacts', 'calls', 'ig', 'kakao', 'in', 'remember', 'gmail', 'tg', 'gcal']
   return (
     <Card className="!py-1 divide-y divide-[var(--color-border-soft)]">
       {order.map((s) => (
@@ -751,7 +864,8 @@ function ConnStatus({ c, file }: { c: Conn; file?: boolean }) {
 /** 마이페이지 > 연결. 곳마다 상태와 비서가 할 수 있는 일을 보여준다 */
 function ConnectScreen({ onBack, onDetail }: { onBack: () => void; onDetail: (s: Src) => void }) {
   const { conn, start } = useConnect()
-  const groups: { id: 'phone' | 'talk' | 'google'; t: string }[] = [
+  const groups: { id: 'phone' | 'talk' | 'google' | 'card'; t: string }[] = [
+    { id: 'card', t: '명함' },
     { id: 'phone', t: '휴대폰' },
     { id: 'talk', t: '대화' },
     { id: 'google', t: '메일과 일정' },
@@ -870,7 +984,7 @@ function ConnectFlowSheet({ src, onClose }: { src: Src; onClose: () => void }) {
   // 열 때 끊겨 있었는지를 기억한다. 다시 연결을 마친 뒤에도 안내 문구가 바뀌지 않게
   const [reconnect] = useState(conn[src].status === 'broken')
   // 목업: 다른 곳을 이미 로그인 정보로 연결했다면 암호화 키가 있다
-  const hasKey = reconnect || (['ig', 'in'] as Src[]).some((s) => s !== src && conn[s].status !== 'off')
+  const hasKey = reconnect || (['ig', 'in', 'remember'] as Src[]).some((s) => s !== src && conn[s].status !== 'off')
   const first = meta.how === 'google' ? 'google' : meta.how === 'device' ? 'device' : meta.how === 'web' && !hasKey ? 'key' : 'login'
   const [step, setStep] = useState<'device' | 'key' | 'login' | 'verify' | 'consent' | 'google' | 'done'>(first)
   const [agree, setAgree] = useState(false)
@@ -887,7 +1001,11 @@ function ConnectFlowSheet({ src, onClose }: { src: Src; onClose: () => void }) {
   const keyOk = key1.length >= 6 && key1 === key2
   const input = 'w-full rounded-xl border border-neutral-200 px-3 py-3 text-[13px] outline-none focus:border-[#25313D]'
 
-  const finish = () => { update(src, { status: 'on', level, last: '방금' }); setStep('done') }
+  const finish = () => {
+    update(src, { status: 'on', level, last: '방금' })
+    if (src === 'remember' && app.myProf.career.length === 0) app.setMyProf({ ...app.myProf, career: MY_PROF.career, edu: MY_PROF.edu })
+    setStep('done')
+  }
   const deny = () => { app.toast(`${meta.label} 없이도 쓸 수 있어요. 마이페이지 > 연결에서 언제든 허용해요`); onClose() }
 
   const doneText: Record<Src, string> = {
@@ -899,6 +1017,7 @@ function ConnectFlowSheet({ src, onClose }: { src: Src; onClose: () => void }) {
     kakao: '',
     gmail: '주고받은 메일을 인물 카드에 이어 붙여요',
     gcal: '내일부터 아침마다 그날 만날 사람을 미리 정리해 드려요',
+    remember: '받은 명함으로 연결된 사람들을 채우고, 내 프로필의 명함에 경력을 넣었어요',
   }
 
   return (
@@ -973,7 +1092,7 @@ function ConnectFlowSheet({ src, onClose }: { src: Src; onClose: () => void }) {
       {step === 'login' && meta.how === 'web' && (
         <>
           <p className="mt-4 text-[13px] text-neutral-600">{meta.label} 로그인 정보를 넣어 주세요. 펠로어 서버가 이 계정으로 로그인해서 대신 읽고 답해요.</p>
-          <input value={uid} onChange={(e) => setUid(e.target.value)} placeholder={src === 'ig' ? '인스타그램 아이디' : '링크드인 이메일'} className={`mt-4 ${input}`} />
+          <input value={uid} onChange={(e) => setUid(e.target.value)} placeholder={src === 'ig' ? '인스타그램 아이디' : `${meta.label} 이메일`} className={`mt-4 ${input}`} />
           {src === 'ig' && uid === 'minjun.k' && <p className="mt-1 text-[11px] text-emerald-700">마이페이지에서 확인한 계정이라 미리 채웠어요</p>}
           <input type="password" value={pw} onChange={(e) => setPw(e.target.value)} placeholder="비밀번호" className={`mt-2 ${input}`} />
           <p className="mt-2 flex items-center gap-1 text-[11px] text-neutral-500"><KeyRound size={12} />내 암호화 키로 잠가서 보관해요. 목업에서는 아무 값이나 넣으면 돼요</p>
@@ -1465,11 +1584,18 @@ function InstaStartCard() {
 
 type ObStep = 'hello' | 'insta' | 'contacts' | 'calls' | 'talk' | 'end'
 const OB_STEPS: ObStep[] = ['hello', 'insta', 'contacts', 'calls', 'talk', 'end']
+/** 온보딩 맨 앞의 짧은 이야기. 한 장에 한 마디, 탭해서 넘긴다 */
+const OB_STORY: string[][] = [
+  ['연락은 카톡에, 인스타에,', '메일에 흩어져 있고'],
+  ['누가 누구였는지,', '무슨 얘기를 나눴는지', '자꾸 잊어버리죠.'],
+  ['펠로어가 사람 단위로 모으고,', '답장은 미리 써 둘게요.'],
+]
 
 function OnboardingFlow({ onDone }: { onDone: () => void }) {
   const { conn, start, openInsta, instaDone, openSort, joinedViaLink } = useConnect()
   const app = useApp()
   const [i, setI] = useState(0)
+  const [story, setStory] = useState(0)
   const [talkPick, setTalkPick] = useState<Src | null>(null)
   const step = OB_STEPS[i]
   const next = () => (i + 1 < OB_STEPS.length ? setI(i + 1) : onDone())
@@ -1500,6 +1626,21 @@ function OnboardingFlow({ onDone }: { onDone: () => void }) {
     end: { t: got.length ? <>{got.length}곳에서<br />계정을 모았어요</> : <>준비됐어요</>, d: got.length ? '같은 사람끼리 묶고 내 사람을 골라 볼게요. 확인할 것은 몇 건 안 돼요.' : '연결은 나중에 해도 돼요. 오늘의 제안에서 하나씩 이어 갈 수 있어요.', cta: got.length && openSort ? '사람 정리 시작' : '오늘의 제안 보기', act: got.length && openSort ? openSort : undefined },
   }
   const c = copy[step]
+
+  if (story < OB_STORY.length) {
+    return (
+      <button onClick={() => setStory(story + 1)} className="flex min-h-full w-full flex-col bg-[#161D25] px-7 pb-10 pt-5 text-left text-white">
+        <span onClick={(e) => { e.stopPropagation(); setStory(OB_STORY.length) }} className="self-end text-[12px] opacity-50">건너뛰기</span>
+        <span key={story} className="mt-auto block animate-[fadeIn_.5s_ease]">
+          {OB_STORY[story].map((l) => <span key={l} className="block text-[24px] font-bold leading-[1.5]">{l}</span>)}
+        </span>
+        <span className="mt-10 flex items-center justify-between">
+          <span className="flex gap-1">{OB_STORY.map((_, j) => <span key={j} className={`h-1 rounded-full ${j === story ? 'w-6 bg-white' : 'w-1.5 bg-white/30'}`} />)}</span>
+          <span className="text-[12px] opacity-50">탭해서 계속</span>
+        </span>
+      </button>
+    )
+  }
 
   return (
     <div className="flex min-h-full flex-col px-5 pb-8 pt-4">
@@ -1688,22 +1829,31 @@ function MeetLinkSheet({ onClose }: { onClose: () => void }) {
   )
 }
 
-/** 인스타 분석 결과가 붙은 마이페이지 카드 조각 */
-function InstaProfileBlock({ photos }: { photos: number }) {
+/** 홈 맨 위에서 펠로어가 먼저 말을 건다. 누르면 말하기로 이어진다 (피클처럼 에이전트가 중심) */
+function AgentHello() {
   const app = useApp()
+  const drafts = app.batchSt.sent ? 0 : app.drafts.length
+  const todo = app.todos.filter((t) => !t.done).length
+  const line = drafts + todo === 0
+    ? '지금은 급한 일이 없어요. 궁금한 사람이나 정리할 일이 있으면 말해 주세요.'
+    : `${app.batchSt.label}이에요. ${drafts > 0 ? `답장 초안 ${drafts}개` : ''}${drafts > 0 && todo > 0 ? '와 ' : ''}${todo > 0 ? `할 일 ${todo}건` : ''}을 준비해 뒀어요.`
   return (
-    <div className="mt-4 border-t border-[var(--color-border-soft)] pt-3">
-      <div className="flex items-center justify-between">
-        <span className="flex items-center gap-1.5 text-[12px] font-semibold"><ChannelBadge ch="ig" />@minjun.k 연동됨</span>
-        <span className="text-[11px] text-neutral-400">피드에서 가져온 사진 {photos}장</span>
+    <div className="mt-3">
+      <div className="flex items-start gap-3">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#25313D] text-white"><Sparkles size={16} /></span>
+        <div className="rounded-2xl rounded-tl-sm bg-neutral-100 px-4 py-3 text-[14px] leading-relaxed">
+          <span className="font-semibold">{app.me.name}님,</span> {line}
+        </div>
       </div>
-      <div className="mt-2 flex gap-1.5 overflow-x-auto">
-        {FEED_TONES.slice(0, photos).map((bg) => <div key={bg} className="h-14 w-14 shrink-0 rounded-lg" style={{ background: bg }} />)}
+      <button onClick={() => app.openAction('chat')} className="mt-3 flex w-full items-center gap-2 rounded-full border border-neutral-200 py-2 pl-4 pr-2 text-left">
+        <span className="flex-1 text-[13px] text-neutral-400">펠로어에게 말하기</span>
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0D0D0D] text-white"><ArrowUp size={15} /></span>
+      </button>
+      <div className="mt-2 scrollbar-hide flex gap-1.5 overflow-x-auto">
+        {['이번 주에 챙길 사람', '지난번에 서윤님이랑 무슨 얘기 했지?', '리멤버 연결해 줘'].map((s) => (
+          <button key={s} onClick={() => app.askAgent(s)} className="shrink-0 rounded-full bg-neutral-100 px-3 py-1.5 text-[12px] text-neutral-600">{s}</button>
+        ))}
       </div>
-      <p className="mt-3 text-[11px] text-neutral-400">페르소나 초안</p>
-      <p className="mt-0.5 text-[13px] leading-relaxed">사람을 만나며 일을 넓히는 실행형 프로덕트 오너. 주말 러닝으로 리듬을 지키고, 새로운 공간과 전시에서 영감을 얻어요.</p>
-      <div className="mt-2 flex flex-wrap gap-1">{['러닝', '성수', '스타트업', '커피', '전시'].map((k) => <span key={k} className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px]">{k}</span>)}</div>
-      <button onClick={() => app.openShare({ title: '한마디 공유하기', url: `felore.io/${app.me.linkId}`, text: '“평일엔 성수, 주말엔 한강” 펠로어가 내 인스타를 보고 건넨 한마디예요' })} className="mt-3 flex items-center gap-1 text-left text-[12px] font-medium text-[#25313D]"><Send size={12} className="shrink-0" />한마디 공유하기 <span className="font-normal text-neutral-400">&ldquo;평일엔 성수, 주말엔 한강&rdquo;</span></button>
     </div>
   )
 }
@@ -1788,6 +1938,7 @@ function TodayTab({ mode, openPerson, onboarding, onOnboardDone }: { mode: Mode;
 
   return (
     <div className="px-5 pb-28">
+      <AgentHello />
       {broken.map((s) => <ReconnectCard key={s} src={s} />)}
       <button onClick={() => app.openPanel({ k: 'batch' })} className="mt-2 flex w-full items-center gap-2 text-left text-[12px] text-neutral-500">
         <Clock size={13} /> 다음 묶음 {app.batchSt.label.startsWith(app.batchTimes[0]) ? app.batchTimes[1] : `내일 ${app.batchTimes[0]}`}
@@ -1934,7 +2085,7 @@ function FeloreSearch({ mode, onBack, openPerson }: { mode: Mode; onBack: () => 
   const mine = q && mode !== 'guest' ? app.people.filter((p) => p.name.includes(q) || p.title.includes(q)) : []
   const others = q ? findOnFelore(q).filter((o) => !mine.some((m) => m.id === o.id)) : []
   const recent = (mode === 'guest' ? [JIMIN, personById('p4')] : ['p6', 'p4'].map((id) => app.getPerson(id)).filter((x): x is Person => !!x))
-  const open = (p: Person) => (mode === 'guest' ? app.openPanel({ k: 'profile', p }) : openPerson(p))
+  const open = (p: Person) => (mode === 'guest' ? app.openProfile(p) : openPerson(p))
   return (
     <div className="pb-28">
       <div className="flex h-12 flex-shrink-0 items-center gap-2 border-b border-[var(--color-border-soft)] px-4">
@@ -1970,7 +2121,7 @@ function FeloreSearch({ mode, onBack, openPerson }: { mode: Mode; onBack: () => 
               <div key={k}>
                 <SectionTitle tag="old">{k}</SectionTitle>
                 {others.filter((o) => o.kind === k).map((o) => (
-                  <PersonRow key={o.id} p={o} onAdd={() => add(o)} added={!!app.people.find((x) => x.id === o.id)} onClick={() => (app.people.find((x) => x.id === o.id) ? openPerson(o) : app.openPanel({ k: 'profile', p: o }))} />
+                  <PersonRow key={o.id} p={o} onAdd={() => add(o)} added={!!app.people.find((x) => x.id === o.id)} onClick={() => (app.people.find((x) => x.id === o.id) ? openPerson(o) : app.openProfile(o))} />
                 ))}
               </div>
             ))}
@@ -2137,7 +2288,7 @@ function PeopleTab({ mode, openPerson, fromLink }: { mode: Mode; openPerson: (p:
                   <div className="text-[15px] font-bold">{JIMIN.name}</div>
                   <div className="text-[12px] text-neutral-500">방금 프로필을 봤어요</div>
                 </div>
-                <Link href={`/${JIMIN.linkId}?from=v2&person=${JIMIN.id}`} className="rounded-full border border-neutral-200 px-3 py-1.5 text-[12px]">프로필 보기</Link>
+                <button onClick={() => app.openProfile(JIMIN)} className="rounded-full border border-neutral-200 px-3 py-1.5 text-[12px]">프로필 보기</button>
               </div>
               <p className="mt-3 text-[13px] text-neutral-600">가입하면 {JIMIN.name}님이 내 사람에 추가돼요.</p>
             </Card>
@@ -2236,7 +2387,7 @@ function PeopleTab({ mode, openPerson, fromLink }: { mode: Mode; openPerson: (p:
         </button>
       )}
       {mode === 'importing' && <SortEntryCard />}
-      <div className="mt-3 flex gap-1.5 overflow-x-auto">
+      <div className="mt-3 scrollbar-hide flex gap-1.5 overflow-x-auto">
         {filters.map((f) => (
           <button key={f} onClick={() => setFilter(f)} className={`shrink-0 rounded-full px-3 py-1.5 text-[12px] ${filter === f ? 'bg-[#25313D] text-white' : 'bg-neutral-100 text-neutral-600'}`}>{f}</button>
         ))}
@@ -2324,9 +2475,7 @@ function PersonDetail({ id, onBack }: { id: string; onBack: () => void }) {
             <div className="text-[20px] font-bold">{p.name}</div>
             <div className="text-[13px] text-neutral-500">{p.title || facts[0]?.t}</div>
             {member ? (
-              p.linkId
-                ? <Link href={`/${p.linkId}?from=v2&person=${p.id}`} className="mt-1 inline-flex items-center text-[12px] font-medium text-[#25313D]">공개 프로필 보기 <ChevronRight size={12} /></Link>
-                : <button onClick={() => app.openPanel({ k: 'profile', p })} className="mt-1 inline-flex items-center text-[12px] font-medium text-[#25313D]">공개 프로필 보기 <ChevronRight size={12} /></button>
+              <button onClick={() => app.openProfile(p)} className="mt-1 inline-flex items-center text-[12px] font-medium text-[#25313D]">프로필 보기 <ChevronRight size={12} /></button>
             ) : <span className="mt-1 inline-block text-[12px] text-neutral-400">펠로어 회원 아님</span>}
           </div>
         </div>
@@ -2483,11 +2632,7 @@ function PersonDetail({ id, onBack }: { id: string; onBack: () => void }) {
         {member && (
           <>
             <SectionTitle tag="old">케미</SectionTitle>
-            {p.linkId ? (
-              <Link href={`/${p.linkId}/kemi-report?from=v2&person=${p.id}`}><Card><div className="flex items-center gap-2 text-[13px]"><Sparkles size={15} /> 나와의 케미 리포트 <ChevronRight size={14} className="ml-auto text-neutral-300" /></div></Card></Link>
-            ) : (
-              <Card onClick={() => app.openPanel({ k: 'kemi', p })}><div className="flex items-center gap-2 text-[13px]"><Sparkles size={15} /> 나와의 케미 리포트 <ChevronRight size={14} className="ml-auto text-neutral-300" /></div></Card>
-            )}
+            <Card onClick={() => app.openPanel({ k: 'kemi', p })}><div className="flex items-center gap-2 text-[13px]"><Sparkles size={15} /> 나와의 케미 리포트 <ChevronRight size={14} className="ml-auto text-neutral-300" /></div></Card>
           </>
         )}
 
@@ -2525,14 +2670,14 @@ function PersonDetail({ id, onBack }: { id: string; onBack: () => void }) {
 /* ───────── 마이페이지 ───────── */
 
 function MeTab({ mode }: { mode: Mode }) {
-  const { conn, openHub, openInsta, instaDone, instaPhotos, openMeetLink, join } = useConnect()
+  const { conn, openHub, openInsta, instaDone, openMeetLink, join } = useConnect()
   const app = useApp()
   if (mode === 'guest') {
     return (
       <div className="px-5 pb-28 pt-10 text-center">
         <User size={40} className="mx-auto text-neutral-300" />
-        <p className="mt-4 text-[16px] font-bold">로그인하고 내 프로필을 만들어요</p>
-        <p className="mt-1 text-[13px] text-neutral-500">프로필 링크 하나로 나를 소개하고, 만난 사람을 정리해요</p>
+        <p className="mt-4 text-[16px] font-bold">가입하면 내 프로필이 생겨요</p>
+        <p className="mt-1 text-[13px] text-neutral-500">링크 하나로 나를 소개하고, 만난 사람은 펠로어가 정리해요</p>
         <div className="mx-auto mt-6 max-w-[260px]"><PrimaryButton onClick={() => join()}>로그인 / 회원가입</PrimaryButton></div>
         <div className="mt-8 text-left">
           <Row icon={<Settings size={18} />} label="언어" desc="한국어" href="/settings?from=v2" tag="old" />
@@ -2541,37 +2686,48 @@ function MeTab({ mode }: { mode: Mode }) {
     )
   }
   const me = app.me
+  const prof = app.myProf
   const srcs = Object.keys(conn) as Src[]
   const onList = srcs.filter((s) => conn[s].status === 'on')
   const brokenCount = srcs.filter((s) => conn[s].status === 'broken').length
   return (
     <div className="px-5 pb-28">
-      <Card className="mt-3">
-        <div className="flex items-center gap-3">
-          <Avatar name={me.name} size={52} img={me.img} />
+      {/* 내 프로필: 한 장짜리 소개 카드의 축소판 */}
+      <div className="mt-3 overflow-hidden rounded-3xl border border-[var(--color-border-soft)]">
+        <button onClick={() => app.openProfile('me')} className="flex w-full items-center gap-4 p-4 text-left">
+          <Avatar name={me.name} size={64} img={me.img} />
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1 text-[16px] font-bold">{me.name} <BadgeCheck size={15} className="text-[#25313D]" /></div>
+            <div className="flex items-center gap-1 text-[18px] font-black">{me.name} <BadgeCheck size={16} className="text-[#25313D]" /></div>
             <div className="truncate text-[12px] text-neutral-500">{me.title}</div>
+            <div className="mt-1 truncate text-[13px]">{prof.line}</div>
           </div>
-          <Link href={`/${ME.linkId}?from=v2`} className="shrink-0 rounded-full border border-neutral-200 px-3 py-1.5 text-[12px]">프로필 보기</Link>
+          <ChevronRight size={18} className="shrink-0 text-neutral-300" />
+        </button>
+        {instaDone ? (
+          <div className="border-t border-[var(--color-border-soft)] px-4 py-3">
+            {prof.word && <p className="text-[14px] font-bold">&ldquo;{prof.word}&rdquo;</p>}
+            <div className="mt-2 flex flex-wrap gap-1">{prof.keywords.map((k) => <span key={k} className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-[11px]">{k}</span>)}</div>
+          </div>
+        ) : (
+          <button onClick={openInsta} className="flex w-full items-center gap-2 border-t border-[var(--color-border-soft)] px-4 py-3 text-left text-[13px]">
+            <ChannelBadge ch="ig" /><span className="flex-1">인스타를 보여주면 프로필을 채워 드려요</span><ChevronRight size={14} className="text-neutral-300" />
+          </button>
+        )}
+        <div className="grid grid-cols-3 gap-2 border-t border-[var(--color-border-soft)] p-3">
+          <button onClick={() => app.openPanel({ k: 'editProf' })} className="flex items-center justify-center gap-1.5 rounded-full border border-neutral-200 py-2.5 text-[12px]"><PenLine size={13} />편집</button>
+          <button onClick={() => app.openShare({ title: '내 프로필 링크 공유', url: `felore.io/${me.linkId}`, text: '받은 사람이 이 링크로 가입하면 서로 내 사람에 추가돼요' })} className="flex items-center justify-center gap-1.5 rounded-full bg-[#0D0D0D] py-2.5 text-[12px] font-semibold text-white"><Send size={13} />링크 공유</button>
+          <button onClick={() => app.openPanel({ k: 'qr' })} className="flex items-center justify-center gap-1.5 rounded-full border border-neutral-200 py-2.5 text-[12px]"><QrCode size={13} />QR</button>
         </div>
-        <div className="mt-4 grid grid-cols-2 gap-2">
-          <button onClick={() => app.openShare({ title: '내 프로필 링크 공유', url: `felore.io/${me.linkId}`, text: '받은 사람이 이 링크로 가입하면 서로 내 사람에 추가돼요' })} className="flex items-center justify-center gap-1.5 rounded-full bg-[#0D0D0D] py-2.5 text-[13px] font-semibold text-white"><Send size={14} />링크 공유</button>
-          <button onClick={() => app.openPanel({ k: 'qr' })} className="flex items-center justify-center gap-1.5 rounded-full border border-neutral-200 py-2.5 text-[13px]"><QrCode size={14} />QR 보여주기</button>
-        </div>
-        {instaDone && <InstaProfileBlock photos={instaPhotos} />}
-      </Card>
+      </div>
 
-      <SectionTitle tag="old">내 프로필</SectionTitle>
+      <SectionTitle>내 프로필</SectionTitle>
       <Card className="!py-1 divide-y divide-[var(--color-border-soft)]">
-        <Row icon={<PenLine size={18} />} label="프로필 관리" desc="기본정보, 하이라이트, SNS, 바이브, 연락처, 리멤버 네트워크" href="/me?edit=true&from=v2" />
-        <Row icon={<ChannelBadge ch="ig" />} label="인스타 연동" desc={instaDone ? '@minjun.k 연동됨. 다시 분석하거나 사진 바꾸기' : 'DM 코드로 내 계정 확인, 피드로 앨범과 페르소나 채우기'} tag="new" onClick={openInsta} right={instaDone ? <Check size={16} className="text-emerald-600" /> : undefined} />
+        <Row icon={<Eye size={18} />} label="공개범위" desc="구역마다 공개 또는 나만 보기" onClick={() => app.openPanel({ k: 'vis' })} />
         <Row icon={<ShieldCheck size={18} />} label="인증" desc="본인인증, 경력, 학력" onClick={() => app.openPanel({ k: 'verify' })} />
-        <Row icon={<Eye size={18} />} label="공개범위" desc="탭마다 공개 또는 비공개" href="/me?section=visibility&from=v2" />
         <Row icon={<BarChart3 size={18} />} label="내 프로필 본 사람" desc="최근 7일 14명" onClick={() => app.openPanel({ k: 'viewers' })} />
       </Card>
 
-      <SectionTitle tag="new">비서 설정</SectionTitle>
+      <SectionTitle tag="new">펠로어에게 맡긴 일</SectionTitle>
       <Card className="!py-1 divide-y divide-[var(--color-border-soft)]">
         <Row
           icon={<MessageCircle size={18} />}
@@ -2579,10 +2735,9 @@ function MeTab({ mode }: { mode: Mode }) {
           desc={
             onList.length || brokenCount
               ? <>{srcs.length}곳 중 {onList.length}곳 연결됨{brokenCount > 0 && <span className="text-rose-500">, {brokenCount}곳 다시 연결 필요</span>}</>
-              : '연락처, 통화 녹음, 인스타, 링크드인, 메일 등'
+              : '연락처, 인스타, 카톡, 리멤버, 메일 등'
           }
           onClick={openHub}
-          right={<span className="flex items-center gap-1">{onList.slice(0, 3).map((s) => <ChannelBadge key={s} ch={SRC[s].ch} />)}<ChevronRight size={16} className="text-neutral-300" /></span>}
         />
         <Row icon={<Clock size={18} />} label="묶음 처리 시간" desc={`${app.batchTimes[0]}, ${app.batchTimes[1]}`} tag="review" onClick={() => app.openPanel({ k: 'batch' })} />
         <Row icon={<Link2 size={18} />} label="내 약속 링크" desc={`${app.meet.on ? '켜짐' : '꺼짐'}. ${meetSummary(app.meet)}`} tag="review" onClick={openMeetLink} />
@@ -2590,10 +2745,9 @@ function MeTab({ mode }: { mode: Mode }) {
 
       <SectionTitle>재화</SectionTitle>
       <Card className="!py-1">
-        <Row icon={<Coins size={18} />} label="내 재화" desc={`${app.coins}개 보유 (이름 미정)`} tag="new" onClick={() => app.openPanel({ k: 'coin' })} />
+        <Row icon={<Coins size={18} />} label="내 재화" desc={`${app.coins}개`} tag="review" onClick={() => app.openPanel({ k: 'coin' })} />
       </Card>
-      <p className="mt-3 text-center text-[11px] text-neutral-400">계정, 언어, 약관, 문의는 위의 설정 버튼에 있어요</p>
-      <button onClick={app.logout} className="mt-3 w-full text-center text-[12px] text-neutral-400 underline">로그아웃</button>
+      <button onClick={app.logout} className="mt-5 w-full text-center text-[12px] text-neutral-400 underline">로그아웃</button>
     </div>
   )
 }
@@ -3154,62 +3308,140 @@ const CHAT_HELLO: Msg[] = [
 
 const CHAT_TIPS = ['도민혁이랑 @minhyuk.d 같은 사람이야, 합쳐줘', '민혁이한테는 반말로 해. 대학 동기야', '지난번에 서윤님이랑 무슨 얘기 했지?', '링크드인 연결해 줘', '이번 주에 챙길 사람']
 
-const SRC_WORDS: [RegExp, Src][] = [[/링크드인/, 'in'], [/인스타/, 'ig'], [/텔레그램/, 'tg'], [/지메일|메일/, 'gmail'], [/캘린더|일정/, 'gcal'], [/카톡|카카오/, 'kakao'], [/통화/, 'calls'], [/연락처/, 'contacts']]
+const SRC_WORDS: [RegExp, Src][] = [[/링크드인/, 'in'], [/인스타/, 'ig'], [/텔레그램/, 'tg'], [/지메일|메일/, 'gmail'], [/캘린더|일정/, 'gcal'], [/카톡|카카오/, 'kakao'], [/통화/, 'calls'], [/연락처/, 'contacts'], [/리멤버|명함/, 'remember']]
+
+/** 채팅 안에 뜨는 로그인 카드. 처음이면 암호화 키부터 만든다 */
+function ChatLoginCard({ src, stage, again, onKey, onLogin }: { src: Src; stage: 'key' | 'form' | 'saved'; again?: boolean; onKey: () => void; onLogin: () => void }) {
+  // 인스타는 프로필에서 확인한 아이디를, 다시 연결할 때는 쓰던 아이디를 미리 채운다
+  const known = src === 'ig' ? 'minjun.k' : again ? 'minjun@felore.io' : ''
+  const [a, setA] = useState(stage === 'key' ? '' : known)
+  const [b, setB] = useState('')
+  const input = 'w-full rounded-xl bg-neutral-100 px-3 py-2.5 text-[13px] outline-none'
+  if (stage === 'saved') {
+    return <div className="flex items-center gap-2 rounded-2xl bg-white px-3 py-2.5 text-[13px]"><ChannelBadge ch={SRC[src].ch} /><span className="flex-1 font-semibold">{SRC[src].label} 로그인</span><Check size={14} className="text-emerald-600" /></div>
+  }
+  if (stage === 'key') {
+    const ok = a.length >= 6 && a === b
+    return (
+      <div className="rounded-2xl bg-white p-3">
+        <p className="flex items-center gap-1.5 text-[13px] font-semibold"><KeyRound size={14} />암호화 키 만들기</p>
+        <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">로그인 정보는 이 키로 잠가 보관해요. 키는 나만 알고 펠로어도 열어볼 수 없어요.</p>
+        <input type="password" value={a} onChange={(e) => setA(e.target.value)} placeholder="키 (6자 이상)" className={`mt-2 ${input}`} />
+        <input type="password" value={b} onChange={(e) => setB(e.target.value)} placeholder="한 번 더" className={`mt-1.5 ${input}`} />
+        <button disabled={!ok} onClick={() => { setA(known); setB(''); onKey() }} className="mt-2 w-full rounded-full bg-[#0D0D0D] py-2.5 text-[13px] font-semibold text-white disabled:opacity-40">키 만들기</button>
+      </div>
+    )
+  }
+  return (
+    <div className="rounded-2xl bg-white p-3">
+      <p className="flex items-center gap-1.5 text-[13px] font-semibold"><ChannelBadge ch={SRC[src].ch} />{SRC[src].label} 로그인</p>
+      <input value={a} onChange={(e) => setA(e.target.value)} placeholder="이메일 또는 아이디" className={`mt-2 ${input}`} />
+      <input type="password" value={b} onChange={(e) => setB(e.target.value)} placeholder="비밀번호" className={`mt-1.5 ${input}`} />
+      <button disabled={!a.trim() || !b} onClick={onLogin} className="mt-2 w-full rounded-full bg-[#0D0D0D] py-2.5 text-[13px] font-semibold text-white disabled:opacity-40">로그인</button>
+      <p className="mt-2 flex items-center gap-1 text-[11px] text-neutral-400"><Lock size={10} />로그인 정보는 암호화로 보호됩니다</p>
+    </div>
+  )
+}
 
 function ChatScreen({ onClose }: { onClose: () => void }) {
-  const { conn, start } = useConnect()
+  const { conn, start, update } = useConnect()
   const app = useApp()
   const msgs = app.chat
   const [input, setInput] = useState('')
+  const [busy, setBusy] = useState(false)
   const endRef = useRef<HTMLDivElement>(null)
-  useEffect(() => { endRef.current?.scrollIntoView({ block: 'end' }) }, [msgs.length])
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([])
+  useEffect(() => { endRef.current?.scrollIntoView({ block: 'end' }) }, [msgs.length, busy])
+  useEffect(() => () => timers.current.forEach(clearTimeout), [])
+
+  /** 펠로어의 말은 조금씩 뜸을 두고 하나씩 나온다 */
+  const say = (list: Msg[]) => {
+    setBusy(true)
+    list.forEach((m, i) => {
+      timers.current.push(setTimeout(() => {
+        app.setChat((x) => [...x, m])
+        if (i === list.length - 1) setBusy(false)
+      }, 550 * (i + 1)))
+    })
+  }
 
   const who = (text: string) => app.people.find((p) => text.includes(p.name) || (p.name.length > 2 && !p.name.startsWith('@') && text.includes(p.name.slice(1))))
+  const hasKey = (['ig', 'in', 'remember'] as Src[]).some((s) => conn[s].status !== 'off') || msgs.some((m) => m.login && m.login.stage !== 'key')
+  const pending = [...msgs].reverse().find((m) => m.login?.stage === 'saved' && conn[m.login.src].status !== 'on')?.login?.src
+
+  const finishLogin = (s: Src, level: Level) => {
+    update(s, { status: 'on', level, last: '방금' })
+    if (s === 'remember' && app.myProf.career.length === 0) app.setMyProf({ ...app.myProf, career: MY_PROF.career, edu: MY_PROF.edu })
+    return s === 'remember'
+      ? '리멤버 연결을 마쳤어요. 받은 명함으로 연결된 사람들을 채우고, 내 프로필의 명함에 경력을 넣었어요.'
+      : `${SRC[s].label} 연결을 마쳤어요. ${LEVEL[level].d}. 대화 상대를 가져오는 중이라, 다 되면 내 사람들에 쌓여요.`
+  }
 
   /** 목업: 정해진 몇 가지 말만 알아듣는다. 답은 요약과 알게 된 정보에서 찾는다 */
-  const reply = (text: string): Msg => {
+  const reply = (text: string): Msg[] => {
     const p = who(text)
+    if (pending && /했어|했어요|완료|끝/.test(text)) {
+      const s = pending
+      if (conn[s].status === 'broken') { update(s, { status: 'on', last: '방금' }); return [{ from: 'ai', text: '확인해 볼게요!' }, { from: 'ai', text: `${SRC[s].label} 연결이 다시 이어졌어요. 그 사이 온 메시지는 다음 묶음에 올려 둘게요.` }] }
+      if (SRC[s].levels.length === 1) return [{ from: 'ai', text: '확인해 볼게요!' }, { from: 'ai', text: finishLogin(s, SRC[s].levels[0]) }]
+      return [{ from: 'ai', text: '확인해 볼게요!' }, { from: 'ai', text: `${SRC[s].label} 로그인이 끝났어요. 계정이 드물게 잠시 제한될 수 있어서, 사람처럼 천천히 하루 정해진 양만 읽고 보낼게요. 어디까지 맡길까요?`, levels: { src: s } }]
+    }
     if (/같은 사람|합쳐|합치/.test(text)) {
       const handle = text.match(/@?[A-Za-z0-9_.]{3,}/)?.[0]
       if (p && handle) {
         const h = handle.startsWith('@') ? handle : `@${handle}`
-        return { from: 'ai', text: '이렇게 합칠게요. 맞으면 눌러주세요.', merge: { personId: p.id, q: { a: { ch: 'ig', h }, b: { ch: p.accounts[0]?.ch ?? 'memo', h: p.name }, why: '말씀하신 두 계정이에요' } } }
+        return [{ from: 'ai', text: '이렇게 합칠게요. 맞으면 눌러주세요.', merge: { personId: p.id, q: { a: { ch: 'ig', h }, b: { ch: p.accounts[0]?.ch ?? 'memo', h: p.name }, why: '말씀하신 두 계정이에요' } } }]
       }
-      return { from: 'ai', text: '누구와 어떤 계정인지 알려주세요. 예: “도민혁이랑 @minhyuk.d 같은 사람이야”' }
+      return [{ from: 'ai', text: '누구와 어떤 계정인지 알려주세요. 예: “도민혁이랑 @minhyuk.d 같은 사람이야”' }]
     }
     if (/반말|존댓말|영어|말투/.test(text)) {
-      if (!p) return { from: 'ai', text: '누구에게 쓰는 말투인지 이름을 같이 말해 주세요.' }
+      if (!p) return [{ from: 'ai', text: '누구에게 쓰는 말투인지 이름을 같이 말해 주세요.' }]
       const base = /반말/.test(text) ? '반말' : /영어/.test(text) ? '영어' : '존댓말'
       const rel = text.split(/[.。]/).slice(1).join(' ').replace(/(이야|야|예요|입니다|임)\s*$/, '').trim()
-      return { from: 'ai', text: `${p.name}님의 관계와 말투를 이렇게 바꿀까요?`, tone: { personId: p.id, tone: rel ? `${base}, ${rel}` : base } }
+      return [{ from: 'ai', text: `${p.name}님의 관계와 말투를 이렇게 바꿀까요?`, tone: { personId: p.id, tone: rel ? `${base}, ${rel}` : base } }]
     }
-    if (/연결/.test(text)) {
+    if (/연결|연동/.test(text)) {
       const hit = SRC_WORDS.find(([re]) => re.test(text))
-      if (!hit) return { from: 'ai', text: '어디를 연결할까요? 인스타그램, 링크드인, 텔레그램, 카톡, 지메일, 구글 캘린더, 연락처, 통화 녹음을 연결할 수 있어요.' }
+      if (!hit) return [{ from: 'ai', text: '어디를 연결할까요? 인스타그램, 링크드인, 리멤버, 텔레그램, 카톡, 지메일, 구글 캘린더, 연락처, 통화 녹음을 연결할 수 있어요.' }]
       const s = hit[1]
-      if (conn[s].status === 'on') return { from: 'ai', text: `${SRC[s].label} 연결은 이미 돼 있어요. 마이페이지 > 연결에서 할 수 있는 일을 바꿀 수 있어요.` }
-      return { from: 'ai', text: SRC[s].how === 'web' ? `${SRC[s].label} 로그인 정보를 넣어 주세요. 내 암호화 키로 잠가서 보관하고, 로그인 확인이 오면 여기서 안내할게요.` : `${SRC[s].label} 연결을 열게요.`, connect: s }
+      if (conn[s].status === 'on') return [{ from: 'ai', text: `${SRC[s].label} 연결은 이미 돼 있어요. 마이페이지 > 연결에서 맡길 범위를 바꿀 수 있어요.` }]
+      if (SRC[s].how === 'web') {
+        const again = conn[s].status === 'broken'
+        return [
+          { from: 'ai', text: `${SRC[s].label} 로그인 바로 준비해 드릴게요!` },
+          { from: 'ai', text: '', login: { src: s, stage: hasKey || again ? 'form' : 'key' } },
+          { from: 'ai', text: hasKey || again ? '위 카드에 아이디와 비밀번호를 넣어 주시면 내 암호화 키로 잠가 보관하고, 바로 로그인을 진행할게요.' : '처음이라 암호화 키부터 만들어요. 한 번 만들면 다른 곳을 연결할 때도 써요.' },
+        ]
+      }
+      return [{ from: 'ai', text: `${SRC[s].label} 연결을 열게요.`, connect: s }]
     }
     if (/챙길|오래 연락|안부/.test(text)) {
       const list = CARE.filter((c) => !app.careOff.includes(c.personId)).map((c) => app.getPerson(c.personId)).filter((x): x is Person => !!x)
-      return { from: 'ai', text: list.length ? `${list.map((x) => `${x.name}님`).join(', ')}을 챙겨 보세요. 오늘의 제안의 챙길 사람에서 안부 초안을 만들 수 있어요.` : '지금은 챙길 사람이 없어요.' }
+      return [{ from: 'ai', text: list.length ? `${list.map((x) => `${x.name}님`).join(', ')}을 챙겨 보세요. 오늘의 제안의 챙길 사람에서 안부 초안을 만들 수 있어요.` : '지금은 챙길 사람이 없어요.' }]
     }
-    if (/메모|기록|적어/.test(text) && p) return { from: 'ai', text: `${p.name}님과의 메모를 열게요.`, record: p.id }
+    if (/메모|기록|적어/.test(text) && p) return [{ from: 'ai', text: `${p.name}님과의 메모를 열게요.`, record: p.id }]
     if (p) {
       const last = app.recs[p.id]?.[0]
       const bits = [p.met && `${p.met}에 만났어요`, p.note, last && `가장 최근 기록은 “${last.text}”`, p.tone && `말투는 ${p.tone}`].filter(Boolean)
-      return { from: 'ai', text: `${p.name}님은 ${bits.join('. ')}. (요약과 알게 된 정보에서 찾았어요. 원문은 보관하지 않아요)` }
+      return [{ from: 'ai', text: `${p.name}님은 ${bits.join('. ')}. (요약과 알게 된 정보에서 찾았어요. 원문은 보관하지 않아요)` }]
     }
-    return { from: 'ai', text: '아직 그 말은 알아듣지 못해요. 이렇게 말해 보세요.', tips: true }
+    return [{ from: 'ai', text: '아직 그 말은 알아듣지 못해요. 이렇게 말해 보세요.', tips: true }]
   }
 
   const send = (text: string) => {
     const t = text.trim()
-    if (!t) return
+    if (!t || busy) return
     const r = reply(t)
-    app.setChat((m) => [...m, { from: 'me', text: t }, r])
+    app.setChat((m) => [...m, { from: 'me', text: t }])
+    say(r)
     setInput('')
   }
+  // 홈에서 한마디를 들고 들어온 경우 바로 건넨다
+  useEffect(() => {
+    if (app.ask) { const t = app.ask; app.askAgent(null); send(t) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const patchMsg = (i: number, patch: Partial<Msg>) => app.setChat((m) => m.map((x, j) => (j === i ? { ...x, ...patch } : x)))
 
   const onMerge = (i: number, m: NonNullable<Msg['merge']>, a: MergeAnswer) => {
@@ -3224,20 +3456,36 @@ function ChatScreen({ onClose }: { onClose: () => void }) {
     patchMsg(i, { tone: { ...t, ans: ok } })
     if (ok) { app.updatePerson(t.personId, { tone: t.tone }); app.toast('다음 답장 초안부터 반영할게요') }
   }
+  const onLogin = (i: number, s: Src) => {
+    patchMsg(i, { login: { src: s, stage: 'saved' } })
+    say([
+      { from: 'ai', text: '', chip: '로그인 정보를 저장했어요' },
+      { from: 'ai', text: '정보 확인했어요! 바로 로그인을 진행해 볼게요.' },
+      { from: 'ai', text: `${SRC[s].label}에서 로그인 확인을 요청했어요. 휴대폰의 ${SRC[s].label} 앱이나 문자로 온 알림에서 승인하고 말씀해 주세요.`, quick: ['다 했어'] },
+    ])
+  }
+  const onLevel = (i: number, s: Src, l: Level) => {
+    patchMsg(i, { levels: { src: s, picked: l } })
+    say([{ from: 'ai', text: finishLogin(s, l) }])
+  }
 
   return (
     <div className="absolute inset-0 z-50 flex flex-col bg-white">
       <div className="flex h-12 flex-shrink-0 items-center gap-2 border-b border-[var(--color-border-soft)] px-4">
-        <button onClick={onClose}><ChevronLeft size={20} className="text-[var(--color-text-secondary)]" /></button>
-        <span className="text-[15px] font-black">펠로어에게 말하기</span>
+        <button onClick={onClose} aria-label="닫기"><ChevronLeft size={20} className="text-[var(--color-text-secondary)]" /></button>
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#25313D] text-white"><Sparkles size={13} /></span>
+        <span className="text-[15px] font-black">펠로어</span>
         <Tag kind="new" />
         <span className="ml-auto"><PrivateBadge /></span>
       </div>
       <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
-        {msgs.map((m, i) => (
+        {msgs.map((m, i) => m.chip ? (
+          <p key={i} className="mx-auto flex w-fit items-center gap-1 rounded-full border border-neutral-200 px-3 py-1 text-[11px] text-neutral-500"><Check size={11} className="text-emerald-600" />{m.chip}</p>
+        ) : (
           <div key={i} className={`flex ${m.from === 'me' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[84%] rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed ${m.from === 'me' ? 'bg-[#25313D] text-white' : 'bg-neutral-100'}`}>
+            <div className={`max-w-[86%] rounded-2xl text-[13px] leading-relaxed ${m.from === 'me' ? 'bg-[#25313D] px-3.5 py-2.5 text-white' : m.login && !m.text ? 'w-[86%] bg-neutral-100 p-1.5' : 'bg-neutral-100 px-3.5 py-2.5'}`}>
               {m.text}
+              {m.login && <ChatLoginCard src={m.login.src} stage={m.login.stage} again={conn[m.login.src].status === 'broken'} onKey={() => { patchMsg(i, { login: { src: m.login!.src, stage: 'form' } }); say([{ from: 'ai', text: '', chip: '암호화 키를 만들었어요' }, { from: 'ai', text: '이제 위 카드에 아이디와 비밀번호를 넣어 주세요.' }]) }} onLogin={() => onLogin(i, m.login!.src)} />}
               {m.merge && (
                 <div className="mt-2"><MergeAskCard q={m.merge.q} onAnswer={(a) => onMerge(i, m.merge!, a)} done={m.merge.ans} /></div>
               )}
@@ -3255,11 +3503,21 @@ function ChatScreen({ onClose }: { onClose: () => void }) {
                   )}
                 </div>
               )}
+              {m.levels && (
+                <div className="mt-2 space-y-1.5">
+                  {SRC[m.levels.src].levels.map((l) => (
+                    <button key={l} disabled={!!m.levels!.picked} onClick={() => onLevel(i, m.levels!.src, l)} className={`flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left ${m.levels!.picked === l ? 'bg-[#25313D] text-white' : 'bg-white'} ${m.levels!.picked && m.levels!.picked !== l ? 'opacity-40' : ''}`}>
+                      <span className="flex-1"><span className="block text-[13px] font-semibold">{LEVEL[l].t}</span><span className={`block text-[11px] ${m.levels!.picked === l ? 'opacity-70' : 'text-neutral-500'}`}>{LEVEL[l].d}</span></span>
+                      {m.levels!.picked === l && <Check size={14} />}
+                    </button>
+                  ))}
+                </div>
+              )}
               {m.connect && (
                 <button onClick={() => start(m.connect!)} className="mt-2 flex w-full items-center gap-2 rounded-xl bg-white px-3 py-2.5 text-left">
                   <ChannelBadge ch={SRC[m.connect].ch} />
-                  <span className="flex-1 text-[13px] font-semibold">{conn[m.connect].status === 'on' ? `${SRC[m.connect].label} 연결됨` : SRC[m.connect].how === 'web' ? `${SRC[m.connect].label} 로그인` : `${SRC[m.connect].label} 연결`}</span>
-                  {conn[m.connect].status === 'on' ? <Check size={14} className="text-emerald-600" /> : <KeyRound size={14} className="text-neutral-400" />}
+                  <span className="flex-1 text-[13px] font-semibold">{conn[m.connect].status === 'on' ? `${SRC[m.connect].label} 연결됨` : `${SRC[m.connect].label} 연결하기`}</span>
+                  {conn[m.connect].status === 'on' ? <Check size={14} className="text-emerald-600" /> : <ChevronRight size={14} className="text-neutral-400" />}
                 </button>
               )}
               {m.record && (
@@ -3273,9 +3531,15 @@ function ChatScreen({ onClose }: { onClose: () => void }) {
             </div>
           </div>
         ))}
+        {busy && <div className="flex justify-start"><div className="flex gap-1 rounded-2xl bg-neutral-100 px-4 py-3.5">{[0, 1, 2].map((d) => <span key={d} className="h-1.5 w-1.5 animate-bounce rounded-full bg-neutral-400" style={{ animationDelay: `${d * 120}ms` }} />)}</div></div>}
+        {!busy && msgs[msgs.length - 1]?.quick && (
+          <div className="flex justify-end gap-1.5">
+            {msgs[msgs.length - 1].quick!.map((s) => <button key={s} onClick={() => send(s)} className="rounded-full border border-[#25313D] px-3.5 py-2 text-[13px] font-semibold text-[#25313D]">{s}</button>)}
+          </div>
+        )}
         <div ref={endRef} />
       </div>
-      <div className="flex gap-1.5 overflow-x-auto px-4 pb-2">
+      <div className="scrollbar-hide flex gap-1.5 overflow-x-auto px-4 pb-2">
         {CHAT_TIPS.slice(2).map((s) => (
           <button key={s} onClick={() => send(s)} className="shrink-0 rounded-full border border-neutral-200 px-3 py-1.5 text-[12px]">{s}</button>
         ))}
@@ -3288,7 +3552,7 @@ function ChatScreen({ onClose }: { onClose: () => void }) {
           placeholder="사람, 관계, 할 일에 대해 말해 주세요"
           className="flex-1 rounded-full bg-neutral-100 px-4 py-2.5 text-[13px] outline-none"
         />
-        <button onClick={() => send(input)} disabled={!input.trim()} className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0D0D0D] text-white disabled:opacity-40" aria-label="보내기"><ArrowUp size={16} /></button>
+        <button onClick={() => send(input)} disabled={!input.trim() || busy} className="flex h-9 w-9 items-center justify-center rounded-full bg-[#0D0D0D] text-white disabled:opacity-40" aria-label="보내기"><ArrowUp size={16} /></button>
       </div>
     </div>
   )
@@ -3549,19 +3813,46 @@ function QrSheet({ onClose }: { onClose: () => void }) {
 }
 
 function VerifySheet({ onClose }: { onClose: () => void }) {
+  const app = useApp()
+  const [working, setWorking] = useState<string | null>(null)
+  const prof = app.myProf
+  const rows = [...prof.career.map((j) => ({ j, kind: 'career' as const })), ...prof.edu.map((j) => ({ j, kind: 'edu' as const }))]
+  const finish = (org: string) => {
+    app.setMyProf({ ...prof, career: prof.career.map((j) => (j.org === org ? { ...j, ok: true } : j)), edu: prof.edu.map((j) => (j.org === org ? { ...j, ok: true } : j)) })
+    setWorking(null)
+    app.toast(`${org} 인증을 마쳤어요`)
+  }
   return (
     <Sheet onClose={onClose}>
       <div className="flex items-center justify-between">
         <h3 className="flex items-center gap-2 text-[17px] font-bold"><ShieldCheck size={18} />인증<Tag kind="old" /></h3>
         <button onClick={onClose}><X size={20} /></button>
       </div>
-      <p className="mt-2 text-[13px] text-neutral-500">인증한 항목은 프로필에 뱃지로 보여요.</p>
-      <Card className="mt-4 !py-1 divide-y divide-[var(--color-border-soft)]">
-        <Row icon={<BadgeCheck size={18} />} label="본인인증" desc="가입할 때 휴대폰으로 확인했어요" right={<span className="text-[12px] font-medium text-emerald-600">완료</span>} />
-        <Row icon={<FileText size={18} />} label="경력 인증" desc="건강보험 자격득실 확인으로 재직 이력을 증명해요" href="/me?section=highlight&from=v2" />
-        <Row icon={<FileText size={18} />} label="학력 인증" desc="학교 이메일이나 졸업증명서로 증명해요" href="/me?section=highlight&from=v2" />
-      </Card>
-      <p className="mt-3 text-[11px] text-neutral-400">경력과 학력 인증은 기존 프로필의 하이라이트 화면에서 이어져요</p>
+      <p className="mt-2 text-[13px] text-neutral-500">인증한 항목은 명함에 뱃지로 보여요.</p>
+      <div className="mt-4 divide-y divide-[var(--color-border-soft)] rounded-2xl border border-[var(--color-border-soft)] px-4">
+        <div className="flex items-center gap-3 py-3">
+          <BadgeCheck size={18} className="text-neutral-500" />
+          <span className="flex-1"><span className="block text-[14px] font-semibold">본인인증</span><span className="block text-[12px] text-neutral-500">가입할 때 휴대폰으로 확인했어요</span></span>
+          <span className="text-[12px] font-medium text-emerald-600">완료</span>
+        </div>
+        {rows.map(({ j, kind }) => (
+          <div key={j.org} className="py-3">
+            <div className="flex items-center gap-3">
+              <FileText size={18} className="text-neutral-500" />
+              <span className="min-w-0 flex-1"><span className="block text-[14px] font-semibold">{j.org}</span><span className="block text-[12px] text-neutral-500">{kind === 'career' ? '경력' : '학력'}, {j.role}</span></span>
+              {j.ok
+                ? <span className="text-[12px] font-medium text-emerald-600">완료</span>
+                : working !== j.org && <button onClick={() => setWorking(j.org)} className="rounded-full bg-[#25313D] px-3 py-1.5 text-[12px] font-semibold text-white">인증하기</button>}
+            </div>
+            {working === j.org && (
+              <div className="mt-3">
+                <ProgressSteps steps={kind === 'career' ? ['간편인증으로 본인 확인', '건강보험 자격득실 불러오기', '재직 이력 맞춰 보기'] : ['학교 이메일로 확인 메일 보내기', '졸업 여부 확인']} onDone={() => finish(j.org)} />
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+      <p className="mt-3 text-[11px] text-neutral-400">경력은 건강보험 자격득실로, 학력은 학교 이메일이나 졸업증명서로 확인해요</p>
     </Sheet>
   )
 }
@@ -3714,56 +4005,341 @@ function HiddenSheet({ onClose }: { onClose: () => void }) {
 }
 
 /** 허구 인물의 공개 프로필. 목업에서는 이지민, 강민준만 실제 프로필 화면으로 이어진다 */
-function ProfilePreviewSheet({ p, onClose }: { p: Person; onClose: () => void }) {
+function Photo({ src, className }: { src: string; className: string }) {
+  // eslint-disable-next-line @next/next/no-img-element
+  return src.startsWith('/') ? <img src={src} alt="" className={`object-cover ${className}`} /> : <div className={className} style={{ background: src }} />
+}
+
+function ProfBlock({ title, sub, hidden, children }: { title: string; sub?: ReactNode; hidden?: boolean; children: ReactNode }) {
+  return (
+    <section className="mt-7">
+      <div className="mb-2.5 flex items-baseline justify-between">
+        <h2 className="flex items-center gap-1.5 text-[16px] font-black text-[var(--color-text-strong)]">{title}{hidden && <span className="flex items-center gap-0.5 rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium text-neutral-500"><Lock size={9} />나만 보기</span>}</h2>
+        {sub && <span className="text-[11px] text-neutral-400">{sub}</span>}
+      </div>
+      {children}
+    </section>
+  )
+}
+
+/**
+ * 한 장짜리 프로필. 내 프로필(주인), 다른 사람 프로필(회원이 볼 때), 링크로 들어온 비회원이 볼 때 세 가지 모습.
+ * 탭이 없고, 직접 채우는 건 한 줄 소개와 명함뿐이다. 나머지는 인스타 분석과 리멤버 연결, 받은 피드백이 채운다.
+ */
+function ProfileView({ target, onBack }: { target: Person | 'me'; onBack: () => void }) {
   const app = useApp()
+  const { conn, start, join, openInsta, instaDone } = useConnect()
   const add = useAddFound()
-  const mine = !!app.getPerson(p.id)
+  const owner = target === 'me'
+  const guest = app.mode === 'guest'
+  const p: Person | null = owner ? null : target
+  const prof = owner ? app.myProf : profOf(p!)
+  const name = owner ? app.me.name : p!.name
+  const title = owner ? app.me.title : p!.title
+  const img = owner ? app.me.img : p!.img
+  const linkId = owner ? app.me.linkId : p!.linkId ?? p!.name.replace('@', '')
+  const mine = !owner && !!app.getPerson(p!.id)
+  const member = owner || p!.member
+  const off = (s: ProfSec) => owner && !app.vis[s]
+  const rememberOn = conn.remember.status === 'on'
+  const photos = owner && !instaDone ? [] : prof.photos
+  const netMax = Math.max(1, ...prof.net.groups.map(([, n]) => n))
+
+  return (
+    <div className="pb-36">
+      <div className="flex h-12 flex-shrink-0 items-center gap-2 border-b border-[var(--color-border-soft)] px-4">
+        <button onClick={onBack} aria-label="뒤로"><ChevronLeft size={20} className="text-[var(--color-text-secondary)]" /></button>
+        <span className="text-[15px] font-black">{owner ? '내 프로필' : '프로필'}</span>
+        <Tag kind="new" />
+        <span className="ml-auto flex items-center gap-3 text-[var(--color-text-secondary)]">
+          {owner && <button onClick={() => app.openPanel({ k: 'vis' })} aria-label="공개범위"><Eye size={19} /></button>}
+          <button onClick={() => app.openShare({ title: `${name}님 프로필 공유`, url: `felore.io/${linkId}`, text: owner ? '받은 사람이 이 링크로 가입하면 서로 내 사람에 추가돼요' : undefined })} aria-label="공유"><Share2 size={19} /></button>
+        </span>
+      </div>
+
+      <div className="px-5 pt-4">
+        {/* 커버: 사진, 이름, 한 줄 소개 */}
+        <div className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-[#25313D]">
+          {img && <Photo src={img} className="absolute inset-0 h-full w-full" />}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 p-5 text-white">
+            <div className="flex items-center gap-1.5 text-[28px] font-black leading-tight">{name}{member && <BadgeCheck size={20} />}</div>
+            <p className="mt-0.5 text-[13px] opacity-85">{title}</p>
+            {prof.line && <p className="mt-2 text-[15px] font-semibold leading-snug">{prof.line}</p>}
+            <p className="mt-2 text-[11px] opacity-60">felore.io/{linkId}</p>
+          </div>
+        </div>
+
+        {guest && (
+          <div className="mt-3 flex items-center gap-2 rounded-2xl bg-amber-50 px-4 py-3 text-[12px] text-amber-700"><Gift size={14} className="shrink-0" />24시간 안에 가입하면 보너스 재화 5개를 드려요</div>
+        )}
+
+        {/* 페르소나: 인스타에서 고른 사진과 키워드가 바이브를 대신한다 */}
+        <ProfBlock title="페르소나" sub={owner && !instaDone ? undefined : <span className="flex items-center gap-1"><Sparkles size={11} />AI가 정리했어요</span>} hidden={off('persona')}>
+          {prof.word && (owner ? instaDone : true) && <p className="mb-2 text-[19px] font-black leading-snug text-[var(--color-text-strong)]">&ldquo;{prof.word}&rdquo;</p>}
+          {(!owner || instaDone) && (
+            <>
+              <p className="text-[14px] leading-relaxed text-neutral-700">{prof.persona}</p>
+              <div className="mt-3 flex flex-wrap gap-1.5">{prof.keywords.map((k) => <span key={k} className="rounded-full bg-neutral-100 px-3 py-1 text-[12px]">{k}</span>)}</div>
+            </>
+          )}
+          {photos.length > 0 && (
+            <div className="mt-3 grid grid-cols-3 gap-1.5">
+              {photos.slice(0, 3).map((s) => <Photo key={s} src={s} className="aspect-square w-full rounded-xl" />)}
+            </div>
+          )}
+          {owner && !instaDone && (
+            <button onClick={openInsta} className="flex w-full items-center gap-2 rounded-2xl border border-dashed border-neutral-300 px-4 py-3 text-left text-[13px]">
+              <ChannelBadge ch="ig" /><span className="flex-1">인스타를 보여주면 사진과 키워드, 한마디를 채워 드려요</span><ChevronRight size={14} className="text-neutral-300" />
+            </button>
+          )}
+          {photos.length > 0 && <p className="mt-2 text-[11px] text-neutral-400">인스타 피드에서 고른 사진이에요</p>}
+        </ProfBlock>
+
+        {/* 케미: 지금 모양을 유지한다. 보는 사람과의 궁합 */}
+        {!owner && member && (
+          <ProfBlock title={guest ? '나와의 케미' : `${app.me.name}님과의 케미`}>
+            {guest ? (
+              <button onClick={() => join(true)} className="relative w-full overflow-hidden rounded-2xl border border-[var(--color-border-soft)] p-4 text-left">
+                <div className="space-y-2 blur-[5px]">{prof.kemi.rows.map(([k, v]) => <p key={k} className="text-[13px]"><b>{k}</b> {v}</p>)}</div>
+                <span className="absolute inset-0 flex items-center justify-center text-[13px] font-semibold underline">가입하면 나와의 케미가 보여요</span>
+              </button>
+            ) : (
+              <Card onClick={() => app.openPanel({ k: 'kemi', p })}>
+                <div className="flex items-center gap-4">
+                  <span className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-full bg-[#25313D] text-white"><span className="text-[18px] font-black leading-none">{prof.kemi.score}</span><span className="text-[9px] opacity-70">케미</span></span>
+                  <div className="min-w-0 flex-1 space-y-1">
+                    {prof.kemi.rows.slice(0, 2).map(([k, v]) => <p key={k} className="text-[13px] leading-snug"><span className="font-semibold">{k}</span> <span className="text-neutral-600">{v}</span></p>)}
+                  </div>
+                  <ChevronRight size={16} className="shrink-0 text-neutral-300" />
+                </div>
+              </Card>
+            )}
+          </ProfBlock>
+        )}
+        {owner && (
+          <ProfBlock title="케미">
+            <Card onClick={() => app.openPanel({ k: 'kemi', p: null })}>
+              <div className="flex items-center gap-3 text-[13px]"><Sparkles size={16} className="shrink-0" /><span className="flex-1">내가 어떤 사람과 잘 맞는지 보기</span><ChevronRight size={16} className="text-neutral-300" /></div>
+            </Card>
+            <p className="mt-1.5 text-[11px] text-neutral-400">내 프로필을 본 사람에게는 그 사람과 나의 케미가 보여요</p>
+          </ProfBlock>
+        )}
+
+        {/* 명함: 하는 일, 경력, 학력 */}
+        <ProfBlock title="명함" sub={owner && rememberOn ? '리멤버에서 가져옴' : undefined} hidden={off('card')}>
+          <Card className="!py-1 divide-y divide-[var(--color-border-soft)]">
+            {[...prof.career.map((j) => ({ ...j, kind: '경력' })), ...prof.edu.map((j) => ({ ...j, kind: '학력' }))].map((j) => (
+              <div key={j.org + j.role} className="flex items-center gap-3 py-3">
+                <span className="w-8 shrink-0 text-[11px] text-neutral-400">{j.kind}</span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-1 text-[14px] font-semibold">{j.org}{j.ok && <BadgeCheck size={14} className="text-[#25313D]" />}</div>
+                  <div className="text-[12px] text-neutral-500">{j.role}, {j.when}</div>
+                </div>
+              </div>
+            ))}
+            {prof.career.length + prof.edu.length === 0 && <p className="py-3 text-[13px] text-neutral-400">{owner ? '아직 적은 경력이 없어요. 프로필 편집에서 적거나 리멤버를 연결해요' : '아직 적은 경력이 없어요'}</p>}
+          </Card>
+          {owner && !rememberOn && (
+            <button onClick={() => start('remember')} className="mt-2 flex w-full items-center gap-2 rounded-2xl border border-dashed border-neutral-300 px-4 py-3 text-left text-[13px]">
+              <ChannelBadge ch="card" /><span className="flex-1">리멤버를 연결하면 경력과 연결된 사람들을 채워 드려요</span><ChevronRight size={14} className="text-neutral-300" />
+            </button>
+          )}
+          {!owner && !guest && member && (
+            <div className="mt-2 grid grid-cols-3 gap-2">
+              {([['전화', <Phone key="a" size={14} />], ['메시지', <MessageCircle key="b" size={14} />], ['메일', <Mail key="c" size={14} />]] as [string, ReactNode][]).map(([t, ic]) => (
+                <button key={t} onClick={() => app.toast(`${t} 앱을 열었어요 (목업)`)} className="flex items-center justify-center gap-1.5 rounded-full border border-neutral-200 py-2.5 text-[13px]">{ic}{t}</button>
+              ))}
+            </div>
+          )}
+        </ProfBlock>
+
+        {/* 연결된 사람들: 명함으로 이어진 사람들의 분포 */}
+        <ProfBlock title="연결된 사람들" sub={owner && !rememberOn ? undefined : `${prof.net.from} ${prof.net.total}명`} hidden={off('net')}>
+          {owner && !rememberOn ? (
+            <button onClick={() => start('remember')} className="flex w-full items-center gap-2 rounded-2xl border border-dashed border-neutral-300 px-4 py-3 text-left text-[13px]">
+              <ChannelBadge ch="card" /><span className="flex-1">리멤버를 연결하면 어느 분야 사람을 많이 아는지 보여줘요</span><ChevronRight size={14} className="text-neutral-300" />
+            </button>
+          ) : (<>
+          {!owner && prof.mutual.length > 0 && !guest && (
+            <div className="mb-3 flex items-center gap-3 rounded-2xl bg-neutral-50 px-4 py-3">
+              <div className="flex -space-x-2">{prof.mutual.map((n) => <div key={n} className="rounded-full ring-2 ring-neutral-50"><Avatar name={n} size={28} /></div>)}</div>
+              <p className="text-[13px]"><span className="font-semibold">{prof.mutual.join(', ')}</span>님을 함께 알아요</p>
+            </div>
+          )}
+          <div className="space-y-2">
+            {prof.net.groups.map(([g, n]) => (
+              <div key={g} className="flex items-center gap-3 text-[12px]">
+                <span className="w-14 shrink-0 text-neutral-600">{g}</span>
+                <span className="h-2 flex-1 overflow-hidden rounded-full bg-neutral-100"><span className="block h-full rounded-full bg-[#25313D]" style={{ width: `${(n / netMax) * 100}%` }} /></span>
+                <span className="w-9 shrink-0 text-right text-neutral-400">{n}명</span>
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-[11px] text-neutral-400">누구인지는 보여주지 않고, 어느 분야 사람을 많이 아는지만 보여줘요</p>
+          </>)}
+        </ProfBlock>
+
+        {/* 평판: 받은 피드백 */}
+        <ProfBlock title="평판" sub={`피드백 ${prof.rep.reduce((n, [, c]) => n + c, 0)}개`} hidden={off('rep')}>
+          {prof.rep.length === 0 && <p className="rounded-2xl bg-neutral-50 px-4 py-3 text-[13px] text-neutral-400">아직 받은 피드백이 없어요</p>}
+          <div className="flex flex-wrap gap-1.5">
+            {prof.rep.map(([k, n]) => <span key={k} className="rounded-full border border-neutral-200 px-3 py-1.5 text-[12px]">{k} <b>{n}</b></span>)}
+          </div>
+          <div className="mt-3 space-y-2">
+            {prof.quotes.map((q) => (
+              <div key={q.from} className="rounded-2xl bg-neutral-50 px-4 py-3">
+                <p className="text-[13px] leading-relaxed">&ldquo;{q.text}&rdquo;</p>
+                <p className="mt-1 text-[11px] text-neutral-400">{q.from}</p>
+              </div>
+            ))}
+          </div>
+          {owner
+            ? <button onClick={() => app.openShare({ title: '피드백 요청 보내기', url: `felore.io/${linkId}`, text: '같이 일해 본 사람에게 보내면 한마디를 남길 수 있어요' })} className="mt-3 w-full rounded-full border border-neutral-200 py-2.5 text-[13px]">피드백 요청 보내기</button>
+            : <button onClick={() => (guest ? join(true) : app.openPanel({ k: 'feedback', p: p! }))} className="mt-3 w-full rounded-full border border-neutral-200 py-2.5 text-[13px]">피드백 남기기</button>}
+        </ProfBlock>
+
+        {app.planTags && (owner || p!.linkId) && (
+          <Link href={`/${owner ? ME.linkId : p!.linkId}?from=v2${owner ? '' : `&person=${p!.id}`}`} className="mt-8 block rounded-2xl bg-amber-50 px-4 py-3 text-center text-[12px] text-amber-700">[기획 확인] 탭 세 개짜리 기존 프로필 화면과 비교하기</Link>
+        )}
+      </div>
+
+      {/* 아래에 붙는 버튼. 하단 탭 위에 뜬다 */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-[76px] z-30 px-5 pb-3">
+        <div className="pointer-events-auto flex gap-2 rounded-full bg-white/95 p-1.5 pr-[76px] shadow-[0_4px_24px_rgba(0,0,0,0.12)] backdrop-blur">
+          {owner ? (
+            <button onClick={() => app.openPanel({ k: 'editProf' })} className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#0D0D0D] py-3 text-[14px] font-semibold text-white"><PenLine size={14} />프로필 편집</button>
+          ) : guest ? (
+            <button onClick={() => join(true)} className="flex-1 rounded-full bg-[#0D0D0D] py-3 text-[14px] font-semibold text-white">가입하고 내 사람에 추가</button>
+          ) : mine ? (
+            <button onClick={() => { onBack(); app.openPerson(p!.id) }} className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#0D0D0D] py-3 text-[14px] font-semibold text-white"><Lock size={13} />내 인물 카드 보기</button>
+          ) : (
+            <button onClick={() => add({ ...p!, kind: p!.member ? '펠로어 회원' : '공개 인물' })} className="flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#0D0D0D] py-3 text-[14px] font-semibold text-white"><UserPlus size={14} />내 사람에 추가</button>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/** 내 프로필 편집. 직접 적는 건 한 줄 소개와 명함뿐이고, 나머지는 펠로어에게 맡긴다 */
+function EditProfSheet({ onClose }: { onClose: () => void }) {
+  const app = useApp()
+  const { conn, start, openInsta, instaDone } = useConnect()
+  const [d, setD] = useState<Prof>(app.myProf)
+  const [org, setOrg] = useState('')
+  const [role, setRole] = useState('')
+  const input = 'w-full rounded-xl border border-neutral-200 px-3 py-3 text-[14px] outline-none focus:border-[#25313D]'
   return (
     <Sheet onClose={onClose}>
       <div className="flex items-center justify-between">
-        <h3 className="flex items-center text-[17px] font-bold">공개 프로필<Tag kind="old" /></h3>
+        <h3 className="text-[17px] font-bold">프로필 편집</h3>
         <button onClick={onClose}><X size={20} /></button>
       </div>
-      <div className="mt-4 rounded-3xl bg-[#25313D] px-5 pb-5 pt-8 text-white">
-        <Avatar name={p.name} size={56} member={false} img={p.img} />
-        <p className="mt-3 text-[22px] font-bold">{p.name}</p>
-        <p className="text-[13px] opacity-80">{p.title || '공개된 정보로 만든 프로필'}</p>
-        <p className="mt-2 text-[11px] opacity-60">felore.io/{p.linkId ?? p.name.replace('@', '')}</p>
+      <label className="mt-4 block text-[12px] font-semibold text-neutral-500">한 줄 소개</label>
+      <input value={d.line} onChange={(e) => setD({ ...d, line: e.target.value })} maxLength={30} className={`mt-1.5 ${input}`} />
+      <p className="mt-1 text-right text-[11px] text-neutral-400">{d.line.length}/30</p>
+
+      <label className="mt-2 block text-[12px] font-semibold text-neutral-500">명함</label>
+      <div className="mt-1.5 divide-y divide-[var(--color-border-soft)] rounded-xl border border-neutral-200 px-3">
+        {d.career.map((j, i) => (
+          <div key={j.org + i} className="flex items-center gap-2 py-2.5 text-[13px]">
+            <span className="min-w-0 flex-1 truncate"><b>{j.org}</b> {j.role}</span>
+            {j.ok ? <span className="shrink-0 text-[11px] text-emerald-600">인증됨</span> : <button onClick={() => setD({ ...d, career: d.career.filter((_, k) => k !== i) })} aria-label="지우기"><X size={14} className="text-neutral-400" /></button>}
+          </div>
+        ))}
+        <div className="flex gap-1.5 py-2.5">
+          <input value={org} onChange={(e) => setOrg(e.target.value)} placeholder="회사" className="min-w-0 flex-1 rounded-lg bg-neutral-50 px-2.5 py-2 text-[13px] outline-none" />
+          <input value={role} onChange={(e) => setRole(e.target.value)} placeholder="하는 일" className="min-w-0 flex-1 rounded-lg bg-neutral-50 px-2.5 py-2 text-[13px] outline-none" />
+          <button disabled={!org.trim()} onClick={() => { setD({ ...d, career: [{ org: org.trim(), role: role.trim() || '재직', when: '지금' }, ...d.career] }); setOrg(''); setRole('') }} className="shrink-0 rounded-lg bg-[#25313D] px-3 text-[12px] font-semibold text-white disabled:opacity-40">추가</button>
+        </div>
       </div>
-      {(p.self ?? p.facts?.map((f) => f.t) ?? []).length > 0 && (
-        <Card className="mt-3 !py-2">
-          <ul className="divide-y divide-[var(--color-border-soft)] text-[13px]">
-            {(p.self ?? p.facts?.map((f) => f.t) ?? []).map((t) => <li key={t} className="py-2">{t}</li>)}
-          </ul>
-        </Card>
-      )}
-      <p className="mt-3 text-[11px] leading-relaxed text-neutral-400">예시 인물이라 간단히 보여줘요. 실제 프로필 화면(커버, 하이라이트, 바이브, 네트워크)은 이지민, 강민준 프로필에서 볼 수 있어요.</p>
-      <div className="mt-4">
-        {p.linkId ? (
-          <Link href={`/${p.linkId}?from=v2${mine ? `&person=${p.id}` : ''}`} className="block w-full rounded-full bg-[#0D0D0D] py-3.5 text-center text-[15px] font-semibold text-white">프로필 화면 열기</Link>
-        ) : mine ? (
-          <PrimaryButton onClick={onClose}>닫기</PrimaryButton>
-        ) : (
-          <PrimaryButton onClick={() => { add({ ...p, kind: p.member ? '펠로어 회원' : '공개 인물' }); onClose() }}>{app.mode === 'guest' ? '가입하고 내 사람에 추가' : '내 사람에 추가'}</PrimaryButton>
-        )}
+
+      <p className="mt-5 text-[12px] font-semibold text-neutral-500">펠로어에게 맡기기</p>
+      <div className="mt-1.5 divide-y divide-[var(--color-border-soft)] rounded-xl border border-neutral-200 px-3">
+        <button onClick={() => { onClose(); openInsta() }} className="flex w-full items-center gap-2 py-3 text-left text-[13px]"><ChannelBadge ch="ig" /><span className="flex-1">{instaDone ? '인스타로 사진과 페르소나 다시 채우기' : '인스타로 사진과 페르소나 채우기'}</span><ChevronRight size={14} className="text-neutral-300" /></button>
+        <button onClick={() => { onClose(); if (conn.remember.status !== 'on') start('remember'); else app.toast('리멤버는 이미 연결돼 있어요') }} className="flex w-full items-center gap-2 py-3 text-left text-[13px]"><ChannelBadge ch="card" /><span className="flex-1">{conn.remember.status === 'on' ? '리멤버 연결됨. 경력과 연결된 사람들을 채웠어요' : '리멤버로 경력과 연결된 사람들 채우기'}</span>{conn.remember.status === 'on' ? <Check size={14} className="text-emerald-600" /> : <ChevronRight size={14} className="text-neutral-300" />}</button>
+        <button onClick={() => { onClose(); app.openPanel({ k: 'verify' }) }} className="flex w-full items-center gap-2 py-3 text-left text-[13px]"><ShieldCheck size={16} className="text-neutral-500" /><span className="flex-1">경력과 학력 인증하기</span><ChevronRight size={14} className="text-neutral-300" /></button>
       </div>
+      <p className="mt-2 text-[11px] leading-relaxed text-neutral-400">취향이나 일상을 따로 적지 않아도 돼요. 인스타에서 고른 사진과 키워드가 대신 보여줘요.</p>
+      <div className="mt-5"><PrimaryButton disabled={!d.line.trim()} onClick={() => { app.setMyProf(d); app.toast('프로필을 고쳤어요'); onClose() }}>저장</PrimaryButton></div>
     </Sheet>
   )
 }
 
-function KemiSheet({ p, onClose }: { p: Person; onClose: () => void }) {
+function VisSheet({ onClose }: { onClose: () => void }) {
+  const app = useApp()
+  const rows: [ProfSec, string, string][] = [['persona', '페르소나', '한마디, 소개, 키워드, 사진'], ['card', '명함', '경력과 학력'], ['net', '연결된 사람들', '분야별 분포'], ['rep', '평판', '받은 피드백']]
   return (
     <Sheet onClose={onClose}>
       <div className="flex items-center justify-between">
-        <h3 className="flex items-center gap-2 text-[17px] font-bold"><Sparkles size={18} />{p.name}님과의 케미<Tag kind="old" /></h3>
+        <h3 className="flex items-center gap-2 text-[17px] font-bold"><Eye size={18} />공개범위</h3>
         <button onClick={onClose}><X size={20} /></button>
       </div>
-      <div className="mt-4 space-y-2">
-        {[['커리어', '서로의 일에 바로 도움이 되는 사이예요'], ['성격', '결정이 빠른 쪽과 꼼꼼한 쪽이 만나 균형이 맞아요'], ['취향', '러닝과 새로운 공간을 좋아하는 점이 겹쳐요']].map(([k, v]) => (
-          <Card key={k}><p className="text-[12px] font-semibold text-[#25313D]">{k}</p><p className="mt-0.5 text-[13px]">{v}</p></Card>
+      <p className="mt-2 text-[13px] text-neutral-500">구역마다 다른 사람에게 보일지 정해요. 이름과 한 줄 소개는 늘 보여요.</p>
+      <div className="mt-3 divide-y divide-[var(--color-border-soft)]">
+        {rows.map(([k, t, d]) => (
+          <button key={k} onClick={() => app.setVis({ ...app.vis, [k]: !app.vis[k] })} className="flex w-full items-center gap-3 py-3.5 text-left">
+            <span className="flex-1"><span className="block text-[14px] font-semibold">{t}</span><span className="block text-[12px] text-neutral-500">{d}</span></span>
+            <span className="text-[12px] text-neutral-500">{app.vis[k] ? '공개' : '나만 보기'}</span>
+            <span className={`relative h-6 w-10 shrink-0 rounded-full transition-colors ${app.vis[k] ? 'bg-[#25313D]' : 'bg-neutral-300'}`}><span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all ${app.vis[k] ? 'left-[18px]' : 'left-0.5'}`} /></span>
+          </button>
         ))}
       </div>
-      <p className="mt-3 text-[11px] leading-relaxed text-neutral-400">예시 인물이라 간단히 보여줘요. 실제 케미 리포트 화면은 이지민님 카드에서 열 수 있어요.</p>
+      <p className="mt-2 text-[11px] text-neutral-400">내 인물 카드와 기록은 여기와 상관없이 늘 나만 봐요</p>
+    </Sheet>
+  )
+}
+
+const FB_WORDS = ['믿고 맡길 수 있어요', '말이 잘 통해요', '전문성이 느껴져요', '추진력이 좋아요', '끝까지 챙겨요', '대화하면 생각이 넓어져요']
+
+function FeedbackSheet({ p, onClose }: { p: Person; onClose: () => void }) {
+  const app = useApp()
+  const [picked, setPicked] = useState<string[]>([])
+  const [text, setText] = useState('')
+  return (
+    <Sheet onClose={onClose}>
+      <div className="flex items-center justify-between">
+        <h3 className="text-[17px] font-bold">{p.name}님은 어떤 분인가요?</h3>
+        <button onClick={onClose}><X size={20} /></button>
+      </div>
+      <p className="mt-1 text-[13px] text-neutral-500">같이 일하거나 만나 본 느낌을 골라 주세요. {p.name}님 프로필의 평판에 더해져요.</p>
+      <div className="mt-4 flex flex-wrap gap-1.5">
+        {FB_WORDS.map((w) => {
+          const on = picked.includes(w)
+          return <button key={w} onClick={() => setPicked((l) => (on ? l.filter((x) => x !== w) : l.length < 3 ? [...l, w] : l))} className={`rounded-full px-3 py-2 text-[13px] ${on ? 'bg-[#25313D] font-semibold text-white' : 'border border-neutral-200'}`}>{w}</button>
+        })}
+      </div>
+      <p className="mt-1.5 text-[11px] text-neutral-400">세 개까지 고를 수 있어요</p>
+      <textarea value={text} onChange={(e) => setText(e.target.value)} rows={2} maxLength={80} placeholder="한마디 남기기 (선택)" className="mt-3 w-full rounded-xl border border-neutral-200 p-3 text-[13px] outline-none focus:border-[#25313D]" />
+      <div className="mt-4"><PrimaryButton disabled={picked.length === 0} onClick={() => { app.toast(`${p.name}님에게 피드백을 남겼어요`); onClose() }}>남기기</PrimaryButton></div>
+    </Sheet>
+  )
+}
+
+function KemiSheet({ p, onClose }: { p: Person | null; onClose: () => void }) {
+  const app = useApp()
+  const k = p ? profOf(p).kemi : app.myProf.kemi
+  return (
+    <Sheet onClose={onClose}>
+      <div className="flex items-center justify-between">
+        <h3 className="flex items-center gap-2 text-[17px] font-bold"><Sparkles size={18} />{p ? `${p.name}님과의 케미` : '내 케미 리포트'}<Tag kind="old" /></h3>
+        <button onClick={onClose}><X size={20} /></button>
+      </div>
+      {p && (
+        <div className="mt-4 flex items-center justify-center gap-4 rounded-3xl bg-[#25313D] px-5 py-6 text-white">
+          <Avatar name={app.me.name} size={48} img={app.me.img} />
+          <div className="text-center"><p className="text-[30px] font-black leading-none">{k.score}</p><p className="mt-1 text-[11px] opacity-70">잘 맞는 사이</p></div>
+          <Avatar name={p.name} size={48} img={p.img} member={false} />
+        </div>
+      )}
+      <div className="mt-3 space-y-2">
+        {k.rows.map(([t, v]) => (
+          <Card key={t}><p className="text-[12px] font-semibold text-[#25313D]">{t}</p><p className="mt-0.5 text-[13px] leading-relaxed">{v}</p></Card>
+        ))}
+      </div>
+      <p className="mt-3 text-[11px] leading-relaxed text-neutral-400">{p ? '두 사람의 페르소나, 명함, 평판으로 계산해요. 대화 내용은 쓰지 않아요.' : '내 페르소나, 명함, 평판으로 계산해요.'}</p>
+      {p?.linkId && app.planTags && <Link href={`/${p.linkId}/kemi-report?from=v2&person=${p.id}`} className="mt-3 block rounded-2xl bg-amber-50 px-4 py-3 text-center text-[12px] text-amber-700">[기획 확인] 기존 케미 리포트 화면 보기</Link>}
       <div className="mt-4"><PrimaryButton onClick={onClose}>닫기</PrimaryButton></div>
     </Sheet>
   )
@@ -3828,6 +4404,11 @@ export default function V2IaPage() {
   const [onboarding, setOnboarding] = useState(false)
   const [uploadInit, setUploadInit] = useState<'kakao' | undefined>()
   const [signup, setSignup] = useState<null | { viaLink: boolean; login?: boolean }>(null)
+  const [viewProf, setViewProf] = useState<Person | 'me' | null>(null)
+  const [myProf, setMyProf] = useState<Prof>(MY_PROF)
+  const [vis, setVis] = useState<Record<ProfSec, boolean>>({ persona: true, card: true, net: true, rep: true })
+  const [planTags, setPlanTags] = useState(false)
+  const [ask, setAsk] = useState<string | null>(null)
 
   // 화면끼리 이어지는 데이터
   const [me, setMe] = useState(ME)
@@ -3864,7 +4445,7 @@ export default function V2IaPage() {
 
   /** 상태를 바꾸면 그 상태의 처음 모습으로 돌아간다 */
   const changeMode = (m: Mode) => {
-    setMode(m); setPersonId(null); setHub(false); setSort(false); setSearching(false); setFlow(null); setDetail(null); setInsta(false); setMeetLink(false)
+    setMode(m); setPersonId(null); setViewProf(null); setMyProf(m === 'new' ? FRESH_PROF : MY_PROF); setAsk(null); setHub(false); setSort(false); setSearching(false); setFlow(null); setDetail(null); setInsta(false); setMeetLink(false)
     setAction(null); setFabOpen(false); setPanel(null); setShare(null); setSignup(null)
     setConn(initConn(m)); setInstaDone(m === 'active' || m === 'importing'); setOnboarding(m === 'new'); setJoinedViaLink(false)
     setPeople(m === 'new' ? [] : PEOPLE); setImported(m === 'new' || m === 'guest' ? [] : VISIBLE_IMPORTED); setHidden(m === 'new' || m === 'guest' ? [] : SPAM)
@@ -3878,6 +4459,7 @@ export default function V2IaPage() {
   const finishSignup = (info: { name: string; title: string; linkId: string }, viaLink: boolean) => {
     changeMode('new')
     setMe({ ...ME, ...info })
+    setMyProf({ ...FRESH_PROF, line: info.title })
     setJoinedViaLink(viaLink)
     // 가입 축하 3개, 링크로 24시간 안에 가입하면 5개 더
     setCoins(viaLink ? 8 : 3)
@@ -4019,8 +4601,16 @@ export default function V2IaPage() {
     openAction: (a, pid) => { setFabOpen(false); setUploadInit(undefined); setRecordFor(pid); setAction(a) },
     openShare: (s) => setShare(s),
     openPanel: (p) => { if (p.k === 'noti') setNotiSeen(true); setPanel(p) },
-    goTab: (t) => { setPersonId(null); setHub(false); setSort(false); setSearching(false); setTab(t) },
+    goTab: (t) => { setPersonId(null); setViewProf(null); setHub(false); setSort(false); setSearching(false); setTab(t) },
     onboarding: mode === 'new' && onboarding,
+    openProfile: (t) => { setPanel(null); setViewProf(t) },
+    myProf,
+    setMyProf,
+    vis,
+    setVis,
+    planTags,
+    ask,
+    askAgent: (text) => { setAsk(text); if (text !== null) { setFabOpen(false); setAction('chat') } },
   }
 
   const openPerson = (p: Person) => app.openPerson(p)
@@ -4029,18 +4619,18 @@ export default function V2IaPage() {
 
   const pick = (a: FabAction) => app.openAction(a)
   const closeAction = () => setAction(null)
-  const sub = !!personId || hub || sort || searching
+  const sub = !!personId || !!viewProf || hub || sort || searching
   // 온보딩은 한 화면에 한 가지만: 헤더, 탭, 플로팅 버튼을 잠깐 치운다
   const immersive = mode === 'new' && onboarding && tab === 'today' && !sub
 
-  useEffect(() => { scroller.current?.scrollTo({ top: 0 }) }, [tab, personId, hub, sort, searching, mode, immersive])
+  useEffect(() => { scroller.current?.scrollTo({ top: 0 }) }, [tab, personId, viewProf, hub, sort, searching, mode, immersive])
 
   const onNoti = (n: Noti) => {
     setPanel(null)
     if (n.kind === 'draft' || n.kind === 'call') goTab('today')
     if (n.kind === 'broken') { goTab('today'); setFlow('in') }
     if (n.kind === 'join') { app.markJoined('p3'); setPersonId('p3') }
-    if (n.kind === 'feedback') window.location.href = `/${ME.linkId}?from=v2`
+    if (n.kind === 'feedback') setViewProf('me')
   }
 
   return (
@@ -4052,13 +4642,18 @@ export default function V2IaPage() {
             <input type="checkbox" checked={fromLink} onChange={(e) => setFromLink(e.target.checked)} /> 링크로 들어옴
           </label>
         )}
+        <label className="ml-1 flex shrink-0 items-center gap-1 text-neutral-600">
+          <input type="checkbox" checked={planTags} onChange={(e) => setPlanTags(e.target.checked)} /> 기획 태그
+        </label>
       </V2ModeBar>
 
       <ConnectCtx.Provider value={connectCtx}>
       <AppCtx.Provider value={app}>
       <div className="relative mx-auto flex h-[calc(100dvh-37px)] w-full max-w-[430px] flex-col overflow-hidden bg-[var(--color-bg-page)]">
         <div ref={scroller} className="scrollbar-hide flex-1 overflow-y-auto">
-          {personId ? (
+          {viewProf ? (
+            <ProfileView target={viewProf} onBack={() => setViewProf(null)} />
+          ) : personId ? (
             <PersonDetail key={personId} id={personId} onBack={() => setPersonId(null)} />
           ) : searching ? (
             <FeloreSearch mode={mode} onBack={() => setSearching(false)} openPerson={openPerson} />
@@ -4111,7 +4706,9 @@ export default function V2IaPage() {
         {panel?.k === 'noti' && <NotiSheet onClose={() => setPanel(null)} onGo={onNoti} />}
         {panel?.k === 'hidden' && <HiddenSheet onClose={() => setPanel(null)} />}
         {panel?.k === 'add' && (mode === 'guest' ? <LoginNotice onClose={() => setPanel(null)} /> : <AddPersonSheet onClose={() => setPanel(null)} />)}
-        {panel?.k === 'profile' && <ProfilePreviewSheet p={panel.p} onClose={() => setPanel(null)} />}
+        {panel?.k === 'editProf' && <EditProfSheet onClose={() => setPanel(null)} />}
+        {panel?.k === 'vis' && <VisSheet onClose={() => setPanel(null)} />}
+        {panel?.k === 'feedback' && <FeedbackSheet p={panel.p} onClose={() => setPanel(null)} />}
         {panel?.k === 'kemi' && <KemiSheet p={panel.p} onClose={() => setPanel(null)} />}
         {panel?.k === 'compose' && <ComposeSheet panel={panel} onClose={() => setPanel(null)} />}
         {share && <ShareSheet spec={share} onClose={() => setShare(null)} />}

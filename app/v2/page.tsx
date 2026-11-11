@@ -1833,6 +1833,7 @@ function TodayTab({ mode, openPerson, onboarding, onOnboardDone }: { mode: Mode;
           <CalendarDays size={13} className="shrink-0" /> {hasMeet ? '캘린더도 연결하면 대화에 없는 약속까지 챙겨요' : '오늘 잡힌 약속을 찾지 못했어요. 캘린더를 연결하면 일정에서 찾아요'} <ChevronRight size={12} className="shrink-0" />
         </button>
       )}
+      {hasMeet && <p className="mt-1.5 flex items-center gap-1.5 text-[11px] text-neutral-400"><Mic size={12} className="shrink-0" />앱에서는 약속 시간에 녹음을 켤지 알림으로 물어봐요. 늘 켜 두는 녹음은 하지 않아요</p>}
 
       <SectionTitle tag="new">챙길 사람</SectionTitle>
       {care.length === 0 ? (
@@ -3217,7 +3218,7 @@ function ChatScreen({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="absolute inset-0 z-50 flex flex-col bg-white">
+    <div className="absolute inset-0 z-50 flex flex-col bg-white sm:pt-3">
       <div className="flex items-center gap-2 border-b border-[var(--color-border-soft)] px-3 py-3">
         <button onClick={onClose}><ChevronLeft size={24} /></button>
         <span className="text-[15px] font-semibold">펠로어에게 말하기</span>
@@ -3328,7 +3329,7 @@ function SignupFlow({ viaLink, initLogin, onClose, onDone, onLogin }: {
   const GoogleMark = <span className="flex h-5 w-5 items-center justify-center rounded-full border border-neutral-200 text-[11px] font-bold text-[#4285F4]">G</span>
 
   return (
-    <div className="absolute inset-0 z-[60] flex flex-col bg-white">
+    <div className="absolute inset-0 z-[60] flex flex-col bg-white sm:pt-3">
       <div className="flex h-12 shrink-0 items-center gap-2 px-3">
         {step !== 'welcome' && <button onClick={back} aria-label="이전">{step === 'start' ? <X size={22} /> : <ChevronLeft size={24} />}</button>}
         {step !== 'login' && step !== 'start' && step !== 'welcome' && (
@@ -4058,7 +4059,7 @@ export default function V2IaPage() {
       <ConnectCtx.Provider value={connectCtx}>
       <AppCtx.Provider value={app}>
       <div className="relative mx-auto flex h-[800px] max-w-[390px] flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl max-sm:h-[calc(100dvh-44px)] max-sm:rounded-none max-sm:shadow-none">
-        <div ref={scroller} className="flex-1 overflow-y-auto">
+        <div ref={scroller} className="flex-1 overflow-y-auto sm:pt-3">
           {personId ? (
             <PersonDetail key={personId} id={personId} onBack={() => setPersonId(null)} />
           ) : searching ? (

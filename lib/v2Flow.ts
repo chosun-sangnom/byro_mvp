@@ -6,10 +6,24 @@
 import { useEffect, useState } from 'react'
 
 const KEY = 'felore-v2-flow'
+/** /v2에서 보던 상태(비회원, 가입 직후, 가져오는 중, 사용 중). 화면을 오가도 유지한다 */
+export const MODE_KEY = 'felore-v2-mode'
 
-export type V2Flow = { active: boolean; backHref: string; backLabel: string }
+export type V2Mode = 'guest' | 'new' | 'importing' | 'active'
+export type V2Tab = 'today' | 'people' | 'me'
+export const V2_MODES: [V2Mode, string][] = [['guest', '비회원'], ['new', '가입 직후'], ['importing', '가져오는 중'], ['active', '사용 중']]
 
-const OFF: V2Flow = { active: false, backHref: '/v2', backLabel: '' }
+export type V2Flow = { active: boolean; backHref: string; tab: V2Tab; mode: V2Mode }
+
+const OFF: V2Flow = { active: false, backHref: '/v2?tab=me', tab: 'me', mode: 'active' }
+
+export function readV2Mode(): V2Mode {
+  try {
+    const m = sessionStorage.getItem(MODE_KEY) as V2Mode | null
+    if (m && V2_MODES.some(([id]) => id === m)) return m
+  } catch {}
+  return 'active'
+}
 
 export function useV2Flow(): V2Flow {
   const [flow, setFlow] = useState<V2Flow>(OFF)
@@ -19,9 +33,10 @@ export function useV2Flow(): V2Flow {
       if (q.get('from') === 'v2') sessionStorage.setItem(KEY, q.get('person') ?? 'me')
       const saved = sessionStorage.getItem(KEY)
       if (!saved) return
+      const mode = readV2Mode()
       setFlow(saved === 'me'
-        ? { active: true, backHref: '/v2?tab=me', backLabel: '마이페이지' }
-        : { active: true, backHref: `/v2?tab=people&person=${saved}`, backLabel: '내 사람들' })
+        ? { active: true, backHref: '/v2?tab=me', tab: 'me', mode }
+        : { active: true, backHref: `/v2?tab=people&person=${saved}`, tab: 'people', mode })
     } catch {}
   }, [])
   return flow

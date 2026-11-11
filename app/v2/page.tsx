@@ -11,7 +11,8 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import { useFeloreStore } from '@/store/useFeloreStore'
 import Link from 'next/link'
-import { clearV2Flow } from '@/lib/v2Flow'
+import { clearV2Flow, MODE_KEY, readV2Mode } from '@/lib/v2Flow'
+import { V2ModeBar, V2TabBar } from '@/components/layout/V2Chrome'
 import {
   Bell, Settings, Sparkles, Users, User, ChevronRight, ChevronLeft, Search,
   Mic, PenLine, Lock, CalendarClock, MessageCircle, Send, Upload, Plus,
@@ -423,20 +424,27 @@ function PrivateBadge() {
 /** 헤더 오른쪽: 펠로어 사람 검색, 알림, 앱 전체 설정. 내 사람들 탭 안의 검색은 내 사람 안에서만 찾는다 */
 function Header({ title, onSearch }: { title: string; onSearch: () => void }) {
   const app = useApp()
+  const icon = 'p-2 text-[var(--color-text-secondary)]'
   return (
-    <div className="flex items-center justify-between px-5 pb-2 pt-3">
-      <h1 className="text-[20px] font-bold text-[var(--color-text-strong)]">{title}</h1>
-      <div className="flex items-center gap-4 text-neutral-700">
-        <button onClick={onSearch} aria-label="펠로어에서 사람 찾기"><Search size={22} /></button>
-        {app.mode !== 'guest' && (
-          <button onClick={() => app.openPanel({ k: 'noti' })} className="relative" aria-label="알림">
-            <Bell size={22} />
-            {app.mode === 'active' && !app.notiSeen && <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-rose-500" />}
-          </button>
-        )}
-        <Link href="/settings?from=v2" aria-label="설정"><Menu size={22} /></Link>
-      </div>
-    </div>
+    <>
+      <header className="flex h-14 flex-shrink-0 items-center justify-between border-b border-[var(--color-border-soft)] bg-[var(--color-bg-page)] px-5">
+        <button onClick={() => app.goTab('today')} aria-label="Felore">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/brand/felore-wordmark.svg" alt="Felore" className="h-[18px] w-auto" />
+        </button>
+        <div className="flex items-center gap-1">
+          <button onClick={onSearch} className={icon} aria-label="펠로어에서 사람 찾기"><Search size={20} /></button>
+          {app.mode !== 'guest' && (
+            <button onClick={() => app.openPanel({ k: 'noti' })} className={`relative ${icon}`} aria-label="알림">
+              <Bell size={20} />
+              {app.mode === 'active' && !app.notiSeen && <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-red-500" />}
+            </button>
+          )}
+          <Link href="/settings?from=v2" className={icon} aria-label="설정"><Menu size={20} /></Link>
+        </div>
+      </header>
+      <h1 className="px-5 pb-1 pt-4 text-[20px] font-black text-[var(--color-text-strong)]">{title}</h1>
+    </>
   )
 }
 
@@ -750,9 +758,9 @@ function ConnectScreen({ onBack, onDetail }: { onBack: () => void; onDetail: (s:
   ]
   return (
     <div className="pb-28">
-      <div className="flex items-center gap-2 px-3 py-3">
-        <button onClick={onBack}><ChevronLeft size={24} /></button>
-        <span className="text-[15px] font-semibold">연결</span>
+      <div className="flex h-12 flex-shrink-0 items-center gap-2 border-b border-[var(--color-border-soft)] px-4">
+        <button onClick={onBack}><ChevronLeft size={20} className="text-[var(--color-text-secondary)]" /></button>
+        <span className="text-[15px] font-black">연결</span>
         <Tag kind="new" />
         <span className="ml-auto"><PrivateBadge /></span>
       </div>
@@ -1256,9 +1264,9 @@ function SortFlow({ onBack, onDone }: { onBack: () => void; onDone: (later: Merg
 
   return (
     <div className="pb-28">
-      <div className="flex items-center gap-2 px-3 py-3">
-        <button onClick={back}><ChevronLeft size={24} /></button>
-        <span className="text-[15px] font-semibold">사람 정리</span>
+      <div className="flex h-12 flex-shrink-0 items-center gap-2 border-b border-[var(--color-border-soft)] px-4">
+        <button onClick={back}><ChevronLeft size={20} className="text-[var(--color-text-secondary)]" /></button>
+        <span className="text-[15px] font-black">사람 정리</span>
         <Tag kind="new" />
         <span className="ml-auto"><PrivateBadge /></span>
       </div>
@@ -1929,8 +1937,8 @@ function FeloreSearch({ mode, onBack, openPerson }: { mode: Mode; onBack: () => 
   const open = (p: Person) => (mode === 'guest' ? app.openPanel({ k: 'profile', p }) : openPerson(p))
   return (
     <div className="pb-28">
-      <div className="flex items-center gap-2 px-3 py-3">
-        <button onClick={onBack}><ChevronLeft size={24} /></button>
+      <div className="flex h-12 flex-shrink-0 items-center gap-2 border-b border-[var(--color-border-soft)] px-4">
+        <button onClick={onBack}><ChevronLeft size={20} className="text-[var(--color-text-secondary)]" /></button>
         <div className="flex flex-1 items-center gap-2 rounded-full bg-neutral-100 px-4 py-2.5">
           <Search size={16} className="text-neutral-400" />
           <input autoFocus value={query} onChange={(e) => setQuery(e.target.value)} placeholder="이름, 회사, 아이디로 펠로어에서 찾기" className="flex-1 bg-transparent text-[13px] outline-none" />
@@ -2296,9 +2304,9 @@ function PersonDetail({ id, onBack }: { id: string; onBack: () => void }) {
 
   return (
     <div className="pb-28">
-      <div className="relative flex items-center gap-2 px-3 py-3">
-        <button onClick={onBack}><ChevronLeft size={24} /></button>
-        <span className="text-[15px] font-semibold">인물 카드</span>
+      <div className="relative flex h-12 flex-shrink-0 items-center gap-2 border-b border-[var(--color-border-soft)] px-4">
+        <button onClick={onBack}><ChevronLeft size={20} className="text-[var(--color-text-secondary)]" /></button>
+        <span className="text-[15px] font-black">인물 카드</span>
         <Tag kind="new" />
         <span className="ml-auto"><PrivateBadge /></span>
         <button onClick={() => setMenu((v) => !v)} aria-label="더 보기"><MoreHorizontal size={20} /></button>
@@ -2618,9 +2626,9 @@ function FabMenu({ onPick, onClose }: { onPick: (a: FabAction) => void; onClose:
 
 function Sheet({ children, onClose }: { children: ReactNode; onClose: () => void }) {
   return (
-    <div className="absolute inset-0 z-50 flex items-end bg-black/40" onClick={onClose}>
-      <div className="max-h-[92%] w-full overflow-y-auto rounded-t-3xl bg-white px-5 pb-8 pt-4" onClick={(e) => e.stopPropagation()}>
-        <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-neutral-200" />
+    <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/45 px-3 sm:px-4" onClick={onClose}>
+      <div className="max-h-[86dvh] w-full max-w-[430px] overflow-y-auto rounded-t-2xl border-x border-t border-[var(--color-border-soft)] bg-white px-5 pb-[max(env(safe-area-inset-bottom),24px)] pt-3" onClick={(e) => e.stopPropagation()}>
+        <div className="mx-auto mb-4 h-1 w-8 rounded-full bg-neutral-200" />
         {children}
       </div>
     </div>
@@ -3218,10 +3226,10 @@ function ChatScreen({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="absolute inset-0 z-50 flex flex-col bg-white sm:pt-3">
-      <div className="flex items-center gap-2 border-b border-[var(--color-border-soft)] px-3 py-3">
-        <button onClick={onClose}><ChevronLeft size={24} /></button>
-        <span className="text-[15px] font-semibold">펠로어에게 말하기</span>
+    <div className="absolute inset-0 z-50 flex flex-col bg-white">
+      <div className="flex h-12 flex-shrink-0 items-center gap-2 border-b border-[var(--color-border-soft)] px-4">
+        <button onClick={onClose}><ChevronLeft size={20} className="text-[var(--color-text-secondary)]" /></button>
+        <span className="text-[15px] font-black">펠로어에게 말하기</span>
         <Tag kind="new" />
         <span className="ml-auto"><PrivateBadge /></span>
       </div>
@@ -3329,9 +3337,9 @@ function SignupFlow({ viaLink, initLogin, onClose, onDone, onLogin }: {
   const GoogleMark = <span className="flex h-5 w-5 items-center justify-center rounded-full border border-neutral-200 text-[11px] font-bold text-[#4285F4]">G</span>
 
   return (
-    <div className="absolute inset-0 z-[60] flex flex-col bg-white sm:pt-3">
+    <div className="absolute inset-0 z-[60] flex flex-col bg-white">
       <div className="flex h-12 shrink-0 items-center gap-2 px-3">
-        {step !== 'welcome' && <button onClick={back} aria-label="이전">{step === 'start' ? <X size={22} /> : <ChevronLeft size={24} />}</button>}
+        {step !== 'welcome' && <button onClick={back} aria-label="이전">{step === 'start' ? <X size={22} /> : <ChevronLeft size={20} className="text-[var(--color-text-secondary)]" />}</button>}
         {step !== 'login' && step !== 'start' && step !== 'welcome' && (
           <div className="ml-1 flex gap-1">
             {flow.slice(1, -1).map((s, j) => <span key={s} className={`h-1 rounded-full ${j === idx - 1 ? 'w-6 bg-[#25313D]' : j < idx - 1 ? 'w-1.5 bg-[#25313D]/40' : 'w-1.5 bg-neutral-200'}`} />)}
@@ -3369,7 +3377,7 @@ function SignupFlow({ viaLink, initLogin, onClose, onDone, onLogin }: {
             <p className="mt-6 text-[22px] font-bold leading-snug">약관에 동의해 주세요</p>
             <button onClick={() => setAgreed(allOn ? [] : TERMS.map((t) => t.id))} className="mt-6 flex w-full items-center gap-3 rounded-2xl bg-neutral-50 px-4 py-4 text-left">
               <span className={`flex h-6 w-6 items-center justify-center rounded-full border ${allOn ? 'border-[#25313D] bg-[#25313D] text-white' : 'border-neutral-300 bg-white'}`}>{allOn && <Check size={14} />}</span>
-              <span className="text-[15px] font-semibold">모두 동의해요</span>
+              <span className="text-[15px] font-black">모두 동의해요</span>
             </button>
             <div className="mt-2 divide-y divide-[var(--color-border-soft)]">
               {TERMS.map((t) => {
@@ -3794,8 +3802,6 @@ function ComposeSheet({ panel, onClose }: { panel: Extract<Panel, { k: 'compose'
   )
 }
 
-const MODE_KEY = 'felore-v2-mode'
-const MODES: Mode[] = ['guest', 'new', 'importing', 'active']
 const MEET0: MeetSet = { on: false, days: ['월', '화', '수', '목', '금'], from: 10, to: 18, dur: 30 }
 const VISIBLE_IMPORTED = IMPORTED.filter((x) => !x.spam)
 const SPAM = IMPORTED.filter((x) => x.spam)
@@ -3889,8 +3895,7 @@ export default function V2IaPage() {
     booted.current = true
     clearV2Flow()
     const q = new URLSearchParams(window.location.search)
-    let m: Mode = 'active'
-    try { const saved = sessionStorage.getItem(MODE_KEY) as Mode | null; if (saved && MODES.includes(saved)) m = saved } catch {}
+    let m: Mode = readV2Mode()
     if (q.get('signup')) m = 'guest'
     if (m !== 'active') { changeMode(m); setOnboarding(false) }
     const t = q.get('tab')
@@ -3898,6 +3903,9 @@ export default function V2IaPage() {
     const back = PEOPLE.find((x) => x.id === q.get('person'))
     if (back && m !== 'guest') { if (m === 'new') setPeople([back]); setPersonId(back.id) }
     if (q.get('signup')) setSignup({ viaLink: q.get('via') === '1' })
+    if (q.get('open') === 'search') setSearching(true)
+    if (q.get('open') === 'noti' && m !== 'guest') { setNotiSeen(true); setPanel({ k: 'noti' }) }
+    if (q.get('fab')) setFabOpen(true)
     if (window.location.search) window.history.replaceState(null, '', '/v2')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -4019,12 +4027,6 @@ export default function V2IaPage() {
   const goTab = app.goTab
   const titles: Record<Tab, string> = { today: '오늘의 제안', people: '내 사람들', me: '마이페이지' }
 
-  const tabs: { id: Tab; label: string; icon: ReactNode }[] = [
-    { id: 'today', label: '오늘의 제안', icon: <Sparkles size={22} /> },
-    { id: 'people', label: '내 사람들', icon: <Users size={22} /> },
-    { id: 'me', label: '마이페이지', icon: <User size={22} /> },
-  ]
-
   const pick = (a: FabAction) => app.openAction(a)
   const closeAction = () => setAction(null)
   const sub = !!personId || hub || sort || searching
@@ -4042,24 +4044,20 @@ export default function V2IaPage() {
   }
 
   return (
-    <div className="min-h-dvh bg-neutral-200 py-4 max-sm:bg-white max-sm:py-0">
-      {/* 기획 확인용 컨트롤 */}
-      <div className="mx-auto mb-3 flex max-w-[390px] flex-wrap items-center gap-2 px-3 text-[12px]">
-        <span className="font-semibold text-neutral-600">상태</span>
-        {([['guest', '비회원'], ['new', '가입 직후'], ['importing', '가져오는 중'], ['active', '사용 중']] as [Mode, string][]).map(([m, l]) => (
-          <button key={m} onClick={() => { changeMode(m); setTab('today') }} className={`rounded-full px-3 py-1 ${mode === m ? 'bg-[#25313D] text-white' : 'bg-white max-sm:bg-neutral-100'}`}>{l}</button>
-        ))}
+    <div className="h-dvh overflow-hidden bg-[var(--color-bg-page)]">
+      {/* [임시] 기획 확인용. 맨 위에 붙어 상태를 바꾼다 */}
+      <V2ModeBar mode={mode} onChange={(m) => { changeMode(m); setTab('today') }}>
         {mode === 'guest' && (
-          <label className="ml-1 flex items-center gap-1 text-neutral-600">
+          <label className="ml-1 flex shrink-0 items-center gap-1 text-neutral-600">
             <input type="checkbox" checked={fromLink} onChange={(e) => setFromLink(e.target.checked)} /> 링크로 들어옴
           </label>
         )}
-      </div>
+      </V2ModeBar>
 
       <ConnectCtx.Provider value={connectCtx}>
       <AppCtx.Provider value={app}>
-      <div className="relative mx-auto flex h-[800px] max-w-[390px] flex-col overflow-hidden rounded-[40px] bg-white shadow-2xl max-sm:h-[calc(100dvh-44px)] max-sm:rounded-none max-sm:shadow-none">
-        <div ref={scroller} className="flex-1 overflow-y-auto sm:pt-3">
+      <div className="relative mx-auto flex h-[calc(100dvh-37px)] w-full max-w-[430px] flex-col overflow-hidden bg-[var(--color-bg-page)]">
+        <div ref={scroller} className="scrollbar-hide flex-1 overflow-y-auto">
           {personId ? (
             <PersonDetail key={personId} id={personId} onBack={() => setPersonId(null)} />
           ) : searching ? (
@@ -4089,31 +4087,8 @@ export default function V2IaPage() {
           )}
         </div>
 
-        {/* 어느 탭, 어느 화면에서든 같은 자리에 떠 있는 버튼 */}
-        {!immersive && (
-          <button
-            onClick={() => setFabOpen((v) => !v)}
-            className="absolute bottom-[88px] right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#0D0D0D] text-white shadow-xl"
-            aria-label="기록하고 말하기"
-          >
-            {fabOpen ? <X size={24} /> : <Plus size={26} />}
-          </button>
-        )}
-
-        {!immersive && (
-          <nav className="flex shrink-0 items-center justify-around border-t border-[var(--color-border-soft)] bg-white pb-5 pt-2">
-            {tabs.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => goTab(t.id)}
-                className={`flex w-20 flex-col items-center gap-0.5 text-[11px] ${tab === t.id && !sub ? 'font-semibold text-[#0D0D0D]' : 'text-neutral-400'}`}
-              >
-                {t.icon}
-                {t.label}
-              </button>
-            ))}
-          </nav>
-        )}
+        {/* 하단 탭과 어느 화면에서든 같은 자리에 떠 있는 버튼. 기존 프로필 화면에서도 같은 것이 보인다 */}
+        {!immersive && <V2TabBar active={sub ? null : tab} onTab={goTab} onFab={() => setFabOpen((v) => !v)} fabOpen={fabOpen} />}
 
         {fabOpen && <FabMenu onPick={pick} onClose={() => setFabOpen(false)} />}
         {action && mode === 'guest' && <LoginNotice onClose={closeAction} />}
@@ -4150,7 +4125,7 @@ export default function V2IaPage() {
           />
         )}
         {toastMsg && (
-          <div key={toastMsg.n} className="pointer-events-none absolute inset-x-0 bottom-[104px] z-[70] flex justify-center px-6">
+          <div key={toastMsg.n} className="pointer-events-none absolute inset-x-0 bottom-[104px] z-[90] flex justify-center px-6">
             <span className="rounded-full bg-[#25313D] px-4 py-2 text-center text-[12px] leading-snug text-white shadow-lg">{toastMsg.msg}</span>
           </div>
         )}
@@ -4158,9 +4133,6 @@ export default function V2IaPage() {
       </AppCtx.Provider>
       </ConnectCtx.Provider>
 
-      <p className="mx-auto mt-3 max-w-[390px] px-3 text-[11px] leading-relaxed text-neutral-500">
-        기획 확인용 와이어프레임 (니즈·기능 정의서 v0.2). 태그: 기존(지금 있는 기능을 옮김), 신규, 다음 단계, 검토(결정 필요). 채널별 가져오기와 보내기 가능 범위는 기술 검토 중. 위 상태 버튼을 누르면 그 상태의 처음 모습으로 돌아가요.
-      </p>
     </div>
   )
 }

@@ -165,7 +165,7 @@ type Job = { org: string; role: string; when: string; ok?: boolean }
 type Prof = {
   /** 한 줄 소개 */
   line: string
-  /** 펠로어가 인스타를 보고 건넨 한마디 */
+  /** 펠로어가 인스타를 보고 건넨 첫인사 */
   word?: string
   persona: string
   keywords: string[]
@@ -345,7 +345,7 @@ type App = {
   setVis: (v: Record<ProfSec, boolean>) => void
   /** 기획 확인용 태그(신규, 기존, 검토)를 보일지 */
   planTags: boolean
-  /** 말하기를 열면서 바로 한마디 건넨다 */
+  /** 말하기를 열면서 바로 건넬 말 */
   ask: string | null
   askAgent: (text: string | null) => void
 }
@@ -1649,7 +1649,7 @@ function OnboardingFlow({ onDone }: { onDone: () => void }) {
         <div className="flex gap-1">
           {OB_STEPS.map((s, j) => <span key={s} className={`h-1 rounded-full ${j === i ? 'w-6 bg-[#25313D]' : j < i ? 'w-1.5 bg-[#25313D]/40' : 'w-1.5 bg-neutral-200'}`} />)}
         </div>
-        {step !== 'end' && <button onClick={onDone} className="ml-auto text-[12px] text-neutral-400">건너뛰기</button>}
+        {step !== 'end' && <button onClick={onDone} className="ml-auto text-[12px] text-neutral-400">모두 건너뛰기</button>}
       </div>
 
       <div className="mt-10 flex items-start gap-3">
@@ -1944,6 +1944,14 @@ function TodayTab({ mode, openPerson, onboarding, onOnboardDone }: { mode: Mode;
         <Clock size={13} /> 다음 묶음 {app.batchSt.label.startsWith(app.batchTimes[0]) ? app.batchTimes[1] : `내일 ${app.batchTimes[0]}`}
         <span className="ml-auto flex items-center">하루 두 번 ({app.batchTimes[0]}, {app.batchTimes[1]})<ChevronRight size={12} /></span>
       </button>
+
+      {app.cands.length > 0 && (
+        <button onClick={() => app.goTab('people')} className="mt-3 flex w-full items-center gap-2 rounded-2xl bg-[#25313D]/5 px-4 py-3 text-left text-[12px]">
+          <GitMerge size={14} className="text-[#25313D]" />
+          <span>같은 사람일 수 있는 계정 <b>{app.cands.length}건</b>이 남아 있어요</span>
+          <ChevronRight size={14} className="ml-auto text-neutral-400" />
+        </button>
+      )}
 
       {(showCall || showKakao) && (
         <>
@@ -3192,7 +3200,7 @@ function UploadSheet({ onClose, init }: { onClose: () => void; init?: 'kakao' })
 
 /* ───────── 인스타 연동 (마이페이지) ─────────
  * 망원동 이자카야 방식. 아이디를 넣으면 코드를 주고, 펠로어 공식 계정에 DM으로 보내면 본인 확인이 끝난다.
- * 공개 계정이면 피드를 한 번 분석해 앨범 사진, 키워드, 페르소나 초안을 채우고 한마디를 건넨다.
+ * 공개 계정이면 피드를 한 번 분석해 앨범 사진, 키워드, 페르소나 초안을 채우고 첫인사를 건넨다.
  * 비공개 계정은 본인 확인만 하고, 에이전트 대행을 연결한 뒤 분석한다.
  */
 
@@ -3272,7 +3280,7 @@ function InstaLinkSheet({ onClose }: { onClose: () => void }) {
       {step === 'result' && !isPrivate && (
         <>
           <div className="mt-3 rounded-2xl bg-neutral-50 px-4 py-4">
-            <p className="text-[11px] text-neutral-400">펠로어의 한마디</p>
+            <p className="text-[11px] text-neutral-400">펠로어의 첫인사</p>
             <p className="mt-1 text-[16px] font-bold leading-snug">{word}</p>
           </div>
           <p className="mt-5 text-[13px] font-semibold">앨범에 넣을 사진</p>
@@ -3293,7 +3301,7 @@ function InstaLinkSheet({ onClose }: { onClose: () => void }) {
           <p className="mt-5 text-[13px] font-semibold">페르소나 초안</p>
           <p className="mt-1 rounded-xl border border-neutral-200 p-3 text-[13px] leading-relaxed">사람을 만나며 일을 넓히는 실행형 프로덕트 오너. 주말 러닝으로 리듬을 지키고, 새로운 공간과 전시에서 영감을 얻어요.</p>
           <div className="mt-5"><PrimaryButton disabled={picked.length === 0} onClick={() => { finishInsta(picked.length); app.toast('프로필에 앨범과 페르소나 초안을 넣었어요'); onClose() }}>프로필에 넣기 (사진 {picked.length}장)</PrimaryButton></div>
-          <button onClick={() => app.openShare({ title: '한마디 공유하기', url: `felore.io/${app.me.linkId}`, text: `${word} 펠로어가 내 인스타를 보고 건넨 한마디예요` })} className="mt-3 w-full text-center text-[13px] text-neutral-500">한마디 공유하기</button>
+          <button onClick={() => app.openShare({ title: '첫인사 공유하기', url: `felore.io/${app.me.linkId}`, text: `${word} 펠로어가 내 인스타를 보고 건넨 첫인사예요` })} className="mt-3 w-full text-center text-[13px] text-neutral-500">첫인사 공유하기</button>
         </>
       )}
     </Sheet>
@@ -3436,7 +3444,7 @@ function ChatScreen({ onClose }: { onClose: () => void }) {
     say(r)
     setInput('')
   }
-  // 홈에서 한마디를 들고 들어온 경우 바로 건넨다
+  // 홈에서 말을 들고 들어온 경우 바로 보낸다
   useEffect(() => {
     if (app.ask) { const t = app.ask; app.askAgent(null); send(t) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -4090,7 +4098,7 @@ function ProfileView({ target, onBack }: { target: Person | 'me'; onBack: () => 
           )}
           {owner && !instaDone && (
             <button onClick={openInsta} className="flex w-full items-center gap-2 rounded-2xl border border-dashed border-neutral-300 px-4 py-3 text-left text-[13px]">
-              <ChannelBadge ch="ig" /><span className="flex-1">인스타를 보여주면 사진과 키워드, 한마디를 채워 드려요</span><ChevronRight size={14} className="text-neutral-300" />
+              <ChannelBadge ch="ig" /><span className="flex-1">인스타를 보여주면 사진과 키워드, 첫인사를 채워 드려요</span><ChevronRight size={14} className="text-neutral-300" />
             </button>
           )}
           {photos.length > 0 && <p className="mt-2 text-[11px] text-neutral-400">인스타 피드에서 고른 사진이에요</p>}
@@ -4195,7 +4203,7 @@ function ProfileView({ target, onBack }: { target: Person | 'me'; onBack: () => 
             ))}
           </div>
           {owner
-            ? <button onClick={() => app.openShare({ title: '피드백 요청 보내기', url: `felore.io/${linkId}`, text: '같이 일해 본 사람에게 보내면 한마디를 남길 수 있어요' })} className="mt-3 w-full rounded-full border border-neutral-200 py-2.5 text-[13px]">피드백 요청 보내기</button>
+            ? <button onClick={() => app.openShare({ title: '피드백 요청 보내기', url: `felore.io/${linkId}`, text: '같이 일해 본 사람에게 보내면 피드백을 남길 수 있어요' })} className="mt-3 w-full rounded-full border border-neutral-200 py-2.5 text-[13px]">피드백 요청 보내기</button>
             : <button onClick={() => (guest ? join(true) : app.openPanel({ k: 'feedback', p: p! }))} className="mt-3 w-full rounded-full border border-neutral-200 py-2.5 text-[13px]">피드백 남기기</button>}
         </ProfBlock>
 
@@ -4269,7 +4277,7 @@ function EditProfSheet({ onClose }: { onClose: () => void }) {
 
 function VisSheet({ onClose }: { onClose: () => void }) {
   const app = useApp()
-  const rows: [ProfSec, string, string][] = [['persona', '페르소나', '한마디, 소개, 키워드, 사진'], ['card', '명함', '경력과 학력'], ['net', '연결된 사람들', '분야별 분포'], ['rep', '평판', '받은 피드백']]
+  const rows: [ProfSec, string, string][] = [['persona', '페르소나', '첫인사, 소개, 키워드, 사진'], ['card', '명함', '경력과 학력'], ['net', '연결된 사람들', '분야별 분포'], ['rep', '평판', '받은 피드백']]
   return (
     <Sheet onClose={onClose}>
       <div className="flex items-center justify-between">
@@ -4311,7 +4319,7 @@ function FeedbackSheet({ p, onClose }: { p: Person; onClose: () => void }) {
         })}
       </div>
       <p className="mt-1.5 text-[11px] text-neutral-400">세 개까지 고를 수 있어요</p>
-      <textarea value={text} onChange={(e) => setText(e.target.value)} rows={2} maxLength={80} placeholder="한마디 남기기 (선택)" className="mt-3 w-full rounded-xl border border-neutral-200 p-3 text-[13px] outline-none focus:border-[#25313D]" />
+      <textarea value={text} onChange={(e) => setText(e.target.value)} rows={2} maxLength={80} placeholder="피드백 남기기 (선택)" className="mt-3 w-full rounded-xl border border-neutral-200 p-3 text-[13px] outline-none focus:border-[#25313D]" />
       <div className="mt-4"><PrimaryButton disabled={picked.length === 0} onClick={() => { app.toast(`${p.name}님에게 피드백을 남겼어요`); onClose() }}>남기기</PrimaryButton></div>
     </Sheet>
   )

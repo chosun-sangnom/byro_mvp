@@ -3707,8 +3707,6 @@ function SignupFlow({ viaLink, initLogin, onClose, onDone, onLogin }: {
   const [method, setMethod] = useState<'google' | 'phone'>('phone')
   const [agreed, setAgreed] = useState<string[]>([])
   const [phone, setPhone] = useState('')
-  const [sent, setSent] = useState(false)
-  const [code, setCode] = useState('')
   const [pw, setPw] = useState('')
   const [name, setName] = useState(ME.name)
   const [certed, setCerted] = useState(false)
@@ -3721,7 +3719,6 @@ function SignupFlow({ viaLink, initLogin, onClose, onDone, onLogin }: {
   const back = () => (step === 'login' ? (initLogin ? onClose() : setStep('start')) : idx <= 0 ? onClose() : go(-1))
   const mustOk = TERMS.filter((t) => t.must).every((t) => agreed.includes(t.id))
   const allOn = agreed.length === TERMS.length
-  const phoneOk = phone.replace(/\D/g, '').length >= 10
 
   const GoogleMark = <span className="flex h-5 w-5 items-center justify-center rounded-full border border-neutral-200 text-[11px] font-bold text-[#4285F4]">G</span>
 

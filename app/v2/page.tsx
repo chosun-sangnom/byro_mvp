@@ -1611,7 +1611,7 @@ function ProfileDraftCard() {
         </div>
       </div>
       <div className="mt-2 flex flex-wrap gap-1">{p.keywords.map((k) => <span key={k} className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px]">{k}</span>)}</div>
-      <p className="mt-3 text-[11px] text-neutral-500">{srcs.map((x) => SRC[x].label).join(', ')}에서 모은 정보로 만들었어요. 경력과 학력은 빠졌으면 직접 더해 주세요</p>
+      <p className="mt-3 text-[11px] text-neutral-500">{srcs.map((x) => SRC[x].label).join(', ')}에서 모은 정보로 만들었어요. {p.career.length > 0 ? '경력은 리멤버 명함에서 가져왔어요. 틀린 곳이 있으면 고쳐 주세요' : '경력과 학력은 찾지 못했어요. 프로필에서 직접 더해 주세요'}</p>
       <div className="mt-3 grid grid-cols-2 gap-2">
         <button onClick={() => { app.seeDraft(); app.openProfile('me') }} className="rounded-full bg-[#0D0D0D] py-2.5 text-[13px] font-semibold text-white">확인하고 다듬기</button>
         <button onClick={() => { setHide(true) }} className="rounded-full border border-neutral-200 py-2.5 text-[13px]">나중에</button>

@@ -344,6 +344,9 @@ type App = {
   openProfile: (t: Person | 'me') => void
   myProf: Prof
   setMyProf: (p: Prof) => void
+  /** 에이전트가 만든 프로필 초안을 사용자가 확인했는지 */
+  profDraft: 'none' | 'ready' | 'seen'
+  seeDraft: () => void
   /** 내 프로필에서 구역별로 공개할지 */
   vis: Record<ProfSec, boolean>
   setVis: (v: Record<ProfSec, boolean>) => void
@@ -369,7 +372,7 @@ const freshBatch = (drafts: Draft[], label: string): BatchSt => ({
 
 /* ───────── 연결 ─────────
  * 인스타, 링크드인 에이전트 대행은 로그인 정보를 받아 사용자가 만든 암호화 키로 잠가 보관하고 서버에서 로그인한다(피클 방식).
- * 인스타 프로필 연동(본인 확인, 피드 분석)은 마이페이지에서 DM 코드로 따로 한다(망원동 이자카야 방식).
+ * 프로필은 맡긴 계정(인스타, 유튜브, 틱톡, 링크드인, 리멤버)에서 에이전트가 초안을 만들고, 홈 카드로 확인받는다.
  * 텔레그램은 공식 API, 지메일, 구글 캘린더는 구글 동의 화면으로 권한을 하나씩 받는다.
  * 카톡은 대화방의 대화 내보내기를 공유하기로 받는다. 자동 내보내기는 하지 않는다.
  * 휴대폰 연락처는 이름과 번호를 읽고 계속 동기화한다. 통화 녹음은 갤럭시는 녹음 파일 권한, 아이폰은 공유하기로 받는다.
@@ -436,12 +439,12 @@ const ConnectCtx = createContext<{
   /** 비회원이 가입한다. viaLink면 링크로 본 프로필의 주인이 내 사람에 들어간다 */
   join: (viaLink?: boolean) => void
   joinedViaLink: boolean
-  /** 마이페이지 > 인스타 연동. DM 코드로 내 계정을 확인하고 피드를 분석한다 */
+  /** 인스타를 맡겨 프로필 초안을 만든다. 이미 맡겼다면 초안을 다시 만든다 */
   openInsta: () => void
   /** 인스타 연동을 마쳤는지와 앨범에 넣은 사진 수 */
   instaDone: boolean
   instaPhotos: number
-  finishInsta: (photos: number) => void
+  finishInsta: (srcs: Src[]) => void
   openMeetLink: () => void
 }>({ conn: initConn('new'), start: () => {}, update: () => {}, openHub: () => {}, join: () => {}, joinedViaLink: false, openInsta: () => {}, instaDone: false, instaPhotos: 6, finishInsta: () => {}, openMeetLink: () => {} })
 
@@ -984,7 +987,7 @@ function ConnectDetailSheet({ src, onClose }: { src: Src; onClose: () => void })
  * 통화 녹음은 갤럭시는 녹음 파일 권한, 아이폰은 공유하기 안내. 구글은 구글 동의 화면에서 이 항목 권한만 받는다.
  */
 function ConnectFlowSheet({ src, onClose }: { src: Src; onClose: () => void }) {
-  const { conn, update, openSort } = useConnect()
+  const { conn, update, openSort, finishInsta } = useConnect()
   const app = useApp()
   const meta = SRC[src]
   // 열 때 끊겨 있었는지를 기억한다. 다시 연결을 마친 뒤에도 안내 문구가 바뀌지 않게
@@ -1009,7 +1012,7 @@ function ConnectFlowSheet({ src, onClose }: { src: Src; onClose: () => void }) {
 
   const finish = () => {
     update(src, { status: 'on', level, last: '방금' })
-    if (src === 'remember' && app.myProf.career.length === 0) app.setMyProf({ ...app.myProf, career: MY_PROF.career, edu: MY_PROF.edu })
+    if (!reconnect) finishInsta([src])
     setStep('done')
   }
   const deny = () => { app.toast(`${meta.label} 없이도 쓸 수 있어요. 마이페이지 > 연결에서 언제든 허용해요`); onClose() }
@@ -1573,15 +1576,46 @@ function KakaoStaleCard({ onSkip }: { onSkip: () => void }) {
   )
 }
 
-/** 가입 직후 맨 위. 인스타로 내 프로필부터 채우게 한다 */
+/** 가입 직후 맨 위. 계정을 맡기면 프로필이 만들어진다는 안내 */
 function InstaStartCard() {
   const { openInsta } = useConnect()
   return (
     <Card className="mt-4 !border-transparent !bg-[#25313D] text-white" onClick={openInsta}>
       <p className="text-[12px] opacity-70">1분이면 돼요</p>
-      <p className="mt-1 text-[17px] font-bold leading-snug">인스타로 내 프로필부터 채워요</p>
-      <p className="mt-1.5 text-[12px] leading-relaxed opacity-80">DM 코드로 내 계정만 확인하면, 피드에서 사진과 관심사를 골라 프로필과 페르소나 초안을 만들어 드려요.</p>
+      <p className="mt-1 text-[17px] font-bold leading-snug">계정을 맡기면 프로필이 만들어져요</p>
+      <p className="mt-1.5 text-[12px] leading-relaxed opacity-80">인스타, 유튜브 같은 계정의 로그인 정보를 맡기면 사진과 관심사를 읽어 프로필과 페르소나 초안을 만들어 드려요.</p>
       <span className="mt-3 inline-flex items-center gap-1 rounded-full bg-white px-3 py-1.5 text-[12px] font-semibold text-[#0D0D0D]">시작하기<ChevronRight size={12} /></span>
+    </Card>
+  )
+}
+
+/** 계정을 맡겨 정보가 모이면 에이전트가 만든 내 프로필 카드를 홈에서 확인받는다 */
+function ProfileDraftCard() {
+  const app = useApp()
+  const { conn } = useConnect()
+  const [hide, setHide] = useState(false)
+  if (app.profDraft !== 'ready' || hide) return null
+  const srcs = PROFILE_SRC.filter((s) => conn[s].status === 'on')
+  const p = app.myProf
+  return (
+    <Card className="mt-3 !border-[#25313D]/20">
+      <p className="flex items-center gap-1.5 text-[12px] font-semibold text-[#25313D]"><Sparkles size={13} />나의 프로필 카드가 만들어졌어요<Tag kind="new" /></p>
+      <div className="mt-3 flex gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-[16px] font-bold">{app.me.name}</p>
+          {p.word && <p className="mt-0.5 text-[13px] font-semibold leading-snug">&ldquo;{p.word}&rdquo;</p>}
+          <p className="mt-1.5 line-clamp-3 text-[12px] leading-relaxed text-neutral-600">{p.persona}</p>
+        </div>
+        <div className="grid w-[72px] shrink-0 grid-cols-2 gap-1">
+          {p.photos.slice(0, 4).map((s) => <Photo key={s} src={s} className="aspect-square w-full rounded-md" />)}
+        </div>
+      </div>
+      <div className="mt-2 flex flex-wrap gap-1">{p.keywords.map((k) => <span key={k} className="rounded-full bg-neutral-100 px-2 py-0.5 text-[11px]">{k}</span>)}</div>
+      <p className="mt-3 text-[11px] text-neutral-500">{srcs.map((x) => SRC[x].label).join(', ')}에서 모은 정보로 만들었어요. 경력과 학력은 빠졌으면 직접 더해 주세요</p>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <button onClick={() => { app.seeDraft(); app.openProfile('me') }} className="rounded-full bg-[#0D0D0D] py-2.5 text-[13px] font-semibold text-white">확인하고 다듬기</button>
+        <button onClick={() => { setHide(true) }} className="rounded-full border border-neutral-200 py-2.5 text-[13px]">나중에</button>
+      </div>
     </Card>
   )
 }
@@ -1638,16 +1672,7 @@ function OnboardingFlow({ onDone }: { onDone: () => void }) {
       const lv = SRC[s].levels.includes(level) ? level : SRC[s].levels[SRC[s].levels.length - 1]
       update(s, { status: 'on', level: lv, last: '방금' })
     }
-    if (sel.some((s) => PROFILE_SRC.includes(s))) {
-      // 연결한 계정에서 에이전트가 프로필 초안을 만들어 둔다
-      finishInsta(6)
-      const prof = app.myProf
-      app.setMyProf({
-        ...prof,
-        word: MY_PROF.word, persona: MY_PROF.persona, keywords: MY_PROF.keywords, photos: MY_PROF.photos,
-        ...(sel.includes('remember') ? { career: MY_PROF.career, edu: MY_PROF.edu, net: MY_PROF.net } : {}),
-      })
-    }
+    finishInsta(sel)
     setStep(foundNames.length ? 'alias' : 'end')
   }
 
@@ -2009,6 +2034,7 @@ function TodayTab({ mode, openPerson, onboarding, onOnboardDone }: { mode: Mode;
   if (mode === 'new') {
     return (
       <div className="px-5 pb-28">
+        <ProfileDraftCard />
         {!instaDone && <InstaStartCard />}
         <p className="mt-6 text-[22px] font-bold leading-snug text-[var(--color-text-strong)]">내 사람들을<br />가져와 볼까요?</p>
         <p className="mt-2 text-[13px] text-neutral-500">연결한 곳의 계정을 같은 사람끼리 묶어 인물 카드로 만들어요. 하나만 먼저 연결해도 충분해요.</p>
@@ -2027,6 +2053,7 @@ function TodayTab({ mode, openPerson, onboarding, onOnboardDone }: { mode: Mode;
   if (mode === 'importing') {
     return (
       <div className="px-5 pb-28">
+        <ProfileDraftCard />
         <Card className="mt-3">
           <p className="text-[15px] font-bold">사람들을 가져오고 있어요</p>
           <div className="mt-3 space-y-2 text-[13px]">
@@ -2054,6 +2081,7 @@ function TodayTab({ mode, openPerson, onboarding, onOnboardDone }: { mode: Mode;
   return (
     <div className="px-5 pb-28">
       <AgentHello />
+      <ProfileDraftCard />
       {broken.map((s) => <ReconnectCard key={s} src={s} />)}
       <button onClick={() => app.openPanel({ k: 'batch' })} className="mt-2 flex w-full items-center gap-2 text-left text-[12px] text-neutral-500">
         <Clock size={13} /> 다음 묶음 {app.batchSt.label.startsWith(app.batchTimes[0]) ? app.batchTimes[1] : `내일 ${app.batchTimes[0]}`}
@@ -3313,117 +3341,7 @@ function UploadSheet({ onClose, init }: { onClose: () => void; init?: 'kakao' })
   )
 }
 
-/* ───────── 인스타 연동 (마이페이지) ─────────
- * 망원동 이자카야 방식. 아이디를 넣으면 코드를 주고, 펠로어 공식 계정에 DM으로 보내면 본인 확인이 끝난다.
- * 공개 계정이면 피드를 한 번 분석해 앨범 사진, 키워드, 페르소나 초안을 채우고 첫인사를 건넨다.
- * 비공개 계정은 본인 확인만 하고, 에이전트 대행을 연결한 뒤 분석한다.
- */
-
 const FEED_TONES = ['#E9D8C4', '#C9D7E3', '#D8E3C9', '#E3C9D2', '#CFC9E3', '#E3DDC9', '#C9E3DF', '#E3CFC9', '#D4D4D4']
-
-function InstaLinkSheet({ onClose }: { onClose: () => void }) {
-  const { start, finishInsta } = useConnect()
-  const app = useApp()
-  const [step, setStep] = useState<'id' | 'code' | 'analyze' | 'result'>('id')
-  const [handle, setHandle] = useState('minjun.k')
-  const [isPrivate, setIsPrivate] = useState(false)
-  const [picked, setPicked] = useState<number[]>([0, 1, 3, 4, 6, 7])
-  const [showPick, setShowPick] = useState(false)
-  const toggle = (i: number) => setPicked((p) => (p.includes(i) ? p.filter((x) => x !== i) : [...p, i]))
-  const word = '“평일엔 성수에서 일하고, 주말엔 한강을 달리는 민준님. 맞죠?”'
-  return (
-    <Sheet onClose={onClose}>
-      <div className="flex items-center justify-between">
-        <h3 className="flex items-center gap-2 text-[17px] font-bold">
-          {step === 'code' && <button onClick={() => setStep('id')} className="-ml-1"><ChevronLeft size={20} /></button>}
-          <ChannelBadge ch="ig" />인스타 연동<Tag kind="new" />
-        </h3>
-        <button onClick={onClose}><X size={20} /></button>
-      </div>
-
-      {step === 'id' && (
-        <>
-          <p className="mt-3 text-[20px] font-bold leading-snug">인스타로 내 프로필을<br />채워 볼까요?</p>
-          <p className="mt-2 text-[13px] text-neutral-500">로그인은 필요 없어요. 내 계정인지만 DM으로 확인하면, 공개된 피드는 제가 읽고 정리해 둘게요.</p>
-          <div className="mt-4 flex items-center rounded-xl border border-neutral-200 px-3 focus-within:border-[#25313D]">
-            <span className="text-[14px] text-neutral-400">@</span>
-            <input value={handle} onChange={(e) => setHandle(e.target.value.replace(/[@\s]/g, ''))} placeholder="인스타 아이디" className="flex-1 bg-transparent px-1 py-3 text-[14px] outline-none" />
-          </div>
-          <label className="mt-3 flex items-center gap-2 text-[12px] text-neutral-500">
-            <input type="checkbox" checked={isPrivate} onChange={(e) => setIsPrivate(e.target.checked)} /> 비공개 계정으로 보기 (목업)
-          </label>
-          <div className="mt-5"><PrimaryButton disabled={!handle} onClick={() => setStep('code')}>다음</PrimaryButton></div>
-        </>
-      )}
-
-      {step === 'code' && (
-        <>
-          <p className="mt-3 text-[15px] font-bold">이 코드를 DM으로 보내 주세요</p>
-          <div className="mt-3 rounded-2xl bg-[#25313D] px-4 py-5 text-center text-white">
-            <p className="text-[12px] opacity-70">인증 코드</p>
-            <p className="mt-1 text-[28px] font-bold tracking-[0.25em]">FL4821</p>
-            <p className="mt-1 text-[11px] opacity-60">10분 동안 쓸 수 있어요</p>
-          </div>
-          <ShareSteps steps={['코드 복사하고 인스타 열기', '@felore.app 에 코드를 DM으로 보내기', '확인됐다는 답장이 오면 펠로어로 돌아오기']} />
-          <div className="mt-5"><PrimaryButton onClick={() => { app.toast('코드를 복사했어요'); setStep('analyze') }}><span className="inline-flex items-center gap-1.5"><Copy size={14} />코드 복사하고 인스타 열기</span></PrimaryButton></div>
-          <p className="mt-2 text-center text-[11px] text-neutral-400">목업에서는 누르면 확인된 것으로 넘어가요</p>
-        </>
-      )}
-
-      {step === 'analyze' && (
-        <div className="py-2">
-          <p className="mt-2 text-[15px] font-bold">@{handle} 확인됐어요</p>
-          <p className="mt-1 text-[13px] text-neutral-500">{isPrivate ? '비공개 계정이라 피드는 볼 수 없어요' : '피드를 읽고 있어요'}</p>
-          <div className="mt-5">
-            <ProgressSteps
-              steps={isPrivate ? ['내 계정 확인'] : ['내 계정 확인', '사진 속 분위기', '관심사 키워드', '앨범에 넣을 사진 고르기', '페르소나 초안']}
-              onDone={() => setStep('result')}
-            />
-          </div>
-        </div>
-      )}
-
-      {step === 'result' && isPrivate && (
-        <div className="py-2 text-center">
-          <Check size={28} className="mx-auto text-emerald-600" />
-          <p className="mt-3 text-[16px] font-bold">내 인스타로 확인했어요</p>
-          <p className="mt-1 text-[13px] leading-relaxed text-neutral-500">프로필에 인스타가 연결됐어요. 비공개 계정은 피드를 볼 수 없어서, 인스타 에이전트를 연결하면 그때 분석해요.</p>
-          <div className="mt-5"><PrimaryButton onClick={() => { onClose(); start('ig') }}>인스타 에이전트 연결</PrimaryButton></div>
-          <button onClick={onClose} className="mt-3 w-full text-center text-[13px] text-neutral-500">나중에</button>
-        </div>
-      )}
-
-      {step === 'result' && !isPrivate && (
-        <>
-          <div className="mt-3 rounded-2xl bg-neutral-50 px-4 py-4">
-            <p className="text-[11px] text-neutral-400">펠로어의 첫인사</p>
-            <p className="mt-1 text-[16px] font-bold leading-snug">{word}</p>
-          </div>
-          <p className="mt-5 text-[13px] font-semibold">앨범에 넣을 사진</p>
-          <p className="text-[11px] text-neutral-500">제가 {picked.length}장을 골랐어요. 고른 사진만 앨범에 들어가고 나머지는 저장하지 않아요</p>
-          {!showPick && <button onClick={() => setShowPick(true)} className="mt-2 text-[12px] font-medium text-neutral-500 underline">사진 바꾸기</button>}
-          {showPick && <div className="mt-2 grid grid-cols-3 gap-1.5">
-            {FEED_TONES.map((c, i) => (
-              <button key={c} onClick={() => toggle(i)} className="relative aspect-square rounded-lg" style={{ background: c }}>
-                <span className={`absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full border ${picked.includes(i) ? 'border-[#25313D] bg-[#25313D] text-white' : 'border-white bg-white/60'}`}>
-                  {picked.includes(i) && <Check size={12} />}
-                </span>
-              </button>
-            ))}
-          </div>}
-          <p className="mt-5 text-[13px] font-semibold">관심사 키워드</p>
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {['러닝', '성수', '스타트업', '커피', '전시'].map((k) => <span key={k} className="rounded-full bg-neutral-100 px-3 py-1 text-[12px]">{k}</span>)}
-          </div>
-          <p className="mt-5 text-[13px] font-semibold">페르소나 초안</p>
-          <p className="mt-1 rounded-xl border border-neutral-200 p-3 text-[13px] leading-relaxed">사람을 만나며 일을 넓히는 실행형 프로덕트 오너. 주말 러닝으로 리듬을 지키고, 새로운 공간과 전시에서 영감을 얻어요.</p>
-          <div className="mt-5"><PrimaryButton disabled={picked.length === 0} onClick={() => { finishInsta(picked.length); app.toast('프로필에 앨범과 페르소나 초안을 넣었어요'); onClose() }}>프로필에 넣기 (사진 {picked.length}장)</PrimaryButton></div>
-          <button onClick={() => app.openShare({ title: '첫인사 공유하기', url: `felore.io/${app.me.linkId}`, text: `${word} 펠로어가 내 인스타를 보고 건넨 첫인사예요` })} className="mt-3 w-full text-center text-[13px] text-neutral-500">첫인사 공유하기</button>
-        </>
-      )}
-    </Sheet>
-  )
-}
 
 /* ───────── 말하기 (채팅) ───────── */
 
@@ -3469,7 +3387,7 @@ function ChatLoginCard({ src, stage, again, onKey, onLogin }: { src: Src; stage:
 }
 
 function ChatScreen({ onClose }: { onClose: () => void }) {
-  const { conn, start, update } = useConnect()
+  const { conn, start, update, finishInsta } = useConnect()
   const app = useApp()
   const msgs = app.chat
   const [input, setInput] = useState('')
@@ -3496,7 +3414,7 @@ function ChatScreen({ onClose }: { onClose: () => void }) {
 
   const finishLogin = (s: Src, level: Level) => {
     update(s, { status: 'on', level, last: '방금' })
-    if (s === 'remember' && app.myProf.career.length === 0) app.setMyProf({ ...app.myProf, career: MY_PROF.career, edu: MY_PROF.edu })
+    finishInsta([s])
     return s === 'remember'
       ? '리멤버 연결을 마쳤어요. 받은 명함으로 연결된 사람들을 채우고, 내 프로필의 명함에 경력을 넣었어요.'
       : `${SRC[s].label} 연결을 마쳤어요. ${LEVEL[level].d}. 대화 상대를 가져오는 중이라, 다 되면 내 사람들에 쌓여요.`
@@ -3787,8 +3705,8 @@ function SignupFlow({ viaLink, initLogin, onClose, onDone, onLogin }: {
             <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">통신사 본인인증으로 이름, 생년월일, 휴대폰 번호를 가져와요. 실명은 나만 보고 공개되지 않아요. 다른 사람의 연락처에 있는 나를 찾아 이어 주는 데도 써요.</p>
             {!certed ? (
               <>
-                <div className="mt-6 grid grid-cols-3 gap-2">
-                  {['PASS', '카카오', '토스'].map((n) => (
+                <div className="mt-6 grid grid-cols-2 gap-2">
+                  {['PASS', '카카오'].map((n) => (
                     <button key={n} onClick={() => { setCerted(true); setPhone('010-2840-1192') }} className="rounded-2xl border border-neutral-200 py-4 text-[13px] font-semibold">{n}</button>
                   ))}
                 </div>
@@ -4213,7 +4131,7 @@ function ProfileView({ target, onBack }: { target: Person | 'me'; onBack: () => 
           )}
           {owner && !instaDone && (
             <button onClick={openInsta} className="flex w-full items-center gap-2 rounded-2xl border border-dashed border-neutral-300 px-4 py-3 text-left text-[13px]">
-              <ChannelBadge ch="ig" /><span className="flex-1">인스타를 보여주면 사진과 키워드, 첫인사를 채워 드려요</span><ChevronRight size={14} className="text-neutral-300" />
+              <ChannelBadge ch="ig" /><span className="flex-1">인스타를 맡기면 사진과 키워드, 첫인사를 만들어 드려요</span><ChevronRight size={14} className="text-neutral-300" />
             </button>
           )}
           {photos.length > 0 && <p className="mt-2 text-[11px] text-neutral-400">인스타 피드에서 고른 사진이에요</p>}
@@ -4380,7 +4298,7 @@ function EditProfSheet({ onClose }: { onClose: () => void }) {
 
       <p className="mt-5 text-[12px] font-semibold text-neutral-500">펠로어에게 맡기기</p>
       <div className="mt-1.5 divide-y divide-[var(--color-border-soft)] rounded-xl border border-neutral-200 px-3">
-        <button onClick={() => { onClose(); openInsta() }} className="flex w-full items-center gap-2 py-3 text-left text-[13px]"><ChannelBadge ch="ig" /><span className="flex-1">{instaDone ? '인스타로 사진과 페르소나 다시 채우기' : '인스타로 사진과 페르소나 채우기'}</span><ChevronRight size={14} className="text-neutral-300" /></button>
+        <button onClick={() => { onClose(); openInsta() }} className="flex w-full items-center gap-2 py-3 text-left text-[13px]"><ChannelBadge ch="ig" /><span className="flex-1">{instaDone ? '맡겨 둔 계정으로 프로필 다시 만들기' : '인스타를 맡기고 프로필 만들기'}</span><ChevronRight size={14} className="text-neutral-300" /></button>
         <button onClick={() => { onClose(); if (conn.remember.status !== 'on') start('remember'); else app.toast('리멤버는 이미 연결돼 있어요') }} className="flex w-full items-center gap-2 py-3 text-left text-[13px]"><ChannelBadge ch="card" /><span className="flex-1">{conn.remember.status === 'on' ? '리멤버 연결됨. 경력과 연결된 사람들을 채웠어요' : '리멤버로 경력과 연결된 사람들 채우기'}</span>{conn.remember.status === 'on' ? <Check size={14} className="text-emerald-600" /> : <ChevronRight size={14} className="text-neutral-300" />}</button>
         <button onClick={() => { onClose(); app.openPanel({ k: 'verify' }) }} className="flex w-full items-center gap-2 py-3 text-left text-[13px]"><ShieldCheck size={16} className="text-neutral-500" /><span className="flex-1">경력과 학력 인증하기</span><ChevronRight size={14} className="text-neutral-300" /></button>
       </div>
@@ -4520,7 +4438,7 @@ export default function V2IaPage() {
   const [detail, setDetail] = useState<Src | null>(null)
   const [sort, setSort] = useState(false)
   const [searching, setSearching] = useState(false)
-  const [insta, setInsta] = useState(false)
+  const [profDraft, setProfDraft] = useState<'none' | 'ready' | 'seen'>('none')
   const [instaDone, setInstaDone] = useState(true)
   const [instaPhotos, setInstaPhotos] = useState(6)
   const [meetLink, setMeetLink] = useState(false)
@@ -4568,7 +4486,7 @@ export default function V2IaPage() {
 
   /** 상태를 바꾸면 그 상태의 처음 모습으로 돌아간다 */
   const changeMode = (m: Mode) => {
-    setMode(m); setPersonId(null); setViewProf(null); setMyProf(m === 'new' ? FRESH_PROF : MY_PROF); setAsk(null); setHub(false); setSort(false); setSearching(false); setFlow(null); setDetail(null); setInsta(false); setMeetLink(false)
+    setMode(m); setPersonId(null); setViewProf(null); setMyProf(m === 'new' ? FRESH_PROF : MY_PROF); setAsk(null); setHub(false); setSort(false); setSearching(false); setFlow(null); setDetail(null); setProfDraft('none'); setMeetLink(false)
     setAction(null); setFabOpen(false); setPanel(null); setShare(null); setSignup(null)
     setConn(initConn(m)); setInstaDone(m === 'active' || m === 'importing'); setOnboarding(m === 'new'); setJoinedViaLink(false)
     setPeople(m === 'new' ? [] : PEOPLE); setImported(m === 'new' || m === 'guest' ? [] : VISIBLE_IMPORTED); setHidden(m === 'new' || m === 'guest' ? [] : SPAM)
@@ -4626,12 +4544,22 @@ export default function V2IaPage() {
     update: (s: Src, patch: Partial<Conn>) => setConn((c) => ({ ...c, [s]: { ...c[s], ...patch } })),
     openHub: () => { setPersonId(null); setHub(true) },
     openSort: mode === 'new' || mode === 'importing' ? () => { setPersonId(null); setHub(false); setOnboarding(false); setSort(true) } : undefined,
-    openInsta: () => setInsta(true),
+    openInsta: () => { if (conn.ig.status === 'on') { connectCtx.finishInsta(['ig']); toast('맡겨 둔 계정으로 프로필 초안을 다시 만들었어요') } else connectCtx.start('ig') },
     join: (viaLink?: boolean) => setSignup({ viaLink: !!viaLink }),
     joinedViaLink,
     instaDone,
     instaPhotos,
-    finishInsta: (n: number) => { setInstaPhotos(n); setInstaDone(true) },
+    /** 프로필 정보를 모을 수 있는 계정을 맡기면 에이전트가 프로필 초안을 만들고, 홈에 확인 카드를 올린다 */
+    finishInsta: (srcs: Src[]) => {
+      if (!srcs.some((x) => PROFILE_SRC.includes(x))) return
+      setInstaPhotos(6); setInstaDone(true)
+      setMyProf({
+        ...myProf,
+        word: MY_PROF.word, persona: MY_PROF.persona, keywords: MY_PROF.keywords, photos: MY_PROF.photos,
+        ...(srcs.includes('remember') && myProf.career.length === 0 ? { career: MY_PROF.career, edu: MY_PROF.edu, net: MY_PROF.net } : {}),
+      })
+      setProfDraft('ready')
+    },
     openMeetLink: () => setMeetLink(true),
   }
 
@@ -4730,6 +4658,8 @@ export default function V2IaPage() {
     openProfile: (t) => { setPanel(null); setViewProf(t) },
     myProf,
     setMyProf,
+    profDraft,
+    seeDraft: () => setProfDraft('seen'),
     vis,
     setVis,
     planTags,
@@ -4820,7 +4750,6 @@ export default function V2IaPage() {
         )}
         {flow && <ConnectFlowSheet key={flow} src={flow} onClose={() => setFlow(null)} />}
         {detail && <ConnectDetailSheet src={detail} onClose={() => setDetail(null)} />}
-        {insta && <InstaLinkSheet onClose={() => setInsta(false)} />}
         {meetLink && <MeetLinkSheet onClose={() => setMeetLink(false)} />}
         {panel?.k === 'qr' && <QrSheet onClose={() => setPanel(null)} />}
         {panel?.k === 'verify' && <VerifySheet onClose={() => setPanel(null)} />}

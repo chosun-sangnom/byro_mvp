@@ -1582,8 +1582,8 @@ function InstaStartCard() {
  * 망원동 이자카야 방식. 펠로어가 말을 걸고, 한 화면에 한 가지만 묻는다. 건너뛰면 목록 화면으로 간다.
  */
 
-type ObStep = 'hello' | 'insta' | 'contacts' | 'calls' | 'talk' | 'end'
-const OB_STEPS: ObStep[] = ['hello', 'insta', 'contacts', 'calls', 'talk', 'end']
+type ObStep = 'hello' | 'career' | 'insta' | 'contacts' | 'calls' | 'talk' | 'end'
+const OB_STEPS: ObStep[] = ['hello', 'career', 'insta', 'contacts', 'calls', 'talk', 'end']
 /** 온보딩 맨 앞의 짧은 이야기. 한 장에 한 마디, 탭해서 넘긴다 */
 const OB_STORY: string[][] = [
   ['연락은 카톡에, 인스타에,', '메일에 흩어져 있고'],
@@ -1597,6 +1597,11 @@ function OnboardingFlow({ onDone }: { onDone: () => void }) {
   const [i, setI] = useState(0)
   const [story, setStory] = useState(0)
   const [talkPick, setTalkPick] = useState<Src | null>(null)
+  // 직접 적는 것은 경력과 학력뿐이다. 나머지는 연결한 계정에서 에이전트가 모아 온다
+  const [co, setCo] = useState('')
+  const [role, setRole] = useState('')
+  const [sc, setSc] = useState('')
+  const [major, setMajor] = useState('')
   const step = OB_STEPS[i]
   const next = () => (i + 1 < OB_STEPS.length ? setI(i + 1) : onDone())
   const got = (Object.keys(GATHER) as Src[]).filter((s) => conn[s].status === 'on')
@@ -1604,6 +1609,7 @@ function OnboardingFlow({ onDone }: { onDone: () => void }) {
   const talkDone = (['ig', 'kakao', 'in', 'gmail', 'tg'] as Src[]).find((s) => conn[s].status === 'on')
   const done: Record<ObStep, boolean> = {
     hello: false,
+    career: app.myProf.career.length > 0 || app.myProf.edu.length > 0,
     insta: instaDone,
     contacts: conn.contacts.status === 'on',
     calls: conn.calls.status === 'on',
@@ -1615,15 +1621,31 @@ function OnboardingFlow({ onDone }: { onDone: () => void }) {
     hello: {
       t: <>{app.me.name}님, 반가워요<br />펠로어예요</>,
       d: joinedViaLink
-        ? `${JIMIN.name}님은 내 사람에 넣어 뒀고, 보너스 재화 5개도 드렸어요. 이제 흩어진 연락을 사람 단위로 모아 볼게요. 몇 가지만 같이 정해요.`
-        : '흩어진 연락을 사람 단위로 모으고, 답장은 미리 써 둘게요. 몇 가지만 같이 정해요.',
+        ? `${JIMIN.name}님은 내 사람에 넣어 뒀고, 보너스 재화 5개도 드렸어요. 앞으로 연락은 제가 사람 단위로 모으고 답장은 미리 써 둘게요. 직접 적으실 건 경력과 학력뿐이고, 나머지는 계정만 이어 주시면 제가 모아 올게요.`
+        : '앞으로 연락은 제가 사람 단위로 모으고 답장은 미리 써 둘게요. 직접 적으실 건 경력과 학력뿐이고, 나머지는 계정만 이어 주시면 제가 모아 올게요.',
       cta: '시작하기',
     },
-    insta: { t: <>인스타로 내 프로필부터<br />채워 볼까요?</>, d: 'DM 코드로 내 계정인지만 확인하고, 피드에서 사진과 관심사를 골라 프로필과 페르소나 초안을 만들어요. 로그인은 필요 없어요.', cta: '인스타 아이디 넣기', act: openInsta, doneText: '내 프로필에 앨범과 페르소나 초안을 넣었어요' },
+    career: {
+      t: <>하는 일만<br />적어 주세요</>,
+      d: '직장과 학교 중 하나만 적어도 돼요. 프로필의 사진, 관심사, 페르소나는 이어 주신 계정에서 제가 만들어요. 인증은 나중에 마이페이지에서 해요.',
+      cta: '저장',
+      act: () => {
+        const prof = app.myProf
+        app.setMyProf({
+          ...prof,
+          line: prof.line || (co.trim() ? `${co.trim()} ${role.trim()}`.trim() : ''),
+          career: co.trim() ? [{ org: co.trim(), role: role.trim() || '재직', when: '지금' }] : prof.career,
+          edu: sc.trim() ? [{ org: sc.trim(), role: major.trim() || '학교', when: '졸업' }] : prof.edu,
+        })
+        app.toast('경력과 학력을 프로필에 넣었어요')
+      },
+      doneText: '프로필에 경력과 학력을 넣었어요',
+    },
+    insta: { t: <>인스타 계정만<br />이어 주세요</>, d: 'DM 코드로 내 계정인지만 확인하면 돼요. 사진과 관심사를 읽어 프로필과 페르소나 초안은 제가 만들어 둘게요. 로그인은 필요 없어요.', cta: '인스타 아이디 넣기', act: openInsta, doneText: '내 프로필에 앨범과 페르소나 초안을 만들어 뒀어요' },
     contacts: { t: <>연락처를<br />읽어도 될까요?</>, d: '이름과 번호로 카톡, 메일, 펠로어 회원이 같은 사람인지 알아봐요. 바뀐 연락처는 계속 맞춰요.', cta: '연락처 허용', act: () => start('contacts'), doneText: '연락처를 읽고 있어요' },
     calls: { t: <>통화한 뒤에<br />요약을 남겨 드릴까요?</>, d: '펠로어가 통화를 녹음하지는 않아요. 휴대폰이 녹음한 통화 중 고른 것만 요약해서 그 사람 카드에 붙여요.', cta: '통화 녹음 가져오기', act: () => start('calls'), doneText: '새 통화 녹음이 생기면 물어볼게요' },
     talk: { t: <>연락이 오는 곳을<br />하나 골라 주세요</>, d: '하나만 연결해도 충분해요. 나머지는 마이페이지 > 연결에서 언제든 더할 수 있어요.', cta: '연결하기', act: () => talkPick && start(talkPick), doneText: `${talkDone ? SRC[talkDone].label : ''} 연결을 마쳤어요` },
-    end: { t: got.length ? <>{got.length}곳에서<br />계정을 모았어요</> : <>준비됐어요</>, d: got.length ? '같은 사람끼리 묶고 내 사람을 골라 볼게요. 확인할 것은 몇 건 안 돼요.' : '연결은 나중에 해도 돼요. 오늘의 제안에서 하나씩 이어 갈 수 있어요.', cta: got.length && openSort ? '사람 정리 시작' : '오늘의 제안 보기', act: got.length && openSort ? openSort : undefined },
+    end: { t: got.length ? <>{got.length}곳에서<br />계정을 모았어요</> : <>준비됐어요</>, d: got.length ? '같은 사람끼리 묶고 내 사람을 골라 볼게요. 확인할 것은 몇 건 안 돼요. 이후에는 뒤에서 계속 모으다가, 새로 찾은 것만 오늘의 제안으로 알려 드릴게요.' : '연결은 나중에 해도 돼요. 오늘의 제안에서 하나씩 이어 갈 수 있어요.', cta: got.length && openSort ? '사람 정리 시작' : '오늘의 제안 보기', act: got.length && openSort ? openSort : undefined },
   }
   const c = copy[step]
 
@@ -1671,6 +1693,25 @@ function OnboardingFlow({ onDone }: { onDone: () => void }) {
         </div>
       )}
 
+      {step === 'career' && !done.career && (
+        <div className="mt-6 space-y-5">
+          <div>
+            <p className="text-[12px] font-semibold text-neutral-500">직장</p>
+            <div className="mt-1.5 flex gap-2">
+              <input value={co} onChange={(e) => setCo(e.target.value)} placeholder="회사나 팀" className="min-w-0 flex-1 rounded-xl border border-neutral-200 px-3 py-3 text-[14px] outline-none focus:border-[#25313D]" />
+              <input value={role} onChange={(e) => setRole(e.target.value)} placeholder="맡은 일" className="min-w-0 flex-1 rounded-xl border border-neutral-200 px-3 py-3 text-[14px] outline-none focus:border-[#25313D]" />
+            </div>
+          </div>
+          <div>
+            <p className="text-[12px] font-semibold text-neutral-500">학교</p>
+            <div className="mt-1.5 flex gap-2">
+              <input value={sc} onChange={(e) => setSc(e.target.value)} placeholder="학교" className="min-w-0 flex-1 rounded-xl border border-neutral-200 px-3 py-3 text-[14px] outline-none focus:border-[#25313D]" />
+              <input value={major} onChange={(e) => setMajor(e.target.value)} placeholder="전공" className="min-w-0 flex-1 rounded-xl border border-neutral-200 px-3 py-3 text-[14px] outline-none focus:border-[#25313D]" />
+            </div>
+          </div>
+        </div>
+      )}
+
       {step === 'insta' && !instaDone && (
         <div className="mt-6 grid grid-cols-3 gap-1.5 opacity-70">
           {FEED_TONES.slice(0, 6).map((bg) => <div key={bg} className="aspect-square rounded-lg" style={{ background: bg }} />)}
@@ -1701,7 +1742,7 @@ function OnboardingFlow({ onDone }: { onDone: () => void }) {
           <PrimaryButton onClick={next}>{done[step] ? '다음' : c.cta}</PrimaryButton>
         ) : (
           <>
-            <PrimaryButton disabled={step === 'talk' && !talkPick} onClick={c.act}>{c.cta}</PrimaryButton>
+            <PrimaryButton disabled={(step === 'talk' && !talkPick) || (step === 'career' && !co.trim() && !sc.trim())} onClick={c.act}>{c.cta}</PrimaryButton>
             <button onClick={next} className="mt-3 w-full text-center text-[13px] text-neutral-500">나중에</button>
           </>
         )}
@@ -3213,6 +3254,7 @@ function InstaLinkSheet({ onClose }: { onClose: () => void }) {
   const [handle, setHandle] = useState('minjun.k')
   const [isPrivate, setIsPrivate] = useState(false)
   const [picked, setPicked] = useState<number[]>([0, 1, 3, 4, 6, 7])
+  const [showPick, setShowPick] = useState(false)
   const toggle = (i: number) => setPicked((p) => (p.includes(i) ? p.filter((x) => x !== i) : [...p, i]))
   const word = '“평일엔 성수에서 일하고, 주말엔 한강을 달리는 민준님. 맞죠?”'
   return (
@@ -3228,7 +3270,7 @@ function InstaLinkSheet({ onClose }: { onClose: () => void }) {
       {step === 'id' && (
         <>
           <p className="mt-3 text-[20px] font-bold leading-snug">인스타로 내 프로필을<br />채워 볼까요?</p>
-          <p className="mt-2 text-[13px] text-neutral-500">로그인은 필요 없어요. 내 계정인지만 DM으로 확인하고, 공개된 피드를 한 번 읽어요.</p>
+          <p className="mt-2 text-[13px] text-neutral-500">로그인은 필요 없어요. 내 계정인지만 DM으로 확인하면, 공개된 피드는 제가 읽고 정리해 둘게요.</p>
           <div className="mt-4 flex items-center rounded-xl border border-neutral-200 px-3 focus-within:border-[#25313D]">
             <span className="text-[14px] text-neutral-400">@</span>
             <input value={handle} onChange={(e) => setHandle(e.target.value.replace(/[@\s]/g, ''))} placeholder="인스타 아이디" className="flex-1 bg-transparent px-1 py-3 text-[14px] outline-none" />
@@ -3284,8 +3326,9 @@ function InstaLinkSheet({ onClose }: { onClose: () => void }) {
             <p className="mt-1 text-[16px] font-bold leading-snug">{word}</p>
           </div>
           <p className="mt-5 text-[13px] font-semibold">앨범에 넣을 사진</p>
-          <p className="text-[11px] text-neutral-500">고른 사진만 앨범에 들어가요. 나머지는 저장하지 않아요</p>
-          <div className="mt-2 grid grid-cols-3 gap-1.5">
+          <p className="text-[11px] text-neutral-500">제가 {picked.length}장을 골랐어요. 고른 사진만 앨범에 들어가고 나머지는 저장하지 않아요</p>
+          {!showPick && <button onClick={() => setShowPick(true)} className="mt-2 text-[12px] font-medium text-neutral-500 underline">사진 바꾸기</button>}
+          {showPick && <div className="mt-2 grid grid-cols-3 gap-1.5">
             {FEED_TONES.map((c, i) => (
               <button key={c} onClick={() => toggle(i)} className="relative aspect-square rounded-lg" style={{ background: c }}>
                 <span className={`absolute right-1.5 top-1.5 flex h-5 w-5 items-center justify-center rounded-full border ${picked.includes(i) ? 'border-[#25313D] bg-[#25313D] text-white' : 'border-white bg-white/60'}`}>
@@ -3293,7 +3336,7 @@ function InstaLinkSheet({ onClose }: { onClose: () => void }) {
                 </span>
               </button>
             ))}
-          </div>
+          </div>}
           <p className="mt-5 text-[13px] font-semibold">관심사 키워드</p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {['러닝', '성수', '스타트업', '커피', '전시'].map((k) => <span key={k} className="rounded-full bg-neutral-100 px-3 py-1 text-[12px]">{k}</span>)}
@@ -3595,7 +3638,6 @@ function SignupFlow({ viaLink, initLogin, onClose, onDone, onLogin }: {
   const [pw, setPw] = useState('')
   const [name, setName] = useState(ME.name)
   const [linkId, setLinkId] = useState(ME.linkId)
-  const [title, setTitle] = useState(ME.title)
   const input = 'w-full rounded-xl border border-neutral-200 px-3 py-3 text-[14px] outline-none focus:border-[#25313D]'
 
   const flow: SignStep[] = method === 'google' ? ['start', 'terms', 'phone', 'profile', 'welcome'] : ['start', 'terms', 'phone', 'pw', 'profile', 'welcome']
@@ -3698,8 +3740,8 @@ function SignupFlow({ viaLink, initLogin, onClose, onDone, onLogin }: {
 
         {step === 'profile' && (
           <>
-            <p className="mt-6 text-[22px] font-bold leading-snug">어떻게 소개할까요?</p>
-            <p className="mt-2 text-[13px] text-neutral-500">프로필 링크에 보이는 이름이에요. 나머지는 가입한 뒤 인스타로 채울 수 있어요.</p>
+            <p className="mt-6 text-[22px] font-bold leading-snug">뭐라고 부를까요?</p>
+            <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">프로필 링크에 보이는 이름이에요. 하는 일과 사진, 관심사는 가입한 뒤 펠로어가 같이 채워요.</p>
             <label className="mt-6 text-[12px] font-semibold text-neutral-500">이름</label>
             <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" className={`mt-1.5 ${input}`} />
             <label className="mt-4 text-[12px] font-semibold text-neutral-500">프로필 주소</label>
@@ -3708,8 +3750,6 @@ function SignupFlow({ viaLink, initLogin, onClose, onDone, onLogin }: {
               <input value={linkId} onChange={(e) => setLinkId(e.target.value.toLowerCase().replace(/[^a-z0-9_.]/g, ''))} className="min-w-0 flex-1 bg-transparent py-3 text-[14px] outline-none" />
             </div>
             <p className={`mt-1 text-[11px] ${linkId.length >= 3 ? 'text-emerald-600' : 'text-neutral-400'}`}>{linkId.length >= 3 ? '쓸 수 있는 주소예요' : '영문, 숫자 3자 이상'}</p>
-            <label className="mt-4 text-[12px] font-semibold text-neutral-500">하는 일 <span className="font-normal text-neutral-400">(선택)</span></label>
-            <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="예: 스타트업 마케터" className={`mt-1.5 ${input}`} />
             <div className="mt-auto pt-8"><PrimaryButton disabled={!name.trim() || linkId.length < 3} onClick={() => go(1)}>가입하기</PrimaryButton></div>
           </>
         )}
@@ -3732,7 +3772,7 @@ function SignupFlow({ viaLink, initLogin, onClose, onDone, onLogin }: {
                 <div className="flex items-center gap-3 rounded-2xl bg-amber-50 p-3 text-[13px] text-amber-700"><Gift size={18} className="ml-2 shrink-0" />24시간 안에 가입해서 보너스 재화 5개를 받았어요</div>
               </div>
             )}
-            <div className="mt-auto pt-8"><PrimaryButton onClick={() => onDone({ name: name.trim(), title: title.trim(), linkId })}>시작하기</PrimaryButton></div>
+            <div className="mt-auto pt-8"><PrimaryButton onClick={() => onDone({ name: name.trim(), title: '', linkId })}>시작하기</PrimaryButton></div>
           </div>
         )}
 

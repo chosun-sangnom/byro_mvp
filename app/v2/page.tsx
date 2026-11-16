@@ -23,7 +23,7 @@ import {
 
 type Tab = 'today' | 'people' | 'me'
 type Mode = 'guest' | 'new' | 'importing' | 'active'
-type Channel = 'ig' | 'in' | 'kakao' | 'tg' | 'mail' | 'cal' | 'phone' | 'call' | 'memo' | 'card'
+type Channel = 'ig' | 'yt' | 'tt' | 'in' | 'kakao' | 'tg' | 'mail' | 'cal' | 'phone' | 'call' | 'memo' | 'card'
 
 type Person = {
   id: string
@@ -133,6 +133,8 @@ const NOTIS: Noti[] = [
 
 const CH: Record<Channel, { label: string; cls: string }> = {
   ig: { label: '인스타', cls: 'bg-pink-50 text-pink-600' },
+  yt: { label: '유튜브', cls: 'bg-red-50 text-red-600' },
+  tt: { label: '틱톡', cls: 'bg-neutral-100 text-neutral-800' },
   in: { label: '링크드인', cls: 'bg-sky-50 text-sky-700' },
   kakao: { label: '카톡', cls: 'bg-yellow-50 text-yellow-700' },
   tg: { label: '텔레그램', cls: 'bg-blue-50 text-blue-600' },
@@ -145,13 +147,13 @@ const CH: Record<Channel, { label: string; cls: string }> = {
 }
 
 /** 초안을 보내는 채널이 어느 연결에 달려 있는지 */
-const CH_SRC: Partial<Record<Channel, Src>> = { ig: 'ig', in: 'in', kakao: 'kakao', tg: 'tg', mail: 'gmail' }
+const CH_SRC: Partial<Record<Channel, Src>> = { ig: 'ig', yt: 'yt', tt: 'tt', in: 'in', kakao: 'kakao', tg: 'tg', mail: 'gmail' }
 
 /** 그 사람에게 연락할 때 쓸 채널. 대화가 오가는 곳을 먼저 고른다 */
 const talkChannel = (p: Person): Channel => p.accounts.find((a) => CH_SRC[a.ch])?.ch ?? 'kakao'
 
 /** [임시] 나. 기존 프로필 서비스의 강민준 프로필과 이어진다 */
-const ME = { name: '강민준', title: 'B2B SaaS Product Owner', linkId: 'gangminjun', img: '/images/mj1.jpg' }
+const ME = { name: '강민준', realName: '강민준', title: 'B2B SaaS Product Owner', linkId: 'gangminjun', img: '/images/mj1.jpg' }
 
 const personById = (id: string) => PEOPLE.find((p) => p.id === id)!
 
@@ -287,6 +289,8 @@ type Msg = {
 type App = {
   mode: Mode
   me: typeof ME
+  /** 프로필에 보이는 이름(활동명)을 바꾼다. 본인인증 실명은 그대로 */
+  setAlias: (name: string) => void
   people: Person[]
   imported: ImportedPerson[]
   getPerson: (id: string) => Person | undefined
@@ -372,7 +376,7 @@ const freshBatch = (drafts: Draft[], label: string): BatchSt => ({
  * 원천 대화와 녹음은 요약을 만든 뒤 지운다.
  */
 
-type Src = 'contacts' | 'calls' | 'ig' | 'in' | 'tg' | 'kakao' | 'gmail' | 'gcal' | 'remember'
+type Src = 'contacts' | 'calls' | 'ig' | 'yt' | 'tt' | 'in' | 'tg' | 'kakao' | 'gmail' | 'gcal' | 'remember'
 type Level = 'read' | 'draft' | 'send'
 type Conn = { status: 'on' | 'off' | 'broken'; level: Level; last?: string }
 type ConnMap = Record<Src, Conn>
@@ -383,6 +387,8 @@ const SRC: Record<Src, { label: string; ch: Channel; group: 'phone' | 'talk' | '
   contacts: { label: '휴대폰 연락처', ch: 'phone', group: 'phone', how: 'device', desc: '이름과 번호, 바뀌면 계속 맞춰요', levels: ['read'], note: '이름과 번호만 읽고, 추가하거나 바꾼 연락처는 계속 맞춰요. 연락처를 고치거나 지우지 않아요' },
   calls: { label: '통화 녹음', ch: 'call', group: 'phone', how: 'device', desc: '휴대폰이 녹음한 통화', levels: ['read'], note: '고른 녹음만 요약해서 인물 카드에 붙이고, 녹음은 지워요' },
   ig: { label: '인스타그램', ch: 'ig', group: 'talk', how: 'web', desc: 'DM과 댓글을 대신 읽고 답해요', levels: ALL_LEVELS },
+  yt: { label: '유튜브', ch: 'yt', group: 'talk', how: 'web', desc: '채널과 댓글, 영상 소개를 대신 읽어요', levels: ['read', 'draft'] },
+  tt: { label: '틱톡', ch: 'tt', group: 'talk', how: 'web', desc: '프로필과 댓글, DM을 대신 읽어요', levels: ALL_LEVELS },
   in: { label: '링크드인', ch: 'in', group: 'talk', how: 'web', desc: '1촌과 메시지를 대신 읽고 답해요', levels: ALL_LEVELS },
   tg: { label: '텔레그램', ch: 'tg', group: 'talk', how: 'api', desc: '대화 상대', levels: ALL_LEVELS },
   kakao: { label: '카톡', ch: 'kakao', group: 'talk', how: 'share', desc: '대화방에서 내보낸 대화', levels: ['read', 'draft'], note: '카톡은 대화방에서 내보낸 대화만 읽어요. 보낼 때는 초안을 복사하거나 카톡 공유로 보내요' },
@@ -400,7 +406,7 @@ const LEVEL: Record<Level, { t: string; d: string }> = {
 const off = (level: Level = 'draft'): Conn => ({ status: 'off', level })
 
 function initConn(mode: Mode): ConnMap {
-  const base: ConnMap = { contacts: off('read'), calls: off('read'), ig: off(), in: off(), tg: off(), kakao: off(), gmail: off(), gcal: off('read'), remember: off('read') }
+  const base: ConnMap = { contacts: off('read'), calls: off('read'), ig: off(), yt: off(), tt: off(), in: off(), tg: off(), kakao: off(), gmail: off(), gcal: off('read'), remember: off('read') }
   if (mode === 'importing') {
     return { ...base, contacts: { status: 'on', level: 'read', last: '방금' }, ig: { status: 'on', level: 'draft', last: '방금' }, kakao: { status: 'on', level: 'draft', last: '방금' }, in: { status: 'on', level: 'draft', last: '가져오는 중' } }
   }
@@ -984,7 +990,7 @@ function ConnectFlowSheet({ src, onClose }: { src: Src; onClose: () => void }) {
   // 열 때 끊겨 있었는지를 기억한다. 다시 연결을 마친 뒤에도 안내 문구가 바뀌지 않게
   const [reconnect] = useState(conn[src].status === 'broken')
   // 목업: 다른 곳을 이미 로그인 정보로 연결했다면 암호화 키가 있다
-  const hasKey = reconnect || (['ig', 'in', 'remember'] as Src[]).some((s) => s !== src && conn[s].status !== 'off')
+  const hasKey = reconnect || (['ig', 'yt', 'tt', 'in', 'remember'] as Src[]).some((s) => s !== src && conn[s].status !== 'off')
   const first = meta.how === 'google' ? 'google' : meta.how === 'device' ? 'device' : meta.how === 'web' && !hasKey ? 'key' : 'login'
   const [step, setStep] = useState<'device' | 'key' | 'login' | 'verify' | 'consent' | 'google' | 'done'>(first)
   const [agree, setAgree] = useState(false)
@@ -1012,6 +1018,8 @@ function ConnectFlowSheet({ src, onClose }: { src: Src; onClose: () => void }) {
     contacts: '연락처의 이름과 번호로 카톡, 메일 상대가 누구인지 알아볼게요. 바뀐 연락처는 계속 맞춰요',
     calls: phone === 'galaxy' ? '새 통화 녹음이 생기면 가져올지 물어볼게요' : '통화 녹음을 공유하면 그 사람 카드에 요약을 붙여요',
     ig: '대화 상대를 가져오고 있어요. 다 되면 내 사람들에 쌓여요',
+    yt: '채널과 댓글을 읽고 있어요. 프로필 초안에 반영해요',
+    tt: '프로필과 대화 상대를 가져오고 있어요',
     in: '대화 상대를 가져오고 있어요. 다 되면 내 사람들에 쌓여요',
     tg: '대화 상대를 가져오고 있어요. 다 되면 내 사람들에 쌓여요',
     kakao: '',
@@ -1582,72 +1590,72 @@ function InstaStartCard() {
  * 망원동 이자카야 방식. 펠로어가 말을 걸고, 한 화면에 한 가지만 묻는다. 건너뛰면 목록 화면으로 간다.
  */
 
-type ObStep = 'hello' | 'career' | 'insta' | 'contacts' | 'calls' | 'talk' | 'end'
-const OB_STEPS: ObStep[] = ['hello', 'career', 'insta', 'contacts', 'calls', 'talk', 'end']
+type ObStep = 'hello' | 'pick' | 'login' | 'alias' | 'end'
 /** 온보딩 맨 앞의 짧은 이야기. 한 장에 한 마디, 탭해서 넘긴다 */
 const OB_STORY: string[][] = [
   ['연락은 카톡에, 인스타에,', '메일에 흩어져 있고'],
   ['누가 누구였는지,', '무슨 얘기를 나눴는지', '자꾸 잊어버리죠.'],
   ['펠로어가 사람 단위로 모으고,', '답장은 미리 써 둘게요.'],
 ]
+/** 맡길 곳 고르는 화면의 묶음 */
+const OB_GROUPS: { t: string; d: string; items: Src[] }[] = [
+  { t: '내 계정', d: '로그인 정보를 맡기면 제가 알아서 읽어 와요. 프로필 초안도 여기서 만들어요', items: ['ig', 'yt', 'tt', 'in', 'remember'] },
+  { t: '대화와 일정', d: '', items: ['kakao', 'gmail', 'gcal'] },
+  { t: '휴대폰', d: '허락하면 기기에서 한 번 더 물어봐요', items: ['contacts', 'calls'] },
+]
+/** 계정에서 찾은 이름 (목업) */
+const FOUND_NAME: Partial<Record<Src, string>> = { ig: 'minjun.k', yt: '민준의 러닝TV', tt: 'minjun_run' }
+const PROFILE_SRC: Src[] = ['ig', 'yt', 'tt', 'in', 'remember']
 
+/** 가입 직후. 프로필을 채우는 시간이 아니라 펠로어에게 일을 맡기는 시간이다 */
 function OnboardingFlow({ onDone }: { onDone: () => void }) {
-  const { conn, start, openInsta, instaDone, openSort, joinedViaLink } = useConnect()
+  const { conn, update, finishInsta, openSort, joinedViaLink } = useConnect()
   const app = useApp()
-  const [i, setI] = useState(0)
+  const [step, setStep] = useState<ObStep>('hello')
   const [story, setStory] = useState(0)
-  const [talkPick, setTalkPick] = useState<Src | null>(null)
-  // 직접 적는 것은 경력과 학력뿐이다. 나머지는 연결한 계정에서 에이전트가 모아 온다
-  const [co, setCo] = useState('')
-  const [role, setRole] = useState('')
-  const [sc, setSc] = useState('')
-  const [major, setMajor] = useState('')
-  const step = OB_STEPS[i]
-  const next = () => (i + 1 < OB_STEPS.length ? setI(i + 1) : onDone())
+  const [sel, setSel] = useState<Src[]>([])
+  const [key1, setKey1] = useState('')
+  const [key2, setKey2] = useState('')
+  const [cred, setCred] = useState<Partial<Record<Src, { id: string; pw: string }>>>({})
+  const [google, setGoogle] = useState(false)
+  const [level, setLevel] = useState<Level>('draft')
+  const [aliasPick, setAliasPick] = useState<string>(app.me.name)
+  const [custom, setCustom] = useState('')
+  const input = 'w-full rounded-xl border border-neutral-200 px-3 py-2.5 text-[13px] outline-none focus:border-[#25313D]'
+
+  const webSel = sel.filter((s) => SRC[s].how === 'web')
+  const googleSel = sel.filter((s) => SRC[s].how === 'google')
+  const keyOk = webSel.length === 0 || (key1.length >= 6 && key1 === key2)
+  const credOk = webSel.every((s) => cred[s]?.id.trim() && cred[s]?.pw)
+  const loginOk = keyOk && credOk && (googleSel.length === 0 || google)
+  const foundNames = sel.map((s) => FOUND_NAME[s]).filter((n): n is string => !!n)
   const got = (Object.keys(GATHER) as Src[]).filter((s) => conn[s].status === 'on')
+  const handed = (Object.keys(SRC) as Src[]).filter((s) => conn[s].status === 'on').length
+  const toggle = (s: Src) => setSel((l) => (l.includes(s) ? l.filter((x) => x !== s) : [...l, s]))
 
-  const talkDone = (['ig', 'kakao', 'in', 'gmail', 'tg'] as Src[]).find((s) => conn[s].status === 'on')
-  const done: Record<ObStep, boolean> = {
-    hello: false,
-    career: app.myProf.career.length > 0 || app.myProf.edu.length > 0,
-    insta: instaDone,
-    contacts: conn.contacts.status === 'on',
-    calls: conn.calls.status === 'on',
-    talk: !!talkDone,
-    end: false,
+  const hand = () => {
+    for (const s of sel) {
+      const lv = SRC[s].levels.includes(level) ? level : SRC[s].levels[SRC[s].levels.length - 1]
+      update(s, { status: 'on', level: lv, last: '방금' })
+    }
+    if (sel.some((s) => PROFILE_SRC.includes(s))) {
+      // 연결한 계정에서 에이전트가 프로필 초안을 만들어 둔다
+      finishInsta(6)
+      const prof = app.myProf
+      app.setMyProf({
+        ...prof,
+        word: MY_PROF.word, persona: MY_PROF.persona, keywords: MY_PROF.keywords, photos: MY_PROF.photos,
+        ...(sel.includes('remember') ? { career: MY_PROF.career, edu: MY_PROF.edu, net: MY_PROF.net } : {}),
+      })
+    }
+    setStep(foundNames.length ? 'alias' : 'end')
   }
 
-  const copy: Record<ObStep, { t: ReactNode; d: string; cta: string; act?: () => void; doneText?: string }> = {
-    hello: {
-      t: <>{app.me.name}님, 반가워요<br />펠로어예요</>,
-      d: joinedViaLink
-        ? `${JIMIN.name}님은 내 사람에 넣어 뒀고, 보너스 재화 5개도 드렸어요. 앞으로 연락은 제가 사람 단위로 모으고 답장은 미리 써 둘게요. 직접 적으실 건 경력과 학력뿐이고, 나머지는 계정만 이어 주시면 제가 모아 올게요.`
-        : '앞으로 연락은 제가 사람 단위로 모으고 답장은 미리 써 둘게요. 직접 적으실 건 경력과 학력뿐이고, 나머지는 계정만 이어 주시면 제가 모아 올게요.',
-      cta: '시작하기',
-    },
-    career: {
-      t: <>하는 일만<br />적어 주세요</>,
-      d: '직장과 학교 중 하나만 적어도 돼요. 프로필의 사진, 관심사, 페르소나는 이어 주신 계정에서 제가 만들어요. 인증은 나중에 마이페이지에서 해요.',
-      cta: '저장',
-      act: () => {
-        const prof = app.myProf
-        app.setMyProf({
-          ...prof,
-          line: prof.line || (co.trim() ? `${co.trim()} ${role.trim()}`.trim() : ''),
-          career: co.trim() ? [{ org: co.trim(), role: role.trim() || '재직', when: '지금' }] : prof.career,
-          edu: sc.trim() ? [{ org: sc.trim(), role: major.trim() || '학교', when: '졸업' }] : prof.edu,
-        })
-        app.toast('경력과 학력을 프로필에 넣었어요')
-      },
-      doneText: '프로필에 경력과 학력을 넣었어요',
-    },
-    insta: { t: <>인스타 계정만<br />이어 주세요</>, d: 'DM 코드로 내 계정인지만 확인하면 돼요. 사진과 관심사를 읽어 프로필과 페르소나 초안은 제가 만들어 둘게요. 로그인은 필요 없어요.', cta: '인스타 아이디 넣기', act: openInsta, doneText: '내 프로필에 앨범과 페르소나 초안을 만들어 뒀어요' },
-    contacts: { t: <>연락처를<br />읽어도 될까요?</>, d: '이름과 번호로 카톡, 메일, 펠로어 회원이 같은 사람인지 알아봐요. 바뀐 연락처는 계속 맞춰요.', cta: '연락처 허용', act: () => start('contacts'), doneText: '연락처를 읽고 있어요' },
-    calls: { t: <>통화한 뒤에<br />요약을 남겨 드릴까요?</>, d: '펠로어가 통화를 녹음하지는 않아요. 휴대폰이 녹음한 통화 중 고른 것만 요약해서 그 사람 카드에 붙여요.', cta: '통화 녹음 가져오기', act: () => start('calls'), doneText: '새 통화 녹음이 생기면 물어볼게요' },
-    talk: { t: <>연락이 오는 곳을<br />하나 골라 주세요</>, d: '하나만 연결해도 충분해요. 나머지는 마이페이지 > 연결에서 언제든 더할 수 있어요.', cta: '연결하기', act: () => talkPick && start(talkPick), doneText: `${talkDone ? SRC[talkDone].label : ''} 연결을 마쳤어요` },
-    end: { t: got.length ? <>{got.length}곳에서<br />계정을 모았어요</> : <>준비됐어요</>, d: got.length ? '같은 사람끼리 묶고 내 사람을 골라 볼게요. 확인할 것은 몇 건 안 돼요. 이후에는 뒤에서 계속 모으다가, 새로 찾은 것만 오늘의 제안으로 알려 드릴게요.' : '연결은 나중에 해도 돼요. 오늘의 제안에서 하나씩 이어 갈 수 있어요.', cta: got.length && openSort ? '사람 정리 시작' : '오늘의 제안 보기', act: got.length && openSort ? openSort : undefined },
+  const steps: ObStep[] = ['hello', 'pick', 'login', 'alias', 'end']
+  const back = () => {
+    if (step === 'login') setStep('pick')
+    else if (step === 'pick') setStep('hello')
   }
-  const c = copy[step]
 
   if (story < OB_STORY.length) {
     return (
@@ -1664,89 +1672,155 @@ function OnboardingFlow({ onDone }: { onDone: () => void }) {
     )
   }
 
+  const bubble = (t: ReactNode) => (
+    <div className="mt-8 flex items-start gap-3">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#25313D] text-white"><Sparkles size={18} /></span>
+      <div className="rounded-2xl rounded-tl-sm bg-neutral-100 px-4 py-3"><p className="text-[20px] font-bold leading-snug">{t}</p></div>
+    </div>
+  )
+
   return (
     <div className="flex min-h-full flex-col px-5 pb-8 pt-4">
       <div className="flex h-6 items-center gap-2">
-        {i > 0 && <button onClick={() => setI(i - 1)} className="-ml-1.5" aria-label="이전"><ChevronLeft size={22} /></button>}
+        {(step === 'pick' || step === 'login') && <button onClick={back} className="-ml-1.5" aria-label="이전"><ChevronLeft size={22} /></button>}
         <div className="flex gap-1">
-          {OB_STEPS.map((s, j) => <span key={s} className={`h-1 rounded-full ${j === i ? 'w-6 bg-[#25313D]' : j < i ? 'w-1.5 bg-[#25313D]/40' : 'w-1.5 bg-neutral-200'}`} />)}
+          {steps.map((s, j) => <span key={s} className={`h-1 rounded-full ${s === step ? 'w-6 bg-[#25313D]' : j < steps.indexOf(step) ? 'w-1.5 bg-[#25313D]/40' : 'w-1.5 bg-neutral-200'}`} />)}
         </div>
-        {step !== 'end' && <button onClick={onDone} className="ml-auto text-[12px] text-neutral-400">모두 건너뛰기</button>}
+        {(step === 'hello' || step === 'pick') && <button onClick={onDone} className="ml-auto text-[12px] text-neutral-400">모두 건너뛰기</button>}
       </div>
 
-      <div className="mt-10 flex items-start gap-3">
-        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#25313D] text-white"><Sparkles size={18} /></span>
-        <div className="rounded-2xl rounded-tl-sm bg-neutral-100 px-4 py-3">
-          <p className="text-[20px] font-bold leading-snug">{c.t}</p>
-        </div>
-      </div>
-      <p className="mt-5 text-[14px] leading-relaxed text-neutral-600">{c.d}</p>
-
-      {step === 'hello' && joinedViaLink && (
-        <div className="mt-6 flex items-center gap-3 rounded-2xl border border-[var(--color-border-soft)] p-3">
-          <Avatar name={JIMIN.name} size={40} img={JIMIN.img} />
-          <div className="min-w-0 flex-1">
-            <div className="text-[13px] font-semibold">{JIMIN.name}</div>
-            <div className="text-[11px] text-neutral-500">내 사람에 추가됨</div>
-          </div>
-          <span className="flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-700"><Gift size={12} />재화 5개</span>
-        </div>
+      {step === 'hello' && (
+        <>
+          {bubble(<>{app.me.name}님, 반가워요<br />펠로어예요</>)}
+          <p className="mt-5 text-[14px] leading-relaxed text-neutral-600">
+            {joinedViaLink ? `${JIMIN.name}님은 내 사람에 넣어 뒀고, 보너스 재화 5개도 드렸어요. ` : ''}
+            앞으로 연락은 제가 사람 단위로 모으고, 답장은 미리 써 둘게요. 프로필도 따로 적을 필요 없이 맡겨 주신 계정에서 제가 초안을 만들어요.
+          </p>
+          {joinedViaLink && (
+            <div className="mt-6 flex items-center gap-3 rounded-2xl border border-[var(--color-border-soft)] p-3">
+              <Avatar name={JIMIN.name} size={40} img={JIMIN.img} />
+              <div className="min-w-0 flex-1"><div className="text-[13px] font-semibold">{JIMIN.name}</div><div className="text-[11px] text-neutral-500">내 사람에 추가됨</div></div>
+              <span className="flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-700"><Gift size={12} />재화 5개</span>
+            </div>
+          )}
+          <div className="mt-auto pt-8"><PrimaryButton onClick={() => setStep('pick')}>맡길 곳 고르기</PrimaryButton></div>
+        </>
       )}
 
-      {step === 'career' && !done.career && (
-        <div className="mt-6 space-y-5">
-          <div>
-            <p className="text-[12px] font-semibold text-neutral-500">직장</p>
-            <div className="mt-1.5 flex gap-2">
-              <input value={co} onChange={(e) => setCo(e.target.value)} placeholder="회사나 팀" className="min-w-0 flex-1 rounded-xl border border-neutral-200 px-3 py-3 text-[14px] outline-none focus:border-[#25313D]" />
-              <input value={role} onChange={(e) => setRole(e.target.value)} placeholder="맡은 일" className="min-w-0 flex-1 rounded-xl border border-neutral-200 px-3 py-3 text-[14px] outline-none focus:border-[#25313D]" />
+      {step === 'pick' && (
+        <>
+          {bubble(<>어디서 연락을<br />모아 올까요?</>)}
+          <p className="mt-4 text-[13px] leading-relaxed text-neutral-500">고른 곳만 맡기고, 하나도 안 골라도 돼요. 나머지는 마이페이지 &gt; 연결에서 언제든 더해요.</p>
+          <div className="mt-2 space-y-5 overflow-y-auto">
+            {OB_GROUPS.map((g) => (
+              <div key={g.t} className="mt-4">
+                <p className="text-[12px] font-semibold text-neutral-500">{g.t}</p>
+                {g.d && <p className="text-[11px] text-neutral-400">{g.d}</p>}
+                <div className="mt-2 space-y-2">
+                  {g.items.map((s) => {
+                    const on = sel.includes(s)
+                    return (
+                      <button key={s} onClick={() => toggle(s)} className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-left ${on ? 'border-[#25313D] bg-[#25313D]/5' : 'border-neutral-200'}`}>
+                        <ChannelBadge ch={SRC[s].ch} />
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-[13px] font-semibold">{SRC[s].label}</span>
+                          <span className="block text-[11px] text-neutral-500">{SRC[s].desc}</span>
+                        </span>
+                        <span className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${on ? 'border-[#25313D] bg-[#25313D] text-white' : 'border-neutral-300'}`}>{on && <Check size={12} />}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-auto pt-8">
+            {sel.length > 0
+              ? <PrimaryButton onClick={() => setStep('login')}>{sel.length}곳 맡기기</PrimaryButton>
+              : <PrimaryButton onClick={() => setStep('end')}>나중에 맡길게요</PrimaryButton>}
+          </div>
+        </>
+      )}
+
+      {step === 'login' && (
+        <>
+          {bubble(<>로그인만 맡겨 주세요</>)}
+          <div className="mt-4 space-y-4 overflow-y-auto">
+            {webSel.length > 0 && (
+              <div className="rounded-2xl bg-neutral-50 p-3">
+                <p className="flex items-center gap-1.5 text-[13px] font-semibold"><KeyRound size={14} />암호화 키 만들기</p>
+                <p className="mt-1 text-[11px] leading-relaxed text-neutral-500">로그인 정보는 이 키로 잠가 보관해요. 키는 나만 알고 펠로어도 열어볼 수 없어요. 한 번만 만들어요.</p>
+                <input type="password" value={key1} onChange={(e) => setKey1(e.target.value)} placeholder="키 (6자 이상)" className={`mt-2 bg-white ${input}`} />
+                <input type="password" value={key2} onChange={(e) => setKey2(e.target.value)} placeholder="한 번 더" className={`mt-1.5 bg-white ${input}`} />
+              </div>
+            )}
+            {webSel.map((s) => (
+              <div key={s}>
+                <p className="flex items-center gap-2 text-[13px] font-semibold"><ChannelBadge ch={SRC[s].ch} />{SRC[s].label}</p>
+                <input value={cred[s]?.id ?? ''} onChange={(e) => setCred({ ...cred, [s]: { id: e.target.value, pw: cred[s]?.pw ?? '' } })} placeholder="아이디" className={`mt-2 ${input}`} />
+                <input type="password" value={cred[s]?.pw ?? ''} onChange={(e) => setCred({ ...cred, [s]: { id: cred[s]?.id ?? '', pw: e.target.value } })} placeholder="비밀번호" className={`mt-1.5 ${input}`} />
+              </div>
+            ))}
+            {webSel.length > 0 && <p className="text-[11px] leading-relaxed text-neutral-400">2단계 인증 코드가 오면 알려 드릴게요. 로그인 정보로 연결하면 계정이 제한될 수 있다는 점을 안내해 드렸어요.</p>}
+            {googleSel.length > 0 && (
+              <button onClick={() => setGoogle(true)} className="flex w-full items-center justify-center gap-2 rounded-full border border-neutral-200 py-3 text-[14px] font-semibold">
+                {google ? <><Check size={14} className="text-emerald-600" />구글 허용을 마쳤어요</> : `구글에서 ${googleSel.map((s) => SRC[s].label).join(', ')} 허용하기`}
+              </button>
+            )}
+            {sel.some((s) => SRC[s].how === 'share' || SRC[s].how === 'device') && (
+              <p className="text-[11px] leading-relaxed text-neutral-500">
+                {sel.filter((s) => SRC[s].how === 'share' || SRC[s].how === 'device').map((s) => SRC[s].label).join(', ')}은 로그인 없이 받아요. 카톡은 대화방에서 내보낸 대화를 공유해 주시면 읽고, 연락처와 통화는 기기에서 허락을 한 번 더 물어봐요.
+              </p>
+            )}
+            <div>
+              <p className="text-[13px] font-semibold">어디까지 맡길까요?</p>
+              <div className="mt-2 space-y-1.5">
+                {ALL_LEVELS.map((l) => (
+                  <button key={l} onClick={() => setLevel(l)} className={`flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left ${level === l ? 'border-[#25313D] bg-[#25313D]/5' : 'border-neutral-200'}`}>
+                    <span className="flex-1"><span className="block text-[13px] font-semibold">{LEVEL[l].t}{l === 'draft' && <span className="ml-1.5 text-[11px] font-normal text-emerald-600">추천</span>}</span><span className="block text-[11px] text-neutral-500">{LEVEL[l].d}</span></span>
+                    {level === l && <Check size={15} className="text-[#25313D]" />}
+                  </button>
+                ))}
+              </div>
+              <p className="mt-1.5 text-[11px] text-neutral-400">곳마다 나중에 바꿀 수 있어요. 카톡은 초안까지만 돼요</p>
             </div>
           </div>
-          <div>
-            <p className="text-[12px] font-semibold text-neutral-500">학교</p>
-            <div className="mt-1.5 flex gap-2">
-              <input value={sc} onChange={(e) => setSc(e.target.value)} placeholder="학교" className="min-w-0 flex-1 rounded-xl border border-neutral-200 px-3 py-3 text-[14px] outline-none focus:border-[#25313D]" />
-              <input value={major} onChange={(e) => setMajor(e.target.value)} placeholder="전공" className="min-w-0 flex-1 rounded-xl border border-neutral-200 px-3 py-3 text-[14px] outline-none focus:border-[#25313D]" />
-            </div>
+          <div className="mt-auto pt-6"><PrimaryButton disabled={!loginOk} onClick={hand}>맡기기</PrimaryButton></div>
+        </>
+      )}
+
+      {step === 'alias' && (
+        <>
+          {bubble(<>이 계정들에서<br />쓰시는 이름을 찾았어요</>)}
+          <p className="mt-4 text-[13px] leading-relaxed text-neutral-500">프로필에는 어떤 이름으로 보일까요? 같은 사람을 알아볼 때는 아래 이름을 모두 써요.</p>
+          <div className="mt-4 space-y-2">
+            {[ME.realName, ...foundNames].map((n) => (
+              <button key={n} onClick={() => { setAliasPick(n); setCustom('') }} className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-left ${aliasPick === n && !custom ? 'border-[#25313D] bg-[#25313D]/5' : 'border-neutral-200'}`}>
+                <span className="flex-1 text-[14px] font-semibold">{n}{n === ME.realName && <span className="ml-1.5 text-[11px] font-normal text-neutral-400">본인인증 실명</span>}</span>
+                {aliasPick === n && !custom && <Check size={15} className="text-[#25313D]" />}
+              </button>
+            ))}
+            <input value={custom} onChange={(e) => setCustom(e.target.value)} placeholder="다른 이름 직접 적기" className={input} />
           </div>
-        </div>
+          <div className="mt-auto pt-8">
+            <PrimaryButton disabled={!(custom.trim() || aliasPick)} onClick={() => { app.setAlias((custom.trim() || aliasPick).trim()); setStep('end') }}>이 이름으로 할게요</PrimaryButton>
+          </div>
+        </>
       )}
 
-      {step === 'insta' && !instaDone && (
-        <div className="mt-6 grid grid-cols-3 gap-1.5 opacity-70">
-          {FEED_TONES.slice(0, 6).map((bg) => <div key={bg} className="aspect-square rounded-lg" style={{ background: bg }} />)}
-        </div>
+      {step === 'end' && (
+        <>
+          {bubble(handed ? <>{handed}곳을 맡아<br />모아 오고 있어요</> : <>준비됐어요</>)}
+          <p className="mt-5 text-[14px] leading-relaxed text-neutral-600">
+            {got.length
+              ? '먼저 같은 사람끼리 묶고 내 사람을 골라 볼게요. 확인할 것은 몇 건 안 돼요. 프로필 초안은 그다음에 확인해 주세요. 이후에는 뒤에서 계속 모으다가, 새로 찾은 것만 오늘의 제안으로 알려 드릴게요.'
+              : '맡기는 건 나중에 해도 돼요. 오늘의 제안에서 하나씩 이어 갈 수 있어요.'}
+          </p>
+          <div className="mt-auto pt-8">
+            <PrimaryButton onClick={() => (got.length && openSort ? openSort() : onDone())}>{got.length && openSort ? '사람 정리 시작' : '오늘의 제안 보기'}</PrimaryButton>
+          </div>
+        </>
       )}
-
-      {step === 'talk' && !talkDone && (
-        <div className="mt-6 space-y-2">
-          {(['ig', 'kakao', 'in'] as Src[]).map((s) => (
-            <button key={s} onClick={() => setTalkPick(s)} className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-left ${talkPick === s ? 'border-[#25313D] bg-[#25313D]/5' : 'border-neutral-200'}`}>
-              <ChannelBadge ch={SRC[s].ch} />
-              <span className="flex-1">
-                <span className="block text-[13px] font-semibold">{SRC[s].label}</span>
-                <span className="block text-[11px] text-neutral-500">{SRC[s].desc}</span>
-              </span>
-              {talkPick === s && <Check size={16} className="text-[#25313D]" />}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {done[step] && (
-        <p className="mt-6 flex items-center gap-1.5 text-[13px] font-medium text-emerald-700"><Check size={14} />{c.doneText}</p>
-      )}
-
-      <div className="mt-auto pt-8">
-        {done[step] || !c.act ? (
-          <PrimaryButton onClick={next}>{done[step] ? '다음' : c.cta}</PrimaryButton>
-        ) : (
-          <>
-            <PrimaryButton disabled={(step === 'talk' && !talkPick) || (step === 'career' && !co.trim() && !sc.trim())} onClick={c.act}>{c.cta}</PrimaryButton>
-            <button onClick={next} className="mt-3 w-full text-center text-[13px] text-neutral-500">나중에</button>
-          </>
-        )}
-      </div>
     </div>
   )
 }
@@ -3359,7 +3433,7 @@ const CHAT_HELLO: Msg[] = [
 
 const CHAT_TIPS = ['도민혁이랑 @minhyuk.d 같은 사람이야, 합쳐줘', '민혁이한테는 반말로 해. 대학 동기야', '지난번에 서윤님이랑 무슨 얘기 했지?', '링크드인 연결해 줘', '이번 주에 챙길 사람']
 
-const SRC_WORDS: [RegExp, Src][] = [[/링크드인/, 'in'], [/인스타/, 'ig'], [/텔레그램/, 'tg'], [/지메일|메일/, 'gmail'], [/캘린더|일정/, 'gcal'], [/카톡|카카오/, 'kakao'], [/통화/, 'calls'], [/연락처/, 'contacts'], [/리멤버|명함/, 'remember']]
+const SRC_WORDS: [RegExp, Src][] = [[/링크드인/, 'in'], [/인스타/, 'ig'], [/유튜브/, 'yt'], [/틱톡/, 'tt'], [/텔레그램/, 'tg'], [/지메일|메일/, 'gmail'], [/캘린더|일정/, 'gcal'], [/카톡|카카오/, 'kakao'], [/통화/, 'calls'], [/연락처/, 'contacts'], [/리멤버|명함/, 'remember']]
 
 /** 채팅 안에 뜨는 로그인 카드. 처음이면 암호화 키부터 만든다 */
 function ChatLoginCard({ src, stage, again, onKey, onLogin }: { src: Src; stage: 'key' | 'form' | 'saved'; again?: boolean; onKey: () => void; onLogin: () => void }) {
@@ -3417,7 +3491,7 @@ function ChatScreen({ onClose }: { onClose: () => void }) {
   }
 
   const who = (text: string) => app.people.find((p) => text.includes(p.name) || (p.name.length > 2 && !p.name.startsWith('@') && text.includes(p.name.slice(1))))
-  const hasKey = (['ig', 'in', 'remember'] as Src[]).some((s) => conn[s].status !== 'off') || msgs.some((m) => m.login && m.login.stage !== 'key')
+  const hasKey = (['ig', 'yt', 'tt', 'in', 'remember'] as Src[]).some((s) => conn[s].status !== 'off') || msgs.some((m) => m.login && m.login.stage !== 'key')
   const pending = [...msgs].reverse().find((m) => m.login?.stage === 'saved' && conn[m.login.src].status !== 'on')?.login?.src
 
   const finishLogin = (s: Src, level: Level) => {
@@ -3627,7 +3701,7 @@ const TERMS: { id: string; t: string; must: boolean }[] = [
 
 function SignupFlow({ viaLink, initLogin, onClose, onDone, onLogin }: {
   viaLink: boolean; initLogin?: boolean; onClose: () => void
-  onDone: (info: { name: string; title: string; linkId: string }) => void; onLogin: () => void
+  onDone: (info: { name: string; realName: string; title: string; linkId: string }) => void; onLogin: () => void
 }) {
   const [step, setStep] = useState<SignStep>(initLogin ? 'login' : 'start')
   const [method, setMethod] = useState<'google' | 'phone'>('phone')
@@ -3637,7 +3711,8 @@ function SignupFlow({ viaLink, initLogin, onClose, onDone, onLogin }: {
   const [code, setCode] = useState('')
   const [pw, setPw] = useState('')
   const [name, setName] = useState(ME.name)
-  const [linkId, setLinkId] = useState(ME.linkId)
+  const [certed, setCerted] = useState(false)
+  const linkId = ME.linkId
   const input = 'w-full rounded-xl border border-neutral-200 px-3 py-3 text-[14px] outline-none focus:border-[#25313D]'
 
   const flow: SignStep[] = method === 'google' ? ['start', 'terms', 'phone', 'profile', 'welcome'] : ['start', 'terms', 'phone', 'pw', 'profile', 'welcome']
@@ -3711,20 +3786,28 @@ function SignupFlow({ viaLink, initLogin, onClose, onDone, onLogin }: {
 
         {step === 'phone' && (
           <>
-            <p className="mt-6 text-[22px] font-bold leading-snug">휴대폰 번호를<br />확인할게요</p>
-            <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">이 번호로 본인을 확인하고, 다른 사람의 연락처에 있는 나를 찾아 이어 줘요. 번호는 공개되지 않아요.</p>
-            <div className="mt-6 flex gap-2">
-              <input value={phone} onChange={(e) => { setPhone(e.target.value.replace(/[^0-9-]/g, '')); setSent(false); setCode('') }} inputMode="tel" placeholder="010-1234-5678" className={input} />
-              <button disabled={!phoneOk} onClick={() => setSent(true)} className="shrink-0 rounded-xl bg-[#25313D] px-4 text-[13px] font-semibold text-white disabled:opacity-40">{sent ? '다시 받기' : '인증번호 받기'}</button>
-            </div>
-            {!phone && <button onClick={() => setPhone('010-2840-1192')} className="mt-2 self-start text-[12px] text-neutral-500 underline">예시 번호 넣기 (목업)</button>}
-            {sent && (
+            <p className="mt-6 text-[22px] font-bold leading-snug">본인인증을 할게요</p>
+            <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">통신사 본인인증으로 이름, 생년월일, 휴대폰 번호를 가져와요. 실명은 나만 보고 공개되지 않아요. 다른 사람의 연락처에 있는 나를 찾아 이어 주는 데도 써요.</p>
+            {!certed ? (
               <>
-                <input autoFocus value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))} inputMode="numeric" placeholder="인증번호 6자리" className={`mt-3 text-center tracking-[0.3em] placeholder:tracking-normal ${input}`} />
-                <p className="mt-2 text-[12px] text-neutral-400">문자로 인증번호를 보냈어요. 목업에서는 아무 숫자 6자리를 넣으면 돼요</p>
+                <div className="mt-6 grid grid-cols-3 gap-2">
+                  {['PASS', '카카오', '토스'].map((n) => (
+                    <button key={n} onClick={() => { setCerted(true); setPhone('010-2840-1192') }} className="rounded-2xl border border-neutral-200 py-4 text-[13px] font-semibold">{n}</button>
+                  ))}
+                </div>
+                <p className="mt-3 text-[12px] text-neutral-400">목업에서는 아무 인증 앱이나 누르면 인증된 것으로 넘어가요</p>
               </>
+            ) : (
+              <div className="mt-6 rounded-2xl border border-[var(--color-border-soft)] p-4">
+                <p className="flex items-center gap-1.5 text-[13px] font-semibold text-emerald-700"><Check size={14} />본인인증을 마쳤어요</p>
+                <dl className="mt-3 space-y-2 text-[13px]">
+                  {[['이름', ME.realName], ['생년월일', '1992.03.14'], ['휴대폰', phone]].map(([k, v]) => (
+                    <div key={k} className="flex justify-between"><dt className="text-neutral-500">{k}</dt><dd className="font-medium">{v}</dd></div>
+                  ))}
+                </dl>
+              </div>
             )}
-            <div className="mt-auto pt-8"><PrimaryButton disabled={!sent || code.length < 6} onClick={() => go(1)}>확인</PrimaryButton></div>
+            <div className="mt-auto pt-8"><PrimaryButton disabled={!certed} onClick={() => go(1)}>다음</PrimaryButton></div>
           </>
         )}
 
@@ -3740,17 +3823,12 @@ function SignupFlow({ viaLink, initLogin, onClose, onDone, onLogin }: {
 
         {step === 'profile' && (
           <>
-            <p className="mt-6 text-[22px] font-bold leading-snug">뭐라고 부를까요?</p>
-            <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">프로필 링크에 보이는 이름이에요. 하는 일과 사진, 관심사는 가입한 뒤 펠로어가 같이 채워요.</p>
-            <label className="mt-6 text-[12px] font-semibold text-neutral-500">이름</label>
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="이름" className={`mt-1.5 ${input}`} />
-            <label className="mt-4 text-[12px] font-semibold text-neutral-500">프로필 주소</label>
-            <div className="mt-1.5 flex items-center rounded-xl border border-neutral-200 px-3 focus-within:border-[#25313D]">
-              <span className="text-[14px] text-neutral-400">felore.io/</span>
-              <input value={linkId} onChange={(e) => setLinkId(e.target.value.toLowerCase().replace(/[^a-z0-9_.]/g, ''))} className="min-w-0 flex-1 bg-transparent py-3 text-[14px] outline-none" />
-            </div>
-            <p className={`mt-1 text-[11px] ${linkId.length >= 3 ? 'text-emerald-600' : 'text-neutral-400'}`}>{linkId.length >= 3 ? '쓸 수 있는 주소예요' : '영문, 숫자 3자 이상'}</p>
-            <div className="mt-auto pt-8"><PrimaryButton disabled={!name.trim() || linkId.length < 3} onClick={() => go(1)}>가입하기</PrimaryButton></div>
+            <p className="mt-6 text-[22px] font-bold leading-snug">어떤 이름으로<br />불리고 싶어요?</p>
+            <p className="mt-2 text-[13px] leading-relaxed text-neutral-500">프로필과 다른 사람에게 보이는 이름이에요. 유튜브나 인스타에서 다른 이름을 쓴다면 그 이름을 적어도 돼요. 계정을 맡기시면 제가 쓰던 이름을 찾아서 제안해요.</p>
+            <label className="mt-6 text-[12px] font-semibold text-neutral-500">활동명</label>
+            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="활동명" className={`mt-1.5 ${input}`} />
+            <p className="mt-2 text-[11px] text-neutral-400">본인인증으로 확인한 실명 {ME.realName}님은 나만 봐요. 활동명은 가입한 뒤 바꿀 수 있어요.</p>
+            <div className="mt-auto pt-8"><PrimaryButton disabled={!name.trim()} onClick={() => go(1)}>가입하기</PrimaryButton></div>
           </>
         )}
 
@@ -3772,7 +3850,7 @@ function SignupFlow({ viaLink, initLogin, onClose, onDone, onLogin }: {
                 <div className="flex items-center gap-3 rounded-2xl bg-amber-50 p-3 text-[13px] text-amber-700"><Gift size={18} className="ml-2 shrink-0" />24시간 안에 가입해서 보너스 재화 5개를 받았어요</div>
               </div>
             )}
-            <div className="mt-auto pt-8"><PrimaryButton onClick={() => onDone({ name: name.trim(), title: '', linkId })}>시작하기</PrimaryButton></div>
+            <div className="mt-auto pt-8"><PrimaryButton onClick={() => onDone({ name: name.trim(), realName: ME.realName, title: '', linkId })}>시작하기</PrimaryButton></div>
           </div>
         )}
 
@@ -4504,7 +4582,7 @@ export default function V2IaPage() {
   }
 
   const storeLogin = () => { try { const s = useFeloreStore.getState(); if (!s.isLoggedIn) s.login() } catch {} }
-  const finishSignup = (info: { name: string; title: string; linkId: string }, viaLink: boolean) => {
+  const finishSignup = (info: { name: string; realName: string; title: string; linkId: string }, viaLink: boolean) => {
     changeMode('new')
     setMe({ ...ME, ...info })
     setMyProf({ ...FRESH_PROF, line: info.title })
@@ -4572,6 +4650,7 @@ export default function V2IaPage() {
   const app: App = {
     mode,
     me,
+    setAlias: (n: string) => setMe((m) => ({ ...m, name: n })),
     people,
     imported,
     hidden,

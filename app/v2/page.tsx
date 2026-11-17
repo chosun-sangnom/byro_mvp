@@ -18,7 +18,7 @@ import {
   Mic, PenLine, Lock, CalendarClock, MessageCircle, Send, Upload, Plus,
   QrCode, BarChart3, Coins, Eye, ShieldCheck, BadgeCheck, X, UserPlus, Check, Square,
   Clock, GitMerge, ArrowUp, FileText, Image as ImageIcon, RefreshCw, CalendarDays, Mail, TriangleAlert, Menu,
-  Phone, PhoneCall, IdCard, Music2, KeyRound, Copy, Link2, MoreHorizontal, EyeOff, Gift, Share2,
+  Phone, PhoneCall, IdCard, KeyRound, Copy, Link2, MoreHorizontal, EyeOff, Gift, Share2,
 } from 'lucide-react'
 
 type Tab = 'today' | 'people' | 'me'
@@ -466,34 +466,28 @@ function Tag({ kind }: { kind: 'old' | 'new' | 'later' | 'review' }) {
   return <span className={`ml-1.5 rounded px-1.5 py-0.5 text-[10px] font-semibold ${cls}`}>{label}</span>
 }
 
-/** 채널 아이콘. 색 없이 검정 선으로만 그린다 */
+/** 채널 아이콘. SNS와 메신저는 실제 로고, 나머지는 검정 선 아이콘 */
+const CH_LOGO: Partial<Record<Channel, string>> = {
+  ig: '/images/channels/instagram.svg',
+  yt: '/images/channels/youtube.svg',
+  in: '/images/channels/linkedin.svg',
+  tt: '/images/channels/tiktok.svg',
+  kakao: '/images/channels/kakao.svg',
+  tg: '/images/channels/telegram.svg',
+}
+
 function ChannelIcon({ ch, size = 18 }: { ch: Channel; size?: number }) {
-  const common = { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.7, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const }
+  const logo = CH_LOGO[ch]
+  // eslint-disable-next-line @next/next/no-img-element
+  if (logo) return <img src={logo} alt="" width={size} height={size} className="shrink-0 object-contain" style={{ width: size, height: size }} />
+  const props = { size, strokeWidth: 1.7 }
   switch (ch) {
-    case 'ig':
-      return <svg {...common}><rect x="3.5" y="3.5" width="17" height="17" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.2" cy="6.8" r="0.6" fill="currentColor" /></svg>
-    case 'yt':
-      return <svg {...common}><rect x="2.5" y="5.5" width="19" height="13" rx="4" /><path d="M10 9.5v5l4.5-2.5z" fill="currentColor" /></svg>
-    case 'in':
-      return <svg {...common}><rect x="3.5" y="3.5" width="17" height="17" rx="3" /><path d="M8 10.5V16M8 7.8v.1M12 16v-5.5M12 12.8c0-1.4 1-2.3 2.3-2.3s2.2.9 2.2 2.3V16" /></svg>
-    case 'tt':
-      return <Music2 size={size} strokeWidth={1.7} />
-    case 'kakao':
-      return <svg {...common}><path d="M12 4.5c4.7 0 8.5 2.9 8.5 6.5s-3.8 6.5-8.5 6.5c-.8 0-1.6-.1-2.3-.3L6 19.5l.9-3.1C5 15.2 3.5 13.3 3.5 11c0-3.6 3.8-6.5 8.5-6.5z" /></svg>
-    case 'tg':
-      return <Send size={size} strokeWidth={1.7} />
-    case 'mail':
-      return <Mail size={size} strokeWidth={1.7} />
-    case 'cal':
-      return <CalendarDays size={size} strokeWidth={1.7} />
-    case 'phone':
-      return <Phone size={size} strokeWidth={1.7} />
-    case 'call':
-      return <PhoneCall size={size} strokeWidth={1.7} />
-    case 'memo':
-      return <PenLine size={size} strokeWidth={1.7} />
-    default:
-      return <IdCard size={size} strokeWidth={1.7} />
+    case 'mail': return <Mail {...props} />
+    case 'cal': return <CalendarDays {...props} />
+    case 'phone': return <Phone {...props} />
+    case 'call': return <PhoneCall {...props} />
+    case 'memo': return <PenLine {...props} />
+    default: return <IdCard {...props} />
   }
 }
 

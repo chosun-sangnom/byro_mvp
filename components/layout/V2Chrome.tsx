@@ -10,11 +10,11 @@ import { V2_MODES, type V2Mode, type V2Tab } from '@/lib/v2Flow'
 /** 기획 확인용. 맨 위에 붙어 상태를 바꾼다 */
 export function V2ModeBar({ mode, onChange, children }: { mode: V2Mode; onChange: (m: V2Mode) => void; children?: ReactNode }) {
   return (
-    <div className="border-b border-amber-200 bg-amber-50">
+    <div className="border-b border-neutral-200 bg-white">
       <div className="mx-auto flex h-9 w-full max-w-[430px] scrollbar-hide items-center gap-1.5 overflow-x-auto px-3 text-[11px]">
-        <span className="shrink-0 font-semibold text-amber-700">임시 상태</span>
+        <span className="shrink-0 font-semibold text-neutral-500">임시 상태</span>
         {V2_MODES.map(([m, l]) => (
-          <button key={m} onClick={() => onChange(m)} className={`shrink-0 rounded-full px-2.5 py-1 ${mode === m ? 'bg-[#25313D] font-semibold text-white' : 'bg-white text-neutral-600'}`}>{l}</button>
+          <button key={m} onClick={() => onChange(m)} className={`shrink-0 rounded-full px-2.5 py-1 ${mode === m ? 'bg-[#25313D] font-semibold text-white' : 'border border-neutral-200 bg-white text-neutral-600'}`}>{l}</button>
         ))}
         {children}
       </div>

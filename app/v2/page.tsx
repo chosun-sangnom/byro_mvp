@@ -476,8 +476,8 @@ function ChannelBadge({ ch, handle }: { ch: Channel; handle?: string }) {
 
 function SectionTitle({ children, tag, right }: { children: ReactNode; tag?: 'old' | 'new' | 'later' | 'review'; right?: ReactNode }) {
   return (
-    <div className="mb-2 mt-6 flex items-center justify-between">
-      <h2 className="flex items-center text-[15px] font-bold text-[var(--color-text-strong)]">
+    <div className="mb-3 mt-9 flex items-center justify-between border-t-2 border-[var(--color-text-strong)] pt-3">
+      <h2 className="flex items-center text-[19px] font-extrabold tracking-[-0.03em] text-[var(--color-text-strong)]">
         {children}
         {tag && <Tag kind={tag} />}
       </h2>
@@ -490,7 +490,7 @@ function Card({ children, className = '', onClick }: { children: ReactNode; clas
   return (
     <div
       onClick={onClick}
-      className={`rounded-2xl border border-[var(--color-border-soft)] bg-white p-4 ${onClick ? 'cursor-pointer active:bg-neutral-50' : ''} ${className}`}
+      className={`rounded-[20px] bg-[#F6F7F8] p-4 ${onClick ? 'cursor-pointer active:bg-[#EFF0F2]' : ''} ${className}`}
     >
       {children}
     </div>
@@ -512,7 +512,7 @@ function Avatar({ name, size = 40, member = true, img }: { name: string; size?: 
 
 function PrimaryButton({ children, onClick, disabled }: { children: ReactNode; onClick?: () => void; disabled?: boolean }) {
   return (
-    <button onClick={onClick} disabled={disabled} className="w-full rounded-full bg-[#0D0D0D] py-3.5 text-[15px] font-semibold text-white disabled:opacity-40">
+    <button onClick={onClick} disabled={disabled} className="w-full rounded-full bg-[#0D0D0D] py-4 text-[15px] font-semibold tracking-[-0.01em] text-white shadow-[0_6px_16px_rgba(0,0,0,0.16)] active:scale-[0.99] disabled:opacity-40 disabled:shadow-none">
       {children}
     </button>
   )
@@ -547,9 +547,15 @@ function PrivateBadge() {
 function Header({ title, onSearch }: { title: string; onSearch: () => void }) {
   const app = useApp()
   const icon = 'p-2 text-[var(--color-text-secondary)]'
+  // 서버와 브라우저의 날짜가 달라 어긋나지 않게 브라우저에서만 채운다
+  const [today, setToday] = useState('')
+  useEffect(() => {
+    const d = new Date()
+    setToday(`${d.getMonth() + 1}월 ${d.getDate()}일 ${'일월화수목금토'[d.getDay()]}요일`)
+  }, [])
   return (
     <>
-      <header className="flex h-14 flex-shrink-0 items-center justify-between border-b border-[var(--color-border-soft)] bg-[var(--color-bg-page)] px-5">
+      <header className="flex h-14 flex-shrink-0 items-center justify-between bg-[var(--color-bg-page)] px-5">
         <button onClick={() => app.goTab('today')} aria-label="Felore">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/images/brand/felore-wordmark.svg" alt="Felore" className="h-[18px] w-auto" />
@@ -565,7 +571,10 @@ function Header({ title, onSearch }: { title: string; onSearch: () => void }) {
           <Link href="/settings?from=v2" className={icon} aria-label="설정"><Menu size={20} /></Link>
         </div>
       </header>
-      <h1 className="px-5 pb-1 pt-4 text-[20px] font-black text-[var(--color-text-strong)]">{title}</h1>
+      <div className="px-5 pb-2 pt-7">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--color-text-tertiary)]">{today || '\u00A0'}</p>
+        <h1 className="mt-1.5 text-[34px] font-extrabold leading-[1.08] tracking-[-0.04em] text-[var(--color-text-strong)]">{title}</h1>
+      </div>
     </>
   )
 }
@@ -1978,20 +1987,18 @@ function AgentHello() {
     ? '지금은 급한 일이 없어요. 궁금한 사람이나 정리할 일이 있으면 말해 주세요.'
     : `${app.batchSt.label}이에요. ${drafts > 0 ? `답장 초안 ${drafts}개` : ''}${drafts > 0 && todo > 0 ? '와 ' : ''}${todo > 0 ? `할 일 ${todo}건` : ''}을 준비해 뒀어요.`
   return (
-    <div className="mt-3">
-      <div className="flex items-start gap-3">
-        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#25313D] text-white"><Sparkles size={16} /></span>
-        <div className="rounded-2xl rounded-tl-sm bg-neutral-100 px-4 py-3 text-[14px] leading-relaxed">
-          <span className="font-semibold">{app.me.name}님,</span> {line}
-        </div>
-      </div>
-      <button onClick={() => app.openAction('chat')} className="mt-3 flex w-full items-center gap-2 rounded-full border border-neutral-200 py-2 pl-4 pr-2 text-left">
+    <div className="mt-2">
+      <p className="flex items-center gap-1.5 text-[12px] font-semibold text-[#25313D]"><Sparkles size={13} />펠로어</p>
+      <p className="mt-2 text-[21px] font-bold leading-[1.4] tracking-[-0.03em] text-[var(--color-text-strong)]">
+        {app.me.name}님, <span className="text-neutral-500">{line}</span>
+      </p>
+      <button onClick={() => app.openAction('chat')} className="mt-5 flex w-full items-center gap-2 rounded-full bg-[#F2F3F5] py-2.5 pl-5 pr-2.5 text-left">
         <span className="flex-1 text-[13px] text-neutral-400">펠로어에게 말하기</span>
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0D0D0D] text-white"><ArrowUp size={15} /></span>
       </button>
       <div className="mt-2 scrollbar-hide flex gap-1.5 overflow-x-auto">
         {['이번 주에 챙길 사람', '지난번에 서윤님이랑 무슨 얘기 했지?', '리멤버 연결해 줘'].map((s) => (
-          <button key={s} onClick={() => app.askAgent(s)} className="shrink-0 rounded-full bg-neutral-100 px-3 py-1.5 text-[12px] text-neutral-600">{s}</button>
+          <button key={s} onClick={() => app.askAgent(s)} className="shrink-0 rounded-full border border-neutral-200 px-3.5 py-1.5 text-[12px] text-neutral-700">{s}</button>
         ))}
       </div>
     </div>
@@ -2843,31 +2850,35 @@ function MeTab({ mode }: { mode: Mode }) {
   const brokenCount = srcs.filter((s) => conn[s].status === 'broken').length
   return (
     <div className="px-5 pb-28">
-      {/* 내 프로필: 한 장짜리 소개 카드의 축소판 */}
-      <div className="mt-3 overflow-hidden rounded-3xl border border-[var(--color-border-soft)]">
-        <button onClick={() => app.openProfile('me')} className="flex w-full items-center gap-4 p-4 text-left">
-          <Avatar name={me.name} size={64} img={me.img} />
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1 text-[18px] font-black">{me.name} <BadgeCheck size={16} className="text-[#25313D]" /></div>
-            <div className="truncate text-[12px] text-neutral-500">{me.title}</div>
-            <div className="mt-1 truncate text-[13px]">{prof.line}</div>
+      {/* 내 프로필: 사진 위에 이름이 얹힌 커버. 누르면 한 장짜리 프로필로 간다 */}
+      <div className="mt-2">
+        <button onClick={() => app.openProfile('me')} className="relative block h-[440px] w-full overflow-hidden rounded-[28px] bg-[#25313D] text-left shadow-[0_10px_30px_rgba(0,0,0,0.14)]">
+          {me.img && <Photo src={me.img} className="absolute inset-0 h-full w-full" />}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-black/10" />
+          <span className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-white backdrop-blur-md"><ChevronRight size={18} /></span>
+          <div className="absolute inset-x-0 bottom-0 p-6 text-white">
+            <div className="flex items-center gap-2 text-[34px] font-extrabold leading-[1.05] tracking-[-0.04em]">{me.name}<BadgeCheck size={20} className="mt-1 shrink-0 opacity-90" /></div>
+            <p className="mt-1.5 text-[13px] font-medium opacity-80">{me.title}</p>
+            {instaDone && prof.word ? (
+              <>
+                <div className="mt-4 flex items-center gap-2"><span className="h-px w-8 bg-gradient-to-r from-white to-white/0" /><span className="text-[10px] font-semibold uppercase tracking-[0.16em] opacity-70">Persona</span></div>
+                <p className="mt-2 text-[19px] font-bold leading-[1.35] tracking-[-0.03em]">&ldquo;{prof.word}&rdquo;</p>
+                <div className="mt-3 flex flex-wrap gap-1.5">{prof.keywords.map((k) => <span key={k} className="rounded-full bg-white/18 px-3 py-1 text-[11px] font-medium backdrop-blur-md">{k}</span>)}</div>
+              </>
+            ) : (
+              <p className="mt-4 text-[16px] font-semibold leading-snug">{prof.line}</p>
+            )}
           </div>
-          <ChevronRight size={18} className="shrink-0 text-neutral-300" />
         </button>
-        {instaDone ? (
-          <div className="border-t border-[var(--color-border-soft)] px-4 py-3">
-            {prof.word && <p className="text-[14px] font-bold">&ldquo;{prof.word}&rdquo;</p>}
-            <div className="mt-2 flex flex-wrap gap-1">{prof.keywords.map((k) => <span key={k} className="rounded-full bg-neutral-100 px-2.5 py-0.5 text-[11px]">{k}</span>)}</div>
-          </div>
-        ) : (
-          <button onClick={openInsta} className="flex w-full items-center gap-2 border-t border-[var(--color-border-soft)] px-4 py-3 text-left text-[13px]">
+        {!instaDone && (
+          <button onClick={openInsta} className="mt-2.5 flex w-full items-center gap-2 rounded-2xl bg-[#F6F7F8] px-4 py-3.5 text-left text-[13px]">
             <ChannelBadge ch="ig" /><span className="flex-1">인스타를 보여주면 프로필을 채워 드려요</span><ChevronRight size={14} className="text-neutral-300" />
           </button>
         )}
-        <div className="grid grid-cols-3 gap-2 border-t border-[var(--color-border-soft)] p-3">
-          <button onClick={() => app.openPanel({ k: 'editProf' })} className="flex items-center justify-center gap-1.5 rounded-full border border-neutral-200 py-2.5 text-[12px]"><PenLine size={13} />편집</button>
-          <button onClick={() => app.openShare({ title: '내 프로필 링크 공유', url: `felore.io/${me.linkId}`, text: '받은 사람이 이 링크로 가입하면 서로 내 사람에 추가돼요' })} className="flex items-center justify-center gap-1.5 rounded-full bg-[#0D0D0D] py-2.5 text-[12px] font-semibold text-white"><Send size={13} />링크 공유</button>
-          <button onClick={() => app.openPanel({ k: 'qr' })} className="flex items-center justify-center gap-1.5 rounded-full border border-neutral-200 py-2.5 text-[12px]"><QrCode size={13} />QR</button>
+        <div className="mt-2.5 grid grid-cols-[1fr_1.4fr_1fr] gap-2">
+          <button onClick={() => app.openPanel({ k: 'editProf' })} className="flex items-center justify-center gap-1.5 rounded-full bg-[#F2F3F5] py-3 text-[13px] font-medium"><PenLine size={14} />편집</button>
+          <button onClick={() => app.openShare({ title: '내 프로필 링크 공유', url: `felore.io/${me.linkId}`, text: '받은 사람이 이 링크로 가입하면 서로 내 사람에 추가돼요' })} className="flex items-center justify-center gap-1.5 rounded-full bg-[#0D0D0D] py-3 text-[13px] font-semibold text-white"><Send size={14} />링크 공유</button>
+          <button onClick={() => app.openPanel({ k: 'qr' })} className="flex items-center justify-center gap-1.5 rounded-full bg-[#F2F3F5] py-3 text-[13px] font-medium"><QrCode size={14} />QR</button>
         </div>
       </div>
 
@@ -2932,8 +2943,8 @@ function FabMenu({ onPick, onClose }: { onPick: (a: FabAction) => void; onClose:
 function Sheet({ children, onClose }: { children: ReactNode; onClose: () => void }) {
   return (
     <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/45 px-3 sm:px-4" onClick={onClose}>
-      <div className="max-h-[86dvh] w-full max-w-[430px] overflow-y-auto rounded-t-2xl border-x border-t border-[var(--color-border-soft)] bg-white px-5 pb-[max(env(safe-area-inset-bottom),24px)] pt-3" onClick={(e) => e.stopPropagation()}>
-        <div className="mx-auto mb-4 h-1 w-8 rounded-full bg-neutral-200" />
+      <div className="max-h-[86dvh] w-full max-w-[430px] overflow-y-auto rounded-t-[28px] bg-white px-6 pb-[max(env(safe-area-inset-bottom),24px)] pt-3" onClick={(e) => e.stopPropagation()}>
+        <div className="mx-auto mb-5 h-1 w-9 rounded-full bg-neutral-300" />
         {children}
       </div>
     </div>
@@ -4053,9 +4064,9 @@ function Photo({ src, className }: { src: string; className: string }) {
 
 function ProfBlock({ title, sub, hidden, children }: { title: string; sub?: ReactNode; hidden?: boolean; children: ReactNode }) {
   return (
-    <section className="mt-7">
-      <div className="mb-2.5 flex items-baseline justify-between">
-        <h2 className="flex items-center gap-1.5 text-[16px] font-black text-[var(--color-text-strong)]">{title}{hidden && <span className="flex items-center gap-0.5 rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium text-neutral-500"><Lock size={9} />나만 보기</span>}</h2>
+    <section className="mt-9 border-t-2 border-[var(--color-text-strong)] pt-3">
+      <div className="mb-3 flex items-baseline justify-between">
+        <h2 className="flex items-center gap-1.5 text-[19px] font-extrabold tracking-[-0.03em] text-[var(--color-text-strong)]">{title}{hidden && <span className="flex items-center gap-0.5 rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] font-medium text-neutral-500"><Lock size={9} />나만 보기</span>}</h2>
         {sub && <span className="text-[11px] text-neutral-400">{sub}</span>}
       </div>
       {children}
@@ -4100,14 +4111,14 @@ function ProfileView({ target, onBack }: { target: Person | 'me'; onBack: () => 
 
       <div className="px-5 pt-4">
         {/* 커버: 사진, 이름, 한 줄 소개 */}
-        <div className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-[#25313D]">
+        <div className="relative aspect-[4/5] overflow-hidden rounded-[28px] bg-[#25313D] shadow-[0_10px_30px_rgba(0,0,0,0.14)]">
           {img && <Photo src={img} className="absolute inset-0 h-full w-full" />}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 p-5 text-white">
-            <div className="flex items-center gap-1.5 text-[28px] font-black leading-tight">{name}{member && <BadgeCheck size={20} />}</div>
-            <p className="mt-0.5 text-[13px] opacity-85">{title}</p>
-            {prof.line && <p className="mt-2 text-[15px] font-semibold leading-snug">{prof.line}</p>}
-            <p className="mt-2 text-[11px] opacity-60">felore.io/{linkId}</p>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 p-6 text-white">
+            <div className="flex items-center gap-2 text-[36px] font-extrabold leading-[1.05] tracking-[-0.04em]">{name}{member && <BadgeCheck size={22} className="mt-1 shrink-0 opacity-90" />}</div>
+            <p className="mt-1.5 text-[13px] font-medium opacity-80">{title}</p>
+            {prof.line && <p className="mt-4 text-[17px] font-bold leading-[1.4] tracking-[-0.02em]">{prof.line}</p>}
+            <p className="mt-3 text-[11px] tracking-wide opacity-55">felore.io/{linkId}</p>
           </div>
         </div>
 
@@ -4117,7 +4128,7 @@ function ProfileView({ target, onBack }: { target: Person | 'me'; onBack: () => 
 
         {/* 페르소나: 인스타에서 고른 사진과 키워드가 바이브를 대신한다 */}
         <ProfBlock title="페르소나" sub={owner && !instaDone ? undefined : <span className="flex items-center gap-1"><Sparkles size={11} />AI가 정리했어요</span>} hidden={off('persona')}>
-          {prof.word && (owner ? instaDone : true) && <p className="mb-2 text-[19px] font-black leading-snug text-[var(--color-text-strong)]">&ldquo;{prof.word}&rdquo;</p>}
+          {prof.word && (owner ? instaDone : true) && <p className="mb-3 text-[22px] font-extrabold leading-[1.3] tracking-[-0.03em] text-[var(--color-text-strong)]">&ldquo;{prof.word}&rdquo;</p>}
           {(!owner || instaDone) && (
             <>
               <p className="text-[14px] leading-relaxed text-neutral-700">{prof.persona}</p>
@@ -4688,7 +4699,7 @@ export default function V2IaPage() {
   }
 
   return (
-    <div className="h-dvh overflow-hidden bg-[var(--color-bg-page)]">
+    <div className="font-pretendard h-dvh overflow-hidden bg-[var(--color-bg-page)] tracking-[-0.01em]">
       {/* [임시] 기획 확인용. 맨 위에 붙어 상태를 바꾼다 */}
       <V2ModeBar mode={mode} onChange={(m) => { changeMode(m); setTab('today') }}>
         {mode === 'guest' && (

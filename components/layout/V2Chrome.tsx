@@ -31,9 +31,10 @@ const TABS: { id: V2Tab; label: string; icon: ReactNode }[] = [
 /** 하단 탭과 그 위에 떠 있는 플로팅 버튼. fixed면 화면 아래에 붙는다(기존 프로필 화면용) */
 export function V2TabBar({ active, onTab, onFab, fabOpen, fixed }: { active: V2Tab | null; onTab: (t: V2Tab) => void; onFab?: () => void; fabOpen?: boolean; fixed?: boolean }) {
   const nav = (
-    <nav className="pointer-events-auto flex items-center justify-around border-t border-[var(--color-border-soft)] bg-[var(--color-bg-page)] pb-[max(env(safe-area-inset-bottom),14px)] pt-2">
+    <nav className="pointer-events-auto flex items-center justify-around border-t border-[var(--color-border-soft)] bg-white/90 pb-[max(env(safe-area-inset-bottom),14px)] pt-2.5 backdrop-blur-xl">
       {TABS.map((t) => (
-        <button key={t.id} onClick={() => onTab(t.id)} className={`flex w-20 flex-col items-center gap-0.5 text-[11px] ${active === t.id ? 'font-semibold text-[var(--color-text-strong)]' : 'text-neutral-400'}`}>
+        <button key={t.id} onClick={() => onTab(t.id)} className={`relative flex w-20 flex-col items-center gap-0.5 text-[11px] tracking-[-0.01em] ${active === t.id ? 'font-bold text-[var(--color-text-strong)]' : 'text-neutral-400'}`}>
+          {active === t.id && <span className="absolute -top-2.5 h-[2px] w-6 rounded-full bg-[var(--color-text-strong)]" />}
           {t.icon}
           {t.label}
         </button>
@@ -43,7 +44,7 @@ export function V2TabBar({ active, onTab, onFab, fabOpen, fixed }: { active: V2T
   const fab = onFab && (
     <button
       onClick={onFab}
-      className="pointer-events-auto absolute bottom-[84px] right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#0D0D0D] text-white shadow-xl"
+      className="pointer-events-auto absolute bottom-[84px] right-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-[#0D0D0D] text-white shadow-[0_10px_28px_rgba(0,0,0,0.28)] active:scale-95"
       aria-label="기록하고 말하기"
     >
       {fabOpen ? <X size={24} /> : <Plus size={26} />}
